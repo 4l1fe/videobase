@@ -1,21 +1,13 @@
 # coding: utf-8
 
-"""
-Django settings for videobase project.
-
-For more information on this file, see
-https://docs.djangoproject.com/en/1.6/topics/settings/
-
-For the full list of settings and their values, see
-https://docs.djangoproject.com/en/1.6/ref/settings/
-"""
-
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 #from ConfigParser import RawConfigParser
 
 BASE_PATH = os.path.dirname(__file__)
 BASE_DIR = os.path.dirname(BASE_PATH)
+
+STATIC_PATH = os.path.join(BASE_PATH, '..', 'static')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
@@ -34,7 +26,6 @@ ADMIN_MEDIA_PREFIX = '/media/'
 
 
 # Application definition
-
 INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.auth',
@@ -44,6 +35,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'south',
     'apps.users',
+    'apps.robots',
     'films',
 )
 
@@ -100,4 +92,5 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
 STATIC_URL = '/static/'
+
 SITE_ID = 1
