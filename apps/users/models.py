@@ -154,8 +154,8 @@ class PersonsExtras(models.Model):
 
 
 #############################################################################################################
-# Персоны
-class Persons(models.Model):
+# Таблица связи Пользователей и Персон
+class UsersPersons(models.Model):
     user       = models.ForeignKey(max_length=255, verbose_name=u'Пользователи')
     person     = models.ForeignKey(max_length=255, verbose_name=u'Персона')
     upstatus   = models.IntegerField(verbose_name=u'Статус')
