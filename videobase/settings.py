@@ -1,3 +1,5 @@
+# coding: utf-8
+
 """
 Django settings for videobase project.
 
@@ -40,7 +42,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-   # 'south',
+    'south',
     'apps.users',
 )
 
@@ -73,6 +75,12 @@ DATABASES = {
     }
 }
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    }
+}
+
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
 
@@ -91,3 +99,4 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
 STATIC_URL = '/static/'
+SITE_ID = 1

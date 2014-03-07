@@ -3,8 +3,13 @@
 from django.contrib import admin
 from models import *
 
-# Register your models here.
+#############################################################################################################
+# Администрирование пользователей
 class UsersAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('id', 'firstname', 'firstname', 'email', 'created', 'ustatus')
+    list_per_page = 30
 
+
+#############################################################################################################
+# Регистрация моделей в админке
 admin.site.register(Users, UsersAdmin)
