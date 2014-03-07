@@ -26,19 +26,6 @@ class Users(models.Model):
 
 
 
-class UsersFilms(models.Model):
-    users_id = models.ForeignKey(Users,verbose_name =u'Идентификатор пользоваля')
-    films_id = models.ForeignKey(Films)
-    ufStatus = models.IntegerField(verbose_name = u'Статус фильма с т.з. пользователя')
-    ufRating = models.IntegerField(verbose_name = u'Рейтинг фильма поставленный пользователем')
-    subscribed = models.IntegerField(verbose_name = u'Статус подписки')
-
-    def __unicode__(self):
-        return u'[%s] %s %s' % (self.pk, self.users_id,self.films_id, self.ufStatus,self.ufRating, self.lastname)
-
-    class  Meta(object):
-        verbose_name = u"Связь Фильм-Пользователь"
-
 class Films(models.Model):
     name = models.CharField(max_length = 255, verbose_name = u'Название фильма')
     ftype = models.CharField(max_length = 255, verbose_name = u'Жанр')
@@ -52,7 +39,7 @@ class Films(models.Model):
     rating_kinopoisk = models.PositiveSmallIntegerField(verbose_name = u'Рейтинг фильма на сайте kinopoisk.ru')
     rating_kinopoisk_cnt = models.PositiveSmallIntegerField(verbose_name = u'Количество пользователей kinopoisk.ru оценивших этот фильм')
     seasons_cnt=models.PositiveSmallIntegerField(verbose_name = u'Количество сезонов')
-    name_org = models.CharField(verbose_name = u'Оригинальное название фильма')
+    name_orig = models.CharField(max_length = 255,verbose_name = u'Оригинальное название фильма')
     poster_id = models.IntegerField(verbose_name = u'Идентификатор постера')
 
 
@@ -60,8 +47,23 @@ class Films(models.Model):
         return u' [%s] %s' % (self.pk, self.name)
 
 
+    class  Meta(object):
+        verbose_name = u"Фильм"
+        verbose_name_plural = u"Фильмы"
         
 
+class UsersFilms(models.Model):
+    users_id = models.ForeignKey(Users,verbose_name =u'Идентификатор пользоваля')
+    films_id = models.ForeignKey(Films)
+    ufStatus = models.IntegerField(verbose_name = u'Статус фильма с т.з. пользователя')
+    ufRating = models.IntegerField(verbose_name = u'Рейтинг фильма поставленный пользователем')
+    subscribed = models.IntegerField(verbose_name = u'Статус подписки')
+
+    def __unicode__(self):
+        return u'[%s] %s %s' % (self.pk, self.users_id,self.films_id, self.ufStatus,self.ufRating, self.lastname)
+
+    class  Meta(object):
+        verbose_name = u"Связь Фильм-Пользователь"
     
     
     
