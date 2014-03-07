@@ -44,6 +44,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'south',
     'apps.users',
+    'films',
 )
 
 MIDDLEWARE_CLASSES = (

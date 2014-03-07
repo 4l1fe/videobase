@@ -9,13 +9,9 @@ class UsersAdmin(admin.ModelAdmin):
     list_display = ('id', 'firstname', 'firstname', 'email', 'created', 'ustatus')
     list_per_page = 30
 
-class FilmsAdmin(admin.ModelAdmin):
-    pass
-
-    
+   
 #############################################################################################################
 # Регистрация моделей в админке
 admin.site.register(Users, UsersAdmin)
-admin.site.register(Films, FilmsAdmin)
 
 

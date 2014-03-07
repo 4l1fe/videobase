@@ -26,46 +26,6 @@ class Users(models.Model):
 
 
 
-class Films(models.Model):
-    name = models.CharField(max_length = 255, verbose_name = u'Название фильма')
-    ftype = models.CharField(max_length = 255, verbose_name = u'Жанр')
-    fReleaseDate = models.DateTimeField(verbose_name =u'Дата выхода')
-    fMonth = models.PositiveSmallIntegerField(verbose_name = u'Месяц (возможно стоит изменить описание)')
-    description = models.TextField(verbose_name = u'Описание фильма')
-    rating_local = models.PositiveSmallIntegerField(verbose_name = u'Рейтинг фильма по мнению пользователей нашего сайта')
-    rating_local_cnt = models.PositiveSmallIntegerField(verbose_name = u'Количество пользователей нашего сайта оценивших фильм')
-    rating_imdb = models.PositiveSmallIntegerField(verbose_name = u'Рейтинг фильма на сайте imdb.com')
-    rating_imdb_cnt = models.IntegerField(verbose_name = u'Количество пользователей imdb.com оценивших этот фильм')
-    rating_kinopoisk = models.PositiveSmallIntegerField(verbose_name = u'Рейтинг фильма на сайте kinopoisk.ru')
-    rating_kinopoisk_cnt = models.PositiveSmallIntegerField(verbose_name = u'Количество пользователей kinopoisk.ru оценивших этот фильм')
-    seasons_cnt=models.PositiveSmallIntegerField(verbose_name = u'Количество сезонов')
-    name_orig = models.CharField(max_length = 255,verbose_name = u'Оригинальное название фильма')
-    poster_id = models.IntegerField(verbose_name = u'Идентификатор постера')
-
-
-    def __unicode__(self):
-        return u' [%s] %s' % (self.pk, self.name)
-
-
-    class  Meta(object):
-        verbose_name = u"Фильм"
-        verbose_name_plural = u"Фильмы"
-        
-
-class UsersFilms(models.Model):
-    users_id = models.ForeignKey(Users,verbose_name =u'Идентификатор пользоваля')
-    films_id = models.ForeignKey(Films)
-    ufStatus = models.IntegerField(verbose_name = u'Статус фильма с т.з. пользователя')
-    ufRating = models.IntegerField(verbose_name = u'Рейтинг фильма поставленный пользователем')
-    subscribed = models.IntegerField(verbose_name = u'Статус подписки')
-
-    def __unicode__(self):
-        return u'[%s] %s %s' % (self.pk, self.users_id,self.films_id, self.ufStatus,self.ufRating, self.lastname)
-
-    class  Meta(object):
-        verbose_name = u"Связь Фильм-Пользователь"
-    
-    
     
 
 
