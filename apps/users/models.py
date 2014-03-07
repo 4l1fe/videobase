@@ -34,3 +34,79 @@ class Users(models.Model):
         db_table = 'users'
         verbose_name = u'Пользователь'
         verbose_name_plural = u'Пользователи'
+
+
+#############################################################################################################
+# Запросы пользователей
+class UsersRequests(models.Model):
+    user    = models.ForeignKey(Users, verbose_name=u'Пользователи')
+    hash    = models.IntegerField(verbose_name=u'Запрос')
+    created = models.DateTimeField(auto_now_add=True, editable=False, verbose_name=u'Дата создания')
+    rtype   = models.CharField(max_length=255, verbose_name=u'Тип запроса')
+    value   = models.CharField(max_length=255, verbose_name=u'Значение запроса')
+
+    def __unicode__(self):
+        return u'[%s] %s' % (self.pk, self.user.name)
+
+    class Meta:
+        # Имя таблицы в БД
+        db_table = 'users_requests'
+        verbose_name = u'Запросы пользователя'
+        verbose_name_plural = u'Запросы пользователей'
+
+
+#############################################################################################################
+# Лог пользователей
+class UsersLog(models.Model):
+    user    = models.ForeignKey(Users, verbose_name=u'Пользователи')
+    created = models.DateTimeField(auto_now_add=True, editable=False, verbose_name=u'Дата создания')
+    itype   = models.CharField(max_length=255, verbose_name=u'Тип')
+    iobject = models.CharField(max_length=255, verbose_name=u'Объект')
+    itext   = models.CharField(max_length=255, verbose_name=u'Текст')
+
+    def __unicode__(self):
+        return u'[%s] %s' % (self.pk, self.user.name)
+
+    class Meta:
+        # Имя таблицы в БД
+        db_table = 'users_logs'
+        verbose_name = u'Лог пользователя'
+        verbose_name_plural = u'Логи пользователей'
+
+
+#############################################################################################################
+# Картинки пользователей
+class UsersPics(models.Model):
+    user = models.ForeignKey(Users, verbose_name=u'Пользователи')
+    url  = models.CharField(max_length=255, verbose_name=u'Url')
+
+
+    def __unicode__(self):
+        return u'[%s] %s' % (self.pk, self.user.name)
+
+    class Meta:
+        # Имя таблицы в БД
+        db_table = 'users_pics'
+        verbose_name = u'Картинки пользователя'
+        verbose_name_plural = u'Картинки пользователей'
+
+
+#############################################################################################################
+# Социальность пользователей
+class UsersSocial(models.Model):
+    user    = models.ForeignKey(Users, verbose_name=u'Пользователи')
+    stype   = models.CharField(max_length=255, verbose_name=u'')
+    stoken  = models.CharField(max_length=255, verbose_name=u'')
+    suserid = models.IntegerField(verbose_name=u'')
+    created = models.DateTimeField(auto_now_add=True, editable=False, verbose_name=u'Дата создания')
+    sphoto  = models.IntegerField(verbose_name=u'')
+
+
+    def __unicode__(self):
+        return u'[%s] %s - %s' % (self.pk, self.user.name, self.stoken)
+
+    class Meta:
+        # Имя таблицы в БД
+        db_table = 'users_socials'
+        verbose_name = u'Социальность пользователя'
+        verbose_name_plural = u'Социальность пользователей'

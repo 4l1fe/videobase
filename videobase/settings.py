@@ -34,7 +34,6 @@ ADMIN_MEDIA_PREFIX = '/media/'
 
 
 # Application definition
-
 INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.auth',
