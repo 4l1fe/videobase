@@ -36,6 +36,7 @@ INSTALLED_APPS = (
     'south',
     'apps.users',
     'apps.robots',
+    'films',
 )
 
 MIDDLEWARE_CLASSES = (
