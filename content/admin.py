@@ -1,34 +1,22 @@
 from django.contrib import admin
-from films import Countries, Genres, Films, UserFilms, FilmExtras, Seasons
-# Register your models here.
+from content.models import Content,Locations,Comments
 
 
-class CountriesAdmin(admin.ModelAdmin):
+class ContentAdmin(admin.ModelAdmin):
     pass
-    
-class GenresAdmin(admin.ModelAdmin):
-    pass
-    
-class FilmsAdmin(admin.ModelAdmin):
-    pass
-    
-class FilmAdmin(admin.ModelAdmin):
-    pass
-    
-class UserFilmsAdmin(admin.ModelAdmin):
-    pass
-    
-class FilmExtrasAdmin(admin.ModelAdmin):
-    pass
-    
-class SeasonsAdmin(admin.ModelAdmin):
-    pass
-    
 
-admin.site.register(Countries,CountriesAdmin)
-admin.site.register(Genres,GenresAdmin)
-admin.site.register(Films,FilmsAdmin)
-admin.site.register(UserFilms,UserFilmsAdmin)
-admin.site.register(FilmExtras,FilmExtrasAdmin)
-admin.site.register(Seasons SeasonsAdmin)
+class LocationsAdmin(admin.ModelAdmin):
+    pass
+
+class CommentsAdmin(admin.ModelAdmin):
+    pass
+
+admin.site.register(Content, ContentAdmin)
+admin.site.register(Locations, LocationsAdmin)
+admin.site.register(Comments, CommentsAdmin)
+
+        
+        
+
+
 
