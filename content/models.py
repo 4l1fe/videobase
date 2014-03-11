@@ -1,4 +1,4 @@
-# coding: utf-8
+1# coding: utf-8
 
 from django.db import models
 
@@ -10,23 +10,6 @@ from apps.films.models import Films,Seasons
 class Content(models.Model):
 
     """
-    film_id
-
-    name str
-    name_orig
-
-    sNumber sint
-
-    description
-    ReleaseDate
-
-    seasonid nullable id
-
-    viewer count integer
-
-    viewer_lastweek_cnt
-    viewed_lastmonth_cnt
-
     """
 
     Film_id = models.ForeignKey(Films)
@@ -41,18 +24,14 @@ class Content(models.Model):
     viewer_cnt = models.IntegerField(verbose_name =u'Количество посмотревших за все время')
     viewer_lastweek_cnt = models.IntegerField(verbose_name =u'Количество посмотревших за последнюю неделю')
     viewer_lastmonth_cnt = models.IntegerField(verbose_name =u'Количество посмотревших за последний месяц')
+
+    class Meta:
+        verbose_name = u'Место'
+        verbose_name_plural = u'Места'
+
     
 class Locations(models.Model):
     '''
-    content_id
-
-    lType str
-    lang str
-    quality str
-    subtitles str
-    price float
-    price_type str
-    value str
     '''
 
     
@@ -64,15 +43,21 @@ class Locations(models.Model):
     price_type = models.CharField(max_length=40,verbose_name =u'Тип цены')
     value = models.CharField(max_length=40,verbose_name =u'Ценность')
     
+    class Meta:
+        verbose_name = u'Место'
+        verbose_name_plural = u'Места'
 
 
 class Comments(models.Model):
 
     User_id = models.ForeignKey(Users)
-    Content_id = IntegerField(verbose_name =u'')
-    cText = TextField(verbose_name =u'')
-    parent_id = IntegerField(verbose_name =u'')
-    cStatus = CharField(max_length=40,verbose_name =u'')
-    created = DateTimeField(auto_now_add=True,verbose_name =u'')
+    Content_id = IntegerField()
+    cText = TextField(verbose_name =u'Tекст комментария')
+    parent_id = IntegerField(verbose_name =u'Родительский комментарий')
+    cStatus = CharField(max_length=40,verbose_name =u'Статус')
+    created = DateTimeField(auto_now_add=True,verbose_name =u'Создан')
     
-    
+    class Meta:
+        verbose_name = u'Комментарий'
+        verbose_name_plural = u'Комментарии'
+        
