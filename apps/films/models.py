@@ -53,7 +53,7 @@ class Films(models.Model):
     rating_kinopoisk_cnt = models.PositiveSmallIntegerField(verbose_name=u'Количество пользователей kinopoisk.ru оценивших этот фильм')
     seasons_cnt = models.PositiveSmallIntegerField(verbose_name=u'Количество сезонов')
     name_orig   = models.CharField(max_length=255,verbose_name=u'Оригинальное название фильма')
-    poster_id   = models.IntegerField(verbose_name=u'Идентификатор постера')
+    poster      = models.ForeignKey(FilmExtras,verbose_name=u'Идентификатор постера')
     countries   = models.ManyToManyField(Countries, verbose_name=u'Страны производители', related_name='countries')
     genres      = models.ManyToManyField(Countries, verbose_name=u'Жанры', related_name="genres")
 
