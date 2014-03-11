@@ -29,6 +29,7 @@ class Films(models.Model):
     name = models.CharField(max_length = 255, verbose_name = u'Название фильма')
     ftype = models.CharField(max_length = 255, verbose_name = u'Жанр')
     fReleaseDate = models.DateTimeField(verbose_name =u'Дата выхода')
+    fMonth = models.PositiveSmallIntegerField(verbose_name = u'Месяц (возможно стоит изменить описание)')
     description = models.TextField(verbose_name = u'Описание фильма')
     rating_local = models.PositiveSmallIntegerField(verbose_name = u'Рейтинг фильма по мнению пользователей нашего сайта')
     rating_local_cnt = models.PositiveSmallIntegerField(verbose_name = u'Количество пользователей нашего сайта оценивших фильм')

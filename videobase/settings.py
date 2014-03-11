@@ -2,12 +2,13 @@
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
-#from ConfigParser import RawConfigParser
+from ConfigParser import RawConfigParser
 
 BASE_PATH = os.path.dirname(__file__)
 BASE_DIR = os.path.dirname(BASE_PATH)
 
 STATIC_PATH = os.path.join(BASE_PATH, '..', 'static')
+CONFIGS_PATH = os.path.join(BASE_PATH, '..', 'configs')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
@@ -60,11 +61,17 @@ WSGI_APPLICATION = 'videobase.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
+dbconf = RawConfigParser()
+dbconf.read(CONFIGS_PATH + '/db.ini')
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE':   dbconf.get('database', 'DATABASE_ENGINE'),
+        'HOST':     dbconf.get('database', 'DATABASE_HOST'),
+        'NAME':     dbconf.get('database', 'DATABASE_NAME'),
+        'USER':     dbconf.get('database', 'DATABASE_USER'),
+        'PASSWORD': dbconf.get('database', 'DATABASE_PASSWORD'),
+        'PORT':     dbconf.get('database', 'DATABASE_PORT')
     }
 }
 
