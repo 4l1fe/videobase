@@ -37,7 +37,27 @@ class Genres(models.Model):
         verbose_name = u'Жанр'
         verbose_name_plural = u'Жанры'
 
+#############################################################################################################
+#
+class FilmExtras(models.Model):
+    film        = models.ForeignKey(Films, verbose_name=u'Фильм')
+    eType       = models.CharField(max_length=255, verbose_name=u'Тип дополнительного материала')
+    name        = models.CharField(max_length=255, verbose_name=u'Название')
+    name_orig   = models.CharField(max_length=255, verbose_name=u'Оригинальное название')
+    description = models.TextField(verbose_name=u'Описание')
+    url         = models.URLField(max_length=255, verbose_name=u'Оригинальное название')
 
+
+    def __unicode__(self):
+        return u' [%s] %s' % (self.pk, self.name)
+
+    class  Meta(object):
+        # Имя таблицы в БД
+        db_table = 'films_extras'
+        verbose_name = u'Дополнительный материал'
+        verbose_name_plural = u'Дополнительные материалы'
+
+        
 #############################################################################################################
 #
 class Films(models.Model):
@@ -53,7 +73,6 @@ class Films(models.Model):
     rating_kinopoisk_cnt = models.PositiveSmallIntegerField(verbose_name=u'Количество пользователей kinopoisk.ru оценивших этот фильм')
     seasons_cnt = models.PositiveSmallIntegerField(verbose_name=u'Количество сезонов')
     name_orig   = models.CharField(max_length=255,verbose_name=u'Оригинальное название фильма')
-    poster      = models.ForeignKey(FilmExtras,verbose_name=u'Идентификатор постера')
     countries   = models.ManyToManyField(Countries, verbose_name=u'Страны производители', related_name='countries')
     genres      = models.ManyToManyField(Countries, verbose_name=u'Жанры', related_name="genres")
 
@@ -86,25 +105,6 @@ class UsersFilms(models.Model):
         verbose_name = u'Связь Фильм-Пользователь'
 
 
-#############################################################################################################
-#
-class FilmExtras(models.Model):
-    film        = models.ForeignKey(Films, verbose_name=u'Фильм')
-    eType       = models.CharField(max_length=255, verbose_name=u'Тип дополнительного материала')
-    name        = models.CharField(max_length=255, verbose_name=u'Название')
-    name_orig   = models.CharField(max_length=255, verbose_name=u'Оригинальное название')
-    description = models.TextField(verbose_name=u'Описание')
-    url         = models.URLField(max_length=255, verbose_name=u'Оригинальное название')
-
-
-    def __unicode__(self):
-        return u' [%s] %s' % (self.pk, self.name)
-
-    class  Meta(object):
-        # Имя таблицы в БД
-        db_table = 'films_extras'
-        verbose_name = u'Дополнительный материал'
-        verbose_name_plural = u'Дополнительные материалы'
 
 
 #############################################################################################################
