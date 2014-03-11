@@ -4,15 +4,6 @@ from django.db import models
 from .constants import *
 
 
-
-
-
-
-
-
-
-
-
 #############################################################################################################
 # Пользователи
 class Users(models.Model):
@@ -135,7 +126,7 @@ class Persons(models.Model):
 #############################################################################################################
 # Расширения персоны
 class PersonsExtras(models.Model):
-    person      = models.ForeignKey(max_length=255, verbose_name=u'Персона')
+    person      = models.ForeignKey(Persons, max_length=255, verbose_name=u'Персона')
     etype       = models.CharField(max_length=255, verbose_name=u'')
     name        = models.TextField(verbose_name=u'Имя')
     name_orig   = models.TextField(verbose_name=u'Оригинальное имя')
@@ -156,8 +147,8 @@ class PersonsExtras(models.Model):
 #############################################################################################################
 # Таблица связи Пользователей и Персон
 class UsersPersons(models.Model):
-    user       = models.ForeignKey(max_length=255, verbose_name=u'Пользователи')
-    person     = models.ForeignKey(max_length=255, verbose_name=u'Персона')
+    user       = models.ForeignKey(Users, max_length=255, verbose_name=u'Пользователи')
+    person     = models.ForeignKey(Persons, max_length=255, verbose_name=u'Персона')
     upstatus   = models.IntegerField(verbose_name=u'Статус')
     subscribed = models.IntegerField(verbose_name=u'Подписка')
 
@@ -168,5 +159,5 @@ class UsersPersons(models.Model):
     class Meta:
         # Имя таблицы в БД
         db_table = 'userspersons'
-        verbose_name = u''
-        verbose_name_plural = u''
+        verbose_name = u'Расширения персоны'
+        verbose_name_plural = u'Расширения персон'

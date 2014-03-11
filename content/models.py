@@ -1,8 +1,10 @@
 # coding: utf-8
 
 from django.db import models
+
 from app.users import Users
-from films.models import Films,Seasons
+from apps.films.models import Films,Seasons
+
 # Create your models here.
 
 class Content(models.Model):

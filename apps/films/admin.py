@@ -1,5 +1,7 @@
 from django.contrib import admin
-from models import Films, Countries, Genres,Seasons
+
+from apps.films.models import Films, Countries, Genres,Seasons
+
 
 
 
