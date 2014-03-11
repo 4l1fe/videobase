@@ -139,7 +139,7 @@ class PersonsExtras(models.Model):
 
     class Meta:
         # Имя таблицы в БД
-        db_table = 'persons-extras'
+        db_table = 'persons_extras'
         verbose_name = u'Расширения персоны'
         verbose_name_plural = u'Расширения персон'
 
@@ -158,6 +158,6 @@ class UsersPersons(models.Model):
 
     class Meta:
         # Имя таблицы в БД
-        db_table = 'userspersons'
+        db_table = 'users_persons'
         verbose_name = u'Расширения персоны'
         verbose_name_plural = u'Расширения персон'
