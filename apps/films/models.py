@@ -43,7 +43,7 @@ class Genres(models.Model):
 class Films(models.Model):
     name             = models.CharField(max_length=255, verbose_name=u'Название фильма')
     ftype = models.CharField(max_length = 255, verbose_name = u'Жанр', choices = [(u'Полнометражный фильм', u'Полнометражный фильм'), (u'Сериал',u'Сериал')])
-    fReleaseDate     = models.DateTimeField(verbose_name=u'Дата выхода')
+    fReleaseDate     = models.DateField(verbose_name=u'Дата выхода')
     description      = models.TextField(verbose_name=u'Описание фильма')
     rating_local     = models.PositiveSmallIntegerField(verbose_name=u'Рейтинг фильма по мнению пользователей нашего сайта')
     rating_local_cnt = models.PositiveSmallIntegerField(verbose_name=u'Количество пользователей нашего сайта оценивших фильм')
