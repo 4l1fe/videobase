@@ -109,7 +109,7 @@ class FilmExtras(models.Model):
 #############################################################################################################
 #
 class Seasons(models.Model):
-    film         = models.ForeignKey(Filmsverbose_name=u'Фильмы')
+    film         = models.ForeignKey(Films, verbose_name=u'Фильмы')
     sReleaseDate = models.DateTimeField(verbose_name=u'Дата выхода сезона')
     series_cnt   = models.PositiveSmallIntegerField(verbose_name=u'Количество серий в сезоне')
     description  = models.TextField(verbose_name=u'Описание сезона')
