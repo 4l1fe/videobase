@@ -25,38 +25,9 @@ class Genres(models.Model):
     name         = models.CharField(max_length=255, verbose_name=u'Название жанра')
     description  = models.TextField(verbose_name=u'Описание жанра')
 
-<<<<<<< HEAD
-    name = models.CharField(max_length =255, verbose_name =u"Название жанра")
-    description  = models.TextField(verbose_name = u"Описание жанра")
-
     class  Meta(object):
         verbose_name = u"Жанр"
         verbose_name_plural = u"Жанры"
-    def __unicode__(self):
-        return u' [%s] %s' % (self.pk, self.name)
-
-class Films(models.Model):
-    name = models.CharField(max_length = 255, verbose_name = u'Название фильма')
-    ftype = models.CharField(max_length = 255, verbose_name = u'Жанр', choices = [(u'Полнометражный фильм', u'Полнометражный фильм'), (u'Сериал',u'Сериал')])
-    fReleaseDate = models.DateField(verbose_name =u'Дата выхода')
-    description = models.TextField(verbose_name = u'Описание фильма')
-    rating_local = models.PositiveSmallIntegerField(verbose_name = u'Рейтинг фильма по мнению пользователей нашего сайта')
-    rating_local_cnt = models.PositiveSmallIntegerField(verbose_name = u'Количество пользователей нашего сайта оценивших фильм')
-    rating_imdb = models.PositiveSmallIntegerField(verbose_name = u'Рейтинг фильма на сайте imdb.com')
-    rating_imdb_cnt = models.IntegerField(verbose_name = u'Количество пользователей imdb.com оценивших этот фильм')
-    rating_kinopoisk = models.PositiveSmallIntegerField(verbose_name = u'Рейтинг фильма на сайте kinopoisk.ru')
-    rating_kinopoisk_cnt = models.PositiveSmallIntegerField(verbose_name = u'Количество пользователей kinopoisk.ru оценивших этот фильм')
-    seasons_cnt=models.PositiveSmallIntegerField(verbose_name = u'Количество сезонов')
-    name_orig = models.CharField(max_length = 255,verbose_name = u'Оригинальное название фильма')
-    poster_id = models.IntegerField(verbose_name = u'Идентификатор постера')
-
-    countries = models.ManyToManyField(Countries, verbose_name = u'Страны производители', related_name ='countries')
-    genres = models.ManyToManyField(Genres, verbose_name = u'Жанры', related_name = "genres")
-
-
-    
-=======
-
     def __unicode__(self):
         return u' [%s] %s' % (self.pk, self.name)
 
@@ -71,7 +42,7 @@ class Films(models.Model):
 #
 class Films(models.Model):
     name             = models.CharField(max_length=255, verbose_name=u'Название фильма')
-    ftype            = models.CharField(max_length=255, verbose_name=u'Жанр')
+    ftype = models.CharField(max_length = 255, verbose_name = u'Жанр', choices = [(u'Полнометражный фильм', u'Полнометражный фильм'), (u'Сериал',u'Сериал')])
     fReleaseDate     = models.DateTimeField(verbose_name=u'Дата выхода')
     description      = models.TextField(verbose_name=u'Описание фильма')
     rating_local     = models.PositiveSmallIntegerField(verbose_name=u'Рейтинг фильма по мнению пользователей нашего сайта')
@@ -86,8 +57,6 @@ class Films(models.Model):
     countries   = models.ManyToManyField(Countries, verbose_name=u'Страны производители', related_name='countries')
     genres      = models.ManyToManyField(Countries, verbose_name=u'Жанры', related_name="genres")
 
-
->>>>>>> f744b84e87e76ec37a81db830f2e6178522652d7
     def __unicode__(self):
         return u' [%s] %s' % (self.pk, self.name)
 
