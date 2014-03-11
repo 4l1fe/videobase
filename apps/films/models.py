@@ -2,8 +2,6 @@
 from django.db import models
 from apps.users.models import Users
 
-
-
 class Countries(models.Model):
     name = models.CharField(max_length = 255, verbose_name = u'Русское название страны')
     name_orig = models.CharField(max_length =255, verbose_name = u'Название страны на ее языке')
@@ -11,8 +9,6 @@ class Countries(models.Model):
 
     def __unicode__(self):
         return u' [%s] %s' % (self.pk, self.name)
-
-    
     class  Meta(object):
         verbose_name = u"Страна"
         verbose_name_plural = u"Страны"
@@ -26,17 +22,13 @@ class Genres(models.Model):
     class  Meta(object):
         verbose_name = u"Жанр"
         verbose_name_plural = u"Жанры"
-
     def __unicode__(self):
         return u' [%s] %s' % (self.pk, self.name)
 
-
-
 class Films(models.Model):
     name = models.CharField(max_length = 255, verbose_name = u'Название фильма')
-    ftype = models.CharField(max_length = 255, verbose_name = u'Жанр')
-    fReleaseDate = models.DateTimeField(verbose_name =u'Дата выхода')
-    fMonth = models.PositiveSmallIntegerField(verbose_name = u'Месяц (возможно стоит изменить описание)')
+    ftype = models.CharField(max_length = 255, verbose_name = u'Жанр', choices = [(u'Полнометражный фильм', u'Полнометражный фильм'), (u'Сериал',u'Сериал')])
+    fReleaseDate = models.DateField(verbose_name =u'Дата выхода')
     description = models.TextField(verbose_name = u'Описание фильма')
     rating_local = models.PositiveSmallIntegerField(verbose_name = u'Рейтинг фильма по мнению пользователей нашего сайта')
     rating_local_cnt = models.PositiveSmallIntegerField(verbose_name = u'Количество пользователей нашего сайта оценивших фильм')
@@ -49,7 +41,7 @@ class Films(models.Model):
     poster_id = models.IntegerField(verbose_name = u'Идентификатор постера')
 
     countries = models.ManyToManyField(Countries, verbose_name = u'Страны производители', related_name ='countries')
-    genres = models.ManyToManyField(Countries, verbose_name = u'Жанры', related_name = "genres")
+    genres = models.ManyToManyField(Genres, verbose_name = u'Жанры', related_name = "genres")
 
 
     
@@ -70,7 +62,7 @@ class UsersFilms(models.Model):
     subscribed = models.IntegerField(verbose_name = u'Статус подписки')
 
     def __unicode__(self):
-        return u'[%s] %s %s' % (self.pk, self.users_id,self.films_id, self.ufStatus,self.ufRating, self.lastname)
+        return u'[%s] %s %s %s' % (self.pk, self.users_id, self.films_id, self.ufStatus)
 
     class  Meta(object):
         verbose_name = u"Связь Фильм-Пользователь"
