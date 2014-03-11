@@ -37,26 +37,6 @@ class Genres(models.Model):
         verbose_name = u'Жанр'
         verbose_name_plural = u'Жанры'
 
-#############################################################################################################
-#
-class FilmExtras(models.Model):
-    film        = models.ForeignKey(Films, verbose_name=u'Фильм')
-    eType       = models.CharField(max_length=255, verbose_name=u'Тип дополнительного материала')
-    name        = models.CharField(max_length=255, verbose_name=u'Название')
-    name_orig   = models.CharField(max_length=255, verbose_name=u'Оригинальное название')
-    description = models.TextField(verbose_name=u'Описание')
-    url         = models.URLField(max_length=255, verbose_name=u'Оригинальное название')
-
-
-    def __unicode__(self):
-        return u' [%s] %s' % (self.pk, self.name)
-
-    class  Meta(object):
-        # Имя таблицы в БД
-        db_table = 'films_extras'
-        verbose_name = u'Дополнительный материал'
-        verbose_name_plural = u'Дополнительные материалы'
-
         
 #############################################################################################################
 #
@@ -85,7 +65,27 @@ class Films(models.Model):
         verbose_name = u'Фильм'
         verbose_name_plural = u'Фильмы'
 
+#############################################################################################################
+#
+class FilmExtras(models.Model):
+    film        = models.ForeignKey(Films, verbose_name=u'Фильм')
+    eType       = models.CharField(max_length=255, verbose_name=u'Тип дополнительного материала')
+    name        = models.CharField(max_length=255, verbose_name=u'Название')
+    name_orig   = models.CharField(max_length=255, verbose_name=u'Оригинальное название')
+    description = models.TextField(verbose_name=u'Описание')
+    url         = models.URLField(max_length=255, verbose_name=u'Оригинальное название')
 
+
+    def __unicode__(self):
+        return u' [%s] %s' % (self.pk, self.name)
+
+    class  Meta(object):
+        # Имя таблицы в БД
+        db_table = 'films_extras'
+        verbose_name = u'Дополнительный материал'
+        verbose_name_plural = u'Дополнительные материалы'
+
+        
 #############################################################################################################
 #
 class UsersFilms(models.Model):
@@ -103,8 +103,6 @@ class UsersFilms(models.Model):
         # Имя таблицы в БД
         db_table = 'users_films'
         verbose_name = u'Связь Фильм-Пользователь'
-
-
 
 
 #############################################################################################################
@@ -125,3 +123,4 @@ class Seasons(models.Model):
         db_table = 'seasons'
         verbose_name = u'Сезон'
         verbose_name_plural = u'Сезоны'
+        
