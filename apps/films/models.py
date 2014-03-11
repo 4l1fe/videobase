@@ -37,13 +37,13 @@ class Genres(models.Model):
         verbose_name = u'Жанр'
         verbose_name_plural = u'Жанры'
 
-
+        
 #############################################################################################################
 #
 class Films(models.Model):
     name             = models.CharField(max_length=255, verbose_name=u'Название фильма')
     ftype = models.CharField(max_length = 255, verbose_name = u'Жанр', choices = [(u'Полнометражный фильм', u'Полнометражный фильм'), (u'Сериал',u'Сериал')])
-    fReleaseDate     = models.DateTimeField(verbose_name=u'Дата выхода')
+    fReleaseDate     = models.DateField(verbose_name=u'Дата выхода')
     description      = models.TextField(verbose_name=u'Описание фильма')
     rating_local     = models.PositiveSmallIntegerField(verbose_name=u'Рейтинг фильма по мнению пользователей нашего сайта')
     rating_local_cnt = models.PositiveSmallIntegerField(verbose_name=u'Количество пользователей нашего сайта оценивших фильм')
@@ -53,7 +53,6 @@ class Films(models.Model):
     rating_kinopoisk_cnt = models.PositiveSmallIntegerField(verbose_name=u'Количество пользователей kinopoisk.ru оценивших этот фильм')
     seasons_cnt = models.PositiveSmallIntegerField(verbose_name=u'Количество сезонов')
     name_orig   = models.CharField(max_length=255,verbose_name=u'Оригинальное название фильма')
-    poster_id   = models.IntegerField(verbose_name=u'Идентификатор постера')
     countries   = models.ManyToManyField(Countries, verbose_name=u'Страны производители', related_name='countries')
     genres      = models.ManyToManyField(Countries, verbose_name=u'Жанры', related_name="genres")
 
@@ -65,26 +64,6 @@ class Films(models.Model):
         db_table = 'films'
         verbose_name = u'Фильм'
         verbose_name_plural = u'Фильмы'
-
-
-#############################################################################################################
-#
-class UsersFilms(models.Model):
-    users      = models.ForeignKey(Users, verbose_name=u'Идентификатор пользоваля')
-    films      = models.ForeignKey(Films, verbose_name=u'Фильм')
-    ufStatus   = models.IntegerField(verbose_name=u'Статус фильма с т.з. пользователя')
-    ufRating   = models.IntegerField(verbose_name=u'Рейтинг фильма поставленный пользователем')
-    subscribed = models.IntegerField(verbose_name=u'Статус подписки')
-
-    def __unicode__(self):
-
-        return u'[%s] %s %s' % (self.pk, self.users_id, self.films_id, self.ufStatus)
-
-    class  Meta(object):
-        # Имя таблицы в БД
-        db_table = 'users_films'
-        verbose_name = u'Связь Фильм-Пользователь'
-
 
 #############################################################################################################
 #
@@ -106,6 +85,25 @@ class FilmExtras(models.Model):
         verbose_name = u'Дополнительный материал'
         verbose_name_plural = u'Дополнительные материалы'
 
+        
+#############################################################################################################
+#
+class UsersFilms(models.Model):
+    users      = models.ForeignKey(Users, verbose_name=u'Идентификатор пользоваля')
+    films      = models.ForeignKey(Films, verbose_name=u'Фильм')
+    ufStatus   = models.IntegerField(verbose_name=u'Статус фильма с т.з. пользователя')
+    ufRating   = models.IntegerField(verbose_name=u'Рейтинг фильма поставленный пользователем')
+    subscribed = models.IntegerField(verbose_name=u'Статус подписки')
+
+    def __unicode__(self):
+
+        return u'[%s] %s %s' % (self.pk, self.users_id, self.films_id, self.ufStatus)
+
+    class  Meta(object):
+        # Имя таблицы в БД
+        db_table = 'users_films'
+        verbose_name = u'Связь Фильм-Пользователь'
+
 
 #############################################################################################################
 #
@@ -125,3 +123,4 @@ class Seasons(models.Model):
         db_table = 'seasons'
         verbose_name = u'Сезон'
         verbose_name_plural = u'Сезоны'
+        
