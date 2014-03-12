@@ -12,7 +12,7 @@ class Countries(models.Model):
     def __unicode__(self):
         return u' [%s] %s' % (self.pk, self.name)
 
-        
+
     class  Meta(object):
         # Имя таблицы в БД
         db_table = 'countries'
@@ -35,7 +35,7 @@ class Genres(models.Model):
         verbose_name = u'Жанр'
         verbose_name_plural = u'Жанры'
 
-        
+
 #############################################################################################################
 #
 class Films(models.Model):
@@ -67,11 +67,13 @@ class Films(models.Model):
 #
 class FilmExtras(models.Model):
     film        = models.ForeignKey(Films, verbose_name=u'Фильм')
-    eType       = models.CharField(max_length=255, verbose_name=u'Тип дополнительного материала')
+    eType       = models.CharField(max_length=255,
+                                   choices=TYPE_ADDITIONAL_MATERIAL,
+                                   verbose_name=u'Тип дополнительного материала')
     name        = models.CharField(max_length=255, verbose_name=u'Название')
     name_orig   = models.CharField(max_length=255, verbose_name=u'Оригинальное название')
     description = models.TextField(verbose_name=u'Описание')
-    url         = models.URLField(max_length=255, verbose_name=u'Оригинальное название')
+    url         = models.URLField(max_length=255, verbose_name=u'Ссылка на дополнительный материал')
 
 
     def __unicode__(self):
@@ -83,7 +85,7 @@ class FilmExtras(models.Model):
         verbose_name = u'Дополнительный материал'
         verbose_name_plural = u'Дополнительные материалы'
 
-        
+
 #############################################################################################################
 #
 class UsersFilms(models.Model):
