@@ -6,7 +6,14 @@ from .models import *
 #############################################################################################################
 # Администрирование роботов
 class RobotsAdmin(admin.ModelAdmin):
-    pass
+    def has_add_permission(self, request):
+        return False
+    def has_delete_permission(self, request):
+        return False
+
+    def __init__(self, *args, **kwargs):
+        super(RobotsAdmin, self).__init__(*args, **kwargs)
+        self.list_display_links = (None,)
 
 
 #############################################################################################################
