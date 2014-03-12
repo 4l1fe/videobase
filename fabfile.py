@@ -85,7 +85,13 @@ def delete_test_db():
         with settings(sudo_user = "postgres"):
             sudo('''echo "DROP DATABASE videobase_test;" | psql''')
 
-    
+def refresh_test_requirements():
+
+    with settings(sudo_user = "www-data"):
+        with cd('/var/www/videobase_test/'):
+            sudo('/home/virtualenv/videobase_test/bin/pip install -r requirements.txt')
+            
+
 def deploy():
 
     """
