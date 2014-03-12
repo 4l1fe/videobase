@@ -13,10 +13,9 @@ class Users(models.Model):
     passhash     = models.CharField(max_length=255, verbose_name=u'Пароль')
     last_visited = models.DateTimeField(verbose_name=u'Последний визит')
     created      = models.DateTimeField(auto_now_add=True, editable=False, verbose_name=u'Дата создания')
-    ustatus      = models.PositiveSmallIntegerField(verbose_name=u'Статус')
-    userpic_type = models.CharField(max_length=255, verbose_name=u'Тип картинки')
-    userpic_id   = models.IntegerField(verbose_name=u'ID картинки')
-
+    ustatus      = models.PositiveSmallIntegerField(choices=USER_STATUS, verbose_name=u'Статус')
+    userpic_type = models.CharField(choices=USER_PIC_TYPES, max_length=255, verbose_name=u'Тип картинки')
+    userpic   = models.ForeignKey('UsersPics', verbose_name=u'Аватар')
 
     def __unicode__(self):
         return u'[%s] %s %s' % (self.pk, self.firstname, self.lastname)
@@ -110,7 +109,7 @@ class Persons(models.Model):
     name      = models.CharField(max_length=255, verbose_name=u'Имя')
     name_orig = models.CharField(max_length=255, verbose_name=u'Оригинальное имя')
     bio       = models.TextField(verbose_name=u'Биография')
-    photo     = models.ImageField(upload_to=APP_PHOTO_DIR, blank=True, null=True, verbose_name=u'Фото')
+    photo     = models.ImageField(upload_to=PERSON_PHOTO_DIR, blank=True, null=True, verbose_name=u'Фото')
 
 
     def __unicode__(self):
