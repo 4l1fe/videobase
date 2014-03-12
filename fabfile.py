@@ -1,5 +1,6 @@
 # coding: utf-8
 from fabric.api import env,roles, run, settings, sudo, cd
+import fabric
 
 env.hosts = ['188.226.191.166',]
 env.user = 'root'
@@ -40,9 +41,11 @@ def deploy_test_code():
     """
     with settings(sudo_user = "www-data"):
         with cd('/var/www'):
-            print([s for s in str(sudo('ls -1')).strip().split('\r\n') if s=='videobase_test'])
-            if [s for s in str(sudo('ls -1')).strip().split('\r\n') if s=='videobase_test']:
 
+            result = str(sudo('ls -1')).strip()
+            filtered_array=[s for s in result.split('\r\n') if s=='videobase_test']
+            
+            if filtered_array:
                 sudo("cd videobase_test; git checkout configs/db.ini")
                 #sudo("cd videobase_test; cat configs/db.ini")
                 sudo('cd videobase_test;git pull')
@@ -85,7 +88,14 @@ def delete_test_db():
         with settings(sudo_user = "postgres"):
             sudo('''echo "DROP DATABASE videobase_test;" | psql''')
 
-    
+
+def refresh_test_requirements():
+
+    with settings(sudo_user = "www-data"):
+        with cd('/var/www/videobase_test/'):
+            sudo('/home/virtualenv/videobase_test/bin/pip install -r requirements.txt')
+            
+
 def deploy():
 
     """
@@ -104,7 +114,6 @@ def flush_test_db():
     delete_test_db()
     init_test_db()
     populate_test_db()
-    
 
 
 def init_if_not_exists_task():
@@ -117,6 +126,25 @@ def init_if_not_exists_task():
     
     with settings(sudo_user = "postgres"):
         with cd('/var/lib/postgresql'):
-            if not ((sudo('''echo "select rolname from pg_roles where rolname = 'pgadmin';" |psql -tA''')).strip()):
+            if not (str(sudo('''echo "select rolname from pg_roles where rolname = 'pgadmin';" |psql -tA''')).strip()):
                 init_db()
- 
+
+def status():
+
+    for k in fabric.state.output:
+        fabric.state.output[k] = False
+    fabric.state.output['user']=True
+        
+    with settings(warn_only=True):
+        print('SUPERVISOR \n')
+        print(run("supervisorctl status"))
+        print("\n NGINX \n")
+        print(run("ps aux |grep nginx"))
+
+        print("\nIs login page is shown on videobase.test.aaysm.com/admin  ? ")
+        print(bool(run('''wget -qO- --header="Host: videobase.test.aaysm.com" localhost:80/admin/ |grep Password | wc -l''')))
+        
+
+    for k in fabric.state.output:
+        fabric.state.output[k] = True
+    fabric.state.output['debug']=False
