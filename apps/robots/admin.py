@@ -12,8 +12,14 @@ class RobotsAdmin(admin.ModelAdmin):
 #############################################################################################################
 # Администрирование логирования роботов
 class RobotsLogAdmin(admin.ModelAdmin):
-    pass
+    def has_add_permission(self, request):
+        return False
+    def has_delete_permission(self, request):
+        return False
 
+    def __init__(self, *args, **kwargs):
+        super(RobotsLogAdmin, self).__init__(*args, **kwargs)
+        self.list_display_links = (None,)
 
 #############################################################################################################
 # Регистрация моделей в админке
