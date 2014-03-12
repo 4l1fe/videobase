@@ -23,7 +23,7 @@ TEMPLATE_DEBUG = DEBUG
 
 ALLOWED_HOSTS = ['*',]
 
-ADMIN_MEDIA_PREFIX = '/media/'
+# ADMIN_MEDIA_PREFIX = '/media/'
 
 
 # Application definition
@@ -58,9 +58,7 @@ ROOT_URLCONF = 'videobase.urls'
 
 WSGI_APPLICATION = 'videobase.wsgi.application'
 
-
 # Database
-# https://docs.djangoproject.com/en/1.6/ref/settings/#databases
 dbconf = RawConfigParser()
 dbconf.read(CONFIGS_PATH + '/db.ini')
 
@@ -99,5 +97,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
 STATIC_URL = '/static/'
+
+STATIC_ROOT = os.path.join(BASE_PATH, '..', 'static')
 
 SITE_ID = 1
