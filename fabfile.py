@@ -14,9 +14,8 @@ def init_test_db():
     
 def populate_test_db():
     with cd('/var/www/videobase_test/sql_dump'):
-        run('chmod 644 $(ls -1 *.sql | head -1)')
         with settings(sudo_user = "postgres"):
-            sudo('''psql -f $(ls -1 *.sql | head -1)''')
+            sudo('''psql -d videobase -f $(ls -1 *.sql | head -1)''')
 
         
 def deploy_test_code():
