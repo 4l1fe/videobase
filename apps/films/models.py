@@ -25,9 +25,6 @@ class Genres(models.Model):
     name         = models.CharField(max_length=255, verbose_name=u'Название жанра')
     description  = models.TextField(verbose_name=u'Описание жанра')
 
-    class  Meta(object):
-        verbose_name = u"Жанр"
-        verbose_name_plural = u"Жанры"
     def __unicode__(self):
         return u' [%s] %s' % (self.pk, self.name)
 
@@ -54,7 +51,7 @@ class Films(models.Model):
     seasons_cnt = models.PositiveSmallIntegerField(verbose_name=u'Количество сезонов')
     name_orig   = models.CharField(max_length=255,verbose_name=u'Оригинальное название фильма')
     countries   = models.ManyToManyField(Countries, verbose_name=u'Страны производители', related_name='countries')
-    genres      = models.ManyToManyField(Genres, verbose_name=u'Жанры', related_name="genres")
+    genres      = models.ManyToManyField(Genres, verbose_name=u'Жанры', related_name='genres')
 
     def __unicode__(self):
         return u' [%s] %s' % (self.pk, self.name)
