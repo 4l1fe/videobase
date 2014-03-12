@@ -19,7 +19,7 @@ class Migration(SchemaMigration):
             ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
             ('ustatus', self.gf('django.db.models.fields.PositiveSmallIntegerField')()),
             ('userpic_type', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('userpic_id', self.gf('django.db.models.fields.IntegerField')()),
+            ('userpic', self.gf('django.db.models.fields.related.ForeignKey')(default=None, to=orm['users.UsersPics'], null=True, blank=True)),
         ))
         db.send_create_signal(u'users', ['Users'])
 
