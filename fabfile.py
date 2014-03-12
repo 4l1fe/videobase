@@ -95,6 +95,17 @@ def deploy():
     restart()
 
 
+def flush_test_db():
+
+    """
+    Перезаписать тестовую базу данных из дампа
+    """
+    delete_test_db()
+    init_test_db()
+    populate_test_db()
+    
+
+
 def init_if_not_exists_task():
     """
     Обновить если пользователя еще нет.
