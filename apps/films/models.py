@@ -1,6 +1,7 @@
 # coding: utf-8
 from django.db import models
 from apps.users.models import Users
+from constants import *
 
 
 class Countries(models.Model):
@@ -39,7 +40,7 @@ class Genres(models.Model):
 #
 class Films(models.Model):
     name             = models.CharField(max_length=255, verbose_name=u'Название фильма')
-    ftype = models.CharField(max_length = 255, verbose_name = u'Жанр', choices = [(u'Полнометражный фильм', u'Полнометражный фильм'), (u'Сериал',u'Сериал')])
+    ftype            = models.CharField(max_length=255, verbose_name=u'Жанр', choices=FILM_TYPES)
     fReleaseDate     = models.DateField(verbose_name=u'Дата выхода')
     description      = models.TextField(verbose_name=u'Описание фильма')
     rating_local     = models.PositiveSmallIntegerField(verbose_name=u'Рейтинг фильма по мнению пользователей нашего сайта')
@@ -93,13 +94,13 @@ class UsersFilms(models.Model):
     subscribed = models.IntegerField(verbose_name=u'Статус подписки')
 
     def __unicode__(self):
-
-        return u'[%s] %s %s' % (self.pk, self.users_id, self.films_id, self.ufStatus)
+        return u'[%s] %s - %s (%s)' % (self.pk, self.users.name, self.films.name, self.ufStatus)
 
     class  Meta(object):
         # Имя таблицы в БД
         db_table = 'users_films'
         verbose_name = u'Связь Фильм-Пользователь'
+        verbose_name_plural = u'Связь Фильм-Пользователи'
 
 
 #############################################################################################################
@@ -113,11 +114,10 @@ class Seasons(models.Model):
 
 
     def __unicode__(self):
-        return u' [%s] %s %s' % (self.pk, self.film, self.sNumber)
+        return u' [%s] %s %s' % (self.pk, self.film.name, self.sNumber)
 
     class  Meta(object):
         # Имя таблицы в БД
         db_table = 'seasons'
         verbose_name = u'Сезон'
         verbose_name_plural = u'Сезоны'
-        
