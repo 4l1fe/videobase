@@ -59,7 +59,7 @@ def restart_all():
     """
 
     sudo('service supervisor stop')
-    sudo('service supervisor start')
+    sudo('sleep 10;service supervisor start')
     sudo('service nginx stop')
     sudo('service nginx start')
                 
@@ -92,8 +92,8 @@ def deploy():
     Обновить код и перезапустить процессы
 
     """
-    refresh_code()
-    restart()
+    deploy_test_code()
+    restart_all()
 
 
 def flush_test_db():
