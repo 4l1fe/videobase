@@ -88,7 +88,7 @@ def delete_test_db():
         with settings(sudo_user = "postgres"):
             sudo('''echo "DROP DATABASE videobase_test;" | psql''')
 
-            
+
 def refresh_test_requirements():
 
     with settings(sudo_user = "www-data"):
