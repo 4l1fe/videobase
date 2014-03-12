@@ -1,3 +1,4 @@
+# coding: utf-8
 from fabric.api import env,roles, run, settings, sudo, cd
 
 env.hosts = ['188.226.191.166',]
