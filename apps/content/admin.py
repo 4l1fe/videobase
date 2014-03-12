@@ -1,5 +1,6 @@
 from django.contrib import admin
-from content.models import Content,Locations,Comments
+
+from apps.content.models import Content,Locations,Comments
 
 
 class ContentAdmin(admin.ModelAdmin):
