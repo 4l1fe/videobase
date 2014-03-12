@@ -1,0 +1,20 @@
+server {
+    root /home/tumani1/workspace/videobase;
+    index index.html index.htm;
+
+    access_log /var/log/nginx/videobase.access.log;
+    error_log /var/log/nginx/videobase.error.log;
+
+    server_name videobase.local;
+
+    location /static {
+        alias /home/tumani1/workspace/videobase;
+        autoindex on;
+        expires 30d;
+    }
+
+    location / {
+        uwsgi_pass unix:///tmp/videobase_uwsgi.sock;
+        include uwsgi_params;
+    }
+}
