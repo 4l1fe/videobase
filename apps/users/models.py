@@ -2,7 +2,7 @@
 
 from django.db import models
 from .constants import *
-
+from users.users_rels import UsersRels
 
 #############################################################################################################
 # Пользователи
