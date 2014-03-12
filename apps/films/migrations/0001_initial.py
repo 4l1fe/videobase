@@ -58,9 +58,9 @@ class Migration(SchemaMigration):
         db.create_table(m2m_table_name, (
             ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
             ('films', models.ForeignKey(orm[u'films.films'], null=False)),
-            ('countries', models.ForeignKey(orm[u'films.countries'], null=False))
+            ('genres', models.ForeignKey(orm[u'films.genres'], null=False))
         ))
-        db.create_unique(m2m_table_name, ['films_id', 'countries_id'])
+        db.create_unique(m2m_table_name, ['films_id', 'genres_id'])
 
         # Adding model 'UsersFilms'
         db.create_table('users_films', (

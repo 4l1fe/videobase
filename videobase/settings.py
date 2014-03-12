@@ -2,6 +2,7 @@
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+import sys
 from ConfigParser import RawConfigParser
 
 BASE_PATH = os.path.dirname(__file__)
@@ -62,15 +63,24 @@ WSGI_APPLICATION = 'videobase.wsgi.application'
 dbconf = RawConfigParser()
 dbconf.read(CONFIGS_PATH + '/db.ini')
 
-DATABASES = {
-    'default': {
-        'ENGINE':   dbconf.get('database', 'DATABASE_ENGINE'),
-        'HOST':     dbconf.get('database', 'DATABASE_HOST'),
-        'NAME':     dbconf.get('database', 'DATABASE_NAME'),
-        'USER':     dbconf.get('database', 'DATABASE_USER'),
-        'PASSWORD': dbconf.get('database', 'DATABASE_PASSWORD'),
-        'PORT':     dbconf.get('database', 'DATABASE_PORT')
+
+if 'test' in sys.argv:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': 'videobase_test',
+        }
     }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE':   dbconf.get('database', 'DATABASE_ENGINE'),
+            'HOST':     dbconf.get('database', 'DATABASE_HOST'),
+            'NAME':     dbconf.get('database', 'DATABASE_NAME'),
+            'USER':     dbconf.get('database', 'DATABASE_USER'),
+            'PASSWORD': dbconf.get('database', 'DATABASE_PASSWORD'),
+            'PORT':     dbconf.get('database', 'DATABASE_PORT')
+        }
 }
 
 CACHES = {
