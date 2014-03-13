@@ -767,7 +767,7 @@ CREATE TABLE users (
     created timestamp with time zone NOT NULL,
     ustatus smallint NOT NULL,
     userpic_type character varying(255) NOT NULL,
-    userpic_id integer NOT NULL,
+    userpic_id integer,
     CONSTRAINT users_ustatus_check CHECK ((ustatus >= 0))
 );
 
@@ -1343,6 +1343,9 @@ COPY auth_permission (id, name, content_type_id, codename) FROM stdin;
 67	Can add Связь Фильм-Пользователь	23	add_usersfilms
 68	Can change Связь Фильм-Пользователь	23	change_usersfilms
 69	Can delete Связь Фильм-Пользователь	23	delete_usersfilms
+70	Can add Сезон	24	add_seasons
+71	Can change Сезон	24	change_seasons
+72	Can delete Сезон	24	delete_seasons
 \.
 
 
@@ -1350,7 +1353,7 @@ COPY auth_permission (id, name, content_type_id, codename) FROM stdin;
 -- Name: auth_permission_id_seq; Type: SEQUENCE SET; Schema: public; Owner: pgadmin
 --
 
-SELECT pg_catalog.setval('auth_permission_id_seq', 69, true);
+SELECT pg_catalog.setval('auth_permission_id_seq', 72, true);
 
 
 --
@@ -1358,7 +1361,7 @@ SELECT pg_catalog.setval('auth_permission_id_seq', 69, true);
 --
 
 COPY auth_user (id, password, last_login, is_superuser, username, first_name, last_name, email, is_staff, is_active, date_joined) FROM stdin;
-1	pbkdf2_sha256$12000$XDN0jBC1ITrH$l7STmnpTc4nsGVYXGHVQZSaTau0CFMKvinpA2B5lqFY=	2014-03-12 15:27:57.299007+04	t	admin			tumani1@yandex.ru	t	t	2014-03-12 15:27:12.757589+04
+1	pbkdf2_sha256$12000$NsufHmw6V25T$SD0gzayijxXInLgTldiOhiuQY/ncuTIJ3LdzAcWgbMk=	2014-03-13 11:13:30.17151+04	t	admin			tumani1@yandex.ru	t	t	2014-03-13 11:13:30.17151+04
 \.
 
 
@@ -1457,6 +1460,7 @@ COPY django_content_type (id, name, app_label, model) FROM stdin;
 21	Фильм	films	films
 22	Дополнительный материал	films	filmextras
 23	Связь Фильм-Пользователь	films	usersfilms
+24	Сезон	films	seasons
 \.
 
 
@@ -1464,7 +1468,7 @@ COPY django_content_type (id, name, app_label, model) FROM stdin;
 -- Name: django_content_type_id_seq; Type: SEQUENCE SET; Schema: public; Owner: pgadmin
 --
 
-SELECT pg_catalog.setval('django_content_type_id_seq', 23, true);
+SELECT pg_catalog.setval('django_content_type_id_seq', 24, true);
 
 
 --
@@ -1472,7 +1476,6 @@ SELECT pg_catalog.setval('django_content_type_id_seq', 23, true);
 --
 
 COPY django_session (session_key, session_data, expire_date) FROM stdin;
-eb6y7h84kn2vbbyw12vkmjkjezo5kfmv	ZWM2ZmExZWU0MThkODU1ZjM0NWUyMzdlNTMyNjdlNDRkNmZiZjYyMzp7Il9hdXRoX3VzZXJfYmFja2VuZCI6ImRqYW5nby5jb250cmliLmF1dGguYmFja2VuZHMuTW9kZWxCYWNrZW5kIiwiX2F1dGhfdXNlcl9pZCI6MX0=	2014-03-26 15:27:57.310227+04
 \.
 
 
@@ -1624,12 +1627,12 @@ SELECT pg_catalog.setval('seasons_id_seq', 1, false);
 --
 
 COPY south_migrationhistory (id, app_name, migration, applied) FROM stdin;
-1	django_extensions	0001_empty	2014-03-12 15:27:33.647955+04
-2	users	0001_initial	2014-03-12 15:27:34.660533+04
-3	users	0002_add_users_rels	2014-03-12 15:27:34.838999+04
-4	robots	0001_initial	2014-03-12 15:27:35.33315+04
-5	films	0001_initial	2014-03-12 15:27:36.454843+04
-6	films	0002_auto__del_field_films_poster_id__chg_field_films_fReleaseDate	2014-03-12 15:27:36.613575+04
+1	django_extensions	0001_empty	2014-03-13 11:13:53.525363+04
+2	users	0001_initial	2014-03-13 11:13:54.849348+04
+3	users	0002_add_users_rels	2014-03-13 11:13:55.029074+04
+4	robots	0001_initial	2014-03-13 11:13:55.610711+04
+5	films	0001_initial	2014-03-13 11:13:57.087789+04
+6	films	0002_auto__del_field_films_poster_id__chg_field_films_fReleaseDate	2014-03-13 11:13:57.289826+04
 \.
 
 
@@ -2296,6 +2299,13 @@ CREATE INDEX users_socials_user_id ON users_socials USING btree (user_id);
 
 
 --
+-- Name: users_userpic_id; Type: INDEX; Schema: public; Owner: pgadmin; Tablespace: 
+--
+
+CREATE INDEX users_userpic_id ON users USING btree (userpic_id);
+
+
+--
 -- Name: auth_group_permissions_permission_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: pgadmin
 --
 
@@ -2501,6 +2511,14 @@ ALTER TABLE ONLY users_rels
 
 ALTER TABLE ONLY users_rels
     ADD CONSTRAINT user_rel_id_refs_id_e1908a29 FOREIGN KEY (user_rel_id) REFERENCES users(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: userpic_id_refs_id_52f925e4; Type: FK CONSTRAINT; Schema: public; Owner: pgadmin
+--
+
+ALTER TABLE ONLY users
+    ADD CONSTRAINT userpic_id_refs_id_52f925e4 FOREIGN KEY (userpic_id) REFERENCES users_pics(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
