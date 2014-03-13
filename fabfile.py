@@ -125,7 +125,7 @@ def db_migrate_test(appname=''):
 
     with settings(sudo_user = "www-data"):
         with cd('/var/www/videobase_test/'):
-            sudo('python manage.py migrate %s' % appname)
+            sudo('/home/virtualenv/videobase_test/bin/python manage.py migrate %s' % appname)
     
 def deploy():
 
@@ -134,6 +134,7 @@ def deploy():
 
     """
     deploy_test_code()
+    db_migrate_test()
     restart_all()
     status()
 
