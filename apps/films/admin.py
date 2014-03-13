@@ -1,5 +1,7 @@
+# coding: utf-8
+
 from django.contrib import admin
-from apps.films.models import  Countries,Genres,Films,UsersFilms,FilmExtras,Seasons
+from apps.films.models import *
 
 
 class CountriesAdmin(admin.ModelAdmin):
@@ -11,7 +13,6 @@ class GenresAdmin(admin.ModelAdmin):
 class FilmsAdmin(admin.ModelAdmin):
     pass
 
-
 class UserFilmsAdmin(admin.ModelAdmin):
     pass
 
@@ -22,6 +23,8 @@ class SeasonsAdmin(admin.ModelAdmin):
     pass
 
 
+#############################################################################################################
+# Регистрация моделей в админке
 admin.site.register(Countries,CountriesAdmin)
 admin.site.register(Genres,GenresAdmin)
 admin.site.register(Films,FilmsAdmin)
