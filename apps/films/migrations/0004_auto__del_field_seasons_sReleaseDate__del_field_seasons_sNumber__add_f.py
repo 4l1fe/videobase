@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 from south.utils import datetime_utils as datetime
 from south.db import db
 from south.v2 import SchemaMigration
@@ -8,58 +9,34 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Rename field 'Films.fReleaseDate'
-        db.rename_column('films', 'fReleaseDate', 'freleasedate')
+        # Rename field  'Seasons.sReleaseDate'
+        db.rename_column('seasons', 'sReleaseDate', 'frelease_date')
 
-        # Adding field 'Films.fduration'
-        db.add_column('films', 'fduration',
-                      self.gf('django.db.models.fields.IntegerField')(null=True, blank=True),
-                      keep_default=False)
+        # Rename field 'Seasons.sNumber'
+        db.rename_column('seasons', 'sNumber', 'number')
 
-        # Adding field 'Films.fbudget'
-        db.add_column('films', 'fbudget',
-                      self.gf('django.db.models.fields.IntegerField')(null=True, blank=True),
-                      keep_default=False)
+        # Rename field 'Films.freleasedate'
+        db.rename_column('films', 'freleasedate', 'frelease_date')
 
-        # Adding field 'Films.kinopoisk_id'
-        db.add_column('films', 'kinopoisk_id',
-                      self.gf('django.db.models.fields.IntegerField')(null=True, blank=True),
-                      keep_default=False)
+        # Rename field 'UsersFilms.users'
+        db.rename_column('users_films', 'users_id', 'user_id')
 
-        # Adding field 'Films.age_limit'
-        db.add_column('films', 'age_limit',
-                      self.gf('django.db.models.fields.PositiveSmallIntegerField')(null=True, blank=True),
-                      keep_default=False)
+        # Rename field 'UsersFilms.ufStatus'
+        db.rename_column('users_films', 'ufStatus', 'ufstatus')
 
-        # Adding field 'Films.kinopoisk_lastupdate'
-        db.add_column('films', 'kinopoisk_lastupdate',
-                      self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True),
-                      keep_default=False)
+        # Rename field 'UsersFilms.ufRating'
+        db.rename_column('users_films', 'ufRating', 'ufrating')
 
+        # Rename field 'UsersFilms.films'
+        db.rename_column('users_films', 'films_id', 'film_id')
 
-        # Changing field 'Films.seasons_cnt'
-        db.alter_column('films', 'seasons_cnt', self.gf('django.db.models.fields.PositiveSmallIntegerField')(null=True))
+        # Rename field 'FilmExtras.eType'
+        db.rename_column('films_extras', 'eType', 'etype')
 
-        # Changing field 'Films.rating_local'
-        db.alter_column('films', 'rating_local', self.gf('django.db.models.fields.PositiveSmallIntegerField')(null=True))
-
-        # Changing field 'Films.rating_imdb'
-        db.alter_column('films', 'rating_imdb', self.gf('django.db.models.fields.PositiveSmallIntegerField')(null=True))
-
-        # Changing field 'Films.rating_kinopoisk_cnt'
-        db.alter_column('films', 'rating_kinopoisk_cnt', self.gf('django.db.models.fields.PositiveSmallIntegerField')(null=True))
-
-        # Changing field 'Films.rating_imdb_cnt'
-        db.alter_column('films', 'rating_imdb_cnt', self.gf('django.db.models.fields.IntegerField')(null=True))
-
-        # Changing field 'Films.rating_local_cnt'
-        db.alter_column('films', 'rating_local_cnt', self.gf('django.db.models.fields.PositiveSmallIntegerField')(null=True))
-
-        # Changing field 'Films.rating_kinopoisk'
-        db.alter_column('films', 'rating_kinopoisk', self.gf('django.db.models.fields.PositiveSmallIntegerField')(null=True))
 
     def backwards(self, orm):
         pass
+
 
     models = {
         u'films.countries': {
@@ -72,7 +49,7 @@ class Migration(SchemaMigration):
         u'films.filmextras': {
             'Meta': {'object_name': 'FilmExtras', 'db_table': "'films_extras'"},
             'description': ('django.db.models.fields.TextField', [], {}),
-            'eType': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'etype': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'film': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['films.Films']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
@@ -86,7 +63,7 @@ class Migration(SchemaMigration):
             'description': ('django.db.models.fields.TextField', [], {'default': "''", 'blank': 'True'}),
             'fbudget': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'fduration': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'freleasedate': ('django.db.models.fields.DateField', [], {}),
+            'frelease_date': ('django.db.models.fields.DateField', [], {}),
             'ftype': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'genres': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'genres'", 'symmetrical': 'False', 'to': u"orm['films.Genres']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
@@ -113,18 +90,18 @@ class Migration(SchemaMigration):
             'description': ('django.db.models.fields.TextField', [], {}),
             'film': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['films.Films']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'sNumber': ('django.db.models.fields.PositiveSmallIntegerField', [], {}),
-            'sReleaseDate': ('django.db.models.fields.DateTimeField', [], {}),
+            'number': ('django.db.models.fields.PositiveSmallIntegerField', [], {}),
+            'release_date': ('django.db.models.fields.DateTimeField', [], {}),
             'series_cnt': ('django.db.models.fields.PositiveSmallIntegerField', [], {})
         },
         u'films.usersfilms': {
             'Meta': {'object_name': 'UsersFilms', 'db_table': "'users_films'"},
-            'films': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['films.Films']"}),
+            'film': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['films.Films']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'subscribed': ('django.db.models.fields.IntegerField', [], {}),
-            'ufRating': ('django.db.models.fields.IntegerField', [], {}),
-            'ufStatus': ('django.db.models.fields.IntegerField', [], {}),
-            'users': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['users.Users']"})
+            'ufrating': ('django.db.models.fields.IntegerField', [], {}),
+            'ufstatus': ('django.db.models.fields.IntegerField', [], {}),
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['users.Users']"})
         },
         u'users.users': {
             'Meta': {'object_name': 'Users', 'db_table': "'users'"},
