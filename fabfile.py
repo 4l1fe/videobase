@@ -46,14 +46,14 @@ def deploy_test_code():
             filtered_array=[s for s in result.split('\r\n') if s=='videobase_test']
             
             if filtered_array:
-                sudo("cd videobase_test; git checkout configs/db.ini")
+                #sudo("cd videobase_test; git checkout configs/db.ini")
                 #sudo("cd videobase_test; cat configs/db.ini")
                 sudo('cd videobase_test;git pull')
-                sudo("cd videobase_test/configs/ && sed -i 's/videobase/videobase_test/g' db.ini")
+                #sudo("cd videobase_test/configs/ && sed -i 's/videobase/videobase_test/g' db.ini")
                 #sudo("cd videobase_test; cat configs/db.ini")
             else:
                 sudo('git clone /var/git/videobase.git/ videobase_test')
-                sudo("cd videobase_test/configs/ && sed -i 's/videobase/videobase_test/g' db.ini")
+                sudo("cd videobase_test/configs/ && cp db.ini.example db.ini && sed -i 's/videobase/videobase_test/g' db.ini")
 
 def restart_all():
     """
@@ -96,6 +96,27 @@ def refresh_test_requirements():
             sudo('/home/virtualenv/videobase_test/bin/pip install -r requirements.txt')
             
 
+def status():
+
+    for k in fabric.state.output:
+        fabric.state.output[k] = False
+    fabric.state.output['user']=True
+        
+    with settings(warn_only=True):
+        print('SUPERVISOR \n')
+        print(run("supervisorctl status"))
+        print("\n NGINX \n")
+        print(run("ps aux |grep nginx"))
+
+        print("\nIs login page is shown on videobase.test.aaysm.com/admin  ? ")
+        print(bool(run('''wget -qO- --header="Host: videobase.test.aaysm.com" localhost:80/admin/ |grep Password | wc -l''')))
+        
+
+    for k in fabric.state.output:
+        fabric.state.output[k] = True
+    fabric.state.output['debug']=False
+
+            
 def deploy():
 
     """
@@ -104,6 +125,7 @@ def deploy():
     """
     deploy_test_code()
     restart_all()
+    status()
 
 
 def flush_test_db():
@@ -129,22 +151,3 @@ def init_if_not_exists_task():
             if not (str(sudo('''echo "select rolname from pg_roles where rolname = 'pgadmin';" |psql -tA''')).strip()):
                 init_db()
 
-def status():
-
-    for k in fabric.state.output:
-        fabric.state.output[k] = False
-    fabric.state.output['user']=True
-        
-    with settings(warn_only=True):
-        print('SUPERVISOR \n')
-        print(run("supervisorctl status"))
-        print("\n NGINX \n")
-        print(run("ps aux |grep nginx"))
-
-        print("\nIs login page is shown on videobase.test.aaysm.com/admin  ? ")
-        print(bool(run('''wget -qO- --header="Host: videobase.test.aaysm.com" localhost:80/admin/ |grep Password | wc -l''')))
-        
-
-    for k in fabric.state.output:
-        fabric.state.output[k] = True
-    fabric.state.output['debug']=False
