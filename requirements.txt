@@ -7,3 +7,4 @@ pillow
 fabric
 uwsgi
 django_extensions
+django-csvimport

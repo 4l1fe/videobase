@@ -37,6 +37,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django_extensions',
     'south',
+    'csvimport',
     'apps.users',
     'apps.robots',
     'apps.films',
