@@ -9,12 +9,12 @@ from users.users_rels import UsersRels
 class Users(models.Model):
     firstname    = models.CharField(max_length=255, verbose_name=u'Имя')
     lastname     = models.CharField(max_length=255, verbose_name=u'Фамилия')
-    email        = models.EmailField(max_length=255, verbose_name=u'Email')
+    email        = models.EmailField(max_length=255, unique=True, verbose_name=u'Email')
     passhash     = models.CharField(max_length=255, verbose_name=u'Пароль')
     last_visited = models.DateTimeField(auto_now_add=True, verbose_name=u'Последний визит')
     created      = models.DateTimeField(auto_now_add=True, editable=False, verbose_name=u'Дата создания')
     ustatus      = models.PositiveSmallIntegerField(choices=USER_STATUS, verbose_name=u'Статус')
-    userpic_type = models.CharField(null=True, blank=True, choices=USER_PIC_TYPES, max_length=255, verbose_name=u'Тип картинки')
+    userpic_type = models.CharField(null=True, blank=True, default=None, choices=USER_PIC_TYPES, max_length=255, verbose_name=u'Тип картинки')
     userpic      = models.ForeignKey('UsersPics', default=None, null=True, blank=True, verbose_name=u'Аватар')
 
     def __unicode__(self):
