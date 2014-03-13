@@ -1,1 +1,4 @@
 *.pyc
+configs/db.ini
+configs/uwsgi.ini
+
