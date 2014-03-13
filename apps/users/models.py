@@ -20,6 +20,10 @@ class Users(models.Model):
     def __unicode__(self):
         return u'[%s] %s %s' % (self.pk, self.firstname, self.lastname)
 
+    @property
+    def name(self):
+        return u'%s %s' % (self.firstname, self.lastname)
+
     class Meta:
         # Имя таблицы в БД
         db_table = 'users'
@@ -73,7 +77,7 @@ class UsersPics(models.Model):
 
 
     def __unicode__(self):
-        return u'[%s] %s' % (self.pk, self.user.name)
+        return u'[%s] %s : %s' % (self.pk, self.user.name, self.url)
 
     class Meta:
         # Имя таблицы в БД
