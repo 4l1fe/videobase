@@ -14,7 +14,11 @@ class UsersAdmin(admin.ModelAdmin):
 class UsersRelsAdmin(admin.ModelAdmin):
     pass
 
+class UsersPicsAdmin(admin.ModelAdmin):
+    pass
+
 #############################################################################################################
 # Регистрация моделей в админке
 admin.site.register(Users, UsersAdmin)
 admin.site.register(UsersRels, UsersRelsAdmin)
+admin.site.register(UsersPics,UsersPicsAdmin)
