@@ -134,10 +134,21 @@ def deploy():
 
     """
     deploy_test_code()
-    db_migrate_test()
     restart_all()
     status()
 
+def project_deploy():
+    '''
+    Обновить весь код
+
+    '''
+    
+    deploy_test_code()
+    refresh_test_requirements()
+    db_migrate_test()
+    restart_all()
+    status()
+    
 
 def db_flush_test():
 
