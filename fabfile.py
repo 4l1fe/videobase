@@ -116,7 +116,17 @@ def status():
         fabric.state.output[k] = True
     fabric.state.output['debug']=False
 
-            
+def db_migrate_test(appname=''):
+
+    '''
+    Выполняет миграцию базы данных для приложения (app в терминах Django) если указано, или просто m
+
+    '''
+
+    with settings(sudo_user = "www-data"):
+        with cd('/var/www/videobase_test/'):
+            sudo('python manage.py migrate %s' % appname)
+    
 def deploy():
 
     """
@@ -128,7 +138,7 @@ def deploy():
     status()
 
 
-def flush_test_db():
+def db_flush_test():
 
     """
     Перезаписать тестовую базу данных из дампа
