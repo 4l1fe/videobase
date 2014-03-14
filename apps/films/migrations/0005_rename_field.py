@@ -63,7 +63,7 @@ class Migration(SchemaMigration):
             'name': ('django.db.models.fields.CharField', [], {'max_length': '255'})
         },
         u'films.seasons': {
-            'Meta': {'object_name': 'Seasons', 'db_table': "'seasons'"},
+            'Meta': {'unique_together': "(('film', 'number'),)", 'object_name': 'Seasons', 'db_table': "'seasons'"},
             'description': ('django.db.models.fields.TextField', [], {}),
             'film': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['films.Films']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
