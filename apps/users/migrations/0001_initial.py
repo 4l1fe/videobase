@@ -8,17 +8,27 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
+        # Adding model 'UsersRels'
+        db.create_table('users_rels', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['users.Users'])),
+            ('user_rel', self.gf('django.db.models.fields.related.ForeignKey')(related_name='user_rel', to=orm['users.Users'])),
+            ('rel_type', self.gf('django.db.models.fields.CharField')(max_length=255)),
+            ('updated', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+        ))
+        db.send_create_signal(u'users', ['UsersRels'])
+
         # Adding model 'Users'
         db.create_table('users', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('firstname', self.gf('django.db.models.fields.CharField')(max_length=255)),
             ('lastname', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('email', self.gf('django.db.models.fields.EmailField')(max_length=255)),
-            ('passhash', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('last_visited', self.gf('django.db.models.fields.DateTimeField')()),
+            ('email', self.gf('django.db.models.fields.EmailField')(unique=True, max_length=255)),
+            ('password', self.gf('django.db.models.fields.CharField')(max_length=255)),
+            ('last_visited', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
             ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
             ('ustatus', self.gf('django.db.models.fields.PositiveSmallIntegerField')()),
-            ('userpic_type', self.gf('django.db.models.fields.CharField')(max_length=255)),
+            ('userpic_type', self.gf('django.db.models.fields.CharField')(default=None, max_length=255, null=True, blank=True)),
             ('userpic', self.gf('django.db.models.fields.related.ForeignKey')(default=None, to=orm['users.UsersPics'], null=True, blank=True)),
         ))
         db.send_create_signal(u'users', ['Users'])
@@ -99,6 +109,9 @@ class Migration(SchemaMigration):
 
 
     def backwards(self, orm):
+        # Deleting model 'UsersRels'
+        db.delete_table('users_rels')
+
         # Deleting model 'Users'
         db.delete_table('users')
 
@@ -146,14 +159,14 @@ class Migration(SchemaMigration):
         u'users.users': {
             'Meta': {'object_name': 'Users', 'db_table': "'users'"},
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'email': ('django.db.models.fields.EmailField', [], {'max_length': '255'}),
+            'email': ('django.db.models.fields.EmailField', [], {'unique': 'True', 'max_length': '255'}),
             'firstname': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'last_visited': ('django.db.models.fields.DateTimeField', [], {}),
+            'last_visited': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'lastname': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'passhash': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'userpic_id': ('django.db.models.fields.IntegerField', [], {}),
-            'userpic_type': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'password': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'userpic': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': u"orm['users.UsersPics']", 'null': 'True', 'blank': 'True'}),
+            'userpic_type': ('django.db.models.fields.CharField', [], {'default': 'None', 'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'ustatus': ('django.db.models.fields.PositiveSmallIntegerField', [], {})
         },
         u'users.userslog': {
@@ -178,6 +191,14 @@ class Migration(SchemaMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'url': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['users.Users']"})
+        },
+        u'users.usersrels': {
+            'Meta': {'object_name': 'UsersRels', 'db_table': "'users_rels'"},
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'rel_type': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'updated': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['users.Users']"}),
+            'user_rel': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'user_rel'", 'to': u"orm['users.Users']"})
         },
         u'users.usersrequests': {
             'Meta': {'object_name': 'UsersRequests', 'db_table': "'users_requests'"},

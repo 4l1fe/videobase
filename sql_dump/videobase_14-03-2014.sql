@@ -277,6 +277,83 @@ ALTER SEQUENCE countries_id_seq OWNED BY countries.id;
 
 
 --
+-- Name: csvimport_csvimport; Type: TABLE; Schema: public; Owner: pgadmin; Tablespace: 
+--
+
+CREATE TABLE csvimport_csvimport (
+    id integer NOT NULL,
+    model_name character varying(255) NOT NULL,
+    field_list character varying(255) NOT NULL,
+    upload_file character varying(100) NOT NULL,
+    file_name character varying(255) NOT NULL,
+    encoding character varying(32) NOT NULL,
+    upload_method character varying(50) NOT NULL,
+    error_log text NOT NULL,
+    import_date date NOT NULL,
+    import_user character varying(255) NOT NULL
+);
+
+
+ALTER TABLE public.csvimport_csvimport OWNER TO pgadmin;
+
+--
+-- Name: csvimport_csvimport_id_seq; Type: SEQUENCE; Schema: public; Owner: pgadmin
+--
+
+CREATE SEQUENCE csvimport_csvimport_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.csvimport_csvimport_id_seq OWNER TO pgadmin;
+
+--
+-- Name: csvimport_csvimport_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: pgadmin
+--
+
+ALTER SEQUENCE csvimport_csvimport_id_seq OWNED BY csvimport_csvimport.id;
+
+
+--
+-- Name: csvimport_importmodel; Type: TABLE; Schema: public; Owner: pgadmin; Tablespace: 
+--
+
+CREATE TABLE csvimport_importmodel (
+    id integer NOT NULL,
+    csvimport_id integer NOT NULL,
+    numeric_id integer NOT NULL,
+    natural_key character varying(100) NOT NULL,
+    CONSTRAINT csvimport_importmodel_numeric_id_check CHECK ((numeric_id >= 0))
+);
+
+
+ALTER TABLE public.csvimport_importmodel OWNER TO pgadmin;
+
+--
+-- Name: csvimport_importmodel_id_seq; Type: SEQUENCE; Schema: public; Owner: pgadmin
+--
+
+CREATE SEQUENCE csvimport_importmodel_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.csvimport_importmodel_id_seq OWNER TO pgadmin;
+
+--
+-- Name: csvimport_importmodel_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: pgadmin
+--
+
+ALTER SEQUENCE csvimport_importmodel_id_seq OWNED BY csvimport_importmodel.id;
+
+
+--
 -- Name: django_admin_log; Type: TABLE; Schema: public; Owner: pgadmin; Tablespace: 
 --
 
@@ -372,20 +449,23 @@ CREATE TABLE films (
     id integer NOT NULL,
     name character varying(255) NOT NULL,
     ftype character varying(255) NOT NULL,
-    "fReleaseDate" date NOT NULL,
+    frelease_date date NOT NULL,
+    fduration integer,
+    fbudget integer,
     description text NOT NULL,
-    rating_local smallint NOT NULL,
-    rating_local_cnt smallint NOT NULL,
-    rating_imdb smallint NOT NULL,
-    rating_imdb_cnt integer NOT NULL,
-    rating_kinopoisk smallint NOT NULL,
-    rating_kinopoisk_cnt smallint NOT NULL,
-    seasons_cnt smallint NOT NULL,
+    rating_local double precision,
+    rating_local_cnt smallint,
+    rating_imdb double precision,
+    rating_imdb_cnt integer,
+    kinopoisk_id integer,
+    age_limit smallint,
+    kinopoisk_lastupdate timestamp with time zone,
+    rating_kinopoisk double precision,
+    rating_kinopoisk_cnt smallint,
+    seasons_cnt smallint,
     name_orig character varying(255) NOT NULL,
-    CONSTRAINT films_rating_imdb_check CHECK ((rating_imdb >= 0)),
-    CONSTRAINT films_rating_kinopoisk_check CHECK ((rating_kinopoisk >= 0)),
+    CONSTRAINT films_age_limit_check CHECK ((age_limit >= 0)),
     CONSTRAINT films_rating_kinopoisk_cnt_check CHECK ((rating_kinopoisk_cnt >= 0)),
-    CONSTRAINT films_rating_local_check CHECK ((rating_local >= 0)),
     CONSTRAINT films_rating_local_cnt_check CHECK ((rating_local_cnt >= 0)),
     CONSTRAINT films_seasons_cnt_check CHECK ((seasons_cnt >= 0))
 );
@@ -434,7 +514,7 @@ ALTER SEQUENCE films_countries_id_seq OWNED BY films_countries.id;
 CREATE TABLE films_extras (
     id integer NOT NULL,
     film_id integer NOT NULL,
-    "eType" character varying(255) NOT NULL,
+    etype character varying(255) NOT NULL,
     name character varying(255) NOT NULL,
     name_orig character varying(255) NOT NULL,
     description text NOT NULL,
@@ -686,11 +766,11 @@ ALTER SEQUENCE robots_log_id_seq OWNED BY robots_log.id;
 CREATE TABLE seasons (
     id integer NOT NULL,
     film_id integer NOT NULL,
-    "sReleaseDate" timestamp with time zone NOT NULL,
+    release_date timestamp with time zone NOT NULL,
     series_cnt smallint NOT NULL,
     description text NOT NULL,
-    "sNumber" smallint NOT NULL,
-    CONSTRAINT "seasons_sNumber_check" CHECK (("sNumber" >= 0)),
+    number smallint NOT NULL,
+    CONSTRAINT seasons_number_check CHECK ((number >= 0)),
     CONSTRAINT seasons_series_cnt_check CHECK ((series_cnt >= 0))
 );
 
@@ -762,11 +842,11 @@ CREATE TABLE users (
     firstname character varying(255) NOT NULL,
     lastname character varying(255) NOT NULL,
     email character varying(255) NOT NULL,
-    passhash character varying(255) NOT NULL,
+    password character varying(255) NOT NULL,
     last_visited timestamp with time zone NOT NULL,
     created timestamp with time zone NOT NULL,
     ustatus smallint NOT NULL,
-    userpic_type character varying(255) NOT NULL,
+    userpic_type character varying(255),
     userpic_id integer,
     CONSTRAINT users_ustatus_check CHECK ((ustatus >= 0))
 );
@@ -780,10 +860,10 @@ ALTER TABLE public.users OWNER TO pgadmin;
 
 CREATE TABLE users_films (
     id integer NOT NULL,
-    users_id integer NOT NULL,
-    films_id integer NOT NULL,
-    "ufStatus" integer NOT NULL,
-    "ufRating" integer NOT NULL,
+    user_id integer NOT NULL,
+    film_id integer NOT NULL,
+    ufstatus integer NOT NULL,
+    ufrating integer NOT NULL,
     subscribed integer NOT NULL
 );
 
@@ -1103,6 +1183,20 @@ ALTER TABLE ONLY countries ALTER COLUMN id SET DEFAULT nextval('countries_id_seq
 -- Name: id; Type: DEFAULT; Schema: public; Owner: pgadmin
 --
 
+ALTER TABLE ONLY csvimport_csvimport ALTER COLUMN id SET DEFAULT nextval('csvimport_csvimport_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: pgadmin
+--
+
+ALTER TABLE ONLY csvimport_importmodel ALTER COLUMN id SET DEFAULT nextval('csvimport_importmodel_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: pgadmin
+--
+
 ALTER TABLE ONLY django_admin_log ALTER COLUMN id SET DEFAULT nextval('django_admin_log_id_seq'::regclass);
 
 
@@ -1295,57 +1389,63 @@ COPY auth_permission (id, name, content_type_id, codename) FROM stdin;
 19	Can add migration history	7	add_migrationhistory
 20	Can change migration history	7	change_migrationhistory
 21	Can delete migration history	7	delete_migrationhistory
-22	Can add Отношения пользователей	8	add_usersrels
-23	Can change Отношения пользователей	8	change_usersrels
-24	Can delete Отношения пользователей	8	delete_usersrels
-25	Can add Пользователь	9	add_users
-26	Can change Пользователь	9	change_users
-27	Can delete Пользователь	9	delete_users
-28	Can add Запросы пользователя	10	add_usersrequests
-29	Can change Запросы пользователя	10	change_usersrequests
-30	Can delete Запросы пользователя	10	delete_usersrequests
-31	Can add Лог пользователя	11	add_userslog
-32	Can change Лог пользователя	11	change_userslog
-33	Can delete Лог пользователя	11	delete_userslog
-34	Can add Картинки пользователя	12	add_userspics
-35	Can change Картинки пользователя	12	change_userspics
-36	Can delete Картинки пользователя	12	delete_userspics
-37	Can add Социальность пользователя	13	add_userssocial
-38	Can change Социальность пользователя	13	change_userssocial
-39	Can delete Социальность пользователя	13	delete_userssocial
-40	Can add Персона	14	add_persons
-41	Can change Персона	14	change_persons
-42	Can delete Персона	14	delete_persons
-43	Can add Расширения персоны	15	add_personsextras
-44	Can change Расширения персоны	15	change_personsextras
-45	Can delete Расширения персоны	15	delete_personsextras
-46	Can add Расширения персоны	16	add_userspersons
-47	Can change Расширения персоны	16	change_userspersons
-48	Can delete Расширения персоны	16	delete_userspersons
-49	Can add Робот	17	add_robots
-50	Can change Робот	17	change_robots
-51	Can delete Робот	17	delete_robots
-52	Can add Логирование робота	18	add_robotslog
-53	Can change Логирование робота	18	change_robotslog
-54	Can delete Логирование робота	18	delete_robotslog
-55	Can add Страна	19	add_countries
-56	Can change Страна	19	change_countries
-57	Can delete Страна	19	delete_countries
-58	Can add Жанр	20	add_genres
-59	Can change Жанр	20	change_genres
-60	Can delete Жанр	20	delete_genres
-61	Can add Фильм	21	add_films
-62	Can change Фильм	21	change_films
-63	Can delete Фильм	21	delete_films
-64	Can add Дополнительный материал	22	add_filmextras
-65	Can change Дополнительный материал	22	change_filmextras
-66	Can delete Дополнительный материал	22	delete_filmextras
-67	Can add Связь Фильм-Пользователь	23	add_usersfilms
-68	Can change Связь Фильм-Пользователь	23	change_usersfilms
-69	Can delete Связь Фильм-Пользователь	23	delete_usersfilms
-70	Can add Сезон	24	add_seasons
-71	Can change Сезон	24	change_seasons
-72	Can delete Сезон	24	delete_seasons
+22	Can add csv import	8	add_csvimport
+23	Can change csv import	8	change_csvimport
+24	Can delete csv import	8	delete_csvimport
+25	Can add import model	9	add_importmodel
+26	Can change import model	9	change_importmodel
+27	Can delete import model	9	delete_importmodel
+28	Can add Отношения пользователей	10	add_usersrels
+29	Can change Отношения пользователей	10	change_usersrels
+30	Can delete Отношения пользователей	10	delete_usersrels
+31	Can add Пользователь	11	add_users
+32	Can change Пользователь	11	change_users
+33	Can delete Пользователь	11	delete_users
+34	Can add Запросы пользователя	12	add_usersrequests
+35	Can change Запросы пользователя	12	change_usersrequests
+36	Can delete Запросы пользователя	12	delete_usersrequests
+37	Can add Лог пользователя	13	add_userslog
+38	Can change Лог пользователя	13	change_userslog
+39	Can delete Лог пользователя	13	delete_userslog
+40	Can add Картинки пользователя	14	add_userspics
+41	Can change Картинки пользователя	14	change_userspics
+42	Can delete Картинки пользователя	14	delete_userspics
+43	Can add Социальность пользователя	15	add_userssocial
+44	Can change Социальность пользователя	15	change_userssocial
+45	Can delete Социальность пользователя	15	delete_userssocial
+46	Can add Персона	16	add_persons
+47	Can change Персона	16	change_persons
+48	Can delete Персона	16	delete_persons
+49	Can add Расширения персоны	17	add_personsextras
+50	Can change Расширения персоны	17	change_personsextras
+51	Can delete Расширения персоны	17	delete_personsextras
+52	Can add Расширения персоны	18	add_userspersons
+53	Can change Расширения персоны	18	change_userspersons
+54	Can delete Расширения персоны	18	delete_userspersons
+55	Can add Робот	19	add_robots
+56	Can change Робот	19	change_robots
+57	Can delete Робот	19	delete_robots
+58	Can add Логирование робота	20	add_robotslog
+59	Can change Логирование робота	20	change_robotslog
+60	Can delete Логирование робота	20	delete_robotslog
+61	Can add Страна	21	add_countries
+62	Can change Страна	21	change_countries
+63	Can delete Страна	21	delete_countries
+64	Can add Жанр	22	add_genres
+65	Can change Жанр	22	change_genres
+66	Can delete Жанр	22	delete_genres
+67	Can add Фильм	23	add_films
+68	Can change Фильм	23	change_films
+69	Can delete Фильм	23	delete_films
+70	Can add Дополнительный материал	24	add_filmextras
+71	Can change Дополнительный материал	24	change_filmextras
+72	Can delete Дополнительный материал	24	delete_filmextras
+73	Can add Связь Фильм-Пользователь	25	add_usersfilms
+74	Can change Связь Фильм-Пользователь	25	change_usersfilms
+75	Can delete Связь Фильм-Пользователь	25	delete_usersfilms
+76	Can add Сезон	26	add_seasons
+77	Can change Сезон	26	change_seasons
+78	Can delete Сезон	26	delete_seasons
 \.
 
 
@@ -1353,7 +1453,7 @@ COPY auth_permission (id, name, content_type_id, codename) FROM stdin;
 -- Name: auth_permission_id_seq; Type: SEQUENCE SET; Schema: public; Owner: pgadmin
 --
 
-SELECT pg_catalog.setval('auth_permission_id_seq', 72, true);
+SELECT pg_catalog.setval('auth_permission_id_seq', 78, true);
 
 
 --
@@ -1361,7 +1461,7 @@ SELECT pg_catalog.setval('auth_permission_id_seq', 72, true);
 --
 
 COPY auth_user (id, password, last_login, is_superuser, username, first_name, last_name, email, is_staff, is_active, date_joined) FROM stdin;
-1	pbkdf2_sha256$12000$NsufHmw6V25T$SD0gzayijxXInLgTldiOhiuQY/ncuTIJ3LdzAcWgbMk=	2014-03-13 11:13:30.17151+04	t	admin			tumani1@yandex.ru	t	t	2014-03-13 11:13:30.17151+04
+1	pbkdf2_sha256$12000$aw3CTpsrmCws$nTr2BJ92eGBr4gRSDbaSvR/rlQxwhbPwPCFL2/KrTgE=	2014-03-14 16:51:21.302072+04	t	admin			tumani1@yandex.ru	t	t	2014-03-14 16:51:21.302072+04
 \.
 
 
@@ -1418,6 +1518,36 @@ SELECT pg_catalog.setval('countries_id_seq', 1, false);
 
 
 --
+-- Data for Name: csvimport_csvimport; Type: TABLE DATA; Schema: public; Owner: pgadmin
+--
+
+COPY csvimport_csvimport (id, model_name, field_list, upload_file, file_name, encoding, upload_method, error_log, import_date, import_user) FROM stdin;
+\.
+
+
+--
+-- Name: csvimport_csvimport_id_seq; Type: SEQUENCE SET; Schema: public; Owner: pgadmin
+--
+
+SELECT pg_catalog.setval('csvimport_csvimport_id_seq', 1, false);
+
+
+--
+-- Data for Name: csvimport_importmodel; Type: TABLE DATA; Schema: public; Owner: pgadmin
+--
+
+COPY csvimport_importmodel (id, csvimport_id, numeric_id, natural_key) FROM stdin;
+\.
+
+
+--
+-- Name: csvimport_importmodel_id_seq; Type: SEQUENCE SET; Schema: public; Owner: pgadmin
+--
+
+SELECT pg_catalog.setval('csvimport_importmodel_id_seq', 1, false);
+
+
+--
 -- Data for Name: django_admin_log; Type: TABLE DATA; Schema: public; Owner: pgadmin
 --
 
@@ -1444,23 +1574,25 @@ COPY django_content_type (id, name, app_label, model) FROM stdin;
 5	content type	contenttypes	contenttype
 6	session	sessions	session
 7	migration history	south	migrationhistory
-8	Отношения пользователей	users	usersrels
-9	Пользователь	users	users
-10	Запросы пользователя	users	usersrequests
-11	Лог пользователя	users	userslog
-12	Картинки пользователя	users	userspics
-13	Социальность пользователя	users	userssocial
-14	Персона	users	persons
-15	Расширения персоны	users	personsextras
-16	Расширения персоны	users	userspersons
-17	Робот	robots	robots
-18	Логирование робота	robots	robotslog
-19	Страна	films	countries
-20	Жанр	films	genres
-21	Фильм	films	films
-22	Дополнительный материал	films	filmextras
-23	Связь Фильм-Пользователь	films	usersfilms
-24	Сезон	films	seasons
+8	csv import	csvimport	csvimport
+9	import model	csvimport	importmodel
+10	Отношения пользователей	users	usersrels
+11	Пользователь	users	users
+12	Запросы пользователя	users	usersrequests
+13	Лог пользователя	users	userslog
+14	Картинки пользователя	users	userspics
+15	Социальность пользователя	users	userssocial
+16	Персона	users	persons
+17	Расширения персоны	users	personsextras
+18	Расширения персоны	users	userspersons
+19	Робот	robots	robots
+20	Логирование робота	robots	robotslog
+21	Страна	films	countries
+22	Жанр	films	genres
+23	Фильм	films	films
+24	Дополнительный материал	films	filmextras
+25	Связь Фильм-Пользователь	films	usersfilms
+26	Сезон	films	seasons
 \.
 
 
@@ -1468,7 +1600,7 @@ COPY django_content_type (id, name, app_label, model) FROM stdin;
 -- Name: django_content_type_id_seq; Type: SEQUENCE SET; Schema: public; Owner: pgadmin
 --
 
-SELECT pg_catalog.setval('django_content_type_id_seq', 24, true);
+SELECT pg_catalog.setval('django_content_type_id_seq', 26, true);
 
 
 --
@@ -1483,7 +1615,7 @@ COPY django_session (session_key, session_data, expire_date) FROM stdin;
 -- Data for Name: films; Type: TABLE DATA; Schema: public; Owner: pgadmin
 --
 
-COPY films (id, name, ftype, "fReleaseDate", description, rating_local, rating_local_cnt, rating_imdb, rating_imdb_cnt, rating_kinopoisk, rating_kinopoisk_cnt, seasons_cnt, name_orig) FROM stdin;
+COPY films (id, name, ftype, frelease_date, fduration, fbudget, description, rating_local, rating_local_cnt, rating_imdb, rating_imdb_cnt, kinopoisk_id, age_limit, kinopoisk_lastupdate, rating_kinopoisk, rating_kinopoisk_cnt, seasons_cnt, name_orig) FROM stdin;
 \.
 
 
@@ -1506,7 +1638,7 @@ SELECT pg_catalog.setval('films_countries_id_seq', 1, false);
 -- Data for Name: films_extras; Type: TABLE DATA; Schema: public; Owner: pgadmin
 --
 
-COPY films_extras (id, film_id, "eType", name, name_orig, description, url) FROM stdin;
+COPY films_extras (id, film_id, etype, name, name_orig, description, url) FROM stdin;
 \.
 
 
@@ -1611,7 +1743,7 @@ SELECT pg_catalog.setval('robots_log_id_seq', 1, false);
 -- Data for Name: seasons; Type: TABLE DATA; Schema: public; Owner: pgadmin
 --
 
-COPY seasons (id, film_id, "sReleaseDate", series_cnt, description, "sNumber") FROM stdin;
+COPY seasons (id, film_id, release_date, series_cnt, description, number) FROM stdin;
 \.
 
 
@@ -1627,12 +1759,10 @@ SELECT pg_catalog.setval('seasons_id_seq', 1, false);
 --
 
 COPY south_migrationhistory (id, app_name, migration, applied) FROM stdin;
-1	django_extensions	0001_empty	2014-03-13 11:13:53.525363+04
-2	users	0001_initial	2014-03-13 11:13:54.849348+04
-3	users	0002_add_users_rels	2014-03-13 11:13:55.029074+04
-4	robots	0001_initial	2014-03-13 11:13:55.610711+04
-5	films	0001_initial	2014-03-13 11:13:57.087789+04
-6	films	0002_auto__del_field_films_poster_id__chg_field_films_fReleaseDate	2014-03-13 11:13:57.289826+04
+1	django_extensions	0001_empty	2014-03-14 16:51:36.929829+04
+2	users	0001_initial	2014-03-14 16:51:38.509475+04
+3	robots	0001_initial	2014-03-14 16:51:39.274241+04
+4	films	0001_initial	2014-03-14 16:51:40.988262+04
 \.
 
 
@@ -1640,14 +1770,15 @@ COPY south_migrationhistory (id, app_name, migration, applied) FROM stdin;
 -- Name: south_migrationhistory_id_seq; Type: SEQUENCE SET; Schema: public; Owner: pgadmin
 --
 
-SELECT pg_catalog.setval('south_migrationhistory_id_seq', 6, true);
+SELECT pg_catalog.setval('south_migrationhistory_id_seq', 4, true);
 
 
 --
 -- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: pgadmin
 --
 
-COPY users (id, firstname, lastname, email, passhash, last_visited, created, ustatus, userpic_type, userpic_id) FROM stdin;
+COPY users (id, firstname, lastname, email, password, last_visited, created, ustatus, userpic_type, userpic_id) FROM stdin;
+1	qwerty	qwerty	tumani1@yandex.ru	1234556	2014-03-13 13:53:40+04	2014-03-13 13:53:40+04	1	1	\N
 \.
 
 
@@ -1655,7 +1786,7 @@ COPY users (id, firstname, lastname, email, passhash, last_visited, created, ust
 -- Data for Name: users_films; Type: TABLE DATA; Schema: public; Owner: pgadmin
 --
 
-COPY users_films (id, users_id, films_id, "ufStatus", "ufRating", subscribed) FROM stdin;
+COPY users_films (id, user_id, film_id, ufstatus, ufrating, subscribed) FROM stdin;
 \.
 
 
@@ -1670,7 +1801,7 @@ SELECT pg_catalog.setval('users_films_id_seq', 1, false);
 -- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: pgadmin
 --
 
-SELECT pg_catalog.setval('users_id_seq', 1, false);
+SELECT pg_catalog.setval('users_id_seq', 1, true);
 
 
 --
@@ -1868,6 +1999,22 @@ ALTER TABLE ONLY countries
 
 
 --
+-- Name: csvimport_csvimport_pkey; Type: CONSTRAINT; Schema: public; Owner: pgadmin; Tablespace: 
+--
+
+ALTER TABLE ONLY csvimport_csvimport
+    ADD CONSTRAINT csvimport_csvimport_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: csvimport_importmodel_pkey; Type: CONSTRAINT; Schema: public; Owner: pgadmin; Tablespace: 
+--
+
+ALTER TABLE ONLY csvimport_importmodel
+    ADD CONSTRAINT csvimport_importmodel_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: django_admin_log_pkey; Type: CONSTRAINT; Schema: public; Owner: pgadmin; Tablespace: 
 --
 
@@ -1988,6 +2135,14 @@ ALTER TABLE ONLY robots
 
 
 --
+-- Name: seasons_film_id_d7c0afc8b6d3cb9_uniq; Type: CONSTRAINT; Schema: public; Owner: pgadmin; Tablespace: 
+--
+
+ALTER TABLE ONLY seasons
+    ADD CONSTRAINT seasons_film_id_d7c0afc8b6d3cb9_uniq UNIQUE (film_id, number);
+
+
+--
 -- Name: seasons_pkey; Type: CONSTRAINT; Schema: public; Owner: pgadmin; Tablespace: 
 --
 
@@ -2001,6 +2156,14 @@ ALTER TABLE ONLY seasons
 
 ALTER TABLE ONLY south_migrationhistory
     ADD CONSTRAINT south_migrationhistory_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: users_email_key; Type: CONSTRAINT; Schema: public; Owner: pgadmin; Tablespace: 
+--
+
+ALTER TABLE ONLY users
+    ADD CONSTRAINT users_email_key UNIQUE (email);
 
 
 --
@@ -2131,6 +2294,13 @@ CREATE INDEX auth_user_username_like ON auth_user USING btree (username varchar_
 
 
 --
+-- Name: csvimport_importmodel_csvimport_id; Type: INDEX; Schema: public; Owner: pgadmin; Tablespace: 
+--
+
+CREATE INDEX csvimport_importmodel_csvimport_id ON csvimport_importmodel USING btree (csvimport_id);
+
+
+--
 -- Name: django_admin_log_content_type_id; Type: INDEX; Schema: public; Owner: pgadmin; Tablespace: 
 --
 
@@ -2229,17 +2399,24 @@ CREATE INDEX seasons_film_id ON seasons USING btree (film_id);
 
 
 --
--- Name: users_films_films_id; Type: INDEX; Schema: public; Owner: pgadmin; Tablespace: 
+-- Name: users_email_like; Type: INDEX; Schema: public; Owner: pgadmin; Tablespace: 
 --
 
-CREATE INDEX users_films_films_id ON users_films USING btree (films_id);
+CREATE INDEX users_email_like ON users USING btree (email varchar_pattern_ops);
 
 
 --
--- Name: users_films_users_id; Type: INDEX; Schema: public; Owner: pgadmin; Tablespace: 
+-- Name: users_films_film_id; Type: INDEX; Schema: public; Owner: pgadmin; Tablespace: 
 --
 
-CREATE INDEX users_films_users_id ON users_films USING btree (users_id);
+CREATE INDEX users_films_film_id ON users_films USING btree (film_id);
+
+
+--
+-- Name: users_films_user_id; Type: INDEX; Schema: public; Owner: pgadmin; Tablespace: 
+--
+
+CREATE INDEX users_films_user_id ON users_films USING btree (user_id);
 
 
 --
@@ -2354,6 +2531,14 @@ ALTER TABLE ONLY films_countries
 
 
 --
+-- Name: csvimport_importmodel_csvimport_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: pgadmin
+--
+
+ALTER TABLE ONLY csvimport_importmodel
+    ADD CONSTRAINT csvimport_importmodel_csvimport_id_fkey FOREIGN KEY (csvimport_id) REFERENCES csvimport_csvimport(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
 -- Name: film_id_refs_id_44e62927; Type: FK CONSTRAINT; Schema: public; Owner: pgadmin
 --
 
@@ -2370,6 +2555,14 @@ ALTER TABLE ONLY films_extras
 
 
 --
+-- Name: film_id_refs_id_f61d2690; Type: FK CONSTRAINT; Schema: public; Owner: pgadmin
+--
+
+ALTER TABLE ONLY users_films
+    ADD CONSTRAINT film_id_refs_id_f61d2690 FOREIGN KEY (film_id) REFERENCES films(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
 -- Name: films_id_refs_id_0a32f7f2; Type: FK CONSTRAINT; Schema: public; Owner: pgadmin
 --
 
@@ -2383,14 +2576,6 @@ ALTER TABLE ONLY films_genres
 
 ALTER TABLE ONLY films_countries
     ADD CONSTRAINT films_id_refs_id_7c2aa0d5 FOREIGN KEY (films_id) REFERENCES films(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
--- Name: films_id_refs_id_f61d2690; Type: FK CONSTRAINT; Schema: public; Owner: pgadmin
---
-
-ALTER TABLE ONLY users_films
-    ADD CONSTRAINT films_id_refs_id_f61d2690 FOREIGN KEY (films_id) REFERENCES films(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
@@ -2482,6 +2667,14 @@ ALTER TABLE ONLY users_requests
 
 
 --
+-- Name: user_id_refs_id_bd11dfad; Type: FK CONSTRAINT; Schema: public; Owner: pgadmin
+--
+
+ALTER TABLE ONLY users_films
+    ADD CONSTRAINT user_id_refs_id_bd11dfad FOREIGN KEY (user_id) REFERENCES users(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
 -- Name: user_id_refs_id_c0d12874; Type: FK CONSTRAINT; Schema: public; Owner: pgadmin
 --
 
@@ -2519,14 +2712,6 @@ ALTER TABLE ONLY users_rels
 
 ALTER TABLE ONLY users
     ADD CONSTRAINT userpic_id_refs_id_52f925e4 FOREIGN KEY (userpic_id) REFERENCES users_pics(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
--- Name: users_id_refs_id_bd11dfad; Type: FK CONSTRAINT; Schema: public; Owner: pgadmin
---
-
-ALTER TABLE ONLY users_films
-    ADD CONSTRAINT users_id_refs_id_bd11dfad FOREIGN KEY (users_id) REFERENCES users(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
