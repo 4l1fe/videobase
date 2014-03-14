@@ -120,18 +120,19 @@ class UsersFilms(models.Model):
 #############################################################################################################
 # Таблица Сезонов фильмов/сериалов
 class Seasons(models.Model):
-    film         = models.ForeignKey(Films, verbose_name=u'Фильмы')
+    film         = models.ForeignKey(Films, verbose_name=u'Фильм')
     release_date = models.DateTimeField(verbose_name=u'Дата выхода сезона')
     series_cnt   = models.PositiveSmallIntegerField(verbose_name=u'Количество серий в сезоне')
     description  = models.TextField(verbose_name=u'Описание сезона')
-    number      = models.PositiveSmallIntegerField(verbose_name=u'Порядковый номер сезона')
+    number       = models.PositiveSmallIntegerField(verbose_name=u'Порядковый номер сезона')
 
 
     def __unicode__(self):
-        return u' [%s] %s %s' % (self.pk, self.film.name, self.snumber)
+        return u' [%s] %s %s' % (self.pk, self.film.name, self.number)
 
     class  Meta(object):
         # Имя таблицы в БД
         db_table = 'seasons'
         verbose_name = u'Сезон'
         verbose_name_plural = u'Сезоны'
+        unique_together = (('film', 'number'),)
