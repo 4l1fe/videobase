@@ -41,6 +41,7 @@ INSTALLED_APPS = (
     'apps.users',
     'apps.robots',
     'apps.films',
+    # 'apps.contents',
 )
 
 MIDDLEWARE_CLASSES = (
