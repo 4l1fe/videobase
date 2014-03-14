@@ -44,9 +44,9 @@ class SeasonsAdmin(admin.ModelAdmin):
 
 #############################################################################################################
 # Регистрация моделей в админке
-admin.site.register(Countries,CountriesAdmin)
-admin.site.register(Genres,GenresAdmin)
-admin.site.register(Films,FilmsAdmin)
-admin.site.register(UsersFilms,UserFilmsAdmin)
-admin.site.register(FilmExtras,FilmExtrasAdmin)
+admin.site.register(Countries, CountriesAdmin)
+admin.site.register(Genres, GenresAdmin)
+admin.site.register(Films, FilmsAdmin)
+admin.site.register(UsersFilms, UserFilmsAdmin)
+admin.site.register(FilmExtras, FilmExtrasAdmin)
 admin.site.register(Seasons, SeasonsAdmin)

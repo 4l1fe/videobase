@@ -14,7 +14,7 @@ class SeasonsAdminForm(ModelForm):
         cleaned_data = super(SeasonsAdminForm, self).clean()
 
         if cleaned_data and not self._errors:
-            if cleaned_data['film'].ftype != SERIAL:
+            if cleaned_data['film'].ftype != APP_FILM_SERIAL:
                 raise ValidationError(u'У фильма не может быть сезона')
 
         return cleaned_data
