@@ -99,7 +99,7 @@ class UsersLog(models.Model):
 #############################################################################################################
 # Картинки пользователей
 class UsersPics(models.Model):
-    user = models.ForeignKey(Users, verbose_name=u'Пользователи')
+    user = models.ForeignKey(Users, verbose_name=u'Пользователь')
     url  = models.CharField(max_length=255, verbose_name=u'Url')
 
 
@@ -116,7 +116,7 @@ class UsersPics(models.Model):
 #############################################################################################################
 # Социальность пользователей
 class UsersSocial(models.Model):
-    user    = models.ForeignKey(Users, verbose_name=u'Пользователи')
+    user    = models.ForeignKey(Users, verbose_name=u'Пользователь')
     stype   = models.CharField(max_length=255, verbose_name=u'')
     stoken  = models.CharField(max_length=255, verbose_name=u'')
     suserid = models.IntegerField(verbose_name=u'')
@@ -142,9 +142,13 @@ class Persons(models.Model):
     bio       = models.TextField(verbose_name=u'Биография')
     photo     = models.ImageField(upload_to=PERSON_PHOTO_DIR, blank=True, null=True, verbose_name=u'Фото')
 
+    @property
+    def get_full_name(self):
+        full_name = u"%s (%s)" % (self.name, self.name_orig,)
+        return full_name.strip()
 
     def __unicode__(self):
-        return u'[%s] %s' % (self.pk, self.user.name)
+        return u'[%s] %s' % (self.pk, self.get_full_name)
 
     class Meta:
         # Имя таблицы в БД
@@ -165,7 +169,7 @@ class PersonsExtras(models.Model):
 
 
     def __unicode__(self):
-        return u'[%s] %s' % (self.pk, self.person.name)
+        return u'[%s] %s' % (self.pk, self.person.get_full_name)
 
     class Meta:
         # Имя таблицы в БД
@@ -177,7 +181,7 @@ class PersonsExtras(models.Model):
 #############################################################################################################
 # Таблица связи Пользователей и Персон
 class UsersPersons(models.Model):
-    user       = models.ForeignKey(Users, max_length=255, verbose_name=u'Пользователи')
+    user       = models.ForeignKey(Users, max_length=255, verbose_name=u'Пользователь')
     person     = models.ForeignKey(Persons, max_length=255, verbose_name=u'Персона')
     upstatus   = models.IntegerField(verbose_name=u'Статус')
     subscribed = models.IntegerField(verbose_name=u'Подписка')
