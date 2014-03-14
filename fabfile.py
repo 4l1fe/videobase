@@ -35,8 +35,7 @@ def local_db_reset():
     '''
     local('''echo "DROP DATABASE videobase;" |  sudo -u postgres psql''')
     local('''echo "CREATE USER pgadmin WITH PASSWORD 'qwerty'; CREATE DATABASE videobase; GRANT ALL PRIVILEGES ON DATABASE videobase to pgadmin;" |  sudo -u postgres psql''')
-    with cd('sql_dump'):
-        local("""sudo -u postgres psql -d videobase -f $(ls -1 *.sql | head -1)""")
+    local("""cd sql_dump && sudo -u postgres psql -d videobase -f $(ls -1 *.sql | head -1)""")
             
         
 def deploy_test_code():
