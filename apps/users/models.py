@@ -41,7 +41,7 @@ class Users(models.Model):
     objects = UserManager()
 
     def __unicode__(self):
-        return u'[%s] %s' % (self.pk, self.get_full_name)
+        return u'[%s] %s' % (self.pk, self.name)
 
     @property
     def name(self):

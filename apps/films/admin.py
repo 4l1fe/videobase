@@ -1,26 +1,45 @@
 # coding: utf-8
 
 from django.contrib import admin
+
 from apps.films.models import *
+from apps.films.forms import *
 
 
+#############################################################################################################
+#
 class CountriesAdmin(admin.ModelAdmin):
     pass
 
+
+#############################################################################################################
+#
 class GenresAdmin(admin.ModelAdmin):
     pass
 
+
+#############################################################################################################
+#
 class FilmsAdmin(admin.ModelAdmin):
     pass
 
+
+#############################################################################################################
+#
 class UserFilmsAdmin(admin.ModelAdmin):
     pass
 
+
+#############################################################################################################
+#
 class FilmExtrasAdmin(admin.ModelAdmin):
     pass
 
+
+#############################################################################################################
+#
 class SeasonsAdmin(admin.ModelAdmin):
-    pass
+    form = SeasonsAdminForm
 
 
 #############################################################################################################
@@ -30,4 +49,4 @@ admin.site.register(Genres,GenresAdmin)
 admin.site.register(Films,FilmsAdmin)
 admin.site.register(UsersFilms,UserFilmsAdmin)
 admin.site.register(FilmExtras,FilmExtrasAdmin)
-admin.site.register(Seasons,SeasonsAdmin)
+admin.site.register(Seasons, SeasonsAdmin)
