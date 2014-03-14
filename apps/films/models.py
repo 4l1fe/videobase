@@ -44,7 +44,7 @@ class Genres(models.Model):
 # Таблица фильмов/сериалов
 class Films(models.Model):
     name             = models.CharField(max_length=255, verbose_name=u'Название фильма')
-    ftype            = models.CharField(max_length=255, choices=FILM_TYPES, verbose_name=u'Тип фильма')
+    ftype            = models.CharField(max_length=255, choices=APP_FILM_FILM_TYPES, verbose_name=u'Тип фильма')
     frelease_date    = models.DateField(verbose_name=u'Дата выхода')
     fduration        = models.IntegerField(null=True, blank=True, verbose_name=u'Продолжительность фильма')
     fbudget          = models.IntegerField(null=True, blank=True, verbose_name=u'Бюджет фильма')
@@ -79,7 +79,7 @@ class Films(models.Model):
 class FilmExtras(models.Model):
     film        = models.ForeignKey(Films, verbose_name=u'Фильм')
     etype       = models.CharField(max_length=255,
-                                   choices=TYPE_ADDITIONAL_MATERIAL,
+                                   choices=APP_FILM_TYPE_ADDITIONAL_MATERIAL,
                                    verbose_name=u'Тип дополнительного материала')
     name        = models.CharField(max_length=255, verbose_name=u'Название')
     name_orig   = models.CharField(max_length=255, verbose_name=u'Оригинальное название')

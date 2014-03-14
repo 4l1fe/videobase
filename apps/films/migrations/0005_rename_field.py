@@ -8,9 +8,11 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
+        db.rename_column('seasons', 'frelease_date', 'release_date')
         db.execute("ALTER TABLE seasons  ADD CONSTRAINT seasons_film_id_number_key UNIQUE(film_id, number);")
 
     def backwards(self, orm):
+        db.rename_column('seasons', 'release_date', 'frelease_date')
         db.execute("ALTER TABLE seasons DROP CONSTRAINT seasons_film_id_number_key;")
 
     models = {
