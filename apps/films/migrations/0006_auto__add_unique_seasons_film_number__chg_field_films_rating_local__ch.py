@@ -8,7 +8,6 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-
         # Changing field 'Films.rating_local'
         db.alter_column('films', 'rating_local', self.gf('django.db.models.fields.FloatField')(null=True))
 
@@ -19,10 +18,6 @@ class Migration(SchemaMigration):
         db.alter_column('films', 'rating_imdb', self.gf('django.db.models.fields.FloatField')(null=True))
 
     def backwards(self, orm):
-        # Removing unique constraint on 'Seasons', fields ['film', 'number']
-        db.delete_unique('seasons', ['film_id', 'number'])
-
-
         # Changing field 'Films.rating_local'
         db.alter_column('films', 'rating_local', self.gf('django.db.models.fields.PositiveSmallIntegerField')(null=True))
 
