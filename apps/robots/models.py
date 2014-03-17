@@ -14,7 +14,7 @@ class Robots(models.Model):
 
 
     def __unicode__(self):
-        return u'[{:s}] {:s}'.format(self.pk, self.name,)
+        return u'[{0}] {1}'.format(self.pk, self.name,)
 
     class Meta:
         # Имя таблицы в БД
@@ -33,7 +33,7 @@ class RobotsLog(models.Model):
 
 
     def __unicode__(self):
-        return u'[{:s}] {:s}'.format(self.pk, self.name,)
+        return u'[{0}] {1}'.format(self.pk, self.name,)
 
     class Meta:
         # Имя таблицы в БД
