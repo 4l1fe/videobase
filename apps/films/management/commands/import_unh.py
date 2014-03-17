@@ -169,16 +169,23 @@ class Command(BaseCommand):
             person_model.save()
         return person_model
 
+    def save_person_film(self, film, person, p_type):
+        try:
+            person_film = PersonsFilms(film=film,
+                                       person=person,
+                                       p_type=p_type)
+            person_film.save()
+            return person_film
+        except:
+            return True
+
     def save_actors(self, film, data = None):
         actors_ru_names = self.compact_list(data['actors_ru'].split(','))
         actors_eng_names = self.compact_list(data['actors_eng'].split(','))
         actors_names = zip(actors_ru_names, actors_eng_names)
         for actor_name in actors_names:
             actor = self.get_person(actor_name)
-            person_film = PersonsFilms(film=film,
-                                       person=actor,
-                                       p_type=APP_PERSON_ACTOR)
-            person_film.save()
+            self.save_person_film(film, actor, APP_PERSON_ACTOR)
         return True
 
     def save_director(self, film, data = None):
@@ -187,10 +194,7 @@ class Command(BaseCommand):
         directors_names = zip(director_ru_names, director_eng_names)
         for director_name in directors_names:
             director = self.get_person(director_name)
-            person_film = PersonsFilms(film=film,
-                                       person=director,
-                                       p_type=APP_PERSON_DIRECTOR)
-            person_film.save()
+            self.save_person_film(film, director, APP_PERSON_DIRECTOR)
         return True
 
     def compact_list(self, list = []):
