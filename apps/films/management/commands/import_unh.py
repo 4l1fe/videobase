@@ -15,7 +15,8 @@ from django.db import models
 from django.contrib.contenttypes.models import ContentType
 
 from apps.films.constants import *
-from apps.films.models import Films, Genres, Countries
+from apps.films.models import Films, Genres, Countries, PersonsFilms, FilmExtras
+from apps.users.models import Persons
 
 class Command(BaseCommand):
     def __init__(self):
@@ -36,7 +37,7 @@ class Command(BaseCommand):
         headers = data[0]
         counter = 0
 
-        for row in data[1:100]:
+        for row in data[1:]:
             item = dict(zip(headers, row)) if (len(headers) <= len(row)) else dict(map(None, headers, row))
             if self.insert_item(item):
                 counter += 1
@@ -82,7 +83,6 @@ class Command(BaseCommand):
             film.countries = self.get_countries(countries=u'Флатландию')
             film.save()
             self.save_trailer(film, data)
-            self.save_poster(film, data)
             self.save_actors(film, data)
             self.save_director(film, data)
 
@@ -115,20 +115,63 @@ class Command(BaseCommand):
         return lists[0] if lists else ''
 
     def save_trailer(self, film, data = None):
-        warnings.warn("Function isn't implemetation")
-        pass
+        if data is None:
+            return True
+        trailer_youtube_id = data['trailer_youtube']
+        if (trailer_youtube_id is None) or (trailer_youtube_id.lower() == 'null'):
+            return True
 
-    def save_poster(self, film, data = None):
-        warnings.warn("Function isn't implemetation")
-        pass
+        youtube_url = "https://www.youtube.com/watch?v=" + trailer_youtube_id
+        try:
+            traler = FilmExtras.get(url=youtube_url,
+                                    etype=APP_FILM_TYPE_ADDITIONAL_MATERIAL_TRAILER)
+        except:
+            traler = FilmExtras(film=film,
+                                name=film.name,
+                                name_orig=film.name_orig,
+                                url=youtube_url,
+                                etype=APP_FILM_TYPE_ADDITIONAL_MATERIAL_TRAILER)
+            traler.save()
+        return True
+
+    # person_data[0] - ru name
+    # person_data[1] - eng name
+    #
+    def get_person(self, person_data):
+        try:
+            person_model = Persons.objects.get(name=person_data[0].strip())
+        except:
+            person_model = Persons(name=person_data[0].strip(),
+                                   name_orig=person_data[1].strip())
+            person_model.save()
+        return person_model
 
     def save_actors(self, film, data = None):
-        warnings.warn("Function isn't implemetation")
-        pass
+        actors_ru_names = self.compact_list(data['actors_ru'].split(','))
+        actors_eng_names = self.compact_list(data['actors_eng'].split(','))
+        actors_names = zip(actors_ru_names, actors_eng_names)
+        for actor_name in actors_names:
+            actor = self.get_person(actor_name)
+            person_film = PersonsFilms(film=film,
+                                       person=actor,
+                                       p_type=APP_PERSON_ACTOR)
+            person_film.save()
+        return True
 
     def save_director(self, film, data = None):
-        warnings.warn("Function isn't implemetation")
-        pass
+        director_ru_names = self.compact_list(data['director_ru'].split(','))
+        director_eng_names = self.compact_list(data['director_eng'].split(','))
+        directors_names = zip(director_ru_names, director_eng_names)
+        for director_name in directors_names:
+            director = self.get_person(director_name)
+            person_film = PersonsFilms(film=film,
+                                       person=director,
+                                       p_type=APP_PERSON_DIRECTOR)
+            person_film.save()
+        return True
+
+    def compact_list(self, list = []):
+        return [ el for el in list if (not el is None) and (el.lower() != 'null')]
 
     def date_or_now(self, date = None):
         if date is None:
