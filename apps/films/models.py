@@ -14,7 +14,7 @@ class Countries(models.Model):
     description = models.TextField(verbose_name=u'Описание')
 
     def __unicode__(self):
-        return u'[{:s}] {:s}'.format(self.pk, self.name)
+        return u'[{0}] {1}'.format(self.pk, self.name.capitalize())
 
 
     class  Meta(object):
@@ -31,7 +31,7 @@ class Genres(models.Model):
     description  = models.TextField(verbose_name=u'Описание жанра')
 
     def __unicode__(self):
-        return u'[{:s}] {:s}'.format(self.pk, self.name)
+        return u'[{0}] {1}'.format(self.pk, self.name)
 
     class  Meta(object):
         # Имя таблицы в БД
@@ -65,7 +65,7 @@ class Films(models.Model):
 
 
     def __unicode__(self):
-        return u'[{:s}] {:s}'.format(self.pk, self.name)
+        return u'[{0}] {1}'.format(self.pk, self.name)
 
     class  Meta(object):
         # Имя таблицы в БД
@@ -88,7 +88,7 @@ class FilmExtras(models.Model):
 
 
     def __unicode__(self):
-        return u'[{:s}] {:s}'.format(self.pk, self.name)
+        return u'[{0}] {1}'.format(self.pk, self.name)
 
     class  Meta(object):
         # Имя таблицы в БД
@@ -108,7 +108,7 @@ class UsersFilms(models.Model):
 
 
     def __unicode__(self):
-        return u'[{:s}] {:s} - {:s} ({:s})'.format(self.pk, self.user.name, self.film.name, self.ufstatus)
+        return u'[{0}] {1} - {2} ({3})'.format(self.pk, self.user.name, self.film.name, self.ufstatus)
 
     class  Meta(object):
         # Имя таблицы в БД
@@ -128,7 +128,7 @@ class Seasons(models.Model):
 
 
     def __unicode__(self):
-        return u'[{:s}] {:s} {:s}'.format(self.pk, self.film.name, self.number)
+        return u'[{0}] {1} {2}'.format(self.pk, self.film.name, self.number)
 
     class  Meta(object):
         # Имя таблицы в БД
@@ -149,8 +149,8 @@ class PersonsFilms(models.Model):
 
 
     def __unicode__(self):
-        return u'[{:s}] {:s} {:s}'.format(self.pk, self.film.name, self.person.name)
-       
+        return u'[{0}] {1} {2}'.format(self.pk, self.film.name, self.person.name)
+
     class  Meta(object):
         # Имя таблицы в БД
         db_table = 'persons_films'
