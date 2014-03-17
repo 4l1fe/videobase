@@ -2,12 +2,13 @@
 
 from django.db import models
 
+from utils.fields import CurrencyField
 from apps.users.models import Users
 from apps.films.models import Films, Seasons
 
 
 #############################################################################################################
-#
+# Таблица контента
 class Content(models.Model):
     film                 = models.ForeignKey(Films, verbose_name=u'Фильм')
     name                 = models.CharField(max_length=255, verbose_name=u'Название')
@@ -20,6 +21,10 @@ class Content(models.Model):
     viewer_lastweek_cnt  = models.IntegerField(verbose_name=u'Количество посмотревших за последнюю неделю')
     viewer_lastmonth_cnt = models.IntegerField(verbose_name=u'Количество посмотревших за последний месяц')
 
+
+    def __unicode__(self):
+        return u'[{:s}] {:s}'.format(self.pk, self.film.name,)
+
     class Meta:
         # Имя таблицы в БД
         db_table = 'content'
@@ -28,16 +33,20 @@ class Content(models.Model):
 
 
 #############################################################################################################
-#
+# Таблица месторасположения контента
 class Locations(models.Model):
     content    = models.ForeignKey(Content, verbose_name=u'Контент')
     ltype      = models.CharField(max_length=255, choices=[], verbose_name=u'Тип')
     quality    = models.CharField(max_length=40, verbose_name=u'Качество')
     subtitles  = models.CharField(max_length=40, verbose_name=u'Субтитры')
-    price      = models.DecimalField(verbose_name=u'Цена')
+    price      = CurrencyField(verbose_name=u'Цена')
     price_type = models.CharField(max_length=40, verbose_name=u'Тип цены')
     value      = models.CharField(max_length=40, verbose_name=u'Ценность')
-    
+
+
+    def __unicode__(self):
+        return u'[{:s}] {:s} {:s}'.format(self.pk, self.content.name, self.ltype)
+
     class Meta:
         # Имя таблицы в БД
         db_table = 'locations'
@@ -46,7 +55,7 @@ class Locations(models.Model):
 
 
 #############################################################################################################
-#
+# Таблица комментариев
 class Comments(models.Model):
     user       = models.ForeignKey(Users, verbose_name=u'Пользователь')
     content    = models.IntegerField(verbose_name=u'Контент')
@@ -54,7 +63,11 @@ class Comments(models.Model):
     parent_id  = models.IntegerField(verbose_name=u'Родительский комментарий')
     cstatus    = models.CharField(max_length=40, verbose_name=u'Статус')
     created    = models.DateTimeField(auto_now_add=True, verbose_name=u'Создан')
-    
+
+
+    def __unicode__(self):
+        return u'[{:s}] {:s} ({:s})'.format(self.pk, self.user.name, self.content)
+
     class Meta:
         # Имя таблицы в БД
         db_table = 'comments'
