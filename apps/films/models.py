@@ -137,7 +137,7 @@ class Seasons(models.Model):
         verbose_name_plural = u'Сезоны'
         unique_together = (('film', 'number'),)
 
-        
+
 #############################################################################################################
 # Таблица роли персон в производстве фильмов
 class PersonsFilms(models.Model):
@@ -147,17 +147,15 @@ class PersonsFilms(models.Model):
     p_type    = models.CharField(max_length=255, choices=APP_FILM_PERSON_TYPES, verbose_name=u'Тип персоны')
     p_character = models.CharField(max_length=255, default = '')
     description = models.CharField(max_length=255, default = '')
-   
-        
+
+
     def __unicode__(self):
         return u' [{:s}] {:s} {:s}'.format(self.pk, self.film.name, self.person.name)
 
-        
+
     class  Meta(object):
         # Имя таблицы в БД
         db_table = 'persons_films'
         verbose_name = u'Роль персоны в производстве фильма'
         verbose_name_plural = u'Роли персон в производстве фильмов'
-        unique_together = (('film', 'person'),)
-
-        
+        unique_together = (('film', 'person', 'p_type'),)
