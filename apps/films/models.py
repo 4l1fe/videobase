@@ -3,7 +3,7 @@
 from django.db import models
 
 from constants import *
-from apps.users.models import Users, Persons
+from apps.users.models import Users
 
 
 #############################################################################################################
@@ -79,8 +79,7 @@ class Films(models.Model):
 # Таблица расширения фильмов/сериалов
 class FilmExtras(models.Model):
     film        = models.ForeignKey(Films, verbose_name=u'Фильм')
-    etype       = models.CharField(max_length=255,
-                                   choices=APP_FILM_TYPE_ADDITIONAL_MATERIAL,
+    etype       = models.CharField(max_length=255, choices=APP_FILM_TYPE_ADDITIONAL_MATERIAL,
                                    verbose_name=u'Тип дополнительного материала')
     name        = models.CharField(max_length=255, verbose_name=u'Название')
     name_orig   = models.CharField(max_length=255, verbose_name=u'Оригинальное название')
@@ -99,7 +98,7 @@ class FilmExtras(models.Model):
 
 
 #############################################################################################################
-#
+# Таблица связи фильмов пользователей
 class UsersFilms(models.Model):
     user      = models.ForeignKey(Users, verbose_name=u'Идентификатор пользоваля')
     film      = models.ForeignKey(Films, verbose_name=u'Фильм')
@@ -114,8 +113,8 @@ class UsersFilms(models.Model):
     class  Meta(object):
         # Имя таблицы в БД
         db_table = 'users_films'
-        verbose_name = u'Связь Фильм-Пользователь'
-        verbose_name_plural = u'Связь Фильм-Пользователи'
+        verbose_name = u'Фильмы пользователя'
+        verbose_name_plural = u'Фильмы пользователей'
 
 
 #############################################################################################################
@@ -137,6 +136,70 @@ class Seasons(models.Model):
         verbose_name = u'Сезон'
         verbose_name_plural = u'Сезоны'
         unique_together = (('film', 'number'),)
+
+
+#############################################################################################################
+# Таблица Персон
+class Persons(models.Model):
+    name      = models.CharField(max_length=255, verbose_name=u'Имя')
+    name_orig = models.CharField(max_length=255, verbose_name=u'Оригинальное имя')
+    bio       = models.TextField(verbose_name=u'Биография')
+    photo     = models.ImageField(upload_to=APP_PERSON_PHOTO_DIR, blank=True, null=True, verbose_name=u'Фото')
+
+
+    @property
+    def get_full_name(self):
+        full_name = u"%s (%s)" % (self.name, self.name_orig,)
+        return full_name.strip()
+
+    def __unicode__(self):
+        return u'[%s] %s' % (self.pk, self.get_full_name)
+
+    class Meta:
+        # Имя таблицы в БД
+        db_table = 'persons'
+        verbose_name = u'Персона'
+        verbose_name_plural = u'Персоны'
+
+
+#############################################################################################################
+# Расширения персоны
+class PersonsExtras(models.Model):
+    person      = models.ForeignKey(Persons, max_length=255, verbose_name=u'Персона')
+    etype       = models.CharField(max_length=255, verbose_name=u'')
+    name        = models.TextField(verbose_name=u'Имя')
+    name_orig   = models.TextField(verbose_name=u'Оригинальное имя')
+    description = models.TextField(verbose_name=u'Описавние')
+    url         = models.CharField(max_length=255, verbose_name=u'Фото')
+
+
+    def __unicode__(self):
+        return u'[%s] %s' % (self.pk, self.person.get_full_name)
+
+    class Meta:
+        # Имя таблицы в БД
+        db_table = 'persons_extras'
+        verbose_name = u'Расширения персоны'
+        verbose_name_plural = u'Расширения персон'
+
+
+#############################################################################################################
+# Таблица связи Пользователей и Персон
+class UsersPersons(models.Model):
+    user       = models.ForeignKey(Users, max_length=255, verbose_name=u'Пользователь')
+    person     = models.ForeignKey(Persons, max_length=255, verbose_name=u'Персона')
+    upstatus   = models.IntegerField(verbose_name=u'Статус')
+    subscribed = models.IntegerField(verbose_name=u'Подписка')
+
+
+    def __unicode__(self):
+        return u'[%s %s]' % (self.user, self.person)
+
+    class Meta:
+        # Имя таблицы в БД
+        db_table = 'users_persons'
+        verbose_name = u'Расширения персоны'
+        verbose_name_plural = u'Расширения персон'
 
 
 #############################################################################################################

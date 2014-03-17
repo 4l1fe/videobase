@@ -3,26 +3,26 @@
 import os
 from videobase.settings  import STATIC_PATH
 
-# Путь к каталогу с фото
+#############################################################################################################
+APP_USER_PIC_DIR = os.path.join(STATIC_PATH, 'upload', 'users', 'user_pic')
 
-PERSON_PHOTO_DIR =  os.path.join(STATIC_PATH, 'upload', 'people', 'photos')
-USER_PIC_DIR =  os.path.join(STATIC_PATH, 'upload', 'users', 'user_pic')
-
-REL_TYPES = (
+#############################################################################################################
+APP_USER_REL_TYPES = (
     ('FRIENDS', 'Friends'),
     ('COLLEAGUES', 'Colleagues'),
 )
 
+#############################################################################################################
+APP_USER_ACTIVE   = 0
+APP_USER_INACTIVE = 1
 
-USER_ACTIVE  = 0
-USER_INACTIVE = 1
-
-USER_STATUS = (
-    (USER_ACTIVE,  u'Активный'),
-    (USER_INACTIVE, u'Заблокирован')
+APP_USER_STATUS = (
+    (APP_USER_ACTIVE,  u'Активный'),
+    (APP_USER_INACTIVE, u'Заблокирован')
 )
 
-USER_PIC_TYPES = (
+#############################################################################################################
+APP_USER_PIC_TYPES = (
     ('SOCIAL', 'Из социальных сетей'),
     ('LOCAL', 'Сохранные изображения')
 )
