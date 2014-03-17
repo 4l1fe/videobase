@@ -33,8 +33,8 @@ class Users(models.Model):
     password     = models.CharField(max_length=255, verbose_name=u'Пароль')
     last_visited = models.DateTimeField(auto_now_add=True, verbose_name=u'Последний визит')
     created      = models.DateTimeField(auto_now_add=True, editable=False, verbose_name=u'Дата создания')
-    ustatus      = models.PositiveSmallIntegerField(choices=USER_STATUS, verbose_name=u'Статус')
-    userpic_type = models.CharField(null=True, blank=True, default=None, choices=USER_PIC_TYPES, max_length=255, verbose_name=u'Тип картинки')
+    ustatus      = models.PositiveSmallIntegerField(choices=APP_USER_STATUS, verbose_name=u'Статус')
+    userpic_type = models.CharField(null=True, blank=True, default=None, choices=APP_USER_PIC_TYPES, max_length=255, verbose_name=u'Тип картинки')
     userpic      = models.ForeignKey('UsersPics', default=None, null=True, blank=True, verbose_name=u'Аватар')
 
 
@@ -132,66 +132,3 @@ class UsersSocial(models.Model):
         db_table = 'users_socials'
         verbose_name = u'Социальность пользователя'
         verbose_name_plural = u'Социальность пользователей'
-
-
-#############################################################################################################
-# Персоны
-class Persons(models.Model):
-    name      = models.CharField(max_length=255, verbose_name=u'Имя')
-    name_orig = models.CharField(max_length=255, verbose_name=u'Оригинальное имя')
-    bio       = models.TextField(verbose_name=u'Биография')
-    photo     = models.ImageField(upload_to=PERSON_PHOTO_DIR, blank=True, null=True, verbose_name=u'Фото')
-
-    @property
-    def get_full_name(self):
-        full_name = u"%s (%s)" % (self.name, self.name_orig,)
-        return full_name.strip()
-
-    def __unicode__(self):
-        return u'[%s] %s' % (self.pk, self.get_full_name)
-
-    class Meta:
-        # Имя таблицы в БД
-        db_table = 'persons'
-        verbose_name = u'Персона'
-        verbose_name_plural = u'Персоны'
-
-
-#############################################################################################################
-# Расширения персоны
-class PersonsExtras(models.Model):
-    person      = models.ForeignKey(Persons, max_length=255, verbose_name=u'Персона')
-    etype       = models.CharField(max_length=255, verbose_name=u'')
-    name        = models.TextField(verbose_name=u'Имя')
-    name_orig   = models.TextField(verbose_name=u'Оригинальное имя')
-    description = models.TextField(verbose_name=u'Описавние')
-    url         = models.CharField(max_length=255, verbose_name=u'Фото')
-
-
-    def __unicode__(self):
-        return u'[%s] %s' % (self.pk, self.person.get_full_name)
-
-    class Meta:
-        # Имя таблицы в БД
-        db_table = 'persons_extras'
-        verbose_name = u'Расширения персоны'
-        verbose_name_plural = u'Расширения персон'
-
-
-#############################################################################################################
-# Таблица связи Пользователей и Персон
-class UsersPersons(models.Model):
-    user       = models.ForeignKey(Users, max_length=255, verbose_name=u'Пользователь')
-    person     = models.ForeignKey(Persons, max_length=255, verbose_name=u'Персона')
-    upstatus   = models.IntegerField(verbose_name=u'Статус')
-    subscribed = models.IntegerField(verbose_name=u'Подписка')
-
-
-    def __unicode__(self):
-        return u'[%s %s]' % (self.user, self.person)
-
-    class Meta:
-        # Имя таблицы в БД
-        db_table = 'users_persons'
-        verbose_name = u'Расширения персоны'
-        verbose_name_plural = u'Расширения персон'

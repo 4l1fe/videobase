@@ -43,6 +43,24 @@ class SeasonsAdmin(admin.ModelAdmin):
 
 
 #############################################################################################################
+# Аминистрирование таблицы Персон
+class PersonsAdmin(admin.ModelAdmin):
+    pass
+
+
+#############################################################################################################
+# Аминистрирование таблицы Персон
+class PersonsAdmin(admin.ModelAdmin):
+    pass
+
+
+#############################################################################################################
+# Аминистрирование таблицы Расширения персон
+class PersonsExtrasAdmin(admin.ModelAdmin):
+    pass
+
+
+#############################################################################################################
 # Администрирование таблицы Связи фильмов с актерами
 class PersonsFilmsAdmin(admin.ModelAdmin):
     pass
@@ -56,4 +74,6 @@ admin.site.register(Films, FilmsAdmin)
 admin.site.register(UsersFilms, UserFilmsAdmin)
 admin.site.register(FilmExtras, FilmExtrasAdmin)
 admin.site.register(Seasons, SeasonsAdmin)
+admin.site.register(Persons, PersonsAdmin)
+admin.site.register(PersonsExtras, PersonsExtrasAdmin)
 admin.site.register(PersonsFilms, PersonsFilmsAdmin)

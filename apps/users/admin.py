@@ -24,13 +24,7 @@ class UsersPicsAdmin(admin.ModelAdmin):
 
 
 #############################################################################################################
-# Аминистрирование таблицы Персон
-class PersonsAdmin(admin.ModelAdmin):
-    pass
-
-#############################################################################################################
 # Регистрация моделей в админке
 admin.site.register(Users, UsersAdmin)
 admin.site.register(UsersRels, UsersRelsAdmin)
 admin.site.register(UsersPics, UsersPicsAdmin)
-admin.site.register(Persons, PersonsAdmin)
