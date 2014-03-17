@@ -36,8 +36,8 @@ class Command(BaseCommand):
         data = self.__csvfile(filename)
         headers = data[0]
         counter = 0
-
         for row in data[1:]:
+            #print('====row====== {0} =='.format(row))
             item = dict(zip(headers, row)) if (len(headers) <= len(row)) else dict(map(None, headers, row))
             if self.insert_item(item):
                 counter += 1
@@ -49,7 +49,7 @@ class Command(BaseCommand):
     def charset_csv_reader(self, csv_data, dialect=csv.excel,
                            charset='utf-8', **kwargs):
         csv_reader = csv.reader(self.charset_encoder(csv_data, charset),
-                                dialect=dialect, delimiter=';', **kwargs)
+                                dialect=dialect, delimiter='|', **kwargs)
         for row in csv_reader:
             yield [unicode(cell, charset) for cell in row]
 
@@ -65,20 +65,7 @@ class Command(BaseCommand):
 
     def insert_item(self, data):
         try:
-            attributes = {
-                'name': self.film_name(data),
-                'name_orig': self.film_name_orig(data),
-                'description': self.film_description(data),
-                'ftype': APP_FILM_FULL_FILM,
-                'kinopoisk_id': data['id_kinopoisk'],
-                'frelease_date': self.date_or_now(data['release']),
-                'rating_imdb': data['vote_imdb'],
-                'rating_imdb_cnt': data['vote_imdb_number'],
-                'fduration': self.null_to_none(data['length'])
-            }
-
-            film = Films(**attributes)
-            film.save()
+            film = self.get_film(data)
             film.genres = self.get_genres(genres=data['genre_ru'])
             film.countries = self.get_countries(countries=u'Флатландию')
             film.save()
@@ -88,37 +75,73 @@ class Command(BaseCommand):
 
             return True
         except Exception as ex:
-            print('========== {0} =='.format(ex.message))
-            print('==============================================')
-            print(data.__repr__())
+            print('====ex====== {0} =='.format(ex))
+            print('====data==== #{0}=='.format(data["id"]))
+            #print('====data==== #{0}=='.format(data.__repr__()))
             return False
+
+    def get_film(self, data):
+        attributes = {
+            'name': self.film_name(data),
+            'name_orig': self.film_name_orig(data),
+            'description': self.film_description(data),
+            'ftype': APP_FILM_FULL_FILM,
+            'kinopoisk_id': data['id_kinopoisk'],
+            'frelease_date': self.date_or_now(data['release']),
+            'rating_imdb': self.to_float(data['vote_imdb']),
+            'rating_imdb_cnt': self.to_int(data['vote_imdb_number']),
+            'fduration': self.null_to_none(data['length']),
+            'imdb_id': self.null_to_none(data['id_imdb'])
+        }
+        try:
+            film = Film.objects.get(name=attributes['name'])
+        except:
+            film = Films(**attributes)
+            film.save()
+
+        return film
+
+    def to_float(self, value):
+        try:
+            return float(value)
+        except:
+            return 0
+
+    def to_int(self, value):
+        try:
+            return int(value)
+        except:
+            return 0
+
+
     def null_to_none(self, value = None):
         if value is None:
             return None
-        if value.lower() == 'null':
+        if value.lower() == 'null' or value.lower() == '\\n':
             return None
+
         return value
 
     def film_description(self, data):
         list_desc = [data['description_ru'], data['description_eng']]
-        lists = filter(lambda v: ((not v is None) and (v.lower() != u'null')), list_desc)
+        lists = filter(lambda v: ((not v is None) and (v.lower() != '\\n')), list_desc)
         return lists[0] if lists else ''
 
     def film_name(self, data):
         list_names = [data['title_ru'], data['title_eng'], data['title_orig']]
-        lists = filter(lambda v: ((not v is None) and (v.lower() != u'null')), list_names)
+        lists = filter(lambda v: ((not v is None) and (v.lower() != '\\n')), list_names)
         return lists[0] if lists else ''
 
     def film_name_orig(self, data):
         list_names = [data['title_orig'], data['title_eng']]
-        lists = filter(lambda v: ((not v is None) and (v.lower() != u'null')), list_names)
+        lists = filter(lambda v: ((not v is None) and (v.lower() != '\\n')), list_names)
         return lists[0] if lists else ''
 
     def save_trailer(self, film, data = None):
         if data is None:
             return True
         trailer_youtube_id = data['trailer_youtube']
-        if (trailer_youtube_id is None) or (trailer_youtube_id.lower() == 'null'):
+        if (trailer_youtube_id is None) or (trailer_youtube_id.lower() == '\\n'):
             return True
 
         youtube_url = "https://www.youtube.com/watch?v=" + trailer_youtube_id
@@ -171,19 +194,22 @@ class Command(BaseCommand):
         return True
 
     def compact_list(self, list = []):
-        return [ el for el in list if (not el is None) and (el.lower() != 'null')]
+        return [ el for el in list if (not el is None) and (el.lower() != '\\n')]
 
     def date_or_now(self, date = None):
         if date is None:
             return datetime.datetime.now()
         if self.is_null(date):
             return datetime.datetime.now()
-        return datetime.datetime.strptime(date, '%Y-%m-%d')
+        try:
+            return datetime.datetime.strptime(date, '%Y-%m-%d')
+        except:
+            return datetime.datetime.now()
 
     def is_null(self, value = None):
         if value is None:
             return true
-        return value.lower() == u'NULL'.lower()
+        return value.lower() == 'null' or value.lower() == '\\n'
 
     def get_genres(self, genres = None):
         if genres is None:
@@ -216,3 +242,10 @@ class Command(BaseCommand):
             country_models.append(country_model)
 
         return country_models
+
+#SELECT * INTO OUTFILE '/tmp/name.csv'
+#FIELDS TERMINATED BY '#'
+#OPTIONALLY ENCLOSED BY '\"'
+#ESCAPED BY '\\'
+#LINES TERMINATED BY '\n'
+#FROM movies;
