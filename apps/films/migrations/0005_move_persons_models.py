@@ -8,54 +8,10 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding model 'PersonsExtras'
-        db.create_table('persons_extras', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('person', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['films.Persons'], max_length=255)),
-            ('etype', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('name', self.gf('django.db.models.fields.TextField')()),
-            ('name_orig', self.gf('django.db.models.fields.TextField')()),
-            ('description', self.gf('django.db.models.fields.TextField')()),
-            ('url', self.gf('django.db.models.fields.CharField')(max_length=255)),
-        ))
-        db.send_create_signal(u'films', ['PersonsExtras'])
-
-        # Adding model 'UsersPersons'
-        db.create_table('users_persons', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['users.Users'], max_length=255)),
-            ('person', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['films.Persons'], max_length=255)),
-            ('upstatus', self.gf('django.db.models.fields.IntegerField')()),
-            ('subscribed', self.gf('django.db.models.fields.IntegerField')()),
-        ))
-        db.send_create_signal(u'films', ['UsersPersons'])
-
-        # Adding model 'Persons'
-        db.create_table('persons', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('name_orig', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('bio', self.gf('django.db.models.fields.TextField')()),
-            ('photo', self.gf('django.db.models.fields.files.ImageField')(max_length=100, null=True, blank=True)),
-        ))
-        db.send_create_signal(u'films', ['Persons'])
-
-
-        # Changing field 'PersonsFilms.person'
-        db.alter_column('persons_films', 'person_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['films.Persons']))
+        pass
 
     def backwards(self, orm):
-        # Deleting model 'PersonsExtras'
-        db.delete_table('persons_extras')
-
-        # Deleting model 'UsersPersons'
-        db.delete_table('users_persons')
-
-        # Deleting model 'Persons'
-        db.delete_table('persons')
-
-        # Changing field 'PersonsFilms.person'
-        db.alter_column('persons_films', 'person_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['users.Persons']))
+        pass
 
     models = {
         u'films.countries': {
