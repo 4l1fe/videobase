@@ -8,49 +8,10 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Deleting model 'Persons'
-        db.delete_table('persons')
-
-        # Deleting model 'PersonsExtras'
-        db.delete_table('persons_extras')
-
-        # Deleting model 'UsersPersons'
-        db.delete_table('users_persons')
-
+        pass
 
     def backwards(self, orm):
-        # Adding model 'Persons'
-        db.create_table('persons', (
-            ('bio', self.gf('django.db.models.fields.TextField')()),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('photo', self.gf('django.db.models.fields.files.ImageField')(max_length=100, null=True, blank=True)),
-            ('name_orig', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-        ))
-        db.send_create_signal(u'users', ['Persons'])
-
-        # Adding model 'PersonsExtras'
-        db.create_table('persons_extras', (
-            ('person', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['users.Persons'], max_length=255)),
-            ('description', self.gf('django.db.models.fields.TextField')()),
-            ('etype', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('url', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name_orig', self.gf('django.db.models.fields.TextField')()),
-            ('name', self.gf('django.db.models.fields.TextField')()),
-        ))
-        db.send_create_signal(u'users', ['PersonsExtras'])
-
-        # Adding model 'UsersPersons'
-        db.create_table('users_persons', (
-            ('upstatus', self.gf('django.db.models.fields.IntegerField')()),
-            ('subscribed', self.gf('django.db.models.fields.IntegerField')()),
-            ('person', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['users.Persons'], max_length=255)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['users.Users'], max_length=255)),
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-        ))
-        db.send_create_signal(u'users', ['UsersPersons'])
-
+        pass
 
     models = {
         u'users.users': {
