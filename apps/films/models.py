@@ -3,7 +3,7 @@
 from django.db import models
 
 from constants import *
-from apps.users.models import Users,Persons
+from apps.users.models import Users, Persons
 
 
 #############################################################################################################
@@ -14,7 +14,7 @@ class Countries(models.Model):
     description = models.TextField(verbose_name=u'Описание')
 
     def __unicode__(self):
-        return u' [%s] %s' % (self.pk, self.name)
+        return u'[{:s}] {:s}'.format(self.pk, self.name)
 
 
     class  Meta(object):
@@ -31,7 +31,7 @@ class Genres(models.Model):
     description  = models.TextField(verbose_name=u'Описание жанра')
 
     def __unicode__(self):
-        return u' [%s] %s' % (self.pk, self.name)
+        return u'[{:s}] {:s}'.format(self.pk, self.name)
 
     class  Meta(object):
         # Имя таблицы в БД
@@ -65,7 +65,7 @@ class Films(models.Model):
 
 
     def __unicode__(self):
-        return u' [%s] %s' % (self.pk, self.name)
+        return u'[{:s}] {:s}'.format(self.pk, self.name)
 
     class  Meta(object):
         # Имя таблицы в БД
@@ -88,13 +88,13 @@ class FilmExtras(models.Model):
 
 
     def __unicode__(self):
-        return u' [%s] %s' % (self.pk, self.name)
+        return u'[{:s}] {:s}'.format(self.pk, self.name)
 
     class  Meta(object):
         # Имя таблицы в БД
         db_table = 'films_extras'
-        verbose_name = u'Дополнительный материал'
-        verbose_name_plural = u'Дополнительные материалы'
+        verbose_name = u'Дополнительный материал к фильму'
+        verbose_name_plural = u'Дополнительные материалы к фильмам'
 
 
 #############################################################################################################
@@ -108,7 +108,7 @@ class UsersFilms(models.Model):
 
 
     def __unicode__(self):
-        return u'[%s] %s - %s (%s)' % (self.pk, self.user.name, self.film.name, self.ufstatus)
+        return u'[{:s}] {:s} - {:s} ({:s})'.format(self.pk, self.user.name, self.film.name, self.ufstatus)
 
     class  Meta(object):
         # Имя таблицы в БД
@@ -128,7 +128,7 @@ class Seasons(models.Model):
 
 
     def __unicode__(self):
-        return u' [%s] %s %s' % (self.pk, self.film.name, self.number)
+        return u'[{:s}] {:s} {:s}'.format(self.pk, self.film.name, self.number)
 
     class  Meta(object):
         # Имя таблицы в БД
@@ -141,18 +141,16 @@ class Seasons(models.Model):
 #############################################################################################################
 # Таблица роли персон в производстве фильмов
 class PersonsFilms(models.Model):
-
-    film      = models.ForeignKey(Films, verbose_name=u'Фильм')
-    person    = models.ForeignKey(Persons, verbose_name=u'Персона')
-    p_type    = models.CharField(max_length=255, choices=APP_FILM_PERSON_TYPES, verbose_name=u'Тип персоны')
+    film        = models.ForeignKey(Films, verbose_name=u'Фильм')
+    person      = models.ForeignKey(Persons, verbose_name=u'Персона')
+    p_type      = models.CharField(max_length=255, choices=APP_FILM_PERSON_TYPES, verbose_name=u'Тип персоны')
     p_character = models.CharField(max_length=255, default = '')
     description = models.CharField(max_length=255, default = '')
 
 
     def __unicode__(self):
-        return u' [{:s}] {:s} {:s}'.format(self.pk, self.film.name, self.person.name)
-
-
+        return u'[{:s}] {:s} {:s}'.format(self.pk, self.film.name, self.person.name)
+       
     class  Meta(object):
         # Имя таблицы в БД
         db_table = 'persons_films'
