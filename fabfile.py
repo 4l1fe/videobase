@@ -21,7 +21,7 @@ def init_test_db():
     """
     with settings(sudo_user = "postgres"):
         sudo('''echo "CREATE USER pgadmin WITH PASSWORD 'qwerty'; CREATE DATABASE videobase_test; GRANT ALL PRIVILEGES ON DATABASE videobase_test to pgadmin;" | psql''')
-    
+
 def populate_test_db():
     """
     Заполняет тестовую базу данных из sql_dump который идет с кодом
@@ -36,8 +36,8 @@ def local_db_reset():
     local('''echo "DROP DATABASE videobase;" |  sudo -u postgres psql''')
     local('''echo "CREATE USER pgadmin WITH PASSWORD 'qwerty'; CREATE DATABASE videobase; GRANT ALL PRIVILEGES ON DATABASE videobase to pgadmin;" |  sudo -u postgres psql''')
     local("""cd sql_dump && sudo -u postgres psql -d videobase -f $(ls -1 *.sql | head -1)""")
-            
-        
+
+
 def deploy_test_code():
     """
     Обновляет или создает код для тестового сайта
@@ -51,7 +51,7 @@ def deploy_test_code():
 
             result = str(sudo('ls -1')).strip()
             filtered_array=[s for s in result.split('\r\n') if s=='videobase_test']
-            
+
             if filtered_array:
                 #sudo("cd videobase_test; git checkout configs/db.ini")
                 #sudo("cd videobase_test; cat configs/db.ini")
@@ -65,32 +65,32 @@ def deploy_test_code():
 def restart_all():
     """
     Перезапуск всех процессов
-    
+
     """
 
     sudo('service supervisor stop')
     sudo('sleep 10;service supervisor start')
     sudo('service nginx stop')
     sudo('service nginx start')
-                
-                
+
+
 def initial_test_deploy():
     """
     Последовательность команд для выгрузки на новую машину
 
     """
-    
+
     init_test_db()
     deploy_test_code()
     populate_test_db()
-                
+
 
 def delete_test_db():
     """
     Удалить тестовую базу данных
 
     """
-    
+
     with cd('/var/lib/postgresql'):
         with settings(sudo_user = "postgres"):
             sudo('''echo "DROP DATABASE videobase_test;" | psql''')
@@ -101,14 +101,14 @@ def refresh_test_requirements():
     with settings(sudo_user = "www-data"):
         with cd('/var/www/videobase_test/'):
             sudo('/home/virtualenv/videobase_test/bin/pip install -r requirements.txt')
-            
+
 
 def status():
 
     for k in fabric.state.output:
         fabric.state.output[k] = False
     fabric.state.output['user']=True
-        
+
     with settings(warn_only=True):
         print('SUPERVISOR \n')
         print(run("supervisorctl status"))
@@ -117,7 +117,7 @@ def status():
 
         print("\nIs login page is shown on videobase.test.aaysm.com/admin  ? ")
         print(bool(run('''wget -qO- --header="Host: videobase.test.aaysm.com" localhost:80/admin/ |grep Password | wc -l''')))
-        
+
 
     for k in fabric.state.output:
         fabric.state.output[k] = True
@@ -132,8 +132,8 @@ def db_migrate_test(appname=''):
 
     with settings(sudo_user = "www-data"):
         with cd('/var/www/videobase_test/'):
-            sudo('/home/virtualenv/videobase_test/bin/python manage.py migrate %s' % appname)
-    
+            sudo('/home/virtualenv/videobase_test/bin/python manage.py migrate %s --no-initial-data' % appname)
+
 def deploy():
 
     """
@@ -149,13 +149,13 @@ def project_deploy():
     Обновить весь код
 
     '''
-    
+
     deploy_test_code()
     refresh_test_requirements()
     db_migrate_test()
     restart_all()
     status()
-    
+
 
 def db_flush_test():
 
@@ -174,9 +174,8 @@ def init_if_not_exists_task():
     Оставил как заготовку
 
     """
-    
+
     with settings(sudo_user = "postgres"):
         with cd('/var/lib/postgresql'):
             if not (str(sudo('''echo "select rolname from pg_roles where rolname = 'pgadmin';" |psql -tA''')).strip()):
                 init_db()
-
