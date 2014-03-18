@@ -15,8 +15,7 @@ from django.db import models
 from django.contrib.contenttypes.models import ContentType
 
 from apps.films.constants import *
-from apps.films.models import Films, Genres, Countries, PersonsFilms, FilmExtras
-from apps.users.models import Persons
+from apps.films.models import Films, Genres, Countries, PersonsFilms, FilmExtras, Persons
 
 class Command(BaseCommand):
     def __init__(self):
