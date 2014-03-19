@@ -21,7 +21,7 @@ class GenresAdmin(admin.ModelAdmin):
 #############################################################################################################
 # Администрирование таблицы фильмов
 class FilmsAdmin(admin.ModelAdmin):
-    list_filter = ('name', 'ftype', 'frelease_date',)
+    list_filter = ('ftype', 'frelease_date',)
     search_fields = ('name', 'ftype', 'frelease_date',)
 
 
@@ -46,7 +46,6 @@ class SeasonsAdmin(admin.ModelAdmin):
 #############################################################################################################
 # Аминистрирование таблицы Персон
 class PersonsAdmin(admin.ModelAdmin):
-    list_filter = ('id', 'name', 'name_orig',)
     search_fields = ('id', 'name', 'name_orig',)
 
 
