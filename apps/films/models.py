@@ -3,7 +3,7 @@
 import os
 
 from django.db import models
-from django.db.models.signals import post_save, pre_delete
+# from django.db.models.signals import post_save, pre_delete
 
 from constants import *
 from utils.common import *
@@ -145,16 +145,10 @@ class Seasons(models.Model):
 #############################################################################################################
 # Таблица Персон
 class Persons(models.Model):
-    def image_path(self, filename):
-        if self.pk is None:
-            return os.path.join(APP_PERSON_PHOTO_DIR, filename)
-        else:
-            return os.path.join(APP_PERSON_PHOTO_DIR, str(self.pk), filename)
-
     name      = models.CharField(max_length=255, verbose_name=u'Имя')
     name_orig = models.CharField(max_length=255, verbose_name=u'Оригинальное имя')
     bio       = models.TextField(verbose_name=u'Биография')
-    photo     = models.ImageField(upload_to=image_path, blank=True, null=True, verbose_name=u'Фото')
+    photo     = models.ImageField(upload_to=get_image_path, blank=True, null=True, verbose_name=u'Фото')
 
 
     @property
@@ -162,7 +156,11 @@ class Persons(models.Model):
         full_name = u"{0} ({1})".format(self.name, self.name_orig)
         return full_name.strip()
 
-    def image_img(self):
+    @property
+    def get_upload_to(self):
+        return APP_PERSON_PHOTO_DIR
+
+    def image_file(self):
         if self.photo:
             return u'< img src="%s" width="60" />' % self.photo.url
         else:
@@ -172,8 +170,8 @@ class Persons(models.Model):
         html = '<a class="image-picker" href="%s"><img src="%s" alt="%s"/></a>'
         return html % (self.photo.url, get_thumbnail_url(self.photo.url), "")
 
-    image_img.short_description = 'Thumbnail'
-    image_img.allow_tags = True
+    image_file.short_description = 'thumbnail'
+    image_file.allow_tags = True
 
     def save(self, *args, **kwargs):
         is_new = self.pk == None
@@ -205,16 +203,6 @@ class Persons(models.Model):
         verbose_name = u'Персона'
         verbose_name_plural = u'Персоны'
 
-def post_save_handler(sender, **kwargs):
-    create_thumbnail(kwargs['instance'].photo.path)
-
-post_save.connect(post_save_handler, sender=Persons)
-
-
-def pre_delete_handler(sender, **kwargs):
-    delete_thumbnail(kwargs['instance'].photo.path)
-
-pre_delete.connect(pre_delete_handler, sender=Persons)
 
 #############################################################################################################
 # Расширения персоны
