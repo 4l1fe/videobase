@@ -59,7 +59,7 @@ def deploy_test_code():
                 #sudo("cd videobase_test/configs/ && sed -i 's/videobase/videobase_test/g' db.ini")
                 #sudo("cd videobase_test; cat configs/db.ini")
             else:
-                sudo('git clone /var/git/videobase.git/ videobase_test')
+                sudo('git clone git@git.aaysm.com:developers/videobase.git videobase_test')
                 sudo("cd videobase_test/configs/ && cp db.ini.example db.ini && sed -i 's/videobase/videobase_test/g' db.ini")
 
 def restart_all():
@@ -170,12 +170,11 @@ def db_flush_test():
 def init_if_not_exists_task():
     """
     Обновить если пользователя еще нет.
-
     Оставил как заготовку
-
     """
 
     with settings(sudo_user = "postgres"):
         with cd('/var/lib/postgresql'):
             if not (str(sudo('''echo "select rolname from pg_roles where rolname = 'pgadmin';" |psql -tA''')).strip()):
                 init_db()
+
