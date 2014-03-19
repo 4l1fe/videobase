@@ -1,10 +1,10 @@
 # coding: utf-8
 
 import os
-from videobase.settings  import STATIC_PATH
+from videobase.settings import STATIC_PATH
 
 #############################################################################################################
-APP_PERSON_PHOTO_DIR =  os.path.join(STATIC_PATH, 'upload', 'people', 'photos')
+APP_PERSON_PHOTO_DIR = os.path.join(STATIC_PATH, 'upload', 'persons')
 
 #############################################################################################################
 APP_FILM_FULL_FILM = 'FULL_FILM'

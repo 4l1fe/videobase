@@ -2,7 +2,7 @@
 
 from django.db import models
 
-from utils.fields import CurrencyField
+from utils.fields.currency_field import CurrencyField
 from apps.users.models import Users
 from apps.films.models import Films, Seasons
 

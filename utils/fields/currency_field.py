@@ -1,7 +1,7 @@
 # coding: utf-8
 
 from decimal import Decimal
-from django.db.models.fields import DecimalField
+from django.db.models import DecimalField
 
 
 #############################################################################################################

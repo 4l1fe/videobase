@@ -1,5 +1,6 @@
 # coding: utf-8
 
+import os, uuid
 from django.db import models
 
 from constants import *
@@ -137,20 +138,65 @@ class Seasons(models.Model):
         verbose_name_plural = u'Сезоны'
         unique_together = (('film', 'number'),)
 
+import re
+
+def create_with_pk(self):
+    instance = self.create()
+    # instance.save()
+    return instance
+
+def get_nzb_filename(instance, filename):
+    if not instance.pk:
+        create_with_pk(instance)
+
+    name_slug = re.sub('[^a-zA-Z0-9]', '-', instance.name).strip('-').lower()
+    name_slug = re.sub('[-]+', '-', name_slug)
+    return os.path.join(APP_PERSON_PHOTO_DIR, str(instance.pk), filename)
+
+def get_image_path(instance, filename):
+    return os.path.join(APP_PERSON_PHOTO_DIR, str(instance.id), filename)
 
 #############################################################################################################
 # Таблица Персон
 class Persons(models.Model):
+    def image_path(self, filename):
+        if self.pk is None:
+            return os.path.join(APP_PERSON_PHOTO_DIR, filename)
+        else:
+            return os.path.join(APP_PERSON_PHOTO_DIR, str(self.pk), filename)
+
     name      = models.CharField(max_length=255, verbose_name=u'Имя')
     name_orig = models.CharField(max_length=255, verbose_name=u'Оригинальное имя')
     bio       = models.TextField(verbose_name=u'Биография')
-    photo     = models.ImageField(upload_to=APP_PERSON_PHOTO_DIR, blank=True, null=True, verbose_name=u'Фото')
+    photo     = models.ImageField(upload_to=image_path, blank=True, null=True, verbose_name=u'Фото')
 
 
     @property
     def get_full_name(self):
-        full_name = u"%s (%s)" % (self.name, self.name_orig,)
+        full_name = u"{0} ({1})".format(self.name, self.name_orig)
         return full_name.strip()
+
+    def save(self, *args, **kwargs):
+        is_new = self.pk == None
+        super(Persons, self).save(*args, **kwargs)
+
+        if is_new:
+            nzb = self.photo
+            if nzb:
+                # Create new filename, using primary key and file extension
+                oldfile = self.photo.name
+                newfile = os.path.join(APP_PERSON_PHOTO_DIR, str(self.id), oldfile.split("/")[-1])
+
+                # Create new file and remove old one
+                if newfile != oldfile:
+                    self.photo.storage.delete(newfile)
+                    self.photo.storage.save(newfile, nzb)
+                    self.photo.name = newfile
+                    self.photo.close()
+                    self.photo.storage.delete(oldfile)
+
+            # Save again to keep changes
+            super(Persons, self).save(*args, **kwargs)
 
     def __unicode__(self):
         return u'[%s] %s' % (self.pk, self.get_full_name)
