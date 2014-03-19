@@ -4,7 +4,7 @@ import os
 from videobase.settings import STATIC_PATH
 
 #############################################################################################################
-APP_PERSON_PHOTO_DIR = os.path.join(STATIC_PATH, 'upload', 'persons')
+APP_PERSON_PHOTO_DIR = os.path.join('upload', 'persons')
 
 #############################################################################################################
 APP_FILM_FULL_FILM = 'FULL_FILM'

@@ -8,3 +8,6 @@ fabric
 uwsgi
 django_extensions
 django-csvimport
+easy_thumbnails
+pillow
+#sudo apt-get install libjpeg-dev libfreetype6-dev zlib1g-dev libpng12-dev

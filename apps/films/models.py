@@ -1,9 +1,12 @@
 # coding: utf-8
 
 import os
+
 from django.db import models
+from django.db.models.signals import post_save, pre_delete
 
 from constants import *
+from utils.common import *
 from apps.users.models import Users
 
 
@@ -159,6 +162,19 @@ class Persons(models.Model):
         full_name = u"{0} ({1})".format(self.name, self.name_orig)
         return full_name.strip()
 
+    def image_img(self):
+        if self.photo:
+            return u'< img src="%s" width="60" />' % self.photo.url
+        else:
+            return '(none)'
+
+    def get_thumbnail_html(self):
+        html = '<a class="image-picker" href="%s"><img src="%s" alt="%s"/></a>'
+        return html % (self.photo.url, get_thumbnail_url(self.photo.url), "")
+
+    image_img.short_description = 'Thumbnail'
+    image_img.allow_tags = True
+
     def save(self, *args, **kwargs):
         is_new = self.pk == None
         super(Persons, self).save(*args, **kwargs)
@@ -189,6 +205,16 @@ class Persons(models.Model):
         verbose_name = u'Персона'
         verbose_name_plural = u'Персоны'
 
+def post_save_handler(sender, **kwargs):
+    create_thumbnail(kwargs['instance'].photo.path)
+
+post_save.connect(post_save_handler, sender=Persons)
+
+
+def pre_delete_handler(sender, **kwargs):
+    delete_thumbnail(kwargs['instance'].photo.path)
+
+pre_delete.connect(pre_delete_handler, sender=Persons)
 
 #############################################################################################################
 # Расширения персоны
