@@ -34,3 +34,5 @@ APP_FILM_PERSON_TYPES = (
     (APP_PERSON_PRODUCER, u'Продюсер'),
     (APP_PERSON_DIRECTOR, u'Режиссер'),
 )
+
+APP_FILM_CRAWLER_LIMIT = 10
