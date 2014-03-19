@@ -1,6 +1,6 @@
 # coding: utf-8
 
-import os, uuid
+import os
 from django.db import models
 
 from constants import *
@@ -138,23 +138,6 @@ class Seasons(models.Model):
         verbose_name_plural = u'Сезоны'
         unique_together = (('film', 'number'),)
 
-import re
-
-def create_with_pk(self):
-    instance = self.create()
-    # instance.save()
-    return instance
-
-def get_nzb_filename(instance, filename):
-    if not instance.pk:
-        create_with_pk(instance)
-
-    name_slug = re.sub('[^a-zA-Z0-9]', '-', instance.name).strip('-').lower()
-    name_slug = re.sub('[-]+', '-', name_slug)
-    return os.path.join(APP_PERSON_PHOTO_DIR, str(instance.pk), filename)
-
-def get_image_path(instance, filename):
-    return os.path.join(APP_PERSON_PHOTO_DIR, str(instance.id), filename)
 
 #############################################################################################################
 # Таблица Персон
@@ -181,22 +164,21 @@ class Persons(models.Model):
         super(Persons, self).save(*args, **kwargs)
 
         if is_new:
-            nzb = self.photo
-            if nzb:
-                # Create new filename, using primary key and file extension
+            instance_photo = self.photo
+            if instance_photo:
+                # Create new filename, using primary key
                 oldfile = self.photo.name
                 newfile = os.path.join(APP_PERSON_PHOTO_DIR, str(self.id), oldfile.split("/")[-1])
 
-                # Create new file and remove old one
-                if newfile != oldfile:
-                    self.photo.storage.delete(newfile)
-                    self.photo.storage.save(newfile, nzb)
-                    self.photo.name = newfile
-                    self.photo.close()
-                    self.photo.storage.delete(oldfile)
+                # Magic with photo
+                self.photo.storage.delete(newfile)
+                self.photo.storage.save(newfile, instance_photo)
+                self.photo.name = newfile
+                self.photo.close()
+                self.photo.storage.delete(oldfile)
 
-            # Save again to keep changes
-            super(Persons, self).save(*args, **kwargs)
+                # Save again to keep changes
+                super(Persons, self).save(*args, **kwargs)
 
     def __unicode__(self):
         return u'[%s] %s' % (self.pk, self.get_full_name)
