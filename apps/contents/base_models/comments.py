@@ -2,11 +2,13 @@
 
 from django.db import models
 
+from apps.users.models import Users
+
 
 #############################################################################################################
 # Модель Комментариев
 class Comments(models.Model):
-    user       = models.ForeignKey('Users', verbose_name=u'Пользователь')
+    user       = models.ForeignKey(Users, verbose_name=u'Пользователь')
     content    = models.IntegerField(verbose_name=u'Контент')
     ctext      = models.TextField(verbose_name=u'Tекст комментария')
     parent_id  = models.IntegerField(verbose_name=u'Родительский комментарий')
