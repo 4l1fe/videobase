@@ -19,6 +19,7 @@ import pprint
 from collections import defaultdict
 from apps.films.constants import APP_PERSON_ACTOR, APP_PERSON_DIRECTOR, APP_PERSON_PRODUCER
 import StringIO
+from PIL import Image
 
 YANDEX_KP_ACTORS_TEMPLATE = "http://st.kp.yandex.net/images/actor_iphone/iphone360_{}.jpg"
 
@@ -87,7 +88,14 @@ def get_photo(actor_id):
         fileobj = StringIO.StringIO()
         fileobj.write(r.content)
         fileobj.seek(0)
-        return fileobj
+
+        img = Image.open(fileobj).conver('RGB')
+
+        conv_file = StringIO.StringIO()
+        img.save(conv_file)
+        conv_file.seek(0)
+
+        return conv_file
 
     except:
 
