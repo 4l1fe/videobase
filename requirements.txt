@@ -9,4 +9,5 @@ django_extensions
 django-csvimport
 easy_thumbnails
 pillow
-#sudo apt-get install libjpeg-dev libfreetype6-dev zlib1g-dev libpng12-dev
+pylibmc
+#sudo apt-get install -y memcached libmemcached-dev zlib1g-dev libssl-dev python-dev build-essential libjpeg-dev libfreetype6-dev zlib1g-dev libpng12-dev
