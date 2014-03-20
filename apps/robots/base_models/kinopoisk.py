@@ -2,6 +2,7 @@
 
 from django.db import models
 
+from apps.films.models import Films
 from ..constants import APP_ROBOTS_PARSE_TRY_RESULT_TYPES
 
 import datetime
@@ -10,7 +11,7 @@ import datetime
 #############################################################################################################
 # Модель Кинопоиска
 class KinopoiskTries(models.Model):
-    film     = models.ForeignKey('Films', verbose_name=u'Фильм')
+    film     = models.ForeignKey(Films, verbose_name=u'Фильм')
     try_time = models.DateTimeField(verbose_name=u'Дата попытки')
     result   = models.CharField(max_length=255, choices=APP_ROBOTS_PARSE_TRY_RESULT_TYPES, verbose_name=u'Удался ли парсинг')
     error_message = models.TextField(verbose_name=u'Сообщение об ошибке', null = True)
@@ -19,10 +20,10 @@ class KinopoiskTries(models.Model):
 
     @property
     def format_try_time(self):
-        return self.try_time, "%Y-%b-%d %H:%M:%S"
+        return self.try_time.strftime("%Y-%b-%d %H:%M:%S")
 
     def __unicode__(self):
-        return u'[{0}] {1}'.format(self.pk, self.film, datetime.datetime.strftime(self.format_try_time))
+        return u'[{0}] {1}'.format(self.pk, self.film, self.format_try_time)
 
     class Meta:
         # Имя таблицы в БД

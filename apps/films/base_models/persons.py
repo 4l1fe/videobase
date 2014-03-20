@@ -3,7 +3,6 @@
 import os
 
 from django.db import models
-from django.utils.safestring import mark_safe
 from ..constants import APP_PERSON_PHOTO_DIR
 from utils.common import *
 
@@ -28,13 +27,13 @@ class Persons(models.Model):
 
     def image_file(self):
         if self.photo:
-            return self.get_thumbnail_html()
+            return self.get_thumbnail_html
         else:
             return '(none)'
 
     @property
     def get_thumbnail_html(self):
-        html = '<a class="image-picker" href="%s"><img src="%s" alt="%s"/></a>'
+        html = '<a class="image-picker" href="%s"><img src="%s" alt="%s" /></a>'
         return html % (self.photo.url, get_thumbnail_url(self.photo.url), "")
 
     image_file.short_description = 'thumbnail'
