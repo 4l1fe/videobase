@@ -149,7 +149,7 @@ def parse_one_page(page_dump):
     for pd in parsed_data:
         element,value = pd
         ddict[element].append(value)
-    return ddict,page_dump
+    return ddict
 
 
 if __name__ == "__main__":

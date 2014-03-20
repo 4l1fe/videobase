@@ -13,6 +13,9 @@ class KinopoiskTries(models.Model):
     film     = models.ForeignKey('Films', verbose_name=u'Фильм')
     try_time = models.DateTimeField(verbose_name=u'Дата попытки')
     result   = models.CharField(max_length=255, choices=APP_ROBOTS_PARSE_TRY_RESULT_TYPES, verbose_name=u'Удался ли парсинг')
+    error_message = models.TextField(verbose_name=u'Сообщение об ошибке', null = True)
+    page_dump = models.TextField(verbose_name=u'Скачанная страница', null = True)
+
 
     @property
     def format_try_time(self):
