@@ -49,7 +49,7 @@ def process_film(film,pdata):
             pf = PersonsFilms(person = po , film = film, p_type = p['p_type'])
             pf.save()
 
-    return page_dump
+
 
 class Command(BaseCommand):
 
@@ -73,6 +73,8 @@ class Command(BaseCommand):
 
         page_dump = "Couldn't get page"
 
+
+
         if args:
             films = [Films.objects.get(pk=args) for film in args]
         else:
@@ -80,20 +82,19 @@ class Command(BaseCommand):
 
         for film in films:
 
-            previous_tries = KinopoiskTries.objects.filter(result = APP_ROBOT_SUCCESS, film = film)
+            previous_tries = KinopoiskTries.objects.filter(result = APP_ROBOT_FAIL, film=film)
 
             if (film.kinopoisk_id is None) or (previous_tries and  (not options.debug) ) :
                 pass
             else:
                 sleep(APP_FILM_CRAWLER_DELAY)
-                #try:
-                if True:
-                    page_dump = acquire_page(film.id)
+                try:
+                    page_dump = acquire_page(film.kinopoisk_id)
                     pdata = parse_one_page(page_dump)
 
                     process_film(film,pdata)
                     kpt = KinopoiskTries(film = film,try_time = now(),result = APP_ROBOT_SUCCESS )
                     kpt.save()
-                #except Exception, e:
-                #    kpt = KinopoiskTries(film = film,try_time = now(),result = APP_ROBOT_FAIL , error_message = str(e), page_dump =page_dump)
-                #    kpt.save()
+                except Exception, e:
+                    kpt = KinopoiskTries(film = film,try_time = now(),result = APP_ROBOT_FAIL , error_message = str(e), page_dump =page_dump)
+                    kpt.save()
