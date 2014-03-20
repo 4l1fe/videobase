@@ -46,7 +46,7 @@ class SeasonsAdmin(admin.ModelAdmin):
 #############################################################################################################
 # Аминистрирование таблицы Персон
 class PersonsAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'name_orig', 'image_img',)
+    list_display = ('id', 'name', 'name_orig', 'image_file',)
     search_fields = ('id', 'name', 'name_orig',)
 
 
