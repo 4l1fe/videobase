@@ -24,5 +24,5 @@ class Locations(models.Model):
         # Имя таблицы в БД
         db_table = 'locations'
         app_label = 'Contents'
-        verbose_name = u'Место'
-        verbose_name_plural = u'Места'
+        verbose_name = u'Месторасположения контента'
+        verbose_name_plural = u'Месторасположения контента'
