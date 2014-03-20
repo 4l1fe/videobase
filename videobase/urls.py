@@ -1,8 +1,12 @@
+from django.contrib import admin
 from django.conf.urls import patterns, include, url
+
+# import admin_tools
 
 from videobase import settings
 
-from django.contrib import admin
+
+
 admin.autodiscover()
 
 urlpatterns = patterns('',
@@ -11,6 +15,7 @@ urlpatterns = patterns('',
     # url(r'^blog/', include('blog.urls')),
 
     url(r'^admin/', include(admin.site.urls)),
+    # url(r'^admin_tools/', include('admin_tools.urls')),
 )
 
 if settings.DEBUG:
