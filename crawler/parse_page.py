@@ -101,6 +101,13 @@ def get_photo(actor_id):
 
         return None
 
+def extract_names(soup):
+    nametag=soup.select('h1.moviename-big')[0]
+    moviename = ('Films', {'name':nametag.text})
+    orig_movie_name = ('Films', {'name_orig':nametag.select('span')[0].text if len(nametag.select('span')) else ''})
+
+    return moviename,orig_movie_name
+
 
 def actors_wrap(actors_names):
    return [('Persons',{'name': an ,'p_type': APP_PERSON_ACTOR,
@@ -108,34 +115,33 @@ def actors_wrap(actors_names):
 
                    }) for an,ai in actors_names]
 
+def acquire_page(page_id):
+
+    url ="http://www.kinopoisk.ru/film/%d/" % page_id
+    print(url)
+    res = requests.get(url, headers = headers)
+    page_dump = res.content.decode('cp1251')
+    return page_dump
 
 
-def parse_one_page(page_id):
+def parse_one_page(page_dump):
 
     parsed_data = []
-
-    res = requests.get("http://www.kinopoisk.ru/film/%d/" % page_id, headers = headers)
-    soup = BeautifulSoup(res.content.decode('cp1251'))
-
+    soup = BeautifulSoup(page_dump)
     info_table = soup.select("div#infoTable")[0]
-
     tds = info_table.select("td.type")
     data_dict = dict([(f.text,s) for f,s in [ td.parent.select("td") for td in tds]])
-    parsed_data.extend(transform_data_dict(data_dict))
-
 
     actor_list = soup.select("div#actorList")[0]
     actors_n_l = [ (a.text,a.attrs['href']) for a in actor_list.find_all('a') if  not 'film' in a.attrs['href']]
 
-    parsed_data.extend(actors_wrap(actors_n_l))
-
     brand_words = ('Films', {'description': soup.select("div.brand_words")[0].text})
-    nametag=soup.select('h1.moviename-big')[0]
-    moviename = ('Films', {'name':nametag.text})
-    orig_movie_name = ('Films', {'name_orig':nametag.select('span')[0].text if len(nametag.select('span')) else ''})
 
+    moviename,orig_movie_name = extract_names(soup)
     vote = ('Films',{'rating_kinopoisk': get_vote(soup)})
 
+    parsed_data.extend(transform_data_dict(data_dict))
+    parsed_data.extend(actors_wrap(actors_n_l))
     parsed_data.extend([brand_words,moviename,orig_movie_name,vote])
 
     ddict = defaultdict(list)
@@ -143,7 +149,7 @@ def parse_one_page(page_id):
     for pd in parsed_data:
         element,value = pd
         ddict[element].append(value)
-    return ddict
+    return ddict,page_dump
 
 
 if __name__ == "__main__":
