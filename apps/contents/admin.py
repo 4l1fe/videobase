@@ -7,7 +7,7 @@ from apps.contents.models import *
 
 #############################################################################################################
 # Администрирование таблицы контента
-class ContentAdmin(admin.ModelAdmin):
+class ContentsAdmin(admin.ModelAdmin):
     pass
 
 
@@ -25,6 +25,6 @@ class CommentsAdmin(admin.ModelAdmin):
 
 #############################################################################################################
 # Регистрация моделей в админке
-admin.site.register(Content, ContentAdmin)
+admin.site.register(Contents, ContentsAdmin)
 admin.site.register(Locations, LocationsAdmin)
 admin.site.register(Comments, CommentsAdmin)

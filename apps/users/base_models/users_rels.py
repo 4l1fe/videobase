@@ -3,8 +3,9 @@
 from django.db import models
 from ..constants import *
 
+
 ################################################################################
-# модель Пользовательских отношений
+# Модель Пользовательских отношений
 class UsersRels(models.Model):
     user = models.ForeignKey('Users', verbose_name=u'Пользователи')
     user_rel = models.ForeignKey('Users', related_name='user_rel',verbose_name=u'Пользователи')
@@ -17,5 +18,6 @@ class UsersRels(models.Model):
     class Meta:
         # Имя таблицы в БД
         db_table = 'users_rels'
+        app_label = 'Users'
         verbose_name = u'Отношения пользователей'
         verbose_name_plural = u'Отношения пользователей'
