@@ -7,8 +7,14 @@ server {
 
     server_name videobase.local;
 
-    location /static {
-        alias /home/tumani1/workspace/videobase;
+    location /production/static/admin/ {
+        alias /home/tumani1/workspace/videobase/static/admin;
+        autoindex on;
+        expires 30d;
+    }
+
+    location /static/upload/ {
+        alias /home/tumani1/workspace/videobase/static/upload/;
         autoindex on;
         expires 30d;
     }
