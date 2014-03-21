@@ -6,7 +6,7 @@ from django.db import IntegrityError
 
 
 class UsersTestCase(TestCase):
-    fixtures = ['initial_data.json']
+    fixtures = ['test.json']
     user = None
     def setUp(self):
         self.features = {
