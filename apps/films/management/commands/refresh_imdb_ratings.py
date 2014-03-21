@@ -7,7 +7,16 @@ from crawler.imdbratings import ny_full_dict
 from itertools import chain
 import datetime
 import HTMLParser
-from Levenshtein import distance
+import logging
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+ch.setFormatter(formatter)
+logger.addHandler(ch)
+
 
 class Command(NoArgsCommand):
 
@@ -22,15 +31,15 @@ class Command(NoArgsCommand):
 
         for i,film in enumerate(Films.objects.all()):
             key = h.unescape(film.name_orig).lower().strip()
-            if len(film.name_orig)<3:
+            if len(film.name_orig) < 3:
                 continue
 
             if key in name_dict:
-                print((u"\nFound rating for {} ".format(film.name_orig)).encode("utf-8"))
+                logger.info((u"Found rating for {} ".format(film.name_orig)).encode("utf-8"))
                 rdict = name_dict[key]
-                print(("\nRating before {} \n Count before {} \n ".format(film.rating_imdb,film.rating_imdb_cnt)).encode("utf-8"))
+                logger.debug(("Rating before {} Count before {} ".format(film.rating_imdb,film.rating_imdb_cnt)).encode("utf-8"))
                 film.rating_imdb=rdict['rating']
                 film.rating_imdb_cnt=rdict['votes']
-                print(("\nRating after {} \n Count after {} \n".format(film.rating_imdb,film.rating_imdb_cnt)).encode("utf-8"))
+                logging.debug(("Rating after {} Count after {}".format(film.rating_imdb,film.rating_imdb_cnt)).encode("utf-8"))
                 film.save()
 
