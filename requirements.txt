@@ -10,4 +10,8 @@ django-csvimport
 easy_thumbnails
 pillow
 pylibmc
-#sudo apt-get install -y memcached libmemcached-dev zlib1g-dev libssl-dev python-dev build-essential libjpeg-dev libfreetype6-dev zlib1g-dev libpng12-dev
+FeedParser
+#django-admin-tools==0.5.1
+hg+https://bitbucket.org/izi/django-admin-tools
+
+#sudo apt-get install -y mercurial memcached libmemcached-dev zlib1g-dev libssl-dev python-dev build-essential libjpeg-dev libfreetype6-dev zlib1g-dev libpng12-dev libpq-dev
