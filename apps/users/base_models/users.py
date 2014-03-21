@@ -7,16 +7,16 @@ from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from ..constants import *
 
 
-class UserManager(BaseUserManager):
-    def create_user(self, email, password=None, **kwargs):
-        if not email:
-            raise ValueError('Users must have an email address')
-
-        user = self.model(email=UserManager.normalize_email(email), **kwargs)
-
-        user.set_password(password)
-        user.save(using=self._db)
-        return user
+# class UserManager(BaseUserManager):
+#     def create_user(self, email, password=None, **kwargs):
+#         if not email:
+#             raise ValueError('Users must have an email address')
+#
+#         user = self.model(email=UserManager.normalize_email(email), **kwargs)
+#
+#         user.set_password(password)
+#         user.save(using=self._db)
+#         return user
 
 
 #############################################################################################################
@@ -33,7 +33,7 @@ class Users(models.Model):
     userpic      = models.ForeignKey('UsersPics', default=None, null=True, blank=True, verbose_name=u'Аватар', related_name='+')
 
 
-    objects = UserManager()
+    # objects = UserManager()
 
     def __unicode__(self):
         return u'[%s] %s' % (self.pk, self.name)

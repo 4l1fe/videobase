@@ -9,13 +9,13 @@ from apps.films.forms import *
 #############################################################################################################
 # Администрирование таблицы стран
 class CountriesAdmin(admin.ModelAdmin):
-    pass
+    search_fields = ('id', 'name',)
 
 
 #############################################################################################################
 # Администрирование таблицы жанров
 class GenresAdmin(admin.ModelAdmin):
-    pass
+    search_fields = ('id', 'name',)
 
 
 #############################################################################################################
@@ -27,20 +27,23 @@ class FilmsAdmin(admin.ModelAdmin):
 
 #############################################################################################################
 # Администрирование таблицы
-class UserFilmsAdmin(admin.ModelAdmin):
-    pass
+class UsersFilmsAdmin(admin.ModelAdmin):
+    raw_id_fields = ('user', 'film',)
 
 
 #############################################################################################################
 # Администрирование таблицы Доп. материалов к фильмам
 class FilmExtrasAdmin(admin.ModelAdmin):
-    pass
+    raw_id_fields = ('film',)
 
 
 #############################################################################################################
 # Администрирование таблицы сезонов для сериалов
 class SeasonsAdmin(admin.ModelAdmin):
     form = SeasonsAdminForm
+    raw_id_fields = ('film',)
+    search_fields = ('film__name',)
+    list_filter = ('release_date',)
 
 
 #############################################################################################################
@@ -53,13 +56,23 @@ class PersonsAdmin(admin.ModelAdmin):
 #############################################################################################################
 # Аминистрирование таблицы Расширения персон
 class PersonsExtrasAdmin(admin.ModelAdmin):
-    pass
+    raw_id_fields = ('person',)
+    search_fields = ('id', 'person__name',)
 
 
 #############################################################################################################
 # Администрирование таблицы Связи фильмов с актерами
 class PersonsFilmsAdmin(admin.ModelAdmin):
-    pass
+    raw_id_fields = ('film', 'person',)
+    list_filter = ('p_type',)
+    search_fields = ('id', 'film__name', 'person__name')
+
+
+#############################################################################################################
+# Администрирование таблицы Связи пользователей с персонами
+class UsersPersonsAdmin(admin.ModelAdmin):
+    raw_id_fields = ('user', 'person',)
+    search_fields = ('id', 'person__name',)
 
 
 #############################################################################################################
@@ -67,9 +80,10 @@ class PersonsFilmsAdmin(admin.ModelAdmin):
 admin.site.register(Countries, CountriesAdmin)
 admin.site.register(Genres, GenresAdmin)
 admin.site.register(Films, FilmsAdmin)
-admin.site.register(UsersFilms, UserFilmsAdmin)
+admin.site.register(UsersFilms, UsersFilmsAdmin)
 admin.site.register(FilmExtras, FilmExtrasAdmin)
 admin.site.register(Seasons, SeasonsAdmin)
 admin.site.register(Persons, PersonsAdmin)
 admin.site.register(PersonsExtras, PersonsExtrasAdmin)
 admin.site.register(PersonsFilms, PersonsFilmsAdmin)
+admin.site.register(UsersPersons, UsersPersonsAdmin)
