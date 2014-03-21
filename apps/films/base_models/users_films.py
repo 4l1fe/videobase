@@ -1,12 +1,13 @@
 # coding: utf-8
 
 from django.db import models
+from apps.users.models import Users
 
 
 #############################################################################################################
 # Модель Пользовательских фильмов
 class UsersFilms(models.Model):
-    user       = models.ForeignKey('Users', verbose_name=u'Идентификатор пользоваля')
+    user       = models.ForeignKey(Users, verbose_name=u'Идентификатор пользоваля')
     film       = models.ForeignKey('Films', verbose_name=u'Фильм')
     ufstatus   = models.IntegerField(verbose_name=u'Статус фильма с т.з. пользователя')
     ufrating   = models.IntegerField(verbose_name=u'Рейтинг фильма поставленный пользователем')
