@@ -7,7 +7,9 @@ from models import *
 #############################################################################################################
 # Администрирование таблицы пользователей
 class UsersAdmin(admin.ModelAdmin):
-    list_display = ('id', 'firstname', 'firstname', 'email', 'created', 'ustatus')
+    list_display = ('id', 'firstname', 'lastname', 'email', 'created', 'ustatus')
+    search_fields = ('id', 'firstname', 'lastname', 'email')
+    list_filter = ('created',)
     list_per_page = 30
 
 

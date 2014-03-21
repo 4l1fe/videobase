@@ -126,6 +126,15 @@ def acquire_page(page_id):
 
 def parse_one_page(page_dump):
 
+    '''
+    Parsing one page from the multiline string @page_dump
+
+    Returns
+
+    Dictionary with keys 'Films', 'Persons', 'Genres'
+
+    '''
+
     parsed_data = []
     soup = BeautifulSoup(page_dump)
     info_table = soup.select("div#infoTable")[0]
