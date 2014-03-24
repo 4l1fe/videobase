@@ -49,6 +49,6 @@ class Users(models.Model):
     class Meta:
         # Имя таблицы в БД
         db_table = 'users'
-        app_label = 'Users'
+        app_label = 'users'
         verbose_name = u'Пользователь'
         verbose_name_plural = u'Пользователи'

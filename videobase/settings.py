@@ -24,9 +24,6 @@ TEMPLATE_DEBUG = DEBUG
 
 ALLOWED_HOSTS = ['*',]
 
-# ADMIN_MEDIA_PREFIX = '/media/'
-
-
 # Application definition
 INSTALLED_APPS = (
     'admin_tools',
@@ -103,7 +100,7 @@ else:
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
-        'LOCATION': 'unix:/tmp/memcached.sock',
+        'LOCATION': '127.0.0.1:11211',
     }
 }
 

@@ -17,6 +17,6 @@ class Countries(models.Model):
     class  Meta(object):
         # Имя таблицы в БД
         db_table = 'countries'
-        app_label = 'Films'
+        app_label = 'films'
         verbose_name = u'Страна'
         verbose_name_plural = u'Страны'

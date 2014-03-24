@@ -35,6 +35,6 @@ class Films(models.Model):
     class  Meta(object):
         # Имя таблицы в БД
         db_table = 'films'
-        app_label = 'Films'
+        app_label = 'films'
         verbose_name = u'Фильм'
         verbose_name_plural = u'Фильмы'
