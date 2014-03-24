@@ -1,0 +1,3 @@
+[submodule "static/jcrop"]
+	path = static/jcrop
+	url = https://github.com/tapmodo/Jcrop.git
