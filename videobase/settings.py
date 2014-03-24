@@ -24,9 +24,6 @@ TEMPLATE_DEBUG = DEBUG
 
 ALLOWED_HOSTS = ['*',]
 
-# ADMIN_MEDIA_PREFIX = '/media/'
-
-
 # Application definition
 INSTALLED_APPS = (
     'admin_tools',
