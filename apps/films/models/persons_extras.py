@@ -20,6 +20,6 @@ class PersonsExtras(models.Model):
     class Meta:
         # Имя таблицы в БД
         db_table = 'persons_extras'
-        app_label = 'Films'
+        app_label = 'films'
         verbose_name = u'Расширения персоны'
         verbose_name_plural = u'Расширения персон'

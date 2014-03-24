@@ -22,6 +22,6 @@ class Comments(models.Model):
     class Meta:
         # Имя таблицы в БД
         db_table = 'comments'
-        app_label = 'Contents'
+        app_label = 'contents'
         verbose_name = u'Комментарий'
         verbose_name_plural = u'Комментарии'
