@@ -159,7 +159,7 @@ def collect_static():
     print("run - collectstatic")
     with settings(sudo_user = "www-data"):
         with cd('/var/www/videobase_test/'):
-            sudo('/home/virtualenv/videobase_test/bin/python manage.py collectstatic')
+            sudo('/home/virtualenv/videobase_test/bin/python manage.py collectstatic --dry-run --noinput')
 
 def deploy():
 
