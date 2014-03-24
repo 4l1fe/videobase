@@ -20,5 +20,5 @@ class UsersPersons(models.Model):
         # Имя таблицы в БД
         db_table = 'users_persons'
         app_label = 'Films'
-        verbose_name = u'Расширения персоны'
-        verbose_name_plural = u'Расширения персон'
+        verbose_name = u'Персоны пользователя'
+        verbose_name_plural = u'Персоны пользователей'
