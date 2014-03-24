@@ -98,7 +98,7 @@ class Command(BaseCommand):
             film.save()
             self.save_trailer(film, data)
             self.save_actors(film, data)
-            #self.save_director(film, data)
+            self.save_director(film, data)
 
             return True
         except Exception as ex:
