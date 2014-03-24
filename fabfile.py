@@ -134,6 +134,12 @@ def db_migrate_test(appname=''):
         with cd('/var/www/videobase_test/'):
             sudo('/home/virtualenv/videobase_test/bin/python manage.py migrate %s --no-initial-data' % appname)
 
+def collect_static():
+    print("run - collectstatic")
+    with settings(sudo_user = "www-data"):
+        with cd('/var/www/videobase_test/'):
+            sudo('/home/virtualenv/videobase_test/bin/python manage.py collectstatic')
+
 def deploy():
 
     """
@@ -153,6 +159,7 @@ def project_deploy():
     deploy_test_code()
     refresh_test_requirements()
     db_migrate_test()
+    collect_static()
     restart_all()
     status()
 
@@ -177,4 +184,3 @@ def init_if_not_exists_task():
         with cd('/var/lib/postgresql'):
             if not (str(sudo('''echo "select rolname from pg_roles where rolname = 'pgadmin';" |psql -tA''')).strip()):
                 init_db()
-
