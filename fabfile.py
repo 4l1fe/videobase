@@ -1,10 +1,31 @@
 # coding: utf-8
 from fabric.api import env,roles, run, settings, sudo, cd,local
 import fabric
+from fabtools import require
+import fabtools
 
 env.hosts = ['188.226.191.166',]
 env.user = 'root'
 env.shell= "/bin/bash -c"
+
+def setup():
+
+    # Require some Debian/Ubuntu packages
+    require.deb.packages([
+        'libxml2-dev',
+        'mercurial',
+        'memcached',
+        'libmemcached-dev',
+        'zlib1g-dev',
+        'libssl-dev',
+        'python-dev',
+        'build-essential',
+        'libjpeg-dev',
+        'libfreetype6-dev',
+        'zlib1g-dev',
+        'libpng12-dev',
+        'libpq-dev'
+    ])
 
 def init_db():
     """
@@ -135,10 +156,12 @@ def db_migrate_test(appname=''):
             sudo('/home/virtualenv/videobase_test/bin/python manage.py migrate %s --no-initial-data' % appname)
 
 def collect_static():
-    print("run - collectstatic")
+    """
+    build/update static files
+    """
     with settings(sudo_user = "www-data"):
         with cd('/var/www/videobase_test/'):
-            sudo('/home/virtualenv/videobase_test/bin/python manage.py collectstatic')
+            sudo('/home/virtualenv/videobase_test/bin/python manage.py collectstatic --dry-run --noinput')
 
 def deploy():
 
@@ -155,7 +178,7 @@ def project_deploy():
     Обновить весь код
 
     '''
-
+    setup()
     deploy_test_code()
     refresh_test_requirements()
     db_migrate_test()
