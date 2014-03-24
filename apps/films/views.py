@@ -6,7 +6,7 @@ import os
 from PIL import Image, ImageEnhance
 from cStringIO import StringIO
 from django.core.files import File
-
+from apps.films.constants import APP_PERSON_PHOTO_DIR
 # Create your views here.
 
 def image_refresh(func):
@@ -29,7 +29,8 @@ def image_refresh(func):
         imc.save(imfile,"PNG")
         imfile.seek(0)
 
-        p.photo.save('.'+path.groupdict()['path']+'_resize.jpg', File(imfile))
+        p.photo.save(os.path.basename(path.groupdict()['path'])+'_resize.png', File(imfile))
+
 
         return HttpResponse("OK")
 
