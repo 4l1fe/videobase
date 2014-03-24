@@ -156,7 +156,9 @@ def db_migrate_test(appname=''):
             sudo('/home/virtualenv/videobase_test/bin/python manage.py migrate %s --no-initial-data' % appname)
 
 def collect_static():
-    print("run - collectstatic")
+    """
+    build/update static files
+    """
     with settings(sudo_user = "www-data"):
         with cd('/var/www/videobase_test/'):
             sudo('/home/virtualenv/videobase_test/bin/python manage.py collectstatic --dry-run --noinput')
