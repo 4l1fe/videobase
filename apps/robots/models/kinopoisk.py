@@ -31,3 +31,4 @@ class KinopoiskTries(models.Model):
         app_label = 'robots'
         verbose_name = u'Попытка взять инфу о фильме с кинопоиска'
         verbose_name_plural = u'Попытки взять инфу о фильме с кинопоиска'
+
