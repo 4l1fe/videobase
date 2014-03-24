@@ -22,6 +22,6 @@ class FilmExtras(models.Model):
     class  Meta(object):
         # Имя таблицы в БД
         db_table = 'films_extras'
-        app_label = 'Films'
+        app_label = 'films'
         verbose_name = u'Дополнительный материал к фильму'
         verbose_name_plural = u'Дополнительные материалы к фильмам'

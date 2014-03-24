@@ -66,6 +66,6 @@ class Persons(models.Model):
     class Meta:
         # Имя таблицы в БД
         db_table = 'persons'
-        app_label = 'Films'
+        app_label = 'films'
         verbose_name = u'Персона'
         verbose_name_plural = u'Персоны'

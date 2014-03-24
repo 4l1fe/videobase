@@ -19,6 +19,6 @@ class Robots(models.Model):
     class Meta:
         # Имя таблицы в БД
         db_table = 'robots'
-        app_label = 'Robots'
+        app_label = 'robots'
         verbose_name = u'Робот'
         verbose_name_plural = u'Роботы'

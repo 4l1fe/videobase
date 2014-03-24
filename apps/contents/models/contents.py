@@ -26,6 +26,6 @@ class Contents(models.Model):
     class Meta:
         # Имя таблицы в БД
         db_table = 'content'
-        app_label = 'Contents'
+        app_label = 'contents'
         verbose_name = u'Контент'
         verbose_name_plural = u'Контент'

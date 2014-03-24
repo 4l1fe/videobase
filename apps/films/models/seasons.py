@@ -19,7 +19,7 @@ class Seasons(models.Model):
     class  Meta(object):
         # Имя таблицы в БД
         db_table = 'seasons'
-        app_label = 'Films'
+        app_label = 'films'
         verbose_name = u'Сезон'
         verbose_name_plural = u'Сезоны'
         unique_together = (('film', 'number'),)

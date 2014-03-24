@@ -1,6 +1,6 @@
 # coding: utf-8
 
-from django.contrib.admin.models import LogEntry, DELETION
+from django.contrib.admin.models import LogEntry, DELETION, ADDITION, CHANGE
 from django.utils.html import escape
 from django.core.urlresolvers import reverse
 from django.contrib import admin
@@ -35,7 +35,7 @@ class LogEntryAdmin(admin.ModelAdmin):
     readonly_fields = LogEntry._meta.get_all_field_names()
     list_filter = ('user', 'content_type', 'action_flag',)
     search_fields = ('object_repr', 'change_message',)
-    list_display = ('action_time', 'user', 'content_type', 'object_link', 'action_flag', 'change_message',)
+    list_display = ('action_time', 'user', 'content_type', 'object_link', 'action_description', 'change_message',)
 
     def has_add_permission(self, request):
         return False
@@ -45,26 +45,15 @@ class LogEntryAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False
-    #
-    # def formfield_for_choice_field(self, db_field, request, **kwargs):
-    #     if db_field.name == "action_flag":
-    #         kwargs['choices'] = (
-    #             (1, 'Add'),
-    #             (2, 'Change'),
-    #             (3, 'Delete'),
-    #         )
-    #
-    #     return super(LogEntryAdmin, self).formfield_for_choice_field(db_field, request, **kwargs)
-    #
-    # def action_flag_name(self, obj):
-    #     if obj.is_addition():
-    #         return "Add"
-    #     elif obj.is_change():
-    #         return "Change"
-    #     else:
-    #         return "Delete"
-    #
-    # action_flag_name.short_description = self
+
+    def action_description(self, obj):
+        action_names = {
+            ADDITION: 'Addition',
+            DELETION: 'Deletion',
+            CHANGE: 'Change',
+        }
+        return action_names[obj.action_flag]
+    action_description.short_description = 'Action'
 
     def object_link(self, obj):
         if obj.action_flag == DELETION:
