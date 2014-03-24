@@ -18,6 +18,6 @@ class RobotsLog(models.Model):
     class Meta:
         # Имя таблицы в БД
         db_table = 'robots_log'
-        app_label = 'Robots'
+        app_label = 'robots'
         verbose_name = u'Логирование робота'
         verbose_name_plural = u'Логирование роботов'

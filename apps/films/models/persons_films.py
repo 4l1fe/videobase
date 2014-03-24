@@ -20,7 +20,7 @@ class PersonsFilms(models.Model):
     class  Meta(object):
         # Имя таблицы в БД
         db_table = 'persons_films'
-        app_label = 'Films'
+        app_label = 'films'
         verbose_name = u'Роль персоны в производстве фильма'
         verbose_name_plural = u'Роли персон в производстве фильмов'
         unique_together = (('film', 'person', 'p_type'),)

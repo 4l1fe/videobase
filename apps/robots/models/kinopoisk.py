@@ -28,7 +28,7 @@ class KinopoiskTries(models.Model):
     class Meta:
         # Имя таблицы в БД
         db_table = 'robots_kinopoisk_tries'
-        app_label = 'Robots'
-        verbose_name = u'Попытка c кинопоиска'
-        verbose_name_plural = u'Попытки с кинопоиска'
+        app_label = 'robots'
+        verbose_name = u'Попытка взять инфу о фильме с кинопоиска'
+        verbose_name_plural = u'Попытки взять инфу о фильме с кинопоиска'
 

@@ -20,6 +20,6 @@ class UsersSocials(models.Model):
     class Meta:
         # Имя таблицы в БД
         db_table = 'users_socials'
-        app_label = 'Users'
+        app_label = 'users'
         verbose_name = u'Социальность пользователя'
         verbose_name_plural = u'Социальность пользователей'

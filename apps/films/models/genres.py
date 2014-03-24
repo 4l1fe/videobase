@@ -16,6 +16,6 @@ class Genres(models.Model):
     class  Meta(object):
         # Имя таблицы в БД
         db_table = 'genres'
-        app_label = 'Films'
+        app_label = 'films'
         verbose_name = u'Жанр'
         verbose_name_plural = u'Жанры'
