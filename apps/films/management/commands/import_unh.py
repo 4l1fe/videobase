@@ -1,11 +1,13 @@
 # coding: utf-8
 
+#from guppy import hpy
 import os, csv, re
 from datetime import datetime
 import codecs
 import chardet
 import datetime
 import warnings
+import HTMLParser
 
 from django.db import DatabaseError
 from django.core.exceptions import ObjectDoesNotExist
@@ -13,6 +15,7 @@ from django.core.management.base import LabelCommand, BaseCommand, CommandError
 from optparse import make_option
 from django.db import models
 from django.contrib.contenttypes.models import ContentType
+from django.db import IntegrityError, transaction
 
 from apps.films.constants import *
 from apps.films.models import Films, Genres, Countries, PersonsFilms, FilmExtras, Persons
@@ -23,32 +26,57 @@ class Command(BaseCommand):
         self.charset = ''
 
     def handle(self, *args, **options):
+
         filename =  args[0]
         if os.path.exists(filename):
-            self.stdout.write('Start: Import from UNH CSV from %s' % filename)
+            self.stdout.write(u'Start: Import from UNH CSV from %s' % filename)
             self.import_file( filename)
         else:
-            raise Exception('File %s not found' % filename)
+            raise Exception(u'File %s not found' % filename)
+
+    @property
+    def html_parser(self):
+        if not hasattr(self, 'h'):
+            self.h = HTMLParser.HTMLParser()
+        return self.h
+
+    def escape_html(self, value):
+        _value = self.html_parser.unescape(value).strip()
+        return _value
 
     def import_file(self, filename):
         self.stdout.write('Run import -  %s' % filename)
         data = self.__csvfile(filename)
         headers = data[0]
         counter = 0
+        rows = []
         for row in data[1:]:
-            #print('====row====== {0} =='.format(row))
-            item = dict(zip(headers, row)) if (len(headers) <= len(row)) else dict(map(None, headers, row))
-            if self.insert_item(item):
-                counter += 1
+            rows.append(row)
             if ((counter % 100) == 0):
-                self.stdout.write('Inserted  {0} items'.format(counter))
+                self.chunk_insert(rows, headers)
+                rows = []
 
-        self.stdout.write('Inserted  {0} items'.format(counter))
+            #if self.insert_item(item):
+
+            counter += 1
+            if ((counter % 100) == 0):
+                self.stdout.write(u'Inserted  {0} items'.format(counter))
+
+        self.stdout.write(u'Inserted  {0} items'.format(counter))
+
+    @transaction.commit_on_success
+    def chunk_insert(self, rows, headers):
+        for row in rows:
+            item = dict(zip(headers, row)) if (len(headers) <= len(row)) else dict(map(None, headers, row))
+            self.insert_item(item)
+        return True
+
 
     def charset_csv_reader(self, csv_data, dialect=csv.excel,
                            charset='utf-8', **kwargs):
         csv_reader = csv.reader(self.charset_encoder(csv_data, charset),
-                                dialect=dialect, delimiter='|', **kwargs)
+                                dialect=dialect, delimiter='|',
+                                lineterminator="\r\n", **kwargs)
         for row in csv_reader:
             yield [unicode(cell, charset) for cell in row]
 
@@ -70,20 +98,23 @@ class Command(BaseCommand):
             film.save()
             self.save_trailer(film, data)
             self.save_actors(film, data)
-            self.save_director(film, data)
+            #self.save_director(film, data)
 
             return True
         except Exception as ex:
-            print('====ex====== {0} =='.format(ex))
-            print('====data==== #{0}=='.format(data["id"]))
+            print u'====data==== #{0}=='.format(data["id"])
+            print u'====ex====== {0} =='.format(data)
+            print ex.message
+            print ex.__class__.__name__
+
             #print('====data==== #{0}=='.format(data.__repr__()))
             return False
 
     def get_film(self, data):
         attributes = {
-            'name': self.film_name(data),
-            'name_orig': self.film_name_orig(data),
-            'description': self.film_description(data),
+            'name': self.escape_html(self.film_name(data)),
+            'name_orig': self.escape_html(self.film_name_orig(data)),
+            'description': self.escape_html(self.film_description(data)),
             'ftype': APP_FILM_FULL_FILM,
             'kinopoisk_id': data['id_kinopoisk'],
             'frelease_date': self.date_or_now(data['release']),
@@ -93,8 +124,8 @@ class Command(BaseCommand):
             'imdb_id': self.null_to_none(data['id_imdb'])
         }
         try:
-            film = Film.objects.get(name=attributes['name'])
-        except:
+            film = Films.objects.get(name=attributes['name'])
+        except Exception as ex:
             film = Films(**attributes)
             film.save()
 
@@ -159,38 +190,33 @@ class Command(BaseCommand):
     # person_data[0] - ru name
     # person_data[1] - eng name
     #
-    def get_person(self, person_data):
+    def get_person(self, person_name):
         try:
-            person_model = Persons.objects.get(name=person_data[0].strip())
+            person_model = Persons.objects.get(name=self.escape_html(person_name))
         except:
-            person_model = Persons(name=person_data[0].strip(),
-                                   name_orig=person_data[1].strip())
+            person_model = Persons(name=self.escape_html(person_name),
+                                   name_orig=self.escape_html(person_name))
             person_model.save()
         return person_model
 
     def save_person_film(self, film, person, p_type):
         try:
-            person_film = PersonsFilms(film=film,
-                                       person=person,
-                                       p_type=p_type)
-            person_film.save()
+            person_film = PersonsFilms.objects.get_or_create(film=film,
+                                                             person=person,
+                                                             p_type=p_type)
             return person_film
         except:
             return True
 
     def save_actors(self, film, data = None):
-        actors_ru_names = self.compact_list(data['actors_ru'].split(','))
-        actors_eng_names = self.compact_list(data['actors_eng'].split(','))
-        actors_names = zip(actors_ru_names, actors_eng_names)
+        actors_names = self.compact_list(self.escape_html(data['actors_eng']).split(','))
         for actor_name in actors_names:
             actor = self.get_person(actor_name)
             self.save_person_film(film, actor, APP_PERSON_ACTOR)
         return True
 
     def save_director(self, film, data = None):
-        director_ru_names = self.compact_list(data['director_ru'].split(','))
-        director_eng_names = self.compact_list(data['director_eng'].split(','))
-        directors_names = zip(director_ru_names, director_eng_names)
+        directors_names = self.compact_list(data['director_eng'].split(','))
         for director_name in directors_names:
             director = self.get_person(director_name)
             self.save_person_film(film, director, APP_PERSON_DIRECTOR)
@@ -217,30 +243,43 @@ class Command(BaseCommand):
     def get_genres(self, genres = None):
         if genres is None:
             return []
+
+        if not(hasattr(self, 'genres')):
+            self.genres = {}
+            print(u'====ex====== load genres ==')
+            for item in Genres.objects.all():
+                self.genres[item.name] = item
+
         genre_names = map(lambda v: v.strip(), genres.split(','))
         genre_models = []
         for genre_name in genre_names:
             try:
-                genre_model = Genres.objects.get(name=genre_name)
+                genre_model = self.genres[genre_name]
             except:
                 genre_model = Genres(name=genre_name)
                 genre_model.save()
-
+                self.genres[genre_name] = genre_model
             genre_models.append(genre_model)
-
         return genre_models
 
     def get_countries(self, countries = None):
         if countries is None:
             return []
+        if not(hasattr(self, 'countries')):
+            print(u'====ex====== load countries ==')
+            self.countries = {}
+            for item in Countries.objects.all():
+                self.countries[item.name] = item
+
         country_names = map(lambda v: v.strip(), countries.split(','))
         country_models = []
         for country_name in country_names:
             try:
-                country_model = Countries.objects.get(name=country_name)
+                country_model = self.countries[country_name]
             except:
                 country_model = Countries(name=country_name)
                 country_model.save()
+                self.countries[country_name] = country_model
 
             country_models.append(country_model)
 
