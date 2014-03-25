@@ -7,6 +7,7 @@ from django.forms.extras.widgets import SelectDateWidget
 from itertools import groupby
 
 from apps.users.logentry_summary import *
+from apps.films.constants import APP_JQUERY_PATH
 
 class FilterForm(forms.Form):
     start_at = forms.DateField(widget=SelectDateWidget(), label=u'с')
@@ -29,7 +30,7 @@ class LogentrySummaryView(TemplateView):
             report = LogentrySummary(period ={'start_at': start_at, 'end_at': end_at})
             filter_form = FilterForm(initial={ 'end_at': end_at, 'start_at': start_at})
 
-
+        context['jquery_path'] = APP_JQUERY_PATH
         context['report_data'] = report.summary()
         context['filter_form'] = filter_form.as_table()
 

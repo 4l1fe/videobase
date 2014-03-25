@@ -1,4 +1,5 @@
 {% extends "admin/base_site.html" %}
+{% block extrahead %}<script src={{jquery_path}} type="text/javascript"></script>{% endblock %}
 {% block title %}Отчет по журналу{% endblock %}
 {% block content %}
 <h2>Отчет за период:</h2>
@@ -28,7 +29,7 @@
     </tr>
 
     {% for item in user.list %}
-    <tr data_user_line="{{user.grouper}}">
+    <tr data_user_line="{{user.grouper}}" data_user_id='{{item.user_id}}'>
         <td>
             {{ user.grouper }}
         </td>
@@ -44,8 +45,21 @@
 
 <script>
     $(function(){
-     console.log('fffffffff')
-    });
+     $.each($('tr[data_user_total_line]', '#table-report'), function(_, item){
+         var user_name = $(item).attr('data_user_total_line')
+         var t = 0;
+         var items = $('tr[data_user_line='+ user_name +'] td:last', '#table-report');
+         var user_id =  $('tr[data_user_line='+ user_name +']:first', '#table-report').attr('data_user_id');
+         $.each(items,
+                function(_, v) {
+                  t = t + parseInt($(v).text(), 10)
+         });
+         $('td:first', item).html("<a href='/admin/users/users/"+ user_id +"/'>"+$('td:first', item).text()+"<a>")
+         if (t > 0){
+             $('td:last', item).text(t)
+         };
+     });
+     });
 </script>
 
 {% endblock %}
