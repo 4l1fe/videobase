@@ -11,12 +11,12 @@ class LogentrySummary:
     def summary(self):
         sql = """
         SELECT users.id,
-                 (users.firstname || users.lastname) as "username",
+                 (users.firstname || ' ' || users.lastname) as "username",
 	         django_admin_log.action_flag,
 	         django_content_type.name,
 	         count(*)
           FROM django_admin_log
-               INNER JOIN users ON users.id = django_admin_log.id
+               INNER JOIN users ON users.id = django_admin_log.user_id
                INNER JOIN django_content_type ON django_content_type.id = django_admin_log.content_type_id
           WHERE django_admin_log.action_time between %s AND %s
           GROUP BY users.id,
