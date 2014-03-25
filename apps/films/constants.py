@@ -45,7 +45,8 @@ APP_FILM_ADMIN_JS_LIBS = ('http://code.jquery.com/jquery-1.9.1.js',
                           'http://cdnjs.cloudflare.com/ajax/libs/camanjs/3.3.0/caman.full.min.js',
                           'http://code.jquery.com/ui/1.10.4/jquery-ui.js',
                           '/static/jcrop/js/jquery.Jcrop.js',
-                          '/static/resize.js'
+                          '/static/resize.js',
+                          '/static/links.js'
                       )
 
 APP_FILM_ADMIN_CSS = ('http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css',)
