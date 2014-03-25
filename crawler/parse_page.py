@@ -20,9 +20,10 @@ from collections import defaultdict
 from apps.films.constants import APP_PERSON_ACTOR, APP_PERSON_DIRECTOR, APP_PERSON_PRODUCER
 import StringIO
 from PIL import Image
+from functools import partial
 
 YANDEX_KP_ACTORS_TEMPLATE = "http://st.kp.yandex.net/images/actor_iphone/iphone360_{}.jpg"
-
+YANDEX_KP_FILMS_TEMPLATE  = "http://st.kp.yandex.net/images/film_big/{}.jpg"
 
 headers = {'User-Agent': 'Mozilla/5.0'}
 
@@ -80,7 +81,10 @@ def transform_data_dict(ddict):
             pass
             #print(u"Can't find parser for {}".format(key))
 
-def get_photo(actor_id):
+
+
+
+def get_image(template,actor_id):
 
     try:
         r = requests.get(YANDEX_KP_ACTORS_TEMPLATE.format(actor_id))
@@ -88,18 +92,18 @@ def get_photo(actor_id):
         fileobj = StringIO.StringIO()
         fileobj.write(r.content)
         fileobj.seek(0)
-
         img = Image.open(fileobj).conver('RGB')
-
         conv_file = StringIO.StringIO()
         img.save(conv_file)
         conv_file.seek(0)
-
         return conv_file
-
     except:
-
         return None
+
+
+get_poster = partial(YANDEX_KP_FILMS_TEMPLATE,get_image)
+get_photo = partial(YANDEX_KP_ACTORS_TEMPLATE,get_image)
+
 
 def extract_names(soup):
     nametag=soup.select('h1.moviename-big')[0]
@@ -118,7 +122,6 @@ def actors_wrap(actors_names):
 def acquire_page(page_id):
 
     url ="http://www.kinopoisk.ru/film/%d/" % page_id
-    print(url)
     res = requests.get(url, headers = headers)
     page_dump = res.content.decode('cp1251')
     return page_dump
