@@ -166,7 +166,11 @@ function edit_mode_init(){
 	    $('#levels').hide()
 }
 
+
+
+
 function load_all(){
+
 if ( $("p.file-upload").length >0){
     init_resizing();
     init_br_co();
@@ -176,8 +180,33 @@ if ( $("p.file-upload").length >0){
 }
 
 }
+function predecision(){
 
-jQuery(document).ready(load_all);
+if ($('#id_etype').length >0){
+
+   if ($('#id_etype')[0].value =="POSTER"){
+
+       load_all()
+       $('div.field-url').hide()
+}
+
+else{
+
+      $('div.field-photo').hide()
+
+}
+
+}
+
+else{
+
+load_all()
+}
+
+}
+
+
+jQuery(document).ready(predecision);
 
 
 
