@@ -16,7 +16,7 @@ class LogentrySummary:
 	         django_content_type.name,
 	         count(*)
           FROM django_admin_log
-               INNER JOIN users ON users.id = django_admin_log.id
+               INNER JOIN users ON users.id = django_admin_log.user_id
                INNER JOIN django_content_type ON django_content_type.id = django_admin_log.content_type_id
           WHERE django_admin_log.action_time between %s AND %s
           GROUP BY users.id,
