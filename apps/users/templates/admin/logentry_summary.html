@@ -1,0 +1,51 @@
+{% extends "admin/base_site.html" %}
+{% block title %}Отчет по журналу{% endblock %}
+{% block content %}
+<h2>Отчет за период:</h2>
+<form action="/admin/users/logentry_summary/" method="post">
+    {% csrf_token %}
+    <div>
+        {{filter_form}}
+        <p><input type="submit" value="Обновить"/></p>
+    </div>
+</form>
+<table id='table-report'>
+    <tr>
+        <th>Пользоваль</th>
+        <th>Тип действия</th>
+        <th>Тип Контента</th>
+        <th>Кол-во</th>
+    </tr>
+    {% regroup report_data by user_name as user_list %}
+    {% for user in user_list %}
+    <tr data_user_total_line="{{user.grouper}}">
+        <td>
+            {{ user.grouper }}
+        </td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+
+    {% for item in user.list %}
+    <tr data_user_line="{{user.grouper}}">
+        <td>
+            {{ user.grouper }}
+        </td>
+        <td>{{ item.action }}</td>
+        <td>{{ item.type }}</td>
+        <td>{{ item.count }}</td>
+    </tr>
+
+    {% endfor %}
+
+    {% endfor %}
+</table>
+
+<script>
+    $(function(){
+     console.log('fffffffff')
+    });
+</script>
+
+{% endblock %}
