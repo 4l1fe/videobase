@@ -10,6 +10,7 @@ function select_p_a(){
 
 }
 
+// Helper function for csrf
 function getCookie(name) {
     var cookieValue = null;
     if (document.cookie && document.cookie != '') {
@@ -25,10 +26,13 @@ function getCookie(name) {
     }
     return cookieValue;
 }
+
+// Global variables for storing crop coordinates
 X=null;
 Y=null;
 X2=null;
 Y2=null;
+// Global variables for storing brightness contrast values.
 BR = null;
 CO = null;
 
@@ -45,10 +49,12 @@ function init_resizing(){
 
     var p = a_p.p
     var src = a_p.src
+    p.append("<div id = 'slinks'><\div>")
+
 
     p.append("<div id ='to-resize'><img id = 'img-to-resize' src ='/static/"+src+"'></div>")
 
-
+        $('#slinks').append('<a href= "http://images.google.com/searchbyimage?image_url='+ encodeURIComponent($('#img-to-resize')[0].src)+'"> Поискать картинку на Google<\a>')
     jQuery("#img-to-resize").Jcrop({
 		onChange: setCoords,
 		onSelect: setCoords
@@ -91,6 +97,11 @@ function init_br_co(){
 
 }
 
+function add_image_search(){
+
+
+}
+
 function add_buttons(){
 
     var p = select_p_a().p;
@@ -103,31 +114,18 @@ function add_buttons(){
     $("#to-resize").append("<input id ='bcrop' style='width:100px' type='button' value = 'Вырезать'></input>")
 
     $("#resbut").click(function(event,ui){
-
-
 	if ($('#levels').length>0){
-
-	    $('#levels').hide();
-	}
-
+	    $('#levels').hide();}
 	$('#to-resize').show();
-})
-
+    })
 
     $("#brcobut").click(function(event,ui){
 	if ($('#to-resize').length>0){
-
-
 	    $('#to-resize').hide();
-
-	    console.log('hide');
 	}
 	if ($('#levels').length>0){
-
-	    $('#levels').show()
-	}else{
-	    }
-})
+	    $('#levels').show()}
+    })
 
     $("#bcrop").click(function(event,ui){
 
@@ -136,26 +134,18 @@ function add_buttons(){
 			       y:Y,
 			       x2:X2,
 			       y2:Y2
-
 			      },function(){
-	location.reload();
-});
-
-
+				  location.reload();
+			      });
     })
     $("#br_co_send").click(function(event,ui){
-
-	console.log("hfs");
-
 	$.post('/api/image/brco/',{image:$('#img-to-resize')[0].src,
 			     br:BR,
 			     co:CO
-
-			    },function(){
-	location.reload();
-});
-
-
+			    },
+	       function(){
+		   location.reload();
+	       });
     })
 
 
@@ -163,10 +153,8 @@ function add_buttons(){
 
 
 function edit_mode_init(){
-	    $('#levels').hide()
+    $('#levels').hide()
 }
-
-
 
 
 function load_all(){
@@ -177,9 +165,8 @@ if ( $("p.file-upload").length >0){
     add_buttons();
     edit_mode_init();
 
-}
+}}
 
-}
 IS_IMAGE_EDITOR_SET = 0;
 
 function predecision(){
@@ -219,6 +206,7 @@ function predecision(){
 
 
 jQuery(document).ready(predecision);
+
 
 
 
