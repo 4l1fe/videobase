@@ -21,12 +21,14 @@ class LogentrySummaryView(TemplateView):
         context = super( LogentrySummaryView, self).get_context_data(**kwargs)
         if self.request.method == 'POST':
             filter_form = FilterForm(self.request.POST)
-            end_at = filter_form['end_at']
-            start_at = filter_form['start_at']
-            report = LogentrySummary(period ={'start_at': start_at.value(), 'end_at': end_at.value()})
+            end_at = filter_form['end_at'].value()
+            start_at = filter_form['start_at'].value()
+            report = LogentrySummary(period ={'start_at': start_at, 'end_at': end_at})
         else:
             end_at = datetime.now()
+            end_at = end_at.replace(hour=23, minute=59, second=59, microsecond=59)
             start_at = (datetime.now() - timedelta(days = datetime.now().weekday()))
+            start_at = start_at.replace(hour=0, minute=0, second=0, microsecond=0)
             report = LogentrySummary(period ={'start_at': start_at, 'end_at': end_at})
             filter_form = FilterForm(initial={ 'end_at': end_at, 'start_at': start_at})
 
