@@ -35,6 +35,14 @@ class FilmExtras(PhotoClass):
                 msg = {'etype': (u"Это поле не изменяемо",)}
                 raise ValidationError(msg)
 
+    def save(self, *args, **kwargs):
+        if self.etype == APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER:
+            self.url = None
+        elif self.etype == APP_FILM_TYPE_ADDITIONAL_MATERIAL_TRAILER:
+            self.photo = None
+
+        super(FilmExtras, self).save(*args, **kwargs)
+
     def __unicode__(self):
         return u'[{0}] {1}'.format(self.pk, self.name)
 
