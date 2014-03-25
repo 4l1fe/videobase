@@ -131,7 +131,7 @@ function add_buttons(){
 
     $("#bcrop").click(function(event,ui){
 
-	$.post('/api/resize/',{image:$('#img-to-resize')[0].src,
+	$.post('/api/image/resize/',{image:$('#img-to-resize')[0].src,
 			       x:X,
 			       y:Y,
 			       x2:X2,
@@ -147,7 +147,7 @@ function add_buttons(){
 
 	console.log("hfs");
 
-	$.post('/api/brco/',{image:$('#img-to-resize')[0].src,
+	$.post('/api/image/brco/',{image:$('#img-to-resize')[0].src,
 			     br:BR,
 			     co:CO
 
@@ -166,7 +166,11 @@ function edit_mode_init(){
 	    $('#levels').hide()
 }
 
+
+
+
 function load_all(){
+
 if ( $("p.file-upload").length >0){
     init_resizing();
     init_br_co();
@@ -176,8 +180,45 @@ if ( $("p.file-upload").length >0){
 }
 
 }
+IS_IMAGE_EDITOR_SET = 0;
 
-jQuery(document).ready(load_all);
+function predecision(){
+
+    if ($('#id_etype').length >0){
+	if ($('#id_etype')[0].value =="POSTER"){
+	    load_all()
+	    IS_IMAGE_EDITOR_SET = 1;
+	    $('div.field-url').hide();
+	}
+	else{
+      $('div.field-photo').hide();}
+
+    }
+    else{
+	load_all()
+	IS_IMAGE_EDITOR_SET = 1;
+    }
+
+    $('#id_etype').change(function(event){
+
+	if (event.target.value == "POSTER"){
+
+	    $('div.field-url').hide()
+	    $('div.field-photo').show()
+	    if (!IS_IMAGE_EDITOR_SET){
+		load_all()
+		IS_IMAGE_EDITOR_SET = 1;
+	    }}
+	else{
+	    $('div.field-url').show()
+	    $('div.field-photo').hide()
+	}
+    })
+
+}
+
+
+jQuery(document).ready(predecision);
 
 
 

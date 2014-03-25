@@ -58,6 +58,14 @@ def local_db_reset():
     local('''echo "CREATE USER pgadmin WITH PASSWORD 'qwerty'; CREATE DATABASE videobase; GRANT ALL PRIVILEGES ON DATABASE videobase to pgadmin;" |  sudo -u postgres psql''')
     local("""cd sql_dump && sudo -u postgres psql -d videobase -f $(ls -1 *.sql | head -1)""")
 
+def setup_system_libraries():
+
+    '''
+    '''
+
+
+    pass
+
 
 def deploy_test_code():
     """

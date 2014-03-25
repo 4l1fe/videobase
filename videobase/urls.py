@@ -13,8 +13,10 @@ urlpatterns = patterns('',
                        url(r'^admin/users/', include('apps.users.urls')),
                        url(r'^admin_tools/', include('admin_tools.urls')),
                        url(r'^admin/', include(admin.site.urls)),
-                       url(r'^api/resize/','apps.films.views.resize_image'),
-                       url(r'^api/brco/','apps.films.views.bri_con'),
+                       url(r'^admin_tools/', include('admin_tools.urls')),
+                       url(r'^admin/', include(admin.site.urls)),
+                       url(r'^api/image/resize/','apps.films.views.resize_image'),
+                       url(r'^api/image/brco/','apps.films.views.bri_con'),
 )
 
 if settings.DEBUG:
