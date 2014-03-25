@@ -26,7 +26,7 @@
                 <tbody>
                 {% regroup report_data by user_name as user_list %}
                 {% for user in user_list %}
-                <tr data_user_total_line="{{user.grouper}}">
+                <tr data_user_total_line="{% filter escapejs %}{{user.grouper}}{% endfilter %}">
                     <td>
                         {{ user.grouper }}
                     </td>
@@ -36,7 +36,7 @@
                 </tr>
 
                 {% for item in user.list %}
-                <tr data_user_line="{{user.grouper}}" data_user_id='{{item.user_id}}'>
+                <tr data_user_line="{% filter escapejs %}{{user.grouper}}{% endfilter %}" data_user_id='{{item.user_id}}'>
                     <td>
                         {{ user.grouper }}
                     </td>
@@ -58,8 +58,8 @@
      $.each($('tr[data_user_total_line]', '#result_list'), function(_, item){
          var user_name = $(item).attr('data_user_total_line')
          var t = 0;
-         var items = $('tr[data_user_line='+ user_name +'] td:last', '#result_list');
-         var user_id =  $('tr[data_user_line='+ user_name +']:first', '#result_list').attr('data_user_id');
+         var items = $("tr[data_user_line='"+ user_name +"'] td:last", '#result_list');
+         var user_id =  $("tr[data_user_line='"+ user_name +"']:first", '#result_list').attr('data_user_id');
          $.each(items,
                 function(_, v) {
              t = t + parseInt($(v).text(), 10)
