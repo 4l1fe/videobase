@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from apps.films.models import Persons,Films
+from apps.films.models import Persons,Films, FilmExtras
 import re
 import os
 from PIL import Image, ImageEnhance
@@ -8,6 +8,7 @@ from cStringIO import StringIO
 from django.core.files import File
 from apps.films.constants import APP_PERSON_PHOTO_DIR
 # Create your views here.
+import warnings
 
 def get_new_namestring(namestring):
 
@@ -31,7 +32,14 @@ def image_refresh(func):
         path = re.match('.+(?P<path>[/]static[/].+)',url)
         d = m.groupdict()
 
-        p = Persons.objects.get(pk = int(d['id']))
+        print request.get_full_path()
+        if d['type'] == 'persons':
+            p = Persons.objects.get(pk = int(d['id']))
+        elif d['type'] == 'filmextras':
+            p = FilmExtras.objects.get(pk = int(d['id']))
+        else:
+            warnings.warn("Unknown type {} of requests for image manipulation")
+
         im = Image.open('.'+path.groupdict()['path'])
 
         imc = func(d,im,request)

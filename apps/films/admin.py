@@ -34,6 +34,7 @@ class UsersFilmsAdmin(admin.ModelAdmin):
 #############################################################################################################
 # Администрирование таблицы Доп. материалов к фильмам
 class FilmExtrasAdmin(admin.ModelAdmin):
+    form = FilmExtrasImageForm
     raw_id_fields = ('film',)
 
 
