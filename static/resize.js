@@ -97,11 +97,6 @@ function init_br_co(){
 
 }
 
-function add_image_search(){
-
-
-}
-
 function add_buttons(){
 
     var p = select_p_a().p;

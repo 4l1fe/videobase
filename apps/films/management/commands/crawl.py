@@ -1,11 +1,11 @@
 # coding: utf-8
 
 from django.core.management.base import BaseCommand, CommandError
-from apps.films.models import Films,PersonsFilms,Persons,Genres
-from apps.films.constants import APP_PERSON_PHOTO_DIR,APP_FILM_CRAWLER_LIMIT,APP_FILM_CRAWLER_DELAY
+from apps.films.models import Films,PersonsFilms,Persons,Genres,FilmExtras,Countries
+from apps.films.constants import APP_PERSON_PHOTO_DIR,APP_FILM_CRAWLER_LIMIT,APP_FILM_CRAWLER_DELAY,APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER
 from apps.robots.models import KinopoiskTries
 from apps.robots.constants import APP_ROBOT_FAIL, APP_ROBOT_SUCCESS
-from crawler.parse_page import acquire_page, parse_one_page
+from crawler.parse_page import acquire_page, parse_one_page, get_poster
 from django.core.files import File
 from itertools import chain
 from optparse import make_option
@@ -33,7 +33,7 @@ def get_person(name):
     else:
         p = Persons(name=name,photo='')
         p.save()
-        logging.debug('Added Person {}'.format(name))
+        logging.debug(u'Added Person {}'.format(name))
         return p
 
 def get_genre(name):
@@ -43,7 +43,7 @@ def get_genre(name):
     else:
         go = Genres(name=name,description = '')
         go.save()
-        logging.debug('Added Genre {}'.format(name))
+        logging.debug(u'Added Genre {}'.format(name))
         return go
 
 def get_country(name):
@@ -51,11 +51,12 @@ def get_country(name):
     if g:
         return g[0]
     else:
-        go = Genres(name=name,description = '')
+        go = Countries(name=name,description = '')
         go.save()
-        logging.debug('Added Country {}'.format(name))
+        logging.debug(u'Added Country {}'.format(name))
         return go
 
+flatland = get_country(u'Флатландию')
 
 def process_film(film,pdata):
     a=[]
@@ -69,10 +70,10 @@ def process_film(film,pdata):
     logger.debug("Updated data for {}".format(film))
 
     for p in pdata['Persons']:
-        po = get_person(film,p['name'])
+        po = get_person(p['name'])
         if 'photo' in p:
             if not (po.photo or (p['photo'] is None)):
-                po.photo.save(os.path.join(APP_PERSON_PHOTO_DIR, str(po.id),'profile.jpg'),File(p['photo']))
+                po.photo.save('profile.jpg',File(p['photo']))
 
         if PersonsFilms.objects.filter(film=film,person=po):
             pass
@@ -83,6 +84,22 @@ def process_film(film,pdata):
         go = get_genre(g['name'])
         if not(go in film.genres.all()):
             film.genres.add(go)
+
+    for c in pdata['Countries']:
+        if flatland in film.countries.all():
+            film.countries.remove(flatland)
+        co = get_country(c['name'])
+        if not(co in film.countries.all()):
+            film.countries.add(co)
+
+    poster =  get_poster(film.kinopoisk_id)
+
+    if poster:
+        logging.debug("Adding poster for %s",film)
+        fe = FilmExtras(film=film,etype = APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER,name= u"Постер для {}".format(film.name),name_orig= u"Poster for {}".format(film.name), description = " ")
+        fe.save()
+        logging.debug("Created film extras %d", fe.pk)
+        fe.photo.save('poster.jpg',File(poster))
 
 
 class Command(BaseCommand):
@@ -103,13 +120,12 @@ class Command(BaseCommand):
         )
 
     def handle(self,*args, **options):
-        #print(args)
         page_dump = u"Couldn't get page"
 
         logger.info("Starting crawler")
 
         if args:
-            films = [Films.objects.get(pk=args) for film in args]
+            films = [Films.objects.get(pk=arg) for arg in args]
         else:
             films = Films.objects.filter(kinopoisk_lastupdate = None,kinopoisk_id__isnull =False)[:LIMIT]
 
@@ -124,6 +140,7 @@ class Command(BaseCommand):
                     kpt = KinopoiskTries(film = film,try_time = now(),result = APP_ROBOT_SUCCESS)
                     kpt.save()
                 except Exception, e:
+                    logging.debug("Caught exception : %s", str(e))
                     kpt = KinopoiskTries(film = film,try_time = now(),result = APP_ROBOT_FAIL , error_message = str(e), page_dump = page_dump)
                     kpt.save()
 
