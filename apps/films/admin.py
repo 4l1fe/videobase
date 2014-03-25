@@ -21,6 +21,7 @@ class GenresAdmin(admin.ModelAdmin):
 #############################################################################################################
 # Администрирование таблицы фильмов
 class FilmsAdmin(admin.ModelAdmin):
+    form = FilmsAdminForm
     list_filter = ('ftype', 'frelease_date',)
     search_fields = ('name', 'ftype', 'frelease_date',)
 
@@ -34,6 +35,7 @@ class UsersFilmsAdmin(admin.ModelAdmin):
 #############################################################################################################
 # Администрирование таблицы Доп. материалов к фильмам
 class FilmExtrasAdmin(admin.ModelAdmin):
+    form = FilmExtrasImageForm
     raw_id_fields = ('film',)
 
 
