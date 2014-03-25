@@ -36,6 +36,7 @@ class LogEntryAdmin(admin.ModelAdmin):
     list_filter = ('user', 'content_type', 'action_flag',)
     search_fields = ('object_repr', 'change_message',)
     list_display = ('action_time', 'user', 'content_type', 'object_link', 'action_description', 'change_message',)
+    change_list_template = 'admin/log_entry_admin/change_list.html'
 
     def has_add_permission(self, request):
         return False
