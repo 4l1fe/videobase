@@ -3,9 +3,8 @@
 from django.forms import ModelForm
 from django.core.exceptions import ValidationError
 
-from apps.films.models import Persons,Seasons,Films,FilmExtras
-
-from apps.films.constants import APP_FILM_ADMIN_CSS,APP_FILM_ADMIN_JS_LIBS
+from apps.films.models import Persons, Seasons, Films, FilmExtras
+from apps.films.constants import APP_FILM_ADMIN_CSS, APP_FILM_ADMIN_JS_LIBS, APP_FILM_SERIAL
 
 
 #############################################################################################################
@@ -21,31 +20,38 @@ class SeasonsAdminForm(ModelForm):
 
         return cleaned_data
 
-
     class Meta:
         model = Seasons
 
 
+#############################################################################################################
+#
 class PersonsImageForm(ModelForm):
     class Media:
-        js =APP_FILM_ADMIN_JS_LIBS
-        css = {'all' :APP_FILM_ADMIN_CSS}
+        js = APP_FILM_ADMIN_JS_LIBS
+        css = {'all': APP_FILM_ADMIN_CSS}
+        
     class Meta:
         model = Persons
 
+
+#############################################################################################################
+#
 class FilmExtrasImageForm(ModelForm):
     class Media:
         js =APP_FILM_ADMIN_JS_LIBS
         css = {'all' :APP_FILM_ADMIN_CSS}
+        
     class Meta:
         model = FilmExtras
 
+
+#############################################################################################################
+#
 class FilmsAdminForm(ModelForm):
     class Media:
         js =APP_FILM_ADMIN_JS_LIBS
         css = {'all' :APP_FILM_ADMIN_CSS}
-
-
 
     class Meta:
         model = Films
