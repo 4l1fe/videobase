@@ -18,10 +18,12 @@ import datetime
 import pprint
 from collections import defaultdict
 from apps.films.constants import APP_PERSON_ACTOR, APP_PERSON_DIRECTOR, APP_PERSON_PRODUCER
+from crawler.constants import PAGE_ARCHIVE
 import StringIO
 from PIL import Image
 from functools import partial
 import logging
+import os
 
 YANDEX_KP_ACTORS_TEMPLATE = "http://st.kp.yandex.net/images/actor_iphone/iphone360_{}.jpg"
 YANDEX_KP_FILMS_TEMPLATE  = "http://st.kp.yandex.net/images/film_big/{}.jpg"
@@ -100,16 +102,15 @@ def transform_data_dict(ddict):
 
 def get_image(template,actor_id):
 
+    
     try:
         r = requests.get(template.format(actor_id))
-
         fileobj = StringIO.StringIO()
         fileobj.write(r.content)
         fileobj.seek(0)
         img = Image.open(fileobj).convert('RGB')
         conv_file = StringIO.StringIO()
         img.save(conv_file,'PNG')
-        print len(conv_file.getvalue())
         conv_file.seek(0)
         return conv_file
     except:
@@ -136,9 +137,20 @@ def actors_wrap(actors_names):
 
 def acquire_page(page_id):
 
-    url ="http://www.kinopoisk.ru/film/%d/" % page_id
-    res = requests.get(url, headers = headers)
-    page_dump = res.content.decode('cp1251')
+    if not os.path.exists(PAGE_ARCHIVE):
+        os.mkdir(PAGE_ARCHIVE)
+
+    dump_path = os.path.join(PAGE_ARCHIVE,str(page_id))
+    if os.path.exists(dump_path):
+        with open(dump_path) as fd:
+            page_dump = fd.read()
+    else:
+        url =u"http://www.kinopoisk.ru/film/%d/" % page_id
+        res = requests.get(url, headers = headers)
+        page_dump = res.content.decode('cp1251')
+        with open(dump_path,'w') as fdw:
+            fdw.write(page_dump.encode('utf-8'))
+
     return page_dump
 
 
