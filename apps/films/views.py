@@ -9,6 +9,18 @@ from django.core.files import File
 from apps.films.constants import APP_PERSON_PHOTO_DIR
 # Create your views here.
 
+def get_new_namestring(namestring):
+
+    print(namestring)
+    m = re.match("(?P<pre>.+)v(?P<version>[0-9]+)[.]png",namestring)
+
+    if m is None:
+        return namestring + '_v1.png'
+    else:
+        d = m.groupdict()
+        return  '{:s}v{:d}.{:s}'.format(d['pre'],int(d['version']) +1,'png')
+
+
 def image_refresh(func):
 
     def wrapper(request):
@@ -29,7 +41,7 @@ def image_refresh(func):
         imc.save(imfile,"PNG")
         imfile.seek(0)
 
-        p.photo.save(os.path.basename(path.groupdict()['path'])+'_resize.png', File(imfile))
+        p.photo.save(get_new_namestring(os.path.basename(path.groupdict()['path'])), File(imfile))
 
 
         return HttpResponse("OK")
@@ -62,11 +74,11 @@ def bri_con(d,im,request):
 
     imc =im
     if br:
-        imc =bre.enhance(br/100.0)
+        imc =bre.enhance(2*(int(br))/100.0)
 
-    con = ImageEnhance.Contrast(imc)
+    coe = ImageEnhance.Contrast(imc)
     if co:
-        imc =con.enhance(co/100.0)
+        imc =coe.enhance(2*(int(co))/100.0)
 
     return imc
-    
+
