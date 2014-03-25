@@ -63,6 +63,7 @@ function init_br_co(){
     p.append("<div id='levels'></div>")
     var pl = $('#levels')
     pl.append("<img id = 'br-co' src ='/static/"+src+"'>")
+    pl.append("<input id ='br_co_send' type='button' value = 'Save'>")
     pl.append("<br><div id='slider-brightness' >Яркость</div>")
     pl.append("<br><div id='slider-contrast' >Контраст</div>")
 
@@ -72,17 +73,17 @@ function init_br_co(){
 
 	$( "#slider-brightness" ).slider( {
 	    slide: function(event,ui) {
-		caman.revert()
-		BR = ui.value -50
-		caman.brightness(BR).render();
+		caman.revert();
+		BR = ui.value;
+		caman.brightness(BR-50).render();
 	},
 	    value:50});
 
 	$( "#slider-contrast" ).slider( {
 	    slide: function(event,ui) {
-		caman.revert()
-		CO= ui.value -50
-		caman.contrast(CO).render();
+		caman.revert();
+		CO= ui.value;
+		caman.contrast(CO-50).render();
 	},
 	    value:50});
 
@@ -131,23 +132,33 @@ function add_buttons(){
     $("#bcrop").click(function(event,ui){
 
 	$.post('/api/resize/',{image:$('#img-to-resize')[0].src,
-x:X,
-y:Y,
-x2:X2,
-y2:Y2
-})
+			       x:X,
+			       y:Y,
+			       x2:X2,
+			       y2:Y2
 
-    $("br_co_send").click(function(event,ui){
+			      },function(){
+	location.reload();
+});
+
+
+    })
+    $("#br_co_send").click(function(event,ui){
+
+	console.log("hfs");
 
 	$.post('/api/brco/',{image:$('#img-to-resize')[0].src,
-br:BR,
-co:CO
+			     br:BR,
+			     co:CO
 
-})
+			    },function(){
+	location.reload();
+});
 
-})
 
-})
+    })
+
+
 }
 
 
@@ -155,11 +166,22 @@ function edit_mode_init(){
 	    $('#levels').hide()
 }
 
-jQuery(document).ready(init_resizing);
-jQuery(document).ready(init_br_co);
-jQuery(document).ready(add_buttons);
-jQuery(document).ready(edit_mode_init);
+function load_all(){
+if ( $("p.file-upload").length >0){
+    init_resizing();
+    init_br_co();
+    add_buttons();
+    edit_mode_init();
 
+}
+
+}
+
+jQuery(document).ready(load_all);
+
+
+
+// Making our request csrf protection compatible
 
 function csrfSafeMethod(method) {
     // these HTTP methods do not require CSRF protection
@@ -175,5 +197,4 @@ $.ajaxSetup({
     }
 });
 
-var EDIT_MODE='resize'
 

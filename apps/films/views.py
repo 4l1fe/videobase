@@ -1,13 +1,26 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from apps.films.models import Persons,Films
+from apps.films.models import Persons,Films, FilmExtras
 import re
 import os
 from PIL import Image, ImageEnhance
 from cStringIO import StringIO
 from django.core.files import File
-
+from apps.films.constants import APP_PERSON_PHOTO_DIR
 # Create your views here.
+import warnings
+
+def get_new_namestring(namestring):
+
+    print(namestring)
+    m = re.match("(?P<pre>.+)v(?P<version>[0-9]+)[.]png",namestring)
+
+    if m is None:
+        return namestring + '_v1.png'
+    else:
+        d = m.groupdict()
+        return  '{:s}v{:d}.{:s}'.format(d['pre'],int(d['version']) +1,'png')
+
 
 def image_refresh(func):
 
@@ -19,7 +32,14 @@ def image_refresh(func):
         path = re.match('.+(?P<path>[/]static[/].+)',url)
         d = m.groupdict()
 
-        p = Persons.objects.get(pk = int(d['id']))
+        print request.get_full_path()
+        if d['type'] == 'persons':
+            p = Persons.objects.get(pk = int(d['id']))
+        elif d['type'] == 'filmextras':
+            p = FilmExtras.objects.get(pk = int(d['id']))
+        else:
+            warnings.warn("Unknown type {} of requests for image manipulation")
+
         im = Image.open('.'+path.groupdict()['path'])
 
         imc = func(d,im,request)
@@ -29,7 +49,8 @@ def image_refresh(func):
         imc.save(imfile,"PNG")
         imfile.seek(0)
 
-        p.photo.save('.'+path.groupdict()['path']+'_resize.jpg', File(imfile))
+        p.photo.save(get_new_namestring(os.path.basename(path.groupdict()['path'])), File(imfile))
+
 
         return HttpResponse("OK")
 
@@ -61,11 +82,11 @@ def bri_con(d,im,request):
 
     imc =im
     if br:
-        imc =bre.enhance(br/100.0)
+        imc =bre.enhance(2*(int(br))/100.0)
 
-    con = ImageEnhance.Contrast(imc)
+    coe = ImageEnhance.Contrast(imc)
     if co:
-        imc =con.enhance(co/100.0)
+        imc =coe.enhance(2*(int(co))/100.0)
 
     return imc
-    
+

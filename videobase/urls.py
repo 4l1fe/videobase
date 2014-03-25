@@ -14,6 +14,7 @@ urlpatterns = patterns('',
                        url(r'^admin_tools/', include('admin_tools.urls')),
                        url(r'^admin/', include(admin.site.urls)),
                        url(r'^api/resize/','apps.films.views.resize_image'),
+                       url(r'^api/brco/','apps.films.views.bri_con'),
 )
 
 if settings.DEBUG:
