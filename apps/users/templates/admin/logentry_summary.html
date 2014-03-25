@@ -55,7 +55,7 @@
 </div>
 <script>
  $(function(){
-     $.each($('tr[data_user_total_line]', '#table-report'), function(_, item){
+     $.each($('tr[data_user_total_line]', '#result_list'), function(_, item){
          var user_name = $(item).attr('data_user_total_line')
          var t = 0;
          var items = $('tr[data_user_line='+ user_name +'] td:last', '#result_list');
