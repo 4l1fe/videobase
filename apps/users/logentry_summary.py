@@ -11,7 +11,7 @@ class LogentrySummary:
     def summary(self):
         sql = """
         SELECT users.id,
-                 (users.firstname || users.lastname) as "username",
+                 (users.firstname || ' ' || users.lastname) as "username",
 	         django_admin_log.action_flag,
 	         django_content_type.name,
 	         count(*)
