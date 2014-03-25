@@ -49,10 +49,12 @@ function init_resizing(){
 
     var p = a_p.p
     var src = a_p.src
+    p.append("<div id = 'slinks'><\div>")
+
 
     p.append("<div id ='to-resize'><img id = 'img-to-resize' src ='/static/"+src+"'></div>")
 
-
+        $('#slinks').append('<a href= "http://images.google.com/searchbyimage?image_url='+ encodeURIComponent($('#img-to-resize')[0].src)+'"> Поискать картинку на Google<\a>')
     jQuery("#img-to-resize").Jcrop({
 		onChange: setCoords,
 		onSelect: setCoords
