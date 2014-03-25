@@ -21,6 +21,7 @@ from apps.films.constants import APP_PERSON_ACTOR, APP_PERSON_DIRECTOR, APP_PERS
 import StringIO
 from PIL import Image
 from functools import partial
+import logging
 
 YANDEX_KP_ACTORS_TEMPLATE = "http://st.kp.yandex.net/images/actor_iphone/iphone360_{}.jpg"
 YANDEX_KP_FILMS_TEMPLATE  = "http://st.kp.yandex.net/images/film_big/{}.jpg"
@@ -29,6 +30,8 @@ headers = {'User-Agent': 'Mozilla/5.0'}
 
 def commatlst(tag):
     return tag.text.strip().split(u',')
+def extract_countries(tag):
+    return [t.text for  t in tag.select('a')]
 
 def date_extract(tag):
     return datetime.datetime.strptime(tag.select("div.prem_ical")[0].attrs['data-date-premier-start-link'],"%Y%m%d")
@@ -47,9 +50,20 @@ def get_vote(soup):
     starbar_div = soup.select('div.starbar_w')
     child_width =  float(dict([i.split(':') for i in starbar_div[0].attrs['style'].split(';')])['width'].replace('px',''))
 
-    print(parent_width,child_width)
     return round(child_width/parent_width *10,2)
 
+def budget(bstring):
+    if u'руб.' in bstring:
+        #ms = bstring.replace(u'руб.','')
+        #There is no way to store rub in database
+        logging.debug("Encountered budget in RUB. Storing nothing")
+        return None
+    elif '$' in bstring :
+        ms = bstring.replace(u'$','')
+        return int(u''.join(ms.split()))
+    else:
+        logging.debug("Encountered budget in unknown currency.Storing nothing")
+        return None
 
 
 def transform_data_dict(ddict):
@@ -58,11 +72,11 @@ def transform_data_dict(ddict):
     transforms= {
 
         #u'roд': lambda d: ('Films',{'freleasedate': datetime.datetime.strptime(d.text.strip(),"%Y%m%d")}),
-        u'cтрана':lambda d:[('Countries', { 'name': c}) for c in commatlst(d)],
+        u'страна':lambda d:[('Countries', { 'name': c}) for c in extract_countries(d)],
         u'жанр' : lambda d:[('Genres', { 'name':c }) for c in commatlst(d)],
         u'режиссер' : lambda d:[('Persons', {'name':c, 'p_type': APP_PERSON_DIRECTOR}) for c in commatlst(d)],
         u'продюсер' : lambda d:[('Persons', {'name':c, 'p_type': APP_PERSON_PRODUCER}) for c in commatlst(d)],
-        u'бюджет': lambda d: [('Films',{'fbudget':int(''.join(d.text.replace(u'$','').split()))})],
+        u'бюджет': lambda d: [('Films',{'fbudget':budget(d.text)})],
         u'премьера (мир)': lambda d: [('Films',{'frelease_date': date_extract(d)})],
         u'премьера (РФ)' : lambda d: [('Films',{'frelease_date': date_extract(d)})],
         u'возраст': lambda d: [('Films',{'age_limit': int(
@@ -87,22 +101,23 @@ def transform_data_dict(ddict):
 def get_image(template,actor_id):
 
     try:
-        r = requests.get(YANDEX_KP_ACTORS_TEMPLATE.format(actor_id))
+        r = requests.get(template.format(actor_id))
 
         fileobj = StringIO.StringIO()
         fileobj.write(r.content)
         fileobj.seek(0)
-        img = Image.open(fileobj).conver('RGB')
+        img = Image.open(fileobj).convert('RGB')
         conv_file = StringIO.StringIO()
-        img.save(conv_file)
+        img.save(conv_file,'PNG')
+        print len(conv_file.getvalue())
         conv_file.seek(0)
         return conv_file
     except:
         return None
 
 
-get_poster = partial(YANDEX_KP_FILMS_TEMPLATE,get_image)
-get_photo = partial(YANDEX_KP_ACTORS_TEMPLATE,get_image)
+get_poster = partial(get_image,YANDEX_KP_FILMS_TEMPLATE)
+get_photo = partial(get_image,YANDEX_KP_ACTORS_TEMPLATE)
 
 
 def extract_names(soup):
@@ -142,7 +157,7 @@ def parse_one_page(page_dump):
     soup = BeautifulSoup(page_dump)
     info_table = soup.select("div#infoTable")[0]
     tds = info_table.select("td.type")
-    data_dict = dict([(f.text,s) for f,s in [ td.parent.select("td") for td in tds]])
+    data_dict = dict([(f.text.strip(),s) for f,s in [ td.parent.select("td") for td in tds]])
 
     actor_list = soup.select("div#actorList")[0]
     actors_n_l = [ (a.text,a.attrs['href']) for a in actor_list.find_all('a') if  not 'film' in a.attrs['href']]
@@ -165,8 +180,13 @@ def parse_one_page(page_dump):
 
 
 if __name__ == "__main__":
-    d = parse_one_page(41520)
+    d = parse_one_page(acquire_page(301))
     for di in d['Films']:
+
+        for k in di :
+            print(k)
+            print(di[k])
+    for di in d['Countries']:
 
         for k in di :
             print(k)
