@@ -10,7 +10,7 @@ class PersonsExtras(models.Model):
     etype       = models.CharField(max_length=255, verbose_name=u'')
     name        = models.TextField(verbose_name=u'Имя')
     name_orig   = models.TextField(verbose_name=u'Оригинальное имя')
-    description = models.TextField(verbose_name=u'Описавние')
+    description = models.TextField(verbose_name=u'Описание')
     url         = models.CharField(max_length=255, verbose_name=u'Фото')
 
 
