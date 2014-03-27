@@ -51,6 +51,7 @@ INSTALLED_APPS = (
     'django_extensions',
     'registration',
     'south',
+    'tastypie',
     'csvimport',
     'apps.users',
     'apps.robots',
