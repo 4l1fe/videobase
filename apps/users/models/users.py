@@ -31,7 +31,8 @@ class Users(models.Model):
     ustatus      = models.PositiveSmallIntegerField(choices=APP_USER_STATUS, verbose_name=u'Статус')
     userpic_type = models.CharField(null=True, blank=True, default=None, choices=APP_USER_PIC_TYPES, max_length=255, verbose_name=u'Тип картинки')
     userpic      = models.ForeignKey('UsersPics', default=None, null=True, blank=True, verbose_name=u'Аватар', related_name='+')
-
+    is_staff     = models.BooleanField(default=True,null=False)
+    is_admin     = models.BooleanField(default=False, null=False)
 
     # objects = UserManager()
 

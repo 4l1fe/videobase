@@ -24,6 +24,18 @@ TEMPLATE_DEBUG = DEBUG
 
 ALLOWED_HOSTS = ['*',]
 
+ACCOUNT_ACTIVATION_DAYS = 2
+
+
+AUTH_USER_EMAIL_UNIQUE = True
+
+EMAIL_HOST = 'localhost'
+EMAIL_PORT = 25
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
+EMAIL_USE_TLS = False
+DEFAULT_FROM_EMAIL = 'info@aasym.com'
+
 # Application definition
 INSTALLED_APPS = (
     'admin_tools',
@@ -37,6 +49,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_extensions',
+    'registration',
     'south',
     'csvimport',
     'apps.users',
