@@ -17,4 +17,6 @@ git+git://github.com/ronnix/fabtools.git
 pygraphviz
 pyparsing==1.5.7
 pydot
+BeautifulSoup4
+requests
 #sudo apt-get install -y mercurial memcached libmemcached-dev zlib1g-dev libssl-dev python-dev build-essential libjpeg-dev libfreetype6-dev zlib1g-dev libpng12-dev libpq-dev libgraphviz-dev graphviz
