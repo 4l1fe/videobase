@@ -24,6 +24,8 @@ ch.setFormatter(formatter)
 logger.addHandler(ch)
 
 LIMIT = 10
+
+
 def get_person(name):
 
     f = Persons.objects.filter(name=name)
@@ -36,6 +38,7 @@ def get_person(name):
         logging.debug(u'Added Person {}'.format(name))
         return p
 
+
 def get_genre(name):
     g = Genres.objects.filter(name = name)
     if g:
@@ -45,6 +48,7 @@ def get_genre(name):
         go.save()
         logging.debug(u'Added Genre {}'.format(name))
         return go
+
 
 def get_country(name):
     g = Countries.objects.filter(name = name)
@@ -58,7 +62,8 @@ def get_country(name):
 
 flatland = get_country(u'Флатландию')
 
-def process_film(film,pdata):
+
+def process_film(film, pdata):
     a=[]
     for d in pdata['Films']:
         a.extend(d.items())
@@ -92,7 +97,7 @@ def process_film(film,pdata):
         if not(co in film.countries.all()):
             film.countries.add(co)
 
-    poster =  get_poster(film.kinopoisk_id)
+    poster = get_poster(film.kinopoisk_id)
 
     if poster:
         logging.debug("Adding poster for %s",film)
@@ -119,7 +124,7 @@ class Command(BaseCommand):
 
         )
 
-    def handle(self,*args, **options):
+    def handle(self, *args, **options):
         page_dump = u"Couldn't get page"
 
         logger.info("Starting crawler")
@@ -130,13 +135,13 @@ class Command(BaseCommand):
             films = Films.objects.filter(kinopoisk_lastupdate = None,kinopoisk_id__isnull =False)[:LIMIT]
 
         for film in films:
-            previous_tries = KinopoiskTries.objects.filter(result = APP_ROBOT_FAIL, film=film)
-            if film.kinopoisk_id and  ((not previous_tries)  or  options['debug'])  :
+            previous_tries = KinopoiskTries.objects.filter(result=APP_ROBOT_FAIL, film=film)
+            if film.kinopoisk_id and ((not previous_tries) or options['debug']):
                 sleep(APP_FILM_CRAWLER_DELAY)
                 try:
                     page_dump = acquire_page(film.kinopoisk_id)
                     pdata = parse_one_page(page_dump)
-                    process_film(film,pdata)
+                    process_film(film, pdata)
                     kpt = KinopoiskTries(film = film,try_time = now(),result = APP_ROBOT_SUCCESS)
                     kpt.save()
                 except Exception, e:
