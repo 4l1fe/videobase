@@ -30,10 +30,14 @@ YANDEX_KP_FILMS_TEMPLATE  = "http://st.kp.yandex.net/images/film_big/{}.jpg"
 
 headers = {'User-Agent': 'Mozilla/5.0'}
 
+
 def commatlst(tag):
     return tag.text.strip().split(u',')
+
+
 def extract_countries(tag):
     return [t.text for  t in tag.select('a')]
+
 
 def date_extract(tag):
     return datetime.datetime.strptime(tag.select("div.prem_ical")[0].attrs['data-date-premier-start-link'],"%Y%m%d")
