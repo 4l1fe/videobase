@@ -7,25 +7,25 @@ from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from ..constants import *
 
 
-# class UserManager(BaseUserManager):
-#     def create_user(self, email, password=None, **kwargs):
-#         if not email:
-#             raise ValueError('Users must have an email address')
-#
-#         user = self.model(email=UserManager.normalize_email(email), **kwargs)
-#
-#         user.set_password(password)
-#         user.save(using=self._db)
-#         return user
+class UserManager(BaseUserManager):
+    def create_user(self, email, password=None, **kwargs):
+        if not email:
+           raise ValueError('Users must have an email address')
+        user = self.model(email=UserManager.normalize_email(email), **kwargs)
+
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
 
 
 #############################################################################################################
 # Модель Пользователей
-class Users(models.Model):
+class Users(AbstractBaseUser): #, PermissionsMixin):
     firstname    = models.CharField(max_length=255, verbose_name=u'Имя')
     lastname     = models.CharField(max_length=255, verbose_name=u'Фамилия')
     email        = models.EmailField(max_length=255, unique=True, verbose_name=u'Email')
-    password     = models.CharField(max_length=255, verbose_name=u'Пароль')
+    #password     = models.CharField(max_length=255, verbose_name=u'Пароль')
+
     last_visited = models.DateTimeField(auto_now_add=True, verbose_name=u'Последний визит')
     created      = models.DateTimeField(auto_now_add=True, editable=False, verbose_name=u'Дата создания')
     ustatus      = models.PositiveSmallIntegerField(choices=APP_USER_STATUS, verbose_name=u'Статус')
@@ -34,7 +34,10 @@ class Users(models.Model):
     is_staff     = models.BooleanField(default=True,null=False)
     is_admin     = models.BooleanField(default=False, null=False)
 
-    # objects = UserManager()
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
+
+    objects = UserManager()
 
     def __unicode__(self):
         return u'[%s] %s' % (self.pk, self.name)
