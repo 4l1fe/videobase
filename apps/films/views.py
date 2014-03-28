@@ -70,7 +70,7 @@ def resize_image(d,im,request):
 
     imc = im.crop((x, y, x2, y2))
 
-    return imc
+    return im
 
 @image_refresh
 def bri_con(d,im,request):
@@ -89,4 +89,6 @@ def bri_con(d,im,request):
         imc =coe.enhance(2*(int(co))/100.0)
 
     return imc
+
+
 

@@ -18,6 +18,8 @@ urlpatterns = patterns('',
                        url(r'^api/image/resize/','apps.films.views.resize_image'),
                        url(r'^api/image/brco/','apps.films.views.bri_con'),
                        url(r'^api/', include(api_v1.urls)),
+                       url(r'^api/robots/','apps.robots.views.schedule_api'),
+                       url(r'^robots/','apps.robots.views.schedule_interface'),
 )
 
 urlpatterns += patterns('',
