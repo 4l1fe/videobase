@@ -4,6 +4,8 @@ from django.shortcuts import render
 from django.views.generic import View, TemplateView
 from django import forms
 from django.forms.extras.widgets import SelectDateWidget
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
 from itertools import groupby
 
 from apps.users.logentry_summary import *
@@ -42,3 +44,14 @@ class LogentrySummaryView(TemplateView):
         context = self.get_context_data(**kwargs)
 
         return self.render_to_response(context)
+
+class UserAccountView(TemplateView):
+    template_name = 'accounts/profile.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(UserAccountView, self).get_context_data(**kwargs)
+        return context
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(UserAccountView, self).dispatch(*args, **kwargs)
