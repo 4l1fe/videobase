@@ -11,6 +11,7 @@ import urllib
 SEARCH_URL = u'http://playfamily.ru/search?{}'
 
 
+
 def form_search_url(search_term):
     '''
     Generate search url for search term for playfamily.ru
