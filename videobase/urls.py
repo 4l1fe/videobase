@@ -3,7 +3,7 @@
 from django.conf.urls import patterns, include, url
 
 import admin_tools
-from testy_pie import v1_api
+from testy_pie import api_v1
 from videobase import settings
 
 from django.contrib import admin
@@ -15,9 +15,9 @@ urlpatterns = patterns('',
                        url(r'^admin/', include(admin.site.urls)),
                        url(r'^admin_tools/', include('admin_tools.urls')),
                        url(r'^admin/', include(admin.site.urls)),
-                       # url(r'^api/image/resize/','apps.films.views.resize_image'),
-                       # url(r'^api/image/brco/','apps.films.views.bri_con'),
-                       url(r'^api/', include(v1_api.urls)),
+                       url(r'^api/image/resize/','apps.films.views.resize_image'),
+                       url(r'^api/image/brco/','apps.films.views.bri_con'),
+                       url(r'^api/', include(api_v1.urls)),
 )
 
 urlpatterns += patterns('',
