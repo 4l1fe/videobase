@@ -7,6 +7,8 @@ from testy_pie import api_v1
 from videobase import settings
 
 from django.contrib import admin
+from apps.users.views import UserAccountView
+
 admin.autodiscover()
 
 urlpatterns = patterns('',
@@ -20,6 +22,7 @@ urlpatterns = patterns('',
                        url(r'^api/', include(api_v1.urls)),
                        url(r'^api/robots/','apps.robots.views.schedule_api'),
                        url(r'^robots/','apps.robots.views.schedule_interface'),
+                       url(r'^accounts/profile/', UserAccountView.as_view(), name='account_profile'),
 )
 
 urlpatterns += patterns('',
