@@ -28,3 +28,8 @@ def schedule_interface(request):
         </body>
         </html>
         """)
+
+def schedule_api(request):
+
+    return HttpResponse('''Not implemented''')
+    
