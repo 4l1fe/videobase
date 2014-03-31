@@ -86,7 +86,3 @@ def simple_get(url, encoding=None):
 
     '''
     return requests.get(url, headers=HEADERS)
-
-
-
-    

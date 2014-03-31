@@ -1,7 +1,10 @@
 # coding: utf-8
+from ..core import BaseParse
+
 from bs4 import BeautifulSoup
 
 
+# Парсер для поисковика фильма
 def parse_search(response):
     try:
         films = response.json()['content']
@@ -11,5 +14,13 @@ def parse_search(response):
     return search_film
 
 
-def parse_film_page(response):
-    pass
+# Парсер для страници фильма
+class ParseFilmPage(BaseParse):
+    def get_cost(self):
+        pass
+
+    def get_series(self):
+        pass
+
+    def get_link(self):
+        pass

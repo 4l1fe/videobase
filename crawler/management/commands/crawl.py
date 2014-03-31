@@ -51,11 +51,11 @@ def get_genre(name):
 
 
 def get_country(name):
-    g = Countries.objects.filter(name = name)
+    g = Countries.objects.filter(name= name)
     if g:
         return g[0]
     else:
-        go = Countries(name=name,description = '')
+        go = Countries(name=name, description='')
         go.save()
         logging.debug(u'Added Country {}'.format(name))
         return go
@@ -64,10 +64,10 @@ flatland = get_country(u'Флатландию')
 
 
 def process_film(film, pdata):
-    a=[]
+    a = []
     for d in pdata['Films']:
         a.extend(d.items())
-    for key,value in dict(a).items():
+    for key, value in dict(a).items():
         setattr(film, key, value)
     film.kinopoisk_lastupdate = now()
 
@@ -100,11 +100,12 @@ def process_film(film, pdata):
     poster = get_poster(film.kinopoisk_id)
 
     if poster:
-        logging.debug("Adding poster for %s",film)
-        fe = FilmExtras(film=film,etype = APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER,name= u"Постер для {}".format(film.name),name_orig= u"Poster for {}".format(film.name), description = " ")
+        logging.debug("Adding poster for %s", film)
+        fe = FilmExtras(film=film, etype=APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER, name=u"Постер для {}".format(film.name),
+                        name_orig=u"Poster for {}".format(film.name), description=" ")
         fe.save()
         logging.debug("Created film extras %d", fe.pk)
-        fe.photo.save('poster.jpg',File(poster))
+        fe.photo.save('poster.jpg', File(poster))
 
 
 class Command(BaseCommand):
@@ -113,16 +114,15 @@ class Command(BaseCommand):
     requires_model_validation = True
     option_list = BaseCommand.option_list + (
         make_option('--limit',
-            dest = 'limit',
-            default = APP_FILM_CRAWLER_LIMIT,
-            help = u'How much films to process'),
+                    dest='limit',
+                    default=APP_FILM_CRAWLER_LIMIT,
+                    help=u'How much films to process'),
         make_option('--debug',
-            dest = 'debug',
-            action='store_true',
-            default = False,
-            help = u'Repeat films crawling for which has failed'),
-
-        )
+                    dest='debug',
+                    action='store_true',
+                    default=False,
+                    help=u'Repeat films crawling for which has failed'),
+    )
 
     def handle(self, *args, **options):
         page_dump = u"Couldn't get page"
