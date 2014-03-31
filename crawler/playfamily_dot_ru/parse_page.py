@@ -64,6 +64,7 @@ def parse_page(page_dump):
     return (price, item.name.strip())
 
 
+
 DEBUG = __name__ == "__main__"
 
 if DEBUG:

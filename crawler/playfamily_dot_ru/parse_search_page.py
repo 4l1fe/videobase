@@ -7,6 +7,7 @@ Module for parsing search pages of playfamily.ru
 from crawler.playfamily_dot_ru.utils import rub_to_int
 import urllib
 
+
 SEARCH_URL = u'http://playfamily.ru/search?{}'
 
 
