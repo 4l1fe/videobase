@@ -4,10 +4,59 @@ from django.shortcuts import render
 from django.views.generic import View, TemplateView
 from django import forms
 from django.forms.extras.widgets import SelectDateWidget
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
 from itertools import groupby
+from django.conf import settings
+from django.contrib.auth import authenticate
+from django.contrib.auth import login
+from registration import signals
+import warnings
 
+from registration.backends.simple.views import RegistrationView as BaseRegistrationView
 from apps.users.logentry_summary import *
 from apps.films.constants import APP_JQUERY_PATH
+from apps.users.models import Users
+
+class RegistrationView(BaseRegistrationView):
+    """
+    A registration backend which implements the simplest possible
+    workflow: a user supplies a username, email address and password
+    (the bare minimum for a useful account), and is immediately signed
+    up and logged in).
+
+    """
+    def register(self, request, **cleaned_data):
+        email, password = cleaned_data['email'], cleaned_data['password1']
+        extra_params = {}
+
+        if cleaned_data.get('firstname'):
+            extra_params['firstname'] = cleaned_data.get('firstname')
+
+        if cleaned_data.get('lastname'):
+            extra_params['lastname'] = cleaned_data.get('lastname')
+
+        try:
+            if Users.objects.get(is_admin=True):
+                extra_params['is_admin'] = False
+        except:
+            warnings.warn("== CREATE ADMIN USER =========: email - {0}".format(email), Warning )
+            extra_params['is_admin'] = True
+
+        Users.objects.create_user(email, password, **extra_params)
+
+        new_user = authenticate(username=email, password=password)
+        login(request, new_user)
+        signals.user_registered.send(sender=self.__class__,
+                                     user=new_user,
+                                     request=request)
+        return new_user
+
+    def get_success_url(self, request, user):
+        if user.is_admin:
+            return ('/admin/', (), {})
+        else:
+            return ('/accounts/profile/', (), {})
 
 class FilterForm(forms.Form):
     start_at = forms.DateField(widget=SelectDateWidget(), label=u'с')
@@ -42,3 +91,14 @@ class LogentrySummaryView(TemplateView):
         context = self.get_context_data(**kwargs)
 
         return self.render_to_response(context)
+
+class UserAccountView(TemplateView):
+    template_name = 'accounts/profile.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(UserAccountView, self).get_context_data(**kwargs)
+        return context
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(UserAccountView, self).dispatch(*args, **kwargs)

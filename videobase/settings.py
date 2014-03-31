@@ -5,8 +5,12 @@ import os
 import sys
 from ConfigParser import RawConfigParser
 
+
+
 BASE_PATH = os.path.dirname(__file__)
 BASE_DIR = os.path.dirname(BASE_PATH)
+
+#sys.path.insert(0, os.path.join(BASE_PATH, 'apps'))
 
 STATIC_PATH = os.path.join(BASE_PATH, '..', 'static')
 CONFIGS_PATH = os.path.join(BASE_PATH, '..', 'configs')
@@ -26,6 +30,19 @@ ALLOWED_HOSTS = ['*',]
 
 ACCOUNT_ACTIVATION_DAYS = 2
 
+#class SplitAuthUserModel(str):
+
+#    def model(self, sp=''):
+#        return super(SplitAuthUserModel, self).split(sp)[-1]
+
+#    def app(self, sp=''):
+#        return sp.join(super(SplitAuthUserModel, self).split(sp)[0:-1])
+
+#    def split(self, sp=''):
+#        return [self.app(sp), self.model(sp)]
+
+#AUTH_USER_MODEL = SplitAuthUserModel('apps.users.Users')
+AUTH_USER_MODEL = 'users.Users'
 
 AUTH_USER_EMAIL_UNIQUE = True
 
