@@ -71,8 +71,9 @@ def cache(func):
                 return fake
             else:
                 r = func(url)
-                with open(cachepath, 'w') as fw:
-                    fw.write(r.content)
+                if r.ok:
+                    with open(cachepath, 'w') as fw:
+                        fw.write(r.content)
                 return r
     return wrapper
 
