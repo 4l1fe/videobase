@@ -19,18 +19,11 @@ class IVI_Loader(BaseLoader):
         self.params = {'q': self.film.name, 'json': 1, 'limit': 1}
 
     # Поиск фильма
-    def __search(self, load_function):
+    def get_url(self, load_function):
         url = "http://%s/%s" % (self.host, self.search_url, )
         response = load_function(url, params=self.params)
         film = parsers.parse_search(response)
         if film is None:
             raise Exception()
         self.url_load = film['link']
-
-    # Загрузка самой страници с фильмом
-    def load(self, load_function=requests.get):
-        self.__search(load_function)
-        url = "http://%s%s" % (self.host, self.url_load)
-        html = load_function(url, params=self.params)
-        if html is None:
-            raise Exception()
+        return "http://%s%s" % (self.host, self.url_load)
