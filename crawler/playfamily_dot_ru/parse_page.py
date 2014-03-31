@@ -1,12 +1,13 @@
 # coding: utf-8
+'''
+Module responsible for parsing one page from playfamily.ru
+'''
+
 
 import microdata
-import re
 from bs4 import BeautifulSoup
 import logging
 from crawler.playfamily_dot_ru.utils import rub_to_int, utfdecode
-
-
 
 
 def extract_price(soup):
@@ -28,10 +29,11 @@ def extract_price(soup):
     return price_rub
 
 
-def get_url_from_english_name(name_orig):
+def form_url_from_name(name_orig):
 
     '''
-    If original name of the movie contains only english characters then return link
+    If original name of the movie contains only english characters
+    then return link
     that probably holds information about this movie.
 
     i.e 'The Matrix' -> 'http://playfamily.ru/the-matrix'
@@ -39,11 +41,8 @@ def get_url_from_english_name(name_orig):
     '''
     try:
         nul = name_orig.strip().decode('ascii').lower()
-
-        return 'http://playfamily.ru/' + nul.strip().decode('ascii').lower().replace(' ', '-')
-
+        return 'http://playfamily.ru/' + nul.replace(' ', '-')
     except UnicodeDecodeError:
-
         return None
 
 @utfdecode
