@@ -16,13 +16,12 @@ HEADERS = {'User-Agent': 'Mozilla/5.0'}
 CACHE_DIR = './cache'
 
 
-
-
 def ljoin(p):
     '''
     Return path with prepended CACHE_DIR
     '''
     return join(CACHE_DIR, p)
+
 
 def lexists(p):
     '''
@@ -32,6 +31,7 @@ def lexists(p):
 
 if not lexists(''):
     os.mkdir(ljoin(''))
+
 
 def construct_path(urlstring):
     '''

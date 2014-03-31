@@ -35,11 +35,11 @@ def commatlst(tag):
 
 
 def extract_countries(tag):
-    return [t.text for  t in tag.select('a')]
+    return [t.text for t in tag.select('a')]
 
 
 def date_extract(tag):
-    return datetime.datetime.strptime(tag.select("div.prem_ical")[0].attrs['data-date-premier-start-link'],"%Y%m%d")
+    return datetime.datetime.strptime(tag.select("div.prem_ical")[0].attrs['data-date-premier-start-link'], "%Y%m%d")
 
 
 def get_vote(soup):
@@ -49,13 +49,14 @@ def get_vote(soup):
     r = requests.get(csslink)
 
     css = r.content
-    m = re.search('[.]starbar[ ]{width[:][ ](?P<width>[0-9]+)px',css)
+    m = re.search('[.]starbar[ ]{width[:][ ](?P<width>[0-9]+)px', css)
     parent_width = float(m.groupdict()['width'])
 
     starbar_div = soup.select('div.starbar_w')
-    child_width =  float(dict([i.split(':') for i in starbar_div[0].attrs['style'].split(';')])['width'].replace('px',''))
+    child_width = float(dict([i.split(':') for i in starbar_div[0].attrs['style'].split(';')])['width'].replace('px',''))
 
     return round(child_width/parent_width *10,2)
+
 
 def budget(bstring):
     if u'руб.' in bstring:
@@ -63,8 +64,8 @@ def budget(bstring):
         #There is no way to store rub in database
         logging.debug("Encountered budget in RUB. Storing nothing")
         return None
-    elif '$' in bstring :
-        ms = bstring.replace(u'$','')
+    elif '$' in bstring:
+        ms = bstring.replace(u'$', '')
         return int(u''.join(ms.split()))
     else:
         logging.debug("Encountered budget in unknown currency.Storing nothing")
@@ -72,10 +73,7 @@ def budget(bstring):
 
 
 def transform_data_dict(ddict):
-
-
-    transforms= {
-
+    transforms = {
         #u'roд': lambda d: ('Films',{'freleasedate': datetime.datetime.strptime(d.text.strip(),"%Y%m%d")}),
         u'страна':lambda d:[('Countries', { 'name': c}) for c in extract_countries(d)],
         u'жанр' : lambda d:[('Genres', { 'name':c }) for c in commatlst(d)],
@@ -87,10 +85,10 @@ def transform_data_dict(ddict):
         u'возраст': lambda d: [('Films',{'age_limit': int(
             [e for e in d.parent.select('div.ageLimit')[0].attrs['class']
             if not  e.endswith(u'Limit')][0].split('age')[-1])
-                                     }
-                            )],
+        }
+                               )],
         u'время' : lambda d :[('Films', {'fduration': int( d.parent.select('td.time')[0].text.split(u'мин.')[0]) })]
-}
+    }
     tkeys = transforms.keys()
     for key,val in ddict.items():
         if key in tkeys:
@@ -101,11 +99,7 @@ def transform_data_dict(ddict):
             #print(u"Can't find parser for {}".format(key))
 
 
-
-
-def get_image(template,actor_id):
-
-    
+def get_image(template, actor_id):
     try:
         r = requests.get(template.format(actor_id))
         fileobj = StringIO.StringIO()
@@ -120,8 +114,8 @@ def get_image(template,actor_id):
         return None
 
 
-get_poster = partial(get_image,YANDEX_KP_FILMS_TEMPLATE)
-get_photo = partial(get_image,YANDEX_KP_ACTORS_TEMPLATE)
+get_poster = partial(get_image, YANDEX_KP_FILMS_TEMPLATE)
+get_photo = partial(get_image, YANDEX_KP_ACTORS_TEMPLATE)
 
 
 def extract_names(soup):

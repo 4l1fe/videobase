@@ -74,6 +74,7 @@ INSTALLED_APPS = (
     'apps.robots',
     'apps.films',
     'apps.contents',
+    'crawler',
 )
 
 MIDDLEWARE_CLASSES = (
