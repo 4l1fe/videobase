@@ -5,7 +5,7 @@ from apps.films.api import *
 
 
 api_v1 = Api(api_name='v1')
-api_v1.register(FilmResource())
+api_v1.register(FilmsSearchResource())
 
 
 __all__ = ['api_v1']
