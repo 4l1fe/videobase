@@ -1,16 +1,17 @@
 # coding: utf-8
 
-from django.contrib.auth.models import User
-from tastypie.resources import ModelResource
-from tastypie import fields
-from tastypie.authorization import DjangoAuthorization
-from tastypie.authentication import BasicAuthentication
-from django.views.decorators.csrf import csrf_exempt
+from django.core.paginator import Paginator, InvalidPage
+from django.http import Http404
 
+from tastypie.resources import ModelResource
+from tastypie.validation import FormValidation
+
+from apps.films.forms import SearchForm
 from apps.films.models import Films
 
+
 #############################################################################################################
-#
+# Api для поиска фильмов
 class FilmsSearchResource(ModelResource):
     """
     Поиск по фильмам:
@@ -24,69 +25,72 @@ class FilmsSearchResource(ModelResource):
         instock - Фильм в наличии в кинотеатрах
     """
 
-    # text     = fields.CharField(null=True, blank=True)
-    # genre    = fields.CharField(null=True, blank=True)
-    # year_old = fields.CharField(null=True, blank=True)
-    # rating   = fields.CharField(null=True, blank=True)
-    # price    = fields.CharField(null=True, blank=True)
-    # page     = fields.CharField(null=True, blank=True)
-    # instock  = fields.CharField(null=True, blank=True)
-
     class Meta:
+        object_class = Films
         queryset = Films.objects.all()
-        # object_class = Films
-        resource_name = 'films/search'
-        list_allowed_methods = ['post', 'get', 'put', 'patch']
+        validation = FormValidation(form_class=SearchForm)
+
+        resource_name = 'films/search.json'
+        allowed_methods = ['post']
+
         include_resource_uri = False
         always_return_data = True
-        # excludes = ['id']
-        fields = ['id', 'name']
-        authentication = BasicAuthentication()
-        authorization = DjangoAuthorization()
+        fields = ['id', 'name', 'name_org', 'release_date', 'poster', \
+                  'relation', 'ratings', 'duration', 'locations',\
+                 ]
 
-
-    # def deserialize(self, request, data, format=None):
-    #     if request.POST:
-    #         data = request.POST.copy()
-    #         return data
-    #     else:
-    #         return super(FilmsSearchResource, self).deserialize(request, data, format)
 
     def determine_format(self, request):
         return 'application/json'
 
-    def hydrate(self, bundle):
-        request_method=bundle.request.META['REQUEST_METHOD']
-        print "ok dfdsf"
 
-        if request_method == 'POST':
-            print "POST"
+    def alter_list_data_to_serialize(self, request, page):
+        bundles = []
 
-            #do something if you want
-        elif request_method == 'PUT':
-            print "PUT"
-            #do something if you want
+        for obj in page.object_list:
+            bundle = self.build_bundle(obj=obj, request=request)
+            bundles.append(self.full_dehydrate(bundle, for_list=True))
 
-        return bundle
+        object_list = {
+            'total_cnt': page.paginator.num_pages,
+            'per_page':  page.paginator.per_page,
+            'page':      page.number,
+            'objects':   bundles,
+        }
 
-    def alter_list_data_to_serialize(self, request, data_dict):
-        resp = {}
-        if isinstance(data_dict, dict):
-            if 'meta' in data_dict:
-                resp['total_cnt'] = data_dict['meta']['total_count']
-                resp['per_page'] = data_dict['meta']['limit']
-                resp['page'] = (data_dict['meta']['offset'] / data_dict['meta']['limit']) + 1
-                del data_dict['meta']
+        return object_list
 
-            resp['items'] = {}
-            if 'objects' in data_dict:
-                resp['items'] = data_dict['objects']
 
-            data_dict['objects'] = resp
+    def alter_deserialized_detail_data(self, request, data):
+        filter = {}
+        if data.get('text'):
+            filter.update({'name': data['text']})
 
-        return resp
+        if data.get('genre'):
+            filter.update({'genre': data['genre']})
 
-    # def obj_create(self, bundle, **kwargs):
-    #     bundle = self.full_hydrate(bundle)
-    #     print kwargs
-    #     return bundle
+        if data.get('rating'):
+            filter.update({'rating': data['rating']})
+
+        if data.get('price'):
+            filter.update({'price': data['price']})
+
+        return data, filter
+
+
+    def post_list(self, request, **kwargs):
+        deserialized = self.deserialize(request, request.body, format=request.META.get('CONTENT_TYPE', 'application/json'))
+        deserialized, filter = self.alter_deserialized_detail_data(request, deserialized)
+
+        o_search = self._meta.queryset.filter(**filter)
+        paginator = Paginator(o_search, 24)
+
+        try:
+            page = paginator.page(int(deserialized.get('page', 1)))
+        except InvalidPage:
+            raise Http404("Sorry, no results on that page.")
+
+        object_list = self.alter_list_data_to_serialize(request, page)
+        self.log_throttled_access(request)
+
+        return self.create_response(request, object_list)
