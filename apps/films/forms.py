@@ -1,7 +1,8 @@
 # coding: utf-8
 
-from django.forms import ModelForm
+from django.forms import ModelForm, Form
 from django.core.exceptions import ValidationError
+from django.forms import fields
 
 from apps.films.models import Persons, Seasons, Films, FilmExtras
 from apps.films.constants import APP_FILM_ADMIN_CSS, APP_FILM_ADMIN_JS_LIBS, APP_FILM_SERIAL
@@ -55,3 +56,20 @@ class FilmsAdminForm(ModelForm):
 
     class Meta:
         model = Films
+
+
+
+#############################################################################################################
+# Форма поиска
+class SearchForm(Form):
+    text     = fields.CharField(max_length='255', required=False)
+    genre    = fields.IntegerField(min_value=1, required=False)
+    year_old = fields.IntegerField(min_value=1, required=False)
+    rating   = fields.FloatField(required=False)
+    price    = fields.IntegerField(required=False)
+    per_page = fields.IntegerField(min_value=1, required=False, initial=24)
+    page     = fields.IntegerField(min_value=1, required=False, initial=1)
+    instock  = fields.BooleanField(required=False, initial=False)
+
+    class Meta:
+        fields = ('text', 'genre', 'year_old', 'rating', 'price', 'per_page', 'page', 'instock',)
