@@ -28,11 +28,10 @@ class Films(models.Model):
     countries   = models.ManyToManyField('Countries', verbose_name=u'Страны производители', related_name='countries')
     genres      = models.ManyToManyField('Genres', verbose_name=u'Жанры', related_name='genres')
 
-
     def __unicode__(self):
         return u'[{0}] {1}'.format(self.pk, self.name)
 
-    class  Meta(object):
+    class Meta(object):
         # Имя таблицы в БД
         db_table = 'films'
         app_label = 'films'
