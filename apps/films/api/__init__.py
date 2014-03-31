@@ -1,6 +1,6 @@
 # coding: utf-8
 
-from search import FilmResource
+from films_search import FilmsSearchResource
 
 
-__all__ = ['FilmResource',]
+__all__ = ['FilmsSearchResource',]
