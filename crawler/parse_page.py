@@ -15,7 +15,6 @@ import re
 import requests
 from bs4 import BeautifulSoup
 import datetime
-import pprint
 from collections import defaultdict
 from apps.films.constants import APP_PERSON_ACTOR, APP_PERSON_DIRECTOR, APP_PERSON_PRODUCER
 from crawler.constants import PAGE_ARCHIVE
@@ -26,7 +25,7 @@ import logging
 import os
 
 YANDEX_KP_ACTORS_TEMPLATE = "http://st.kp.yandex.net/images/actor_iphone/iphone360_{}.jpg"
-YANDEX_KP_FILMS_TEMPLATE  = "http://st.kp.yandex.net/images/film_big/{}.jpg"
+YANDEX_KP_FILMS_TEMPLATE = "http://st.kp.yandex.net/images/film_big/{}.jpg"
 
 headers = {'User-Agent': 'Mozilla/5.0'}
 
