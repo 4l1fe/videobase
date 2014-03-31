@@ -15,6 +15,7 @@ class ExtractedInformation(models.Model):
     class Meta:
         # Имя таблицы в БД
 
+        
         db_table = 'robots_extracted_information'
         app_label = 'robots'
         verbose_name = u'Extracted information'

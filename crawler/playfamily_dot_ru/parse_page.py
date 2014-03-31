@@ -5,7 +5,7 @@ Module responsible for parsing one page from playfamily.ru
 
 
 import microdata
-import re
+from bs4 import BeautifulSoup
 import logging
 from crawler.playfamily_dot_ru.utils import rub_to_int, utfdecode
 
