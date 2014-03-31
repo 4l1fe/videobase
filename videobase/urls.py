@@ -7,7 +7,8 @@ from testy_pie import api_v1
 from videobase import settings
 
 from django.contrib import admin
-from apps.users.views import UserAccountView
+from apps.users.views import UserAccountView, RegistrationView
+from apps.users.forms import CustomRegistrationForm
 
 admin.autodiscover()
 
@@ -26,11 +27,20 @@ urlpatterns = patterns('',
 )
 
 urlpatterns += patterns('',
+
+                        url(
+                            r'^accounts/register/$',
+                            RegistrationView.as_view(
+                                form_class=CustomRegistrationForm,
+                            ),
+                            name='registration_register',
+                        ),
+
                         (r'^accounts/', include('registration.urls')),
                         (r'^admin/', include(admin.site.urls)),
                     )
 
 if settings.DEBUG:
     urlpatterns += patterns('',
-        (r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT}),
+                            (r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT}),
     )
