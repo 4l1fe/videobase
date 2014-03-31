@@ -61,7 +61,7 @@ def parse_page(page_dump):
     except:
         logging.debug("Can't extract price for %s'", item.name.strip())
         price = None
-    return (price, item.name.strip(), item.alternativeHeadline.strip())
+    return (price, item.name.strip())
 
 
 DEBUG = __name__ == "__main__"

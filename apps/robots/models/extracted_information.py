@@ -7,7 +7,7 @@ class ExtractedInformation(models.Model):
     mobile = models.BooleanField(verbose_name = 'Is available on mobile ?')
     smart_tv = models.BooleanField(verbose_name = 'Is available on Smart TV ?')
     computer = models.BooleanField(verbose_name = 'Is available on PC ?')
-    
+
 
     def __unicode__(self):
         return u'[{0}] {1}'.format(self.pk, self.domain)
