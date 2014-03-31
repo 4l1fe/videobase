@@ -22,8 +22,8 @@ class GenresAdmin(admin.ModelAdmin):
 # Администрирование таблицы фильмов
 class FilmsAdmin(admin.ModelAdmin):
     form = FilmsAdminForm
-    list_filter = ('ftype', 'frelease_date',)
-    search_fields = ('name', 'ftype', 'frelease_date',)
+    list_filter = ('type', 'release_date',)
+    search_fields = ('name', 'type', 'release_date',)
 
 
 #############################################################################################################
