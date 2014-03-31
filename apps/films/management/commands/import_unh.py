@@ -20,6 +20,7 @@ from django.db import IntegrityError, transaction
 from apps.films.constants import *
 from apps.films.models import Films, Genres, Countries, PersonsFilms, FilmExtras, Persons
 
+
 class Command(BaseCommand):
     def __init__(self):
         super(Command, self).__init__()
@@ -222,10 +223,10 @@ class Command(BaseCommand):
             self.save_person_film(film, director, APP_PERSON_DIRECTOR)
         return True
 
-    def compact_list(self, list = []):
+    def compact_list(self, list=[]):
         return [ el for el in list if (not el is None) and (el.lower() != '\\n')]
 
-    def date_or_now(self, date = None):
+    def date_or_now(self, date=None):
         if date is None:
             return datetime.datetime.now()
         if self.is_null(date):
@@ -235,9 +236,9 @@ class Command(BaseCommand):
         except:
             return datetime.datetime.now()
 
-    def is_null(self, value = None):
+    def is_null(self, value=None):
         if value is None:
-            return true
+            return True
         return value.lower() == 'null' or value.lower() == '\\n'
 
     def get_genres(self, genres = None):
