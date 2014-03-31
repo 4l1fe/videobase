@@ -2,11 +2,13 @@ from django.db import models
 
 class ExtractedInformation(models.Model):
 
-    domain = models.ForeignKey('ExternalSources' , verbose_name = u'External Source')
-    film   = models.ForeignKey(Films, verbose_name = u'Фильм')
-    rtry   = models.ForeignKey(RobotTries,verbose_name = 'Try')
+    rtry   = models.ForeignKey('RobotTries',verbose_name = 'Try')
     price  = models.IntegerField(verbose_name = 'Price')
-    url    = models.URLField(max_length = 255,verbose_name='URL to film information')
+    mobile = models.BooleanField(verbose_name = 'Is available on mobile ?')
+    smart_tv = models.BooleanField(verbose_name = 'Is available on Smart TV ?')
+    computer = models.BooleanField(verbose_name = 'Is available on PC ?')
+    
+    
 
 
 
@@ -15,7 +17,7 @@ class ExtractedInformation(models.Model):
 
     class Meta:
         # Имя таблицы в БД
-        db_table = 'robots_extsources'
+        db_table = 'robots_extracted_information'
         app_label = 'robots'
-        verbose_name = u'Внешние источники'
-        verbose_name_plural = u'Внешние источники'
+        verbose_name = u'Extracted information'
+        verbose_name_plural = u'Extracted information'
