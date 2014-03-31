@@ -1,7 +1,7 @@
 # coding: utf-8
 
 from django.core.management.base import BaseCommand, CommandError
-from apps.films.models import Films,PersonsFilms,Persons,Genres,FilmExtras,Countries
+from apps.films.models import Films, PersonsFilms, Persons, Genres, FilmExtras, Countries
 from apps.films.constants import APP_PERSON_PHOTO_DIR,APP_FILM_CRAWLER_LIMIT,APP_FILM_CRAWLER_DELAY,APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER
 from apps.robots.models import KinopoiskTries
 from apps.robots.constants import APP_ROBOT_FAIL, APP_ROBOT_SUCCESS
@@ -132,7 +132,7 @@ class Command(BaseCommand):
         if args:
             films = [Films.objects.get(pk=arg) for arg in args]
         else:
-            films = Films.objects.filter(kinopoisk_lastupdate = None,kinopoisk_id__isnull =False)[:LIMIT]
+            films = Films.objects.filter(kinopoisk_lastupdate=None, kinopoisk_id__isnull=False)[:LIMIT]
 
         for film in films:
             previous_tries = KinopoiskTries.objects.filter(result=APP_ROBOT_FAIL, film=film)
