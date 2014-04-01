@@ -4,3 +4,4 @@ from robots import Robots
 from robots_logs import RobotsLog
 from kinopoisk import KinopoiskTries
 from extsources import ExternalSources
+from robot_tries import RobotsTries

@@ -17,7 +17,7 @@ class Contents(models.Model):
     season               = models.ForeignKey(Seasons, null=True, blank=True, verbose_name=u'Сезоны')
     viewer_cnt           = models.IntegerField(verbose_name=u'Количество посмотревших за все время')
     viewer_lastweek_cnt  = models.IntegerField(verbose_name=u'Количество посмотревших за последнюю неделю')
-    viewer_lastmonth_cnt = models.IntegerField(verbose_name=u'Количество посмотревших за последний месяц')
+    viewer_lastmonth_cnt = models.IntegerField(verbose_name=u'Количество посмотревших за последний месяцo')
 
 
     def __unicode__(self):
