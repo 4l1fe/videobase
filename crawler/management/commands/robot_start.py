@@ -50,7 +50,9 @@ def sane_dict(film):
             'viewer_cnt': 0,
             'viewer_lastweek_cnt': 0,
             'viewer_lastmonth_cnt': 0,
-            'value':None
+            'value': None,
+            'price': 0,
+            'price_type': None,
     }
 
 

@@ -8,8 +8,8 @@ class Robot(object):
 
     def get_data(self, dict_gen):
         for film in self.loaders:
-            html = self.loaders[film].load()
-            for data in self.parser.parse(html,dict_gen):
-                data['url_load'] = d['url']
+            html, url = self.loaders[film].load()
+            for data in self.parser.parse(html, dict_gen):
+                data['url_load'] = url
                 yield data
 
