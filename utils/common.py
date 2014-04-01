@@ -2,6 +2,7 @@
 
 import os
 from PIL import Image
+from collections import defaultdict
 
 
 def get_image_path(instance, filename):
@@ -69,3 +70,53 @@ def check_callable_function(obj, method):
         pass
 
     return callable_flag
+
+
+def list_of(list, key, objects=False, distinct=False):
+    """
+    Возвращает массив состоящий из значений всех полей key
+    в двумерном массиве или в массиве объектов list
+    """
+    result_list = []
+    for item in list:
+        if objects:
+            value = getattr(item, key)
+        else:
+            value = item[key]
+
+        result_list.append(value)
+
+    # if distinct:
+    #     result_list = list(set(result_list))
+
+    return result_list
+
+
+def reindex_by(list, key, objects=False):
+    """
+    Преобразует массив объектов, в масисв с ключем по полю key
+    """
+    result_dict = {}
+    for item in list:
+        if objects: k_value = getattr(item, key)
+        else: k_value = item[key]
+        result_dict[k_value] = item
+
+    return result_dict
+
+
+def group_by(list, key, objects=False):
+    """
+    Сгруппировать двумерный массив или массив объектов
+    по полю с именем key
+    """
+    result_dict = {}
+    for item in list:
+        if objects: k_value = getattr(item, key)
+        else: k_value = item[key]
+
+        if not result_dict.has_key(k_value):
+            result_dict[k_value] = []
+        result_dict[k_value].append(item)
+
+    return result_dict

@@ -5,6 +5,13 @@ from ..constants import *
 
 
 #############################################################################################################
+#
+class FilmManager(models.Manager):
+    def get_query_set(self):
+        return super(FilmManager, self).get_query_set().filter(type=APP_FILM_FULL_FILM)
+
+
+#############################################################################################################
 # Модель фильмов/сериалов
 class Films(models.Model):
     name             = models.CharField(max_length=255, blank=False, verbose_name=u'Название фильма')
@@ -28,6 +35,7 @@ class Films(models.Model):
     countries   = models.ManyToManyField('Countries', verbose_name=u'Страны производители', related_name='countries')
     genres      = models.ManyToManyField('Genres', verbose_name=u'Жанры', related_name='genres')
 
+    get_film_type = FilmManager()
 
     def __unicode__(self):
         return u'[{0}] {1}'.format(self.pk, self.name)
