@@ -9,7 +9,7 @@ from apps.contents.models import Contents, Locations
 from apps.films.constants import APP_FILM_CRAWLER_LIMIT
 from crawler.ivi_ru.loader import IVI_Loader
 from crawler.ivi_ru.parsers import ParseFilmPage
-from crawler.core.browser import RetrievePageException
+from crawler.core.exseptions import RetrievePageException
 from requests.exceptions import ConnectionError
 from apps.robots.constants import APP_ROBOTS_TRY_SITE_UNAVAILABLE,APP_ROBOTS_TRY_NO_SUCH_PAGE, APP_ROBOTS_TRY_PARSE_ERROR, APP_ROBOTS_TRY_SUCCESS 
 from apps.robots.models import RobotsTries
@@ -146,7 +146,7 @@ class Command(BaseCommand):
         try:
             robot = Robot(films=film, **sites_crawler[site])
             for data in robot.get_data():
-                pass
+                print data
                 
         except ConnectionError, ce:
             # Couldn't conect to server
