@@ -18,12 +18,18 @@ class BaseParse(object):
     def get_link(self):
         raise NotImplementedError()
 
+    def film_in_sait(self):
+        raise NotImplementedError()
+
     @classmethod
     def parse(cls, html):
         obj = cls(html)
-        resp_dict = {
-            'cost': obj.get_cost(),
-            'series': obj.get_series(),
-            'link': obj.get_link(),
-        }
+        resp_dict = None
+        if obj.film_in_sait():
+            resp_dict = {
+                'cost': obj.get_cost(),
+                'series': obj.get_series(),
+                'link': obj.get_link(),
+            }
+
         return resp_dict
