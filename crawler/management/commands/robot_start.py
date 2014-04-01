@@ -40,6 +40,7 @@ sites_crawler = {
 
 
 def sane_dict(film):
+
     return {'name': film.name,
             'name_orig': film.name_orig,
             'number': None,
@@ -48,10 +49,12 @@ def sane_dict(film):
             'series_cnt': None,
             'viewer_cnt': 0,
             'viewer_lastweek_cnt': 0,
-            'viewer_lastmonth_cnt': 0
+            'viewer_lastmonth_cnt': 0,
+            'value':None
     }
-            
 
+
+    
 def get_content(film, **kwargs):
 
     # Getting all content with this film
@@ -105,7 +108,6 @@ def get_content(film, **kwargs):
                 content = Contents(film=film, name=precontent.name, name_orig=precontent.name_orig,
                                    description=description, number=season_num, release_date=release_date, viewer_cnt=0,
                                    season=season, viewer_lastweek_cnt=0, viewer_lastmonth_cnt=0)
-
                 content.save()
 
         return content
