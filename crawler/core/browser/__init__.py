@@ -15,6 +15,10 @@ HEADERS = {'User-Agent': 'Mozilla/5.0'}
 
 CACHE_DIR = './cache'
 
+class RetrievePageException(Exception):
+    def __init__(self,url, status_code):
+        self.url = url
+        self.status_code = status_code
 
 
 def ljoin(p):
@@ -78,7 +82,18 @@ def cache(func):
                 return r
     return wrapper
 
+def nopage_handler(func):
+    def wrapper(url, **kwargs):
+        
+        r = func(url)
+        if r.ok:
+            return r.content
+        else:
+            raise RetrievePageException(url = url, status_code = r.status_code)
+    return wrapper
 
+    
+@nopage_handler
 @cache
 def simple_get(url, encoding=None):
     '''
@@ -86,3 +101,6 @@ def simple_get(url, encoding=None):
 
     '''
     return requests.get(url, headers=HEADERS)
+
+
+    
