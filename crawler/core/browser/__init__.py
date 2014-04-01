@@ -76,7 +76,7 @@ def cache(func):
                     fake = FakeResponse(ok=True, content=fr.read(), url=url)
                 return fake
             else:
-                r = func(url)
+                r = func(url, params=kwargs.get('params', {}))
                 if r.ok:
                     with open(cachepath, 'w') as fw:
                         fw.write(r.content)
@@ -87,7 +87,7 @@ def cache(func):
 def nopage_handler(func):
     def wrapper(url, **kwargs):
         
-        r = func(url)
+        r = func(url, **kwargs)
         if r.ok:
             return r.content
         else:
