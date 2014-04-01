@@ -53,6 +53,11 @@ def sane_dict(film):
             'value': None,
             'price': 0,
             'price_type': None,
+            'url_view':None,
+            'quality':'',
+            'subtitles':'',
+            'url_source':'',
+
     }
 
 
@@ -62,8 +67,8 @@ def get_content(film, **kwargs):
     # Getting all content with this film
     contents = Contents.objects.filter(film=film)
 
-    if 'season_num' in kwargs:
-        season_num = kwargs['season_num']
+    if 'number' in kwargs:
+        season_num = kwargs['number']
     else:
         season_num = None
 
@@ -114,18 +119,23 @@ def get_content(film, **kwargs):
                 content = Contents(film=film, name=precontent.name,
                                    name_orig=precontent.name_orig,
                                    description=description, number=season_num,
-                                   release_date=release_date, viewer_cnt=0,
-                                   season=season, viewer_lastweek_cnt=0,
-                                   viewer_lastmonth_cnt=0)
-
+                                   release_date=release_date,
+                                   viewer_cnt=kwargs['viewer_cnt'],
+                                   season=season,
+                                   viewer_lastweek_cnt=kwargs['viewer_cnt'],
+                                   viewer_lastmonth_cnt=kwargs['viewer_cnt'])
                 content.save()
-
         return content
 
 
 def save_location(film, **kwargs):
     content = get_content(film, **kwargs)
-    location = Locations(content=content, **kwargs)
+    location = Locations(content=content,
+                         value = url,
+                         quality = kwargs['quality'],
+                         subtitles = kwargs['subtitles'],
+                         price = price,
+                         price_type = price_type)
     location.save()
 
 

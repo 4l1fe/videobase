@@ -15,7 +15,7 @@ class Loader():
     self.page_type = None
     
     def load():
-        url_from_name = form_url_from_name(name_orig)
+        url_from_name = form_url_from_name(self.film.name_orig)
         
         if not url_from_name is None:
             html_with_type = HTML_with_type(simple_get(url_from_name))
@@ -26,9 +26,8 @@ class Loader():
             html_with_type.page_type = 'search_page'
             return html_with_type
 
-        
-
 def playfamily_loader (film):
 
     return Loader(film)
+
     
