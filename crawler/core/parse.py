@@ -19,12 +19,12 @@ class BaseParse(object):
         raise NotImplementedError()
 
     @classmethod
-    def parse(cls, html, dict_gen):
+    def parse(cls, html, dict_gen, film):
         obj = cls(html)
-        resp_dict = dict_gen()
-        seasons = obj.get_seasons()
+        resp_dict = dict_gen(film)
         link = obj.get_link()
         price, price_type = obj.get_price()
+        seasons = obj.get_seasons()
         if seasons:
             for season in seasons:
                 resp_dict['numer'] = season
