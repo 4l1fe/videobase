@@ -77,8 +77,11 @@ def get_content(film, **kwargs):
 
         if not season_num is None:
             raise NameError("Variant with new TV series not in db not implemented")
-        content = Contents(film=film, name=film.name, name_orig=film.name_orig, description=description,
-                           release_date=film.release_date, viever_cnt=0, viever_lastweek_cnt=0)
+        content = Contents(film=film, name=film.name, name_orig=film.name_orig,
+                           description=description,
+                           release_date=film.release_date,
+                           viever_cnt=0,
+                           viever_lastweek_cnt=0)
         content.save()
         
     else:
@@ -100,11 +103,15 @@ def get_content(film, **kwargs):
                     logging.debug("Assigned new series count in season to number of series in previous season for season %d for film %d", season_num, film.pk)
                     series_cnt = precontent.season.series_cnt
                     
-                season = Seasons(film=film, release_date=release_date, series_cnt=series_cnt,
-                                 description=description, number=season_num)
-                content = Contents(film=film, name=precontent.name, name_orig=precontent.name_orig,
-                                   description=description, number=season_num, release_date=release_date, viewer_cnt=0,
-                                   season=season, viewer_lastweek_cnt=0, viewer_lastmonth_cnt=0)
+                season = Seasons(film=film, release_date=release_date,
+                                 series_cnt=series_cnt, description=description,
+                                 number=season_num)
+                content = Contents(film=film, name=precontent.name,
+                                   name_orig=precontent.name_orig,
+                                   description=description, number=season_num,
+                                   release_date=release_date, viewer_cnt=0,
+                                   season=season, viewer_lastweek_cnt=0,
+                                   viewer_lastmonth_cnt=0)
 
                 content.save()
 
@@ -134,7 +141,7 @@ class Command(BaseCommand):
     )
 
     def handle(self, *args, **options):
-        film = Films.objects.filter(pk=1)
+        film = Films.objects.filter(id=1)
         site = options['site']
         try:
             robot = Robot(films=film, **sites_crawler[site])
@@ -148,10 +155,10 @@ class Command(BaseCommand):
             host = m.groups()[0]
             url = ce.message.url
 
-            robot_try = RobotsTries(domain = host,
-                                   url = 'http://'+host+url,
-                                   film = film,
-                                   outcome = APP_ROBOTS_TRY_SITE_UNAVAILABLE
+            robot_try = RobotsTries(domain=host,
+                                    url='http://'+host+url,
+                                    film=film,
+                                    outcome=APP_ROBOTS_TRY_SITE_UNAVAILABLE
             )
 
             robot_try.save()
@@ -159,16 +166,16 @@ class Command(BaseCommand):
         except RetrievePageException, rexp:
             # Server responded but not 200
 
-            robot_try = RobotsTries(domain = site,
-                                   url = rexp.url,
-                                   film = film,
-                                   outcome = APP_ROBOTS_TRY_NO_SUCH_PAGE
+            robot_try = RobotsTries(domain=site,
+                                    url=rexp.url,
+                                    film=film,
+                                    outcome=APP_ROBOTS_TRY_NO_SUCH_PAGE
             )
 
             robot_try.save()
         except:
             # Most likely parsing error
-            robot_try = RobotsTries(domain = site,
+            robot_try = RobotsTries(domain=site,
                                    url=rexp.url,
                                    film=film,
                                    outcome=APP_ROBOTS_TRY_PARSE_ERROR

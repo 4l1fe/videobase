@@ -1,6 +1,6 @@
 # coding: utf-8
 
-from ..core import simple_get
+from ..core.browser import simple_get
 
 
 # Базовый класс загрузчика страници
@@ -22,7 +22,5 @@ class BaseLoader(object):
     # сама функция загрузки
     def load(self, load_function=simple_get):
         url = self.get_url(load_function)
-        html = load_function(url, params=self.params)
-        # Ошибка в случае загрузки страници
-        if html is None:
-            raise Exception()
+        return load_function(url, params=self.params)
+
