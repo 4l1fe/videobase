@@ -8,6 +8,7 @@ class Robot(object):
 
     def get_data(self):
         for film in self.loaders:
-            html = self.loaders[film].load()
-            data = self.parser.parse(html)
+            d = self.loaders[film].load()
+            data = self.parser.parse(d['html'])
+            data['url_load'] = d['url']
             yield data

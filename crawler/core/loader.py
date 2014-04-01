@@ -22,5 +22,5 @@ class BaseLoader(object):
     # сама функция загрузки
     def load(self, load_function=simple_get):
         url = self.get_url(load_function)
-        return load_function(url, params=self.params)
+        return {'html': load_function(url, params=self.params), 'link': url}
 
