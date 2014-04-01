@@ -6,8 +6,8 @@ class Robot(object):
         self.loaders = {film: loader(film) for film in films}
         self.parser = parser
 
-    def get_data(self):
+    def get_data(self, dict_gen):
         for film in self.loaders:
             html = self.loaders[film].load()
-            data = self.parser.parse(html)
-            yield data
+            for data in  self.parser.parse(html,dict_gen):
+                yield data
