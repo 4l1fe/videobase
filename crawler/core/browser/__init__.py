@@ -1,6 +1,8 @@
 '''
 Module for emulating browser
 '''
+from crawler.core.exseptions import RetrievePageException
+
 import requests
 from urlparse import urlparse
 from os.path import exists
@@ -14,12 +16,6 @@ FakeResponse = namedtuple('FakeResponse', ['ok', 'content', 'url'])
 HEADERS = {'User-Agent': 'Mozilla/5.0'}
 
 CACHE_DIR = './cache'
-
-
-class RetrievePageException(Exception):
-    def __init__(self, url, status_code):
-        self.url = url
-        self.status_code = status_code
 
 
 def ljoin(p):
