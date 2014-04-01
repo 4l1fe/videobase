@@ -40,19 +40,16 @@ sites_crawler = {
 
 
 def sane_dict(film):
-
-
-
-    return {'name':film.name,
-            'name_orig':film.name_orig,
-            'number':None,
-            'description':Film.description,
-            'release_date':film.release_date,
+    return {'name': film.name,
+            'name_orig': film.name_orig,
+            'number': None,
+            'description': film.description,
+            'release_date': film.release_date,
             'series_cnt': None,
-            'viewer_cnt':0,
-            'viewer_lastweek_cnt':0,
-            'viewer_lastmonth_cnt'0:
-            
+            'viewer_cnt': 0,
+            'viewer_lastweek_cnt': 0,
+            'viewer_lastmonth_cnt': 0
+    }
             
 
 def get_content(film, **kwargs):
@@ -74,21 +71,21 @@ def get_content(film, **kwargs):
         description = kwargs['description']
     else:
         description = None
-    
-        
+
     if len(contents) == 0:
         #If there is no such content just creating one with meaningfull defaults
 
-        if  not season_num is None:
+        if not season_num is None:
             raise NameError("Variant with new TV series not in db not implemented")
-        content = Contents(film = film, name = film.name, name_orig= film.name_orig, description = description, release_date =film.release_date, viever_cnt =0, viever_lastweek_cnt =0)
+        content = Contents(film=film, name=film.name, name_orig=film.name_orig, description=description,
+                           release_date=film.release_date, viever_cnt=0, viever_lastweek_cnt=0)
         content.save()
         
     else:
         if season_num is None:
             content = contents[0]
         else:
-            content = next( (c for c in contents if c.season.number == season_num),None)
+            content = next((c for c in contents if c.season.number == season_num), None)
 
             if content is None:
 
@@ -103,36 +100,23 @@ def get_content(film, **kwargs):
                     logging.debug("Assigned new series count in season to number of series in previous season for season %d for film %d", season_num, film.pk)
                     series_cnt = precontent.season.series_cnt
                     
-                season = Seasons (film = film,
-                                  release_date = release_date,
-                                  series_cnt = series_cnt,
-                                  description = description,
-                                  number = season_num
-                )
-                                  
-                                  
-                                  
-                content = Contents( film= film,
-                                    name =precontent.name,
-                                    name_orig= precontent.name_orig,
-                                    description = description,
-                                    number = season_num,
-                                    release_date = release_date,
-                                    viewer_cnt = 0,
-                                    season = season,
-                                    viewer_lastweek_cnt = 0,
-                                    viewer_lastmonth_cnt = 0 )
+                season = Seasons(film=film, release_date=release_date, series_cnt=series_cnt,
+                                 description=description, number=season_num)
+                content = Contents(film=film, name=precontent.name, name_orig=precontent.name_orig,
+                                   description=description, number=season_num, release_date=release_date, viewer_cnt=0,
+                                   season=season, viewer_lastweek_cnt=0, viewer_lastmonth_cnt=0)
 
                 content.save()
 
-                return content
+        return content
 
-def get_location(film, **kwargs):
 
+def save_location(film, **kwargs):
     content = get_content(film, **kwargs)
+    location = Locations(content=content, **kwargs)
+    location.save()
 
-    location = Locations(content = content, **kwargs)
-                
+
 class Command(BaseCommand):
     help = u'Запустить краулеры'
     requires_model_validation = True
@@ -159,7 +143,7 @@ class Command(BaseCommand):
                 
         except ConnectionError, ce:
             # Couldn't conect to server
-            m = re.match(".+host[=][']([^']+)['].+",ce.message.message)
+            m = re.match(".+host[=][']([^']+)['].+", ce.message.message)
 
             host = m.groups()[0]
             url = ce.message.url
@@ -185,9 +169,9 @@ class Command(BaseCommand):
         except:
             # Most likely parsing error
             robot_try = RobotsTries(domain = site,
-                                   url = rexp.url,
-                                   film = film,
-                                   outcome = APP_ROBOTS_TRY_PARSE_ERROR
+                                   url=rexp.url,
+                                   film=film,
+                                   outcome=APP_ROBOTS_TRY_PARSE_ERROR
             )
 
             robot_try.save()
