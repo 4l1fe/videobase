@@ -26,6 +26,6 @@ class RobotsTries(models.Model):
         # Имя таблицы в БД
         db_table = 'robots_tries'
         app_label = 'robots'
-        verbose_name = u'Результат попытки'
-        verbose_name_plural = u'Результаты попыток'
+        verbose_name = u'Попытка'
+        verbose_name_plural = u'Попытки'
 

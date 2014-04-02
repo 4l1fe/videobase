@@ -10,6 +10,7 @@ from os.path import join
 import os
 from collections import namedtuple
 import base64
+import logging
 
 FakeResponse = namedtuple('FakeResponse', ['ok', 'content', 'url'])
 
@@ -68,12 +69,16 @@ def cache(func):
         if (not 'cache' in kwargs) or kwargs['cache']:
             cachepath = construct_path(url)
             if exists(cachepath):
+                logging.debug('Found cache for %s in %s. Returning cached copy', url, cachepath)
                 with open(cachepath) as fr:
                     fake = FakeResponse(ok=True, content=fr.read(), url=url)
                 return fake
             else:
-                r = func(url, params=kwargs.get('params', {}))
+                r = func(url, **kwargs)
                 if r.ok:
+                                    
+                    logging.debug("Saving cache for %s in %s.", url,cachepath)
+
                     with open(cachepath, 'w') as fw:
                         fw.write(r.content)
                 return r
@@ -85,7 +90,7 @@ def nopage_handler(func):
         
         r = func(url, **kwargs)
         if r.ok:
-            return r.content
+            return r
         else:
             raise RetrievePageException(url=url, status_code=r.status_code)
     return wrapper
@@ -93,7 +98,7 @@ def nopage_handler(func):
     
 @nopage_handler
 @cache
-def simple_get(url, encoding=None, **kwargs):
+def simple_get(url, **kwargs):
     '''
     Simple wrapper around requests.get function with preset headers
     '''

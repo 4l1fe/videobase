@@ -10,6 +10,7 @@ import logging
 from crawler.playfamily_dot_ru.utils import rub_to_int, utfdecode
 
 
+
 def extract_price(soup):
     '''
     Given BeautifuSoup object from page
@@ -36,12 +37,12 @@ def form_url_from_name(name_orig):
     then return link
     that probably holds information about this movie.
 
-    i.e 'The Matrix' -> 'http://playfamily.ru/the-matrix'
+    i.e 'The Matrix' -> 'http://playfamily.ru/movie/the-matrix'
 
     '''
     try:
         nul = name_orig.strip().decode('ascii').lower()
-        return 'http://playfamily.ru/' + nul.replace(' ', '-')
+        return 'http://playfamily.ru/movie/' + nul.replace(' ', '-')
     except UnicodeDecodeError:
         return None
 
@@ -52,13 +53,10 @@ def parse_page(page_dump):
     '''
 
     item = [i for i in  microdata.get_items(page_dump) if 'name' in i.props][0]
-    print item.name.strip()
-    print item.alternativeHeadline.strip()
-
     try:
         soup = BeautifulSoup(page_dump)
         price = extract_price(soup)
-    except:
+    except Exception,e:
         logging.debug("Can't extract price for %s'", item.name.strip())
         price = None
     return (price, item.name.strip())
