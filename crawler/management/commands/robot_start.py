@@ -1,5 +1,7 @@
 # coding: utf-8
 """ Command to crawler sites"""
+from crawler.zoomby_ru.loader import ZOOMBY_Loader
+from crawler.zoomby_ru.parsers import ParseFilm
 
 from django.core.management.base import BaseCommand
 from optparse import make_option
@@ -18,19 +20,18 @@ from apps.robots.models import RobotsTries
 import logging
 import re
 from crawler import Robot
-from exceptions import UnicodeDecodeError
+
 # Список допустимых сайтов
 sites = ('ivi.ru', 'zoomby.ru', 'now.ru', 'playfamily.ru', 'amediateka.ru')
-logging.basicConfig(level = logging.DEBUG)
+
 # Словарь сайтов:
 # louder: загрузчик страници
 # parser: парсер страници фильма
 sites_crawler = {
     'ivi.ru': {'loader': IVI_Loader,
                'parser': ParseFilmPage},
-    'zoomby.ru': {'loader': None,
-                  'parser': None
-        },
+    'zoomby.ru': {'loader': ZOOMBY_Loader,
+                  'parser': ParseFilm},
     'megogo.net': {'loader': None,
                    'parser': None},
     'now.ru': {'loader': None,
@@ -42,6 +43,7 @@ sites_crawler = {
         }
 
 
+def sane_dict(film):
 
 def sane_dict(film=None):
 
@@ -130,6 +132,7 @@ def get_content(film, kwargs):
                                    viewer_lastweek_cnt=kwargs['viewer_cnt'],
                                    viewer_lastmonth_cnt=kwargs['viewer_cnt'])
                 content.save()
+
         return content
 
 
@@ -148,7 +151,6 @@ def save_location(film,**kwargs):
 class Command(BaseCommand):
     help = u'Запустить краулеры'
     requires_model_validation = True
-    
     option_list = BaseCommand.option_list + (
         make_option('--limit',
                     dest='limit',
