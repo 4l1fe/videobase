@@ -12,7 +12,6 @@ import warnings
 
 def get_new_namestring(namestring):
 
-    print(namestring)
     m = re.match("(?P<pre>.+)v(?P<version>[0-9]+)[.]png",namestring)
 
     if m is None:
@@ -32,7 +31,7 @@ def image_refresh(func):
         path = re.match('.+(?P<path>[/]static[/].+)',url)
         d = m.groupdict()
 
-        print request.get_full_path()
+        
         if d['type'] == 'persons':
             p = Persons.objects.get(pk = int(d['id']))
         elif d['type'] == 'filmextras':
