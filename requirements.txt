@@ -3,6 +3,7 @@ South==0.8.4
 argparse==1.2.1
 psycopg2==2.5.2
 wsgiref==0.1.2
+microdata==0.4.1
 fabric
 uwsgi
 django_extensions
