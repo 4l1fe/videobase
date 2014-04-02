@@ -10,6 +10,7 @@ class Robot(object):
         for film in self.loaders:
             d = self.loaders[film].load()
             for data in self.parser.parse(d['html'], dict_gen, film):
+                
                 data['url_load'] = d['url']
                 yield data
 

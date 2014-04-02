@@ -12,6 +12,8 @@ from apps.films.constants import APP_FILM_CRAWLER_LIMIT
 from crawler.ivi_ru.loader import IVI_Loader
 from crawler.ivi_ru.parsers import ParseFilmPage
 from crawler.core.exseptions import RetrievePageException
+from crawler.playfamily_dot_ru.loader import playfamily_loader
+from crawler.playfamily_dot_ru.parser import PlayfamilyParser
 from requests.exceptions import ConnectionError
 from apps.robots.constants import APP_ROBOTS_TRY_SITE_UNAVAILABLE,APP_ROBOTS_TRY_NO_SUCH_PAGE, APP_ROBOTS_TRY_PARSE_ERROR, APP_ROBOTS_TRY_SUCCESS 
 from apps.robots.models import RobotsTries
@@ -34,16 +36,19 @@ sites_crawler = {
                    'parser': None},
     'now.ru': {'loader': None,
                'parser': None},
-    'playfamily.ru': {'loader': None,
-                      'parser': None},
     'amediateka.ru': {'loader': None,
                       'parser': None},
-}
+    'playfamily.ru': {'loader': playfamily_loader,
+                  'parser': PlayfamilyParser()}       
+        }
 
 
 def sane_dict(film):
 
-    return {'name': film.name,
+def sane_dict(film=None):
+
+    return {'film':film,
+            'name': film.name,
             'name_orig': film.name_orig,
             'number': None,
             'description': film.description,
@@ -55,17 +60,21 @@ def sane_dict(film):
             'value': None,
             'price': 0,
             'price_type': None,
+            'url_view':None,
+            'quality':'',
+            'subtitles':'',
+            'url_source':''
     }
 
 
     
-def get_content(film, **kwargs):
+def get_content(film, kwargs):
 
     # Getting all content with this film
     contents = Contents.objects.filter(film=film)
 
-    if 'season_num' in kwargs:
-        season_num = kwargs['season_num']
+    if 'number' in kwargs:
+        season_num = kwargs['number']
     else:
         season_num = None
 
@@ -87,8 +96,9 @@ def get_content(film, **kwargs):
         content = Contents(film=film, name=film.name, name_orig=film.name_orig,
                            description=description,
                            release_date=film.release_date,
-                           viever_cnt=0,
-                           viever_lastweek_cnt=0)
+                           viewer_cnt=0,
+                           viewer_lastweek_cnt=0,
+        viewer_lastmonth_cnt = 0)
         content.save()
         
     else:
@@ -116,18 +126,25 @@ def get_content(film, **kwargs):
                 content = Contents(film=film, name=precontent.name,
                                    name_orig=precontent.name_orig,
                                    description=description, number=season_num,
-                                   release_date=release_date, viewer_cnt=0,
-                                   season=season, viewer_lastweek_cnt=0,
-                                   viewer_lastmonth_cnt=0)
-
+                                   release_date=release_date,
+                                   viewer_cnt=kwargs['viewer_cnt'],
+                                   season=season,
+                                   viewer_lastweek_cnt=kwargs['viewer_cnt'],
+                                   viewer_lastmonth_cnt=kwargs['viewer_cnt'])
                 content.save()
 
         return content
 
 
-def save_location(film, **kwargs):
-    content = get_content(film, **kwargs)
-    location = Locations(content=content, **kwargs)
+def save_location(film,**kwargs):
+    
+    content = get_content(film,kwargs)
+    location = Locations(content=content,
+                         value = kwargs['url_view'],
+                         quality = kwargs['quality'],
+                         subtitles = kwargs['subtitles'],
+                         price = kwargs['price'],
+                         price_type = kwargs['price_type'])
     location.save()
 
 
@@ -152,8 +169,9 @@ class Command(BaseCommand):
         site = options['site']
         try:
             robot = Robot(films=film, **sites_crawler[site])
-            for data in robot.get_data():
-                print data
+            for data in robot.get_data(sane_dict):
+                logging.debug("Trying to put data from %s for %s to db", site,str(data['film']))
+                save_location(**data)
                 
         except ConnectionError, ce:
             # Couldn't conect to server
@@ -161,10 +179,12 @@ class Command(BaseCommand):
 
             host = m.groups()[0]
             url = ce.message.url
+            if host is None:
+                host = 'unknown'
 
             robot_try = RobotsTries(domain=host,
                                     url='http://'+host+url,
-                                    film=film,
+                                    film=film[0],
                                     outcome=APP_ROBOTS_TRY_SITE_UNAVAILABLE
             )
 
@@ -173,18 +193,39 @@ class Command(BaseCommand):
         except RetrievePageException, rexp:
             # Server responded but not 200
 
+            if site is None:
+                site = 'unknown'
+
             robot_try = RobotsTries(domain=site,
                                     url=rexp.url,
-                                    film=film,
+                                    film=film[0],
                                     outcome=APP_ROBOTS_TRY_NO_SUCH_PAGE
             )
 
             robot_try.save()
-        except:
-            # Most likely parsing error
+
+        except UnicodeDecodeError:
+
+            if site is None:
+                site = 'unknown'
+
+
             robot_try = RobotsTries(domain=site,
-                                   url=rexp.url,
-                                   film=film,
+                                   #url=rexp.url,
+                                   film=film[0],
+                                   outcome=APP_ROBOTS_TRY_PARSE_ERROR
+            )
+
+            robot_try.save()
+        except Exception ,e :
+            # Most likely parsing error
+            if site is None:
+                
+                site = 'unknown'
+
+            robot_try = RobotsTries(domain=site,
+                                   #url=rexp.url,
+                                   film=film[0],
                                    outcome=APP_ROBOTS_TRY_PARSE_ERROR
             )
 

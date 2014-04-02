@@ -96,7 +96,7 @@ def transform_data_dict(ddict):
                 yield el
         else:
             pass
-            #print(u"Can't find parser for {}".format(key))
+            logging.debug(u"Can't find parser for %s",key)
 
 
 def get_image(template, actor_id):

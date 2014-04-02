@@ -1,3 +1,9 @@
+# coding: utf-8
+import re
+
+class HTML_with_type(unicode):
+    page_type =None
+
 def rub_to_int(rub_price):
     '''
     Get int value from string like '79 руб.'
@@ -15,7 +21,9 @@ def utfdecode(func):
         '''
         Wrapper function
         '''
-        if type(page_str) is str:
+        if type(page_str) is HTML_with_type:
+            return func(page_str)
+        elif type(page_str) is str:
             decoded = page_str.decode('utf-8')
             return func(decoded)
         elif type(page_str) is unicode:
