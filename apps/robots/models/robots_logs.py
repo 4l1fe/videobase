@@ -10,7 +10,7 @@ class RobotsLog(models.Model):
     created    = models.DateTimeField(verbose_name=u'Дата следующего старта')
     value      = models.CharField(max_length=255, verbose_name=u'Значение')
     itype      = models.IntegerField(choices=(), verbose_name=u'Тип')
-
+    try_time   = models.DateTimeField(auto_now_add=True, editable=False, verbose_name=u'Дата попытки')
 
     def __unicode__(self):
         return u'[{0}] {1}'.format(self.pk, self.name,)

@@ -40,7 +40,7 @@ class Films(models.Model):
     def __unicode__(self):
         return u'[{0}] {1}'.format(self.pk, self.name)
 
-    class  Meta(object):
+    class Meta(object):
         # Имя таблицы в БД
         db_table = 'films'
         app_label = 'films'
