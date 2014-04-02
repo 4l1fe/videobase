@@ -1,5 +1,7 @@
 # coding: utf-8
 """ Command to crawler sites"""
+from crawler.zoomby_ru.loader import ZOOMBY_Loader
+from crawler.zoomby_ru.parsers import ParseFilm
 
 from django.core.management.base import BaseCommand
 from optparse import make_option
@@ -26,8 +28,8 @@ sites = ('ivi.ru', 'zoomby.ru', 'now.ru', 'playfamily.ru', 'amediateka.ru')
 sites_crawler = {
     'ivi.ru': {'loader': IVI_Loader,
                'parser': ParseFilmPage},
-    'zoomby.ru': {'loader': None,
-                  'parser': None},
+    'zoomby.ru': {'loader': ZOOMBY_Loader,
+                  'parser': ParseFilm},
     'megogo.net': {'loader': None,
                    'parser': None},
     'now.ru': {'loader': None,
