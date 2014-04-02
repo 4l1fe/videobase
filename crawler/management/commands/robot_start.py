@@ -10,16 +10,18 @@ from apps.films.constants import APP_FILM_CRAWLER_LIMIT
 from crawler.ivi_ru.loader import IVI_Loader
 from crawler.ivi_ru.parsers import ParseFilmPage
 from crawler.core.exseptions import RetrievePageException
+from crawler.playfamily_dot_ru.loader import playfamily_loader
+from crawler.playfamily_dot_ru.parser import PlayfamilyParser
 from requests.exceptions import ConnectionError
 from apps.robots.constants import APP_ROBOTS_TRY_SITE_UNAVAILABLE,APP_ROBOTS_TRY_NO_SUCH_PAGE, APP_ROBOTS_TRY_PARSE_ERROR, APP_ROBOTS_TRY_SUCCESS 
 from apps.robots.models import RobotsTries
 import logging
 import re
 from crawler import Robot
-
+from exceptions import UnicodeDecodeError
 # Список допустимых сайтов
 sites = ('ivi.ru', 'zoomby.ru', 'now.ru', 'playfamily.ru', 'amediateka.ru')
-
+logging.basicConfig(level = logging.DEBUG)
 # Словарь сайтов:
 # louder: загрузчик страници
 # parser: парсер страници фильма
@@ -27,21 +29,24 @@ sites_crawler = {
     'ivi.ru': {'loader': IVI_Loader,
                'parser': ParseFilmPage},
     'zoomby.ru': {'loader': None,
-                  'parser': None},
+                  'parser': None
+        },
     'megogo.net': {'loader': None,
                    'parser': None},
     'now.ru': {'loader': None,
                'parser': None},
-    'playfamily.ru': {'loader': None,
-                      'parser': None},
     'amediateka.ru': {'loader': None,
                       'parser': None},
-}
+    'playfamily.ru': {'loader': playfamily_loader,
+                  'parser': PlayfamilyParser()}       
+        }
 
 
-def sane_dict(film):
 
-    return {'name': film.name,
+def sane_dict(film=None):
+
+    return {'film':film,
+            'name': film.name,
             'name_orig': film.name_orig,
             'number': None,
             'description': film.description,
@@ -56,13 +61,12 @@ def sane_dict(film):
             'url_view':None,
             'quality':'',
             'subtitles':'',
-            'url_source':'',
-
+            'url_source':''
     }
 
 
     
-def get_content(film, **kwargs):
+def get_content(film, kwargs):
 
     # Getting all content with this film
     contents = Contents.objects.filter(film=film)
@@ -90,8 +94,9 @@ def get_content(film, **kwargs):
         content = Contents(film=film, name=film.name, name_orig=film.name_orig,
                            description=description,
                            release_date=film.release_date,
-                           viever_cnt=0,
-                           viever_lastweek_cnt=0)
+                           viewer_cnt=0,
+                           viewer_lastweek_cnt=0,
+        viewer_lastmonth_cnt = 0)
         content.save()
         
     else:
@@ -128,20 +133,22 @@ def get_content(film, **kwargs):
         return content
 
 
-def save_location(film, **kwargs):
-    content = get_content(film, **kwargs)
+def save_location(film,**kwargs):
+    
+    content = get_content(film,kwargs)
     location = Locations(content=content,
-                         value = url,
+                         value = kwargs['url_view'],
                          quality = kwargs['quality'],
                          subtitles = kwargs['subtitles'],
-                         price = price,
-                         price_type = price_type)
+                         price = kwargs['price'],
+                         price_type = kwargs['price_type'])
     location.save()
 
 
 class Command(BaseCommand):
     help = u'Запустить краулеры'
     requires_model_validation = True
+    
     option_list = BaseCommand.option_list + (
         make_option('--limit',
                     dest='limit',
@@ -160,8 +167,9 @@ class Command(BaseCommand):
         site = options['site']
         try:
             robot = Robot(films=film, **sites_crawler[site])
-            for data in robot.get_data():
-                print data
+            for data in robot.get_data(sane_dict):
+                logging.debug("Trying to put data from %s for %s to db", site,str(data['film']))
+                save_location(**data)
                 
         except ConnectionError, ce:
             # Couldn't conect to server
@@ -169,10 +177,12 @@ class Command(BaseCommand):
 
             host = m.groups()[0]
             url = ce.message.url
+            if host is None:
+                host = 'unknown'
 
             robot_try = RobotsTries(domain=host,
                                     url='http://'+host+url,
-                                    film=film,
+                                    film=film[0],
                                     outcome=APP_ROBOTS_TRY_SITE_UNAVAILABLE
             )
 
@@ -181,18 +191,39 @@ class Command(BaseCommand):
         except RetrievePageException, rexp:
             # Server responded but not 200
 
+            if site is None:
+                site = 'unknown'
+
             robot_try = RobotsTries(domain=site,
                                     url=rexp.url,
-                                    film=film,
+                                    film=film[0],
                                     outcome=APP_ROBOTS_TRY_NO_SUCH_PAGE
             )
 
             robot_try.save()
-        except:
-            # Most likely parsing error
+
+        except UnicodeDecodeError:
+
+            if site is None:
+                site = 'unknown'
+
+
             robot_try = RobotsTries(domain=site,
-                                   url=rexp.url,
-                                   film=film,
+                                   #url=rexp.url,
+                                   film=film[0],
+                                   outcome=APP_ROBOTS_TRY_PARSE_ERROR
+            )
+
+            robot_try.save()
+        except Exception ,e :
+            # Most likely parsing error
+            if site is None:
+                
+                site = 'unknown'
+
+            robot_try = RobotsTries(domain=site,
+                                   #url=rexp.url,
+                                   film=film[0],
                                    outcome=APP_ROBOTS_TRY_PARSE_ERROR
             )
 
