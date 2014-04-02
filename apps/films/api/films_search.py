@@ -1,34 +1,18 @@
 # coding: utf-8
 
+from django.http import Http404
 from django.conf.urls import url
 from django.core.paginator import Paginator, InvalidPage
-from django.http import Http404
 
-from tastypie.resources import ModelResource, csrf_exempt
 from tastypie.validation import FormValidation
-from tastypie import fields
 
 from apps.films.forms import SearchForm
-from apps.films.models import Films, FilmExtras
-from apps.contents.models import Contents, Locations
-from apps.films.constants import APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER
-from apps.contents.models import Locations
-from utils.common import group_by, reindex_by, list_of
-from django.forms.models import model_to_dict
-
-from collections import defaultdict
-
-
-class LocationsResource(ModelResource):
-    class Meta:
-        object_class = Locations
-        queryset = Locations.objects.all()
-        fields = []
+from apps.films.api.vbFilm import vbFilm
 
 
 #############################################################################################################
 # Api для поиска фильмов
-class FilmsSearchResource(ModelResource):
+class FilmsSearchResource(vbFilm):
     """
     Поиск по фильмам:
         text - Текст для поиска
@@ -41,24 +25,10 @@ class FilmsSearchResource(ModelResource):
         instock - Фильм в наличии в кинотеатрах
     """
 
-    ratings   = fields.DictField(readonly=True)
-    poster    = fields.ListField(readonly=True)
-    relation  = fields.DictField(readonly=True)
-    locations = fields.ListField(readonly=True)
-
-    class Meta:
-        object_class = Films
-        queryset = Films.get_film_type.all()
-        validation = FormValidation(form_class=SearchForm)
-
+    class Meta(vbFilm.Meta):
+        allowed_methods = ['post', 'get']
         resource_name = 'films/search'
-        allowed_methods = ['post']
-
-        include_resource_uri = False
-        always_return_data = True
-        fields = ['id', 'name', 'name_orig', 'release_date', 'poster', \
-                  'relation', 'ratings', 'duration', 'locations',\
-                 ]
+        validation = FormValidation(form_class=SearchForm)
 
 
     def prepend_urls(self):
@@ -69,8 +39,6 @@ class FilmsSearchResource(ModelResource):
         return [
             url(r"^(?P<resource_name>%s)\.(?P<format>\w+)$" % self._meta.resource_name, self.wrap_view('dispatch_list'), name="api_dispatch_list"),
             url(r"^(?P<resource_name>%s)/schema\.(?P<format>\w+)$" % self._meta.resource_name, self.wrap_view('get_schema'), name="api_get_schema"),
-            # url(r"^(?P<resource_name>%s)/set/(?P<pk_list>\w[\w/;-]*)\.(?P<format>\w+)$" % self._meta.resource_name, self.wrap_view('get_multiple'), name="api_get_multiple"),
-            # url(r"^(?P<resource_name>%s)/(?P<pk>\w[\w/-]*)\.(?P<format>\w+)$" % self._meta.resource_name, self.wrap_view('dispatch_detail'), name="api_dispatch_detail"),
         ]
 
 
@@ -84,69 +52,10 @@ class FilmsSearchResource(ModelResource):
         return super(FilmsSearchResource, self).determine_format(request)
 
 
-    def wrap_view(self, view):
-        @csrf_exempt
-        def wrapper(request, *args, **kwargs):
-            request.format = kwargs.pop('format', None)
-            wrapped_view = super(FilmsSearchResource, self).wrap_view(view)
-            return wrapped_view(request, *args, **kwargs)
-        return wrapper
-
-
-    def dehydrate_ratings(self, bundle):
-        obj = bundle.obj
-        ratings = {
-            'imdb': [obj.rating_imdb, obj.rating_imdb_cnt],
-            'kp': [obj.rating_kinopoisk, obj.rating_kinopoisk_cnt],
-            'cons': [0, 0],
-        }
-
-        return ratings
-
-    def dehydrate_relation(self, bundle):
-        relation = {}
-        if bundle.request.user.is_authenticated():
-            relation = {
-                'subscribed': False,
-                'status': '',
-                'ratring': '',
-            }
-
-        return relation
-
-    def dehydrate_poster(self, bundle):
-        return [item.url for item in bundle.obj.poster if len(item.url)]
-
-
-    def dehydrate_locations(self, bundle):
-        return bundle.obj.locations
-
-
-    def get_films_extras(self, list_ids):
-        extras = FilmExtras.objects.filter(film__in=list_ids, etype=APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER)
-        return group_by(extras, 'id', True)
-
-    def get_films_locations(self, list_ids):
-        # Select contents by films
-        contents = Contents.objects.filter(film__in=list_ids).values('id', 'film')
-        contents = list_of(contents, 'id', True, True)
-
-        # Select locations contents by contents
-        locations = Locations.objects.filter(content__in=contents)
-        locations = reindex_by(locations, 'content', True)
-
-        # Rebuild data
-        result = {}
-        for item in contents:
-            result[item.film] = locations[item.id]
-
-        return result
-
-
     def alter_list_data_to_serialize(self, request, page):
         bundles = []
-
         list_ids = [i.pk for i in page.object_list]
+
         extras = self.get_films_extras(list_ids)
         locations = self.get_films_locations(list_ids)
 
@@ -160,7 +69,7 @@ class FilmsSearchResource(ModelResource):
             'total_cnt': page.paginator.num_pages,
             'per_page':  page.paginator.per_page,
             'page':      page.number,
-            'objects':   bundles,
+            'items':   bundles,
         }
 
         return object_list
