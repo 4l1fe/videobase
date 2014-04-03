@@ -6,7 +6,6 @@ import sys
 from ConfigParser import RawConfigParser
 
 
-
 BASE_PATH = os.path.dirname(__file__)
 BASE_DIR = os.path.dirname(BASE_PATH)
 
