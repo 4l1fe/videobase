@@ -28,6 +28,17 @@ class Persons(PhotoClass):
     def __unicode__(self):
         return u'[%s] %s' % (self.pk, self.get_full_name)
 
+    def as_vBPerson(self, extend = False):
+
+        p_dict ={'id': self.pk,
+                'name': self.name,
+                'photo': self.photo if self.photo else '',
+        }
+        if extend:
+            p_dict['bio'] = self.bio
+        return p_dict
+
+        
     class Meta:
         # Имя таблицы в БД
         db_table = 'persons'

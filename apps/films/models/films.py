@@ -40,6 +40,29 @@ class Films(models.Model):
     def __unicode__(self):
         return u'[{0}] {1}'.format(self.pk, self.name)
 
+    def as_vbFilm(self,extend=False,persons =False, authorized=False):
+
+        f_dict = {'id':self.pk,
+                  'name': self.name,
+                  'name_orig':self.name_orig,
+                  'release_date': self.release_date,
+                  'poster': [],
+                  'ratings': {'imdb':(self.rating_imdb,
+                                      self.rating_imdb_cnt),
+                              'kp': (self.rating_kinopoisk,
+                                     self.rating_kinopoisk_cnt),
+                              'cons':(0,0)},
+                  'duration' : self.duration,
+                  #TODO Implement locations
+                  'locations': [],}
+        if extend:
+
+            pass
+        if persons:
+            pass
+
+        return f_dict
+                  
     class Meta(object):
         # Имя таблицы в БД
         db_table = 'films'
