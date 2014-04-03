@@ -30,7 +30,7 @@ ALLOWED_HOSTS = ['*',]
 
 ACCOUNT_ACTIVATION_DAYS = 2
 
-AUTH_USER_MODEL = 'users.Users'
+# AUTH_USER_MODEL = 'users.Users'
 
 AUTH_USER_EMAIL_UNIQUE = True
 
@@ -56,7 +56,8 @@ INSTALLED_APPS = (
     'django_extensions',
     'registration',
     'south',
-    'tastypie',
+    #'tastypie',
+    'rest_framework',
     'csvimport',
     'apps.users',
     'apps.robots',
@@ -147,3 +148,10 @@ STATIC_URL = '/production/static/'
 STATIC_ROOT = os.path.join('/var/www/')
 
 SITE_ID = 1
+
+REST_FRAMEWORK = {
+  'DEFAULT_RENDERER_CLASSES': (
+    'rest_framework.renderers.XMLRenderer',
+    'rest_framework.renderers.JSONRenderer',
+  )
+}
