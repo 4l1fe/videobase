@@ -123,7 +123,7 @@ class PersonFilmographyAPIView(APIView):
         try:
             p = Persons.objects.get(pk = resource_id)
 
-            pfs = PersonFilms.objects.filter(person = p).all()
+            pfs = PersonFilms.objects.filter(person = p)
 
             vbFilms = [pf.film.as_vbFilm() for pf in pfs]
 

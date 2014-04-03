@@ -9,7 +9,6 @@ from videobase import settings
 from django.contrib import admin
 from apps.users.views import UserAccountView, RegistrationView
 from apps.users.forms import CustomRegistrationForm
-from apps.films.views import PersonAPIView, PersonFilmographyAPIView
 admin.autodiscover()
 
 urlpatterns = patterns('',
@@ -24,9 +23,6 @@ urlpatterns = patterns('',
                        url(r'^api/robots/','apps.robots.views.schedule_api'),
                        url(r'^robots/','apps.robots.views.schedule_interface'),
                        url(r'^accounts/profile/', UserAccountView.as_view(), name='account_profile'),
-                       url(r'^api/v1.0/person/(?P<resource_id>\d+)([/]?|[.](?P<format>\w+))$', PersonAPIView.as_view(), name='my_rest_view'),
-                       url(r'^api/v1.0/resource[/]?$', PersonAPIView.as_view(), name='my_rest_view'),
-                      url(r'^api/v1.0/person/(?P<resource_id>\d+)[/]filmography[.](?P<format>\w+)$', PersonFilmographyAPIView.as_view(), name='my_rest_view'),
 )
 urlpatterns += patterns('',
 

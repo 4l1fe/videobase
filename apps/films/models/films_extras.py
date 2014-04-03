@@ -28,6 +28,7 @@ class FilmExtras(PhotoClass):
 
     # poster_obj = PosterFilmManager()
 
+    objects = models.Manager()
 
     def __init__(self, *args, **kwargs):
         super(FilmExtras, self).__init__(*args, **kwargs)
