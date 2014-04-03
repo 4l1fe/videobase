@@ -1,7 +1,7 @@
 # coding: utf-8
 """ Command to crawler sites"""
-from crawler.zoomby_ru.loader import ZOOMBY_Loader
-from crawler.zoomby_ru.parsers import ParseFilm
+# from crawler.zoomby_ru.loader import ZOOMBY_Loader
+# from crawler.zoomby_ru.parsers import ParseFilm
 
 from django.core.management.base import BaseCommand
 from optparse import make_option
@@ -11,7 +11,7 @@ from apps.contents.models import Contents, Locations
 from apps.films.constants import APP_FILM_CRAWLER_LIMIT
 from crawler.ivi_ru.loader import IVI_Loader
 from crawler.ivi_ru.parsers import ParseFilmPage
-from crawler.core.exseptions import RetrievePageException
+from crawler.core.exseptions import *
 from crawler.playfamily_dot_ru.loader import playfamily_loader
 from crawler.playfamily_dot_ru.parser import PlayfamilyParser
 from requests.exceptions import ConnectionError
@@ -39,15 +39,13 @@ sites_crawler = {
     'amediateka.ru': {'loader': None,
                       'parser': None},
     'playfamily.ru': {'loader': playfamily_loader,
-                  'parser': PlayfamilyParser()}       
-        }
+                      'parser': PlayfamilyParser()}
+}
 
-
-def sane_dict(film):
 
 def sane_dict(film=None):
 
-    return {'film':film,
+    return {'film': film,
             'name': film.name,
             'name_orig': film.name_orig,
             'number': None,
@@ -57,18 +55,16 @@ def sane_dict(film=None):
             'viewer_cnt': 0,
             'viewer_lastweek_cnt': 0,
             'viewer_lastmonth_cnt': 0,
-            'value': None,
             'price': 0,
             'price_type': None,
-            'url_view':None,
-            'quality':'',
-            'subtitles':'',
-            'url_source':''
+            'url_view': None,
+            'quality':  '',
+            'subtitles': '',
+            'url_source': ''
     }
 
 
-    
-def get_content(film, kwargs):
+def get_content(film, **kwargs):
 
     # Getting all content with this film
     contents = Contents.objects.filter(film=film)
@@ -98,7 +94,7 @@ def get_content(film, kwargs):
                            release_date=film.release_date,
                            viewer_cnt=0,
                            viewer_lastweek_cnt=0,
-        viewer_lastmonth_cnt = 0)
+                           viewer_lastmonth_cnt=0)
         content.save()
         
     else:
@@ -136,15 +132,15 @@ def get_content(film, kwargs):
         return content
 
 
-def save_location(film,**kwargs):
+def save_location(film, **kwargs):
     
-    content = get_content(film,kwargs)
+    content = get_content(film, kwargs)
     location = Locations(content=content,
-                         value = kwargs['url_view'],
-                         quality = kwargs['quality'],
-                         subtitles = kwargs['subtitles'],
-                         price = kwargs['price'],
-                         price_type = kwargs['price_type'])
+                         value=kwargs['url_view'],
+                         quality=kwargs['quality'],
+                         subtitles=kwargs['subtitles'],
+                         price=kwargs['price'],
+                         price_type=kwargs['price_type'])
     location.save()
 
 
@@ -152,8 +148,11 @@ class Command(BaseCommand):
     help = u'Запустить краулеры'
     requires_model_validation = True
     option_list = BaseCommand.option_list + (
-        make_option('--limit',
-                    dest='limit',
+        make_option('--start',
+                    dest='start',
+                    help=u'Id of first film'),
+        make_option('--count',
+                    dest='count',
                     default=APP_FILM_CRAWLER_LIMIT,
                     help=u'How much films to process'),
         make_option('--site',
@@ -165,7 +164,9 @@ class Command(BaseCommand):
     )
 
     def handle(self, *args, **options):
-        film = Films.objects.filter(id=1)
+        start = int(options['start'])
+        count = int(options['count'])
+        film = Films.objects.filter(id__in=range(5, start + count + 1))
         site = options['site']
         try:
             robot = Robot(films=film, **sites_crawler[site])
@@ -216,6 +217,11 @@ class Command(BaseCommand):
                                    outcome=APP_ROBOTS_TRY_PARSE_ERROR
             )
 
+            robot_try.save()
+        except NoSuchFilm as e:
+            robot_try = RobotsTries(domain=site,
+                                   film=e.film,
+                                   outcome=APP_ROBOTS_TRY_NO_SUCH_PAGE)
             robot_try.save()
         except Exception ,e :
             # Most likely parsing error

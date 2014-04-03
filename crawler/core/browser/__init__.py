@@ -76,12 +76,14 @@ def cache(func):
             else:
                 r = func(url, **kwargs)
                 if r.ok:
-                                    
-                    logging.debug("Saving cache for %s in %s.", url,cachepath)
+
+                    logging.debug("Saving cache for %s in %s.", url, cachepath)
 
                     with open(cachepath, 'w') as fw:
                         fw.write(r.content)
                 return r
+        else:
+            return func(url, **kwargs)
     return wrapper
 
 
@@ -102,4 +104,4 @@ def simple_get(url, **kwargs):
     '''
     Simple wrapper around requests.get function with preset headers
     '''
-    return requests.get(url, headers=HEADERS, **kwargs)
+    return requests.get(url, headers=HEADERS, params=kwargs.get('params', {}))
