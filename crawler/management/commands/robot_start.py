@@ -30,8 +30,8 @@ sites = ('ivi.ru', 'zoomby.ru', 'now.ru', 'playfamily.ru', 'amediateka.ru')
 sites_crawler = {
     'ivi.ru': {'loader': IVI_Loader,
                'parser': ParseFilmPage},
-    'zoomby.ru': {'loader': ZOOMBY_Loader,
-                  'parser': ParseFilm},
+#    'zoomby.ru': {'loader': ZOOMBY_Loader,
+#                  'parser': ParseFilm},
     'megogo.net': {'loader': None,
                    'parser': None},
     'now.ru': {'loader': None,
@@ -64,7 +64,7 @@ def sane_dict(film=None):
     }
 
 
-def get_content(film, **kwargs):
+def get_content(film, kwargs):
 
     # Getting all content with this film
     contents = Contents.objects.filter(film=film)
@@ -128,7 +128,7 @@ def get_content(film, **kwargs):
                                    viewer_lastweek_cnt=kwargs['viewer_cnt'],
                                    viewer_lastmonth_cnt=kwargs['viewer_cnt'])
                 content.save()
-
+        print content
         return content
 
 
@@ -136,6 +136,7 @@ def save_location(film, **kwargs):
     
     content = get_content(film, kwargs)
     location = Locations(content=content,
+                         type=0,
                          value=kwargs['url_view'],
                          quality=kwargs['quality'],
                          subtitles=kwargs['subtitles'],
@@ -166,14 +167,19 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         start = int(options['start'])
         count = int(options['count'])
+        
         film = Films.objects.filter(id__in=range(5, start + count + 1))
+        film = Films.objects.filter(id=2012)
+        print film
         site = options['site']
-        try:
+        #try:
+        if True:
             robot = Robot(films=film, **sites_crawler[site])
             for data in robot.get_data(sane_dict):
                 logging.debug("Trying to put data from %s for %s to db", site,str(data['film']))
                 save_location(**data)
-                
+        try:
+            pass
         except ConnectionError, ce:
             # Couldn't conect to server
             m = re.match(".+host[=][']([^']+)['].+", ce.message.message)

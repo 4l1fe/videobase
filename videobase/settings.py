@@ -29,7 +29,7 @@ ALLOWED_HOSTS = ['*',]
 
 ACCOUNT_ACTIVATION_DAYS = 2
 
-AUTH_USER_MODEL = 'users.Users'
+#AUTH_USER_MODEL = 'users.Users'
 
 AUTH_USER_EMAIL_UNIQUE = True
 
@@ -61,7 +61,7 @@ INSTALLED_APPS = (
     'apps.robots',
     'apps.films',
     'apps.contents',
-    'crawler',
+    'crawler',\
 )
 
 MIDDLEWARE_CLASSES = (
