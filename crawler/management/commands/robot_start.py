@@ -9,6 +9,7 @@ from optparse import make_option
 from apps.films.models import Films, Seasons
 from apps.contents.models import Contents, Locations
 from apps.films.constants import APP_FILM_CRAWLER_LIMIT
+from apps.contents.constants import *
 from crawler.ivi_ru.loader import IVI_Loader
 from crawler.ivi_ru.parsers import ParseFilmPage
 from crawler.now_ru.loader import NOW_Loader
@@ -17,8 +18,9 @@ from crawler.core.exseptions import *
 from crawler.playfamily_dot_ru.loader import playfamily_loader
 from crawler.playfamily_dot_ru.parser import PlayfamilyParser
 from requests.exceptions import ConnectionError
-from apps.robots.constants import APP_ROBOTS_TRY_SITE_UNAVAILABLE,APP_ROBOTS_TRY_NO_SUCH_PAGE, APP_ROBOTS_TRY_PARSE_ERROR, APP_ROBOTS_TRY_SUCCESS 
+from apps.robots.constants import APP_ROBOTS_TRY_SITE_UNAVAILABLE, APP_ROBOTS_TRY_NO_SUCH_PAGE, APP_ROBOTS_TRY_PARSE_ERROR, APP_ROBOTS_TRY_SUCCESS
 from apps.robots.models import RobotsTries
+
 import logging
 import re
 from crawler import Robot
@@ -58,8 +60,8 @@ def sane_dict(film=None):
             'viewer_lastweek_cnt': 0,
             'viewer_lastmonth_cnt': 0,
             'price': 0,
-            'price_type': None,
-            'url_view': None,
+            'price_type': APP_CONTENTS_PRICE_TYPE_FREE,
+            'url_view': '',
             'quality':  '',
             'subtitles': '',
             'url_source': ''
@@ -130,7 +132,6 @@ def get_content(film, kwargs):
                                    viewer_lastweek_cnt=kwargs['viewer_cnt'],
                                    viewer_lastmonth_cnt=kwargs['viewer_cnt'])
                 content.save()
-
         return content
 
 
@@ -139,7 +140,7 @@ def save_location(film, **kwargs):
     content = get_content(film, kwargs)
     location = Locations(content=content,
                          type=0,
-                         value=kwargs['url_view'],
+                         url_view=kwargs['url_view'],
                          quality=kwargs['quality'],
                          subtitles=kwargs['subtitles'],
                          price=kwargs['price'],
@@ -171,17 +172,13 @@ class Command(BaseCommand):
         count = int(options['count'])
         
         film = Films.objects.filter(id__in=range(start, start + count + 1))
-        film = Films.objects.filter(id=380)
-        print film
         site = options['site']
-        #try:
-        if True:
+        try:
             robot = Robot(films=film, **sites_crawler[site])
             for data in robot.get_data(sane_dict):
-                logging.debug("Trying to put data from %s for %s to db", site,str(data['film']))
-                save_location(**data)
-        try:
-            pass
+                pass
+                # logging.debug("Trying to put data from %s for %s to db", site,str(data['film']))
+                # save_location(**data)
         except ConnectionError, ce:
             # Couldn't conect to server
             m = re.match(".+host[=][']([^']+)['].+", ce.message.message)

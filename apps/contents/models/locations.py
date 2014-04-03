@@ -16,8 +16,7 @@ class Locations(models.Model):
     subtitles  = models.CharField(max_length=40, verbose_name=u'Субтитры')
     price      = CurrencyField(verbose_name=u'Цена')
     price_type = models.SmallIntegerField(choices=APP_CONTENTS_PRICE_TYPE, verbose_name=u'Тип цены')
-    value      = models.CharField(max_length=40, verbose_name=u'Ценность')
-
+    url_view   = models.URLField(max_length=255, verbose_name=u'Ссылка для просмотра')
 
     def __unicode__(self):
         return u'[{:s}] {:s} {:s}'.format(self.pk, self.content.name, self.type)
