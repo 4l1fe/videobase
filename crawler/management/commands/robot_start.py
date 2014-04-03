@@ -64,7 +64,7 @@ def sane_dict(film=None):
     }
 
 
-def get_content(film, **kwargs):
+def get_content(film, kwargs):
 
     # Getting all content with this film
     contents = Contents.objects.filter(film=film)
@@ -136,6 +136,7 @@ def save_location(film, **kwargs):
     
     content = get_content(film, kwargs)
     location = Locations(content=content,
+                         type=0,
                          value=kwargs['url_view'],
                          quality=kwargs['quality'],
                          subtitles=kwargs['subtitles'],
@@ -166,14 +167,19 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         start = int(options['start'])
         count = int(options['count'])
+        
         film = Films.objects.filter(id__in=range(5, start + count + 1))
+        film = Films.objects.filter(id=2012)
+        print film
         site = options['site']
-        try:
+        #try:
+        if True:
             robot = Robot(films=film, **sites_crawler[site])
             for data in robot.get_data(sane_dict):
                 logging.debug("Trying to put data from %s for %s to db", site,str(data['film']))
                 save_location(**data)
-
+        try:
+            pass
         except ConnectionError, ce:
             # Couldn't conect to server
             m = re.match(".+host[=][']([^']+)['].+", ce.message.message)
