@@ -55,13 +55,12 @@ INSTALLED_APPS = (
     'django_extensions',
     'registration',
     'south',
-    'tastypie',
     'csvimport',
     'apps.users',
     'apps.robots',
     'apps.films',
     'apps.contents',
-    'crawler',\
+    'crawler',
 )
 
 MIDDLEWARE_CLASSES = (
