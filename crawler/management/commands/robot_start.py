@@ -173,7 +173,7 @@ class Command(BaseCommand):
             for data in robot.get_data(sane_dict):
                 logging.debug("Trying to put data from %s for %s to db", site,str(data['film']))
                 save_location(**data)
-                
+
         except ConnectionError, ce:
             # Couldn't conect to server
             m = re.match(".+host[=][']([^']+)['].+", ce.message.message)
