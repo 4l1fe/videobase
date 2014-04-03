@@ -26,7 +26,7 @@ class FilmExtras(PhotoClass):
     url         = models.URLField(max_length=255, blank=True, null=True, verbose_name=u'Ссылка на дополнительный материал')
     photo       = models.ImageField(upload_to=get_image_path, blank=True, null=True, verbose_name=u'Постер')
 
-    poster_obj = PosterFilmManager()
+    # poster_obj = PosterFilmManager()
 
 
     def __init__(self, *args, **kwargs):
