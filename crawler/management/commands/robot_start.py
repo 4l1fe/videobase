@@ -11,6 +11,8 @@ from apps.contents.models import Contents, Locations
 from apps.films.constants import APP_FILM_CRAWLER_LIMIT
 from crawler.ivi_ru.loader import IVI_Loader
 from crawler.ivi_ru.parsers import ParseFilmPage
+from crawler.now_ru.loader import NOW_Loader
+from crawler.now_ru.parsers import ParseNowFilmPage
 from crawler.core.exseptions import *
 from crawler.playfamily_dot_ru.loader import playfamily_loader
 from crawler.playfamily_dot_ru.parser import PlayfamilyParser
@@ -30,12 +32,12 @@ sites = ('ivi.ru', 'zoomby.ru', 'now.ru', 'playfamily.ru', 'amediateka.ru')
 sites_crawler = {
     'ivi.ru': {'loader': IVI_Loader,
                'parser': ParseFilmPage},
-    'zoomby.ru': {'loader': ZOOMBY_Loader,
-                  'parser': ParseFilm},
+    # 'zoomby.ru': {'loader': ZOOMBY_Loader,
+    #               'parser': ParseFilm},
     'megogo.net': {'loader': None,
                    'parser': None},
-    'now.ru': {'loader': None,
-               'parser': None},
+    'now.ru': {'loader': NOW_Loader,
+               'parser': ParseNowFilmPage()},
     'amediateka.ru': {'loader': None,
                       'parser': None},
     'playfamily.ru': {'loader': playfamily_loader,
@@ -168,8 +170,8 @@ class Command(BaseCommand):
         start = int(options['start'])
         count = int(options['count'])
         
-        film = Films.objects.filter(id__in=range(5, start + count + 1))
-        film = Films.objects.filter(id=2012)
+        film = Films.objects.filter(id__in=range(start, start + count + 1))
+        film = Films.objects.filter(id=380)
         print film
         site = options['site']
         #try:

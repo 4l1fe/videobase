@@ -23,8 +23,9 @@ class BaseParse(object):
         obj = cls(response.content)
         resp_list = []
         link = obj.get_link()
-        price, price_type = obj.get_price()
+        price = obj.get_price()
         seasons = obj.get_seasons()
+        price_type = 'on...'
         if seasons:
             for season in seasons:
                 resp_dict = dict_gen(film)
