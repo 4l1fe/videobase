@@ -9,9 +9,15 @@ from utils.common import get_image_path
 
 
 #############################################################################################################
+#
+class PosterFilmManager(models.Manager):
+    def get_query_set(self):
+        return super(PosterFilmManager, self).get_query_set().filter(etype=APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER)
+
+#############################################################################################################
 # Модель Расширения фильмов/сериалов
 class FilmExtras(PhotoClass):
-    film        = models.ForeignKey('Films', verbose_name=u'Фильм')
+    film        = models.ForeignKey('Films', verbose_name=u'Фильм', related_name="extras")
     etype       = models.CharField(max_length=255, choices=APP_FILM_TYPE_ADDITIONAL_MATERIAL,
                                    verbose_name=u'Тип дополнительного материала')
     name        = models.CharField(max_length=255, verbose_name=u'Название')
@@ -19,6 +25,8 @@ class FilmExtras(PhotoClass):
     description = models.TextField(verbose_name=u'Описание')
     url         = models.URLField(max_length=255, blank=True, null=True, verbose_name=u'Ссылка на дополнительный материал')
     photo       = models.ImageField(upload_to=get_image_path, blank=True, null=True, verbose_name=u'Постер')
+
+    poster_obj = PosterFilmManager()
 
 
     def __init__(self, *args, **kwargs):

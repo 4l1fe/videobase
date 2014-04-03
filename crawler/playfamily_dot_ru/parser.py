@@ -13,7 +13,7 @@ class PlayfamilyParser(object):
 
             data = parse_page(html)
             d['price'] = data[0]
-            d['price_type'] = 'online'
+            d['price_type'] = 0
             d['url_view'] = form_url_from_name(film.name_orig)
             yield d
 
@@ -25,7 +25,7 @@ class PlayfamilyParser(object):
                     d = dict_gen(film)
 
                     d['price'] = data[2]
-                    d['price_type'] = 'online'
+                    d['price_type'] = 0
                     d['url_view'] = data[1]
 
                     yield d 
