@@ -1,0 +1,7 @@
+# coding: utf-8
+
+APP_CRAWLER_PRICE_TYPE_FREE = 'free'
+APP_CRAWLER_PRICE_TYPE_SUBSCRIPTION = 'subscription'
+APP_CRAWLER_PRICE_TYPE_PAY = 'pay'
+
+
