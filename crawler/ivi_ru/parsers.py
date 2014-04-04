@@ -65,6 +65,7 @@ class ParseFilmPage(BaseParse):
             price = 0.0
         else:
             tag_a = children_div.find('a')
+            price_type = APP_CONTENTS_PRICE_TYPE_PAY
             if 'data-can-buy' in tag_a.attrs:
                 reg = re.findall(u'([0-9]+)', tag_a.text)
                 price = float(reg[0])
