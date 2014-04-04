@@ -35,10 +35,9 @@ class Films(models.Model):
     countries   = models.ManyToManyField('Countries', verbose_name=u'Страны производители', related_name='countries')
     genres      = models.ManyToManyField('Genres', verbose_name=u'Жанры', related_name='genres')
 
-    # get_film_type = FilmManager()
-
-
     objects = models.Manager()
+    get_film_type = FilmManager()
+
 
     def __unicode__(self):
         return u'[{0}] {1}'.format(self.pk, self.name)

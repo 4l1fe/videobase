@@ -16,6 +16,12 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
+    def create_superuser(self, email, password=None, **kwargs):
+        user = self.model(email=UserManager.normalize_email(email), is_admin=True, **kwargs)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
 
 #############################################################################################################
 # Модель Пользователей
@@ -32,7 +38,7 @@ class Users(AbstractBaseUser):
     is_admin     = models.BooleanField(default=False, null=False)
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['']
+    REQUIRED_FIELDS = []
 
     objects = UserManager()
 
