@@ -7,25 +7,24 @@ class BaseParse(object):
         self.html = html
 
     # Стоимость и варианты оплаты (подписка/просмотр/бесплатно)
-    def get_price(self):
+    def get_price(self, **kwargs):
         raise NotImplementedError()
 
     # Доступные серии для просмотра
-    def get_seasons(self):
+    def get_seasons(self, **kwargs):
         raise NotImplementedError()
 
     # Ссылка на просмотр
-    def get_link(self):
+    def get_link(self, **kwargs):
         raise NotImplementedError()
 
     @classmethod
-    def parse(cls, response, dict_gen, film):
+    def parse(cls, response, dict_gen, film, **kwargs):
         obj = cls(response.content)
         resp_list = []
-        link = obj.get_link()
-        price = obj.get_price()
-        seasons = obj.get_seasons()
-        price_type = 'on...'
+        link = obj.get_link(**kwargs)
+        price, price_type = obj.get_price(**kwargs)
+        seasons = obj.get_seasons(**kwargs)
         if seasons:
             for season in seasons:
                 resp_dict = dict_gen(film)
