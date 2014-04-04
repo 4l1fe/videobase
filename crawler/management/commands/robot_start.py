@@ -14,7 +14,7 @@ from crawler.ivi_ru.loader import IVI_Loader
 from crawler.ivi_ru.parsers import ParseFilmPage
 from crawler.now_ru.loader import NOW_Loader
 from crawler.now_ru.parsers import ParseNowFilmPage
-from crawler.core.exseptions import *
+from crawler.core.exceptions import *
 from crawler.playfamily_dot_ru.loader import playfamily_loader
 from crawler.playfamily_dot_ru.parser import PlayfamilyParser
 from requests.exceptions import ConnectionError
@@ -23,6 +23,7 @@ from apps.robots.models import RobotsTries
 
 import logging
 import re
+import json
 from crawler import Robot
 
 # Список допустимых сайтов
@@ -176,9 +177,8 @@ class Command(BaseCommand):
         try:
             robot = Robot(films=film, **sites_crawler[site])
             for data in robot.get_data(sane_dict):
-                pass
-                # logging.debug("Trying to put data from %s for %s to db", site,str(data['film']))
-                # save_location(**data)
+                logging.debug("Trying to put data from %s for %s to db", site, str(data['film']))
+                save_location(**data)
         except ConnectionError, ce:
             # Couldn't conect to server
             m = re.match(".+host[=][']([^']+)['].+", ce.message.message)
@@ -228,7 +228,7 @@ class Command(BaseCommand):
                                    film=e.film,
                                    outcome=APP_ROBOTS_TRY_NO_SUCH_PAGE)
             robot_try.save()
-        except Exception ,e :
+        except Exception as e:
             # Most likely parsing error
             if site is None:
                 
@@ -241,5 +241,3 @@ class Command(BaseCommand):
             )
 
             robot_try.save()
-
-            
