@@ -1,6 +1,7 @@
 # coding: utf-8
 
 from django.db import models
+from django.contrib.auth.models import User
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 
 from ..constants import *
@@ -26,7 +27,7 @@ class UserManager(BaseUserManager):
 #############################################################################################################
 # Модель Пользователей
 class Users(AbstractBaseUser):
-
+    auth         = models.ForeignKey(User, verbose_name=u'')
     firstname    = models.CharField(max_length=255, verbose_name=u'Имя')
     lastname     = models.CharField(max_length=255, verbose_name=u'Фамилия')
     email        = models.EmailField(max_length=255, unique=True, verbose_name=u'Email')
