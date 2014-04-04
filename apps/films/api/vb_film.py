@@ -74,6 +74,15 @@ class ContentSerializer(serializers.ModelSerializer):
 
 #############################################################################################################
 #
+class vbExtrasSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = FilmExtras
+        fields = ('id', 'name', 'name_orig', 'type', 'description', 'url')
+
+
+#############################################################################################################
+#
 class vbFilmSerializer(serializers.HyperlinkedModelSerializer):
     countries = CountriesSerializer()
     genres = GentriesSerializer()
