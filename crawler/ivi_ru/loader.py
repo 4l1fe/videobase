@@ -1,5 +1,6 @@
 # coding: utf-8
-import requests
+from crawler.core.exseptions import NoSuchFilm
+
 import parsers
 from ..core import BaseLoader
 
@@ -16,14 +17,14 @@ class IVI_Loader(BaseLoader):
         # url для поиска фильмов
         self.search_url = URL_SEARCH
         # параметры для поиска
-        self.params = {'q': self.film.name, 'json': 1, 'limit': 1}
+        self.params = {'q': self.film.name + ' ', 'json': 1, 'limit': 1}
 
     # Поиск фильма
     def get_url(self, load_function):
         url = "http://%s/%s" % (self.host, self.search_url, )
-        response = load_function(url, params=self.params)
+        response = load_function(url, params=self.params, cache=False)
         film = parsers.parse_search(response)
         if film is None:
-            raise Exception()
+            raise NoSuchFilm(self.film)
         self.url_load = film['link']
         return "http://%s%s" % (self.host, self.url_load)
