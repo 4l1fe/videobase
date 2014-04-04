@@ -1,24 +1,21 @@
 # coding: utf-8
 
 from django.http import Http404
-
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
 from apps.films.models import Films
-
-from vb_film import vbFilmSerializer
+from apps.films.api.serializers import vbFilm
 
 
 #############################################################################################################
-#
 class DetailFilmView(APIView):
     """
-    Detailed information about film
+    Return detailed information about movie
     """
 
-    serializer_class = vbFilmSerializer
+    serializer_class = vbFilm
 
     def __get_object(self, pk):
         try:
@@ -29,7 +26,7 @@ class DetailFilmView(APIView):
 
     def __get_result(self, film_id, **kwargs):
         film = self.__get_object(film_id)
-        serializer = vbFilmSerializer(film, extend=True, persons=True)
+        serializer = vbFilm(film, extend=True, persons=True)
 
         return serializer
 

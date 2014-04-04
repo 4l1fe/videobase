@@ -1,21 +1,18 @@
 # coding: utf-8
 
 from django.http import Http404
-
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
 from apps.films.models import Films
-
-from vb_film import vbPersonsSerializer
+from apps.films.api.serializers import vbPerson
 
 
 #############################################################################################################
-#
 class PersonsFilmView(APIView):
     """
-    All persons by film
+    Returns all persons by film
     """
 
     def __get_result(self, film_id):
@@ -29,6 +26,6 @@ class PersonsFilmView(APIView):
 
     def get(self, request, film_id, format=None, *args, **kwargs):
         result = self.__get_result(film_id)
-        serializer = vbPersonsSerializer(result, extend=True)
+        serializer = vbPerson(result, extend=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
