@@ -19,7 +19,7 @@ class Locations(models.Model):
     url_view   = models.URLField(max_length=255, verbose_name=u'Ссылка для просмотра')
 
     def __unicode__(self):
-        return u'[{:s}] {:s} {:s}'.format(self.pk, self.content.name, self.type)
+        return u'[{0}] {1} {2}'.format(self.pk, self.content.name, self.type)
 
     class Meta:
         # Имя таблицы в БД

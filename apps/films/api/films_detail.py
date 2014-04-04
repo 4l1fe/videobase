@@ -11,11 +11,14 @@ from apps.films.models import Films
 from vb_film import vbFilmSerializer
 
 
-
+#############################################################################################################
+#
 class DetailFilmView(APIView):
-    serializer_class = vbFilmSerializer
-    allowed_methods = ['get', 'post']
+    """
+    Detailed information about film
+    """
 
+    serializer_class = vbFilmSerializer
 
     def __get_object(self, pk):
         try:
@@ -24,9 +27,9 @@ class DetailFilmView(APIView):
             raise Http404
 
 
-    def __get_result(self, film_id):
+    def __get_result(self, film_id, **kwargs):
         film = self.__get_object(film_id)
-        serializer = vbFilmSerializer(film)
+        serializer = vbFilmSerializer(film, persons=True)
 
         return serializer
 
@@ -34,10 +37,10 @@ class DetailFilmView(APIView):
     def post(self, request, film_id, format=None, *args, **kwargs):
         serializer = self.__get_result(film_id)
 
-        return Response({'test': 'test'}, status=status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
     def get(self, request, film_id, format=None, *args, **kwargs):
         serializer = self.__get_result(film_id)
 
-        return Response({'test': 'test'}, status=status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_200_OK)
