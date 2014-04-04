@@ -8,14 +8,14 @@ from rest_framework import status
 
 from apps.films.models import Films
 
-from vb_film import vbPersonsSerializer
+from vb_film import vbFilmSerializer
 
 
 #############################################################################################################
 #
-class PersonsFilmView(APIView):
+class SimilarFilmView(APIView):
     """
-    All persons by film
+    Return similar information by film
     """
 
     def __get_result(self, film_id):
@@ -29,6 +29,6 @@ class PersonsFilmView(APIView):
 
     def get(self, request, film_id, format=None, *args, **kwargs):
         result = self.__get_result(film_id)
-        serializer = vbPersonsSerializer(result, extend=True)
+        serializer = vbFilmSerializer(result, extend=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
