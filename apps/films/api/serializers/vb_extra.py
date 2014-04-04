@@ -1,12 +1,13 @@
 # coding: utf-8
 
 from rest_framework import serializers
-from apps.contents.models import Locations
+from apps.films.models import FilmExtras
 
 
 #############################################################################################################
 #
-class vbLocationsFilmSerializer(serializers.ModelSerializer):
+class vbExtra(serializers.ModelSerializer):
 
     class Meta:
-        model = Locations
+        model = FilmExtras
+        fields = ('id', 'name', 'name_orig', 'type', 'description', 'url')

@@ -6,13 +6,13 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from apps.films.models import Films, FilmExtras
-from apps.films.api.serializers import vbExtra
+from apps.films.api.serializers import vbComment
 
 
 #############################################################################################################
-class ExtrasFilmView(APIView):
+class CommentsFilmView(APIView):
     """
-    Returns extra information about movie
+    Returns to the movie comments
     """
 
     def __get_film_id(self, film_id):
@@ -37,8 +37,11 @@ class ExtrasFilmView(APIView):
 
 
     def post(self, request, film_id, format=None, *args, **kwargs):
-        type = request.DATA.get('type', False)
-        result = self.__get_result(film_id, type)
-        serializer = vbExtra(result)
+        page = request.DATA.get('page', 1)
+        per_page = request.DATA.get('per_page', 10)
+
+        result = self.__get_result(film_id, page, per_page)
+        serializer = vbComment(result)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
+
