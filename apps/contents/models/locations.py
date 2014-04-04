@@ -18,6 +18,19 @@ class Locations(models.Model):
     price_type = models.SmallIntegerField(choices=APP_CONTENTS_PRICE_TYPE, verbose_name=u'Тип цены')
     url_view   = models.URLField(max_length=255, verbose_name=u'Ссылка для просмотра')
 
+    def as_vbLocation(self):
+
+        return {'id':self.pk,
+                'type':str(self.type),
+                'lang':self.lang,
+                'quality':self.quality,
+                'subtitles':self.subtitles,
+                'price':str(self.price),
+                'price_type':str(self.type),
+                'value':self.value
+        }
+                
+        
     def __unicode__(self):
         return u'[{0}] {1} {2}'.format(self.pk, self.content.name, self.type)
 
