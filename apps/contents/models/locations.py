@@ -20,7 +20,7 @@ class Locations(models.Model):
 
 
     def __unicode__(self):
-        return u'[{:s}] {:s} {:s}'.format(self.pk, self.content.name, self.type)
+        return u'[{0}] {1} {2}'.format(self.pk, self.content.name, self.type)
 
     class Meta:
         # Имя таблицы в БД
