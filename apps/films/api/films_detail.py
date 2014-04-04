@@ -29,7 +29,7 @@ class DetailFilmView(APIView):
 
     def __get_result(self, film_id, **kwargs):
         film = self.__get_object(film_id)
-        serializer = vbFilmSerializer(film, persons=True)
+        serializer = vbFilmSerializer(film, extend=True, persons=True)
 
         return serializer
 
