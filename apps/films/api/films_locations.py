@@ -15,13 +15,14 @@ from vb_locations import vbLocationsFilmSerializer
 #
 class LocationsFilmView(APIView):
     """
-    All locations film
+    All locations by film
     """
 
     def __get_obj_content(self, film_id):
         try:
-            return Contents.objects.filter(film=film_id)[0]
-        except Exception as e:
+            content = Contents.objects.get(film=film_id)
+            return content.id
+        except Contents.DoesNotExist:
             raise Http404
 
 
@@ -32,7 +33,7 @@ class LocationsFilmView(APIView):
 
     def get(self, request, film_id, format=None, *args, **kwargs):
         content = self.__get_obj_content(film_id)
-        location = self.__get_all_locations(content.id)
+        location = self.__get_all_locations(content)
         serializer = vbLocationsFilmSerializer(location)
 
         return Response({'test': 'test'}, status=status.HTTP_200_OK)
