@@ -1,7 +1,7 @@
 '''
 Module for emulating browser
 '''
-from crawler.core.exseptions import RetrievePageException
+from crawler.core.exceptions import RetrievePageException
 
 import requests
 from urlparse import urlparse
