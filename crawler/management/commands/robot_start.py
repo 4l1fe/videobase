@@ -24,6 +24,7 @@ from apps.robots.models import RobotsTries
 import logging
 import re
 from crawler import Robot
+logging.basicConfig(level = logging.DEBUG)
 
 # Список допустимых сайтов
 sites = ('ivi.ru', 'zoomby.ru', 'now.ru', 'playfamily.ru', 'amediateka.ru')
@@ -100,6 +101,7 @@ def get_content(film, kwargs):
                            viewer_lastweek_cnt=0,
                            viewer_lastmonth_cnt=0)
         content.save()
+        return content
         
     else:
         if season_num is None:
@@ -173,14 +175,19 @@ class Command(BaseCommand):
         
         film = Films.objects.filter(id__in=range(start, start + count + 1))
         site = options['site']
+        logging.debug("Starting robot for %s", site)
         try:
+        #if True:
             robot = Robot(films=film, **sites_crawler[site])
             for data in robot.get_data(sane_dict):
-                pass
-                # logging.debug("Trying to put data from %s for %s to db", site,str(data['film']))
-                # save_location(**data)
+
+                logging.debug("Trying to put data from %s for %s to db", site,str(data['film']))
+                save_location(**data)
+        
+            
         except ConnectionError, ce:
             # Couldn't conect to server
+            logging.debug("Connection error")
             m = re.match(".+host[=][']([^']+)['].+", ce.message.message)
 
             host = m.groups()[0]
@@ -198,7 +205,7 @@ class Command(BaseCommand):
             
         except RetrievePageException, rexp:
             # Server responded but not 200
-
+            logging.debug("RetrievePageException")
             if site is None:
                 site = 'unknown'
 
@@ -211,7 +218,7 @@ class Command(BaseCommand):
             robot_try.save()
 
         except UnicodeDecodeError:
-
+            logging.debug("Unicode error")
             if site is None:
                 site = 'unknown'
 
@@ -229,6 +236,7 @@ class Command(BaseCommand):
                                    outcome=APP_ROBOTS_TRY_NO_SUCH_PAGE)
             robot_try.save()
         except Exception ,e :
+            logging.debug("Unknown exception %s",str(e))
             # Most likely parsing error
             if site is None:
                 

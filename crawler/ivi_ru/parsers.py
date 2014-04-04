@@ -1,6 +1,6 @@
 # coding: utf-8
 from ..core import BaseParse
-from ..core.constants import *
+from ..core.constants import APP_CRAWLER_PRICE_TYPE_FREE
 
 from bs4 import BeautifulSoup
 import json
