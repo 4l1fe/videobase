@@ -5,8 +5,10 @@ import rest_framework.fields
 
 from apps.films.models import Films, FilmExtras, Countries, Genres, PersonsFilms, Persons
 from apps.films.constants import APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER
-
 from apps.contents.models import Contents, Locations
+
+from utils.common import group_by, reindex_by, list_of
+from utils.middlewares.local_thread import get_current_request
 
 
 #############################################################################################################
@@ -33,8 +35,8 @@ class PersonsSerializer(serializers.ModelSerializer):
 
     def __init__(self, *args, **kwargs):
         new_fields = []
-        extend = kwargs.pop('extend', False)
 
+        extend = kwargs.pop('extend', False)
         if not extend:
             new_fields += ['bio']
 
@@ -58,22 +60,34 @@ class LocationsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Locations
-        exclude = ('content',)
+
+
+#############################################################################################################
+#
+class ContentSerializer(serializers.ModelSerializer):
+    film = LocationsSerializer()
+
+    class Meta:
+        model = Locations
+        fields = ('id', 'film',)
+
 
 
 #############################################################################################################
 #
 class vbFilmSerializer(serializers.HyperlinkedModelSerializer):
-    locations = LocationsSerializer()
     countries = CountriesSerializer()
     genres = GentriesSerializer()
     persons = PersonsSerializer()
     ratings = serializers.SerializerMethodField('calc_ratings')
+    locations = serializers.SerializerMethodField('locations_list')
+    poster = serializers.SerializerMethodField('poster_list')
+    relation = serializers.SerializerMethodField('relation_list')
 
     def __init__(self, *args, **kwargs):
         new_fields = []
-        extend = kwargs.pop('extend', False)
 
+        extend = kwargs.pop('extend', False)
         if not extend:
             new_fields += ['description', 'genres', 'countries']
 
@@ -97,17 +111,39 @@ class vbFilmSerializer(serializers.HyperlinkedModelSerializer):
             'cons': [0, 0],
         }
 
+    def locations_list(self, obj):
+        # Select contents by films
+        contents = Contents.objects.filter(film__in=[obj.pk]).values('id', 'film')
+        # result = LocationsSerializer(contents)
+        contents = list_of(contents, 'id', True, True)
+
+        # Select locations contents by contents
+        locations = Locations.objects.filter(content__in=contents)
+        locations = reindex_by(locations, 'content', True)
+
+        # Rebuild data
+        result = {}
+        for item in contents:
+            result[item.film] = LocationsSerializer(locations[item.id])
+
+        return result.get(obj.pk, [])
+
+    def poster_list(self, obj):
+        extras = FilmExtras.objects.filter(film__in=[obj.pk], etype=APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER)
+        extras = group_by(extras, 'id', True)
+
+        return [item.url for item in extras.get(obj.pk, []) if len(item.url)]
+
+    def relation_list(self, obj):
+        req =  get_current_request()
+        if req.user.is_authenticated():
+            pass
+
+        return []
 
     class Meta:
         model = Films
         fields = ['id', 'name', 'name_orig', 'release_date', \
-                  'ratings', 'duration', #'locations', 'relation', 'poster',
+                  'ratings', 'duration', 'locations', 'poster', 'relation', \
                   'description', 'countries', 'genres', 'persons',
                  ]
-    #
-    # def to_native(self, obj):
-    #     del self.fields['name']
-    #     return obj
-
-    def work(self):
-        pass
