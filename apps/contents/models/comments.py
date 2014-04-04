@@ -17,7 +17,7 @@ class Comments(models.Model):
 
 
     def __unicode__(self):
-        return u'[{:s}] {:s} ({:s})'.format(self.pk, self.user.name, self.content)
+        return u'[{0}] {1} ({2})'.format(self.pk, self.user.name, self.content)
 
     class Meta:
         # Имя таблицы в БД

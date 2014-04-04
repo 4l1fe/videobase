@@ -21,15 +21,18 @@ class vbFilm(ModelResource):
     poster    = fields.ListField(readonly=True)
     relation  = fields.DictField(readonly=True)
     locations = fields.ListField(readonly=True)
+    genres    = fields.DictField(readonly=True)
+    countries = fields.DictField(readonly=True)
 
     class Meta:
         object_class = Films
-        queryset = Films.get_film_type.all()
+        queryset = Films.objects.all()
 
         include_resource_uri = False
         always_return_data = True
         fields = ['id', 'name', 'name_orig', 'release_date', 'poster', \
-                  'relation', 'ratings', 'duration', 'locations',\
+                  'relation', 'ratings', 'duration', 'locations', \
+                  'description', 'genres', 'countries', 'persons' \
                  ]
 
     def wrap_view(self, view):
@@ -99,4 +102,10 @@ class vbFilm(ModelResource):
         if hasattr(obj, 'locations'):
             return obj.locations
 
+        return []
+
+    def prepend_urls(self):
+        return []
+
+    def base_urls(self):
         return []

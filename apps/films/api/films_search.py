@@ -26,7 +26,7 @@ class FilmsSearchResource(vbFilm):
     """
 
     class Meta(vbFilm.Meta):
-        allowed_methods = ['post', 'get']
+        allowed_methods = ['post']
         resource_name = 'films/search'
         validation = FormValidation(form_class=SearchForm)
 
@@ -69,7 +69,7 @@ class FilmsSearchResource(vbFilm):
             'total_cnt': page.paginator.num_pages,
             'per_page':  page.paginator.per_page,
             'page':      page.number,
-            'items':   bundles,
+            'items':     bundles,
         }
 
         return object_list
