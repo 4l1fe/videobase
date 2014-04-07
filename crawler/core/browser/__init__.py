@@ -36,7 +36,7 @@ if not lexists(''):
     os.mkdir(ljoin(''))
 
 
-def construct_path(urlstring):
+def construct_path(urlstring, kwargs):
     '''
     Constructing correct cache path for urlstring
     '''
@@ -51,10 +51,13 @@ def construct_path(urlstring):
     if not lexists(repath):
         os.mkdir(ljoin(repath))
 
-    if purl.query == '':
-        return join(ljoin(repath), 'cache')
+    if 'params' in kwargs or 'query' in kwargs:
+        return join(ljoin(repath), base64.urlsafe_b64encode(str(kwargs)))
     else:
-        return join(ljoin(repath), base64.urlsafe_b64encode(purl.query))
+        if purl.query == '':
+            return join(ljoin(repath), 'cache')
+        else:
+            return join(ljoin(repath), base64.urlsafe_b64encode(purl.query))
 
 
 def cache(func):
@@ -67,13 +70,7 @@ def cache(func):
         '''
 
         if (not 'cache' in kwargs) or kwargs['cache']:
-            try:
-                p = u'&'.join( key+u'='+value for key,value in kwargs['params'].items())
-                print p
-                cachepath = construct_path(url+ p if 'params' in kwargs else '')
-            except Exception,e:
-
-                print "Here",e
+                cachepath = construct_path(url,kwargs)
             if exists(cachepath):
                 logging.debug('Found cache for %s in %s. Returning cached copy', url, cachepath)
                 with open(cachepath) as fr:
