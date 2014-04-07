@@ -1,7 +1,5 @@
 # coding: utf-8
 """ Command to crawler sites"""
-from crawler.tvigle_ru.loader import TVIGLE_Loader
-from crawler.tvigle_ru.parsers import ParseTvigleFilm
 from crawler.zoomby_ru.loader import ZOOMBY_Loader
 from crawler.zoomby_ru.parsers import ParseFilm
 
@@ -22,12 +20,15 @@ from crawler.playfamily_dot_ru.parser import PlayfamilyParser
 from requests.exceptions import ConnectionError
 from apps.robots.constants import APP_ROBOTS_TRY_SITE_UNAVAILABLE, APP_ROBOTS_TRY_NO_SUCH_PAGE, APP_ROBOTS_TRY_PARSE_ERROR, APP_ROBOTS_TRY_SUCCESS
 from apps.robots.models import RobotsTries
+
 import logging
 import re
 import json
 from crawler import Robot
 logging.basicConfig(level = logging.DEBUG)
 
+# Список допустимых сайтов
+sites = ('ivi.ru', 'zoomby.ru', 'now.ru', 'playfamily.ru', 'amediateka.ru')
 
 # Словарь сайтов:
 # louder: загрузчик страници
@@ -180,16 +181,14 @@ class Command(BaseCommand):
         count = int(options['count'])
         
         film = Films.objects.filter(id__in=range(start, start + count + 1))
-        film = Films.objects.filter(id=75)
-        print film
         site = options['site']
+        logging.debug("Starting robot for %s", site)
         try:
+        #if True:
             robot = Robot(films=film, **sites_crawler[site])
             for data in robot.get_data(sane_dict):
                 logging.debug("Trying to put data from %s for %s to db", site, str(data['film']))
                 save_location(**data)
-        try:
-            pass
         except ConnectionError, ce:
             # Couldn't conect to server
             logging.debug("Connection error")
@@ -241,7 +240,6 @@ class Command(BaseCommand):
                                    outcome=APP_ROBOTS_TRY_NO_SUCH_PAGE)
             robot_try.save()
         except Exception ,e :
-            print e
             logging.debug("Unknown exception %s",str(e))
             # Most likely parsing error
             if site is None:
