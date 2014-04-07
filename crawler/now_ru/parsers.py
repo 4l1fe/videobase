@@ -8,13 +8,13 @@ COST = 0
 # Парсер для поисковика фильма
 def parse_search(response, film):
     searchTextTitle = 'Результаты поиска'.decode('utf-8')
-    filmDiv = None;
+    filmDiv = None
     exitFlag = False
     try:
         content = response.content
         soup = BeautifulSoup(content)
-        if(soup.select('div.noresults')==None):
-            return
+        if(soup.select('div.noresults')!= None):
+            return None
         if(searchTextTitle in soup.head.title.text):
             for tag in soup.select('div.play-about'):
                 if(exitFlag):
