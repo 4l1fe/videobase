@@ -37,7 +37,7 @@ sites_crawler = {
     'ivi.ru': {'loader': IVI_Loader,
                'parser': ParseFilmPage},
     'zoomby.ru': {'loader': ZOOMBY_Loader,
-                  'parser': ParseFilm},
+                  'parser': ParseFilm()},
     'megogo.net': {'loader': None,
                    'parser': None},
     'now.ru': {'loader': NOW_Loader,
@@ -173,12 +173,10 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         start = int(options['start'])
         count = int(options['count'])
-        
         film = Films.objects.filter(id__in=range(start, start + count + 1))
         site = options['site']
         logging.debug("Starting robot for %s", site)
         try:
-        #if True:
             robot = Robot(films=film, **sites_crawler[site])
             for data in robot.get_data(sane_dict):
                 logging.debug("Trying to put data from %s for %s to db", site, str(data['film']))
@@ -234,6 +232,7 @@ class Command(BaseCommand):
                                    outcome=APP_ROBOTS_TRY_NO_SUCH_PAGE)
             robot_try.save()
         except Exception ,e :
+            print e
             logging.debug("Unknown exception %s",str(e))
             # Most likely parsing error
             if site is None:
