@@ -29,6 +29,7 @@ def parse_search(response, film):
                 aTag = filmDiv.a
                 costDiv = filmDiv.find(attrs={'class':'watch_container'})
                 if(costDiv != None):
+                    global COST
                     COST = costDiv.span.getText().strip().split(' ')[0]
                 filmLink = HOST + aTag.get('href')
         else:
@@ -43,18 +44,17 @@ def parse_search(response, film):
 
 # Парсер для страници фильма
 class ParseNowFilmPage(object):
-    def parse(self, response, dict_gen, film):
+    def parse(self, response, dict_gen, film, url):
         d = dict_gen(film)
-        d['url_view'] = self.get_link()
+        d['url_view'] = url
         d['price_type'] = 0
         d['price'] = self.get_price()
-        print d
         return  [d]
     def get_price(self):
-       return 0
+       return COST
 
     def get_seasons(self):
         [0,]
 
     def get_link(self):
-       return FILM_URL
+       pass
