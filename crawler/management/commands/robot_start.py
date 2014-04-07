@@ -173,7 +173,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         start = int(options['start'])
         count = int(options['count'])
-        
         film = Films.objects.filter(id__in=range(start, start + count + 1))
         film = Films.objects.filter(id=1)
         site = options['site']
@@ -233,6 +232,7 @@ class Command(BaseCommand):
                                    outcome=APP_ROBOTS_TRY_NO_SUCH_PAGE)
             robot_try.save()
         except Exception ,e :
+            print e
             logging.debug("Unknown exception %s",str(e))
             # Most likely parsing error
             if site is None:
