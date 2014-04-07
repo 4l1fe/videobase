@@ -179,6 +179,7 @@ class Command(BaseCommand):
         count = int(options['count'])
         
         film = Films.objects.filter(id__in=range(start, start + count + 1))
+        film = Films.objects.filter(id=1)
         site = options['site']
         logging.debug("Starting robot for %s", site)
         try:
