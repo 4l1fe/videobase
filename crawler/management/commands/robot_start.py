@@ -45,9 +45,13 @@ sites_crawler = {
     'amediateka.ru': {'loader': None,
                       'parser': None},
     'playfamily.ru': {'loader': playfamily_loader,
-                      'parser': PlayfamilyParser()}
+                      'parser': PlayfamilyParser()},
+    'tvigle.ru':{'loader':TVIGLE_Loader,
+                 'parser':ParseTvigleFilm()}
 }
 
+# Список допустимых сайтов
+sites = sites_crawler.keys()
 
 def sane_dict(film=None):
 
@@ -233,6 +237,7 @@ class Command(BaseCommand):
                                    outcome=APP_ROBOTS_TRY_NO_SUCH_PAGE)
             robot_try.save()
         except Exception ,e :
+            print e
             logging.debug("Unknown exception %s",str(e))
             # Most likely parsing error
             if site is None:
