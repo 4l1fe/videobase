@@ -1,25 +1,29 @@
 from django.http import Http404
 from django.shortcuts import render
 from django.http import HttpResponse
-from apps.films.models import Persons,Films, FilmExtras, PersonsFilms, UsersPersons
-from apps.users.models import Users
-import re
-import os
-from PIL import Image, ImageEnhance
-from cStringIO import StringIO
 from django.core.files import File
-from apps.films.constants import APP_PERSON_PHOTO_DIR
 from django.template import Template, Context
 
 from django.core.context_processors import csrf
 from django.shortcuts import render_to_response
 
-
-# Create your views here.
-import warnings
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+
+
+from apps.films.models import Persons,Films, FilmExtras, PersonsFilms, UsersPersons,PersonsExtras
+from apps.films.constants import APP_PERSON_PHOTO_DIR
+import apps.films.models
+
+
+from cStringIO import StringIO
+from PIL import Image, ImageEnhance
+import re
+import os
+import warnings
+
+# Create your views here.
 
 def get_new_namestring(namestring):
 
@@ -101,9 +105,6 @@ def bri_con(d,im,request):
     return imc
 
 
-
-
-
 class PersonAPIView(APIView):
 
     def get(self, request, format = None,resource_id = None, extend = False ):
@@ -146,56 +147,67 @@ class PersonFilmographyAPIView(APIView):
 class PersonActionAPIView(APIView):
 
 
-    def __users_person_set(self,user,person_id,subscribed):
+    def __users_person_set(self,user,person,subscribed):
 
-            
-            p = Persons.objects.get(id = person_id)
-
-            try:
-                up = UsersPersons.objects.get(user = user,
-                                         person = p)
-                up.subscribed = subscribed
-            except:
-                up = UsersPersons(user = user,
-                                  person = p,
-                                  subscribed=subscribed,
-                                  upstatus=0 )
         
-    
-    def get(self, request, format = None, resource_id = None):
 
-        #try:
-        if True:
-            
-            self.__users_person_set(request.user,resource_id,1)
-            response = Response({'status':unicode(request.user)}, status=status.HTTP_200_OK)
-
-            return response
         try:
-            pass
+            up = UsersPersons.objects.get(user = user,
+                                          person = person)
+            up.subscribed = subscribed
+        except UsersPersons.DoesNotExist, ue:
+            up = UsersPersons(user = user,
+                              person = person,
+                              subscribed=subscribed,
+                              upstatus=0 )
+            up.save()
+        
+    def _response_template(self,subscribed, request, format = None, resource_id = None):
+        '''
+        Template for responses
+        '''
+        
+        try:
+            person = Persons.objects.get(id=resource_id)
+            self.__users_person_set(request.user, person, subscribed)
+            response = Response(None, status=status.HTTP_200_OK)
+            return response
+
         except Exception,e:
             print e
             raise Http404
             # Any URL parameters get passed in **kw
 
+            
+    def post(self, request, format = None, resource_id = None):
+        return self._response_template(1, request, format, resource_id)
+        
     def delete(self, request, format = None, resource_id = None):
+        return self._response_template(0, request, format, resource_id)
+
+
+class PersonsExtrasAPIView(APIView):
+
+    def get(self, request, format=None, resource_id=None, extend=False, type = None):
 
         try:
+            person = Persons.objects.get(id=resource_id)
+            if type is None:
+                pes = PersonsExtras.objects.filter(person = person)
+            else:
+                pes = PersonsExtras.objects.filter(person = person, type = type)
 
-            print 1
-            print resource_id
-            print 2
+            result = [pe.as_vbExtras for pe in pes]
             
-            self.__users_person_set(request.user,resource_id,0)
-            response = Response({'status':unicode(request.user)}, status=status.HTTP_200_OK)
-
+            response = Response(result, status=status.HTTP_200_OK)
             return response
+
         except Exception,e:
             print e
             raise Http404
             # Any URL parameters get passed in **kw
-
-
+        
+        
     
 def test_view(request):
 
