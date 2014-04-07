@@ -77,7 +77,6 @@ class LogEntryAdmin(admin.ModelAdmin):
 
 #############################################################################################################
 # Регистрация моделей в админке
-admin.site.register(Users, UsersAdmin)
 admin.site.register(UsersRels, UsersRelsAdmin)
 admin.site.register(UsersPics, UsersPicsAdmin)
 admin.site.register(LogEntry, LogEntryAdmin)
