@@ -1,4 +1,5 @@
 # coding: utf-8
+from crawler.core.exceptions import NoSuchFilm
 import requests
 import parsers
 import urllib
@@ -19,7 +20,7 @@ class NOW_Loader(BaseLoader):
         response = load_function(url, params=self.params)
         link = parsers.parse_search(response, self.film.name)
         if link is None:
-            raise Exception()
+            raise NoSuchFilm(self.film)
         self.url_load = link
         return self.url_load
 
