@@ -7,8 +7,6 @@ import admin_tools
 from videobase import settings
 
 from django.contrib import admin
-from apps.users.views import UserAccountView, RegistrationView
-from apps.users.forms import CustomRegistrationForm
 from apps.films.views import test_view
 admin.autodiscover()
 
@@ -23,7 +21,6 @@ urlpatterns = patterns('',
                        url(r'^api/', include('apps.films.urls')),
                        url(r'^api/robots/', 'apps.robots.views.schedule_api'),
                        url(r'^robots/', 'apps.robots.views.schedule_interface'),
-
                        url(r'^api/test',test_view),
 )
 
