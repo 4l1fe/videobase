@@ -67,7 +67,7 @@ def cache(func):
         '''
 
         if (not 'cache' in kwargs) or kwargs['cache']:
-            cachepath = construct_path(url)
+            cachepath = construct_path(url+kwargs['params'] if 'params' in kwargs else '')
             if exists(cachepath):
                 logging.debug('Found cache for %s in %s. Returning cached copy', url, cachepath)
                 with open(cachepath) as fr:
