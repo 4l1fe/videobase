@@ -13,33 +13,19 @@ from apps.films.views import test_view
 admin.autodiscover()
 
 urlpatterns = patterns('',
-                       url(r'^admin/users/', include('apps.users.urls')),
                        url(r'^admin_tools/', include('admin_tools.urls')),
                        url(r'^admin/', include(admin.site.urls)),
                        url(r'^admin_tools/', include('admin_tools.urls')),
                        url(r'^admin/', include(admin.site.urls)),
-                       url(r'^api/image/resize/','apps.films.views.resize_image'),
-                       url(r'^api/image/brco/','apps.films.views.bri_con'),
-                       url(r'^api/test',test_view),
+
+                       url(r'^api/image/resize/', 'apps.films.views.resize_image'),
+                       url(r'^api/image/brco/', 'apps.films.views.bri_con'),
                        url(r'^api/', include('apps.films.urls')),
-                       
-                       url(r'^api/robots/','apps.robots.views.schedule_api'),
-                       url(r'^robots/','apps.robots.views.schedule_interface'),
-                       url(r'^accounts/profile/', UserAccountView.as_view(), name='account_profile'),
+                       url(r'^api/robots/', 'apps.robots.views.schedule_api'),
+                       url(r'^robots/', 'apps.robots.views.schedule_interface'),
+
+                       url(r'^api/test',test_view),
 )
-urlpatterns += patterns('',
-
-                        url(
-                            r'^accounts/register/$',
-                            RegistrationView.as_view(
-                                form_class=CustomRegistrationForm,
-                            ),
-                            name='registration_register',
-                        ),
-
-                        (r'^accounts/', include('registration.urls')),
-                        (r'^admin/', include(admin.site.urls)),
-                    )
 
 if settings.DEBUG:
     urlpatterns += patterns('',

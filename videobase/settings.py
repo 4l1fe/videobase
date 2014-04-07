@@ -25,11 +25,9 @@ DEBUG = True
 
 TEMPLATE_DEBUG = DEBUG
 
-ALLOWED_HOSTS = ['*',]
+ALLOWED_HOSTS = ['*', ]
 
 ACCOUNT_ACTIVATION_DAYS = 2
-
-# AUTH_USER_MODEL = 'users.Users'
 
 AUTH_USER_EMAIL_UNIQUE = True
 
@@ -55,7 +53,6 @@ INSTALLED_APPS = (
     'django_extensions',
     'registration',
     'south',
-    #'tastypie',
     'rest_framework',
     'csvimport',
     'apps.users',
