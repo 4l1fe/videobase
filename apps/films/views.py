@@ -9,6 +9,11 @@ from PIL import Image, ImageEnhance
 from cStringIO import StringIO
 from django.core.files import File
 from apps.films.constants import APP_PERSON_PHOTO_DIR
+from django.template import Template, Context
+
+from django.core.context_processors import csrf
+from django.shortcuts import render_to_response
+
 
 # Create your views here.
 import warnings
@@ -141,19 +146,17 @@ class PersonFilmographyAPIView(APIView):
 class PersonActionAPIView(APIView):
 
 
-    def __users_person_set(user,person,subscribed):
+    def __users_person_set(self,user,person_id,subscribed):
 
-            u = Users.objects.get(auth = request.user)
-            p = Persons.objects.get(id = resource_id)
+            
+            p = Persons.objects.get(id = person_id)
 
-            up = UsersPerson.objects.get(user = u,
+            try:
+                up = UsersPersons.objects.get(user = user,
                                          person = p)
-
-            if up:
-                up.subscribed =subscribed
-            else:
-
-                up = UsersPersons(user = u,
+                up.subscribed = subscribed
+            except:
+                up = UsersPersons(user = user,
                                   person = p,
                                   subscribed=subscribed,
                                   upstatus=0 )
@@ -161,13 +164,91 @@ class PersonActionAPIView(APIView):
     
     def get(self, request, format = None, resource_id = None):
 
-        try:
+        #try:
+        if True:
             
-            response = Response({'status':unicode(u)}, status=status.HTTP_200_OK)
+            self.__users_person_set(request.user,resource_id,1)
+            response = Response({'status':unicode(request.user)}, status=status.HTTP_200_OK)
+
+            return response
+        try:
+            pass
+        except Exception,e:
+            print e
+            raise Http404
+            # Any URL parameters get passed in **kw
+
+    def delete(self, request, format = None, resource_id = None):
+
+        try:
+
+            print 1
+            print resource_id
+            print 2
+            
+            self.__users_person_set(request.user,resource_id,0)
+            response = Response({'status':unicode(request.user)}, status=status.HTTP_200_OK)
 
             return response
         except Exception,e:
             print e
             raise Http404
             # Any URL parameters get passed in **kw
-            
+
+
+    
+def test_view(request):
+
+
+    template = Template("""
+
+                        <html>
+                        <head>
+                        <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+                        </head>
+                        <body>
+                        <script>
+// Helper function for csrf
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+                        function csrfSafeMethod(method) {
+                            // these HTTP methods do not require CSRF protection
+                            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+                        }
+                        csrftoken =getCookie("csrftoken")
+                        $.ajaxSetup({
+                            crossDomain: false, // obviates need for sameOrigin test
+                            beforeSend: function(xhr, settings) {
+                                if (!csrfSafeMethod(settings.type)) {
+                                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                                }
+                             }
+                        });
+                        </script>
+                        {%csrf_token%}
+                        </body>
+                        </html>
+
+                        """)
+
+
+    c = Context({})
+    c.update(csrf(request))
+    
+    # ... view code here
+    return HttpResponse(template.render(c))
+
+    
