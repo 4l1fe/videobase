@@ -30,6 +30,7 @@ logging.basicConfig(level = logging.DEBUG)
 # Список допустимых сайтов
 sites = ('ivi.ru', 'zoomby.ru', 'now.ru', 'playfamily.ru', 'amediateka.ru')
 
+
 # Словарь сайтов:
 # louder: загрузчик страници
 # parser: парсер страници фильма
@@ -38,8 +39,8 @@ sites_crawler = {
                'parser': ParseFilmPage},
     'zoomby.ru': {'loader': ZOOMBY_Loader,
                   'parser': ParseFilm()},
-    'megogo.net': {'loader': None,
-                   'parser': None},
+    'megogo.net': {'loader': MEGOGO_Loader,
+                   'parser': ParseMegogoFilm},
     'now.ru': {'loader': NOW_Loader,
                'parser': ParseNowFilmPage()},
     'amediateka.ru': {'loader': None,
@@ -49,6 +50,7 @@ sites_crawler = {
     'tvigle.ru':{'loader':TVIGLE_Loader,
                  'parser':ParseTvigleFilm()}
 }
+sites = sites_crawler.keys()
 
 # Список допустимых сайтов
 sites = sites_crawler.keys()
@@ -177,13 +179,10 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         start = int(options['start'])
         count = int(options['count'])
-        
         film = Films.objects.filter(id__in=range(start, start + count + 1))
         film = Films.objects.filter(id=1)
         site = options['site']
-        logging.debug("Starting robot for %s", site)
         try:
-        #if True:
             robot = Robot(films=film, **sites_crawler[site])
             for data in robot.get_data(sane_dict):
                 logging.debug("Trying to put data from %s for %s to db", site, str(data['film']))
