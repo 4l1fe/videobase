@@ -1,5 +1,7 @@
 # coding: utf-8
 """ Command to crawler sites"""
+from crawler.tvigle_ru.loader import TVIGLE_Loader
+from crawler.tvigle_ru.parsers import ParseTvigleFilm
 from crawler.zoomby_ru.loader import ZOOMBY_Loader
 from crawler.zoomby_ru.parsers import ParseFilm
 
@@ -27,8 +29,6 @@ import json
 from crawler import Robot
 logging.basicConfig(level = logging.DEBUG)
 
-# Список допустимых сайтов
-sites = ('ivi.ru', 'zoomby.ru', 'now.ru', 'playfamily.ru', 'amediateka.ru')
 
 # Словарь сайтов:
 # louder: загрузчик страници
@@ -45,9 +45,13 @@ sites_crawler = {
     'amediateka.ru': {'loader': None,
                       'parser': None},
     'playfamily.ru': {'loader': playfamily_loader,
-                      'parser': PlayfamilyParser()}
+                      'parser': PlayfamilyParser()},
+    'tvigle.ru':{'loader':TVIGLE_Loader,
+                 'parser':ParseTvigleFilm()}
 }
 
+# Список допустимых сайтов
+sites = sites_crawler.keys()
 
 def sane_dict(film=None):
 
@@ -174,7 +178,7 @@ class Command(BaseCommand):
         start = int(options['start'])
         count = int(options['count'])
         film = Films.objects.filter(id__in=range(start, start + count + 1))
-        film = Films.objects.filter(id=1)
+        film = Films.objects.filter(id=9692)
         site = options['site']
         try:
             robot = Robot(films=film, **sites_crawler[site])
