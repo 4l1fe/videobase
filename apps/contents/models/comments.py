@@ -1,14 +1,13 @@
 # coding: utf-8
 
 from django.db import models
-
-from apps.users.models import Users
+from django.contrib.auth.models import User
 
 
 #############################################################################################################
 # Модель Комментариев
 class Comments(models.Model):
-    user       = models.ForeignKey(Users, verbose_name=u'Пользователь')
+    user       = models.ForeignKey(User, verbose_name=u'Пользователь')
     content    = models.IntegerField(verbose_name=u'Контент')
     text       = models.TextField(verbose_name=u'Tекст комментария')
     parent_id  = models.IntegerField(verbose_name=u'Родительский комментарий')
@@ -17,7 +16,7 @@ class Comments(models.Model):
 
 
     def __unicode__(self):
-        return u'[{:s}] {:s} ({:s})'.format(self.pk, self.user.name, self.content)
+        return u'[{0}] {1} ({2})'.format(self.pk, self.user.name, self.content)
 
     class Meta:
         # Имя таблицы в БД

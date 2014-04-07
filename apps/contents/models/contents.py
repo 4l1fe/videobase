@@ -21,7 +21,9 @@ class Contents(models.Model):
 
 
     def __unicode__(self):
-        return u'[{:d}] {:s}'.format(self.pk, self.film.name,)
+
+        return u'[{0}] {1}'.format(self.pk, self.film.name,)
+
 
     class Meta:
         # Имя таблицы в БД

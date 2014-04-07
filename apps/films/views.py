@@ -1,3 +1,4 @@
+from django.http import Http404
 from django.shortcuts import render
 from django.http import HttpResponse
 from apps.films.models import Persons,Films, FilmExtras
@@ -7,8 +8,12 @@ from PIL import Image, ImageEnhance
 from cStringIO import StringIO
 from django.core.files import File
 from apps.films.constants import APP_PERSON_PHOTO_DIR
+
 # Create your views here.
 import warnings
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
 
 def get_new_namestring(namestring):
 
@@ -20,7 +25,7 @@ def get_new_namestring(namestring):
         d = m.groupdict()
         return  '{:s}v{:d}.{:s}'.format(d['pre'],int(d['version']) +1,'png')
 
-
+      
 def image_refresh(func):
 
     def wrapper(request):
@@ -91,3 +96,41 @@ def bri_con(d,im,request):
 
 
 
+
+
+class PersonAPIView(APIView):
+
+    def get(self, request, format = None,resource_id = None, extend = False ):
+        # Process any get params that you may need
+        # If you don't need to process get params,
+        # you can skip this part
+        #extend = request.GET.get('extend', False)
+        #p = Persons.objects.get(pk = kw['resource_id'])
+        try:
+            p = Persons.objects.get(pk = resource_id)
+        except:
+            raise Http404
+            # Any URL parameters get passed in **kw
+        
+        response = Response(p.as_vBPerson(extend=='true'), status=status.HTTP_200_OK)
+        return response
+        
+
+class PersonFilmographyAPIView(APIView):
+
+    def get(self, request, format = None,resource_id = None, extend = False ):
+
+        try:
+            p = Persons.objects.get(pk = resource_id)
+
+            pfs = PersonFilms.objects.filter(person = p)
+
+            vbFilms = [pf.film.as_vbFilm() for pf in pfs]
+
+            
+        except:
+            raise Http404
+            # Any URL parameters get passed in **kw
+        
+        response = Response(vbFilms, status=status.HTTP_200_OK)
+        return response
