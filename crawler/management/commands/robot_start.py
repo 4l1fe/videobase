@@ -49,7 +49,6 @@ sites_crawler = {
     'tvigle.ru':{'loader':TVIGLE_Loader,
                  'parser':ParseTvigleFilm()}
 }
-sites = sites_crawler.keys()
 
 # Список допустимых сайтов
 sites = sites_crawler.keys()
@@ -181,6 +180,7 @@ class Command(BaseCommand):
         count = int(options['count'])
         
         film = Films.objects.filter(id__in=range(start, start + count + 1))
+        film = Films.objects.filter(id=1)
         site = options['site']
         logging.debug("Starting robot for %s", site)
         try:
