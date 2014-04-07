@@ -20,7 +20,6 @@ from crawler.playfamily_dot_ru.parser import PlayfamilyParser
 from requests.exceptions import ConnectionError
 from apps.robots.constants import APP_ROBOTS_TRY_SITE_UNAVAILABLE, APP_ROBOTS_TRY_NO_SUCH_PAGE, APP_ROBOTS_TRY_PARSE_ERROR, APP_ROBOTS_TRY_SUCCESS
 from apps.robots.models import RobotsTries
-
 import logging
 import re
 import json
@@ -36,7 +35,7 @@ sites_crawler = {
     'ivi.ru': {'loader': IVI_Loader,
                'parser': ParseFilmPage},
     'zoomby.ru': {'loader': ZOOMBY_Loader,
-                  'parser': ParseFilm},
+                  'parser': ParseFilm()},
     'megogo.net': {'loader': None,
                    'parser': None},
     'now.ru': {'loader': NOW_Loader,
@@ -133,6 +132,7 @@ def get_content(film, kwargs):
                                    viewer_lastweek_cnt=kwargs['viewer_cnt'],
                                    viewer_lastmonth_cnt=kwargs['viewer_cnt'])
                 content.save()
+
         return content
 
 
@@ -173,12 +173,17 @@ class Command(BaseCommand):
         count = int(options['count'])
         
         film = Films.objects.filter(id__in=range(start, start + count + 1))
+        film = Films.objects.filter(id=75)
+        print film
         site = options['site']
-        try:
+        #try:
+        if True:
             robot = Robot(films=film, **sites_crawler[site])
             for data in robot.get_data(sane_dict):
-                logging.debug("Trying to put data from %s for %s to db", site, str(data['film']))
+                logging.debug("Trying to put data from %s for %s to db", site,str(data['film']))
                 save_location(**data)
+        try:
+            pass
         except ConnectionError, ce:
             # Couldn't conect to server
             m = re.match(".+host[=][']([^']+)['].+", ce.message.message)
