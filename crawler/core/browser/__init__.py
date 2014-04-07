@@ -42,7 +42,7 @@ def construct_path(urlstring, kwargs):
     '''
 
     purl = urlparse(urlstring)
-    print purl
+    
     if not lexists(purl.netloc):
         os.mkdir(ljoin(purl.netloc))
 
