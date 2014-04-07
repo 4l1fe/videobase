@@ -1,7 +1,7 @@
 '''
 Module for emulating browser
 '''
-from crawler.core.exseptions import RetrievePageException
+from crawler.core.exceptions import RetrievePageException
 
 import requests
 from urlparse import urlparse
@@ -67,7 +67,7 @@ def cache(func):
         '''
 
         if (not 'cache' in kwargs) or kwargs['cache']:
-            cachepath = construct_path(url)
+            cachepath = construct_path(url+'&'.join(key+'='+value for key,value in kwargs['params'].items() if 'params' in kwargs else '')
             if exists(cachepath):
                 logging.debug('Found cache for %s in %s. Returning cached copy', url, cachepath)
                 with open(cachepath) as fr:

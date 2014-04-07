@@ -11,7 +11,7 @@ class Robots(models.Model):
     last_start  = models.DateTimeField(verbose_name=u'Дата последнего старта')
     next_start  = models.DateTimeField(verbose_name=u'Дата следующего старта')
     rstatus     = models.IntegerField(verbose_name=u'Статус')
-
+    state       = models.TextField(verbose_name=u'Состояние между запусками')
 
     def __unicode__(self):
         return u'[{0}] {1}'.format(self.pk, self.name,)
