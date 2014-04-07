@@ -1,8 +1,8 @@
 # coding: utf-8
 from crawler.core.exceptions import NoSuchFilm
 import string
-import parsers
 import re
+import parsers
 from ..core import BaseLoader
 
 HOST = 'www.megogo.net/ru'
