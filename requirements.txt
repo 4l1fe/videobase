@@ -15,7 +15,6 @@ FeedParser
 hg+https://bitbucket.org/izi/django-admin-tools
 git+git://github.com/ronnix/fabtools.git
 git+git://github.com/omab/django-social-auth.git
-hg+https://bitbucket.org/ubernostrum/django-registration
 pygraphviz
 pyparsing==1.5.7
 pydot
