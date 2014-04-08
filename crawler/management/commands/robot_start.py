@@ -178,7 +178,7 @@ class Command(BaseCommand):
         start = int(options['start'])
         count = int(options['count'])
         film = Films.objects.filter(id__in=range(start, start + count + 1))
-        film = Films.objects.filter(id=9692)
+        film = Films.objects.filter(id=13988)
         site = options['site']
         try:
             robot = Robot(films=film, **sites_crawler[site])
