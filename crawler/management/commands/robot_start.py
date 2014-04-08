@@ -1,5 +1,7 @@
 # coding: utf-8
 """ Command to crawler sites"""
+from crawler.tvigle_ru.loader import TVIGLE_Loader
+from crawler.tvigle_ru.parsers import ParseTvigleFilm
 from crawler.zoomby_ru.loader import ZOOMBY_Loader
 from crawler.zoomby_ru.parsers import ParseFilm
 
@@ -27,8 +29,6 @@ import json
 from crawler import Robot
 logging.basicConfig(level = logging.DEBUG)
 
-# Список допустимых сайтов
-sites = ('ivi.ru', 'zoomby.ru', 'now.ru', 'playfamily.ru', 'amediateka.ru')
 
 # Словарь сайтов:
 # louder: загрузчик страници
