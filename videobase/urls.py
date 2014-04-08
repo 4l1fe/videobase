@@ -8,6 +8,7 @@ from videobase import settings
 
 from django.contrib import admin
 from apps.films.views import test_view
+
 admin.autodiscover()
 
 urlpatterns = patterns('',
@@ -22,6 +23,7 @@ urlpatterns = patterns('',
                        url(r'^api/robots/', 'apps.robots.views.schedule_api'),
                        url(r'^robots/', 'apps.robots.views.schedule_interface'),
                        url(r'^api/test',test_view),
+                       url(r'^profile/', 'apps.users.views.profile_edit'),
 )
 
 if settings.DEBUG:
