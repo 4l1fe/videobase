@@ -87,6 +87,9 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.request',
 )
 
+TEMPLATE_DIRS = (os.path.join(BASE_DIR,'templates/'),)
+print TEMPLATE_DIRS
+
 ROOT_URLCONF = 'videobase.urls'
 
 WSGI_APPLICATION = 'videobase.wsgi.application'
@@ -140,6 +143,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
 MEDIA_ROOT = os.path.abspath(BASE_PATH + '/../static')
+print "BASE_PATH", BASE_PATH, MEDIA_ROOT
 MEDIA_URL = '/static/'
 
 STATIC_URL = '/production/static/'
