@@ -18,36 +18,33 @@ def profile_edit(request):
     if request.method == 'POST': # If the form has been submitted...
         # ContactForm was defined in the the previous section
         
-        form = UsersProfileEditForm(request.POST) #A form bound to the POST data
+        up_form = UsersProfileEditForm(request.POST) #A form bound to the POST data
+        u_form = UserEditForm(request.POST)
         
-        if form.is_valid(): # All validation rules pass
+        if up_form.is_valid(): # All validation rules pass
             # Process the data in form.cleaned_data
             # ...
-            pass
-        form3 = UserPicsEditForm(request.POST, request.FILES)    
-        if form3.is_valid():
-            try:
-                m = UsersPics.objects.get(user=request.user)
-            except UsersPics.DoesNotExist:
-                m= UsersPics(user = request.user)
-                
-            
-            m.url = form3.cleaned_data['url']
-            m.save()
+            up_form.save()
+        if u_form.is_valid():
+
+            form2.save()
+        upics_form = UserPicsEditForm(request.POST, request.FILES)    
+        if upics_form.is_valid():
+            upics_form.save()
             return HttpResponseRedirect('/profile/') # Redirect after POST
             
     else:
         
-        up = UsersProfile.objects.get(user=request.user)
+        uprofile = UsersProfile.objects.get(user=request.user)
         upic = UsersProfile.objects.get(user=request.user)
-        form = UsersProfileEditForm(instance=up)
-        form2 = UserEditForm(instance=request.user)
-        form3 = UserPicsEditForm(instance = upic)
+        uprofile_form = UsersProfileEditForm(instance=uprofile)
+        user_email_form = UserEditForm(instance=request.user)
+        user_pics_form = UserPicsEditForm(instance = upic)
 
     c = {
-        'form':form ,
-        'form2':form2,
-        'form3':form3,
+        'uprofile_form':uprofile_form,
+        'user_email_form':user_email_form,
+        'form3':user_pics_form,
     }
     c.update(csrf(request))    
     #return HttpResponseRedirect('/admin/')
