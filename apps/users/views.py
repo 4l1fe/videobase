@@ -29,8 +29,11 @@ def restore_password(request):
                                    {'password': password})
             msg = EmailMultiAlternatives(subject=SUBJECT_TO_RESTORE_PASSWORD, to=[to])
             msg.attach_alternative(tpl, 'text/html')
-        except User.DoesNotExist:
-            response = HttpResponseBadRequest()
+            msg.send(fail_silently=True)
+        except User.DoesNotExist as e:
+            response = HttpResponseBadRequest(e)
+        except Exception as e:
+            response = HttpResponseBadRequest(e)
     else:
         response = HttpResponseBadRequest()
 
