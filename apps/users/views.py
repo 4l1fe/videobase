@@ -11,13 +11,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.contrib.auth.models import User
 from django.http import HttpResponseBadRequest
 from django.template.loader import render_to_string
-from django.contrib.auth import login, authenticate
-from django.contrib.auth.backends import ModelBackend
-from django.http import Http404
 
-from rest_framework import status
-from rest_framework.views import APIView
-from rest_framework.response import Response
 
 def profile_edit(request):
 
@@ -85,18 +79,4 @@ def restore_password(request):
 
     return response
 
-class AuthorizeAPIView(APIView):
 
-    def get(self,request):
-
-        try:
-            
-           user = request.user             
-           user.backend = '%s.%s' % (ModelBackend.__module__,ModelBackend.__class__.__name__)
-           login(request, user)
-           response = Response(None, status=status.HTTP_200_OK)
-
-           return response
-        except Exception,e :
-            print(e)
-            raise Http404

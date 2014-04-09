@@ -8,7 +8,7 @@ from videobase import settings
 
 from django.contrib import admin
 from apps.films.views import test_view
-from apps.users.views import AuthorizeAPIView
+from apps.users.views import ObtainAuthToken
 
 admin.autodiscover()
 
@@ -26,7 +26,7 @@ urlpatterns = patterns('',
                        url(r'^profile/', 'apps.users.views.profile_edit'),
                        url(r'^users/', include('apps.users.urls')),
                        url(r'^auth/login/', 'rest_framework.authtoken.views.obtain_auth_token'),
-                       url(r'^auth/session', AuthorizeAPIView.as_view(), name = 'auth_rest_view'),                                              
+
 )
 
 if settings.DEBUG:
