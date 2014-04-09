@@ -147,7 +147,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
 MEDIA_ROOT = os.path.abspath(BASE_PATH + '/../static')
-print "BASE_PATH", BASE_PATH, MEDIA_ROOT
 MEDIA_URL = '/static/'
 
 STATIC_URL = '/production/static/'

@@ -21,8 +21,7 @@ urlpatterns = patterns('',
                        url(r'^api/', include('apps.films.urls')),
                        url(r'^api/robots/', 'apps.robots.views.schedule_api'),
                        url(r'^robots/', 'apps.robots.views.schedule_interface'),
-                       url(r'^api/test',test_view),
-                       url(r'^profile/', 'apps.users.views.profile_edit'),
+                       url(r'^api/test', test_view),
                        url(r'^users/', include('apps.users.urls'))
 
 )

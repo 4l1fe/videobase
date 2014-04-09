@@ -7,7 +7,7 @@ from ..constants import *
 
 class UsersProfile(models.Model):
     user         = models.OneToOneField(User, verbose_name=u'Пользователь', related_name='profile')
-    username     = models.CharField(max_length=128, verbose_name=u'Имя пользователя', default='NoneName')
+    nickname     = models.CharField(max_length=128, verbose_name=u'Имя пользователя', default='NoneName')
     phone        = models.CharField(max_length=12, verbose_name=u'Номер телефона', null=True, blank=True)
     last_visited = models.DateTimeField(verbose_name=u'Песледний визит', auto_now_add=True, blank=True)
     created      = models.DateTimeField(verbose_name=u'Время создания', auto_now_add=True, blank=True)
