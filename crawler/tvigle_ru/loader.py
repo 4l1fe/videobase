@@ -1,4 +1,5 @@
 # coding: utf-8
+from apps.films.constants import APP_FILM_SERIAL
 from crawler.core.exceptions import NoSuchFilm
 import requests
 import parsers
@@ -15,9 +16,12 @@ class TVIGLE_Loader(BaseLoader):
         self.search_url = 'category/search/?{}'.format(search_film)
 
     def get_url(self, load_function):
+        serial = False
         url = "http://%s/%s" % (self.host, self.search_url, )
         response = load_function(url)
-        filmLink = parsers.parse_search(response,self.film.name)
-        if filmLink is None:
+        if self.film.type == APP_FILM_SERIAL:
+            serial = True
+        film_link = parsers.parse_search(response, self.film.name, serial)
+        if film_link is None:
             raise NoSuchFilm(self.film)
-        return filmLink
+        return film_link
