@@ -180,7 +180,6 @@ class Command(BaseCommand):
         
         film = Films.objects.filter(id__in=range(start, start + count + 1))
         site = options['site']
-        logging.debug("Starting robot for %s", site)
         try:
             robot = Robot(films=film, **sites_crawler[site])
             for data in robot.get_data(sane_dict):

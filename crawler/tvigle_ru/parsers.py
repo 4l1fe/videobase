@@ -4,55 +4,72 @@ from bs4 import BeautifulSoup
 import re
 
 URL_FILM = ''
+SEASONS = [0,]
 
-
-def parse_search(response, filmName):
+def parse_search(response, film_name, serial):
     s = u'Сезон'
     mas = []
     reg = re.compile('(?P<season>'+ s +')[ ](?P<number>\d+)')
     try:
         soup = BeautifulSoup(response.content)
-        tag_h4 = soup.findAll('h4')
-        if(tag_h4 == None):
-            return None
-        for tag in tag_h4:
-            tagA = tag.a
-            if tagA == None:
-                continue
-            seasonName = tagA.text
-            if filmName in seasonName:
-                if u'Сезон' in seasonName:
-                    search = reg.search(seasonName)
-                    if int(search.group('number')) in mas:
-                        continue
-                    mas.append(int(search.group('number')))
-                    print mas
-
-        tag = soup.find('h4',text=filmName)
-        tagA = tag.a
-        filmLink = tagA.get('href')
+        url_seasons = None
+        if serial:
+            tag_seasons = soup.find('h4')
+            a_seasons = tag_seasons.a
+            url_seasons = a_seasons.get('href')
+            tag_h4 = soup.findAll('h4')
+            if tag_h4 is None:
+                return None
+            for tag in tag_h4:
+                tag_a = tag.a
+                if tag_a is None:
+                    continue
+                season_name = tag_a.text
+                if film_name in season_name:
+                    if u'Сезон' in season_name:
+                        search = reg.search(season_name)
+                        if int(search.group('number')) in mas:
+                            continue
+                        mas.append(int(search.group('number')))
+            global SEASONS
+            SEASONS = mas
+            film_link = url_seasons
+        if url_seasons is None:
+            tag = soup.find('h4', text=film_name)
+            tag_a = tag.a
+            film_link = tag_a.get('href')
 
     except:
-        filmLink = None
-    return filmLink
+        film_link = None
+    return film_link
 
 
 
 class ParseTvigleFilm(object):
     def __init__(self):
         pass
-    def parse(self, response, dict_gen, film,url):
-        d = dict_gen(film)
-        d['url_view'] = url
-        d['price_type'] = 0
-        d['price'] = self.get_price()
-        return  [d]
+    def parse(self, response, dict_gen, film, url):
+        resp_list = []
+        link = url
+        price = self.get_price()
+        seasons = self.get_seasons()
+        if seasons:
+            for season in seasons:
+                resp_dict = dict_gen(film)
+                resp_dict['number'] = season
+                resp_dict['value'] = link
+                resp_dict['url_view'] = link
+                resp_dict['price'] = price
+                resp_list.append(resp_dict)
+
+        return resp_list
 
     def get_price(self):
         return 0
 
     def get_seasons(self):
-        return [0.]
+        global SEASONS
+        return SEASONS
 
     def get_link(self):
         pass
