@@ -1,19 +1,29 @@
 from django.http import Http404
 from django.shortcuts import render
 from django.http import HttpResponse
-from apps.films.models import Persons,Films, FilmExtras
-import re
-import os
-from PIL import Image, ImageEnhance
-from cStringIO import StringIO
 from django.core.files import File
-from apps.films.constants import APP_PERSON_PHOTO_DIR
+from django.template import Template, Context
 
-# Create your views here.
-import warnings
+from django.core.context_processors import csrf
+from django.shortcuts import render_to_response
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+
+
+from apps.films.models import Persons,Films, FilmExtras, PersonsFilms, UsersPersons,PersonsExtras
+from apps.films.constants import APP_PERSON_PHOTO_DIR
+import apps.films.models
+
+
+from cStringIO import StringIO
+from PIL import Image, ImageEnhance
+import re
+import os
+import warnings
+
+# Create your views here.
 
 def get_new_namestring(namestring):
 
@@ -95,9 +105,6 @@ def bri_con(d,im,request):
     return imc
 
 
-
-
-
 class PersonAPIView(APIView):
 
     def get(self, request, format = None,resource_id = None, extend = False ):
@@ -123,14 +130,137 @@ class PersonFilmographyAPIView(APIView):
         try:
             p = Persons.objects.get(pk = resource_id)
 
-            pfs = PersonFilms.objects.filter(person = p)
+            pfs = PersonsFilms.objects.filter(person = p)
 
             vbFilms = [pf.film.as_vbFilm() for pf in pfs]
 
             
-        except:
+        except Exception,e:
+            print e
             raise Http404
             # Any URL parameters get passed in **kw
         
         response = Response(vbFilms, status=status.HTTP_200_OK)
         return response
+
+
+class PersonActionAPIView(APIView):
+
+
+    def __users_person_set(self,user,person,subscribed):
+
+        
+
+        try:
+            up = UsersPersons.objects.get(user = user,
+                                          person = person)
+            up.subscribed = subscribed
+        except UsersPersons.DoesNotExist, ue:
+            up = UsersPersons(user = user,
+                              person = person,
+                              subscribed=subscribed,
+                              upstatus=0 )
+            up.save()
+        
+    def _response_template(self,subscribed, request, format = None, resource_id = None):
+        '''
+        Template for responses
+        '''
+        
+        try:
+            person = Persons.objects.get(id=resource_id)
+            self.__users_person_set(request.user, person, subscribed)
+            response = Response(None, status=status.HTTP_200_OK)
+            return response
+
+        except Exception,e:
+            print e
+            raise Http404
+            # Any URL parameters get passed in **kw
+
+            
+    def post(self, request, format = None, resource_id = None):
+        return self._response_template(1, request, format, resource_id)
+        
+    def delete(self, request, format = None, resource_id = None):
+        return self._response_template(0, request, format, resource_id)
+
+
+class PersonsExtrasAPIView(APIView):
+
+    def get(self, request, format=None, resource_id=None, extend=False, type = None):
+
+        try:
+            person = Persons.objects.get(id=resource_id)
+            if type is None:
+                pes = PersonsExtras.objects.filter(person = person)
+            else:
+                pes = PersonsExtras.objects.filter(person = person, type = type)
+
+            result = [pe.as_vbExtras for pe in pes]
+            
+            response = Response(result, status=status.HTTP_200_OK)
+            return response
+
+        except Exception,e:
+            print e
+            raise Http404
+            # Any URL parameters get passed in **kw
+        
+        
+    
+def test_view(request):
+
+
+    template = Template("""
+
+                        <html>
+                        <head>
+                        <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+                        </head>
+                        <body>
+                        <script>
+// Helper function for csrf
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+                        function csrfSafeMethod(method) {
+                            // these HTTP methods do not require CSRF protection
+                            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+                        }
+                        csrftoken =getCookie("csrftoken")
+                        $.ajaxSetup({
+                            crossDomain: false, // obviates need for sameOrigin test
+                            beforeSend: function(xhr, settings) {
+                                if (!csrfSafeMethod(settings.type)) {
+                                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                                }
+                             }
+                        });
+                        </script>
+                        {%csrf_token%}
+                        </body>
+                        </html>
+
+                        """)
+
+
+    c = Context({})
+    c.update(csrf(request))
+    
+    # ... view code here
+    return HttpResponse(template.render(c))
+
+    
