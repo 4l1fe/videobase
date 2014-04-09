@@ -2,6 +2,7 @@
 from django.http import HttpResponseBadRequest, HttpResponse, HttpResponseRedirect
 from django.views.generic import CreateView, TemplateView
 from django.template.loader import render_to_string
+from django.shortcuts import render_to_response
 from django.core.context_processors import csrf
 from django.core.mail import EmailMultiAlternatives
 from django.contrib.auth.models import User
@@ -43,21 +44,23 @@ class RegisterUserView(CreateView):
 
 
 def restore_password(request):
-    response = HttpResponse(status=200)
+    resp_dict = {}
+    resp_dict.update(csrf(request))
+    response = render_to_response('restore_password_form.html',)
     if request.method == 'POST' and 'to' in request.POST:
         to = request.POST['to']
         try:
             user = User.objects.get(username=to)
             password = User.objects.make_random_password()
             user.set_password(password)
-            tpl = render_to_string('restore_password.html',
+            tpl = render_to_string('restore_password_email.html',
                                    {'password': password})
             msg = EmailMultiAlternatives(subject=SUBJECT_TO_RESTORE_PASSWORD, to=[to])
             msg.attach_alternative(tpl, 'text/html')
-        except User.DoesNotExist:
-            response = HttpResponseBadRequest()
-    else:
-        response = HttpResponseBadRequest()
+        except User.DoesNotExist as e:
+            response = HttpResponseBadRequest(e)
+        except Exception as e:
+            response = HttpResponseBadRequest(e)
 
     return response
 
