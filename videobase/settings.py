@@ -60,7 +60,6 @@ INSTALLED_APPS = (
     'apps.films',
     'apps.contents',
     'crawler',
-    'rest_framework',
     'social_auth'
 )
 
