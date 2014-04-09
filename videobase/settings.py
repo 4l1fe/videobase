@@ -53,6 +53,7 @@ INSTALLED_APPS = (
     'django_extensions',
     'south',
     'rest_framework',
+    'rest_framework.authtoken',
     'csvimport',
     'apps.users',
     'apps.robots',
@@ -158,7 +159,12 @@ REST_FRAMEWORK = {
   'DEFAULT_RENDERER_CLASSES': (
     'rest_framework.renderers.XMLRenderer',
     'rest_framework.renderers.JSONRenderer',
-  )
+  ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+    )
 }
 
 # Backends for social auth
@@ -170,6 +176,7 @@ AUTHENTICATION_BACKENDS = (
     'social_auth.backends.contrib.odnoklassniki.OdnoklassnikiBackend',
     'social_auth.backends.contrib.mailru.MailruBackend',
     'django.contrib.auth.backends.ModelBackend',
+    'rest_framework.authentication.TokenAuthentication',
 )
 
 # Перечислим pipeline, которые последовательно буду обрабатывать респонс

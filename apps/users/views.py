@@ -1,11 +1,10 @@
 # coding: utf-8
 from django.http import HttpResponseBadRequest, HttpResponse, HttpResponseRedirect
-from django.core.context_processors import csrf
 from django.views.generic import CreateView, TemplateView
 from django.template.loader import render_to_string
+from django.core.context_processors import csrf
 from django.core.mail import EmailMultiAlternatives
 from django.contrib.auth.models import User
-
 
 from constants import SUBJECT_TO_RESTORE_PASSWORD
 from .forms import UsersProfileForm, CustomRegisterForm
@@ -61,4 +60,5 @@ def restore_password(request):
         response = HttpResponseBadRequest()
 
     return response
+
 
