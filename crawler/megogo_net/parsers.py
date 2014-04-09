@@ -4,6 +4,8 @@ from bs4 import BeautifulSoup
 from apps.contents.constants import *
 import re
 import json
+
+
 def parse_search(response, filmName):
     regFilmname = re.compile('(?P<name>.+)[ ][(](?P<year>[0-9]{4})[)]')
     search_film = None
@@ -17,6 +19,7 @@ def parse_search(response, filmName):
     except IndexError:
         search_film = None
     return search_film
+
 
 class ParseMegogoFilm(BaseParse):
     def __init__(self, html):
