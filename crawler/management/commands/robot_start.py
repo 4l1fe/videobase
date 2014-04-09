@@ -43,7 +43,7 @@ sites_crawler = {
     'megogo.net': {'loader': MEGOGO_Loader,
                    'parser': ParseMegogoFilm},
     'now.ru': {'loader': NOW_Loader,
-               'parser': ParseNowFilmPage()},
+               'parser': ParseNowFilmPage},
     'amediateka.ru': {'loader': None,
                       'parser': None},
     'playfamily.ru': {'loader': playfamily_loader,
@@ -176,7 +176,7 @@ class Command(BaseCommand):
         start = int(options['start'])
         count = int(options['count'])
         film = Films.objects.filter(id__in=range(start, start + count + 1))
-#        film = Films.objects.filter(id=380)
+        film = Films.objects.filter(id=35589)
         site = options['site']
         if True:
         #try:

@@ -9,6 +9,7 @@ HOST = 'www.megogo.net/ru'
 URL_SEARCH = 'searchhint'
 URL_LOAD = ''
 
+
 class MEGOGO_Loader(BaseLoader):
     def __init__(self,  film, host=HOST, url_load=URL_LOAD):
         super(MEGOGO_Loader, self).__init__(film, host, url_load)
