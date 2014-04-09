@@ -18,7 +18,7 @@ class UsersAdmin(admin.ModelAdmin):
 #############################################################################################################
 # Администрирование таблицы пользователей
 class UsersProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'username', 'phone', 'last_visited', 'created', 'status', 'userpic_type', 'userpic_id')
+    list_display = ('user', 'nickname', 'phone', 'last_visited', 'created', 'status', 'userpic_type', 'userpic_id')
     search_fields = ('user', 'created', 'status')
     list_per_page = 30
 
