@@ -1,17 +1,24 @@
 # coding: utf-8
 
 from django.db import models
+from django.contrib.auth.models import User
+
+from ..constants import APP_USER_PIC_DIR
+from utils.common import get_image_path
 
 
 #############################################################################################################
 # Модель пользовательских картинок
 class UsersPics(models.Model):
-    user = models.ForeignKey('Users', verbose_name=u'Пользователь')
-    url  = models.CharField(max_length=255, verbose_name=u'Url')
+    user  = models.ForeignKey(User, verbose_name=u'Пользователь', related_name='pics')
+    image = models.ImageField(upload_to=get_image_path, verbose_name=u'Аватарка')
 
+    @property
+    def get_upload_to(self):
+        return APP_USER_PIC_DIR
 
     def __unicode__(self):
-        return u'[%s] %s : %s' % (self.pk, self.user.name, self.url)
+        return u'[%s] %s : %s' % (self.pk, self.user, self.image.name, )
 
     class Meta:
         # Имя таблицы в БД

@@ -2,9 +2,15 @@
 
 from django.conf.urls import patterns, url
 
-from apps.users.views import LogentrySummaryView
+from .views import RegisterUserView, ProfileEdit
 
+urlpatterns = patterns('apps.users.views',
+    # Регистрация
+    (r'^register/$', RegisterUserView.as_view()),
 
-urlpatterns = patterns('',
-                       url(r'^logentry_summary/$', LogentrySummaryView.as_view(), name='logentry_summary'),
+    # Востановление пароля
+    (r'^restore_password/$', 'restore_password'),
+
+    # Редоктирование профиля
+    (r'^profile/$', ProfileEdit.as_view()),
 )

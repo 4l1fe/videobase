@@ -12,7 +12,7 @@ class Robot(object):
         for film in self.loaders:
             time.sleep(random.randint(1, 16))
             d = self.loaders[film].load()
-            for data in self.parser.parse(d['html'], dict_gen, film):
+            for data in self.parser.parse(d['html'], dict_gen, film, url=d['url']):
                 data['url_source'] = d['url']
                 yield data
 

@@ -26,3 +26,5 @@ APP_USER_PIC_TYPES = (
     ('SOCIAL', 'Из социальных сетей'),
     ('LOCAL', 'Сохранные изображения')
 )
+
+SUBJECT_TO_RESTORE_PASSWORD = u'Востановление пароля'
