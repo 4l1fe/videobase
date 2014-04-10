@@ -19,7 +19,7 @@ class ActCommentFilmView(APIView):
         Return object Films or Response object with 404 error
         """
         try:
-            result = Films.objects.get(pk=film_id)
+            result = Contents.objects.get(film=film_id)
         except Films.DoesNotExist:
             result = Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -30,14 +30,9 @@ class ActCommentFilmView(APIView):
         form = CommentForm(request.DATA)
         if form.is_valid():
             # Выбираем и проверяем, что фильм существует
-            o_film = self.__get_object(film_id)
-            if type(o_film) == Response:
-                return o_film
-
-            try:
-                o_content = Contents.objects.get(film=o_film.pk)
-            except:
-                return Response(status=status.HTTP_404_NOT_FOUND)
+            o_content = self.__get_object(film_id)
+            if type(o_content) == Response:
+                return o_content
 
             # Init data
             filter = {

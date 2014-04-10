@@ -13,7 +13,7 @@ class Comments(models.Model):
     content    = models.ForeignKey('Contents', verbose_name=u'Контент')
     text       = models.TextField(verbose_name=u'Tекст комментария')
     parent_id  = models.IntegerField(null=True, blank=True, verbose_name=u'Родительский комментарий')
-    status     = models.SmallIntegerField(null=True, blank=True, choices=APP_CONTENTS_COMMENT_STATUS, verbose_name=u'Статус')
+    status     = models.PositiveIntegerField(null=True, blank=True, choices=APP_CONTENTS_COMMENT_STATUS, verbose_name=u'Статус')
     created    = models.DateTimeField(auto_now_add=True, verbose_name=u'Создан')
 
 
