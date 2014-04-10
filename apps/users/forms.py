@@ -1,40 +1,72 @@
+# coding: utf-8
+
+
+from django.forms import ModelForm
+from .models import UsersProfile, UsersPics
+from django.contrib.auth.models import User
 from django import forms
-from django.utils.translation import ugettext_lazy as _
+from .models import User, UsersProfile
 
-class CustomRegistrationForm(forms.Form):
 
-    required_css_class = 'required'
+class UsersProfileForm(forms.Form):
+    nickname  = forms.CharField(label=u'Имя пользователя', max_length=128, required=False)
+    email     = forms.EmailField(label=u'Email', required=False)
+    phone     = forms.CharField(label=u'Телефон', max_length=13, required=False)
+    image     = forms.ImageField(label=u'Аватарка', required=False)
 
-    firstname = forms.CharField(label=_("firstname"), required=False)
-    lastname = forms.CharField(label=_("lastname"), required=False)
+    def __init__(self, user, **kwargs):
+        super(UsersProfileForm, self).__init__(**kwargs)
+        self.user = user
+        self.profile = user.profile
+        self.fields['nickname'].initial = user.profile.nickname
+        self.fields['email'].initial = user.email
+        self.fields['phone'].initial = user.profile.phone
+        try:
+            default = UsersPics.objects.get(pk=user.profile.userpic_id)
+        except UsersPics.DoesNotExist:
+            default = None
+        kwargs = {}
+        if default:
+            kwargs['empty_label'] = default
+        self.fields['user_pic'] = forms.ModelChoiceField(queryset=user.pics.all(), label=u'Выбор аватарки', required=False, **kwargs)
 
-    email = forms.EmailField(label=_("E-mail"))
-    password1 = forms.CharField(widget=forms.PasswordInput,
-                                label=_("Password"))
-    password2 = forms.CharField(widget=forms.PasswordInput,
-                                label=_("Password (again)"))
+    def save(self):
+        self.profile.phone = self.cleaned_data['phone']
+        self.profile.nickname = self.cleaned_data['nickname']
+        self.user.email = self.user.username = self.cleaned_data['email']
+        if self.cleaned_data['image']:
+            pic = UsersPics(user=self.user, image=self.cleaned_data['image'])
+            pic.save()
+        if self.cleaned_data['user_pic']:
+            self.profile.userpic_id = self.cleaned_data['user_pic'].pk
 
-    def clean_username(self):
-        """
-        Validate that the username is alphanumeric and is not already
-        in use.
+        self.profile.save()
+        self.user.save()
 
-        """
-        existing = User.objects.filter(username__iexact=self.cleaned_data['username'])
-        if existing.exists():
-            raise forms.ValidationError(_("A user with that username already exists."))
-        else:
-            return self.cleaned_data['username']
+
+class CustomRegisterForm(forms.ModelForm):
+    real_username = forms.CharField(label='Имя', max_length=128, required=False)
+
+    def __init__(self, **kwargs):
+        super(CustomRegisterForm, self).__init__(**kwargs)
+        self.fields['username'].required = False
 
     def clean(self):
-        """
-        Verifiy that the values entered into the two password fields
-        match. Note that an error here will end up in
-        ``non_field_errors()`` because it doesn't apply to a single
-        field.
+        self.cleaned_data['username'] = self.cleaned_data['email']
+        return super(CustomRegisterForm, self).clean()
 
-        """
-        if 'password1' in self.cleaned_data and 'password2' in self.cleaned_data:
-            if self.cleaned_data['password1'] != self.cleaned_data['password2']:
-                raise forms.ValidationError(_("The two password fields didn't match."))
-        return self.cleaned_data
+    def save(self, commit=True):
+        instance = super(CustomRegisterForm, self).save(commit)
+        username = self.cleaned_data.get('real_username', None)
+        if username is not None:
+            UsersProfile.objects.create(username=username, user=instance)
+        return instance
+
+    class Meta:
+        model = User
+        fields = ['email', 'password', 'username']
+        widgets = {
+            'password': forms.PasswordInput(),
+            'username': forms.HiddenInput(),
+        }
+

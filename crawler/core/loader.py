@@ -1,7 +1,7 @@
 # coding: utf-8
 
 from ..core.browser import simple_get
-
+from crawler.core.exceptions import RetrievePageException
 
 # Базовый класс загрузчика страници
 class BaseLoader(object):
@@ -21,6 +21,9 @@ class BaseLoader(object):
 
     # сама функция загрузки
     def load(self, load_function=simple_get):
-        url = self.get_url(load_function)
-        return {'html': load_function(url), 'url': url}
+        try:
+            url = self.get_url(load_function)
+            return {'html': load_function(url), 'url': url}
+        except RetrievePageException as e:
+            raise RetrievePageException(url=e.url, status_code=e.status_code, film=self.film)
 
