@@ -14,6 +14,11 @@ v1_api_patterns = patterns('',
     url(r'^v1/films/(?P<film_id>\d+)/semilar?$', SimilarFilmView.as_view(), name='film_semilar_view'),
     url(r'^v1/films/(?P<film_id>\d+)/extras?$', ExtrasFilmView.as_view(), name='film_extras_view'),
     url(r'^v1/films/(?P<film_id>\d+)/comments?$', CommentsFilmView.as_view(), name='film_comments_view'),
+    url(r'^v1/films/(?P<film_id>\d+)/action/subscribe?$', ActSubscribeFilmView.as_view(), name='act_film_subscribe_view'),
+    url(r'^v1/films/(?P<film_id>\d+)/action/playlist?$', ActPlaylistFilmView.as_view(), name='act_film_playlist_view'),
+    url(r'^v1/films/(?P<film_id>\d+)/action/notwatch?$', ActNotwatchFilmView.as_view(), name='act_film_notwatch_view'),
+    url(r'^v1/films/(?P<film_id>\d+)/action/rate?$', ActRateFilmView.as_view(), name='act_film_rate_view'),
+    url(r'^v1/films/(?P<film_id>\d+)/action/comment?$', ActCommentFilmView.as_view(), name='act_film_rate_view'),
 )
 
 # Format suffixes
