@@ -1,7 +1,11 @@
 # coding: utf-8
-from django import forms
 
+
+from django.forms import ModelForm
 from .models import UsersProfile, UsersPics
+from django.contrib.auth.models import User
+from django import forms
+from .models import User, UsersProfile
 
 
 class UsersProfileForm(forms.Form):
@@ -57,4 +61,12 @@ class CustomRegisterForm(forms.ModelForm):
         if username is not None:
             UsersProfile.objects.create(username=username, user=instance)
         return instance
+
+    class Meta:
+        model = User
+        fields = ['email', 'password', 'username']
+        widgets = {
+            'password': forms.PasswordInput(),
+            'username': forms.HiddenInput(),
+        }
 

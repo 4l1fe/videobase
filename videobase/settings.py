@@ -60,7 +60,6 @@ INSTALLED_APPS = (
     'apps.films',
     'apps.contents',
     'crawler',
-    'rest_framework',
     'social_auth'
 )
 
@@ -91,8 +90,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 
 
 TEMPLATE_DIRS = (
-    os.path.join(BASE_DIR, 'tpls'),
-    os.path.join(BASE_DIR,'templates/'),
+    os.path.join(BASE_DIR, 'templates/'),
 )
 
 ROOT_URLCONF = 'videobase.urls'
