@@ -71,7 +71,7 @@ class vbFilm(serializers.HyperlinkedModelSerializer):
             new_fields += ['persons']
 
         # Instantiate the superclass normally
-        super(vbFilmSerializer, self).__init__(*args, **kwargs)
+        super(vbFilm, self).__init__(*args, **kwargs)
 
         if len(new_fields):
             # Drop keys if they exist
