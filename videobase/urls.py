@@ -8,7 +8,7 @@ from videobase import settings
 
 from django.contrib import admin
 from apps.films.views import test_view
-from apps.users.views import ObtainAuthToken
+
 
 admin.autodiscover()
 
