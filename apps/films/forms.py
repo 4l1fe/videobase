@@ -58,7 +58,6 @@ class FilmsAdminForm(ModelForm):
         model = Films
 
 
-
 #############################################################################################################
 # Форма поиска
 class SearchForm(Form):
@@ -73,3 +72,21 @@ class SearchForm(Form):
 
     class Meta:
         fields = ('text', 'genre', 'year_old', 'rating', 'price', 'per_page', 'page', 'instock',)
+
+
+#############################################################################################################
+class RatingForm(Form):
+    """
+    Форма рейтинга для фильмов
+    """
+
+    rating = fields.IntegerField(min_value=1, max_value=10, help_text=u'Оценка')
+
+
+#############################################################################################################
+class CommentForm(Form):
+    """
+    Форма рейтинга для фильмов
+    """
+
+    text = fields.CharField(max_length=255, help_text=u'Комментарий')

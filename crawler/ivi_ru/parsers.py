@@ -45,7 +45,7 @@ class ParseFilmPage(BaseParse):
             seasons_div_tag = self.soup.find_all('div', {'class': 'series-block'})
             seasons_number = seasons_div_tag.find('div', {'class': 'seasons-list-block'}).\
                 find('li')
-            return range(len(seasons_number))
+            return range(1, len(seasons_number)+1)
         else:
             return [0]
 

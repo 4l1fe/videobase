@@ -215,3 +215,12 @@ def init_if_not_exists_task():
         with cd('/var/lib/postgresql'):
             if not (str(sudo('''echo "select rolname from pg_roles where rolname = 'pgadmin';" |psql -tA''')).strip()):
                 init_db()
+
+
+def scheme():
+
+    local('python ./manage.py graph_models -a -g -o current.png')
+
+def show_scheme():
+    scheme()
+    local('feh current.png')

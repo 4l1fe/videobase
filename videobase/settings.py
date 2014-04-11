@@ -51,16 +51,16 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_extensions',
-    'registration',
     'south',
     'rest_framework',
+    'rest_framework.authtoken',
     'csvimport',
     'apps.users',
     'apps.robots',
     'apps.films',
     'apps.contents',
     'crawler',
-    'rest_framework',
+    'social_auth'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -85,6 +85,12 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.media',
     'django.contrib.messages.context_processors.messages',
     'django.core.context_processors.request',
+)
+
+
+
+TEMPLATE_DIRS = (
+    os.path.join(BASE_DIR, 'templates/'),
 )
 
 ROOT_URLCONF = 'videobase.urls'
@@ -151,5 +157,41 @@ REST_FRAMEWORK = {
   'DEFAULT_RENDERER_CLASSES': (
     'rest_framework.renderers.XMLRenderer',
     'rest_framework.renderers.JSONRenderer',
-  )
+  ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+    )
 }
+
+# Backends for social auth
+AUTHENTICATION_BACKENDS = (
+    'social_auth.backends.twitter.TwitterBackend',
+    'social_auth.backends.facebook.FacebookBackend',
+    'social_auth.backends.contrib.vk.VKOAuth2Backend',
+    'social_auth.backends.google.GoogleOAuth2Backend',
+    'social_auth.backends.contrib.odnoklassniki.OdnoklassnikiBackend',
+    'social_auth.backends.contrib.mailru.MailruBackend',
+    'django.contrib.auth.backends.ModelBackend',
+    'rest_framework.authentication.TokenAuthentication',
+)
+
+# Перечислим pipeline, которые последовательно буду обрабатывать респонс
+SOCIAL_AUTH_PIPELINE = (
+    # Получает по backend и uid инстансы social_user и user
+    'social_auth.backends.pipeline.social.social_auth_user',
+    # Получает по user.email инстанс пользователя и заменяет собой тот, который получили выше.
+    # Кстати, email выдает только Facebook и GitHub, а Vkontakte и Twitter не выдают
+    'social_auth.backends.pipeline.associate.associate_by_email',
+    # Пытается собрать правильный username, на основе уже имеющихся данных
+    'social_auth.backends.pipeline.user.get_username',
+    # Создает нового пользователя, если такого еще нет
+    'social_auth.backends.pipeline.user.create_user',
+    # Пытается связать аккаунты
+    'social_auth.backends.pipeline.social.associate_user',
+    # Получает и обновляет social_user.extra_data
+    'social_auth.backends.pipeline.social.load_extra_data',
+    # Обновляет инстанс user дополнительными данными с бекенда
+    'social_auth.backends.pipeline.user.update_user_details'
+)
