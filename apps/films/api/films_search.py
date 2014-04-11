@@ -35,7 +35,7 @@ class SearchFilmsView(APIView):
             filter.update({'year_old': data['year_old']})
 
         if data.get('genre'):
-            filter.update({'genre': data['genre']})
+            filter.update({'genres': data['genre']})
 
         if data.get('rating'):
             filter.update({'rating': data['rating']})
@@ -66,8 +66,8 @@ class SearchFilmsView(APIView):
                 params=[filter['year_old']],
             )
 
-        if filter.get('genre'):
-            o_search = o_search.filter(genre=filter['genre'])
+        if filter.get('genres'):
+            o_search = o_search.filter(genres=filter['genres'])
 
         try:
             page = Paginator(o_search, per_page=per_page).page(page)
