@@ -49,9 +49,8 @@ sites_crawler = {
     'tvigle.ru':{'loader':TVIGLE_Loader,
                  'parser':ParseTvigleFilm()}
 }
-
-# Список допустимых сайтов
 sites = sites_crawler.keys()
+
 
 def sane_dict(film=None):
 
@@ -139,7 +138,6 @@ def get_content(film, kwargs):
                                    viewer_lastweek_cnt=kwargs['viewer_cnt'],
                                    viewer_lastmonth_cnt=kwargs['viewer_cnt'])
                 content.save()
-
         return content
 
 
@@ -180,7 +178,6 @@ class Command(BaseCommand):
         count = int(options['count'])
         
         film = Films.objects.filter(id__in=range(start, start + count + 1))
-        film = Films.objects.filter(id=1)
         site = options['site']
         logging.debug("Starting robot for %s", site)
         try:
