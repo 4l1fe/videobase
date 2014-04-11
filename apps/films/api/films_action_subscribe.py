@@ -13,7 +13,7 @@ class ActSubscribeFilmView(APIView):
     """
     """
 
-    def __get_object_film(self, film_id):
+    def __get_object(self, film_id):
         """
         Return object Films or Response object with 404 error
         """
@@ -27,7 +27,7 @@ class ActSubscribeFilmView(APIView):
 
     def get(self, request, film_id, format=None, *args, **kwargs):
         # Выбираем и проверяем, что фильм существует
-        o_film = self.__get_object_film(film_id)
+        o_film = self.__get_object(film_id)
         if type(o_film) == Response:
             return o_film
 
@@ -56,7 +56,7 @@ class ActSubscribeFilmView(APIView):
 
 
     def delete(self, request, film_id, format=None, *args, **kwargs):
-        o_film = self.__get_object_film(film_id)
+        o_film = self.__get_object(film_id)
         if type(o_film) == Response:
             return o_film
 
