@@ -57,15 +57,22 @@ class SearchFilmsView(APIView):
         filter = self.parse_post(request.DATA)
 
         o_search = Films.objects.all()
+        # Поиск по имени
         if filter.get('name'):
             o_search = o_search.filter(name__icontains=filter['name'])
 
+        # Поиск по количеству прошедших лет
         if filter.get('year_old'):
             o_search = o_search.extra(
                 where=['extract(year from age(current_date, "films"."release_date")) >= %s'],
                 params=[filter['year_old']],
             )
 
+        # Поиск по рейтингу
+        if filter.get('rating'):
+            o_search = o_search.filter(rating_cons__gte=filter['rating'])
+
+        # Поиск по жанрам
         if filter.get('genres'):
             o_search = o_search.filter(genres=filter['genres'])
 
