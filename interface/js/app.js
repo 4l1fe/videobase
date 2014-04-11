@@ -10,7 +10,7 @@
   conf = {
     no_poster_url: "img/noposter.jpg",
     filter_delay: 1000,
-    api_url: 'api/',
+    api_url: 'api/v1/',
     tpl_prefix: 'jade/_part_'
   };
 
@@ -333,7 +333,7 @@
     var _active_page, _options, _pages, _query_params, _templates, _user;
 
     _options = {
-      api_url: 'api/',
+      api_url: 'api/v1/',
       tpl_prefix: 'jade/_part_'
     };
 
@@ -425,11 +425,17 @@
 
     App.prototype.search_submit = function() {
       var text;
+
       text = this._e.search.input.val() || "";
-      if (_active_page === "Mai1n") {
-        return this.page().filter_changed(text);
+
+      if (_active_page === "Main") {
+
+        var a= this.page().filter_changed(text);
+
+          return a;
       } else {
         if (text) {
+
           text = "?text=" + text;
         }
         return window.location.href = "/" + text;
@@ -605,6 +611,7 @@
       var current_filter_counter;
       _filter_counter++;
       if (text) {
+
         _filter_params.text = text || "";
       }
       current_filter_counter = _filter_counter;
@@ -699,6 +706,7 @@
       if (!opts.params) {
         opts.params = {};
       }
+
       return this._app.rest.films.read("search", opts.params).done((function(_this) {
         return function(data) {
           var item, _i, _len, _ref;
