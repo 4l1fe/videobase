@@ -11,6 +11,8 @@ from constants import SUBJECT_TO_RESTORE_PASSWORD
 from .forms import UsersProfileForm, CustomRegisterForm
 
 
+from rest_framework.views import APIView
+
 class ProfileEdit(TemplateView):
     template_name = 'profile.html'
 
@@ -65,3 +67,17 @@ def restore_password(request):
     return response
 
 
+class UserSessionAPIView(APIView):
+    '''
+
+
+
+    '''
+
+
+
+    def post(self, request, format = None, resource_id = None):
+        raise NameError("Not Implemented")
+
+    def delete(self, request, format = None, resource_id = None):
+        raise NameError("Not Implemented")
