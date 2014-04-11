@@ -1,11 +1,13 @@
 # coding: utf-8
 
-from django.http import Http404
+from django.core.paginator import Paginator, InvalidPage
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-from apps.films.models import Films, FilmExtras
+from apps.films.models import Films
+from apps.contents.models import Comments, Contents
 from apps.films.api.serializers import vbComment
 
 
@@ -15,33 +17,34 @@ class CommentsFilmView(APIView):
     Returns to the movie comments
     """
 
-    def __get_film_id(self, film_id):
-        o_film = Films.objects.get(pk=film_id)
-        return o_film.pk
+    def __get_object(self, film_id):
+        """
+        Return object Films or Response object with 404 error
+        """
 
-
-    def __get_result(self, film_id, type):
         try:
-            filter = {
-                'film': self.__get_film_id(film_id),
-            }
-
-            if type:
-                filter.update({'etype': type})
-
-            o_extras = FilmExtras.objects.filter(**filter)
+            result = Contents.objects.get(film=film_id)
         except Films.DoesNotExist:
-            raise Http404
+            result = Response(status=status.HTTP_404_NOT_FOUND)
 
-        return o_extras
+        return result
 
 
     def post(self, request, film_id, format=None, *args, **kwargs):
+        content = self.__get_object(film_id)
+        if type(content) == Response:
+            return content
+
+        # Init data
         page = request.DATA.get('page', 1)
         per_page = request.DATA.get('per_page', 10)
 
-        result = self.__get_result(film_id, page, per_page)
+        filter = {
+            'content': content.film.pk,
+        }
+
+        o_comments = Comments.objects.filter(**filter)
+        result = Paginator(o_comments, per_page=per_page).page(page)
         serializer = vbComment(result)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
-
