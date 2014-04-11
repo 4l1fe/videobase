@@ -1,3 +1,3 @@
 # coding: utf-8
 
-from test.users_model import *
+# from test.users_model import *
