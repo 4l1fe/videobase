@@ -1,14 +1,15 @@
 # coding: utf-8
 
 from rest_framework import serializers
-import rest_framework.fields
 
-from apps.films.models import Films, FilmExtras, Countries, Genres, PersonsFilms, Persons
+from apps.films.models import *
 from apps.films.constants import APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER
-from apps.contents.models import Contents, Locations
+from apps.contents.models import *
 
 from utils.common import group_by, reindex_by, list_of
 from utils.middlewares.local_thread import get_current_request
+
+from vb_person import vbPerson
 
 
 #############################################################################################################
@@ -31,31 +32,6 @@ class GentriesSerializer(serializers.ModelSerializer):
 
 #############################################################################################################
 #
-class PersonsSerializer(serializers.ModelSerializer):
-
-    def __init__(self, *args, **kwargs):
-        new_fields = []
-
-        extend = kwargs.pop('extend', False)
-        if not extend:
-            new_fields += ['bio']
-
-        # Instantiate the superclass normally
-        super(PersonsSerializer, self).__init__(*args, **kwargs)
-
-        if len(new_fields):
-            # Drop keys if they exist
-            for field_name in new_fields:
-                self.fields.pop(field_name, None)
-
-
-    class Meta:
-        model = Persons
-        fields = ('id', 'name', 'photo', 'bio')
-
-
-#############################################################################################################
-#
 class LocationsSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -72,13 +48,12 @@ class ContentSerializer(serializers.ModelSerializer):
         fields = ('id', 'film',)
 
 
-
 #############################################################################################################
 #
-class vbFilmSerializer(serializers.HyperlinkedModelSerializer):
+class vbFilm(serializers.HyperlinkedModelSerializer):
     countries = CountriesSerializer()
     genres = GentriesSerializer()
-    persons = PersonsSerializer()
+    persons = vbPerson()
     ratings = serializers.SerializerMethodField('calc_ratings')
     locations = serializers.SerializerMethodField('locations_list')
     poster = serializers.SerializerMethodField('poster_list')
@@ -96,7 +71,7 @@ class vbFilmSerializer(serializers.HyperlinkedModelSerializer):
             new_fields += ['persons']
 
         # Instantiate the superclass normally
-        super(vbFilmSerializer, self).__init__(*args, **kwargs)
+        super(vbFilm, self).__init__(*args, **kwargs)
 
         if len(new_fields):
             # Drop keys if they exist
@@ -136,7 +111,7 @@ class vbFilmSerializer(serializers.HyperlinkedModelSerializer):
         return [item.url for item in extras.get(obj.pk, []) if len(item.url)]
 
     def relation_list(self, obj):
-        req =  get_current_request()
+        req = get_current_request()
         if req.user.is_authenticated():
             pass
 

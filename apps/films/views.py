@@ -1,19 +1,20 @@
 from django.http import Http404
-from django.shortcuts import render
+from django.shortcuts import render_to_response
 from django.http import HttpResponse
 from django.core.files import File
 from django.template import Template, Context
-
 from django.core.context_processors import csrf
-from django.shortcuts import render_to_response
+
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
 
-from apps.films.models import Persons,Films, FilmExtras, PersonsFilms, UsersPersons,PersonsExtras
-from apps.films.constants import APP_PERSON_PHOTO_DIR
+from apps.films.models import Persons, Films, FilmExtras, PersonsFilms, UsersPersons, PersonsExtras, UsersFilms
+from apps.contents.models import Comments, Contents
+
+# Do not remove there is something going on when importing, probably models registering itselves
 import apps.films.models
 
 
@@ -145,11 +146,12 @@ class PersonFilmographyAPIView(APIView):
 
 
 class PersonActionAPIView(APIView):
+    '''
 
+    /api/persons/../action/subscribe
 
+    '''
     def __users_person_set(self,user,person,subscribed):
-
-        
 
         try:
             up = UsersPersons.objects.get(user = user,
@@ -181,9 +183,60 @@ class PersonActionAPIView(APIView):
             
     def post(self, request, format = None, resource_id = None):
         return self._response_template(1, request, format, resource_id)
-        
+
     def delete(self, request, format = None, resource_id = None):
         return self._response_template(0, request, format, resource_id)
+
+
+
+class FilmActionAPIView(APIView):
+    '''
+
+
+
+    '''
+
+    post_action_constant = None
+    delete_action_constant = None
+    def __users_films_set(self,user,film, kwargs):
+
+        try:
+            uf = UsersFilms.objects.get(user = user,
+                                          film = film)
+
+            for key in kwargs:
+                setattr(uf,key,kwargs[key])
+
+
+        except UsersFilms.DoesNotExist, ue:
+            up = UsersFilms(user = user,
+                              film = film,
+                              **kwargs)
+            up.save()
+
+    def _response_template(self, subscribed, request, format=None, resource_id=None):
+        '''
+        Template for responses
+        '''
+
+        try:
+            person = Films.objects.get(id=resource_id)
+            self.__users_film_set(request.user, film, subscribed)
+            response = Response(None, status=status.HTTP_200_OK)
+            return response
+
+        except Exception, e:
+            print e
+            raise Http404
+            # Any URL parameters get passed in **kw
+
+
+    def post(self, request, format = None, resource_id = None):
+        raise NameError("Not Implemented")
+
+    def delete(self, request, format = None, resource_id = None):
+        raise NameError("Not Implemented")
+
 
 
 class PersonsExtrasAPIView(APIView):
@@ -207,60 +260,31 @@ class PersonsExtrasAPIView(APIView):
             raise Http404
             # Any URL parameters get passed in **kw
         
-        
+class FilmsCommentsAPIView(APIView):
+
+
+    def get(self, request, format = None, resource_id = None, per_page = 10, page= 1 ):
+
+        try:
+            film = Films.objects.get(pk=resource_id)
+            content = Contents.objects.get(film=film)
+            vbComments = [comment.as_vbComment() for comment in Comments.objects.filter(content=content.id)]
+
+        except Exception, e:
+            print e
+            raise Http404
+            # Any URL parameters get passed in **kw
+
+        response = Response(vbComments, status=status.HTTP_200_OK)
+        return response
+
+
     
 def test_view(request):
-
-
-    template = Template("""
-
-                        <html>
-                        <head>
-                        <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
-                        </head>
-                        <body>
-                        <script>
-// Helper function for csrf
-function getCookie(name) {
-    var cookieValue = null;
-    if (document.cookie && document.cookie != '') {
-        var cookies = document.cookie.split(';');
-        for (var i = 0; i < cookies.length; i++) {
-            var cookie = jQuery.trim(cookies[i]);
-            // Does this cookie string begin with the name we want?
-            if (cookie.substring(0, name.length + 1) == (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
-                        function csrfSafeMethod(method) {
-                            // these HTTP methods do not require CSRF protection
-                            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-                        }
-                        csrftoken =getCookie("csrftoken")
-                        $.ajaxSetup({
-                            crossDomain: false, // obviates need for sameOrigin test
-                            beforeSend: function(xhr, settings) {
-                                if (!csrfSafeMethod(settings.type)) {
-                                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
-                                }
-                             }
-                        });
-                        </script>
-                        {%csrf_token%}
-                        </body>
-                        </html>
-
-                        """)
-
-
     c = Context({})
     c.update(csrf(request))
     
     # ... view code here
-    return HttpResponse(template.render(c))
+    return render_to_response('api_test.html',c)
 
-    
+
