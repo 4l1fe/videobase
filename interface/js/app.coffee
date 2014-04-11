@@ -214,7 +214,7 @@ class User
 
 class App
   _options =
-    api_url: 'api/'
+    api_url: 'api/v1/'
     tpl_prefix: 'jade/_part_'
 
   _user =
@@ -254,8 +254,8 @@ class App
     @rest.films.action.add("rate")
     @rest.films.action.add("subscribe")
     @rest.films.action.add("notwatch")
-    @rest.add("persons")
-    @rest.persons.add("filmography", {isSingle: true})
+    @rest.add("person")
+    @rest.person.add("filmography", {isSingle: true})
 
     # TODO autoauth user
 

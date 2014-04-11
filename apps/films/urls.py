@@ -11,10 +11,10 @@ v1_api_patterns = patterns('',
     url(r'^v1/films/(?P<film_id>\d+)?$', DetailFilmView.as_view(), name='film_details_view'),
     url(r'^v1/films/(?P<film_id>\d+)/locations?$', LocationsFilmView.as_view(), name='film_locations_view'),
     url(r'^v1/films/(?P<resource_id>\d+)/comments$', FilmsCommentsAPIView.as_view(), name='my_rest_view'),
-    url(r'^v1/person/(?P<resource_id>\d+)$', PersonAPIView.as_view(), name='my_rest_view'),
-    url(r'^v1/person/(?P<resource_id>\d+)/filmography$', PersonFilmographyAPIView.as_view(), name='my_rest_view'),
-    url(r'^v1/person/(?P<resource_id>\d+)/action/subscribe$', PersonActionAPIView.as_view(), name='my_rest_view'),
-    url(r'^v1/person/(?P<resource_id>\d+)/extras$', PersonsExtrasAPIView.as_view(), name='my_rest_view'),
+    url(r'^v1/persons/(?P<resource_id>\d+)$', PersonAPIView.as_view(), name='my_rest_view'),
+    url(r'^v1/persons/(?P<resource_id>\d+)/filmography$', PersonFilmographyAPIView.as_view(), name='my_rest_view'),
+    url(r'^v1/persons/(?P<resource_id>\d+)/action/subscribe$', PersonActionAPIView.as_view(), name='my_rest_view'),
+    url(r'^v1/persons/(?P<resource_id>\d+)/extras$', PersonsExtrasAPIView.as_view(), name='my_rest_view'),
 
 
 )
