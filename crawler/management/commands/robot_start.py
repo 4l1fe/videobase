@@ -47,7 +47,9 @@ sites_crawler = {
     'amediateka.ru': {'loader': None,
                       'parser': None},
     'playfamily.ru': {'loader': playfamily_loader,
-                      'parser': PlayfamilyParser()}
+                      'parser': PlayfamilyParser()},
+    'tvigle.ru':{'loader':TVIGLE_Loader,
+                 'parser':ParseTvigleFilm()}
 }
 sites = sites_crawler.keys()
 
@@ -175,11 +177,13 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         start = int(options['start'])
         count = int(options['count'])
+        
         film = Films.objects.filter(id__in=range(start, start + count + 1))
-        film = Films.objects.filter(id=35589)
+#        film = Films.objects.filter(id=380)
         site = options['site']
-        if True:
-        #try:
+        logging.debug("Starting robot for %s", site)
+        try:
+        #if True:
             robot = Robot(films=film, **sites_crawler[site])
             for data in robot.get_data(sane_dict):
                 logging.debug("Trying to put data from %s for %s to db", site, str(data['film']))
@@ -237,7 +241,6 @@ class Command(BaseCommand):
                                    outcome=APP_ROBOTS_TRY_NO_SUCH_PAGE)
             robot_try.save()
         except Exception ,e :
-            print e
             logging.debug("Unknown exception %s",str(e))
             # Most likely parsing error
             if site is None:
