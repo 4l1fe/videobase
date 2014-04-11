@@ -165,6 +165,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
+        'apps.users.models.api_session.MultipleTokenAuthentication',
     )
 }
 
@@ -178,6 +179,7 @@ AUTHENTICATION_BACKENDS = (
     'social_auth.backends.contrib.mailru.MailruBackend',
     'django.contrib.auth.backends.ModelBackend',
     'rest_framework.authentication.TokenAuthentication',
+    'apps.users.models.api_session.MultipleTokenAuthentication',
 )
 
 # Перечислим pipeline, которые последовательно буду обрабатывать респонс
