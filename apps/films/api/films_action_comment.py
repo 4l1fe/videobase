@@ -20,7 +20,7 @@ class ActCommentFilmView(APIView):
         """
         try:
             result = Contents.objects.get(film=film_id)
-        except Films.DoesNotExist:
+        except Contents.DoesNotExist:
             result = Response(status=status.HTTP_404_NOT_FOUND)
 
         return result
