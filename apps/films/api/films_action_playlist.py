@@ -11,6 +11,11 @@ from apps.films.constants import APP_USERFILM_STATUS_SUBS, APP_USERFILM_SUBS_TRU
 #############################################################################################################
 class ActPlaylistFilmView(APIView):
     """
+    Method get:
+        - Sets subscribe to the serial
+
+    Method delete:
+        - Delete subscribe to the serial
     """
 
     def __get_object(self, film_id):

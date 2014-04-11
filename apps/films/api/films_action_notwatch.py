@@ -11,6 +11,11 @@ from apps.films.constants import APP_USERFILM_STATUS_NOT_WATCH, APP_USERFILM_STA
 #############################################################################################################
 class ActNotwatchFilmView(APIView):
     """
+    Method get:
+        - Sets subscribe to the movie
+
+    Method delete:
+        - Delete subscribe to the movie
     """
 
     def __get_object(self, film_id):

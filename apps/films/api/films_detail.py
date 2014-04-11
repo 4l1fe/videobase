@@ -15,18 +15,25 @@ class DetailFilmView(APIView):
     Return detailed information about movie
     """
 
-    serializer_class = vbFilm
+    def __get_object(self, film_id):
+        """
+        Return object Films or Response object with 404 error
+        """
 
-    def __get_object(self, pk):
         try:
-            return Films.objects.get(pk=pk)
-        except Exception as e:
-            raise Http404
+            result = Films.objects.get(pk=film_id)
+        except Films.DoesNotExist:
+            result = Response(status=status.HTTP_404_NOT_FOUND)
+
+        return result
 
 
     def __get_result(self, film_id, **kwargs):
-        film = self.__get_object(film_id)
-        serializer = vbFilm(film, extend=True, persons=True)
+        o_film = self.__get_object(film_id)
+        if type(o_film) == Response:
+            raise Http404
+
+        serializer = vbFilm(o_film, extend=True, persons=True)
 
         return serializer
 
