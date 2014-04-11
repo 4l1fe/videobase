@@ -5,7 +5,7 @@ window.App = undefined
 conf =
   no_poster_url: "img/noposter.jpg"
   filter_delay: 1000
-  api_url: 'api/'
+  api_url: 'api/v1/'
   tpl_prefix: 'jade/_part_'
 
 error = (txt, type = "norm") ->
@@ -288,7 +288,7 @@ class App
 
   search_submit: ->
     text = @_e.search.input.val() || ""
-    if _active_page == "Mai1n" # current page is main
+    if _active_page == "Main" # current page is main
       @page().filter_changed text
     else
       text = "?text=" + text if text
