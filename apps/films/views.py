@@ -214,8 +214,6 @@ class PersonsExtrasAPIView(APIView):
             raise Http404
             # Any URL parameters get passed in **kw
         
-class FilmsCommentsAPIView(APIView):
-
 
     def get(self, request, format = None, resource_id = None, per_page = 10, page= 1 ):
 

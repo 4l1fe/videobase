@@ -52,3 +52,22 @@ APP_FILM_ADMIN_JS_LIBS = ('http://code.jquery.com/jquery-1.9.1.js',
 APP_FILM_ADMIN_CSS = ('http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css',)
 
 
+#############################################################################################################
+APP_USERFILM_STATUS_UNDEF = 0
+APP_USERFILM_STATUS_NOT_WATCH = 1
+APP_USERFILM_STATUS_SUBS = 2
+
+APP_USERFILM_STATUS = (
+    (APP_USERFILM_STATUS_UNDEF, u'Не определено'),
+    (APP_USERFILM_STATUS_NOT_WATCH, u'Не буду смотреть'),
+    (APP_USERFILM_STATUS_SUBS, u'Подписан'),
+)
+
+#############################################################################################################
+APP_USERFILM_SUBS_FALSE = 0
+APP_USERFILM_SUBS_TRUE = 1
+
+APP_USERFILM_SUBS = (
+    (APP_USERFILM_SUBS_FALSE, u'Не подписан'),
+    (APP_USERFILM_SUBS_TRUE, u'Подписан'),
+)

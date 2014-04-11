@@ -17,10 +17,10 @@ class FilmManager(models.Manager):
 # Модель фильмов/сериалов
 class Films(models.Model):
     name             = models.CharField(max_length=255, blank=False, verbose_name=u'Название фильма')
-    type            = models.CharField(max_length=255, choices=APP_FILM_FILM_TYPES, verbose_name=u'Тип фильма')
-    release_date    = models.DateField(verbose_name=u'Дата выхода')
-    duration        = models.IntegerField(null=True, blank=True, verbose_name=u'Продолжительность фильма')
-    budget          = models.IntegerField(null=True, blank=True, verbose_name=u'Бюджет фильма')
+    type             = models.CharField(max_length=255, choices=APP_FILM_FILM_TYPES, verbose_name=u'Тип фильма')
+    release_date     = models.DateField(verbose_name=u'Дата выхода')
+    duration         = models.IntegerField(null=True, blank=True, verbose_name=u'Продолжительность фильма')
+    budget           = models.IntegerField(null=True, blank=True, verbose_name=u'Бюджет фильма')
     description      = models.TextField(default='', blank=True, verbose_name=u'Описание фильма')
     rating_local     = models.FloatField(null=True, blank=True, verbose_name=u'Рейтинг фильма по мнению пользователей нашего сайта')
     rating_local_cnt = models.PositiveSmallIntegerField(null=True, blank=True, verbose_name=u'Количество пользователей нашего сайта оценивших фильм')
