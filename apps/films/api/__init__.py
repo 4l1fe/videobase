@@ -1,6 +1,6 @@
 # coding: utf-8
 
-from films_search import FilmsSearchResource
+from films_search import SearchFilmsView
 from films_detail import DetailFilmView
 from films_locations import LocationsFilmView
 from films_persons import PersonsFilmView
@@ -15,7 +15,7 @@ from films_action_subscribe import ActSubscribeFilmView
 
 
 __all__ = [
-    'FilmsSearchResource', 'DetailFilmView', 'LocationsFilmView', 'PersonsFilmView', \
+    'SearchFilmsView', 'DetailFilmView', 'LocationsFilmView', 'PersonsFilmView', \
     'SimilarFilmView', 'ExtrasFilmView', 'CommentsFilmView', 'ActSubscribeFilmView', \
     'ActPlaylistFilmView', 'ActNotwatchFilmView', 'ActRateFilmView', 'ActCommentFilmView', \
 ]
