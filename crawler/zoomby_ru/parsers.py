@@ -19,17 +19,24 @@ def parse_search(response, filmName):
 
 
 
-class ParseFilm(BaseParse):
+class ParseFilm(object):
     def __init__(self):
-        self.host = HOST
-        self.url_film = URL_FILM
+        pass
+    def parse(self, response, dict_gen, film,url):
+        d = dict_gen(film)
+        print url
+        d['url_view'] = url
+        d['price_type'] = 0
+        d['price'] = self.get_price()
+        print d
+        return  [d]
 
     def get_price(self):
         return 0
 
     def get_seasons(self):
-        return 1
+        return [0,]
 
     def get_link(self):
-        return URL_FILM
+        pass
 

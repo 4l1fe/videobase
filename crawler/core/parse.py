@@ -28,7 +28,7 @@ class BaseParse(object):
         if seasons:
             for season in seasons:
                 resp_dict = dict_gen(film)
-                resp_dict['numer'] = season
+                resp_dict['number'] = season
                 resp_dict['value'] = link
                 resp_dict['price'] = price
                 resp_dict['price_type'] = price_type
