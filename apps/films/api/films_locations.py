@@ -1,6 +1,5 @@
 # coding: utf-8
 
-from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -15,22 +14,25 @@ class LocationsFilmView(APIView):
     Returns all locations movie
     """
 
-    def __get_obj_content(self, film_id):
+    def __get_object(self, film_id):
+        """
+        Return object Films or Response object with 404 error
+        """
+
         try:
-            content = Contents.objects.get(film=film_id)
-            return content.id
+            result = Contents.objects.get(film=film_id)
         except Contents.DoesNotExist:
-            raise Http404
+            result = Response(status=status.HTTP_404_NOT_FOUND)
 
-
-    def __get_all_locations(self, content_id):
-        location = Locations.objects.filter(content=content_id).defer('content')
-        return location
+        return result
 
 
     def get(self, request, film_id, format=None, *args, **kwargs):
-        content = self.__get_obj_content(film_id)
-        location = self.__get_all_locations(content)
-        serializer = vbLocation(location)
+        o_content = self.__get_object(film_id)
+        if type(o_content) == Response:
+            return o_content
+
+        o_location = Locations.objects.filter(content=o_content.pk).defer('content')
+        serializer = vbLocation(o_location)
 
         return Response(serializer.data, status=status.HTTP_200_OK)

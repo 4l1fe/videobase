@@ -12,6 +12,8 @@ from apps.films.forms import CommentForm
 #############################################################################################################
 class ActCommentFilmView(APIView):
     """
+    Method post:
+        - Makes insert a comment to the movie
     """
 
     def __get_object(self, film_id):

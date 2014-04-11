@@ -11,6 +11,7 @@ from apps.films.constants import APP_USERFILM_SUBS_TRUE, APP_USERFILM_SUBS_FALSE
 #############################################################################################################
 class ActSubscribeFilmView(APIView):
     """
+
     """
 
     def __get_object(self, film_id):
