@@ -46,7 +46,7 @@ class SearchFilmsView(APIView):
         return filter
 
 
-    def get(self, request, format=None, *args, **kwargs):
+    def post(self, request, format=None, *args, **kwargs):
         # Init data
         page = request.DATA.get('page', 1)
         per_page = request.DATA.get('per_page', 12)
