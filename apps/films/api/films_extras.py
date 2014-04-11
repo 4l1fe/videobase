@@ -1,18 +1,17 @@
 # coding: utf-8
 
-from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-from apps.films.models import Films
-from apps.films.api.serializers import vbFilm
+from apps.films.models import Films, FilmExtras
+from apps.films.api.serializers import vbExtra
 
 
 #############################################################################################################
-class DetailFilmView(APIView):
+class ExtrasFilmView(APIView):
     """
-    Return detailed information about movie
+    Returns extra information about movie
     """
 
     def __get_object(self, film_id):
@@ -28,23 +27,22 @@ class DetailFilmView(APIView):
         return result
 
 
-    def __get_result(self, film_id, **kwargs):
+    def post(self, request, film_id, format=None, *args, **kwargs):
+        # Выбираем и проверяем, что фильм существует
         o_film = self.__get_object(film_id)
         if type(o_film) == Response:
-            raise Http404
+            return o_film
 
-        serializer = vbFilm(o_film, extend=True, persons=True)
+        # Init data
+        type = request.DATA.get('type', False)
+        filter = {
+            'film': o_film.pk,
+        }
 
-        return serializer
+        if type:
+            filter.update({'type': type})
 
-
-    def post(self, request, film_id, format=None, *args, **kwargs):
-        serializer = self.__get_result(film_id)
-
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-    def get(self, request, film_id, format=None, *args, **kwargs):
-        serializer = self.__get_result(film_id)
+        o_extras = FilmExtras.objects.filter(**filter)
+        serializer = vbExtra(o_extras)
 
         return Response(serializer.data, status=status.HTTP_200_OK)

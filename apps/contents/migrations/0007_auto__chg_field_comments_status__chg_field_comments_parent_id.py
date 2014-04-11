@@ -8,52 +8,31 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Deleting field 'Locations.ltype'
-        db.delete_column('locations', 'ltype')
+        db.delete_column('comments', 'status')
 
-        # Adding field 'Locations.type'
-        db.add_column('locations', 'type', self.gf('django.db.models.fields.SmallIntegerField')(default=0))
+        # Changing field 'Comments.status'
+        db.add_column('comments', 'status', self.gf('django.db.models.fields.PositiveIntegerField')(null=True))
 
-        # Deleting field 'Locations.price_type'
-        db.delete_column('locations', 'price_type')
-
-        # Changing field 'Locations.price_type'
-        db.add_column('locations', 'price_type', self.gf('django.db.models.fields.SmallIntegerField')(default=0))
-
-        # Renaming field 'Comments.ctext'
-        db.rename_column('comments', 'ctext', 'text')
-
-        # Renaming field 'Comments.cstatus'
-        db.rename_column('comments', 'cstatus', 'status')
+        # Changing field 'Comments.parent_id'
+        db.alter_column('comments', 'parent_id', self.gf('django.db.models.fields.IntegerField')(null=True))
 
 
     def backwards(self, orm):
-        # Adding field 'Locations.ltype'
-        db.add_column('locations', 'ltype', self.gf('django.db.models.fields.CharField')(max_length=255))
+        # Changing field 'Comments.status'
+        db.alter_column('comments', 'status', self.gf('django.db.models.fields.CharField')(max_length=40))
 
-        # Deleting field 'Locations.type'
-        db.delete_column('locations', 'type')
+        # Changing field 'Comments.parent_id'
+        db.alter_column('comments', 'parent_id', self.gf('django.db.models.fields.IntegerField')())
 
-        # Deleting field 'Locations.price_type'
-        db.delete_column('locations', 'price_type')
-
-        # Changing field 'Locations.price_type'
-        db.add_column('locations', 'price_type', self.gf('django.db.models.fields.CharField')(max_length=40))
-
-        # Renaming field 'Comments.text'
-        db.rename_column('comments', 'text', 'ctext')
-
-        # Renaming field 'Comments.status'
-        db.rename_column('comments', 'status', 'cstatus')
 
     models = {
         'contents.comments': {
             'Meta': {'object_name': 'Comments', 'db_table': "'comments'"},
-            'content': ('django.db.models.fields.IntegerField', [], {}),
+            'content': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contents.Contents']"}),
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'parent_id': ('django.db.models.fields.IntegerField', [], {}),
-            'status': ('django.db.models.fields.CharField', [], {'max_length': '40'}),
+            'parent_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'status': ('django.db.models.fields.PositiveIntegerField', [], {'null': 'True', 'blank': 'True'}),
             'text': ('django.db.models.fields.TextField', [], {}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['users.Users']"})
         },
@@ -75,12 +54,13 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'Locations', 'db_table': "'locations'"},
             'content': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contents.Contents']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'lang': ('django.db.models.fields.CharField', [], {'max_length': '40'}),
             'price': ('django.db.models.fields.DecimalField', [], {'default': "'0.0'", 'max_digits': '30', 'decimal_places': '2'}),
             'price_type': ('django.db.models.fields.SmallIntegerField', [], {}),
             'quality': ('django.db.models.fields.CharField', [], {'max_length': '40'}),
             'subtitles': ('django.db.models.fields.CharField', [], {'max_length': '40'}),
             'type': ('django.db.models.fields.SmallIntegerField', [], {}),
-            'value': ('django.db.models.fields.CharField', [], {'max_length': '40'})
+            'url_view': ('django.db.models.fields.URLField', [], {'max_length': '255'})
         },
         'films.countries': {
             'Meta': {'object_name': 'Countries', 'db_table': "'countries'"},
@@ -103,6 +83,7 @@ class Migration(SchemaMigration):
             'kinopoisk_lastupdate': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'name_orig': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '255', 'blank': 'True'}),
+            'persons': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'persons'", 'symmetrical': 'False', 'through': "orm['films.PersonsFilms']", 'to': "orm['films.Persons']"}),
             'rating_imdb': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
             'rating_imdb_cnt': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'rating_kinopoisk': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
@@ -118,6 +99,23 @@ class Migration(SchemaMigration):
             'description': ('django.db.models.fields.TextField', [], {}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '255'})
+        },
+        'films.persons': {
+            'Meta': {'object_name': 'Persons', 'db_table': "'persons'"},
+            'bio': ('django.db.models.fields.TextField', [], {}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'name_orig': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'photo': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'})
+        },
+        'films.personsfilms': {
+            'Meta': {'unique_together': "(('film', 'person', 'p_type'),)", 'object_name': 'PersonsFilms', 'db_table': "'persons_films'"},
+            'description': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '255'}),
+            'film': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['films.Films']"}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'p_character': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '255'}),
+            'p_type': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'person': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['films.Persons']"})
         },
         'films.seasons': {
             'Meta': {'unique_together': "(('film', 'number'),)", 'object_name': 'Seasons', 'db_table': "'seasons'"},
