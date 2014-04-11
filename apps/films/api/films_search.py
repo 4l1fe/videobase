@@ -3,11 +3,11 @@
 from django.http import Http404
 from django.conf.urls import url
 from django.core.paginator import Paginator, InvalidPage
-
 from tastypie.validation import FormValidation
 
+from apps.films.api.serializers import vbFilm
 from apps.films.forms import SearchForm
-from apps.films.api.vbFilm import vbFilm
+
 
 
 #############################################################################################################

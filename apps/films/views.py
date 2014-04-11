@@ -1,19 +1,30 @@
 from django.http import Http404
-from django.shortcuts import render
+from django.shortcuts import render_to_response
 from django.http import HttpResponse
-from apps.films.models import Persons,Films, FilmExtras
-import re
-import os
-from PIL import Image, ImageEnhance
-from cStringIO import StringIO
 from django.core.files import File
-from apps.films.constants import APP_PERSON_PHOTO_DIR
+from django.template import Template, Context
+from django.core.context_processors import csrf
 
-# Create your views here.
-import warnings
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+
+
+from apps.films.models import Persons, Films, FilmExtras, PersonsFilms, UsersPersons, PersonsExtras, UsersFilms
+from apps.contents.models import Comments, Contents
+
+# Do not remove there is something going on when importing, probably models registering itselves
+import apps.films.models
+
+
+from cStringIO import StringIO
+from PIL import Image, ImageEnhance
+import re
+import os
+import warnings
+
+# Create your views here.
 
 def get_new_namestring(namestring):
 
@@ -95,9 +106,6 @@ def bri_con(d,im,request):
     return imc
 
 
-
-
-
 class PersonAPIView(APIView):
 
     def get(self, request, format = None,resource_id = None, extend = False ):
@@ -123,14 +131,160 @@ class PersonFilmographyAPIView(APIView):
         try:
             p = Persons.objects.get(pk = resource_id)
 
-            pfs = PersonFilms.objects.filter(person = p)
+            pfs = PersonsFilms.objects.filter(person = p)
 
             vbFilms = [pf.film.as_vbFilm() for pf in pfs]
 
             
-        except:
+        except Exception,e:
+            print e
             raise Http404
             # Any URL parameters get passed in **kw
         
         response = Response(vbFilms, status=status.HTTP_200_OK)
         return response
+
+
+class PersonActionAPIView(APIView):
+    '''
+
+    /api/persons/../action/subscribe
+
+    '''
+    def __users_person_set(self,user,person,subscribed):
+
+        try:
+            up = UsersPersons.objects.get(user = user,
+                                          person = person)
+            up.subscribed = subscribed
+        except UsersPersons.DoesNotExist, ue:
+            up = UsersPersons(user = user,
+                              person = person,
+                              subscribed=subscribed,
+                              upstatus=0 )
+            up.save()
+        
+    def _response_template(self,subscribed, request, format = None, resource_id = None):
+        '''
+        Template for responses
+        '''
+        
+        try:
+            person = Persons.objects.get(id=resource_id)
+            self.__users_person_set(request.user, person, subscribed)
+            response = Response(None, status=status.HTTP_200_OK)
+            return response
+
+        except Exception,e:
+            print e
+            raise Http404
+            # Any URL parameters get passed in **kw
+
+            
+    def post(self, request, format = None, resource_id = None):
+        return self._response_template(1, request, format, resource_id)
+
+    def delete(self, request, format = None, resource_id = None):
+        return self._response_template(0, request, format, resource_id)
+
+
+
+class FilmActionAPIView(APIView):
+    '''
+
+
+
+    '''
+
+    post_action_constant = None
+    delete_action_constant = None
+    def __users_films_set(self,user,film, kwargs):
+
+        try:
+            uf = UsersFilms.objects.get(user = user,
+                                          film = film)
+
+            for key in kwargs:
+                setattr(uf,key,kwargs[key])
+
+
+        except UsersFilms.DoesNotExist, ue:
+            up = UsersFilms(user = user,
+                              film = film,
+                              **kwargs)
+            up.save()
+
+    def _response_template(self, subscribed, request, format=None, resource_id=None):
+        '''
+        Template for responses
+        '''
+
+        try:
+            person = Films.objects.get(id=resource_id)
+            self.__users_film_set(request.user, film, subscribed)
+            response = Response(None, status=status.HTTP_200_OK)
+            return response
+
+        except Exception, e:
+            print e
+            raise Http404
+            # Any URL parameters get passed in **kw
+
+
+    def post(self, request, format = None, resource_id = None):
+        raise NameError("Not Implemented")
+
+    def delete(self, request, format = None, resource_id = None):
+        raise NameError("Not Implemented")
+
+
+
+class PersonsExtrasAPIView(APIView):
+
+    def get(self, request, format=None, resource_id=None, extend=False, type = None):
+
+        try:
+            person = Persons.objects.get(id=resource_id)
+            if type is None:
+                pes = PersonsExtras.objects.filter(person = person)
+            else:
+                pes = PersonsExtras.objects.filter(person = person, type = type)
+
+            result = [pe.as_vbExtras for pe in pes]
+            
+            response = Response(result, status=status.HTTP_200_OK)
+            return response
+
+        except Exception,e:
+            print e
+            raise Http404
+            # Any URL parameters get passed in **kw
+        
+class FilmsCommentsAPIView(APIView):
+
+
+    def get(self, request, format = None, resource_id = None, per_page = 10, page= 1 ):
+
+        try:
+            film = Films.objects.get(pk=resource_id)
+            content = Contents.objects.get(film=film)
+            vbComments = [comment.as_vbComment() for comment in Comments.objects.filter(content=content.id)]
+
+        except Exception, e:
+            print e
+            raise Http404
+            # Any URL parameters get passed in **kw
+
+        response = Response(vbComments, status=status.HTTP_200_OK)
+        return response
+
+
+    
+def test_view(request):
+    c = Context({})
+    c.update(csrf(request))
+    
+    # ... view code here
+    return render_to_response('api_test.html',c)
+
+

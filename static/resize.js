@@ -1,13 +1,11 @@
-
 function select_p_a(){
     var p = $("p.file-upload")
     var a = p.children().select("a")
     var src = a.html()
 
     return {p:p,
-	   a:a,
-	   src:src}
-
+            a:a,
+            src:src}
 }
 
 // Helper function for csrf
@@ -56,9 +54,9 @@ function init_resizing(){
 
         $('#slinks').append('<a href= "http://images.google.com/searchbyimage?image_url='+ encodeURIComponent($('#img-to-resize')[0].src)+'"> Поискать картинку на Google<\a>')
     jQuery("#img-to-resize").Jcrop({
-		onChange: setCoords,
-		onSelect: setCoords
-	});
+        onChange: setCoords,
+        onSelect: setCoords
+    });
 }
 
 function init_br_co(){
@@ -75,23 +73,23 @@ function init_br_co(){
 
     Caman("#br-co",function(){
 
-	var caman = this;
+        var caman = this;
 
-	$( "#slider-brightness" ).slider( {
-	    slide: function(event,ui) {
-		caman.revert();
-		BR = ui.value;
-		caman.brightness(BR-50).render();
-	},
-	    value:50});
+        $( "#slider-brightness" ).slider( {
+            slide: function(event,ui) {
+                caman.revert();
+                BR = ui.value;
+                caman.brightness(BR-50).render();
+            },
+            value:50});
 
-	$( "#slider-contrast" ).slider( {
-	    slide: function(event,ui) {
-		caman.revert();
-		CO= ui.value;
-		caman.contrast(CO-50).render();
-	},
-	    value:50});
+        $( "#slider-contrast" ).slider( {
+            slide: function(event,ui) {
+                caman.revert();
+                CO= ui.value;
+                caman.contrast(CO-50).render();
+            },
+            value:50});
 
 })
 
@@ -109,38 +107,38 @@ function add_buttons(){
     $("#to-resize").append("<input id ='bcrop' style='width:100px' type='button' value = 'Вырезать'></input>")
 
     $("#resbut").click(function(event,ui){
-	if ($('#levels').length>0){
-	    $('#levels').hide();}
-	$('#to-resize').show();
+        if ($('#levels').length>0){
+            $('#levels').hide();}
+        $('#to-resize').show();
     })
 
     $("#brcobut").click(function(event,ui){
-	if ($('#to-resize').length>0){
-	    $('#to-resize').hide();
-	}
-	if ($('#levels').length>0){
-	    $('#levels').show()}
+        if ($('#to-resize').length>0){
+            $('#to-resize').hide();
+        }
+        if ($('#levels').length>0){
+            $('#levels').show()}
     })
 
     $("#bcrop").click(function(event,ui){
 
-	$.post('/api/image/resize/',{image:$('#img-to-resize')[0].src,
-			       x:X,
-			       y:Y,
-			       x2:X2,
-			       y2:Y2
-			      },function(){
-				  location.reload();
-			      });
+        $.post('/api/image/resize/',{image:$('#img-to-resize')[0].src,
+                                     x:X,
+                                     y:Y,
+                                     x2:X2,
+                                     y2:Y2
+                                    },function(){
+                                  location.reload();
+});
     })
     $("#br_co_send").click(function(event,ui){
-	$.post('/api/image/brco/',{image:$('#img-to-resize')[0].src,
-			     br:BR,
-			     co:CO
-			    },
-	       function(){
-		   location.reload();
-	       });
+        $.post('/api/image/brco/',{image:$('#img-to-resize')[0].src,
+                                   br:BR,
+                                   co:CO
+                                  },
+               function(){
+                   location.reload();
+   });
     })
 
 
@@ -167,34 +165,34 @@ IS_IMAGE_EDITOR_SET = 0;
 function predecision(){
 
     if ($('#id_etype').length >0){
-	if ($('#id_etype')[0].value =="POSTER"){
-	    load_all()
-	    IS_IMAGE_EDITOR_SET = 1;
-	    $('div.field-url').hide();
-	}
-	else{
+        if $('#id_etype')[0].value =="POSTER"){
+            load_all()
+            IS_IMAGE_EDITOR_SET = 1;
+            $('div.field-url').hide();
+        }
+        else{
       $('div.field-photo').hide();}
 
     }
     else{
-	load_all()
-	IS_IMAGE_EDITOR_SET = 1;
+        load_all()
+        IS_IMAGE_EDITOR_SET = 1;
     }
 
     $('#id_etype').change(function(event){
 
-	if (event.target.value == "POSTER"){
+        if (event.target.value == "POSTER"){
 
-	    $('div.field-url').hide()
-	    $('div.field-photo').show()
-	    if (!IS_IMAGE_EDITOR_SET){
-		load_all()
-		IS_IMAGE_EDITOR_SET = 1;
-	    }}
-	else{
-	    $('div.field-url').show()
-	    $('div.field-photo').hide()
-	}
+            $('div.field-url').hide()
+            $('div.field-photo').show()
+            if (!IS_IMAGE_EDITOR_SET){
+                load_all()
+                IS_IMAGE_EDITOR_SET = 1;
+            }}
+        else{
+            $('div.field-url').show()
+            $('div.field-photo').hide()
+        }
     })
 
 }
@@ -220,5 +218,3 @@ $.ajaxSetup({
         }
     }
 });
-
-
