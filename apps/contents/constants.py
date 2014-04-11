@@ -17,3 +17,6 @@ APP_CONTENTS_PRICE_TYPE = (
     (APP_CONTENTS_PRICE_TYPE_SUBSCRIPTION, 'По подписке'),
     (APP_CONTENTS_PRICE_TYPE_PAY, 'Платно')
 )
+
+###############################################################################
+APP_CONTENTS_COMMENT_STATUS = ()
