@@ -21,9 +21,11 @@ urlpatterns = patterns('',
                        url(r'^api/robots/', 'apps.robots.views.schedule_api'),
                        url(r'^robots/', 'apps.robots.views.schedule_interface'),
                        url(r'^api/test', test_view),
-                       url(r'^users/', include('apps.users.urls')),
                        url(r'^auth/login/', 'rest_framework.authtoken.views.obtain_auth_token'),
-
+                       # Users
+                       url(r'^users/', include('apps.users.urls')),
+                       # Social-OAuth2
+                       url(r'^', include('social_auth.urls')),
 )
 
 if settings.DEBUG:
