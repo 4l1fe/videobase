@@ -58,6 +58,7 @@ def construct_path(urlstring, kwargs):
             return join(ljoin(repath), 'cache')
         else:
             return join(ljoin(repath), base64.urlsafe_b64encode(purl.query))
+  
 
 
 def cache(func):
@@ -70,13 +71,7 @@ def cache(func):
         '''
 
         if (not 'cache' in kwargs) or kwargs['cache']:
-            try:
-                p = u'&'.join( key+u'='+value for key,value in kwargs['params'].items())
-                print p
-                cachepath = construct_path(url+ p if 'params' in kwargs else '')
-            except Exception,e:
-
-                print "Here",e
+            cachepath = construct_path(url+'&'.join(key+'='+value for key,value in kwargs['params'].items() if 'params' in kwargs else '')
             if exists(cachepath):
                 logging.debug('Found cache for %s in %s. Returning cached copy', url, cachepath)
                 with open(cachepath) as fr:
