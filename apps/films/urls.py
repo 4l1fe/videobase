@@ -23,7 +23,6 @@ v1_api_patterns = patterns('',
     url(r'^v1/films/(?P<film_id>\d+)/action/comment?$', ActCommentFilmView.as_view(), name='act_film_rate_view'),
 
     # Person API
-    # url(r'^v1/films/(?P<resource_id>\d+)/comments$', FilmsCommentsAPIView.as_view(), name='my_rest_view'),
     url(r'^v1/person/(?P<resource_id>\d+)$', PersonAPIView.as_view(), name='my_rest_view'),
     url(r'^v1/person/(?P<resource_id>\d+)/filmography$', PersonFilmographyAPIView.as_view(), name='my_rest_view'),
     url(r'^v1/person/(?P<resource_id>\d+)/action/subscribe$', PersonActionAPIView.as_view(), name='my_rest_view'),
