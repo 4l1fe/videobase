@@ -12,7 +12,7 @@ from utils.common import get_image_path
 #
 class PosterFilmManager(models.Manager):
     def get_query_set(self):
-        return super(PosterFilmManager, self).get_query_set().filter(etype=APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER)
+        return super(PosterFilmManager, self).get_query_set().filter(type=APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER)
 
 #############################################################################################################
 # Модель Расширения фильмов/сериалов
