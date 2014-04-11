@@ -54,13 +54,13 @@ INSTALLED_APPS = (
     'south',
     'rest_framework',
     'rest_framework.authtoken',
+    'social_auth',
     'csvimport',
     'apps.users',
     'apps.robots',
     'apps.films',
     'apps.contents',
     'crawler',
-    'social_auth'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -85,6 +85,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.media',
     'django.contrib.messages.context_processors.messages',
     'django.core.context_processors.request',
+    # Social
+    'social_auth.context_processors.social_auth_by_type_backends',
 )
 
 
@@ -165,6 +167,31 @@ REST_FRAMEWORK = {
     )
 }
 
+LOGIN_REDIRECT_URL = '/'
+
+# Ключи для OAuth2 авторизации
+# Vkontakte
+VK_APP_ID            = '4296663'
+VKONTAKTE_APP_ID     = VK_APP_ID
+VK_API_SECRET        = 'JAEQddzkBCm554iGXe6S'
+VKONTAKTE_APP_SECRET = VK_API_SECRET
+VK_EXTRA_SCOPE = ['notify', 'friends', 'status', 'groups', 'notifications']
+# Facebook
+FACEBOOK_APP_ID     = '212532105624824'
+FACEBOOK_API_SECRET = 'a99fcef38b7054279d73beb4ebb7b6cc'
+# Twitter
+TWITTER_CONSUMER_KEY    = 'HACuJARrAXJyeHdeD5viHULZR'
+TWITTER_CONSUMER_SECRET = 'Ge0k2rKltyPq3ida76IjTbhesZVdIrvckcNPXzJaBU2ouzixut'
+# Google+
+GOOGLE_OAUTH2_CLIENT_ID     = 'AIzaSyD9C36HCncY0tVWQekEmz5KEarnCzOCCb0'
+GOOGLE_OAUTH2_CLIENT_SECRET = ''
+# Mail.ru
+MAILRU_OAUTH2_APP_KEY = '719516'
+MAILRU_OAUTH2_CLIENT_KEY = '4daa3ed8bef5be08ebd7e25ff5ae806a'
+MAILRU_OAUTH2_CLIENT_SECRET = '8cc7bb50e5b93663774e6584a1251d79'
+
+SOCIAL_AUTH_CREATE_USERS = True
+
 # Backends for social auth
 AUTHENTICATION_BACKENDS = (
     'social_auth.backends.twitter.TwitterBackend',
@@ -174,24 +201,25 @@ AUTHENTICATION_BACKENDS = (
     'social_auth.backends.contrib.odnoklassniki.OdnoklassnikiBackend',
     'social_auth.backends.contrib.mailru.MailruBackend',
     'django.contrib.auth.backends.ModelBackend',
-    'rest_framework.authentication.TokenAuthentication',
 )
 
 # Перечислим pipeline, которые последовательно буду обрабатывать респонс
 SOCIAL_AUTH_PIPELINE = (
     # Получает по backend и uid инстансы social_user и user
     'social_auth.backends.pipeline.social.social_auth_user',
+    # Пытается связать аккаунты
+    'social_auth.backends.pipeline.social.associate_user',
     # Получает по user.email инстанс пользователя и заменяет собой тот, который получили выше.
     # Кстати, email выдает только Facebook и GitHub, а Vkontakte и Twitter не выдают
     'social_auth.backends.pipeline.associate.associate_by_email',
     # Пытается собрать правильный username, на основе уже имеющихся данных
-    'social_auth.backends.pipeline.user.get_username',
-    # Создает нового пользователя, если такого еще нет
+    'apps.users.social.get_username',
+    # # Создает нового пользователя, если такого еще нет
     'social_auth.backends.pipeline.user.create_user',
-    # Пытается связать аккаунты
-    'social_auth.backends.pipeline.social.associate_user',
-    # Получает и обновляет social_user.extra_data
-    'social_auth.backends.pipeline.social.load_extra_data',
-    # Обновляет инстанс user дополнительными данными с бекенда
-    'social_auth.backends.pipeline.user.update_user_details'
+    # # Получает и обновляет social_user.extra_data
+    # 'social_auth.backends.pipeline.social.load_extra_data',
+    # # Обновляет инстанс user дополнительными данными с бекенда
+    # 'social_auth.backends.pipeline.user.update_user_details'
 )
+
+# from social_auth.backends.pipeline.user

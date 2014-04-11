@@ -8,6 +8,7 @@
     {% csrf_token %}
     {{ form.as_p }}
     <input type="submit" value="Register" />
+    <a href="{% url 'socialauth_begin' 'vk-oauth' %}">Vk</a>
 </form>
 </body>
 </html>
