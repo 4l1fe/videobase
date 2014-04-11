@@ -1,6 +1,5 @@
 # coding: utf-8
 
-from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -16,16 +15,29 @@ class SimilarFilmView(APIView):
     """
 
     def __get_result(self, film_id):
-        try:
-            result = Films.objects.prefetch_related('persons').get(pk=film_id)
-        except Films.DoesNotExist:
-            raise Http404
+        """
+        Return object Films or Response object with 404 error
+        """
 
-        return result.persons.all()
+        try:
+            result = Films.objects.get(pk=film_id)
+        except Films.DoesNotExist:
+            result = Response(status=status.HTTP_404_NOT_FOUND)
+
+        return result
 
 
     def get(self, request, film_id, format=None, *args, **kwargs):
-        result = self.__get_result(film_id)
+        # Выбираем и проверяем, что фильм существует
+        o_film = self.__get_result(film_id)
+        if type(o_film) == Response:
+            return o_film
+
+        # Логика для выборки похожих фильмов
+        pass
+
+        result = o_film
+
         serializer = vbFilm(result, extend=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
