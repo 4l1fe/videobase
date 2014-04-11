@@ -1,35 +1,39 @@
 # coding: utf-8
 
 from django.http import Http404
-
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
 from apps.films.models import Films
-
-from vb_film import vbFilmSerializer
+from apps.films.api.serializers import vbFilm
 
 
 #############################################################################################################
-#
 class DetailFilmView(APIView):
     """
-    Detailed information about film
+    Return detailed information about movie
     """
 
-    serializer_class = vbFilmSerializer
+    def __get_object(self, film_id):
+        """
+        Return object Films or Response object with 404 error
+        """
 
-    def __get_object(self, pk):
         try:
-            return Films.objects.get(pk=pk)
-        except Exception as e:
-            raise Http404
+            result = Films.objects.get(pk=film_id)
+        except Films.DoesNotExist:
+            result = Response(status=status.HTTP_404_NOT_FOUND)
+
+        return result
 
 
     def __get_result(self, film_id, **kwargs):
-        film = self.__get_object(film_id)
-        serializer = vbFilmSerializer(film, persons=True)
+        o_film = self.__get_object(film_id)
+        if type(o_film) == Response:
+            raise Http404
+
+        serializer = vbFilm(o_film, extend=True, persons=True)
 
         return serializer
 
