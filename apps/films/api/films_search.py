@@ -26,7 +26,6 @@ class SearchFilmsView(APIView):
         instock - Фильм в наличии в кинотеатрах
     """
 
-
     def parse_post(self, data):
         filter = {}
         if data.get('text'):
@@ -47,21 +46,23 @@ class SearchFilmsView(APIView):
         return filter
 
 
-    def post(self, request, format=None, *args, **kwargs):
+    def get(self, request, format=None, *args, **kwargs):
         # Init data
         page = request.DATA.get('page', 1)
         per_page = request.DATA.get('per_page', 12)
 
-        filter = {}
+        filter = self.parse_post(request.DATA)
 
-        o_search = Films.objects.filter(**filter)
+        o_search = Films.objects.all()
+        if filter.get('name'):
+            o_search = o_search.filter(name__icontains=filter['name'])
 
         try:
             page = Paginator(o_search, per_page=per_page).page(page)
         except InvalidPage as e:
             return Response({'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
 
-        serializer = vbFilm(page)
+        serializer = vbFilm(page.object_list)
 
         result = {
             'total_cnt': page.paginator.num_pages,
@@ -70,4 +71,4 @@ class SearchFilmsView(APIView):
             'items': serializer.data,
         }
 
-        return Response({}, status=status.HTTP_200_OK)
+        return Response(result, status=status.HTTP_200_OK)
