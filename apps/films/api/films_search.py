@@ -31,6 +31,9 @@ class SearchFilmsView(APIView):
         if data.get('text'):
             filter.update({'name': data['text']})
 
+        if data.get('year_old'):
+            filter.update({'year_old': data['year_old']})
+
         if data.get('genre'):
             filter.update({'genre': data['genre']})
 
@@ -57,9 +60,18 @@ class SearchFilmsView(APIView):
         if filter.get('name'):
             o_search = o_search.filter(name__icontains=filter['name'])
 
+        if filter.get('year_old'):
+            o_search = o_search.extra(
+                where=['extract(year from age(current_date, "films"."release_date")) >= %s'],
+                params=[filter['year_old']],
+            )
+
+        if filter.get('genre'):
+            o_search = o_search.filter(genre=filter['genre'])
+
         try:
             page = Paginator(o_search, per_page=per_page).page(page)
-        except InvalidPage as e:
+        except Exception as e:
             return Response({'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
 
         serializer = vbFilm(page.object_list)
