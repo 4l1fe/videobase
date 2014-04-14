@@ -23,7 +23,6 @@ urlpatterns = patterns('',
                        url(r'^api/robots/', 'apps.robots.views.schedule_api'),
                        url(r'^robots/', 'apps.robots.views.schedule_interface'),
                        url(r'^api/test',test_view),
-                       url(r'^profile/', 'apps.users.views.profile_edit'),
                        url(r'^users/', include('apps.users.urls')),
                        url(r'^auth/login/', 'rest_framework.authtoken.views.obtain_auth_token'),
 

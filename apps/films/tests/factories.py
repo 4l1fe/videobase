@@ -5,7 +5,7 @@ import factory
 from apps.films.models import Persons, Films
 
 
-class PersonFactory(factory.Factory):
+class PersonFactory(factory.DjangoModelFactory):
 
     FACTORY_FOR = Persons
     name = u'Серж'
@@ -16,7 +16,7 @@ class PersonFactory(factory.Factory):
     pk = 1
 
 
-class FilmFactory(factory.Factory):
+class FilmFactory(factory.DjangoModelFactory):
     FACTORY_FOR = Films
     pk = 1
     id = 1
