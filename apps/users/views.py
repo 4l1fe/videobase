@@ -2,7 +2,6 @@
 
 from django.views.generic import CreateView, TemplateView
 
-from django.http import Http404
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.core.context_processors import csrf
@@ -10,6 +9,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.contrib.auth.models import User
 from django.http import HttpResponseBadRequest
 from django.template.loader import render_to_string
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -76,26 +76,16 @@ def restore_password(request):
 
 
 class ObtainSessionToken(APIView):
-    def get(self, request, format=None, resource_id=None, extend=False):
 
-        #try:
-        if True:
-            session = create_new_session(request.user)
-
-            print(session.created)
-            response_dict = {'session': session.pk,
-                             'expires': session.get_expiration_time(),
-                             'session_token': session.token.key
-
-            }
+    def get(self, request, format=None, *args, **kwargs):
         try:
-            pass
-        except Exception, e:
-            print e
-            raise Http404
-            # Any URL parameters get passed in **kw
+            session = create_new_session(request.user)
+            response_dict = {
+                'session': session.pk,
+                'expires': session.get_expiration_time(),
+                'session_token': session.token.key,
+            }
+        except Exception as e:
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
-        response = Response(response_dict, status=status.HTTP_200_OK)
-        return response
-
-
+        return Response(response_dict, status=status.HTTP_200_OK)
