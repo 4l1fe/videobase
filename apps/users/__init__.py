@@ -9,3 +9,10 @@ from rest_framework.authtoken.models import Token
 def create_auth_token(sender, instance=None, created=False, **kwargs):
     if created:
         Token.objects.create(user=instance)
+
+
+
+@receiver(post_save, sender=get_user_model())
+def create_auth_token(sender, instance=None, created=False, **kwargs):
+    if created:
+        SessionToken.objects.create(user=instance)
