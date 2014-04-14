@@ -208,19 +208,17 @@ AUTHENTICATION_BACKENDS = (
 SOCIAL_AUTH_PIPELINE = (
     # Получает по backend и uid инстансы social_user и user
     'social_auth.backends.pipeline.social.social_auth_user',
-    # Пытается связать аккаунты
-    'social_auth.backends.pipeline.social.associate_user',
     # Получает по user.email инстанс пользователя и заменяет собой тот, который получили выше.
     # Кстати, email выдает только Facebook и GitHub, а Vkontakte и Twitter не выдают
     'social_auth.backends.pipeline.associate.associate_by_email',
     # Пытается собрать правильный username, на основе уже имеющихся данных
-    'apps.users.social.pipeline.username',
+    'social_auth.backends.pipeline.user.get_username',
     # # Создает нового пользователя, если такого еще нет
     'social_auth.backends.pipeline.user.create_user',
+    # Пытается связать аккаунты
+    'social_auth.backends.pipeline.social.associate_user',
     # Получает и обновляет social_user.extra_data
     'social_auth.backends.pipeline.social.load_extra_data',
     # Обновляет инстанс user дополнительными данными с бекенда
     'social_auth.backends.pipeline.user.update_user_details'
 )
-
-# from social_auth.backends.pipeline.user

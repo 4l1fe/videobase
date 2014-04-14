@@ -12,9 +12,6 @@ from apps.films.views import test_view
 admin.autodiscover()
 
 urlpatterns = patterns('',
-                       url(r'^admin_tools/', include('admin_tools.urls')),
-                       url(r'^admin/', include(admin.site.urls)),
-                       url(r'^admin_tools/', include('admin_tools.urls')),
                        # API
                        url(r'^api/image/resize/', 'apps.films.views.resize_image'),
                        url(r'^api/image/brco/', 'apps.films.views.bri_con'),
@@ -30,11 +27,9 @@ urlpatterns = patterns('',
                        url(r'^$', 'apps.films.views.index_view'),
                        # Social
                        url(r'', include('social_auth.urls')),
-
                        # Admin
                        url(r'^admin_tools/', include('admin_tools.urls')),
                        url(r'^admin/', include(admin.site.urls)),
-                       url(r'^admin_tools/', include('admin_tools.urls')),
 )
 
 if settings.DEBUG:
