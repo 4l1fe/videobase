@@ -3,6 +3,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 
 from apps.films.models import Films, UsersFilms
 from apps.films.constants import APP_USERFILM_STATUS_NOT_WATCH, APP_USERFILM_STATUS_UNDEF
@@ -17,6 +18,8 @@ class ActNotwatchFilmView(APIView):
     Method delete:
         - Delete subscribe to the movie
     """
+
+    permission_classes = (IsAuthenticated,)
 
     def __get_object(self, film_id):
         """

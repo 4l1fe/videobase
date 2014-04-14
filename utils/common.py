@@ -120,3 +120,19 @@ def group_by(list, key, objects=False):
         result_dict[k_value].append(item)
 
     return result_dict
+
+
+def get_authorization_header(request):
+    """
+    Return request's 'Authorization:' header, as a bytestring.
+    Hide some test client ickyness where the header can be unicode.
+    """
+
+    from rest_framework import HTTP_HEADER_ENCODING
+
+    auth = request.META.get('HTTP_AUTHORIZATION', b'')
+    if type(auth) == type(''):
+        # Work around django test client oddness
+        auth = auth.encode(HTTP_HEADER_ENCODING)
+
+    return auth

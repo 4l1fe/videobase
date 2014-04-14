@@ -105,7 +105,7 @@ class vbFilm(serializers.HyperlinkedModelSerializer):
         return result.get(obj.pk, [])
 
     def poster_list(self, obj):
-        extras = FilmExtras.objects.filter(film__in=[obj.pk], etype=APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER)
+        extras = FilmExtras.objects.filter(film__in=[obj.pk], type=APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER)
         extras = group_by(extras, 'id', True)
 
         return [item.url for item in extras.get(obj.pk, []) if len(item.url)]

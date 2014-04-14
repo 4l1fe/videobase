@@ -162,6 +162,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
+        'apps.users.models.api_session.MultipleTokenAuthentication',
     )
 }
 
@@ -175,6 +176,7 @@ AUTHENTICATION_BACKENDS = (
     'social_auth.backends.contrib.mailru.MailruBackend',
     'django.contrib.auth.backends.ModelBackend',
     'rest_framework.authentication.TokenAuthentication',
+    'apps.users.models.api_session.MultipleTokenAuthentication',
 )
 
 # Перечислим pipeline, которые последовательно буду обрабатывать респонс
@@ -195,3 +197,5 @@ SOCIAL_AUTH_PIPELINE = (
     # Обновляет инстанс user дополнительными данными с бекенда
     'social_auth.backends.pipeline.user.update_user_details'
 )
+
+API_SESSION_EXPIRATION_TIME = 15 # in minutes
