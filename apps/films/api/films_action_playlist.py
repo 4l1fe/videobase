@@ -3,6 +3,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 
 from apps.films.models import Films, UsersFilms
 from apps.films.constants import APP_USERFILM_STATUS_SUBS, APP_USERFILM_SUBS_TRUE, APP_FILM_SERIAL
@@ -17,6 +18,8 @@ class ActPlaylistFilmView(APIView):
     Method delete:
         - Delete subscribe to the serial
     """
+
+    permission_classes = (IsAuthenticated,)
 
     def __get_object(self, film_id):
         """
@@ -53,7 +56,7 @@ class ActPlaylistFilmView(APIView):
         # Устанавливаем в плейлист
         try:
             o_subs = UsersFilms.object.get(**filter)
-            return Response({'error': 'Уже подписан'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': u'Уже подписан'}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             try:
                 o_subs = UsersFilms(**filter(add_params))
