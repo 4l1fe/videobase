@@ -9,7 +9,10 @@ from django.db import models
 from django.conf import settings
 import binascii
 import os
+import  datetime
 from hashlib import sha1
+from django.conf import settings
+from django.utils import timezone
 
 AUTH_USER_MODEL = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
 
@@ -22,7 +25,7 @@ def get_authorization_header(request):
 
     Hide some test client ickyness where the header can be unicode.
     """
-    auth = request.META.get('X-VB-Token', b'')
+    auth = request.META.get('HTTP_AUTHORIZATION', b'')
     if type(auth) == type(''):
         # Work around django test client oddness
         auth = auth.encode(HTTP_HEADER_ENCODING)
@@ -40,16 +43,16 @@ class SessionToken(models.Model):
     The default authorization token model.
     """
     key = models.CharField(max_length=40, primary_key=True)
-    user = models.ForeignKey(AUTH_USER_MODEL, verbose_name= 'Session Token')
+    user = models.ForeignKey(User, verbose_name= 'Session User')
     created = models.DateTimeField(auto_now_add=True)
 
-    class Meta:
+    #class Meta:
         # Work around for a bug in Django:
         # https://code.djangoproject.com/ticket/19422
         #
         # Also see corresponding ticket:
         # https://github.com/tomchristie/django-rest-framework/issues/705
-        abstract = 'rest_framework.authtoken' not in settings.INSTALLED_APPS
+    #    abstract = 'rest_framework.authtoken' not in settings.INSTALLED_APPS
 
     def save(self, *args, **kwargs):
         if not self.key:
@@ -61,6 +64,12 @@ class SessionToken(models.Model):
 
     def __unicode__(self):
         return self.key
+    class Meta:
+        # Имя таблицы в БД
+        db_table = 'users_api_session_tokens'
+        app_label = 'users'
+        verbose_name = u'API сессия'
+        verbose_name_plural = u'API Сессии'
 
 
 class MultipleTokenAuthentication(BaseAuthentication):
@@ -84,7 +93,7 @@ class MultipleTokenAuthentication(BaseAuthentication):
     def authenticate(self, request):
         auth = get_authorization_header(request).split()
 
-        if not auth or auth[0].lower() != b'token':
+        if not auth or auth[0].lower() != b'x-vb-token':
             return None
 
         if len(auth) == 1:
@@ -105,27 +114,44 @@ class MultipleTokenAuthentication(BaseAuthentication):
         if not token.user.is_active:
             raise exceptions.AuthenticationFailed('User inactive or deleted')
 
+        try:
+            uas = UsersApiSessions.objects.get(token = token)
+
+            if uas.get_expiration_time() > timezone.now():
+                raise exceptions.AuthenticationFailed('Session expired')
+        except UsersApiSessions.DoesNotExist:
+            raise exceptions.AuthenticationFailed('There is no session associated with this token')
+
+
         return (token.user, token)
 
     def authenticate_header(self, request):
-        return 'Token'
+        return 'X-VB-Token'
 
 class UsersApiSessions(models.Model):
 
     created = models.DateTimeField(auto_now_add=True, editable=False, verbose_name=u'Дата создания')
-    token = models.ForeignKey(SessionToken)
+    token = models.ForeignKey('SessionToken')
 
     def get_expire_time(self):
         pass
     def __unicode__(self):
         return u'[%s] %s' % (self.pk, self.user.name)
 
+    def get_expiration_time(self):
+
+        return self.created + datetime.timedelta(minutes=settings.API_SESSION_EXPIRATION_TIME)
     class Meta:
         # Имя таблицы в БД
         db_table = 'users_api_sessions'
         app_label = 'users'
         verbose_name = u'API сессия'
         verbose_name_plural = u'API Сессии'
+
+
+
+
+
 
 
 '''
