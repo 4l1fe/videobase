@@ -85,7 +85,7 @@ class MultipleTokenAuthentication(BaseAuthentication):
         try:
             uas = UsersApiSessions.objects.get(token=token)
 
-            if uas.get_expiration_time() > timezone.now():
+            if uas.get_expiration_time() < timezone.now():
                 raise exceptions.AuthenticationFailed('Session expired')
 
         except UsersApiSessions.DoesNotExist:
