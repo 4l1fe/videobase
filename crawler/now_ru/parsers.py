@@ -1,60 +1,76 @@
 # coding: utf-8
 from ..core import BaseParse
-
+from apps.contents.constants import *
+import re
 from bs4 import BeautifulSoup
-HOST = 'http://www.now.ru'
-FILM_URL = ''
-COST = 0
+
+
 # Парсер для поисковика фильма
 def parse_search(response, film):
-    searchTextTitle = 'Результаты поиска'.decode('utf-8')
-    filmDiv = None;
-    exitFlag = False
+    HOST = 'http://www.now.ru'
+    search_text_title = 'Результаты поиска'.decode('utf-8')
+    film_div = None
+    exit_flag = False
     try:
         content = response.content
         soup = BeautifulSoup(content)
-        if(soup.select('div.noresults')==None):
-            return
-        if(searchTextTitle in soup.head.title.text):
+        if soup.find(attrs={'id': 'noresults'})is not None:
+            return None
+        if search_text_title in soup.head.title.text:
             for tag in soup.select('div.play-about'):
-                if(exitFlag):
+                if exit_flag:
                     break
                 for h2 in tag.find_all('h2'):
                     h2.span.extract()
-                    if(h2.text.lower().strip() == film.decode('utf-8').lower().strip()):
-                        filmDiv = h2.parent.parent.parent
-                        exitFlag = True
+                    if h2.text.lower().strip() == film.decode('utf-8').lower().strip():
+                        film_div = h2.parent.parent.parent
+                        exit_flag = True
                         break
-            if(filmDiv != None):
-                aTag = filmDiv.a
-                costDiv = filmDiv.find(attrs={'class':'watch_container'})
-                if(costDiv != None):
-                    COST = costDiv.span.getText().strip().split(' ')[0]
-                filmLink = HOST + aTag.get('href')
+            if film_div is not None:
+                a_tag = film_div.a
+                film_link = HOST + a_tag.get('href')
         else:
-            filmLink = soup.find(attrs={'property':'og:url'}).get('content')
-
-        global FILM_URL
-        FILM_URL = filmLink
+            film_link = soup.find(attrs={'property':'og:url'}).get('content')
 
     except IndexError:
-        filmLink = None
-    return filmLink
+        film_link = None
+    return film_link
+
 
 # Парсер для страници фильма
-class ParseNowFilmPage(object):
-    def parse(self, response, dict_gen, film):
-        d = dict_gen(film)
-        d['url_view'] = self.get_link()
-        d['price_type'] = 0
-        d['price'] = self.get_price()
-        print d
-        return  [d]
-    def get_price(self):
-       return 0
+class ParseNowFilmPage(BaseParse):
+    def __init__(self, html):
+        super(ParseNowFilmPage, self).__init__(html)
+        self.soup = BeautifulSoup(html, "html")
 
-    def get_seasons(self):
-        [0,]
+    def get_link(self, **kwargs):
+        link = self.soup.find(attrs={'property': 'og:url'}).get('content')
+        return link
 
-    def get_link(self):
-       return FILM_URL
+    def get_price(self, **kwargs):
+        price = 0
+        price_type = APP_CONTENTS_PRICE_TYPE_FREE
+        root_div = self.soup.find('div', {'class': ['content-prices', 'bookmarked']})
+        div_price = root_div.find('div', {'class': 'watch_additional_container'})
+        if div_price is not None:
+            price_type = APP_CONTENTS_PRICE_TYPE_PAY
+            price = float(div_price.span.getText().strip().split(' ')[0])
+        else:
+            div_price = root_div.find('div', {'class': 'watch_container'})
+            if div_price is not None:
+                reg = re.search(ur'\d+', div_price.span.text)
+                if div_price.input['value'] == u'Подписка':
+                    price_type = APP_CONTENTS_PRICE_TYPE_SUBSCRIPTION
+                    price = float(reg.group())
+                elif reg is not None:
+                    price_type = APP_CONTENTS_PRICE_TYPE_PAY
+                    price = float(reg.group())
+        return price, price_type
+
+    def get_seasons(self, **kwargs):
+        seasons_div = self.soup.find('div', {'class': 'balloontabs'})
+        if seasons_div is not None:
+            seasons = seasons_div.find_all('div', {'class': 'balloontab'})
+            return range(1, len(seasons)+1)
+        else:
+            return [0]
