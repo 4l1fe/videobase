@@ -91,6 +91,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 
 TEMPLATE_DIRS = (
     os.path.join(BASE_DIR, 'templates/'),
+    os.path.join(BASE_DIR, 'interface/'),
 )
 
 ROOT_URLCONF = 'videobase.urls'

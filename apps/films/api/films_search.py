@@ -49,12 +49,12 @@ class SearchFilmsView(APIView):
         return filter
 
 
-    def post(self, request, format=None, *args, **kwargs):
+    def get(self, request, format=None, *args, **kwargs):
         # Init data
-        page = request.DATA.get('page', 1)
-        per_page = request.DATA.get('per_page', 12)
+        page = request.QUERY_PARAMS.get('page', 1)
+        per_page = request.QUERY_PARAMS.get('per_page', 12)
 
-        filter = self.parse_post(request.DATA)
+        filter = self.parse_post(request.QUERY_PARAMS)
 
         o_search = Films.objects.all()
         # Поиск по имени

@@ -189,53 +189,7 @@ class PersonActionAPIView(APIView):
 
 
 
-class FilmActionAPIView(APIView):
-    '''
 
-
-
-    '''
-
-    post_action_constant = None
-    delete_action_constant = None
-    def __users_films_set(self,user,film, kwargs):
-
-        try:
-            uf = UsersFilms.objects.get(user = user,
-                                          film = film)
-
-            for key in kwargs:
-                setattr(uf,key,kwargs[key])
-
-
-        except UsersFilms.DoesNotExist, ue:
-            up = UsersFilms(user = user,
-                              film = film,
-                              **kwargs)
-            up.save()
-
-    def _response_template(self, subscribed, request, format=None, resource_id=None):
-        '''
-        Template for responses
-        '''
-
-        try:
-            person = Films.objects.get(id=resource_id)
-            self.__users_film_set(request.user, film, subscribed)
-            response = Response(None, status=status.HTTP_200_OK)
-            return response
-
-        except Exception, e:
-            print e
-            raise Http404
-            # Any URL parameters get passed in **kw
-
-
-    def post(self, request, format = None, resource_id = None):
-        raise NameError("Not Implemented")
-
-    def delete(self, request, format = None, resource_id = None):
-        raise NameError("Not Implemented")
 
 
 
@@ -261,10 +215,47 @@ class PersonsExtrasAPIView(APIView):
             # Any URL parameters get passed in **kw
         
 
+    def get(self, request, format = None, resource_id = None, per_page = 10, page= 1 ):
+
+        try:
+            film = Films.objects.get(pk=resource_id)
+            content = Contents.objects.get(film=film)
+            vbComments = [comment.as_vbComment() for comment in Comments.objects.filter(content=content.id)]
+
+        except Exception, e:
+            print e
+            raise Http404
+            # Any URL parameters get passed in **kw
+
+        response = Response(vbComments, status=status.HTTP_200_OK)
+        return response
+
+
+def index_view(request):
+        # ... view code here
+
+    return render_to_response('index.html',)
+
+def person_view(request):
+        # ... view code here
+
+    return render_to_response('person.html',)
+
+def register_view(request):
+        # ... view code here
+
+    return render_to_response('register.html',)
+
+def login_view(request):
+        # ... view code here
+
+    return render_to_response('login.html',)
+
+
 def test_view(request):
     c = Context({})
     c.update(csrf(request))
-    
+
     # ... view code here
     return render_to_response('api_test.html',c)
 
