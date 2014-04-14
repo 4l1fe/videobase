@@ -50,7 +50,7 @@ class CommentsFilmView(APIView):
         except InvalidPage as e:
             return Response({'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
 
-        serializer = vbComment(page)
+        serializer = vbComment(page.object_list, many=True)
         result = {
             'page': page.number,
             'total_cnt': page.paginator.num_pages,

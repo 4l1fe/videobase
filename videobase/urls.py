@@ -15,21 +15,19 @@ urlpatterns = patterns('',
                        url(r'^admin_tools/', include('admin_tools.urls')),
                        url(r'^admin/', include(admin.site.urls)),
                        url(r'^admin_tools/', include('admin_tools.urls')),
-                       # API
+                       url(r'^admin/', include(admin.site.urls)),
                        url(r'^api/image/resize/', 'apps.films.views.resize_image'),
                        url(r'^api/image/brco/', 'apps.films.views.bri_con'),
                        url(r'^api/', include('apps.films.urls')),
+                       url(r'^api/', include('apps.users.api.urls')),
                        url(r'^api/robots/', 'apps.robots.views.schedule_api'),
                        url(r'^api/test', test_view),
 
                        url(r'^robots/', 'apps.robots.views.schedule_interface'),
+                       url(r'^api/test',test_view),
+                       url(r'^profile/', 'apps.users.views.profile_edit'),
                        url(r'^users/', include('apps.users.urls')),
                        url(r'^auth/login/', 'rest_framework.authtoken.views.obtain_auth_token'),
-                       url(r'^person/', 'apps.films.views.person_view'),
-                       url(r'^register/', 'apps.films.views.register_view'),
-                       url(r'^login/', 'apps.films.views.login_view'),
-                       url(r'^$', 'apps.films.views.index_view'),
-
 
                        # Admin
                        url(r'^admin_tools/', include('admin_tools.urls')),
