@@ -33,6 +33,6 @@ class LocationsFilmView(APIView):
             return o_content
 
         o_location = Locations.objects.filter(content=o_content.pk).defer('content')
-        serializer = vbLocation(o_location)
+        serializer = vbLocation(o_location, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
