@@ -241,10 +241,6 @@ def person_view(request):
 
     return render_to_response('person.html',)
 
-def register_view(request):
-        # ... view code here
-
-    return render_to_response('register.html',)
 
 def login_view(request):
         # ... view code here

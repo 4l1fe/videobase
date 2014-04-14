@@ -26,10 +26,10 @@ urlpatterns = patterns('',
                        url(r'^users/', include('apps.users.urls')),
                        url(r'^auth/login/', 'rest_framework.authtoken.views.obtain_auth_token'),
                        url(r'^person/', 'apps.films.views.person_view'),
-                       url(r'^register/', 'apps.films.views.register_view'),
-                       url(r'^login/', 'apps.films.views.login_view'),
+                       url(r'^login/$', 'apps.films.views.login_view'),
                        url(r'^$', 'apps.films.views.index_view'),
-
+                       # Social
+                       url(r'', include('social_auth.urls')),
 
                        # Admin
                        url(r'^admin_tools/', include('admin_tools.urls')),
