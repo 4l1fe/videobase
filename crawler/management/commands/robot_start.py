@@ -14,6 +14,8 @@ from crawler.ivi_ru.loader import IVI_Loader
 from crawler.ivi_ru.parsers import ParseFilmPage
 from crawler.now_ru.loader import NOW_Loader
 from crawler.now_ru.parsers import ParseNowFilmPage
+from crawler.megogo_net.loader import MEGOGO_Loader
+from crawler.megogo_net.parsers import ParseMegogoFilm
 from crawler.core.exceptions import *
 from crawler.playfamily_dot_ru.loader import playfamily_loader
 from crawler.playfamily_dot_ru.parser import PlayfamilyParser
@@ -28,7 +30,7 @@ from crawler import Robot
 logging.basicConfig(level = logging.DEBUG)
 
 # Список допустимых сайтов
-sites = ('ivi.ru', 'zoomby.ru', 'now.ru', 'playfamily.ru', 'amediateka.ru')
+
 
 # Словарь сайтов:
 # louder: загрузчик страници
@@ -37,17 +39,19 @@ sites_crawler = {
     'ivi.ru': {'loader': IVI_Loader,
                'parser': ParseFilmPage},
     'zoomby.ru': {'loader': ZOOMBY_Loader,
-                  'parser': ParseFilm},
-    'megogo.net': {'loader': None,
-                   'parser': None},
+                  'parser': ParseFilm()},
+    'megogo.net': {'loader': MEGOGO_Loader,
+                   'parser': ParseMegogoFilm},
     'now.ru': {'loader': NOW_Loader,
-               'parser': ParseNowFilmPage()},
+               'parser': ParseNowFilmPage},
     'amediateka.ru': {'loader': None,
                       'parser': None},
     'playfamily.ru': {'loader': playfamily_loader,
-                      'parser': PlayfamilyParser()}
+                      'parser': PlayfamilyParser()},
+    'tvigle.ru':{'loader':TVIGLE_Loader,
+                 'parser':ParseTvigleFilm()}
 }
-
+sites = sites_crawler.keys()
 
 def sane_dict(film=None):
 
@@ -175,6 +179,7 @@ class Command(BaseCommand):
         count = int(options['count'])
         
         film = Films.objects.filter(id__in=range(start, start + count + 1))
+#        film = Films.objects.filter(id=380)
         site = options['site']
         logging.debug("Starting robot for %s", site)
         try:
@@ -183,6 +188,8 @@ class Command(BaseCommand):
             for data in robot.get_data(sane_dict):
                 logging.debug("Trying to put data from %s for %s to db", site, str(data['film']))
                 save_location(**data)
+        try:
+            pass
         except ConnectionError, ce:
             # Couldn't conect to server
             logging.debug("Connection error")

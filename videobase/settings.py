@@ -60,7 +60,6 @@ INSTALLED_APPS = (
     'apps.films',
     'apps.contents',
     'crawler',
-    'rest_framework',
     'social_auth'
 )
 
@@ -91,8 +90,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 
 
 TEMPLATE_DIRS = (
-    os.path.join(BASE_DIR, 'tpls'),
-    os.path.join(BASE_DIR,'templates/'),
+    os.path.join(BASE_DIR, 'templates/'),
 )
 
 ROOT_URLCONF = 'videobase.urls'
@@ -148,7 +146,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
 MEDIA_ROOT = os.path.abspath(BASE_PATH + '/../static')
-print "BASE_PATH", BASE_PATH, MEDIA_ROOT
 MEDIA_URL = '/static/'
 
 STATIC_URL = '/production/static/'
