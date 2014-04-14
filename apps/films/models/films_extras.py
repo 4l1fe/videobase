@@ -31,7 +31,7 @@ class FilmExtras(PhotoClass):
 
     def __init__(self, *args, **kwargs):
         super(FilmExtras, self).__init__(*args, **kwargs)
-        self._original_etype = self.etype
+        self._original_type = self.type
 
     @property
     def get_upload_to(self):
@@ -39,14 +39,14 @@ class FilmExtras(PhotoClass):
 
     def clean(self, *args, **kwargs):
         if not self.pk is None:
-            if self._original_etype != self.etype:
-                msg = {'etype': (u"Это поле не изменяемо",)}
+            if self._original_type != self.type:
+                msg = {'type': (u"Это поле не изменяемо",)}
                 raise ValidationError(msg)
 
     def save(self, *args, **kwargs):
-        if self.etype == APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER:
+        if self.type == APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER:
             self.url = None
-        elif self.etype == APP_FILM_TYPE_ADDITIONAL_MATERIAL_TRAILER:
+        elif self.type == APP_FILM_TYPE_ADDITIONAL_MATERIAL_TRAILER:
             self.photo = None
 
         super(FilmExtras, self).save(*args, **kwargs)
