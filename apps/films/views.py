@@ -260,26 +260,7 @@ class PersonsExtrasAPIView(APIView):
             raise Http404
             # Any URL parameters get passed in **kw
         
-class FilmsCommentsAPIView(APIView):
 
-
-    def get(self, request, format = None, resource_id = None, per_page = 10, page= 1 ):
-
-        try:
-            film = Films.objects.get(pk=resource_id)
-            content = Contents.objects.get(film=film)
-            vbComments = [comment.as_vbComment() for comment in Comments.objects.filter(content=content.id)]
-
-        except Exception, e:
-            print e
-            raise Http404
-            # Any URL parameters get passed in **kw
-
-        response = Response(vbComments, status=status.HTTP_200_OK)
-        return response
-
-
-    
 def test_view(request):
     c = Context({})
     c.update(csrf(request))

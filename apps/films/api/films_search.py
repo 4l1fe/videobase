@@ -1,18 +1,19 @@
 # coding: utf-8
 
 from django.http import Http404
-from django.conf.urls import url
 from django.core.paginator import Paginator, InvalidPage
-from tastypie.validation import FormValidation
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
 
 from apps.films.api.serializers import vbFilm
+from apps.films.models import Films
 from apps.films.forms import SearchForm
 
 
-
 #############################################################################################################
-# Api для поиска фильмов
-class FilmsSearchResource(vbFilm):
+class SearchFilmsView(APIView):
     """
     Поиск по фильмам:
         text - Текст для поиска
@@ -25,63 +26,16 @@ class FilmsSearchResource(vbFilm):
         instock - Фильм в наличии в кинотеатрах
     """
 
-    class Meta(vbFilm.Meta):
-        allowed_methods = ['post']
-        resource_name = 'films/search'
-        validation = FormValidation(form_class=SearchForm)
-
-
-    def prepend_urls(self):
-        """
-        Returns a URL scheme based on the default scheme to specify
-        the response format as a file extension, e.g. /api/v1/users.json
-        """
-        return [
-            url(r"^(?P<resource_name>%s)\.(?P<format>\w+)$" % self._meta.resource_name, self.wrap_view('dispatch_list'), name="api_dispatch_list"),
-            url(r"^(?P<resource_name>%s)/schema\.(?P<format>\w+)$" % self._meta.resource_name, self.wrap_view('get_schema'), name="api_get_schema"),
-        ]
-
-
-    def determine_format(self, request):
-        """
-        Used to determine the desired format from the request.format attribute.
-        """
-        if (hasattr(request, 'format') and
-                request.format in self._meta.serializer.formats):
-            return self._meta.serializer.get_mime_for_format(request.format)
-        return super(FilmsSearchResource, self).determine_format(request)
-
-
-    def alter_list_data_to_serialize(self, request, page):
-        bundles = []
-        list_ids = [i.pk for i in page.object_list]
-
-        extras = self.get_films_extras(list_ids)
-        locations = self.get_films_locations(list_ids)
-
-        for obj in page.object_list:
-            obj.poster = extras.get(obj.pk, [])
-            obj.locations = locations.get(obj.pk, [])
-            bundle = self.build_bundle(obj=obj, request=request)
-            bundles.append(self.full_dehydrate(bundle, for_list=True))
-
-        object_list = {
-            'total_cnt': page.paginator.num_pages,
-            'per_page':  page.paginator.per_page,
-            'page':      page.number,
-            'items':     bundles,
-        }
-
-        return object_list
-
-
-    def alter_deserialized_detail_data(self, request, data):
+    def parse_post(self, data):
         filter = {}
         if data.get('text'):
             filter.update({'name': data['text']})
 
+        if data.get('year_old'):
+            filter.update({'year_old': data['year_old']})
+
         if data.get('genre'):
-            filter.update({'genre': data['genre']})
+            filter.update({'genres': data['genre']})
 
         if data.get('rating'):
             filter.update({'rating': data['rating']})
@@ -92,22 +46,48 @@ class FilmsSearchResource(vbFilm):
         if data.get('instock'):
             filter.update({'instock': data['instock']})
 
-        return data, filter
+        return filter
 
 
-    def post_list(self, request, **kwargs):
-        deserialized = self.deserialize(request, request.body, format=request.META.get('CONTENT_TYPE', 'application/json'))
-        deserialized, filter = self.alter_deserialized_detail_data(request, deserialized)
+    def post(self, request, format=None, *args, **kwargs):
+        # Init data
+        page = request.DATA.get('page', 1)
+        per_page = request.DATA.get('per_page', 12)
 
-        o_search = self._meta.queryset.filter(**filter)
-        paginator = Paginator(o_search, deserialized.get('per_page', 24))
+        filter = self.parse_post(request.DATA)
+
+        o_search = Films.objects.all()
+        # Поиск по имени
+        if filter.get('name'):
+            o_search = o_search.filter(name__icontains=filter['name'])
+
+        # Поиск по количеству прошедших лет
+        if filter.get('year_old'):
+            o_search = o_search.extra(
+                where=['extract(year from age(current_date, "films"."release_date")) >= %s'],
+                params=[filter['year_old']],
+            )
+
+        # Поиск по рейтингу
+        if filter.get('rating'):
+            o_search = o_search.filter(rating_cons__gte=filter['rating'])
+
+        # Поиск по жанрам
+        if filter.get('genres'):
+            o_search = o_search.filter(genres=filter['genres'])
 
         try:
-            page = paginator.page(int(deserialized.get('page', 1)))
-        except InvalidPage:
-            raise Http404("Sorry, no results on that page.")
+            page = Paginator(o_search, per_page=per_page).page(page)
+        except Exception as e:
+            return Response({'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
 
-        object_list = self.alter_list_data_to_serialize(request, page)
-        self.log_throttled_access(request)
+        serializer = vbFilm(page.object_list, many=True)
 
-        return self.create_response(request, object_list)
+        result = {
+            'total_cnt': page.paginator.num_pages,
+            'per_page': page.paginator.per_page,
+            'page': page.number,
+            'items': serializer.data,
+        }
+
+        return Response(result, status=status.HTTP_200_OK)

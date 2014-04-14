@@ -3,6 +3,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 
 from apps.films.forms import RatingForm
 from apps.films.models import Films, UsersFilms
@@ -11,7 +12,14 @@ from apps.films.models import Films, UsersFilms
 #############################################################################################################
 class ActRateFilmView(APIView):
     """
+    Method post:
+        - Sets rating for a movie by user
+
+    Method delete:
+        - Sets rating as None for a movie by user
     """
+
+    permission_classes = (IsAuthenticated,)
 
     def __get_object(self, film_id):
         """

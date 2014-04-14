@@ -3,8 +3,8 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 
-from apps.films.models import Films
 from apps.contents.models import Comments, Contents
 from apps.films.forms import CommentForm
 
@@ -16,9 +16,11 @@ class ActCommentFilmView(APIView):
         - Makes insert a comment to the movie
     """
 
+    permission_classes = (IsAuthenticated,)
+
     def __get_object(self, film_id):
         """
-        Return object Films or Response object with 404 error
+        Return object Contents or Response object with 404 error
         """
         try:
             result = Contents.objects.get(film=film_id)

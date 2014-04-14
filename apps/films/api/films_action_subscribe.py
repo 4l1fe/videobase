@@ -3,6 +3,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 
 from apps.films.models import Films, UsersFilms
 from apps.films.constants import APP_USERFILM_SUBS_TRUE, APP_USERFILM_SUBS_FALSE, APP_FILM_SERIAL
@@ -11,8 +12,14 @@ from apps.films.constants import APP_USERFILM_SUBS_TRUE, APP_USERFILM_SUBS_FALSE
 #############################################################################################################
 class ActSubscribeFilmView(APIView):
     """
+    Method get:
+        - Sets subscribe for a serial by user
 
+    Method delete:
+        - Delete subscribe for a serial by user
     """
+
+    permission_classes = (IsAuthenticated,)
 
     def __get_object(self, film_id):
         """
@@ -34,7 +41,7 @@ class ActSubscribeFilmView(APIView):
 
         # Проверка, что это сериал
         if o_film.type != APP_FILM_SERIAL:
-            return Response({'error': 'Нельзя подписаться на фильм'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': u'Нельзя подписаться на фильм'}, status=status.HTTP_400_BAD_REQUEST)
 
         # Init data
         subscribed = APP_USERFILM_SUBS_TRUE
@@ -63,15 +70,16 @@ class ActSubscribeFilmView(APIView):
 
         # Проверка, что это сериал
         if o_film.type != APP_FILM_SERIAL:
-            return Response({'error': 'Нельзя отписаться от фильма'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': u'Нельзя отписаться от фильма'}, status=status.HTTP_400_BAD_REQUEST)
 
         # Init data
+        subscribed = APP_USERFILM_SUBS_FALSE
         filter = {
             'user': request.user.pk,
             'film': o_film.pk,
         }
 
         # Удалим подписку
-        UsersFilms.objects.filter(**filter).update(subscribed=APP_USERFILM_SUBS_FALSE)
+        UsersFilms.objects.filter(**filter).update(subscribed=subscribed)
 
         return Response(status=status.HTTP_200_OK)

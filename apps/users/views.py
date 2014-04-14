@@ -1,14 +1,24 @@
 # coding: utf-8
-from django.http import HttpResponseBadRequest, HttpResponse, HttpResponseRedirect
+
 from django.views.generic import CreateView, TemplateView
-from django.template.loader import render_to_string
+
+from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.core.context_processors import csrf
 from django.core.mail import EmailMultiAlternatives
 from django.contrib.auth.models import User
+from django.http import HttpResponseBadRequest
+from django.template.loader import render_to_string
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
 
 from constants import SUBJECT_TO_RESTORE_PASSWORD
 from .forms import UsersProfileForm, CustomRegisterForm
+
+from apps.users.api.utils import create_new_session
+
 
 
 class ProfileEdit(TemplateView):
@@ -65,3 +75,17 @@ def restore_password(request):
     return response
 
 
+class ObtainSessionToken(APIView):
+
+    def get(self, request, format=None, *args, **kwargs):
+        try:
+            session = create_new_session(request.user)
+            response_dict = {
+                'session': session.pk,
+                'expires': session.get_expiration_time(),
+                'session_token': session.token.key,
+            }
+        except Exception as e:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        return Response(response_dict, status=status.HTTP_200_OK)
