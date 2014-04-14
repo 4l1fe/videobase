@@ -43,6 +43,6 @@ class ExtrasFilmView(APIView):
             filter.update({'type': type})
 
         o_extras = FilmExtras.objects.filter(**filter)
-        serializer = vbExtra(o_extras)
+        serializer = vbExtra(o_extras, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
