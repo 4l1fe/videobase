@@ -1,38 +1,38 @@
 # coding: utf-8
 
-from django.http import Http404
-
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
 from apps.contents.models import Contents, Locations
-
-from vb_locations import vbLocationsFilmSerializer
+from apps.films.api.serializers.vb_location import vbLocation
 
 
 #############################################################################################################
-#
 class LocationsFilmView(APIView):
     """
-    All locations film
+    Returns all locations movie
     """
 
-    def __get_obj_content(self, film_id):
+    def __get_object(self, film_id):
+        """
+        Return object Films or Response object with 404 error
+        """
+
         try:
-            return Contents.objects.filter(film=film_id)[0]
-        except Exception as e:
-            raise Http404
+            result = Contents.objects.get(film=film_id)
+        except Contents.DoesNotExist:
+            result = Response(status=status.HTTP_404_NOT_FOUND)
 
-
-    def __get_all_locations(self, content_id):
-        location = Locations.objects.filter(content=content_id).defer('content')
-        return location
+        return result
 
 
     def get(self, request, film_id, format=None, *args, **kwargs):
-        content = self.__get_obj_content(film_id)
-        location = self.__get_all_locations(content.id)
-        serializer = vbLocationsFilmSerializer(location)
+        o_content = self.__get_object(film_id)
+        if type(o_content) == Response:
+            return o_content
 
-        return Response({'test': 'test'}, status=status.HTTP_200_OK)
+        o_location = Locations.objects.filter(content=o_content.pk).defer('content')
+        serializer = vbLocation(o_location, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)

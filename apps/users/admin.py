@@ -10,15 +10,16 @@ from models import *
 #############################################################################################################
 # Администрирование таблицы пользователей
 class UsersAdmin(admin.ModelAdmin):
-    list_display = ('id', 'username', 'firstname', 'lastname', 'email', 'is_staff', 'is_active')
-    search_fields = ('id', 'username', 'firstname', 'lastname', 'email')
+    list_display = ('id', 'firstname', 'lastname', 'email',)
+    search_fields = ('id', 'firstname', 'lastname', 'email')
+    list_filter = ('created',)
     list_per_page = 30
 
 
 #############################################################################################################
 # Администрирование таблицы пользователей
 class UsersProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'username', 'phone', 'last_visited', 'created', 'status', 'userpic_type', 'userpic_id')
+    list_display = ('user', 'nickname', 'phone', 'last_visited', 'created', 'status', 'userpic_type', 'userpic_id')
     search_fields = ('user', 'created', 'status')
     list_per_page = 30
 
@@ -84,6 +85,7 @@ class LogEntryAdmin(admin.ModelAdmin):
 
 #############################################################################################################
 # Регистрация моделей в админке
+#admin.site.register(User, UsersAdmin)
 admin.site.register(UsersProfile, UsersProfileAdmin)
 admin.site.register(UsersRels, UsersRelsAdmin)
 admin.site.register(UsersPics, UsersPicsAdmin)
