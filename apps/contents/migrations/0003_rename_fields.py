@@ -12,7 +12,7 @@ class Migration(SchemaMigration):
         db.delete_column('locations', 'ltype')
 
         # Adding field 'Locations.type'
-        #db.add_column('locations', 'type', self.gf('django.db.models.fields.SmallIntegerField')(default=0))
+        db.add_column('locations', 'type', self.gf('django.db.models.fields.SmallIntegerField')(default=0))
 
         # Deleting field 'Locations.price_type'
         db.delete_column('locations', 'price_type')
