@@ -10,10 +10,11 @@ from apps.films.api import *
 # Api patterns
 v1_api_patterns = patterns('',
     # Films API
+    url(r'^v1/films/search?$', SearchFilmsView.as_view(), name='film_search_view'),
     url(r'^v1/films/(?P<film_id>\d+)?$', DetailFilmView.as_view(), name='film_details_view'),
     url(r'^v1/films/(?P<film_id>\d+)/persons?$', PersonsFilmView.as_view(), name='film_persons_view'),
     url(r'^v1/films/(?P<film_id>\d+)/locations?$', LocationsFilmView.as_view(), name='film_locations_view'),
-    url(r'^v1/films/(?P<film_id>\d+)/semilar?$', SimilarFilmView.as_view(), name='film_semilar_view'),
+    url(r'^v1/films/(?P<film_id>\d+)/similar?$', SimilarFilmView.as_view(), name='film_similar_view'),
     url(r'^v1/films/(?P<film_id>\d+)/extras?$', ExtrasFilmView.as_view(), name='film_extras_view'),
     url(r'^v1/films/(?P<film_id>\d+)/comments?$', CommentsFilmView.as_view(), name='film_comments_view'),
     url(r'^v1/films/(?P<film_id>\d+)/action/subscribe?$', ActSubscribeFilmView.as_view(), name='act_film_subscribe_view'),
@@ -23,7 +24,6 @@ v1_api_patterns = patterns('',
     url(r'^v1/films/(?P<film_id>\d+)/action/comment?$', ActCommentFilmView.as_view(), name='act_film_rate_view'),
 
     # Person API
-    # url(r'^v1/films/(?P<resource_id>\d+)/comments$', FilmsCommentsAPIView.as_view(), name='my_rest_view'),
     url(r'^v1/person/(?P<resource_id>\d+)$', PersonAPIView.as_view(), name='my_rest_view'),
     url(r'^v1/person/(?P<resource_id>\d+)/filmography$', PersonFilmographyAPIView.as_view(), name='my_rest_view'),
     url(r'^v1/person/(?P<resource_id>\d+)/action/subscribe$', PersonActionAPIView.as_view(), name='my_rest_view'),

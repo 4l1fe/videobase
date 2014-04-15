@@ -44,7 +44,18 @@ class CommentsFilmView(APIView):
         }
 
         o_comments = Comments.objects.filter(**filter)
-        result = Paginator(o_comments, per_page=per_page).page(page)
-        serializer = vbComment(result)
 
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        try:
+            page = Paginator(o_comments, per_page=per_page).page(page)
+        except InvalidPage as e:
+            return Response({'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = vbComment(page.object_list, many=True)
+        result = {
+            'page': page.number,
+            'total_cnt': page.paginator.num_pages,
+            'per_page': page.paginator.per_page,
+            'items': serializer.data,
+        }
+
+        return Response(result, status=status.HTTP_200_OK)

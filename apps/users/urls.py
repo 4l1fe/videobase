@@ -2,15 +2,13 @@
 
 from django.conf.urls import patterns, url
 
-from .views import RegisterUserView, ProfileEdit
+from apps.users.views import ObtainSessionToken
 
-urlpatterns = patterns('apps.users.views',
-    # Регистрация
-    (r'^register/$', RegisterUserView.as_view()),
+from rest_framework.urlpatterns import format_suffix_patterns
 
-    # Востановление пароля
-    (r'^restore_password/$', 'restore_password'),
-
-    # Редоктирование профиля
-    (r'^profile/$', ProfileEdit.as_view()),
+v1_api_patterns = patterns('',
+    url(r'^v1/auth/session$', ObtainSessionToken.as_view()),
+    url(r'^v1/auth/login/', 'rest_framework.authtoken.views.obtain_auth_token'),
 )
+
+urlpatterns = format_suffix_patterns(v1_api_patterns, suffix_required=True)
