@@ -29,9 +29,24 @@ class SearchFilmsView(APIView):
     """
 
     def parse_post(self, data):
-        filter = {}
+        filter = {
+            'page': 1,
+            'per_page': 12,
+        }
+
         film_group = 0
         location_group = 0
+
+        if data.get('page'):
+            page = data['page']
+            if isinstance(page, int) and page > 0:
+                filter.update({'page': page})
+
+        if data.get('per_page'):
+            per_page = data['per_page']
+            if isinstance(per_page, int) and (0 < page < 30):
+                filter.update({'per_page': per_page})
+
         if data.get('text'):
             film_group += 1
             filter.update({'name': data['text']})
@@ -111,9 +126,6 @@ class SearchFilmsView(APIView):
 
     def post(self, request, format=None, *args, **kwargs):
         # Init data
-        page = request.DATA.get('page', 1)
-        per_page = request.DATA.get('per_page', 12)
-
         filter, film_group, location_group = self.parse_post(request.DATA)
 
         if film_group > 0:
@@ -135,7 +147,7 @@ class SearchFilmsView(APIView):
             o_search = Films.objects.filter(pk__in=list_films_by_content)
 
         try:
-            page = Paginator(o_search, per_page=per_page).page(page)
+            page = Paginator(o_search, per_page=filter['per_page']).page(filter['page'])
         except Exception as e:
             return Response({'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
 
