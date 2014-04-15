@@ -29,49 +29,24 @@ class SearchFilmsView(APIView):
     """
 
     def parse_post(self, data):
-        filter = {
-            'page': 1,
-            'per_page': 12,
-        }
-
         film_group = 0
         location_group = 0
 
-        if data.get('page'):
-            page = data['page']
-            if isinstance(page, int) and page > 0:
-                filter.update({'page': page})
+        for i in ['text', 'year_old', 'genre', 'rating']:
+            if i in data:
+                film_group += 1
+                break
 
-        if data.get('per_page'):
-            per_page = data['per_page']
-            if isinstance(per_page, int) and (0 < page < 30):
-                filter.update({'per_page': per_page})
+        for i in ['price', 'instock']:
+            if i in data:
+                film_group += 1
+                break
+        #
+        # if data.get('text'):
+        #     film_group += 1
+        #     filter.update({'name': data['text']})
 
-        if data.get('text'):
-            film_group += 1
-            filter.update({'name': data['text']})
-
-        if data.get('year_old'):
-            film_group += 1
-            filter.update({'year_old': data['year_old']})
-
-        if data.get('genre'):
-            film_group += 1
-            filter.update({'genres': data['genre']})
-
-        if data.get('rating'):
-            film_group += 1
-            filter.update({'rating': data['rating']})
-
-        if data.get('price'):
-            location_group += 1
-            filter.update({'price': data['price']})
-
-        if data.get('instock'):
-            location_group += 1
-            filter.update({'instock': data['instock']})
-
-        return filter, film_group, location_group
+        return data, film_group, location_group
 
 
     def search_by_films(self, filter):
@@ -125,39 +100,42 @@ class SearchFilmsView(APIView):
 
 
     def post(self, request, format=None, *args, **kwargs):
-        # Init data
-        filter, film_group, location_group = self.parse_post(request.DATA)
+        form = SearchForm(data=request.DATA)
+        if form.is_valid():
+            # Init data
+            filter, film_group, location_group = self.parse_post(form.cleaned_data)
 
-        if film_group > 0:
-            o_search = self.search_by_films(filter)
+            if film_group > 0:
+                o_search = self.search_by_films(filter)
 
-            list_films_by_content = []
-            if location_group > 0:
-                list_films_by_content = self.search_by_location(filter, o_search)
+                list_films_by_content = []
+                if location_group > 0:
+                    list_films_by_content = self.search_by_location(filter, o_search)
 
-            # Пересечение не пусто
-            if len(list_films_by_content):
+                # Пересечение не пусто
+                if len(list_films_by_content):
+                    o_search = Films.objects.filter(pk__in=list_films_by_content)
+
+            else:
+                list_films_by_content = []
+                if location_group > 0:
+                    list_films_by_content = self.search_by_location(filter)
+
                 o_search = Films.objects.filter(pk__in=list_films_by_content)
 
-        else:
-            list_films_by_content = []
-            if location_group > 0:
-                list_films_by_content = self.search_by_location(filter)
+            try:
+                page = Paginator(o_search, per_page=filter['per_page']).page(filter['page'])
+            except Exception as e:
+                return Response({'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
 
-            o_search = Films.objects.filter(pk__in=list_films_by_content)
+            serializer = vbFilm(page.object_list, many=True)
 
-        try:
-            page = Paginator(o_search, per_page=filter['per_page']).page(filter['page'])
-        except Exception as e:
-            return Response({'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
+            result = {
+                'total_cnt': page.paginator.num_pages,
+                'per_page': page.paginator.per_page,
+                'page': page.number,
+                'items': serializer.data,
+            }
 
-        serializer = vbFilm(page.object_list, many=True)
-
-        result = {
-            'total_cnt': page.paginator.num_pages,
-            'per_page': page.paginator.per_page,
-            'page': page.number,
-            'items': serializer.data,
-        }
-
-        return Response(result, status=status.HTTP_200_OK)
+            return Response(result, status=status.HTTP_200_OK)
+        return Response(form.errors, status=status.HTTP_400_BAD_REQUEST)
