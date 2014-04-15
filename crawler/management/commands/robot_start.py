@@ -51,10 +51,8 @@ sites_crawler = {
     'playfamily.ru': {'loader': playfamily_loader,
                       'parser': PlayfamilyParser()},
     'tvigle.ru':{'loader':TVIGLE_Loader,
-                 'parser':ParseTvigleFilm()}
-                      'parser': PlayfamilyParser()},
-    'tvigle.ru':{'loader':TVIGLE_Loader,
-                 'parser':ParseTvigleFilm()}
+                 'parser':ParseTvigleFilm()},
+
 }
 
 # Список допустимых сайтов
