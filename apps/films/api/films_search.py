@@ -33,16 +33,16 @@ class SearchFilmsView(APIView):
         location_group = 0
 
         for i in ['text', 'year_old', 'genre', 'rating']:
-            if i in data:
+            if i in data.data:
                 film_group += 1
                 break
 
         for i in ['price', 'instock']:
-            if i in data:
-                film_group += 1
+            if i in data.data:
+                location_group += 1
                 break
 
-        return data, film_group, location_group
+        return data.cleaned_data, film_group, location_group
 
 
     def search_by_films(self, filter):
@@ -99,7 +99,7 @@ class SearchFilmsView(APIView):
         form = SearchForm(data=request.DATA)
         if form.is_valid():
             # Init data
-            filter, film_group, location_group = self.parse_post(form.cleaned_data)
+            filter, film_group, location_group = self.parse_post(form)
 
             if film_group > 0:
                 o_search = self.search_by_films(filter)
