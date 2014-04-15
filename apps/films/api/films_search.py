@@ -41,10 +41,6 @@ class SearchFilmsView(APIView):
             if i in data:
                 film_group += 1
                 break
-        #
-        # if data.get('text'):
-        #     film_group += 1
-        #     filter.update({'name': data['text']})
 
         return data, film_group, location_group
 
