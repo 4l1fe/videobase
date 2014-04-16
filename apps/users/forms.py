@@ -70,3 +70,7 @@ class CustomRegisterForm(forms.ModelForm):
             'username': forms.HiddenInput(),
         }
 
+
+class UserUpdateForm(forms.Form):
+    name = forms.CharField(max_length=30, required=False)
+    email = forms.EmailField(required=False)
