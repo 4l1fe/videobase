@@ -199,4 +199,6 @@ SOCIAL_AUTH_PIPELINE = (
     'social_auth.backends.pipeline.user.update_user_details'
 )
 
-API_SESSION_EXPIRATION_TIME = 15 # in minutes
+# In minutes
+API_SESSION_EXPIRATION_TIME = 15
+
