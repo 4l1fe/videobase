@@ -21,6 +21,7 @@ class SimilarFilmView(APIView):
 
         try:
             result = Films.objects.get(pk=film_id)
+            #.filter(pk=film_id).prefetch_related('genres')
         except Films.DoesNotExist:
             result = Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -34,10 +35,9 @@ class SimilarFilmView(APIView):
             return o_film
 
         # Логика для выборки похожих фильмов
-        pass
+        list_genres = o_film.genres.all().values_list('pk', flat=True)
+        o_similar = Films.objects.filter(genres=list_genres).order_by('-rating_cons')[:10]
 
-        result = o_film
-
-        serializer = vbFilm(result, extend=True)
+        serializer = vbFilm(o_similar, extend=True, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
