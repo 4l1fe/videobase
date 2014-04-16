@@ -95,11 +95,11 @@ class SearchFilmsView(APIView):
         return list_films_by_content
 
 
-    def post(self, request, format=None, *args, **kwargs):
+    def get(self, request, format=None, *args, **kwargs):
         # Copy post request
-        self.post_copy = request.DATA.copy()
+        self.get_copy = request.QUERY_PARAMS.copy()
 
-        form = SearchForm(data=self.post_copy)
+        form = SearchForm(data=self.get_copy)
         if form.is_valid():
             # Init data
             filter, film_group, location_group = self.parse_post(form)
@@ -139,4 +139,5 @@ class SearchFilmsView(APIView):
             }
 
             return Response(result, status=status.HTTP_200_OK)
+
         return Response(form.errors, status=status.HTTP_400_BAD_REQUEST)
