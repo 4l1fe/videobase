@@ -1,7 +1,7 @@
 # coding: utf-8
 
-from django.http import Http404
-from django.core.paginator import Paginator, InvalidPage
+from django.db.models import Q
+from django.core.paginator import Paginator
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -49,7 +49,7 @@ class SearchFilmsView(APIView):
         o_search = Films.objects.all()
         # Поиск по имени
         if filter.get('name'):
-            o_search = o_search.filter(name__icontains=filter['name'])
+            o_search = o_search.filter(Q(name__icontains=filter['name']) | Q(name_orig__icontains=filter['name']))
 
         # Поиск по количеству прошедших лет
         if filter.get('year_old'):
