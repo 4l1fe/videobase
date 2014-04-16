@@ -155,13 +155,11 @@ STATIC_ROOT = os.path.join('/var/www/')
 SITE_ID = 1
 
 REST_FRAMEWORK = {
-  'DEFAULT_RENDERER_CLASSES': (
-    'rest_framework.renderers.XMLRenderer',
-    'rest_framework.renderers.JSONRenderer',
-  ),
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.XMLRenderer',
+        'rest_framework.renderers.JSONRenderer',
+    ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        #'rest_framework.authentication.BasicAuthentication',
-        #'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
         'apps.users.models.api_session.MultipleTokenAuthentication',
     )
