@@ -53,7 +53,7 @@ class CommentsFilmView(APIView):
         serializer = vbComment(page.object_list, many=True)
         result = {
             'page': page.number,
-            'total_cnt': page.paginator.num_pages,
+            'total_cnt': page.paginator.count,
             'per_page': page.paginator.per_page,
             'items': serializer.data,
         }
