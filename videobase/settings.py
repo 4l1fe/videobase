@@ -91,6 +91,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 
 TEMPLATE_DIRS = (
     os.path.join(BASE_DIR, 'templates/'),
+    os.path.join(BASE_DIR, 'interface/'),
 )
 
 ROOT_URLCONF = 'videobase.urls'
@@ -159,8 +160,8 @@ REST_FRAMEWORK = {
     'rest_framework.renderers.JSONRenderer',
   ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.BasicAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
+        #'rest_framework.authentication.BasicAuthentication',
+        #'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
         'apps.users.models.api_session.MultipleTokenAuthentication',
     )

@@ -1,14 +1,11 @@
 # coding: utf-8
-
+from django.http import HttpResponseBadRequest, HttpResponse, HttpResponseRedirect
 from django.views.generic import CreateView, TemplateView
-
-from django.http import HttpResponseRedirect
+from django.template.loader import render_to_string
 from django.shortcuts import render_to_response
 from django.core.context_processors import csrf
 from django.core.mail import EmailMultiAlternatives
 from django.contrib.auth.models import User
-from django.http import HttpResponseBadRequest
-from django.template.loader import render_to_string
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
