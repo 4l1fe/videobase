@@ -132,7 +132,7 @@ class SearchFilmsView(APIView):
             serializer = vbFilm(page.object_list, many=True)
 
             result = {
-                'total_cnt': page.paginator.num_pages,
+                'total_cnt': page.paginator.count,
                 'per_page': page.paginator.per_page,
                 'page': page.number,
                 'items': serializer.data,
