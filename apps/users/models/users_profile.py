@@ -28,6 +28,7 @@ class UsersProfile(models.Model):
                 'name': self.nickname,
                 'avatar': url
                 }
+
     class Meta:
         db_table = 'users_profile'
         app_label = 'users'
