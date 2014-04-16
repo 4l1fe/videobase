@@ -1,0 +1,21 @@
+mixin afilm(item)
+    .afilm-place(id = "film"+item.id).col-md-3.text-center
+        .afilm-poster-place
+            img.img-responsive.img-thumbnail(src = item.poster?item.poster:"img/noposter.jpg").afilm-poster
+        .afilm-common-place
+            .afilm-rating(class = item.rating?"":"invisible")
+                = item.rating
+            .afilm-name-place
+                a(href="#").afilm-name
+                    = item.name
+                span.afilm-year
+                    = item.year
+        .clearfix
+        .afilm-userrel-place
+            div.rateit.afilm-rate(data-rateit-value=relation && relation.rating?relation.rating:0)
+            button.afilm-tolist L
+        .afilm-watchtext-place(class = item.watchtext?"":"invisible").text-left
+            .afilm-watchbut
+                button Смотреть
+            .afilm-watchtext
+                = item.watchtext

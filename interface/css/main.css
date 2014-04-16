@@ -1,0 +1,9 @@
+.afilm-place {height: 450px;}
+.afilm-poster-place {height: 360px;}
+.afilm-rating {float: right; padding: 5px; font-weight: bold; text-align: center}
+.afilm-name-place {float: left}
+.afilm-userrel-place {}
+.afilm-year {margin-left: 10px}
+
+.afilm-watchbut {display: inline-block; padding: 10px; font-weight: bold}
+.afilm-watchtext {display: inline-block; text-align:left}

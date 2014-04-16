@@ -1,11 +1,10 @@
 # coding: utf-8
+
 from django.shortcuts import render
 from django.http import HttpResponse
 
-# Create your views here.
+
 def schedule_interface(request):
-
-
     if request.method =="GET":
 
         return HttpResponse("""
@@ -29,7 +28,6 @@ def schedule_interface(request):
         </html>
         """)
 
-def schedule_api(request):
 
+def schedule_api(request):
     return HttpResponse('''Not implemented''')
-    
