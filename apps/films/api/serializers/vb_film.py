@@ -88,19 +88,16 @@ class vbFilm(serializers.HyperlinkedModelSerializer):
 
     def locations_list(self, obj):
         # Select contents by films
-        contents = Contents.objects.filter(film__in=[obj.pk]).values('id', 'film')
-        # result = LocationsSerializer(contents)
-        contents_list = list_of(contents, 'id', False, True)
+        contents = dict(Contents.objects.filter(film__in=[obj.pk]).values_list('id', 'film'))
 
         # Select locations contents by contents
-        locations = Locations.objects.filter(content__in=contents_list)
+        locations = Locations.objects.filter(content__in=contents.keys())
         locations = reindex_by(locations, 'content_id', True)
 
         # Rebuild data
         result = {}
-        for item in contents:
-            ser = LocationsSerializer(locations[item['id']])
-            result[item['film']] = ser.data
+        for k,v in contents.items():
+            result[v] = LocationsSerializer(locations[k]).data
 
         return result.get(obj.pk, [])
 
