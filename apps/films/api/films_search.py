@@ -96,7 +96,10 @@ class SearchFilmsView(APIView):
 
 
     def post(self, request, format=None, *args, **kwargs):
-        form = SearchForm(data=request.DATA)
+        # Copy post request
+        self.post_copy = request.DATA.copy()
+
+        form = SearchForm(data=self.post_copy)
         if form.is_valid():
             # Init data
             filter, film_group, location_group = self.parse_post(form)
@@ -117,7 +120,9 @@ class SearchFilmsView(APIView):
                 if location_group > 0:
                     list_films_by_content = self.search_by_location(filter)
 
-                o_search = Films.objects.filter(pk__in=list_films_by_content)
+                o_search = Films.objects.all()
+                if len(list_films_by_content):
+                    o_search = o_search.filter(pk__in=list_films_by_content)
 
             try:
                 page = Paginator(o_search, per_page=filter['per_page']).page(filter['page'])
