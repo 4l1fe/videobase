@@ -8,14 +8,13 @@ from apps.films.models import *
 from apps.films.constants import APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER
 from apps.contents.models import *
 
-from utils.common import group_by, reindex_by, list_of
+from utils.common import group_by
 from utils.middlewares.local_thread import get_current_request
 
 from vb_person import vbPerson
 
 
 #############################################################################################################
-#
 class CountriesSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -24,7 +23,6 @@ class CountriesSerializer(serializers.ModelSerializer):
 
 
 #############################################################################################################
-#
 class GentriesSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -33,20 +31,13 @@ class GentriesSerializer(serializers.ModelSerializer):
 
 
 #############################################################################################################
-#
 class LocationsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Locations
 
-# class LocationsSerializer(serializers.Serializer):
-#
-#     class Meta:
-#         model = Locations
-
 
 #############################################################################################################
-#
 class ContentSerializer(serializers.ModelSerializer):
     film = LocationsSerializer()
 
@@ -56,7 +47,6 @@ class ContentSerializer(serializers.ModelSerializer):
 
 
 #############################################################################################################
-#
 class vbFilm(serializers.ModelSerializer):
     countries = CountriesSerializer()
     genres = GentriesSerializer()
@@ -100,25 +90,26 @@ class vbFilm(serializers.ModelSerializer):
 
     def _get_obj_list(self):
         list_pk = []
-
-        if hasattr(self.object, '__iter__') and not isinstance(self.object, (Page, dict)):
-            for item in self.object:
+        instance = self.object
+        if hasattr(instance, '__iter__') and not isinstance(instance, (Page, dict)):
+            for item in instance:
                 list_pk.append(item.pk)
         else:
-            list_pk.append(self.object.pk)
+            list_pk.append(instance.pk)
 
         self.list_obj_pk = list_pk
 
 
     def _rebuild_location(self):
         self.location_rebuild = {}
-        locations = Locations.objects.select_related('content')\
-            .filter(content__film__in=self.list_obj_pk).order_by('content__film')\
+
+        locations = Locations.objects.filter(content__film__in=self.list_obj_pk)\
+            .order_by('content__film').select_related('content')
             # .values('content__film', 'content', 'type', 'lang', 'quality', 'subtitles', 'price', 'price_type', 'url_view')
 
         result = {}
         for item in locations:
-            v = item.content.film.pk
+            v = item.content.film_id
             if not v in result:
                 result[v] = []
             result[v].append(item)
@@ -137,7 +128,7 @@ class vbFilm(serializers.ModelSerializer):
     def poster_list(self, obj):
         result = self.poster_rebuild.get(obj.pk, [])
         if len(result):
-            return [item.url for item in result if len(item.url)]
+            return [item.url for item in result if not item.url is None and len(item.url)]
 
         return result
 
@@ -155,6 +146,14 @@ class vbFilm(serializers.ModelSerializer):
             pass
 
         return []
+
+    # def to_native(self, obj):
+    #     self._get_obj_list()
+    #     self._rebuild_location()
+    #     self._rebuild_poster_list()
+    #
+    #     super(vbFilm, self).to_native(*args, **kwargs)
+
 
     class Meta:
         model = Films
