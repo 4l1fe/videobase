@@ -114,3 +114,13 @@ class CommentForm(Form):
     """
 
     text = fields.CharField(max_length=255, help_text=u'Комментарий')
+
+
+#############################################################################################################
+class DetailForm(Form):
+    """
+    Форма детализация для vbFilm
+    """
+
+    extend  = fields.BooleanField(initial=False, required=False, help_text=u'Расширенный')
+    persons = fields.BooleanField(initial=False, required=False, help_text=u'Персоны')

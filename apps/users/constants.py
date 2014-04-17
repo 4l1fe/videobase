@@ -7,9 +7,14 @@ from videobase.settings import STATIC_PATH
 APP_USER_PIC_DIR = os.path.join(STATIC_PATH, 'upload', 'users', 'user_pic')
 
 #############################################################################################################
+APP_USER_REL_TYPE_FRIENDS = 'FRIENDS'
+APP_USER_REL_TYPE_NONE = 'NONE'
+APP_USER_REL_TYPE_COLLEAGUES = 'COLLEAGUES'
+
 APP_USER_REL_TYPES = (
-    ('FRIENDS', 'Friends'),
-    ('COLLEAGUES', 'Colleagues'),
+    (APP_USER_REL_TYPE_NONE, 'None'),
+    (APP_USER_REL_TYPE_FRIENDS, 'Friends'),
+    (APP_USER_REL_TYPE_COLLEAGUES, 'Colleagues'),
 )
 
 #############################################################################################################

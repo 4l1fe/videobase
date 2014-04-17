@@ -34,10 +34,9 @@ class SimilarFilmView(APIView):
             return o_film
 
         # Логика для выборки похожих фильмов
-        pass
+        list_genres = [i.pk for i in o_film.genres.all()]
 
-        result = o_film
+        o_similar = Films.objects.filter(genres__in=list_genres).order_by('-rating_cons')[:10]
 
-        serializer = vbFilm(result, extend=True)
-
+        serializer = vbFilm(o_similar, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)

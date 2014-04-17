@@ -1,7 +1,7 @@
 # coding: utf-8
 
-from django.http import Http404
-from django.core.paginator import Paginator, InvalidPage
+from django.db.models import Q
+from django.core.paginator import Paginator
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -49,7 +49,7 @@ class SearchFilmsView(APIView):
         o_search = Films.objects.all()
         # Поиск по имени
         if filter.get('name'):
-            o_search = o_search.filter(name__icontains=filter['name'])
+            o_search = o_search.filter(Q(name__icontains=filter['name']) | Q(name_orig__icontains=filter['name']))
 
         # Поиск по количеству прошедших лет
         if filter.get('year_old'):
@@ -95,11 +95,11 @@ class SearchFilmsView(APIView):
         return list_films_by_content
 
 
-    def post(self, request, format=None, *args, **kwargs):
+    def get(self, request, format=None, *args, **kwargs):
         # Copy post request
-        self.post_copy = request.DATA.copy()
+        self.get_copy = request.QUERY_PARAMS.copy()
 
-        form = SearchForm(data=self.post_copy)
+        form = SearchForm(data=self.get_copy)
         if form.is_valid():
             # Init data
             filter, film_group, location_group = self.parse_post(form)
@@ -132,11 +132,12 @@ class SearchFilmsView(APIView):
             serializer = vbFilm(page.object_list, many=True)
 
             result = {
-                'total_cnt': page.paginator.num_pages,
+                'total_cnt': page.paginator.count,
                 'per_page': page.paginator.per_page,
                 'page': page.number,
                 'items': serializer.data,
             }
 
             return Response(result, status=status.HTTP_200_OK)
+
         return Response(form.errors, status=status.HTTP_400_BAD_REQUEST)
