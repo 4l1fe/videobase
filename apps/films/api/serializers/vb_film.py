@@ -1,5 +1,7 @@
 # coding: utf-8
 
+from django.core.paginator import Page
+
 from rest_framework import serializers
 
 from apps.films.models import *
@@ -37,6 +39,11 @@ class LocationsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Locations
 
+# class LocationsSerializer(serializers.Serializer):
+#
+#     class Meta:
+#         model = Locations
+
 
 #############################################################################################################
 #
@@ -50,7 +57,7 @@ class ContentSerializer(serializers.ModelSerializer):
 
 #############################################################################################################
 #
-class vbFilm(serializers.HyperlinkedModelSerializer):
+class vbFilm(serializers.ModelSerializer):
     countries = CountriesSerializer()
     genres = GentriesSerializer()
     persons = vbPerson()
@@ -78,6 +85,10 @@ class vbFilm(serializers.HyperlinkedModelSerializer):
             for field_name in new_fields:
                 self.fields.pop(field_name, None)
 
+        self._get_obj_list()
+        self._rebuild_location()
+        self._rebuild_poster_list()
+
 
     def calc_ratings(self, obj):
         return {
@@ -86,26 +97,56 @@ class vbFilm(serializers.HyperlinkedModelSerializer):
             'cons': [0, 0],
         }
 
-    def locations_list(self, obj):
-        # Select contents by films
-        contents = dict(Contents.objects.filter(film__in=[obj.pk]).values_list('id', 'film'))
+    def _get_obj_list(self):
+        list_pk = []
 
-        # Select locations contents by contents
-        locations = Locations.objects.filter(content__in=contents.keys())
-        locations = reindex_by(locations, 'content_id', True)
+        if hasattr(self.object, '__iter__') and not isinstance(self.object, (Page, dict)):
+            for item in self.object:
+                list_pk.append(item.pk)
+        else:
+            list_pk.append(self.object.pk)
 
-        # Rebuild data
+        self.list_obj_pk = list_pk
+
+
+    def _rebuild_location(self):
+        self.location_rebuild = {}
+        locations = Locations.objects.select_related('content')\
+            .filter(content__film__in=self.list_obj_pk).order_by('content__film')\
+            # .values('content__film', 'content', 'type', 'lang', 'quality', 'subtitles', 'price', 'price_type', 'url_view')
+
         result = {}
-        for k,v in contents.items():
-            result[v] = LocationsSerializer(locations[k]).data
+        for item in locations:
+            v = item.content.film.pk
+            if not v in result:
+                result[v] = []
+            result[v].append(item)
 
-        return result.get(obj.pk, [])
+        self.location_rebuild = result
+
+
+    def locations_list(self, obj):
+        result = self.location_rebuild.get(obj.pk, [])
+        if len(result):
+            return LocationsSerializer(result, many=True).data
+
+        return result
+
 
     def poster_list(self, obj):
-        extras = FilmExtras.objects.filter(film__in=[obj.pk], type=APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER)
+        result = self.poster_rebuild.get(obj.pk, [])
+        if len(result):
+            return [item.url for item in result if len(item.url)]
+
+        return result
+
+
+    def _rebuild_poster_list(self):
+        extras = FilmExtras.objects.filter(film__in=self.list_obj_pk, type=APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER)
         extras = group_by(extras, 'id', True)
 
-        return [item.url for item in extras.get(obj.pk, []) if len(item.url)]
+        self.poster_rebuild = extras
+
 
     def relation_list(self, obj):
         req = get_current_request()

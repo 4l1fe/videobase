@@ -36,8 +36,7 @@ class SimilarFilmView(APIView):
         # Логика для выборки похожих фильмов
         list_genres = [i.pk for i in o_film.genres.all()]
 
-        o_similar = Films.objects.filter(genres__in=list_genres).order_by('-rating_cons')\
-                        .prefetch_related('genres', 'countries')[:10]
+        o_similar = Films.objects.filter(genres__in=list_genres).order_by('-rating_cons')[:10]
 
-        serializer = vbFilm(o_similar, extend=True, many=True)
+        serializer = vbFilm(o_similar, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
