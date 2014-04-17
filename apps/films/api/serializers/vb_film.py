@@ -97,6 +97,7 @@ class vbFilm(serializers.ModelSerializer):
             'cons': [0, 0],
         }
 
+
     def _get_obj_list(self):
         list_pk = []
 
