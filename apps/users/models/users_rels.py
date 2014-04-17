@@ -21,5 +21,6 @@ class UsersRels(models.Model):
         # Имя таблицы в БД
         db_table = 'users_rels'
         app_label = 'users'
+        unique_together = ('user', 'user_rel', )
         verbose_name = u'Отношения пользователей'
         verbose_name_plural = u'Отношения пользователей'

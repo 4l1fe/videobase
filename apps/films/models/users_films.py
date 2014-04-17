@@ -12,7 +12,7 @@ from apps.films.constants import APP_USERFILM_STATUS, APP_USERFILM_STATUS_UNDEF,
 # Модель Пользовательских фильмов
 class UsersFilms(models.Model):
     user       = models.ForeignKey(User, verbose_name=u'Идентификатор пользоваля', related_name='films')
-    film       = models.ForeignKey('Films', verbose_name=u'Фильм')
+    film       = models.ForeignKey('Films', verbose_name=u'Фильм', related_name='users_films')
     status     = models.PositiveSmallIntegerField(null=True, blank=True, default=APP_USERFILM_STATUS_UNDEF, choices=APP_USERFILM_STATUS, verbose_name=u'Статус фильма с т.з. пользователя')
     rating     = models.PositiveSmallIntegerField(null=True, blank=True, verbose_name=u'Рейтинг фильма поставленный пользователем')
     subscribed = models.PositiveSmallIntegerField(null=True, blank=True, default=APP_USERFILM_SUBS_FALSE, choices=APP_USERFILM_SUBS, verbose_name=u'Статус подписки')
