@@ -1,48 +1,123 @@
 #coding: utf-8
-from apps.films.api import DetailFilmView
-from apps.films.api.serializers import vbFilm
-
 __author__ = 'ipatov'
-from apps.films.tests.factories import ContentFactory, FilmFactory, LocationFactory, GenreFactory
-from apps.films.views import PersonAPIView
-from rest_framework.test import APIRequestFactory, APITestCase
-from rest_framework.test import APIClient
-from rest_framework.authtoken.models import Token
-from django.core.urlresolvers import reverse
+from apps.films.tests.factories import *
+from rest_framework.test import APITestCase
 from rest_framework import status
-from django.test import TestCase
 from rest_framework.reverse import reverse
-import json
 
 
 class FilmsTest(APITestCase):
-    """
-    Метод  post в film_datail не тестируем, т.к. там те же действия что и в get
-    """
     def setUp(self):
+        self.user = UserFactory.create()
         self.genres = []
         self.locations = []
+        self.contents = []
         self.films = []
+        self.comments = []
+        self.extras = []
+        self.persons = []
+        self.pfilms = []
+        self.countries = []
         for i in range(4):
             self.genres.append(GenreFactory.create())
+            self.countries.append(CountriesFactory.create())
         for i in range(2):
-            self.locations.append(LocationFactory.create(content__film__genres=(self.genres[2*i], self.genres[2*i+1])))
-        for location in self.locations:
-            self.films.append(location.content.film)
+            self.persons.append(PersonFactory.create())
+            self.films.append(FilmFactory.create(genres=(self.genres[2*i], self.genres[2*i+1]), countries=(self.countries[2*i], self.countries[2*i+1])))
+            self.contents.append(ContentFactory.create(film=self.films[i]))
+            self.locations.append(LocationFactory.create(content=self.contents[i]))
+            self.comments.append(CommentsFactory.create(content=self.contents[i], user=self.user))
+            self.extras.append(FilmsExtrasFactory.create(film=self.films[i]))
+            self.pfilms.append(PersonsFilmFactory.create(film=self.films[i], person=self.persons[i]))
 
-    def test_api_detail_ok(self):
+    def test_api_detail_ok_get(self):
         film = self.films[0]
         response = self.client.get(reverse('film_details_view', kwargs={'film_id': film.id, 'format': 'json'}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_api_detail_data(self):
+    def test_api_detail_data_get(self):
         film = self.films[0]
-        location = None
+        locations = []
+        extras = []
         for loc in self.locations:
             if film.id == loc.content.film.id:
-                location = loc
-                break
+                locations.append(loc)
+        for ext in self.extras:
+            if film.id == ext.film.id:
+                extras.append(ext)
+
         response = self.client.get(reverse('film_details_view', kwargs={'film_id': film.id, 'format': 'json'}))
+        if len(response.data['locations']) != len(locations):
+            self.assertTrue(False)
+        for i in range(len(response.data['locations'])):
+            self.assertEqual(response.data['locations'][i]['id'], locations[i].id)
+            self.assertEqual(response.data['locations'][i]['type'], locations[i].type)
+            self.assertEqual(response.data['locations'][i]['lang'], locations[i].lang)
+            self.assertEqual(response.data['locations'][i]['quality'], locations[i].quality)
+            self.assertEqual(response.data['locations'][i]['subtitles'], locations[i].subtitles)
+            self.assertEqual(response.data['locations'][i]['price'], locations[i].price)
+            self.assertEqual(response.data['locations'][i]['price_type'], locations[i].price_type)
+            self.assertEqual(response.data['locations'][i]['url_view'], locations[i].url_view)
+        if len(response.data['poster']) != len(extras):
+            self.assertTrue(False)
+        for i in range(len(response.data['poster'])):
+            self.assertEqual(response.data['poster'][i], extras[i].url)
+        self.assertEqual(response.data['id'], film.id)
+        self.assertEqual(response.data['name'], film.name)
+        self.assertEqual(response.data['name_orig'], film.name_orig)
+        self.assertEqual(response.data['release_date'], film.release_date)
+        self.assertEqual(response.data['ratings']['kp'][0], film.rating_kinopoisk)
+        self.assertEqual(response.data['ratings']['kp'][1], film.rating_kinopoisk_cnt)
+        self.assertEqual(response.data['ratings']['imdb'][0], film.rating_imdb)
+        self.assertEqual(response.data['ratings']['imdb'][1], film.rating_imdb_cnt)
+        self.assertEqual(response.data['ratings']['cons'][0], 0)
+        self.assertEqual(response.data['ratings']['cons'][1], 0)
+        self.assertEqual(response.data['duration'], film.duration)
+        self.assertEqual(response.data['relation'], [])
+
+    def test_api_detail_ok_post(self):
+        film = self.films[0]
+        response = self.client.post(reverse('film_details_view', kwargs={'film_id': film.id, 'format': 'json'}), data={})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_api_detail_all_data_post(self):
+        film = self.films[0]
+        locations = []
+        extras = []
+        for loc in self.locations:
+            if film.id == loc.content.film.id:
+                locations.append(loc)
+        for ext in self.extras:
+            if film.id == ext.film.id:
+                extras.append(ext)
+        response = self.client.post(reverse('film_details_view', kwargs={'film_id': film.id, 'format': 'json'}), data={'extend': 1, 'persons': 1})
+        if len(response.data['countries']) != len(film.countries.all().values('id', 'name')):
+            self.assertTrue(False)
+        if len(response.data['genres']) != len(film.genres.all().values('id', 'name')):
+            self.assertTrue(False)
+        if len(response.data['persons']) != len(film.persons.all().values('id', 'name', 'photo')):
+            self.assertTrue(False)
+        for i in range(len(response.data['countries'])):
+            self.assertEqual(response.data['countries'][i], film.countries.all().values('id', 'name')[i])
+        for i in range(len(response.data['genres'])):
+            self.assertEqual(response.data['genres'][i], film.genres.all().values('id', 'name')[i])
+        for i in range(len(response.data['persons'])):
+            self.assertEqual(response.data['persons'][i], film.persons.all().values('id', 'name', 'photo')[i])
+        if len(response.data['locations']) != len(locations):
+            self.assertTrue(False)
+        for i in range(len(response.data['locations'])):
+            self.assertEqual(response.data['locations'][i]['id'], locations[i].id)
+            self.assertEqual(response.data['locations'][i]['type'], locations[i].type)
+            self.assertEqual(response.data['locations'][i]['lang'], locations[i].lang)
+            self.assertEqual(response.data['locations'][i]['quality'], locations[i].quality)
+            self.assertEqual(response.data['locations'][i]['subtitles'], locations[i].subtitles)
+            self.assertEqual(response.data['locations'][i]['price'], locations[i].price)
+            self.assertEqual(response.data['locations'][i]['price_type'], locations[i].price_type)
+            self.assertEqual(response.data['locations'][i]['url_view'], locations[i].url_view)
+        if len(response.data['poster']) != len(extras):
+            self.assertTrue(False)
+        for i in range(len(response.data['poster'])):
+            self.assertEqual(response.data['poster'][i], extras[i].url)
         self.assertEqual(response.data['id'], film.id)
         self.assertEqual(response.data['name'], film.name)
         self.assertEqual(response.data['name_orig'], film.name_orig)
@@ -55,19 +130,6 @@ class FilmsTest(APITestCase):
         self.assertEqual(response.data['ratings']['cons'][0], 0)
         self.assertEqual(response.data['ratings']['cons'][1], 0)
         self.assertEqual(response.data['duration'], film.duration)
-        self.assertEqual(response.data['poster'], [])
-        self.assertEqual(response.data['countries'], [])
-        self.assertEqual(response.data['genres'][0], film.genres.all().values('id', 'name')[0])
-        self.assertEqual(response.data['persons'], [])
-        self.assertEqual(response.data['locations']['id'], location.id)
-        self.assertEqual(response.data['locations']['content'], location.content.id)
-        self.assertEqual(response.data['locations']['type'], location.type)
-        self.assertEqual(response.data['locations']['lang'], location.lang)
-        self.assertEqual(response.data['locations']['quality'], location.quality)
-        self.assertEqual(response.data['locations']['subtitles'], location.subtitles)
-        self.assertEqual(response.data['locations']['price'], location.price)
-        self.assertEqual(response.data['locations']['price_type'], location.price_type)
-        self.assertEqual(response.data['locations']['url_view'], location.url_view)
         self.assertEqual(response.data['relation'], [])
 
     def test_api_detail_404(self):
@@ -77,5 +139,5 @@ class FilmsTest(APITestCase):
     def test_api_search(self):
         film = self.films[0]
         data = {'text': film.name}
-        response = self.client.post(reverse('film_search_view', kwargs={'format': 'json'}), data=data)
+        response = self.client.get(reverse('film_search_view', kwargs={'format': 'json'}), data=data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
