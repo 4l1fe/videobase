@@ -32,7 +32,7 @@ class SearchFilmsView(APIView):
         film_group = 0
         location_group = 0
 
-        for i in ['text', 'year_old', 'genres', 'rating']:
+        for i in ['text', 'year_old', 'genre', 'rating']:
             if i in data.data:
                 film_group += 1
                 break
@@ -47,9 +47,10 @@ class SearchFilmsView(APIView):
 
     def search_by_films(self, filter):
         o_search = Films.objects.all()
+
         # Поиск по имени
         if filter.get('name'):
-            o_search = o_search.filter(Q(name__icontains=filter['name']) | Q(name_orig__icontains=filter['name']))
+            o_search = o_search.filter(Q(name__icontains=filter['text']) | Q(name_orig__icontains=filter['text']))
 
         # Поиск по количеству прошедших лет
         if filter.get('year_old'):
@@ -63,8 +64,8 @@ class SearchFilmsView(APIView):
             o_search = o_search.filter(rating_cons__gte=filter['rating'])
 
         # Поиск по жанрам
-        if filter.get('genres'):
-            o_search = o_search.filter(genres=filter['genres'])
+        if filter.get('genre'):
+            o_search = o_search.filter(genres=filter['genre'])
 
         return o_search
 
@@ -97,7 +98,7 @@ class SearchFilmsView(APIView):
 
     def get(self, request, format=None, *args, **kwargs):
         # Copy post request
-        self.get_copy = request.QUERY_PARAMS.copy()
+        self.get_copy = request.GET.copy()
 
         form = SearchForm(data=self.get_copy)
         if form.is_valid():
