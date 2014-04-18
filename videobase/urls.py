@@ -22,7 +22,13 @@ urlpatterns = patterns('',
     url(r'^admin_tools/', include('admin_tools.urls')),
     url(r'^admin/', include(admin.site.urls)),
     # Social
-    url(r'', include('social_auth.urls'))
+    url(r'', include('social_auth.urls')),
+
+    # Interface
+    url(r'^person/', 'apps.films.views.person_view'),
+    url(r'^register/', 'apps.films.views.register_view'),
+    url(r'^login/', 'apps.films.views.login_view'),
+    url(r'^$', 'apps.films.views.index_view'),
 )
 
 if settings.DEBUG:

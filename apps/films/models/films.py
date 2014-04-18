@@ -38,11 +38,9 @@ class Films(models.Model):
     name_orig   = models.CharField(max_length=255, default='', blank=True, verbose_name=u'Оригинальное название фильма')
     countries   = models.ManyToManyField('Countries', verbose_name=u'Страны производители', related_name='countries')
     genres      = models.ManyToManyField('Genres', verbose_name=u'Жанры', related_name='genres')
-
     persons     = models.ManyToManyField('Persons', through='PersonsFilms', verbose_name=u'Персоны', related_name='persons')
 
     get_film_type = FilmManager()
-
     objects = models.Manager()
         
     def __unicode__(self):

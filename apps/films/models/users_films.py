@@ -11,7 +11,7 @@ from apps.films.constants import APP_USERFILM_STATUS, APP_USERFILM_STATUS_UNDEF,
 #############################################################################################################
 # Модель Пользовательских фильмов
 class UsersFilms(models.Model):
-    user       = models.ForeignKey(User, verbose_name=u'Идентификатор пользоваля')
+    user       = models.ForeignKey(User, verbose_name=u'Идентификатор пользоваля', related_name='films')
     film       = models.ForeignKey('Films', verbose_name=u'Фильм')
     status     = models.PositiveSmallIntegerField(null=True, blank=True, default=APP_USERFILM_STATUS_UNDEF, choices=APP_USERFILM_STATUS, verbose_name=u'Статус фильма с т.з. пользователя')
     rating     = models.PositiveSmallIntegerField(null=True, blank=True, verbose_name=u'Рейтинг фильма поставленный пользователем')
@@ -19,7 +19,7 @@ class UsersFilms(models.Model):
 
 
     def __unicode__(self):
-        return u'[{0}] {1} - {2} ({3})'.format(self.pk, self.user.name, self.film.name, self.status)
+        return u'[{0}] {1} - {2} ({3})'.format(self.pk, self.user.username, self.film.name, self.status)
 
     class  Meta(object):
         # Имя таблицы в БД

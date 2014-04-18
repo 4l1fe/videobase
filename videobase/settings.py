@@ -51,6 +51,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_extensions',
+    'memcache_status',
     'south',
     'rest_framework',
     'rest_framework.authtoken',
@@ -61,7 +62,6 @@ INSTALLED_APPS = (
     'apps.contents',
     'crawler',
     'social_auth',
-    'memcache_status',
     'djcelery',
 
 )
@@ -127,11 +127,9 @@ else:
 
 CACHES = {
     'default': {
-        'BACKEND':
-            #'django.core.cache.backends.memcached.MemcachedCache',
-            'django.core.cache.backends.memcached.PyLibMCCache',
+        'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
         'LOCATION': '127.0.0.1:11211',
-        'KEY_PREFIX': 'videobase_',
+        'PREFIX': 'weee:',
     }
 }
 
@@ -161,13 +159,11 @@ STATIC_ROOT = os.path.join('/var/www/')
 SITE_ID = 1
 
 REST_FRAMEWORK = {
-  'DEFAULT_RENDERER_CLASSES': (
-    'rest_framework.renderers.XMLRenderer',
-    'rest_framework.renderers.JSONRenderer',
-  ),
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.XMLRenderer',
+        'rest_framework.renderers.JSONRenderer',
+    ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        #'rest_framework.authentication.BasicAuthentication',
-        #'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
         'apps.users.models.api_session.MultipleTokenAuthentication',
     )
@@ -205,27 +201,6 @@ SOCIAL_AUTH_PIPELINE = (
     'social_auth.backends.pipeline.user.update_user_details'
 )
 
-API_SESSION_EXPIRATION_TIME = 15 # in minutes
-
-RAVEN_CONFIG = {
-    'dsn': 'http://bdc7927fb0754cf39e88c8604fb49b2b:c1da745568c440b2a245c25e60f55a50@sentry.aaysm.com/2',
-
-}
-
-# Add raven to the list of installed apps
-INSTALLED_APPS = INSTALLED_APPS + (
-    # ...
-    'raven.contrib.django.raven_compat',
-)
-
-from datetime import timedelta
-
-CELERYBEAT_SCHEDULE = {
-    'robot-launch': {
-        'task': 'robot_launch',
-        'schedule': timedelta(minutes=5),
-    },
-}
-
-CELERY_TIMEZONE = 'UTC'
+# In minutes
+API_SESSION_EXPIRATION_TIME = 15
 
