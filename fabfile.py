@@ -3,6 +3,8 @@ from fabric.api import env,roles, run, settings, sudo, cd,local
 import fabric
 from fabtools import require
 import fabtools
+import  os
+from string import  Template
 
 env.hosts = ['188.226.191.166',]
 env.user = 'root'
@@ -224,3 +226,47 @@ def scheme():
 def show_scheme():
     scheme()
     local('feh current.png')
+
+def generate_robots_conf(python_interpreter = None, videobase_dir = None, user= None):
+
+
+    if python_interpreter is None:
+        python_interpreter = local("which python",capture=True)
+    if videobase_dir is None:
+        videobase_dir = os.path.abspath('.')
+    if user is None:
+        user = local('whoami',capture=True)
+
+
+    robots_list = local('python manage.py list_robots',capture=True).split()
+    print robots_list
+
+    template = Template("""[program:$name]
+command=$interpreter manage.py robot_start --site $name
+process_name=%(program_name)s ; process_name expr (default %(program_name)s)
+numprocs=1 ; number of processes copies to start (def 1)
+directory=$workdir ; directory to cwd to before exec (def no cwd)
+umask=022 ; umask for process (default None)
+autostart=false ; start at supervisord start (default: true)
+autorestart=false ; retstart at unexpected quit (default: true)
+startretries=1 ; max # of serial start failures (default 3)
+user=$user ; setuid to this UNIX account to run the program
+redirect_stderr=true ; redirect proc stderr to stdout (default false)
+stdout_logfile=/var/log/$name.log""")
+
+
+    config = '\n'.join(template.substitute({'interpreter':python_interpreter,
+        'user':user,
+        'workdir': videobase_dir,
+        'name': robot_name
+        }) for robot_name in robots_list)
+
+    return config
+
+def set_local_robot_config():
+    with open('configs/robots.conf','w') as fw:
+        fw.write(generate_robots_conf())
+
+    local('sudo cp configs/robots.conf /etc/supervisor/conf.d/robots.conf')
+    local('sudo service supervisor restart')
+

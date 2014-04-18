@@ -10,7 +10,7 @@ from apps.contents.constants import APP_CONTENTS_COMMENT_STATUS
 #############################################################################################################
 # Модель Комментариев
 class Comments(models.Model):
-    user       = models.ForeignKey(User, verbose_name=u'Пользователь')
+    user       = models.ForeignKey(User, verbose_name=u'Пользователь', related_name='comments')
     content    = models.ForeignKey('Contents', verbose_name=u'Контент')
     text       = models.TextField(verbose_name=u'Tекст комментария')
     parent_id  = models.IntegerField(null=True, blank=True, verbose_name=u'Родительский комментарий')

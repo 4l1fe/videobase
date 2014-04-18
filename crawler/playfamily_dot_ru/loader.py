@@ -27,7 +27,7 @@ class PlayfamilyLoader():
         else:
             html_with_type =HTML_with_type(simple_get(form_search_url(self.film.name)))
             html_with_type.page_type = 'search_page'
-            return html_with_type
+            return {'html':html_with_type, 'url_view':url_from_name, 'url':url_from_name}
 
 def playfamily_loader (film):
 

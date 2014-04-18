@@ -9,11 +9,10 @@ class Genres(models.Model):
     name         = models.CharField(max_length=255, verbose_name=u'Название жанра')
     description  = models.TextField(verbose_name=u'Описание жанра')
 
-
     def __unicode__(self):
         return u'[{0}] {1}'.format(self.pk, self.name)
 
-    class  Meta(object):
+    class Meta(object):
         # Имя таблицы в БД
         db_table = 'genres'
         app_label = 'films'
