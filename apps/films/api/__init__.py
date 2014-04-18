@@ -4,7 +4,7 @@ from films_search import SearchFilmsView
 from films_detail import DetailFilmView
 from films_locations import LocationsFilmView
 from films_persons import PersonsFilmView
-from films_semilar import SimilarFilmView
+from films_similar import SimilarFilmView
 from films_extras import ExtrasFilmView
 from films_comments import CommentsFilmView
 from films_action_comment import ActCommentFilmView
