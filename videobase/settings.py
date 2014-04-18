@@ -61,7 +61,9 @@ INSTALLED_APPS = (
     'apps.contents',
     'apps.robots',
     'crawler',
-    'social_auth'
+    'social_auth',
+    'djcelery',
+
 )
 
 MIDDLEWARE_CLASSES = (
