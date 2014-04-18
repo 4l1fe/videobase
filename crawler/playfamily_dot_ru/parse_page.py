@@ -42,8 +42,10 @@ def form_url_from_name(name_orig):
     '''
     try:
         nul = name_orig.strip().decode('ascii').lower()
-        return 'http://playfamily.ru/movie/' + nul.replace(' ', '-')
+        return 'http://playfamily.ru/movie/' + nul.replace(' ', '-').replace(':','')
     except UnicodeDecodeError:
+        return None
+    except UnicodeEncodeError:
         return None
 
 @utfdecode
