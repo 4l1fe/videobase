@@ -1,2 +1,0 @@
-52 6  1   *   *  root supervisorctl start imdb_robot
-52 6  *   *   *  root supervisorctl start kinopoisk_robot

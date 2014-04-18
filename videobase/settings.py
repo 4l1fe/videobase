@@ -51,6 +51,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_extensions',
+    'memcache_status',
     'south',
     'rest_framework',
     'rest_framework.authtoken',
@@ -60,7 +61,9 @@ INSTALLED_APPS = (
     'apps.films',
     'apps.contents',
     'crawler',
-    'social_auth'
+    'social_auth',
+    'djcelery',
+
 )
 
 MIDDLEWARE_CLASSES = (
@@ -126,6 +129,7 @@ CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
         'LOCATION': '127.0.0.1:11211',
+        'PREFIX': 'weee:',
     }
 }
 
@@ -155,13 +159,11 @@ STATIC_ROOT = os.path.join('/var/www/')
 SITE_ID = 1
 
 REST_FRAMEWORK = {
-  'DEFAULT_RENDERER_CLASSES': (
-    'rest_framework.renderers.XMLRenderer',
-    'rest_framework.renderers.JSONRenderer',
-  ),
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.XMLRenderer',
+        'rest_framework.renderers.JSONRenderer',
+    ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        #'rest_framework.authentication.BasicAuthentication',
-        #'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
         'apps.users.models.api_session.MultipleTokenAuthentication',
     )
@@ -199,4 +201,6 @@ SOCIAL_AUTH_PIPELINE = (
     'social_auth.backends.pipeline.user.update_user_details'
 )
 
-API_SESSION_EXPIRATION_TIME = 15 # in minutes
+# In minutes
+API_SESSION_EXPIRATION_TIME = 15
+

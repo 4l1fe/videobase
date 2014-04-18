@@ -1,6 +1,7 @@
 # coding: utf-8
 
 from django.db import models
+import json
 
 
 #############################################################################################################
@@ -9,12 +10,12 @@ class Robots(models.Model):
     name        = models.CharField(max_length=255, primary_key=True, verbose_name=u'Имя')
     description = models.TextField(verbose_name=u'Описание робота')
     last_start  = models.DateTimeField(verbose_name=u'Дата последнего старта')
-    next_start  = models.DateTimeField(verbose_name=u'Дата следующего старта')
+    delay       = models.IntegerField(verbose_name=u'Время между стартами в минутах')
     rstatus     = models.IntegerField(verbose_name=u'Статус')
     state       = models.TextField(verbose_name=u'Состояние между запусками')
 
     def __unicode__(self):
-        return u'[{0}] {1}'.format(self.pk, self.name,)
+        return u' "id": "{0}" name = {1} last_start = {2}'.format(self.pk, self.name, self.last_start)
 
     class Meta:
         # Имя таблицы в БД

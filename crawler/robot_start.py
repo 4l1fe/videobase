@@ -1,16 +1,14 @@
 # coding: utf-8
 """ Command to crawler sites"""
-from crawler.tvigle_ru.loader import TVIGLE_Loader
-from crawler.tvigle_ru.parsers import ParseTvigleFilm
 from crawler.zoomby_ru.loader import ZOOMBY_Loader
 from crawler.zoomby_ru.parsers import ParseFilm
 
+from django.utils import timezone
 from django.core.management.base import BaseCommand
 from optparse import make_option
 
 from apps.films.models import Films, Seasons
 from apps.contents.models import Contents, Locations
-from apps.films.constants import APP_FILM_CRAWLER_LIMIT
 from apps.contents.constants import *
 from crawler.ivi_ru.loader import IVI_Loader
 from crawler.ivi_ru.parsers import ParseFilmPage
@@ -21,45 +19,48 @@ from crawler.megogo_net.parsers import ParseMegogoFilm
 from crawler.core.exceptions import *
 from crawler.playfamily_dot_ru.loader import playfamily_loader
 from crawler.playfamily_dot_ru.parser import PlayfamilyParser
+from crawler.tvigle_ru.loader import TVIGLE_Loader
+from crawler.tvigle_ru.parsers import ParseTvigleFilm
 from requests.exceptions import ConnectionError
-from apps.robots.constants import APP_ROBOTS_TRY_SITE_UNAVAILABLE, APP_ROBOTS_TRY_NO_SUCH_PAGE, APP_ROBOTS_TRY_PARSE_ERROR, APP_ROBOTS_TRY_SUCCESS
-from apps.robots.models import RobotsTries
+from apps.robots.constants import APP_ROBOTS_TRY_SITE_UNAVAILABLE, APP_ROBOTS_TRY_NO_SUCH_PAGE, \
+    APP_ROBOTS_TRY_PARSE_ERROR
+from apps.robots.models import RobotsTries, Robots
 
-import logging
 import re
-import json
 from crawler import Robot
-logging.basicConfig(level = logging.DEBUG)
+import json
+
+
 
 # Список допустимых сайтов
-sites = ('ivi.ru', 'zoomby.ru', 'now.ru', 'playfamily.ru', 'amediateka.ru')
+
 
 # Словарь сайтов:
 # louder: загрузчик страници
 # parser: парсер страници фильма
 sites_crawler = {
-    'ivi.ru': {'loader': IVI_Loader,
+    'ivi_ru': {'loader': IVI_Loader,
                'parser': ParseFilmPage},
-    'zoomby.ru': {'loader': ZOOMBY_Loader,
+    'zoomby_ru': {'loader': ZOOMBY_Loader,
                   'parser': ParseFilm()},
-    'megogo.net': {'loader': MEGOGO_Loader,
+    'megogo_net': {'loader': MEGOGO_Loader,
                    'parser': ParseMegogoFilm},
-    'now.ru': {'loader': NOW_Loader,
+    'now_ru': {'loader': NOW_Loader,
                'parser': ParseNowFilmPage},
-    'amediateka.ru': {'loader': None,
+    'amediateka_ru': {'loader': None,
                       'parser': None},
-    'playfamily.ru': {'loader': playfamily_loader,
+    'playfamily_ru': {'loader': playfamily_loader,
                       'parser': PlayfamilyParser()},
-    'tvigle.ru':{'loader':TVIGLE_Loader,
-                 'parser':ParseTvigleFilm()},
-
+    'tvigle_ru': {'loader': TVIGLE_Loader,
+                  'parser': ParseTvigleFilm()}
 }
-
-# Список допустимых сайтов
 sites = sites_crawler.keys()
 
-def sane_dict(film=None):
 
+def sane_dict(film=None):
+    '''
+    Template for dict returned by parsers with sane defaults
+    '''
     return {'film': film,
             'name': film.name,
             'name_orig': film.name_orig,
@@ -73,14 +74,21 @@ def sane_dict(film=None):
             'price': 0,
             'price_type': APP_CONTENTS_PRICE_TYPE_FREE,
             'url_view': '',
-            'quality':  '',
+            'quality': '',
             'subtitles': '',
             'url_source': ''
-    }
+            }
 
 
 def get_content(film, kwargs):
+    '''
+    Finds or creates content with this film.
 
+    If there are
+
+    number,release_data,description in kwargs then Contents
+    object will be created with these defaults
+    '''
     # Getting all content with this film
     contents = Contents.objects.filter(film=film)
 
@@ -112,7 +120,7 @@ def get_content(film, kwargs):
                            viewer_lastmonth_cnt=0)
         content.save()
         return content
-        
+
     else:
         if season_num is None:
             content = contents[0]
@@ -123,15 +131,15 @@ def get_content(film, kwargs):
 
                 precontent = contents[0]
                 if release_date is None:
-                    logging.debug("Assigned release date for new content based on release date for the film %d", film.pk)
+                    print "Assigned release date for new content based on release date for the film %d" %   film.pk
                     release_date = film.release_date
 
                 if 'series_cnt' in kwargs:
                     series_cnt = kwargs['series_cnt']
                 else:
-                    logging.debug("Assigned new series count in season to number of series in previous season for season %d for film %d", season_num, film.pk)
+                    print "Assigned new series count in season to number of series in previous season for season %d for film %d" % ( season_num, film.pk)
                     series_cnt = precontent.season.series_cnt
-                    
+
                 season = Seasons(film=film, release_date=release_date,
                                  series_cnt=series_cnt, description=description,
                                  number=season_num)
@@ -148,7 +156,6 @@ def get_content(film, kwargs):
 
 
 def save_location(film, **kwargs):
-    
     content = get_content(film, kwargs)
     location = Locations(content=content,
                          type=0,
@@ -160,100 +167,112 @@ def save_location(film, **kwargs):
     location.save()
 
 
-class Command(BaseCommand):
-    help = u'Запустить краулеры'
-    requires_model_validation = True
-    option_list = BaseCommand.option_list + (
-        make_option('--start',
-                    dest='start',
-                    help=u'Id of first film'),
-        make_option('--count',
-                    dest='count',
-                    default=APP_FILM_CRAWLER_LIMIT,
-                    help=u'How much films to process'),
-        make_option('--site',
-                    type='choice',
-                    choices=sites,
-                    dest='site',
-                    action='store',
-                    help=u'Site for crawling'),
-    )
+def launch_next_robot_try(site):
+    '''
+    This will launch next robot iteration according to its setting stored in db
 
-    def handle(self, *args, **options):
-        start = int(options['start'])
-        count = int(options['count'])
-        
-        film = Films.objects.filter(id__in=range(start, start + count + 1))
-#        film = Films.objects.filter(id=380)
-        site = options['site']
-        logging.debug("Starting robot for %s", site)
-        try:
-            robot = Robot(films=film, **sites_crawler[site])
-            for data in robot.get_data(sane_dict):
-                logging.debug("Trying to put data from %s for %s to db", site, str(data['film']))
-                save_location(**data)
-        except ConnectionError, ce:
-            # Couldn't conect to server
-            logging.debug("Connection error")
-            m = re.match(".+host[=][']([^']+)['].+", ce.message.message)
+    As of now it just processes one next film
 
-            host = m.groups()[0]
-            url = ce.message.url
-            if host is None:
-                host = 'unknown'
+    '''
 
-            robot_try = RobotsTries(domain=host,
-                                    url='http://'+host+url,
-                                    film=film[0],
-                                    outcome=APP_ROBOTS_TRY_SITE_UNAVAILABLE
-            )
+    try:
+        robot = Robots.objects.get(name=site)
+    except Robots.DoesNotExist:
+        print 'There is no such site in db'
+        return
 
-            robot_try.save()
-            
-        except RetrievePageException, rexp:
-            # Server responded but not 200
-            logging.debug("RetrievePageException")
-            if site is None:
-                site = 'unknown'
+    params = json.loads(robot.state)
+    start = params['start'] if 'start' in params else 1
 
-            robot_try = RobotsTries(domain=site,
-                                    url=rexp.url,
-                                    film=film[0],
-                                    outcome=APP_ROBOTS_TRY_NO_SUCH_PAGE
-            )
+    film_number = start + 1
+    film_number = 53
+    film = Films.objects.filter(pk=film_number)
 
-            robot_try.save()
+    print film
 
-        except UnicodeDecodeError:
-            logging.debug("Unicode error")
-            if site is None:
-                site = 'unknown'
+    if not film:
+        film_number = 1
+        film = Films.objects.filter(pk=film_number)
+        if not film:
+            print "Empty films db"
+            return
+        print "Starting again"
 
 
-            robot_try = RobotsTries(domain=site,
-                                   #url=rexp.url,
-                                   film=film[0],
-                                   outcome=APP_ROBOTS_TRY_PARSE_ERROR
-            )
+    robot.last_start = timezone.now()
+    robot.state = json.dumps({'start': film_number})
+    robot.save()
 
-            robot_try.save()
-        except NoSuchFilm as e:
-            robot_try = RobotsTries(domain=site,
-                                   film=e.film,
-                                   outcome=APP_ROBOTS_TRY_NO_SUCH_PAGE)
-            robot_try.save()
-        except Exception ,e :
-            print e
-            logging.debug("Unknown exception %s",str(e))
-            # Most likely parsing error
-            if site is None:
-                
-                site = 'unknown'
+    if RobotsTries.objects.filter(film=film, domain=site, outcome=APP_ROBOTS_TRY_NO_SUCH_PAGE):
+        print "Skipping this film {} on that site {} as previous attempt was unsuccessful".format(film,site)
 
-            robot_try = RobotsTries(domain=site,
-                                   #url=rexp.url,
-                                   film=film[0],
-                                   outcome=APP_ROBOTS_TRY_PARSE_ERROR
-            )
+    try:
 
-            robot_try.save()
+        robot = Robot(films=film, **sites_crawler[site])
+        for data in robot.get_data(sane_dict):
+            print "Trying to put data from %s for %s to db" % (site, str(data['film']))
+            save_location(**data)
+
+    except ConnectionError, ce:
+        # Couldn't conect to server
+        print "Connection error"
+        m = re.match(".+host[=][']([^']+)['].+", ce.message.message)
+
+        host = m.groups()[0]
+        url = ce.message.url
+        if host is None:
+            host = 'unknown'
+
+        robot_try = RobotsTries(domain=host,
+                                url='http://' + host + url,
+                                film=film[0],
+                                outcome=APP_ROBOTS_TRY_SITE_UNAVAILABLE
+                                )
+
+        robot_try.save()
+
+    except RetrievePageException, rexp:
+        # Server responded but not 200
+        print "RetrievePageException"
+        if site is None:
+            site = 'unknown'
+
+        robot_try = RobotsTries(domain=site,
+                                url=rexp.url,
+                                film=film[0],
+                                outcome=APP_ROBOTS_TRY_NO_SUCH_PAGE
+                                )
+
+        robot_try.save()
+
+    except UnicodeDecodeError:
+        print "Unicode error"
+        if site is None:
+            site = 'unknown'
+
+        robot_try = RobotsTries(domain=site,
+                                film=film[0],
+                                outcome=APP_ROBOTS_TRY_PARSE_ERROR
+                                )
+
+        robot_try.save()
+    except NoSuchFilm as e:
+        robot_try = RobotsTries(domain=site,
+                                film=e.film,
+                                outcome=APP_ROBOTS_TRY_NO_SUCH_PAGE)
+
+        robot_try.save()
+    '''
+    except Exception, e:
+        print "Unknown exception %s", str(e)
+        # Most likely parsing error
+        if site is None:
+            site = 'unknown'
+
+        robot_try = RobotsTries(domain=site,
+                                film=film[0],
+                                outcome=APP_ROBOTS_TRY_PARSE_ERROR
+                                )
+
+        robot_try.save()
+    '''
