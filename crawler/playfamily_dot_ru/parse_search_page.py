@@ -17,7 +17,8 @@ def form_search_url(search_term):
     Generate search url for search term for playfamily.ru
 
     '''
-    return SEARCH_URL.format(urllib.urlencode({'q':search_term}))
+    print search_term,type
+    return SEARCH_URL.format(urllib.urlencode({'q':search_term.encode('utf-8')}))
 
 
 def parse_search_page(html):
@@ -40,6 +41,9 @@ def parse_search_page(html):
                          for l, p in link_price_tags]
 
     return name_links_price
+
+
+
 
 
 

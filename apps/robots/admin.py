@@ -6,10 +6,10 @@ from .models import *
 #############################################################################################################
 # Администрирование роботов
 class RobotsAdmin(admin.ModelAdmin):
-    def has_add_permission(self, request):
-        return False
-    def has_delete_permission(self, request):
-        return False
+    def has_add_permission(self, request, obj = None):
+        return request.user.is_superuser
+    def has_delete_permission(self, request,obj =None):
+        return request.user.is_superuser
 
     def __init__(self, *args, **kwargs):
         super(RobotsAdmin, self).__init__(*args, **kwargs)
@@ -26,7 +26,7 @@ class RobotsLogAdmin(admin.ModelAdmin):
 
     def __init__(self, *args, **kwargs):
         super(RobotsLogAdmin, self).__init__(*args, **kwargs)
-        self.list_display_links = (None,)
+        #self.list_display_links = (None,)
 
 #############################################################################################################
 # Регистрация моделей в админке

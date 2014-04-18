@@ -105,7 +105,7 @@ class SearchFilmsView(APIView):
         if form.is_valid():
             # Init data
             filter, film_group, location_group = self.parse_post(form)
-            cache_key = ':'.join([str(i) for i in filter.values()])
+            cache_key = ':'.join([i if isinstance(i, basestring) else str(i) for i in filter.values()])
             result = cache.get(cache_key)
 
             if result is None:

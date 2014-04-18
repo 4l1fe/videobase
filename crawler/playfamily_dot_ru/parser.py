@@ -5,7 +5,7 @@ from parse_page import parse_page,form_url_from_name
 class PlayfamilyParser(object):
 
     
-    def parse(self,html,dict_gen,film):
+    def parse(self,html,dict_gen,film,url):
 
         if html.page_type == 'film_page':
 
