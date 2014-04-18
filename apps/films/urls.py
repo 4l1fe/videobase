@@ -21,7 +21,7 @@ v1_api_patterns = patterns('',
     url(r'^v1/films/(?P<film_id>\d+)/action/playlist?$', ActPlaylistFilmView.as_view(), name='act_film_playlist_view'),
     url(r'^v1/films/(?P<film_id>\d+)/action/notwatch?$', ActNotwatchFilmView.as_view(), name='act_film_notwatch_view'),
     url(r'^v1/films/(?P<film_id>\d+)/action/rate?$', ActRateFilmView.as_view(), name='act_film_rate_view'),
-    url(r'^v1/films/(?P<film_id>\d+)/action/comment?$', ActCommentFilmView.as_view(), name='act_film_rate_view'),
+    url(r'^v1/films/(?P<film_id>\d+)/action/comment?$', ActCommentFilmView.as_view(), name='act_film_comment_view'),
 
     # Person API
     url(r'^v1/person/(?P<resource_id>\d+)$', PersonAPIView.as_view(), name='my_rest_view'),
