@@ -9,6 +9,7 @@ import datetime
 from apps.contents.models import *
 from apps.films.models import *
 from django.contrib.auth.models import User
+from rest_framework.authtoken.models import Token
 
 
 class FilmFactory(factory.DjangoModelFactory):
@@ -42,6 +43,7 @@ class FilmFactory(factory.DjangoModelFactory):
 
 class UserFactory(factory.DjangoModelFactory):
     FACTORY_FOR = User
+    pk = factory.Sequence(lambda f: f)
     username = factory.Sequence(lambda q: u'name{0}'.format(q))
     password = factory.Sequence(lambda q: u'pass{0}'.format(q))
 
@@ -118,8 +120,6 @@ class CountriesFactory(factory.DjangoModelFactory):
     pk = factory.Sequence(lambda h: h)
     name = factory.Sequence(lambda h: u'Страна{0}'.format(h))
     name_orig = factory.Sequence(lambda h: u'Country{0}'.format(h))
-
-
 
 
 
