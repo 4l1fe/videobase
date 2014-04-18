@@ -32,7 +32,7 @@ class SearchFilmsView(APIView):
         film_group = 0
         location_group = 0
 
-        for i in ['text', 'year_old', 'genre', 'rating']:
+        for i in ['text', 'year_old', 'genres', 'rating']:
             if i in data.data:
                 film_group += 1
                 break
