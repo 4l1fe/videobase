@@ -8,7 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from apps.users.models import User
-from apps.films.models import UsersPersons, Persons
+from apps.films.models import Persons
 from apps.films.api.serializers import vbPerson
 
 
