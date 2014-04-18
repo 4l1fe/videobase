@@ -51,6 +51,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_extensions',
+    'memcache_status',
     'south',
     'rest_framework',
     'rest_framework.authtoken',
@@ -130,6 +131,7 @@ CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
         'LOCATION': '127.0.0.1:11211',
+        'PREFIX': 'weee:',
     }
 }
 

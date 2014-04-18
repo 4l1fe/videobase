@@ -1,6 +1,7 @@
 # coding: utf-8
 
 from django.db.models import Q
+from django.core.cache import cache
 from django.core.paginator import Paginator
 
 from rest_framework.views import APIView
@@ -47,9 +48,10 @@ class SearchFilmsView(APIView):
 
     def search_by_films(self, filter):
         o_search = Films.objects.all()
+
         # Поиск по имени
         if filter.get('name'):
-            o_search = o_search.filter(Q(name__icontains=filter['name']) | Q(name_orig__icontains=filter['name']))
+            o_search = o_search.filter(Q(name__icontains=filter['text']) | Q(name_orig__icontains=filter['text']))
 
         # Поиск по количеству прошедших лет
         if filter.get('year_old'):
@@ -63,8 +65,8 @@ class SearchFilmsView(APIView):
             o_search = o_search.filter(rating_cons__gte=filter['rating'])
 
         # Поиск по жанрам
-        if filter.get('genres'):
-            o_search = o_search.filter(genres=filter['genres'])
+        if filter.get('genre'):
+            o_search = o_search.filter(genres=filter['genre'])
 
         return o_search
 
@@ -97,46 +99,51 @@ class SearchFilmsView(APIView):
 
     def get(self, request, format=None, *args, **kwargs):
         # Copy post request
-        self.get_copy = request.QUERY_PARAMS.copy()
+        self.get_copy = request.GET.copy()
 
         form = SearchForm(data=self.get_copy)
         if form.is_valid():
             # Init data
             filter, film_group, location_group = self.parse_post(form)
+            cache_key = ':'.join([str(i) for i in filter.values()])
+            result = cache.get(cache_key)
 
-            if film_group > 0:
-                o_search = self.search_by_films(filter)
+            if result is None:
+                if film_group > 0:
+                    o_search = self.search_by_films(filter)
 
-                list_films_by_content = []
-                if location_group > 0:
-                    list_films_by_content = self.search_by_location(filter, o_search)
+                    list_films_by_content = []
+                    if location_group > 0:
+                        list_films_by_content = self.search_by_location(filter, o_search)
 
-                # Пересечение не пусто
-                if len(list_films_by_content):
-                    o_search = Films.objects.filter(pk__in=list_films_by_content)
+                    # Пересечение не пусто
+                    if len(list_films_by_content):
+                        o_search = Films.objects.filter(pk__in=list_films_by_content)
 
-            else:
-                list_films_by_content = []
-                if location_group > 0:
-                    list_films_by_content = self.search_by_location(filter)
+                else:
+                    list_films_by_content = []
+                    if location_group > 0:
+                        list_films_by_content = self.search_by_location(filter)
 
-                o_search = Films.objects.all()
-                if len(list_films_by_content):
-                    o_search = o_search.filter(pk__in=list_films_by_content)
+                    o_search = Films.objects.all()
+                    if len(list_films_by_content):
+                        o_search = o_search.filter(pk__in=list_films_by_content)
 
-            try:
-                page = Paginator(o_search, per_page=filter['per_page']).page(filter['page'])
-            except Exception as e:
-                return Response({'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
+                try:
+                    page = Paginator(o_search, per_page=filter['per_page']).page(filter['page'])
+                except Exception as e:
+                    return Response({'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
 
-            serializer = vbFilm(page.object_list, many=True)
+                serializer = vbFilm(page.object_list, many=True)
 
-            result = {
-                'total_cnt': page.paginator.count,
-                'per_page': page.paginator.per_page,
-                'page': page.number,
-                'items': serializer.data,
-            }
+                result = {
+                    'total_cnt': page.paginator.count,
+                    'per_page': page.paginator.per_page,
+                    'page': page.number,
+                    'items': serializer.data,
+                }
+
+                cache.set(cache_key, result, 300)
 
             return Response(result, status=status.HTTP_200_OK)
 

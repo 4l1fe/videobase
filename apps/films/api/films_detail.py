@@ -45,7 +45,7 @@ class DetailFilmView(APIView):
 
 
     def post(self, request, film_id, format=None, *args, **kwargs):
-        form = DetailForm(data=request.DATA)
+        form = DetailForm(data=request.POST)
         if form.is_valid():
             serializer = self.__get_result(film_id, form.cleaned_data)
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -55,7 +55,7 @@ class DetailFilmView(APIView):
 
 
     def get(self, request, film_id, format=None, *args, **kwargs):
-        form = DetailForm(data=request.QUERY_PARAMS)
+        form = DetailForm(data=request.GET)
         if form.is_valid():
             serializer = self.__get_result(film_id, form.cleaned_data)
             return Response(serializer.data, status=status.HTTP_200_OK)
