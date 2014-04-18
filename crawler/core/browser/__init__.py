@@ -65,13 +65,15 @@ def cache(func):
     '''
     Caching wrapper for get functions
     '''
+
+
     def wrapper(url, **kwargs):
         '''
         Wrapper function
         '''
 
         if (not 'cache' in kwargs) or kwargs['cache']:
-            cachepath = construct_path(url+'&'.join(key+'='+value for key,value in kwargs['params'].items() if 'params' in kwargs else '')
+            cachepath = construct_path(url,kwargs)
             if exists(cachepath):
                 logging.debug('Found cache for %s in %s. Returning cached copy', url, cachepath)
                 with open(cachepath) as fr:
@@ -82,7 +84,6 @@ def cache(func):
                 if r.ok:
 
                     logging.debug("Saving cache for %s in %s.", url, cachepath)
-
                     with open(cachepath, 'w') as fw:
                         fw.write(r.content)
                 return r
