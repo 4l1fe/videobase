@@ -1,19 +1,20 @@
 # coding: utf-8
 
+from django.core.paginator import Page
+
 from rest_framework import serializers
 
 from apps.films.models import *
 from apps.films.constants import APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER
 from apps.contents.models import *
 
-from utils.common import group_by, reindex_by, list_of
+from utils.common import group_by
 from utils.middlewares.local_thread import get_current_request
 
 from vb_person import vbPerson
 
 
 #############################################################################################################
-#
 class CountriesSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -22,7 +23,6 @@ class CountriesSerializer(serializers.ModelSerializer):
 
 
 #############################################################################################################
-#
 class GentriesSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -31,7 +31,6 @@ class GentriesSerializer(serializers.ModelSerializer):
 
 
 #############################################################################################################
-#
 class LocationsSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -39,7 +38,6 @@ class LocationsSerializer(serializers.ModelSerializer):
 
 
 #############################################################################################################
-#
 class ContentSerializer(serializers.ModelSerializer):
     film = LocationsSerializer()
 
@@ -49,8 +47,7 @@ class ContentSerializer(serializers.ModelSerializer):
 
 
 #############################################################################################################
-#
-class vbFilm(serializers.HyperlinkedModelSerializer):
+class vbFilm(serializers.ModelSerializer):
     countries = CountriesSerializer()
     genres = GentriesSerializer()
     persons = vbPerson()
@@ -78,6 +75,10 @@ class vbFilm(serializers.HyperlinkedModelSerializer):
             for field_name in new_fields:
                 self.fields.pop(field_name, None)
 
+        self._get_obj_list()
+        self._rebuild_location()
+        self._rebuild_poster_list()
+
 
     def calc_ratings(self, obj):
         return {
@@ -86,29 +87,58 @@ class vbFilm(serializers.HyperlinkedModelSerializer):
             'cons': [0, 0],
         }
 
-    def locations_list(self, obj):
-        # Select contents by films
-        contents = Contents.objects.filter(film__in=[obj.pk]).values('id', 'film')
-        # result = LocationsSerializer(contents)
-        contents_list = list_of(contents, 'id', False, True)
 
-        # Select locations contents by contents
-        locations = Locations.objects.filter(content__in=contents_list)
-        locations = reindex_by(locations, 'content_id', True)
+    def _get_obj_list(self):
+        list_pk = []
+        instance = self.object
+        if hasattr(instance, '__iter__') and not isinstance(instance, (Page, dict)):
+            for item in instance:
+                list_pk.append(item.pk)
+        else:
+            list_pk.append(instance.pk)
 
-        # Rebuild data
+        self.list_obj_pk = list_pk
+
+
+    def _rebuild_location(self):
+        self.location_rebuild = {}
+
+        locations = Locations.objects.filter(content__film__in=self.list_obj_pk)\
+            .order_by('content__film').select_related('content')
+            # .values('content__film', 'content', 'type', 'lang', 'quality', 'subtitles', 'price', 'price_type', 'url_view')
+
         result = {}
-        for item in contents:
-            ser = LocationsSerializer(locations[item['id']])
-            result[item['film']] = ser.data
+        for item in locations:
+            v = item.content.film_id
+            if not v in result:
+                result[v] = []
+            result[v].append(item)
 
-        return result.get(obj.pk, [])
+        self.location_rebuild = result
+
+
+    def locations_list(self, obj):
+        result = self.location_rebuild.get(obj.pk, [])
+        if len(result):
+            return LocationsSerializer(result, many=True).data
+
+        return result
+
 
     def poster_list(self, obj):
-        extras = FilmExtras.objects.filter(film__in=[obj.pk], type=APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER)
+        result = self.poster_rebuild.get(obj.pk, [])
+        if len(result):
+            return [item.url for item in result if not item.url is None and len(item.url)]
+
+        return result
+
+
+    def _rebuild_poster_list(self):
+        extras = FilmExtras.objects.filter(film__in=self.list_obj_pk, type=APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER)
         extras = group_by(extras, 'id', True)
 
-        return [item.url for item in extras.get(obj.pk, []) if len(item.url)]
+        self.poster_rebuild = extras
+
 
     def relation_list(self, obj):
         req = get_current_request()
@@ -116,6 +146,14 @@ class vbFilm(serializers.HyperlinkedModelSerializer):
             pass
 
         return []
+
+    # def to_native(self, obj):
+    #     self._get_obj_list()
+    #     self._rebuild_location()
+    #     self._rebuild_poster_list()
+    #
+    #     super(vbFilm, self).to_native(*args, **kwargs)
+
 
     class Meta:
         model = Films

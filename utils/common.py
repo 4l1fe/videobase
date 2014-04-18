@@ -115,7 +115,7 @@ def group_by(list, key, objects=False):
         if objects: k_value = getattr(item, key)
         else: k_value = item[key]
 
-        if not result_dict.has_key(k_value):
+        if not k_value in result_dict:
             result_dict[k_value] = []
         result_dict[k_value].append(item)
 
