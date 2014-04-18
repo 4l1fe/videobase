@@ -280,5 +280,5 @@ class FilmsTest(APITestCase):
         s_token = SessionToken.objects.create(user=self.user)
         UsersApiSessions.objects.create(token=s_token)
         headers = "%s %s" % ('X-VB-Token', s_token.key)
-        response = self.client.post(reverse('person_action_view', kwargs={'act_film_comment_view': film.id, 'format': 'json'}), HTTP_AUTHORIZATION=headers)
+        response = self.client.post(reverse('act_film_comment_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_AUTHORIZATION=headers, data={'text': u'Отличный фильм'})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
