@@ -6,14 +6,6 @@ from apps.films.models import Genres
 from apps.users.models import User, UsersPics, UsersRels
 from apps.users.constants import APP_USER_REL_TYPE_NONE, APP_USER_REL_TYPE_FRIENDS
 
-API_USER_REL_TYPE_NONE = 'null'
-API_USER_REL_TYPE_FRIENDS = 'f'
-
-relation_dict_APP_API = {
-    APP_USER_REL_TYPE_NONE: API_USER_REL_TYPE_NONE,
-    APP_USER_REL_TYPE_FRIENDS: API_USER_REL_TYPE_FRIENDS,
-}
-
 
 class vbUser(serializers.HyperlinkedModelSerializer):
     avatar = serializers.SerializerMethodField('path_to_avatar')
@@ -67,8 +59,7 @@ class vbUser(serializers.HyperlinkedModelSerializer):
         return obj.date_joined
 
     def get_friends_cnt(self, obj):
-        return UsersRels.objects.filter(user=obj, user_rel=self.cer_user,
-                                        rel_type=APP_USER_REL_TYPE_FRIENDS).count()
+        return UsersRels.objects.filter(user=obj, rel_type=APP_USER_REL_TYPE_FRIENDS).count()
 
     def get_films_watched_cnt(self, obj):
         return 0
@@ -79,9 +70,9 @@ class vbUser(serializers.HyperlinkedModelSerializer):
     def get_relation(self, obj):
         try:
             rel = UsersRels.objects.get(user=obj, user_rel=self.cer_user).rel_type
-            return relation_dict_APP_API[rel]
         except:
-            return API_USER_REL_TYPE_NONE
+            rel = APP_USER_REL_TYPE_NONE
+        return rel
 
     def genres_list(self, obj):
         genres = Genres.objects.filter(genres__users_films__user=obj)
