@@ -89,11 +89,6 @@ class SearchForm(Form):
                 return 24
             return self.cleaned_data['per_page']
 
-    def clean_text(self):
-        if 'text' in self.cleaned_data:
-            self.cleaned_data['name'] = self.cleaned_data['text']
-            return self.cleaned_data['text']
-
     class Meta:
         fields = ('text', 'genre', 'year_old', 'rating', 'price', 'per_page', 'page', 'instock',)
 

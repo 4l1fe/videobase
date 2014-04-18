@@ -1,6 +1,6 @@
 # coding: utf-8
 
-from django.core.paginator import Paginator, InvalidPage
+from django.core.paginator import Paginator
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -47,14 +47,14 @@ class CommentsFilmView(APIView):
 
         try:
             page = Paginator(o_comments, per_page=per_page).page(page)
-        except InvalidPage as e:
+        except Exception as e:
             return Response({'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
 
         serializer = vbComment(page.object_list, many=True)
         result = {
-            'page': page.number,
             'total_cnt': page.paginator.count,
             'per_page': page.paginator.per_page,
+            'page': page.number,
             'items': serializer.data,
         }
 
