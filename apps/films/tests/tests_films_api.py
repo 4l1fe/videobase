@@ -1,8 +1,9 @@
 #coding: utf-8
 from apps.users.models.api_session import SessionToken, UsersApiSessions
+from rest_framework.authtoken.models import Token
 
 __author__ = 'ipatov'
-from apps.films.tests.factories import *
+from apps.films.tests.factories_films_api import *
 from rest_framework.test import APITestCase
 from rest_framework import status
 from rest_framework.reverse import reverse
