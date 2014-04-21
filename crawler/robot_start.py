@@ -110,20 +110,24 @@ def get_content(film, kwargs):
     if len(contents) == 0:
         #If there is no such content just creating one with meaningful defaults
 
-        if not season_num is None:
-            raise NameError("Variant with new TV series not in db not implemented")
-        content = Contents(film=film, name=film.name, name_orig=film.name_orig,
+        if  (season_num is None) or (season_num ==0):
+
+            content = Contents(film=film, name=film.name, name_orig=film.name_orig,
                            description=description,
                            release_date=film.release_date,
                            viewer_cnt=0,
                            viewer_lastweek_cnt=0,
                            viewer_lastmonth_cnt=0)
-        content.save()
-        return content
+            content.save()
+
+            return content
+        else:
+             raise NameError(u"Variant with new series for serie not in db not implemented")
 
     else:
         print season_num
-        if season_num is None:
+        #According to contract we agreed if there are no seasons there should be return 0, buy some code may return None
+        if (season_num is None) or (season_num == 0):
             content = contents[0]
         else:
             content = next((c for c in contents if c.season.number == season_num), None)
@@ -132,13 +136,13 @@ def get_content(film, kwargs):
 
                 precontent = contents[0]
                 if release_date is None:
-                    print "Assigned release date for new content based on release date for the film %d" %   film.pk
+                    print u"Assigned release date for new content based on release date for the film %d" %   film.pk
                     release_date = film.release_date
 
                 if 'series_cnt' in kwargs:
                     series_cnt = kwargs['series_cnt']
                 else:
-                    print "Assigned new series count in season to number of series in previous season for season %d for film %d" % ( season_num, film.pk)
+                    print u"Assigned new series count in season to number of series in previous season for season %d for film %d" % ( season_num, film.pk)
                     series_cnt = precontent.season.series_cnt
 
                 season = Seasons(film=film, release_date=release_date,
@@ -179,7 +183,7 @@ def launch_next_robot_try(site, film_id = None):
     try:
         robot = Robots.objects.get(name=site)
     except Robots.DoesNotExist:
-        print 'There is no such site in db'
+        print u'There is no such site in db'
         return
 
     params = json.loads(robot.state)
@@ -199,7 +203,7 @@ def launch_next_robot_try(site, film_id = None):
         if not film:
             print "Empty films db"
             return
-        print "Starting again"
+        print u"Starting again"
 
 
     robot.last_start = timezone.now()
@@ -207,18 +211,18 @@ def launch_next_robot_try(site, film_id = None):
     robot.save()
 
     if RobotsTries.objects.filter(film=film, domain=site, outcome=APP_ROBOTS_TRY_NO_SUCH_PAGE):
-        print "Skipping this film {} on that site {} as previous attempt was unsuccessful".format(film,site)
+        print u"Skipping this film {} on that site {} as previous attempt was unsuccessful".format(film,site)
 
     try:
 
         robot = Robot(films=film, **sites_crawler[site])
         for data in robot.get_data(sane_dict):
-            print "Trying to put data from %s for %s to db" % (site, str(data['film']))
+            print u"Trying to put data from %s for %s to db" % (site, unicode(data['film']))
             save_location(**data)
 
     except ConnectionError, ce:
         # Couldn't conect to server
-        print "Connection error"
+        print u"Connection error"
         m = re.match(".+host[=][']([^']+)['].+", ce.message.message)
 
         host = m.groups()[0]
@@ -236,7 +240,7 @@ def launch_next_robot_try(site, film_id = None):
 
     except RetrievePageException, rexp:
         # Server responded but not 200
-        print "RetrievePageException"
+        print u"RetrievePageException"
         if site is None:
             site = 'unknown'
 
@@ -265,7 +269,6 @@ def launch_next_robot_try(site, film_id = None):
                                 outcome=APP_ROBOTS_TRY_NO_SUCH_PAGE)
 
         robot_try.save()
-    '''
     except Exception, e:
         print "Unknown exception %s", str(e)
         # Most likely parsing error
@@ -278,4 +281,4 @@ def launch_next_robot_try(site, film_id = None):
                                 )
 
         robot_try.save()
-    '''
+
