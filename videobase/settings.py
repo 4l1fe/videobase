@@ -208,3 +208,24 @@ SOCIAL_AUTH_PIPELINE = (
 # In minutes
 API_SESSION_EXPIRATION_TIME = 15
 
+RAVEN_CONFIG = {
+    'dsn': 'http://bdc7927fb0754cf39e88c8604fb49b2b:c1da745568c440b2a245c25e60f55a50@sentry.aaysm.com/2',
+
+}
+
+# Add raven to the list of installed apps
+INSTALLED_APPS = INSTALLED_APPS + (
+    # ...
+    'raven.contrib.django.raven_compat',
+)
+
+from datetime import timedelta
+
+CELERYBEAT_SCHEDULE = {
+    'robot-launch': {
+        'task': 'robot_launch',
+        'schedule': timedelta(seconds=10),
+    },
+}
+
+CELERY_TIMEZONE = 'UTC'
