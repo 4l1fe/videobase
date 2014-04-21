@@ -9,6 +9,6 @@ DATABASE_PORT: 5432
 DATABASE_ENGINE: django.db.backends.postgresql_psycopg2
 DATABASE_HOST: localhost
 DATABASE_NAME: test_base
-DATABASE_USER: pgadmin
+DATABASE_USER: postgres
 DATABASE_PASSWORD: qwerty
 DATABASE_PORT: 5432
