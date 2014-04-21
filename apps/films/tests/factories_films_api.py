@@ -1,6 +1,6 @@
 #coding: utf-8
-from apps.contents.constants import APP_CONTENTS_ONLINE_CINEMA, APP_CONTENTS_PRICE_TYPE_FREE
-from apps.films.constants import APP_PERSON_ACTOR, APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER
+from apps.contents.constants import *
+from apps.films.constants import *
 import factory
 import datetime
 from apps.contents.models import *
@@ -94,7 +94,7 @@ class PersonsFilmFactory(factory.DjangoModelFactory):
 
 class CommentsFactory(factory.DjangoModelFactory):
     FACTORY_FOR = Comments
-    pk = factory.Sequence(lambda x: x)
+    # pk = factory.Sequence(lambda x: x)
     user = factory.SubFactory(UserFactory)
     content = factory.SubFactory(ContentFactory)
     text = factory.Sequence(lambda x: u'Comment{0}'.format(x))
@@ -118,8 +118,11 @@ class CountriesFactory(factory.DjangoModelFactory):
     name_orig = factory.Sequence(lambda h: u'Country{0}'.format(h))
 
 
-
-
+class UsersFilmsFactory(factory.DjangoModelFactory):
+    FACTORY_FOR = UsersFilms
+    user = factory.SubFactory(UserFactory)
+    film = factory.SubFactory(FilmFactory)
+    status = APP_USERFILM_STATUS_UNDEF
 
 
 
