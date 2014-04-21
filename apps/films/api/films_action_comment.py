@@ -40,9 +40,9 @@ class ActCommentFilmView(APIView):
 
             # Init data
             filter = {
-                'user': request.user.pk,
+                'user': request.user,
                 'text': form.cleaned_data['text'],
-                'content': o_content.pk,
+                'content': o_content,
             }
 
             try:
@@ -50,5 +50,5 @@ class ActCommentFilmView(APIView):
                 o_com.save()
             except Exception as e:
                 return Response({'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
-
-        return Response(status=status.HTTP_200_OK)
+            return Response(status=status.HTTP_200_OK)
+        return Response({'error': form.errors}, status=status.HTTP_400_BAD_REQUEST)

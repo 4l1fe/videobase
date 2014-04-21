@@ -14,6 +14,8 @@ from apps.films.forms import SearchForm
 from apps.contents.models import Contents, Locations
 from apps.contents.constants import APP_CONTENTS_ONLINE_CINEMA
 
+import videobase.settings as settings
+
 
 #############################################################################################################
 class SearchFilmsView(APIView):
@@ -105,8 +107,9 @@ class SearchFilmsView(APIView):
         if form.is_valid():
             # Init data
             filter, film_group, location_group = self.parse_post(form)
-            cache_key = ':'.join([i if isinstance(i, basestring) else str(i) for i in filter.values()])
-            result = cache.get(cache_key)
+            cache_key = u'{0}({1})'.format(self.__class__.__name__,
+                                          ':'.join([i if isinstance(i, basestring) else str(i) for i in filter.values()]))
+            result = cache.get(cache_key) if not settings.DEBUG else None
 
             if result is None:
                 if film_group > 0:
