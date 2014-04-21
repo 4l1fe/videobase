@@ -1,8 +1,9 @@
 #coding: utf-8
 from apps.users.models.api_session import SessionToken, UsersApiSessions
+from rest_framework.authtoken.models import Token
 
 __author__ = 'ipatov'
-from apps.films.tests.factories import *
+from apps.films.tests.factories_films_api import *
 from rest_framework.test import APITestCase
 from rest_framework import status
 from rest_framework.reverse import reverse
@@ -274,11 +275,75 @@ class FilmsTest(APITestCase):
         response = self.client.get(reverse('film_search_view', kwargs={'format': 'json'}), data=data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_api_action_comments(self):
+    def test_api_action_comments_add_ok(self):
         film = self.films[0]
         token = Token.objects.get(user=self.user)
         s_token = SessionToken.objects.create(user=self.user)
         UsersApiSessions.objects.create(token=s_token)
         headers = "%s %s" % ('X-VB-Token', s_token.key)
-        response = self.client.post(reverse('act_film_comment_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_AUTHORIZATION=headers, data={'text': u'Отличный фильм'})
+        data = {'text': u'Отличный фильм'}
+        response = self.client.post(reverse('act_film_comment_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_AUTHORIZATION=headers, data=data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        comment = Comments.objects.all().last()
+        self.assertEqual(comment.user, self.user)
+        self.assertEqual(comment.content.film, film)
+        self.assertEqual(comment.text, data['text'])
+
+    def test_api_action_comments_add_bad(self):
+        film = self.films[0]
+        token = Token.objects.get(user=self.user)
+        s_token = SessionToken.objects.create(user=self.user)
+        UsersApiSessions.objects.create(token=s_token)
+        headers = "%s %s" % ('X-VB-Token', s_token.key)
+        response = self.client.post(reverse('act_film_comment_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_AUTHORIZATION=headers)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_api_action_comments_add_404(self):
+        token = Token.objects.get(user=self.user)
+        s_token = SessionToken.objects.create(user=self.user)
+        UsersApiSessions.objects.create(token=s_token)
+        headers = "%s %s" % ('X-VB-Token', s_token.key)
+        data = {'text': u'Отличный фильм'}
+        response = self.client.post(reverse('act_film_comment_view', kwargs={'film_id': 0, 'format': 'json'}), HTTP_AUTHORIZATION=headers, data=data)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_api_action_not_watch_add_new(self):
+        film = self.films[0]
+        token = Token.objects.get(user=self.user)
+        s_token = SessionToken.objects.create(user=self.user)
+        UsersApiSessions.objects.create(token=s_token)
+        headers = "%s %s" % ('X-VB-Token', s_token.key)
+        response = self.client.get(reverse('act_film_notwatch_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_AUTHORIZATION=headers)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        user_film = UsersFilms.objects.all().last()
+        self.assertEqual(user_film.film, film)
+        self.assertEqual(user_film.user, self.user)
+        self.assertEqual(user_film.status, APP_USERFILM_STATUS_NOT_WATCH)
+
+    # def test_api_action_not_watch_update(self):
+    #     film = self.films[0]
+    #     UsersFilmsFactory.create(user=self.user, film=film)
+    #     token = Token.objects.get(user=self.user)
+    #     s_token = SessionToken.objects.create(user=self.user)
+    #     UsersApiSessions.objects.create(token=s_token)
+    #     headers = "%s %s" % ('X-VB-Token', s_token.key)
+    #     response = self.client.get(reverse('act_film_notwatch_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_AUTHORIZATION=headers)
+    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
+    #     user_film = UsersFilms.objects.all().last()
+    #     self.assertEqual(user_film.film, film)
+    #     self.assertEqual(user_film.user, self.user)
+    #     self.assertEqual(user_film.status, APP_USERFILM_STATUS_NOT_WATCH)
+
+    def test_api_action_not_watch_delete_ok(self):
+        film = self.films[0]
+        UsersFilmsFactory.create(user=self.user, film=film, status=APP_USERFILM_STATUS_NOT_WATCH)
+        token = Token.objects.get(user=self.user)
+        s_token = SessionToken.objects.create(user=self.user)
+        UsersApiSessions.objects.create(token=s_token)
+        headers = "%s %s" % ('X-VB-Token', s_token.key)
+        response = self.client.delete(reverse('act_film_notwatch_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_AUTHORIZATION=headers)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        user_film = UsersFilms.objects.all().last()
+        self.assertEqual(user_film.film, film)
+        self.assertEqual(user_film.user, self.user)
+        self.assertEqual(user_film.status, APP_USERFILM_STATUS_UNDEF)
