@@ -51,7 +51,6 @@ class PersonsTest(APITestCase):
         UsersApiSessions.objects.create(token=s_token)
         headers = "%s %s" % ('X-VB-Token', s_token.key)
         response = self.client.post(reverse('person_action_view', kwargs={'resource_id': self.person_filmography.person.id, 'format': 'json'}), HTTP_AUTHORIZATION=headers)
-        print response
 
 
 

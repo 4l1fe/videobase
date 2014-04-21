@@ -49,15 +49,15 @@ class ActNotwatchFilmView(APIView):
         }
 
         # Устанавливаем подписку
-        with transaction.atomic():
+        # with transaction.atomic():
+        try:
+            o_subs = UsersFilms(status=not_watch, **filter)
+            o_subs.save()
+        except Exception as e:
             try:
-                o_subs = UsersFilms(status=not_watch, **filter)
-                o_subs.save()
+                UsersFilms.objects.filter(**filter).update(status=not_watch)
             except Exception as e:
-                try:
-                    UsersFilms.objects.filter(**filter).update(status=not_watch)
-                except Exception as e:
-                    return Response({'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(status=status.HTTP_200_OK)
 
