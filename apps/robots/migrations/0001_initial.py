@@ -8,6 +8,9 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
+        # Deleting model 'Users'
+        db.delete_table('users')
+
         # Adding model 'Robots'
         db.create_table('robots', (
             ('name', self.gf('django.db.models.fields.CharField')(max_length=255, primary_key=True)),
