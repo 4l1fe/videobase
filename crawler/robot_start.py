@@ -47,8 +47,8 @@ sites_crawler = {
                    'parser': ParseMegogoFilm},
     'now_ru': {'loader': NOW_Loader,
                'parser': ParseNowFilmPage},
-    'amediateka_ru': {'loader': None,
-                      'parser': None},
+    #'amediateka_ru': {'loader': None,
+    #                  'parser': None},
     'playfamily_ru': {'loader': playfamily_loader,
                       'parser': PlayfamilyParser()},
     'tvigle_ru': {'loader': TVIGLE_Loader,
@@ -108,7 +108,7 @@ def get_content(film, kwargs):
         description = None
 
     if len(contents) == 0:
-        #If there is no such content just creating one with meaningfull defaults
+        #If there is no such content just creating one with meaningful defaults
 
         if not season_num is None:
             raise NameError("Variant with new TV series not in db not implemented")
@@ -122,6 +122,7 @@ def get_content(film, kwargs):
         return content
 
     else:
+        print season_num
         if season_num is None:
             content = contents[0]
         else:
@@ -167,7 +168,7 @@ def save_location(film, **kwargs):
     location.save()
 
 
-def launch_next_robot_try(site):
+def launch_next_robot_try(site, film_id = None):
     '''
     This will launch next robot iteration according to its setting stored in db
 
@@ -184,8 +185,10 @@ def launch_next_robot_try(site):
     params = json.loads(robot.state)
     start = params['start'] if 'start' in params else 1
 
-    film_number = start + 1
-    film_number = 53
+    if film_id is None:
+        film_number = start + 1
+    else:
+        film_number = film_id
     film = Films.objects.filter(pk=film_number)
 
     print film
