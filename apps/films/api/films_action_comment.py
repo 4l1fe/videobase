@@ -40,9 +40,9 @@ class ActCommentFilmView(APIView):
 
             # Init data
             filter = {
-                'user': request.user.pk,
+                'user': request.user,
                 'text': form.cleaned_data['text'],
-                'content': o_content.pk,
+                'content': o_content,
             }
 
             try:
