@@ -1,15 +1,13 @@
 #coding: utf-8
-__author__ = 'eugene'
+from django.contrib.auth.models import User
 
+from rest_framework.authtoken.models import Token
 
+from apps.films.models import Persons, PersonsFilms, Films, UsersPersons
 
 import factory
-from apps.films.models import Persons, PersonsFilms, Films, UsersPersons
-from rest_framework.authtoken.models import Token
 import datetime
-from django.contrib.auth.models import User
 import random
-
 
 
 class PersonFactory(factory.DjangoModelFactory):
