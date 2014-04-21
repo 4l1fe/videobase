@@ -8,62 +8,14 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # # Deleting model 'Users'
-        # db.delete_table('users')
+        # Adding unique constraint on 'UsersRels', fields ['user', 'user_rel']
+        db.create_unique('users_rels', ['user_id', 'user_rel_id'])
 
-
-        # Changing field 'UsersSocials.user'
-        db.alter_column('users_socials', 'user_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User']))
-
-        # Changing field 'UsersLogs.user'
-        db.alter_column('users_logs', 'user_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User']))
-
-        # Changing field 'UsersPics.url'
-        db.alter_column('users_pics', 'url', self.gf('django.db.models.fields.files.ImageField')(max_length=100))
-
-        # Changing field 'UsersPics.user'
-        db.alter_column('users_pics', 'user_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User']))
-
-        # Changing field 'UsersRels.user_rel'
-        db.alter_column('users_rels', 'user_rel_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User']))
-
-        # Changing field 'UsersRels.user'
-        db.alter_column('users_rels', 'user_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User']))
 
     def backwards(self, orm):
-        # Adding model 'Users'
-        db.create_table('users', (
-            ('userpic_type', self.gf('django.db.models.fields.CharField')(default=None, max_length=255, null=True, blank=True)),
-            ('is_admin', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('password', self.gf('django.db.models.fields.CharField')(max_length=128)),
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('last_visited', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('fio', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
-            ('ustatus', self.gf('django.db.models.fields.PositiveSmallIntegerField')(default=0)),
-            ('last_login', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now)),
-            ('email', self.gf('django.db.models.fields.EmailField')(max_length=255, unique=True)),
-        ))
-        db.send_create_signal('users', ['Users'])
+        # Removing unique constraint on 'UsersRels', fields ['user', 'user_rel']
+        db.delete_unique('users_rels', ['user_id', 'user_rel_id'])
 
-
-        # Changing field 'UsersSocials.user'
-        db.alter_column('users_socials', 'user_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['users.Users']))
-
-        # Changing field 'UsersLogs.user'
-        db.alter_column('users_logs', 'user_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['users.Users']))
-
-        # Changing field 'UsersPics.url'
-        db.alter_column('users_pics', 'url', self.gf('django.db.models.fields.CharField')(max_length=255))
-
-        # Changing field 'UsersPics.user'
-        db.alter_column('users_pics', 'user_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['users.Users']))
-
-        # Changing field 'UsersRels.user_rel'
-        db.alter_column('users_rels', 'user_rel_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['users.Users']))
-
-        # Changing field 'UsersRels.user'
-        db.alter_column('users_rels', 'user_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['users.Users']))
 
     models = {
         u'auth.group': {
@@ -102,6 +54,19 @@ class Migration(SchemaMigration):
             'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
+        'users.sessiontoken': {
+            'Meta': {'object_name': 'SessionToken', 'db_table': "'users_api_session_tokens'"},
+            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'key': ('django.db.models.fields.CharField', [], {'max_length': '40', 'primary_key': 'True'}),
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"})
+        },
+        'users.usersapisessions': {
+            'Meta': {'object_name': 'UsersApiSessions', 'db_table': "'users_api_sessions'"},
+            'active': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
+            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'token': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['users.SessionToken']"})
+        },
         'users.userslogs': {
             'Meta': {'object_name': 'UsersLogs', 'db_table': "'users_logs'"},
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
@@ -114,15 +79,27 @@ class Migration(SchemaMigration):
         'users.userspics': {
             'Meta': {'object_name': 'UsersPics', 'db_table': "'users_pics'"},
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'url': ('django.db.models.fields.files.ImageField', [], {'max_length': '100'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"})
+            'image': ('django.db.models.fields.files.ImageField', [], {'max_length': '100'}),
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'pics'", 'to': u"orm['auth.User']"})
+        },
+        'users.usersprofile': {
+            'Meta': {'object_name': 'UsersProfile', 'db_table': "'users_profile'"},
+            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'last_visited': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'nickname': ('django.db.models.fields.CharField', [], {'default': "'NoneName'", 'max_length': '128'}),
+            'phone': ('django.db.models.fields.CharField', [], {'max_length': '12', 'null': 'True', 'blank': 'True'}),
+            'status': ('django.db.models.fields.SmallIntegerField', [], {'default': '0'}),
+            'user': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'profile'", 'unique': 'True', 'to': u"orm['auth.User']"}),
+            'userpic_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'userpic_type': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'})
         },
         'users.usersrels': {
-            'Meta': {'object_name': 'UsersRels', 'db_table': "'users_rels'"},
+            'Meta': {'unique_together': "(('user', 'user_rel'),)", 'object_name': 'UsersRels', 'db_table': "'users_rels'"},
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'rel_type': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'updated': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"}),
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'rels'", 'to': u"orm['auth.User']"}),
             'user_rel': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'user_rel'", 'to': u"orm['auth.User']"})
         },
         'users.userssocials': {

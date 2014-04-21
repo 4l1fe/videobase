@@ -1,4 +1,5 @@
 # coding: utf-8
+
 from django.core.paginator import Paginator
 
 from rest_framework import status
@@ -7,18 +8,11 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from apps.users.models import User
-from apps.films.models import Films
-from apps.films.constants import APP_FILM_FULL_FILM, APP_FILM_SERIAL, APP_USERFILM_STATUS_SUBS
-from apps.films.api.serializers import vbFilm
-
-films_type = {
-    'f': [APP_FILM_FULL_FILM],
-    's': [APP_FILM_SERIAL],
-    'all': [APP_FILM_SERIAL, APP_FILM_FULL_FILM],
-}
+from apps.films.models import Persons
+from apps.films.api.serializers import vbPerson
 
 
-class UsersFilmsView(APIView):
+class UsersPersonsView(APIView):
 
     permission_classes = (IsAuthenticated, )
 
@@ -33,26 +27,19 @@ class UsersFilmsView(APIView):
         page = request.DATA.get('page', 1)
         per_page = request.DATA.get('per_page', 10)
         type = request.DATA.get('type', 'all')
-        try:
-            ftype = films_type[type]
-        except KeyError as e:
-            return Response({'e': e.message}, status=status.HTTP_400_BAD_REQUEST)
 
-        films = Films.objects.filter(users_films__user=user, type__in=ftype,
-                                     users_films__status=APP_USERFILM_STATUS_SUBS)
+        persons = Persons.objects.filter(users_persons__user=user)
         try:
-            page = Paginator(films, per_page).page(page)
+            page = Paginator(persons, per_page).page(page)
         except Exception as e:
             return Response({'e': e.message}, status=status.HTTP_400_BAD_REQUEST)
 
-        serializer = vbFilm(page.object_list, many=True)
-
+        serializer = vbPerson(page.object_list, many=True)
         result = {
-            'per_page': page.paginator.per_page,
             'page': page.number,
-            'total_cnt': page.paginator.count,
+            'per_page': page.paginator.per_page,
             'items': serializer.data,
+            'total_cnt': page.paginator.count,
         }
 
         return Response(result, status=status.HTTP_200_OK)
-

@@ -57,11 +57,13 @@ INSTALLED_APPS = (
     'rest_framework.authtoken',
     'csvimport',
     'apps.users',
-    'apps.robots',
     'apps.films',
     'apps.contents',
+    'apps.robots',
     'crawler',
-    'social_auth'
+    'social_auth',
+    'djcelery',
+
 )
 
 MIDDLEWARE_CLASSES = (
@@ -107,8 +109,12 @@ dbconf.read(CONFIGS_PATH + '/db.ini')
 if 'test' in sys.argv:
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': 'videobase_test',
+            'ENGINE':   dbconf.get('testbase', 'DATABASE_ENGINE'),
+            'HOST':     dbconf.get('testbase', 'DATABASE_HOST'),
+            'NAME':     dbconf.get('testbase', 'DATABASE_NAME'),
+            'USER':     dbconf.get('testbase', 'DATABASE_USER'),
+            'PASSWORD': dbconf.get('testbase', 'DATABASE_PASSWORD'),
+            'PORT':     dbconf.get('testbase', 'DATABASE_PORT')
         }
     }
 else:
