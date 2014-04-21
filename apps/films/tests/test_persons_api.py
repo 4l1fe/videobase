@@ -1,3 +1,4 @@
+#coding: utf-8
 from apps.films.tests.factories import *
 from apps.users import UsersApiSessions
 from apps.users.models.api_session import SessionToken
@@ -10,7 +11,11 @@ from rest_framework.test import APITestCase
 class PersonsTest(APITestCase):
     def setUp(self):
         self.person_filmography = PersonsFilmography.create()
+        self.persons_extras_factory = PersonsExtrasFactory.create()
+        self.content_factory = ContentFactory.create()
         self.user_factory = UserFactory.create()
+        Token.objects.get(user=self.user_factory)
+        self.s_token = SessionToken.objects.create(user=self.user_factory)
 
 
     def test_person_view_ok(self):
@@ -42,16 +47,33 @@ class PersonsTest(APITestCase):
         self.assertEqual(response.data[0]['name_orig'], self.person_filmography.film.name_orig)
         self.assertEqual(response.data[0]['release_date'], self.person_filmography.film.release_date)
 
-    def test_person_action_api_view_ok(self):
+    def test_person_action_subscribe_api_view_ok(self):
         pass
 
-    def test_person_action_api_view(self):
-        Token.objects.get(user=self.user_factory)
-        s_token = SessionToken.objects.create(user=self.user_factory)
-        UsersApiSessions.objects.create(token=s_token)
-        headers = "%s %s" % ('X-VB-Token', s_token.key)
-        response = self.client.post(reverse('person_action_view', kwargs={'resource_id': self.person_filmography.person.id, 'format': 'json'}), HTTP_AUTHORIZATION=headers)
+    def test_person_action_subscribe_api_view(self):
+        UsersApiSessions.objects.create(token=self.s_token)
+        headers = "%s %s" % ('X-VB-Token', self.s_token.key)
+        self.client.post(reverse('person_action_view', kwargs={'resource_id': self.person_filmography.person.id, 'format': 'json'}), HTTP_AUTHORIZATION=headers)
+        user_person = UsersPersons.objects.all().last()
+        self.assertEqual(user_person.person, self.person_filmography.person)
+        self.assertEqual(user_person.user, self.user_factory)
+        self.assertEqual(user_person.subscribed, 1)
+
+
+    def test_person_action_subscribe_delete(self):
+        UsersApiSessions.objects.create(token=self.s_token)
+        headers = "%s %s" % ('X-VB-Token', self.s_token.key)
+        self.client.post(reverse('person_action_view', kwargs={'resource_id': self.person_filmography.person.id, 'format': 'json'}), HTTP_AUTHORIZATION=headers)
+        self.client.delete(reverse('person_action_view', kwargs={'resource_id': self.person_filmography.person.id, 'format': 'json'}), HTTP_AUTHORIZATION=headers)
+        user_person = UsersPersons.objects.last()
+        self.assertEqual(user_person.subscribed, 0)
+        self.assertEqual(user_person.person, self.person_filmography.person)
+        self.assertEqual(user_person.user, self.user_factory)
+
+    def test_person_extras_view(self):
+        response = self.client.get(reverse('person_extras_view', kwargs={'resource_id': self.person_filmography.person.id, 'format': 'json'}))
         print response
+
 
 
 
