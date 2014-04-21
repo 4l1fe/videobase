@@ -65,8 +65,8 @@ def local_db_reset():
     local('''echo "DROP DATABASE videobase;" |  sudo -u postgres psql''')
     local('''echo "CREATE USER pgadmin WITH PASSWORD 'qwerty'; CREATE DATABASE videobase; GRANT ALL PRIVILEGES ON DATABASE videobase to pgadmin;" |  sudo -u postgres psql''')
     local("""cd sql_dump && sudo -u postgres psql -d videobase -f $(ls -1 *.sql | head -1)""")
-    local('''echo "DROP DATABASE videobase_test;" | sudo -u postgres psql ''')
-    local('''echo "CREATE USER pgadmin WITH PASSWORD 'qwerty'; CREATE DATABASE videobase_test; GRANT ALL PRIVILEGES ON DATABASE videobase to pgadmin;" |  sudo -u postgres psql''')
+    local('''echo "DROP DATABASE test_videobase;" | sudo -u postgres psql ''')
+    local('''echo "CREATE USER pgadmin WITH PASSWORD 'qwerty'; CREATE DATABASE test_videobase; GRANT ALL PRIVILEGES ON DATABASE videobase to pgadmin;" |  sudo -u postgres psql''')
 
 
 def setup_system_libraries():

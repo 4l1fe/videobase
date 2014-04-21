@@ -1,10 +1,13 @@
+# coding: utf-8
+from django.core.urlresolvers import reverse
+
+from rest_framework.authtoken.models import Token
+from rest_framework import status
+from rest_framework.test import APITestCase
+
 from apps.films.tests.factories import *
 from apps.users import UsersApiSessions
 from apps.users.models.api_session import SessionToken
-from rest_framework.authtoken.models import Token
-from django.core.urlresolvers import reverse
-from rest_framework import status
-from rest_framework.test import APITestCase
 
 
 class PersonsTest(APITestCase):

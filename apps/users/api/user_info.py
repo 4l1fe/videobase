@@ -27,7 +27,7 @@ class UserInfoView(APIView):
         profile, flag = UsersProfile.objects.get_or_create(user=user)
         if form.is_valid():
             try:
-                nickname = form.cleaned_data.get('nickname', None)
+                nickname = form.cleaned_data.get('name', None)
                 profile.nickname = nickname or profile.nickname
                 email = form.cleaned_data.get('email', None)
                 user.email = email or user.email

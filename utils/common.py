@@ -1,8 +1,9 @@
 # coding: utf-8
 
 import os
+import random
+import string
 from PIL import Image
-from collections import defaultdict
 
 
 def get_image_path(instance, filename):
@@ -136,3 +137,7 @@ def get_authorization_header(request):
         auth = auth.encode(HTTP_HEADER_ENCODING)
 
     return auth
+
+
+def random_string(size=30, chars=string.ascii_letters+string.digits):
+    return ''.join(random.choice(chars) for _ in range(size))
