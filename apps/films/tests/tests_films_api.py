@@ -1,5 +1,6 @@
 #coding: utf-8
 from apps.users.models.api_session import SessionToken, UsersApiSessions
+from django.db import transaction
 from rest_framework.authtoken.models import Token
 
 __author__ = 'ipatov'
@@ -307,6 +308,12 @@ class FilmsTest(APITestCase):
         response = self.client.post(reverse('act_film_comment_view', kwargs={'film_id': 0, 'format': 'json'}), HTTP_AUTHORIZATION=headers, data=data)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+    def test_api_action_comments_add_not_authenticated(self):
+        film = self.films[0]
+        data = {'text': u'Отличный фильм'}
+        response = self.client.post(reverse('act_film_comment_view', kwargs={'film_id': film.id, 'format': 'json'}), data=data)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
     def test_api_action_not_watch_add_new(self):
         film = self.films[0]
         token = Token.objects.get(user=self.user)
@@ -334,6 +341,11 @@ class FilmsTest(APITestCase):
     #     self.assertEqual(user_film.user, self.user)
     #     self.assertEqual(user_film.status, APP_USERFILM_STATUS_NOT_WATCH)
 
+    def test_api_action_not_watch_add_not_authenticated(self):
+        film = self.films[0]
+        response = self.client.post(reverse('act_film_notwatch_view', kwargs={'film_id': film.id, 'format': 'json'}))
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
     def test_api_action_not_watch_delete_ok(self):
         film = self.films[0]
         UsersFilmsFactory.create(user=self.user, film=film, status=APP_USERFILM_STATUS_NOT_WATCH)
@@ -347,3 +359,47 @@ class FilmsTest(APITestCase):
         self.assertEqual(user_film.film, film)
         self.assertEqual(user_film.user, self.user)
         self.assertEqual(user_film.status, APP_USERFILM_STATUS_UNDEF)
+
+    def test_api_action_not_watch_delete_without_users_films_ok(self):
+        film = self.films[0]
+        token = Token.objects.get(user=self.user)
+        s_token = SessionToken.objects.create(user=self.user)
+        UsersApiSessions.objects.create(token=s_token)
+        headers = "%s %s" % ('X-VB-Token', s_token.key)
+        response = self.client.delete(reverse('act_film_notwatch_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_AUTHORIZATION=headers)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_api_action_not_watch_delete_404(self):
+        token = Token.objects.get(user=self.user)
+        s_token = SessionToken.objects.create(user=self.user)
+        UsersApiSessions.objects.create(token=s_token)
+        headers = "%s %s" % ('X-VB-Token', s_token.key)
+        response = self.client.delete(reverse('act_film_notwatch_view', kwargs={'film_id': 0, 'format': 'json'}), HTTP_AUTHORIZATION=headers)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_api_action_not_watch_add_not_authenticated(self):
+        film = self.films[0]
+        response = self.client.delete(reverse('act_film_notwatch_view', kwargs={'film_id': film.id, 'format': 'json'}))
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_api_action_playlist_add(self):
+        film = self.films[0]
+        token = Token.objects.get(user=self.user)
+        s_token = SessionToken.objects.create(user=self.user)
+        UsersApiSessions.objects.create(token=s_token)
+        headers = "%s %s" % ('X-VB-Token', s_token.key)
+        response = self.client.get(reverse('act_film_playlist_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_AUTHORIZATION=headers)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        users_films = UsersFilms.objects.all().last()
+        self.assertEqual(users_films.status, APP_USERFILM_STATUS_SUBS)
+        self.assertEqual(users_films.subscribed, APP_USERFILM_SUBS_TRUE)
+
+    def test_api_action_playlist_already_exist(self):
+        film = self.films[0]
+        UsersFilmsFactory.create(user=self.user, film=film, status=APP_USERFILM_STATUS_SUBS, subscribed=APP_USERFILM_SUBS_TRUE)
+        token = Token.objects.get(user=self.user)
+        s_token = SessionToken.objects.create(user=self.user)
+        UsersApiSessions.objects.create(token=s_token)
+        headers = "%s %s" % ('X-VB-Token', s_token.key)
+        response = self.client.get(reverse('act_film_playlist_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_AUTHORIZATION=headers)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
