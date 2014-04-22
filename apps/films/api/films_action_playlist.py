@@ -75,6 +75,10 @@ class ActPlaylistFilmView(APIView):
             return o_film
 
         # Удаляем из плейлиста
-        UsersFilms.objects.filter(pk=o_film.pk).delete()
+        filter = {
+            'film': o_film.pk,
+            'user': request.user.pk,
+        }
+        UsersFilms.objects.filter(**filter).delete()
 
         return Response(status=status.HTTP_200_OK)

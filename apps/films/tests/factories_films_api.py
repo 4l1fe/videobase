@@ -13,7 +13,7 @@ class FilmFactory(factory.DjangoModelFactory):
     FACTORY_DJANGO_GET_OR_CREATE = ('name',)
     pk = factory.Sequence(lambda n: n)
     name = factory.Sequence(lambda n: u'Фильм{0}'.format(n))
-    type = u'FULL_FILM'
+    type = APP_FILM_FULL_FILM
     release_date = datetime.date(2014, 3, 21)
     description = u'Боевик'
     name_orig = factory.Sequence(lambda n: u'Film{0}'.format(n))
