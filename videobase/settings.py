@@ -25,7 +25,7 @@ DEBUG = True
 
 TEMPLATE_DEBUG = DEBUG
 
-ALLOWED_HOSTS = ['*', ]
+ALLOWED_HOSTS = ['*','vsevi.com']
 
 ACCOUNT_ACTIVATION_DAYS = 2
 
@@ -209,8 +209,7 @@ SOCIAL_AUTH_PIPELINE = (
 API_SESSION_EXPIRATION_TIME = 15
 
 RAVEN_CONFIG = {
-    'dsn': 'http://bdc7927fb0754cf39e88c8604fb49b2b:c1da745568c440b2a245c25e60f55a50@sentry.aaysm.com/2',
-
+    'dsn': 'http://8684bf8b497047d9ac170fd16aefc873:41e89f4666b24f998125370f3d1a1789@sentry.aaysm.com/2'
 }
 
 # Add raven to the list of installed apps
@@ -224,7 +223,7 @@ from datetime import timedelta
 CELERYBEAT_SCHEDULE = {
     'robot-launch': {
         'task': 'robot_launch',
-        'schedule': timedelta(seconds=10),
+        'schedule': timedelta(minutes=5),
     },
 }
 
