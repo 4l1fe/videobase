@@ -10,7 +10,7 @@ from apps.users.tests.factories import UserFactory, UserProfileFactory
 class APIUsersTestCase(APITestCase):
     def setUp(self):
         self.user = UserFactory.create()
-        self.profile = UserProfileFactory.create(user=self.user)
+        self.profile = self.user.profile
         self.url_name = 'users'
         self.kwargs = {'format': 'json', 'user_id': self.user.pk}
         s_token = SessionToken.objects.create(user=self.user)
@@ -32,9 +32,9 @@ class APIUsersTestCase(APITestCase):
         response = self.client.get(reverse(self.url_name, kwargs=self.kwargs),
                                    HTTP_AUTHORIZATION=self.headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIsNotNone(response.data.get('username', None))
+        self.assertIsNotNone(response.data.get('name', None))
         self.assertIsNotNone(response.data.get('avatar', None))
         self.assertIsNotNone(response.data.get('id', None))
         self.assertEqual(response.data['id'], self.user.pk)
-        self.assertEqual(response.data['username'], self.profile.nickname)
+        self.assertEqual(response.data['name'], self.profile.nickname)
         # self.assertEqual(response.data['avatar'], self.profile.nickname)
