@@ -223,7 +223,7 @@ from datetime import timedelta
 CELERYBEAT_SCHEDULE = {
     'robot-launch': {
         'task': 'robot_launch',
-        'schedule': timedelta(seconds=10),
+        'schedule': timedelta(minutes=5),
     },
 }
 
