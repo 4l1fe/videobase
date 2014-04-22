@@ -48,7 +48,10 @@ class PersonsTest(APITestCase):
         self.assertEqual(response.data[0]['release_date'], self.person_filmography.film.release_date)
 
     def test_person_action_subscribe_api_view_ok(self):
-        pass
+        UsersApiSessions.objects.create(token=self.s_token)
+        headers = "%s %s" % ('X-VB-Token', self.s_token.key)
+        response = self.client.post(reverse('person_action_view', kwargs={'resource_id': self.person_filmography.person.id, 'format': 'json'}), HTTP_AUTHORIZATION=headers)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_person_action_subscribe_api_view(self):
         UsersApiSessions.objects.create(token=self.s_token)
@@ -58,7 +61,6 @@ class PersonsTest(APITestCase):
         self.assertEqual(user_person.person, self.person_filmography.person)
         self.assertEqual(user_person.user, self.user_factory)
         self.assertEqual(user_person.subscribed, 1)
-
 
     def test_person_action_subscribe_delete(self):
         UsersApiSessions.objects.create(token=self.s_token)
