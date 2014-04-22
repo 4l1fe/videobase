@@ -1,4 +1,4 @@
-#coding: utf-8
+# coding: utf-8
 
 from django.db import transaction, IntegrityError
 
@@ -9,8 +9,6 @@ from rest_framework.authtoken.models import Token
 
 from apps.films.tests.factories_films_api import *
 from apps.users.models.api_session import SessionToken, UsersApiSessions
-# from apps.films.tests.factories_films_api import *
-# from apps.users.models.api_session import SessionToken, UsersApiSessions
 
 
 class FilmsTest(APITestCase):
