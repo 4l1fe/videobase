@@ -46,8 +46,8 @@ class ActSubscribeFilmView(APIView):
         # Init data
         subscribed = APP_USERFILM_SUBS_TRUE
         filter = {
-            'user': request.user.pk,
-            'film': o_film.pk,
+            'user': request.user,
+            'film': o_film,
         }
 
         # Устанавливаем подписку
