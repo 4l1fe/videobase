@@ -1,11 +1,13 @@
 #coding: utf-8
+from django.contrib.auth.models import User
+
 from apps.contents.constants import *
 from apps.films.constants import *
-import factory
-import datetime
 from apps.contents.models import *
 from apps.films.models import *
-from django.contrib.auth.models import User
+
+import factory
+import datetime
 
 
 class FilmFactory(factory.DjangoModelFactory):
