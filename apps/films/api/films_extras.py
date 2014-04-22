@@ -34,13 +34,13 @@ class ExtrasFilmView(APIView):
             return o_film
 
         # Init data
-        type = request.DATA.get('type', False)
+        film_type = request.DATA.get('type', False)
         filter = {
             'film': o_film.pk,
         }
 
-        if type:
-            filter.update({'type': type})
+        if film_type:
+            filter.update({'type': film_type})
 
         o_extras = FilmExtras.objects.filter(**filter)
         serializer = vbExtra(o_extras, many=True)

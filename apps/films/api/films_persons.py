@@ -33,6 +33,6 @@ class PersonsFilmView(APIView):
         if type(o_film) == Response:
             return o_film
 
-        serializer = vbPerson(o_film, many=True)
+        serializer = vbPerson(o_film)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
