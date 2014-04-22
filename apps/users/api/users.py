@@ -15,8 +15,6 @@ class UsersView(APIView):
     def get(self, request, user_id, format=None, *args, **kwargs):
         try:
             user = User.objects.get(pk=user_id)
-        except User.DoesNotExist as e:
-            return Response({'e': e.message}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({'e': e.message}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -27,8 +25,6 @@ class UsersView(APIView):
     def post(self, request, user_id, format=None, *args, **kwargs):
         try:
             user = User.objects.get(pk=user_id)
-        except User.DoesNotExist as e:
-            return Response({'e': e.message}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({'e': e.message}, status=status.HTTP_400_BAD_REQUEST)
 
