@@ -3,6 +3,9 @@ configs/uwsgi.ini
 
 *.py[cod]
 
+# Pycharm conf
+.idea
+
 # C extensions
 *.so
 
