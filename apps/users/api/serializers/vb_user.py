@@ -10,6 +10,7 @@ from apps.users.constants import APP_USER_REL_TYPE_NONE, APP_USER_REL_TYPE_FRIEN
 
 
 class vbUser(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField('get_name')
     avatar = serializers.SerializerMethodField('path_to_avatar')
 
     # extend
@@ -49,6 +50,9 @@ class vbUser(serializers.ModelSerializer):
             # Drop keys if they exist
             for field_name in del_fields:
                 self.fields.pop(field_name, None)
+
+    def get_name(self, obj):
+        return obj.profile.nickname
 
     def path_to_avatar(self, obj):
         userpic = obj.profile.userpic_id
@@ -90,6 +94,6 @@ class vbUser(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'avatar', 'regdate',
+        fields = ('id', 'name', 'avatar', 'regdate',
                   'friends_cnt', 'films_watched', 'comments_cnt',
                   'relation', 'genres', 'friends')

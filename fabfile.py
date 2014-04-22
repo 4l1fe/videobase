@@ -10,6 +10,7 @@ env.hosts = ['188.226.191.166',]
 env.user = 'root'
 env.shell= "/bin/bash -c"
 
+
 def setup():
 
     # Require some Debian/Ubuntu packages
@@ -29,6 +30,7 @@ def setup():
         'libpq-dev'
     ])
 
+
 def init_db():
     """
     Создает базу данных и пользователя для основного сайта
@@ -36,6 +38,7 @@ def init_db():
     """
     with settings(sudo_user = "postgres"):
         sudo('''echo "CREATE USER pgadmin WITH PASSWORD 'qwerty'; CREATE DATABASE videobase; GRANT ALL PRIVILEGES ON DATABASE videobase to pgadmin;" | psql''')
+
 
 def init_test_db():
     """
@@ -45,6 +48,7 @@ def init_test_db():
     with settings(sudo_user = "postgres"):
         sudo('''echo "CREATE USER pgadmin WITH PASSWORD 'qwerty'; CREATE DATABASE videobase_test; GRANT ALL PRIVILEGES ON DATABASE videobase_test to pgadmin;" | psql''')
 
+
 def populate_test_db():
     """
     Заполняет тестовую базу данных из sql_dump который идет с кодом
@@ -52,6 +56,8 @@ def populate_test_db():
     with cd('/var/www/videobase_test/sql_dump'):
         with settings(sudo_user = "postgres"):
             sudo('''psql -d videobase_test -f $(ls -1 *.sql | head -1)''')
+
+
 def local_db_reset():
     '''
     Перезаписать локальную базу из репозитория
@@ -59,6 +65,9 @@ def local_db_reset():
     local('''echo "DROP DATABASE videobase;" |  sudo -u postgres psql''')
     local('''echo "CREATE USER pgadmin WITH PASSWORD 'qwerty'; CREATE DATABASE videobase; GRANT ALL PRIVILEGES ON DATABASE videobase to pgadmin;" |  sudo -u postgres psql''')
     local("""cd sql_dump && sudo -u postgres psql -d videobase -f $(ls -1 *.sql | head -1)""")
+    local('''echo "DROP DATABASE test_videobase;" | sudo -u postgres psql ''')
+    local('''echo "CREATE USER pgadmin WITH PASSWORD 'qwerty'; CREATE DATABASE test_videobase; GRANT ALL PRIVILEGES ON DATABASE videobase to pgadmin;" |  sudo -u postgres psql''')
+
 
 def setup_system_libraries():
 
@@ -92,6 +101,7 @@ def deploy_test_code():
             else:
                 sudo('git clone git@git.aaysm.com:developers/videobase.git videobase_test')
                 sudo("cd videobase_test/configs/ && cp db.ini.example db.ini && sed -i 's/videobase/videobase_test/g' db.ini")
+
 
 def restart_all():
     """
@@ -154,6 +164,7 @@ def status():
         fabric.state.output[k] = True
     fabric.state.output['debug']=False
 
+
 def db_migrate_test(appname=''):
 
     '''
@@ -165,6 +176,7 @@ def db_migrate_test(appname=''):
         with cd('/var/www/videobase_test/'):
             sudo('/home/virtualenv/videobase_test/bin/python manage.py migrate %s --no-initial-data' % appname)
 
+
 def collect_static():
     """
     build/update static files
@@ -172,6 +184,7 @@ def collect_static():
     with settings(sudo_user = "www-data"):
         with cd('/var/www/videobase_test/'):
             sudo('/home/virtualenv/videobase_test/bin/python manage.py collectstatic --dry-run --noinput')
+
 
 def deploy():
 
@@ -182,6 +195,7 @@ def deploy():
     deploy_test_code()
     restart_all()
     status()
+
 
 def project_deploy():
     '''
@@ -222,6 +236,7 @@ def init_if_not_exists_task():
 def scheme():
 
     local('python ./manage.py graph_models -a -g -o current.png')
+
 
 def show_scheme():
     scheme()
