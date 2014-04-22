@@ -8,6 +8,7 @@ from apps.users.constants import APP_USER_REL_TYPE_NONE, APP_USER_REL_TYPE_FRIEN
 
 
 class vbUser(serializers.HyperlinkedModelSerializer):
+    username = serializers.SerializerMethodField('get_username')
     avatar = serializers.SerializerMethodField('path_to_avatar')
     # extend
     regdate = serializers.SerializerMethodField('get_regdate')
@@ -45,6 +46,9 @@ class vbUser(serializers.HyperlinkedModelSerializer):
             # Drop keys if they exist
             for field_name in del_fields:
                 self.fields.pop(field_name, None)
+
+    def get_username(self, obj):
+        return obj.profile.nickname
 
     def path_to_avatar(self, obj):
         userpic = obj.profile.userpic_id
