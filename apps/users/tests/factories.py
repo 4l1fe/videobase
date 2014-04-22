@@ -2,6 +2,7 @@
 from apps.users.models import User, UsersProfile, UsersPics
 
 import factory
+from factory.django import ImageField
 
 
 class UserFactory(factory.DjangoModelFactory):
