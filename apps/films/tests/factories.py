@@ -52,7 +52,7 @@ class UsersPersonsFactory(factory.DjangoModelFactory):
 class UserFactory(factory.DjangoModelFactory):
 
     FACTORY_FOR = User
-    pk = factory.Sequence(lambda n: n)
+    # pk = factory.Sequence(lambda n: n)
     username = factory.Sequence(lambda n: u'admin{0}'.format(n))
     password = u'admin'
 

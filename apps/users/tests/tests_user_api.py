@@ -12,7 +12,7 @@ from utils.common import random_string
 class APIUserTestCase(APITestCase):
     def setUp(self):
         self.user = UserFactory.create()
-        self.profile = UserProfileFactory.create(user=self.user)
+        self.profile = self.user.profile
         self.url_name = ''
         s_token = SessionToken.objects.create(user=self.user)
         UsersApiSessions.objects.create(token=s_token)
