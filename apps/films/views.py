@@ -205,7 +205,7 @@ class PersonsExtrasAPIView(APIView):
             else:
                 pes = PersonsExtras.objects.filter(person = person, type = type)
 
-            result = [pe.as_vbExtras for pe in pes]
+            result = [pe.as_vbExtra() for pe in pes]
             
             response = Response(result, status=status.HTTP_200_OK)
             return response

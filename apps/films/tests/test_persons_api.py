@@ -70,9 +70,20 @@ class PersonsTest(APITestCase):
         self.assertEqual(user_person.person, self.person_filmography.person)
         self.assertEqual(user_person.user, self.user_factory)
 
+    def test_person_extras_view_ok(self):
+        response = self.client.get(reverse('person_extras_view', kwargs={'resource_id': self.persons_extras_factory.person.id, 'format': 'json'}))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_person_extras_view_404(self):
+        response = self.client.get(reverse('person_extras_view', kwargs={'resource_id': 0, 'format': 'json'}))
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
     def test_person_extras_view(self):
-        response = self.client.get(reverse('person_extras_view', kwargs={'resource_id': self.person_filmography.person.id, 'format': 'json'}))
-        print response
+        response = self.client.get(reverse('person_extras_view', kwargs={'resource_id': self.persons_extras_factory.person.id, 'format': 'json'}))
+        self.assertEqual(response.data[0]['name'], self.persons_extras_factory.name)
+        self.assertEqual(response.data[0]['name_orig'], self.persons_extras_factory.name_orig)
+        self.assertEqual(response.data[0]['description'], self.persons_extras_factory.description)
+
 
 
 
