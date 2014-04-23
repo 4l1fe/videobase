@@ -1,12 +1,15 @@
 # coding: utf-8
-from fabric.api import env,roles, run, settings, sudo, cd,local
+from fabric.api import env, roles, run, settings, sudo, cd, local
 import fabric
 from fabtools import require
 import fabtools
+import os
+from string import Template
 
 env.hosts = ['188.226.191.166',]
 env.user = 'root'
-env.shell= "/bin/bash -c"
+env.shell = "/bin/bash -c"
+
 
 def setup():
 
@@ -26,6 +29,7 @@ def setup():
         'libpng12-dev',
         'libpq-dev'
     ])
+
 
 def init_db():
     """
@@ -57,6 +61,9 @@ def local_db_reset():
     local('''echo "DROP DATABASE videobase;" |  sudo -u postgres psql''')
     local('''echo "CREATE USER pgadmin WITH PASSWORD 'qwerty'; CREATE DATABASE videobase; GRANT ALL PRIVILEGES ON DATABASE videobase to pgadmin;" |  sudo -u postgres psql''')
     local("""cd sql_dump && sudo -u postgres psql -d videobase -f $(ls -1 *.sql | head -1)""")
+    local('''echo "DROP DATABASE test_base;" | sudo -u postgres psql ''')
+    local('''echo "CREATE DATABASE test_base; ALTER DATABASE test_base OWNER TO pgadmin;" |  sudo -u postgres psql''')
+
 
 def setup_system_libraries():
 
@@ -79,17 +86,17 @@ def deploy_test_code():
         with cd('/var/www'):
 
             result = str(sudo('ls -1')).strip()
-            filtered_array=[s for s in result.split('\r\n') if s=='videobase_test']
+            filtered_array=[s for s in result.split('\r\n') if s=='test_base']
 
             if filtered_array:
                 #sudo("cd videobase_test; git checkout configs/db.ini")
                 #sudo("cd videobase_test; cat configs/db.ini")
-                sudo('cd videobase_test;git pull')
+                sudo('cd test_base;git pull')
                 #sudo("cd videobase_test/configs/ && sed -i 's/videobase/videobase_test/g' db.ini")
                 #sudo("cd videobase_test; cat configs/db.ini")
             else:
-                sudo('git clone git@git.aaysm.com:developers/videobase.git videobase_test')
-                sudo("cd videobase_test/configs/ && cp db.ini.example db.ini && sed -i 's/videobase/videobase_test/g' db.ini")
+                sudo('git clone git@git.aaysm.com:developers/videobase.git test_base')
+                sudo("cd test_base/configs/ && cp db.ini.example db.ini && sed -i 's/videobase/test_base/g' db.ini")
 
 def restart_all():
     """
@@ -163,6 +170,7 @@ def db_migrate_test(appname=''):
         with cd('/var/www/videobase_test/'):
             sudo('/home/virtualenv/videobase_test/bin/python manage.py migrate %s --no-initial-data' % appname)
 
+
 def collect_static():
     """
     build/update static files
@@ -170,6 +178,7 @@ def collect_static():
     with settings(sudo_user = "www-data"):
         with cd('/var/www/videobase_test/'):
             sudo('/home/virtualenv/videobase_test/bin/python manage.py collectstatic --dry-run --noinput')
+
 
 def deploy():
 
@@ -180,6 +189,7 @@ def deploy():
     deploy_test_code()
     restart_all()
     status()
+
 
 def project_deploy():
     '''
@@ -221,6 +231,54 @@ def scheme():
 
     local('python ./manage.py graph_models -a -g -o current.png')
 
+
+
 def show_scheme():
     scheme()
     local('feh current.png')
+
+
+def generate_robots_conf(python_interpreter = None, videobase_dir = None, user= None):
+
+
+    if python_interpreter is None:
+        python_interpreter = local("which python",capture=True)
+    if videobase_dir is None:
+        videobase_dir = os.path.abspath('.')
+    if user is None:
+        user = local('whoami',capture=True)
+
+
+    robots_list = local('python manage.py list_robots',capture=True).split()
+    print robots_list
+
+    template = Template("""[program:$name]
+command=$interpreter manage.py robot_start --site $name
+process_name=%(program_name)s ; process_name expr (default %(program_name)s)
+numprocs=1 ; number of processes copies to start (def 1)
+directory=$workdir ; directory to cwd to before exec (def no cwd)
+umask=022 ; umask for process (default None)
+autostart=false ; start at supervisord start (default: true)
+autorestart=false ; retstart at unexpected quit (default: true)
+startretries=1 ; max # of serial start failures (default 3)
+user=$user ; setuid to this UNIX account to run the program
+redirect_stderr=true ; redirect proc stderr to stdout (default false)
+stdout_logfile=/var/log/$name.log""")
+
+
+    config = '\n'.join(template.substitute({'interpreter':python_interpreter,
+        'user':user,
+        'workdir': videobase_dir,
+        'name': robot_name
+        }) for robot_name in robots_list)
+
+    return config
+
+
+def set_local_robot_config():
+    with open('configs/robots.conf','w') as fw:
+        fw.write(generate_robots_conf())
+
+    local('sudo cp configs/robots.conf /etc/supervisor/conf.d/robots.conf')
+    local('sudo service supervisor restart')
+

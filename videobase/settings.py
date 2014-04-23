@@ -51,6 +51,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_extensions',
+    'memcache_status',
     'south',
     'rest_framework',
     'rest_framework.authtoken',
@@ -61,6 +62,9 @@ INSTALLED_APPS = (
     'apps.films',
     'apps.contents',
     'crawler',
+    'social_auth',
+    'djcelery',
+    'raven.contrib.django.raven_compat',  # may be delete later
 )
 
 MIDDLEWARE_CLASSES = (
@@ -108,8 +112,12 @@ dbconf.read(CONFIGS_PATH + '/db.ini')
 if 'test' in sys.argv:
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': 'videobase_test',
+            'ENGINE':   dbconf.get('testbase', 'DATABASE_ENGINE'),
+            'HOST':     dbconf.get('testbase', 'DATABASE_HOST'),
+            'NAME':     dbconf.get('testbase', 'DATABASE_NAME'),
+            'USER':     dbconf.get('testbase', 'DATABASE_USER'),
+            'PASSWORD': dbconf.get('testbase', 'DATABASE_PASSWORD'),
+            'PORT':     dbconf.get('testbase', 'DATABASE_PORT')
         }
     }
 else:
@@ -128,6 +136,7 @@ CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
         'LOCATION': '127.0.0.1:11211',
+        'PREFIX': 'weee:',
     }
 }
 
@@ -157,14 +166,13 @@ STATIC_ROOT = os.path.join('/var/www/')
 SITE_ID = 1
 
 REST_FRAMEWORK = {
-  'DEFAULT_RENDERER_CLASSES': (
-    'rest_framework.renderers.XMLRenderer',
-    'rest_framework.renderers.JSONRenderer',
-  ),
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.XMLRenderer',
+        'rest_framework.renderers.JSONRenderer',
+    ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.BasicAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
+        'apps.users.models.api_session.MultipleTokenAuthentication',
     )
 }
 
@@ -202,6 +210,8 @@ AUTHENTICATION_BACKENDS = (
     'social_auth.backends.contrib.odnoklassniki.OdnoklassnikiBackend',
     'social_auth.backends.contrib.mailru.MailruBackend',
     'django.contrib.auth.backends.ModelBackend',
+    'rest_framework.authentication.TokenAuthentication',
+    'apps.users.models.api_session.MultipleTokenAuthentication',
 )
 
 # Перечислим pipeline, которые последовательно буду обрабатывать респонс
@@ -213,7 +223,7 @@ SOCIAL_AUTH_PIPELINE = (
     'social_auth.backends.pipeline.associate.associate_by_email',
     # Пытается собрать правильный username, на основе уже имеющихся данных
     'social_auth.backends.pipeline.user.get_username',
-    # # Создает нового пользователя, если такого еще нет
+    # Создает нового пользователя, если такого еще нет
     'social_auth.backends.pipeline.user.create_user',
     # Пытается связать аккаунты
     'social_auth.backends.pipeline.social.associate_user',
@@ -222,3 +232,21 @@ SOCIAL_AUTH_PIPELINE = (
     # Обновляет инстанс user дополнительными данными с бекенда
     'social_auth.backends.pipeline.user.update_user_details'
 )
+
+# In minutes
+API_SESSION_EXPIRATION_TIME = 15
+
+RAVEN_CONFIG = {
+    'dsn': 'http://8684bf8b497047d9ac170fd16aefc873:41e89f4666b24f998125370f3d1a1789@sentry.aaysm.com/2'
+}
+
+from datetime import timedelta
+
+CELERYBEAT_SCHEDULE = {
+    'robot-launch': {
+        'task': 'robot_launch',
+        'schedule': timedelta(minutes=5),
+    },
+}
+
+CELERY_TIMEZONE = 'UTC'

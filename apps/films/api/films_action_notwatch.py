@@ -42,8 +42,8 @@ class ActNotwatchFilmView(APIView):
         # Init data
         not_watch = APP_USERFILM_STATUS_NOT_WATCH
         filter = {
-            'user': request.user.pk,
-            'film': o_film.pk,
+            'user': request.user,
+            'film': o_film,
         }
 
         # Устанавливаем подписку
