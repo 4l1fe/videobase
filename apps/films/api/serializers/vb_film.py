@@ -48,21 +48,28 @@ class ContentSerializer(serializers.ModelSerializer):
 
 #############################################################################################################
 class vbFilm(serializers.ModelSerializer):
-    countries = CountriesSerializer()
-    genres = GentriesSerializer()
-    persons = vbPerson()
+    poster = serializers.SerializerMethodField('poster_list')
     ratings = serializers.SerializerMethodField('calc_ratings')
+    relation = serializers.SerializerMethodField('relation_list')
     releasedate = serializers.SerializerMethodField('calc_release')
     locations = serializers.SerializerMethodField('locations_list')
-    poster = serializers.SerializerMethodField('poster_list')
-    relation = serializers.SerializerMethodField('relation_list')
+
+    # Признак extend
+    countries = CountriesSerializer()
+    genres = GentriesSerializer()
+    director = serializers.SerializerMethodField('director_list')
+    scriptwriters = serializers.SerializerMethodField('scriptwriters_list')
+
+    # Признак person
+    persons = vbPerson()
+
 
     def __init__(self, *args, **kwargs):
         new_fields = []
 
         extend = kwargs.pop('extend', False)
         if not extend:
-            new_fields += ['description', 'genres', 'countries']
+            new_fields += ['description', 'genres', 'countries', 'directors', 'scriptwriters']
 
         persons = kwargs.pop('persons', False)
         if not persons:
@@ -150,14 +157,15 @@ class vbFilm(serializers.ModelSerializer):
         if req.user.is_authenticated():
             pass
 
+        return {}
+
+
+    def director_list(self, obj):
         return []
 
-    # def to_native(self, obj):
-    #     self._get_obj_list()
-    #     self._rebuild_location()
-    #     self._rebuild_poster_list()
-    #
-    #     super(vbFilm, self).to_native(*args, **kwargs)
+
+    def scriptwriters_list(self, obj):
+        return []
 
 
     class Meta:
