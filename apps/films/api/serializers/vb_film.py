@@ -57,7 +57,7 @@ class vbFilm(serializers.ModelSerializer):
     # Признак extend
     countries = CountriesSerializer()
     genres = GentriesSerializer()
-    director = serializers.SerializerMethodField('director_list')
+    directors = serializers.SerializerMethodField('director_list')
     scriptwriters = serializers.SerializerMethodField('scriptwriters_list')
 
     # Признак person
@@ -172,5 +172,6 @@ class vbFilm(serializers.ModelSerializer):
         model = Films
         fields = ['id', 'name', 'name_orig', 'releasedate', \
                   'ratings', 'duration', 'locations', 'poster', 'relation', \
-                  'description', 'countries', 'genres', 'persons',
+                  'description', 'countries', 'directors', 'scriptwriters', \
+                  'genres', 'persons',
                  ]

@@ -82,7 +82,7 @@ class FilmsTest(APITestCase):
         self.assertEqual(response.data['ratings']['cons'][0], 0)
         self.assertEqual(response.data['ratings']['cons'][1], 0)
         self.assertEqual(response.data['duration'], film.duration)
-        self.assertEqual(response.data['relation'], [])
+        self.assertEqual(response.data['relation'], {})
 
     def test_api_detail_ok_post(self):
         film = self.films[0]
@@ -139,7 +139,7 @@ class FilmsTest(APITestCase):
         self.assertEqual(response.data['ratings']['cons'][0], 0)
         self.assertEqual(response.data['ratings']['cons'][1], 0)
         self.assertEqual(response.data['duration'], film.duration)
-        self.assertEqual(response.data['relation'], [])
+        self.assertEqual(response.data['relation'], {})
 
     def test_api_detail_extend_data_post(self):
         film = self.films[0]
@@ -187,7 +187,7 @@ class FilmsTest(APITestCase):
         self.assertEqual(response.data['ratings']['cons'][0], 0)
         self.assertEqual(response.data['ratings']['cons'][1], 0)
         self.assertEqual(response.data['duration'], film.duration)
-        self.assertEqual(response.data['relation'], [])
+        self.assertEqual(response.data['relation'], {})
 
     def test_api_detail_persons_data_post(self):
         film = self.films[0]
@@ -226,7 +226,7 @@ class FilmsTest(APITestCase):
         self.assertEqual(response.data['ratings']['cons'][0], 0)
         self.assertEqual(response.data['ratings']['cons'][1], 0)
         self.assertEqual(response.data['duration'], film.duration)
-        self.assertEqual(response.data['relation'], [])
+        self.assertEqual(response.data['relation'], {})
 
     def test_api_detail_data_without_param_post(self):
         film = self.films[0]
@@ -265,7 +265,7 @@ class FilmsTest(APITestCase):
         self.assertEqual(response.data['ratings']['cons'][0], 0)
         self.assertEqual(response.data['ratings']['cons'][1], 0)
         self.assertEqual(response.data['duration'], film.duration)
-        self.assertEqual(response.data['relation'], [])
+        self.assertEqual(response.data['relation'], {})
 
     def test_api_detail_404_post(self):
         response = self.client.post(reverse('film_details_view', kwargs={'film_id': 0, 'format': 'json'}), data={})
@@ -645,7 +645,7 @@ class FilmsTest(APITestCase):
             self.assertEqual(film['ratings']['cons'][0], 0)
             self.assertEqual(film['ratings']['cons'][1], 0)
             self.assertEqual(film['duration'], sim_film.duration)
-            self.assertEqual(film['relation'], [])
+            self.assertEqual(film['relation'], {})
 
     def test_api_similar_ok(self):
         film = self.films[0]
