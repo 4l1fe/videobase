@@ -105,7 +105,7 @@ class RatingForm(Form):
 #############################################################################################################
 class CommentForm(Form):
     """
-    Форма рейтинга для фильмов
+    Форма для комментария к фильму
     """
 
     text = fields.CharField(max_length=255, help_text=u'Комментарий')
@@ -119,3 +119,23 @@ class DetailForm(Form):
 
     extend  = fields.BooleanField(initial=False, required=False, help_text=u'Расширенный')
     persons = fields.BooleanField(initial=False, required=False, help_text=u'Персоны')
+
+
+#############################################################################################################
+class PersonForm(Form):
+    """
+    Форма детализация для vbFilm
+    """
+
+    type  = fields.IntegerField(required=False, help_text=u'Тип')
+    top   = fields.IntegerField(initial=0, min_value=0, help_text=u'Сортировать с')
+    limit = fields.IntegerField(initial=12, min_value=1, help_text=u'Ограничение')
+
+    def __init__(self, *args, **kwargs):
+        if not kwargs['data'].get('top'):
+           kwargs['data']['top'] = 0
+
+        if not kwargs['data'].get('limit'):
+           kwargs['data']['limit'] = 10
+
+        super(PersonForm, self).__init__(*args, **kwargs)

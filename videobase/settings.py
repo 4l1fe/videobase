@@ -90,8 +90,6 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.request',
 )
 
-
-
 TEMPLATE_DIRS = (
     os.path.join(BASE_DIR, 'templates/'),
     os.path.join(BASE_DIR, 'interface/'),
