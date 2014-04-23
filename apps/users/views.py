@@ -1,8 +1,7 @@
 # coding: utf-8
-
+from django.http import HttpResponseBadRequest, HttpResponseRedirect
 from django.views.generic import CreateView, TemplateView
-
-from django.http import HttpResponseRedirect
+from django.template.loader import render_to_string
 from django.shortcuts import render_to_response
 from django.core.context_processors import csrf
 from django.core.mail import EmailMultiAlternatives
@@ -10,13 +9,18 @@ from django.contrib.auth.models import User
 from django.http import HttpResponseBadRequest
 from django.template.loader import render_to_string
 
+from rest_framework.authtoken.models import Token
 from rest_framework.views import APIView
+from rest_framework.authtoken import views
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import permission_classes
 
 from constants import SUBJECT_TO_RESTORE_PASSWORD
 from .forms import UsersProfileForm, CustomRegisterForm
 
+from apps.users.models.api_session import UsersApiSessions, SessionToken
 from apps.users.api.utils import create_new_session
 
 
@@ -76,6 +80,12 @@ def restore_password(request):
     return response
 
 
+class ObtainAuthToken(views.ObtainAuthToken):
+
+    def post(self, request, format=None, *args, **kwargs):
+        return super(ObtainAuthToken, self).post(request)
+
+
 class ObtainSessionToken(APIView):
 
     def get(self, request, format=None, *args, **kwargs):
@@ -90,3 +100,29 @@ class ObtainSessionToken(APIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         return Response(response_dict, status=status.HTTP_200_OK)
+
+    @permission_classes((IsAuthenticated, ))
+    def delete(self, request, format=None, *args, **kwargs):
+        token = request.auth
+        try:
+            session = UsersApiSessions.objects.get(token=token.pk)
+            session.active = False
+            session.save()
+        except UsersApiSessions.DoesNotExist as e:
+            return Response({'e': e.message}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(status=status.HTTP_200_OK)
+
+
+class RevokeSessionToken(APIView):
+
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request, format=None, *args, **kwargs):
+        user = request.user
+        session_keys = SessionToken.objects.filter(user=user).values_list('key', flat=True)
+        UsersApiSessions.objects.filter(token__in=session_keys).update(active=False)
+        token = user.auth_token
+        token.delete()
+        Token.objects.create(user=user)
+        return Response(status.HTTP_200_OK)

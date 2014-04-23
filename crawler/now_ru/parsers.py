@@ -7,6 +7,9 @@ from bs4 import BeautifulSoup
 
 # Парсер для поисковика фильма
 def parse_search(response, film):
+    if not (type(film) is unicode):
+        film = film.decode('utf-8')
+
     HOST = 'http://www.now.ru'
     search_text_title = 'Результаты поиска'.decode('utf-8')
     film_div = None
@@ -22,13 +25,15 @@ def parse_search(response, film):
                     break
                 for h2 in tag.find_all('h2'):
                     h2.span.extract()
-                    if h2.text.lower().strip() == film.decode('utf-8').lower().strip():
+                    if h2.text.lower().strip() == film.lower().strip():
                         film_div = h2.parent.parent.parent
                         exit_flag = True
                         break
-            if film_div is not None:
+            if film_div:
                 a_tag = film_div.a
                 film_link = HOST + a_tag.get('href')
+            else:
+                return None
         else:
             film_link = soup.find(attrs={'property':'og:url'}).get('content')
 

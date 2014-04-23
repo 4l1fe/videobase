@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+</head>
+<body>
+<script>
+// Helper function for csrf
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+csrftoken =getCookie("csrftoken")
+$.ajaxSetup({
+    crossDomain: false, // obviates need for sameOrigin test
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type)) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    }
+});
+
+function get_new_token(){
+
+var ses_token = "lal";
+
+$.ajax({
+    type:"POST",
+    url: "/auth/login/",
+    data: "username=admin&password=admin",
+    async: false,
+    success: function(data){
+        var token;
+        token = data.token;
+        $.ajax({
+            url: "v1/auth/session.json",
+        	type: "GET",
+        	async: false,
+        	headers: {'Authorization': 'Token '+token},
+        	success: function(data){
+                ses_token = data.session_token;
+                console.log(ses_token);
+        	}
+        });
+    }
+});
+    return ses_token;
+}
+
+var ses_token = get_new_token()
+
+
+</script>
+{%csrf_token%}
+</body>
+</html>
+
+
+
+

@@ -63,12 +63,31 @@ class FilmsAdminForm(ModelForm):
 class SearchForm(Form):
     text     = fields.CharField(max_length='255', required=False)
     genre    = fields.IntegerField(min_value=1, required=False)
-    year_old = fields.IntegerField(min_value=1, required=False)
+    year_old = fields.IntegerField(min_value=0, required=False)
     rating   = fields.FloatField(required=False)
-    price    = fields.IntegerField(required=False)
-    per_page = fields.IntegerField(min_value=1, required=False, initial=24)
-    page     = fields.IntegerField(min_value=1, required=False, initial=1)
-    instock  = fields.BooleanField(required=False, initial=False)
+    price    = fields.FloatField(min_value=0, required=False)
+    per_page = fields.IntegerField(initial=24, min_value=1)
+    page     = fields.IntegerField(initial=1, min_value=1)
+    instock  = fields.BooleanField(required=False)
+
+    def __init__(self, *args, **kwargs):
+        if not kwargs['data'].get('page'):
+           kwargs['data']['page'] = 1
+
+        if not kwargs['data'].get('per_page'):
+           kwargs['data']['per_page'] = 24
+
+        super(SearchForm, self).__init__(*args, **kwargs)
+
+        for k,v in self.fields.items():
+            if k in kwargs['data'] and self.fields[k].required==False:
+                self.fields[k].required = True
+
+    def clean_per_page(self):
+        if 'per_page' in self.cleaned_data:
+            if self.cleaned_data['per_page'] > 30:
+                return 24
+            return self.cleaned_data['per_page']
 
     class Meta:
         fields = ('text', 'genre', 'year_old', 'rating', 'price', 'per_page', 'page', 'instock',)
@@ -90,3 +109,13 @@ class CommentForm(Form):
     """
 
     text = fields.CharField(max_length=255, help_text=u'Комментарий')
+
+
+#############################################################################################################
+class DetailForm(Form):
+    """
+    Форма детализация для vbFilm
+    """
+
+    extend  = fields.BooleanField(initial=False, required=False, help_text=u'Расширенный')
+    persons = fields.BooleanField(initial=False, required=False, help_text=u'Персоны')

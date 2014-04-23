@@ -24,18 +24,16 @@ class ParseFilm(object):
         pass
     def parse(self, response, dict_gen, film,url):
         d = dict_gen(film)
-        print url
         d['url_view'] = url
         d['price_type'] = 0
         d['price'] = self.get_price()
-        print d
-        return  [d]
+        return [d]
 
     def get_price(self):
         return 0
 
     def get_seasons(self):
-        return [0,]
+        return [0, ]
 
     def get_link(self):
         pass
