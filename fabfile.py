@@ -46,16 +46,16 @@ def init_test_db():
 
     """
     with settings(sudo_user = "postgres"):
-        sudo('''echo "CREATE DATABASE test_base; GRANT ALL PRIVILEGES ON DATABASE test_base to pgadmin;" | psql''')
+        sudo('''echo "CREATE USER pgadmin WITH PASSWORD 'qwerty'; CREATE DATABASE videobase_test; GRANT ALL PRIVILEGES ON DATABASE videobase_test to pgadmin;" | psql''')
 
 
 def populate_test_db():
     """
     Заполняет тестовую базу данных из sql_dump который идет с кодом
     """
-    with cd('/var/www/test_base/sql_dump'):
+    with cd('/var/www/videobase_test/sql_dump'):
         with settings(sudo_user = "postgres"):
-            sudo('''psql -d test_base -f $(ls -1 *.sql | head -1)''')
+            sudo('''psql -d videobase_test -f $(ls -1 *.sql | head -1)''')
 
 
 def local_db_reset():
@@ -65,8 +65,8 @@ def local_db_reset():
     local('''echo "DROP DATABASE videobase;" |  sudo -u postgres psql''')
     local('''echo "CREATE USER pgadmin WITH PASSWORD 'qwerty'; CREATE DATABASE videobase; GRANT ALL PRIVILEGES ON DATABASE videobase to pgadmin;" |  sudo -u postgres psql''')
     local("""cd sql_dump && sudo -u postgres psql -d videobase -f $(ls -1 *.sql | head -1)""")
-    local('''echo "DROP DATABASE test_base;" | sudo -u postgres psql ''')
-    local('''echo "CREATE DATABASE test_base; ALTER DATABASE test_base OWNER TO pgadmin;" |  sudo -u postgres psql''')
+    local('''echo "DROP DATABASE videobase_test;" | sudo -u postgres psql ''')
+    local('''echo "CREATE USER pgadmin WITH PASSWORD qwerty; CREATE DATABASE videobase_test GRANT ALL PRIVILEGES ON DATABASE videobase to pgadmin;" |  sudo -u postgres psql''')
 
 
 def setup_system_libraries():
@@ -90,17 +90,17 @@ def deploy_test_code():
         with cd('/var/www'):
 
             result = str(sudo('ls -1')).strip()
-            filtered_array=[s for s in result.split('\r\n') if s=='test_base']
+            filtered_array=[s for s in result.split('\r\n') if s=='videobase_test']
 
             if filtered_array:
                 #sudo("cd videobase_test; git checkout configs/db.ini")
                 #sudo("cd videobase_test; cat configs/db.ini")
-                sudo('cd test_base;git pull')
+                sudo('cd videobase_test;git pull')
                 #sudo("cd videobase_test/configs/ && sed -i 's/videobase/videobase_test/g' db.ini")
                 #sudo("cd videobase_test; cat configs/db.ini")
             else:
-                sudo('git clone git@git.aaysm.com:developers/videobase.git test_base')
-                sudo("cd test_base/configs/ && cp db.ini.example db.ini && sed -i 's/videobase/test_base/g' db.ini")
+                sudo('git clone git@git.aaysm.com:developers/videobase.git videobase_test')
+                sudo("cd videobase_test/configs/ && cp db.ini.example db.ini && sed -i 's/videobase/videobase_test/g' db.ini")
 
 
 def restart_all():
@@ -134,14 +134,14 @@ def delete_test_db():
 
     with cd('/var/lib/postgresql'):
         with settings(sudo_user = "postgres"):
-            sudo('''echo "DROP DATABASE test_base;" | psql''')
+            sudo('''echo "DROP DATABASE videobase_test;" | psql''')
 
 
 def refresh_test_requirements():
 
     with settings(sudo_user = "www-data"):
-        with cd('/var/www/test_base/'):
-            sudo('/home/virtualenv/test_base/bin/pip install -r requirements.txt')
+        with cd('/var/www/videobase_test/'):
+            sudo('/home/virtualenv/videobase_test/bin/pip install -r requirements.txt')
 
 
 def status():
@@ -173,8 +173,8 @@ def db_migrate_test(appname=''):
     '''
 
     with settings(sudo_user = "www-data"):
-        with cd('/var/www/test_base/'):
-            sudo('/home/virtualenv/test_base/bin/python manage.py migrate %s --no-initial-data' % appname)
+        with cd('/var/www/videobase_test/'):
+            sudo('/home/virtualenv/videobase_test/bin/python manage.py migrate %s --no-initial-data' % appname)
 
 
 def collect_static():
@@ -182,8 +182,8 @@ def collect_static():
     build/update static files
     """
     with settings(sudo_user = "www-data"):
-        with cd('/var/www/test_base/'):
-            sudo('/home/virtualenv/test_base/bin/python manage.py collectstatic --dry-run --noinput')
+        with cd('/var/www/videobase_test/'):
+            sudo('/home/virtualenv/videobase_test/bin/python manage.py collectstatic --dry-run --noinput')
 
 
 def deploy():
