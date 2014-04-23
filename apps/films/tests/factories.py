@@ -1,14 +1,12 @@
 #coding: utf-8
-__author__ = 'eugene'
+from apps.contents.models import Contents
 
-
-
-import factory
-from apps.films.models import Persons, PersonsFilms, Films, UsersPersons
-from rest_framework.authtoken.models import Token
-import datetime
+from apps.films.models import Persons, PersonsFilms, Films, UsersPersons, PersonsExtras
 from django.contrib.auth.models import User
-import random
+import datetime
+import factory
+
+
 
 
 
@@ -19,7 +17,6 @@ class PersonFactory(factory.DjangoModelFactory):
     name_orig = u'Nicolas Cage'
     bio = u''
     photo = ''
-    id = 1
     pk = factory.Sequence(lambda n: n)
 
 
@@ -57,6 +54,26 @@ class UserFactory(factory.DjangoModelFactory):
     pk = factory.Sequence(lambda n: n)
     username = factory.Sequence(lambda n: u'admin{0}'.format(n))
     password = u'admin'
+
+
+class ContentFactory(factory.DjangoModelFactory):
+    FACTORY_FOR = Contents
+    pk = factory.Sequence(lambda o: o)
+    name = factory.SelfAttribute('film.name')
+    film = factory.SubFactory(FilmFactory)
+    release_date = factory.SelfAttribute('film.release_date')
+    viewer_cnt = 0
+    viewer_lastweek_cnt = 0
+    viewer_lastmonth_cnt = 0
+
+
+class PersonsExtrasFactory(factory.DjangoModelFactory):
+    FACTORY_FOR = PersonsExtras
+    person = factory.SubFactory(PersonFactory)
+    name        = u'Имя'
+    name_orig   = u'Оригинальное имя'
+    description = u'Описание'
+    pk = factory.Sequence(lambda n: n)
 
 
 
