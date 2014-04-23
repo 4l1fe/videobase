@@ -52,6 +52,7 @@ class vbFilm(serializers.ModelSerializer):
     genres = GentriesSerializer()
     persons = vbPerson()
     ratings = serializers.SerializerMethodField('calc_ratings')
+    releasedate = serializers.SerializerMethodField('calc_release')
     locations = serializers.SerializerMethodField('locations_list')
     poster = serializers.SerializerMethodField('poster_list')
     relation = serializers.SerializerMethodField('relation_list')
@@ -86,6 +87,10 @@ class vbFilm(serializers.ModelSerializer):
             'kp': [obj.rating_kinopoisk, obj.rating_kinopoisk_cnt],
             'cons': [0, 0],
         }
+
+
+    def calc_release(self, obj):
+        return obj.release_date
 
 
     def _get_obj_list(self):
@@ -157,7 +162,7 @@ class vbFilm(serializers.ModelSerializer):
 
     class Meta:
         model = Films
-        fields = ['id', 'name', 'name_orig', 'release_date', \
+        fields = ['id', 'name', 'name_orig', 'releasedate', \
                   'ratings', 'duration', 'locations', 'poster', 'relation', \
                   'description', 'countries', 'genres', 'persons',
                  ]
