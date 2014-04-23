@@ -106,6 +106,12 @@ class FilmsTest(APITestCase):
             self.assertTrue(False)
         if len(response.data['persons']) != len(film.persons.all().values('id', 'name', 'photo')):
             self.assertTrue(False)
+        if len(response.data['directors']) != len([]):
+            self.assertTrue(False)
+        if len(response.data['scriptwriters']) != len([]):
+            self.assertTrue(False)
+        #     ===================================================================================================================
+
         for i in range(len(response.data['countries'])):
             self.assertEqual(response.data['countries'][i], film.countries.all().values('id', 'name')[i])
         for i in range(len(response.data['genres'])):
@@ -162,6 +168,12 @@ class FilmsTest(APITestCase):
             self.assertEqual(response.data['genres'][i], film.genres.all().values('id', 'name')[i])
         if len(response.data['locations']) != len(locations):
             self.assertTrue(False)
+        if len(response.data['directors']) != len([]):
+            self.assertTrue(False)
+        if len(response.data['scriptwriters']) != len([]):
+            self.assertTrue(False)
+            #     ===================================================================================================================
+
         for i in range(len(response.data['locations'])):
             self.assertEqual(response.data['locations'][i]['id'], locations[i].id)
             self.assertEqual(response.data['locations'][i]['type'], locations[i].type)

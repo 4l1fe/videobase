@@ -1,11 +1,13 @@
 # coding: utf-8
 
+from django.db.models import Q
 from django.core.paginator import Page
 
 from rest_framework import serializers
 
 from apps.films.models import *
-from apps.films.constants import APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER
+from apps.films.constants import APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER,\
+                                 APP_PERSON_DIRECTOR, APP_PERSON_SCRIPTWRITER, APP_PERSON_ACTOR
 from apps.contents.models import *
 
 from utils.common import group_by
@@ -58,7 +60,7 @@ class vbFilm(serializers.ModelSerializer):
     countries = CountriesSerializer()
     genres = GentriesSerializer()
     directors = serializers.SerializerMethodField('director_list')
-    scriptwriters = serializers.SerializerMethodField('scriptwriters_list')
+    scriptwriters = serializers.SerializerMethodField('scriptwriter_list')
 
     # Признак person
     persons = vbPerson()
@@ -67,12 +69,12 @@ class vbFilm(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):
         new_fields = []
 
-        extend = kwargs.pop('extend', False)
-        if not extend:
+        self.extend_sign = kwargs.pop('extend', False)
+        if not self.extend_sign:
             new_fields += ['description', 'genres', 'countries', 'directors', 'scriptwriters']
 
-        persons = kwargs.pop('persons', False)
-        if not persons:
+        self.persons_sign = kwargs.pop('persons', False)
+        if not self.persons_sign:
             new_fields += ['persons']
 
         # Instantiate the superclass normally
@@ -86,6 +88,30 @@ class vbFilm(serializers.ModelSerializer):
         self._get_obj_list()
         self._rebuild_location()
         self._rebuild_poster_list()
+        self._rebuild_tors_list()
+
+
+    def _rebuild_tors_list(self):
+        directors_list = []
+        scriptwriters_list = []
+
+        if self.extend_sign:
+            o_pf = PersonsFilms.objects.\
+                filter(Q(p_type=APP_PERSON_DIRECTOR) | Q(p_type=APP_PERSON_SCRIPTWRITER), film__in=self.list_obj_pk).\
+                values('person', 'p_type')
+
+            for item in o_pf:
+                if item['p_type'] == APP_PERSON_DIRECTOR:
+                    directors_list.append(item['person'])
+                else:
+                    scriptwriters_list.append(item['person'])
+
+            # Unique values
+            directors_list = list(set(directors_list))
+            scriptwriters_list = list(set(scriptwriters_list))
+
+        self.directors_list = directors_list
+        self.scriptwriters_list = scriptwriters_list
 
 
     def calc_ratings(self, obj):
@@ -113,8 +139,6 @@ class vbFilm(serializers.ModelSerializer):
 
 
     def _rebuild_location(self):
-        self.location_rebuild = {}
-
         locations = Locations.objects.filter(content__film__in=self.list_obj_pk)\
             .order_by('content__film').select_related('content')
             # .values('content__film', 'content', 'type', 'lang', 'quality', 'subtitles', 'price', 'price_type', 'url_view')
@@ -153,18 +177,30 @@ class vbFilm(serializers.ModelSerializer):
 
 
     def relation_list(self, obj):
-        req = get_current_request()
-        if req.user.is_authenticated():
-            pass
+        request = get_current_request()
+        if request.user.is_authenticated():
+            return {
+                'subscribed': True,
+                'status': True,
+                'rating': True,
+            }
 
         return {}
 
 
     def director_list(self, obj):
+        if len(self.directors_list):
+            o_person = Persons.objects.filter(id__in=self.directors_list)
+            return vbPerson(o_person, many=True).data
+
         return []
 
 
-    def scriptwriters_list(self, obj):
+    def scriptwriter_list(self, obj):
+        if len(self.scriptwriters_list):
+            o_person = Persons.objects.filter(id__in=self.scriptwriters_list)
+            return vbPerson(o_person, many=True).data
+
         return []
 
 
