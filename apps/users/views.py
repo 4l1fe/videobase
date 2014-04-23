@@ -7,6 +7,7 @@ from django.core.context_processors import csrf
 from django.core.mail import EmailMultiAlternatives
 from django.contrib.auth.models import User
 
+from rest_framework.authtoken.models import Token
 from rest_framework.views import APIView
 from rest_framework.authtoken import views
 from rest_framework.response import Response
@@ -119,6 +120,6 @@ class RevokeSessionToken(APIView):
         session_keys = SessionToken.objects.filter(user=user).values_list('key', flat=True)
         UsersApiSessions.objects.filter(token__in=session_keys).update(active=False)
         token = user.auth_token
-        token.key = token.generate_key()
-        token.save()
+        token.delete()
+        Token.objects.create(user=user)
         return Response(status.HTTP_200_OK)
