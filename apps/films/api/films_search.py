@@ -146,7 +146,11 @@ class SearchFilmsView(APIView):
                     'items': serializer.data,
                 }
 
-                cache.set(cache_key, result, 300)
+                if not settings.DEBUG:
+                    try:
+                        cache.set(cache_key, result, 300)
+                    except:
+                        pass
 
             return Response(result, status=status.HTTP_200_OK)
 

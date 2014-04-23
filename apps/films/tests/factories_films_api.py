@@ -1,11 +1,13 @@
 #coding: utf-8
-from apps.contents.constants import APP_CONTENTS_ONLINE_CINEMA, APP_CONTENTS_PRICE_TYPE_FREE
-from apps.films.constants import APP_PERSON_ACTOR, APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER
-import factory
-import datetime
+from django.contrib.auth.models import User
+
+from apps.contents.constants import *
+from apps.films.constants import *
 from apps.contents.models import *
 from apps.films.models import *
-from django.contrib.auth.models import User
+
+import factory
+import datetime
 
 
 class FilmFactory(factory.DjangoModelFactory):
@@ -13,7 +15,7 @@ class FilmFactory(factory.DjangoModelFactory):
     FACTORY_DJANGO_GET_OR_CREATE = ('name',)
     pk = factory.Sequence(lambda n: n)
     name = factory.Sequence(lambda n: u'Фильм{0}'.format(n))
-    type = u'FULL_FILM'
+    type = APP_FILM_FULL_FILM
     release_date = datetime.date(2014, 3, 21)
     description = u'Боевик'
     name_orig = factory.Sequence(lambda n: u'Film{0}'.format(n))
@@ -94,7 +96,7 @@ class PersonsFilmFactory(factory.DjangoModelFactory):
 
 class CommentsFactory(factory.DjangoModelFactory):
     FACTORY_FOR = Comments
-    pk = factory.Sequence(lambda x: x)
+    # pk = factory.Sequence(lambda x: x)
     user = factory.SubFactory(UserFactory)
     content = factory.SubFactory(ContentFactory)
     text = factory.Sequence(lambda x: u'Comment{0}'.format(x))
@@ -118,8 +120,11 @@ class CountriesFactory(factory.DjangoModelFactory):
     name_orig = factory.Sequence(lambda h: u'Country{0}'.format(h))
 
 
-
-
+class UsersFilmsFactory(factory.DjangoModelFactory):
+    FACTORY_FOR = UsersFilms
+    user = factory.SubFactory(UserFactory)
+    film = factory.SubFactory(FilmFactory)
+    status = APP_USERFILM_STATUS_UNDEF
 
 
 

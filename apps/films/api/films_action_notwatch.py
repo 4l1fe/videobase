@@ -1,5 +1,7 @@
 # coding: utf-8
 
+from django.db import transaction
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -47,6 +49,7 @@ class ActNotwatchFilmView(APIView):
         }
 
         # Устанавливаем подписку
+        # with transaction.atomic():
         try:
             o_subs = UsersFilms(status=not_watch, **filter)
             o_subs.save()
