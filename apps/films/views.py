@@ -236,10 +236,10 @@ def index_view(request):
 
     return render_to_response('index.html',)
 
-def person_view(request):
+def person_view(request, film_id):
         # ... view code here
 
-    return render_to_response('person.html',)
+    return render_to_response('person.html')
 
 def register_view(request):
         # ... view code here
