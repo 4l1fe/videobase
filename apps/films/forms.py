@@ -130,7 +130,7 @@ class PersonApiForm(Form):
 
     type  = fields.ChoiceField(required=False, choices=APP_FILM_PERSON_TYPES, help_text=u'Тип')
     top   = fields.IntegerField(initial=0, min_value=0, help_text=u'Сортировать с')
-    limit = fields.IntegerField(initial=12, min_value=1, help_text=u'Ограничение')
+    limit = fields.IntegerField(initial=12, min_value=1, max_value=20, help_text=u'Ограничение')
 
     def __init__(self, *args, **kwargs):
         if not kwargs['data'].get('top'):
@@ -140,12 +140,3 @@ class PersonApiForm(Form):
            kwargs['data']['limit'] = 12
 
         super(PersonApiForm, self).__init__(*args, **kwargs)
-
-    def clean(self):
-        cleaned_data = super(PersonApiForm, self).clean()
-
-        if cleaned_data and not self._errors:
-            if cleaned_data['top'] > cleaned_data['limit']:
-                raise ValidationError('top не может быть больше, чем limit')
-
-        return cleaned_data
