@@ -63,7 +63,7 @@ INSTALLED_APPS = (
     'crawler',
     'social_auth',
     'djcelery',
-
+    'raven.contrib.django.raven_compat',  # may be delete later
 )
 
 MIDDLEWARE_CLASSES = (
@@ -212,18 +212,12 @@ RAVEN_CONFIG = {
     'dsn': 'http://8684bf8b497047d9ac170fd16aefc873:41e89f4666b24f998125370f3d1a1789@sentry.aaysm.com/2'
 }
 
-# Add raven to the list of installed apps
-INSTALLED_APPS = INSTALLED_APPS + (
-    # ...
-    'raven.contrib.django.raven_compat',
-)
-
 from datetime import timedelta
 
 CELERYBEAT_SCHEDULE = {
     'robot-launch': {
         'task': 'robot_launch',
-        'schedule': timedelta(seconds=10),
+        'schedule': timedelta(minutes=5),
     },
 }
 
