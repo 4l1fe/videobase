@@ -6,6 +6,8 @@ from django.contrib.auth.models import User
 from ..constants import APP_USER_PIC_DIR
 from utils.common import get_image_path
 
+import os
+
 
 #############################################################################################################
 # Модель пользовательских картинок
@@ -17,8 +19,12 @@ class UsersPics(models.Model):
     def get_upload_to(self):
         return APP_USER_PIC_DIR
 
+    @property
+    def filename(self):
+        return os.path.basename(self.image.file.name)
+
     def __unicode__(self):
-        return u'[%s] %s : %s' % (self.pk, self.user, self.image.name, )
+        return u'[%s] %s : %s' % (self.pk, self.user, self.filename, )
 
     class Meta:
         # Имя таблицы в БД
