@@ -33,7 +33,7 @@ class PersonsFilmView(APIView):
         if not len(result):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-        return list(set(result))
+        return result
 
 
     def get(self, request, film_id, format=None, *args, **kwargs):
