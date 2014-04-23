@@ -31,7 +31,7 @@ class ActCommentFilmView(APIView):
 
 
     def post(self, request, film_id, format=None, *args, **kwargs):
-        form = CommentForm(request.DATA)
+        form = CommentForm(request.POST)
         if form.is_valid():
             # Выбираем и проверяем, что фильм существует
             o_content = self.__get_object(film_id)
@@ -40,9 +40,9 @@ class ActCommentFilmView(APIView):
 
             # Init data
             filter = {
-                'user': request.user.pk,
+                'user': request.user,
                 'text': form.cleaned_data['text'],
-                'content': o_content.pk,
+                'content': o_content,
             }
 
             try:

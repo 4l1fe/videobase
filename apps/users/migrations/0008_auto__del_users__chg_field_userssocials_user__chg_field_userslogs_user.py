@@ -8,8 +8,8 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Deleting model 'Users'
-        db.delete_table('users')
+        # # Deleting model 'Users'
+        # db.delete_table('users')
 
 
         # Changing field 'UsersSocials.user'

@@ -44,10 +44,10 @@ class FilmExtras(PhotoClass):
                 raise ValidationError(msg)
 
     def save(self, *args, **kwargs):
-        if self.type == APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER:
-            self.url = None
-        elif self.type == APP_FILM_TYPE_ADDITIONAL_MATERIAL_TRAILER:
-            self.photo = None
+        # if self.type == APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER:
+        #     self.url = None
+        # elif self.type == APP_FILM_TYPE_ADDITIONAL_MATERIAL_TRAILER:
+        #     self.photo = None
 
         super(FilmExtras, self).save(*args, **kwargs)
 

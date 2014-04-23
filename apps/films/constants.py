@@ -26,8 +26,8 @@ APP_FILM_TYPE_ADDITIONAL_MATERIAL = (
 )
 
 #############################################################################################################
-APP_PERSON_ACTOR ='actor'
-APP_PERSON_PRODUCER ='producer'
+APP_PERSON_ACTOR = 'actor'
+APP_PERSON_PRODUCER = 'producer'
 APP_PERSON_DIRECTOR = 'director'
 
 APP_FILM_PERSON_TYPES = (
