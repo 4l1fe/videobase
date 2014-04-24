@@ -1,34 +1,63 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="cdfd2ba9-018b-4f8a-acfd-a775bc592f0d" name="Default" comment="-fixed search api by text&#10;">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/dataSources.ids" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/.name" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/encodings.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/jsLinters/gjslint.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/jsLinters/jshint.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/jsLinters/jslint.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/modules.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/scopes/scope_settings.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/dictionaries/tumani1.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/vagrant.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/videobase.iml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/static/upload/filmextras/33648/Moderat_ii.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/static/upload/filmextras/33649/Moderat_ii.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/static/upload/persons/111857/thumbs_60/паспорт24032014.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/static/upload/persons/111857/паспорт24032014.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/static/upload/persons/58997/MTR040_Cover_rgb-600x600.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/static/upload/persons/58997/thumbs_60/MTR040_Cover_rgb-600x600.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/static/upload/persons/59003/Moderat_ii.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/static/upload/persons/59003/thumbs_60/Moderat_ii.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/static/upload/persons/59004/Moderat_ii.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/static/upload/persons/59005/Moderat_ii.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/static/upload/persons/59005/thumbs_60/Moderat_ii.jpg" afterPath="" />
+    <list default="true" id="cdfd2ba9-018b-4f8a-acfd-a775bc592f0d" name="Default" comment="-current version interfaces&#10;">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/interface/static/3d/rateit/delete.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/interface/static/img/facebook.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/interface/static/fonts/glyphicons-halflings-regular.eot" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/interface/static/fonts/glyphicons-halflings-regular.ttf" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/interface/static/fonts/glyphicons-halflings-regular.woff" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/interface/static/img/google-plus.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/interface/static/img/google_plus.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/interface/static/img/logo.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/interface/static/img/logo_foot.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/interface/static/img/mailru.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/interface/static/img/noperson-big.jpg" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/interface/static/img/noperson.jpg" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/interface/static/img/nophoto.jpg" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/interface/static/img/noposter.jpg" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/interface/static/img/odnoklassniki.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/interface/static/img/tmp/person1.jpg" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/interface/static/img/tmp/poster1.jpg" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/interface/static/img/tmp/poster2.jpg" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/interface/static/img/tmp/poster3.jpg" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/interface/static/img/tmp/poster4.jpg" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/interface/static/3d/rateit/star.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/interface/static/img/twitter.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/interface/static/img/tmp/user.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/interface/static/img/vkontakte.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/interface/account.jade" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/interface/static/js/app.coffee" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/interface/static/js/app.js" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/interface/static/css/bootstrap-theme.css.map" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/interface/static/css/bootstrap-theme.css" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/interface/static/css/bootstrap-theme.min.css" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/interface/static/css/bootstrap.css.map" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/interface/static/css/bootstrap.css" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/interface/static/js/bootstrap.js" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/interface/static/css/bootstrap.min.css" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/interface/static/js/bootstrap.min.js" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/interface/static/tpl/comment-thumb.html" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/interface/static/tpl/comment-thumb.jade" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/interface/static/js/config.coffee" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/interface/static/js/config.js" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/interface/crossdomain.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/interface/static/tpl/film-thumb.html" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/interface/static/tpl/film-thumb.jade" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/interface/static/fonts/glyphicons-halflings-regular.svg" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/interface/static/3d/rateit/jquery.rateit.js" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/interface/static/3d/rateit/jquery.rateit.min.js" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/interface/static/css/main.css" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/interface/static/js/mi.helper.js" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/interface/static/js/mi.rest.coffee" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/interface/static/js/mi.rest.js" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/interface/static/tpl/person-thumb.html" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/interface/static/tpl/person-thumb.jade" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/interface/static/3d/rateit/rateit.css" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/interface/user.jade" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/interface/api/films/search.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/interface/api/persons/1/filmography.json" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="videobase.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -64,7 +93,7 @@
       <file leaf-file-name=".gitignore" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/.gitignore">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="2" column="0" selection-start="33" selection-end="33" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1175">
+            <state line="2" column="0" selection-start="33" selection-end="33" vertical-scroll-proportion="0.0" vertical-offset="30" max-vertical-offset="600">
               <folding />
             </state>
           </provider>
@@ -73,7 +102,7 @@
       <file leaf-file-name="constants.py" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/apps/users/constants.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="4" column="0" selection-start="70" selection-end="70" vertical-scroll-proportion="0.1" vertical-offset="0" max-vertical-offset="960">
+            <state line="4" column="0" selection-start="70" selection-end="70" vertical-scroll-proportion="0.07537688" vertical-offset="0" max-vertical-offset="1107">
               <folding />
             </state>
           </provider>
@@ -230,7 +259,139 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
+              <option name="myItemId" value="interface" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="videobase" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="videobase" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="interface" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
               <option name="myItemId" value="static" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="videobase" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="videobase" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="interface" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="static" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="js" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="videobase" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="videobase" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="interface" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="static" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="img" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="videobase" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="videobase" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="interface" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="static" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="fonts" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="videobase" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="videobase" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="interface" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="static" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="css" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="videobase" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="videobase" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="interface" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="static" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="3d" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="rateit" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -295,175 +456,6 @@
       <recent name="$PROJECT_DIR$/apps/films/api" />
       <recent name="$PROJECT_DIR$/apps/films/api/serialize" />
     </key>
-  </component>
-  <component name="RestoreUpdateTree">
-    <UpdateInfo date="Moments ago" ActionInfo="_Update">
-      <UpdatedFiles>
-        <FILE-GROUP>
-          <option name="myUpdateName" value="Updated from server" />
-          <option name="myStatusName" value="Changed on server" />
-          <option name="mySupportsDeletion" value="false" />
-          <option name="myCanBeAbsent" value="false" />
-          <option name="myId" value="CHANGED_ON_SERVER" />
-          <FILE-GROUP>
-            <option name="myUpdateName" value="Updated" />
-            <option name="myStatusName" value="Changed" />
-            <option name="mySupportsDeletion" value="false" />
-            <option name="myCanBeAbsent" value="false" />
-            <option name="myId" value="UPDATED" />
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/.gitignore</PATH>
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/films/api/films_action_comment.py</PATH>
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/films/api/films_action_notwatch.py</PATH>
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/films/api/films_action_playlist.py</PATH>
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/films/api/films_comments.py</PATH>
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/films/api/films_extras.py</PATH>
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/films/api/films_persons.py</PATH>
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/films/api/films_search.py</PATH>
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/films/api/films_similar.py</PATH>
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/films/api/serializers/vb_comment.py</PATH>
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/films/forms.py</PATH>
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/films/models/persons_extras.py</PATH>
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/films/tests/factories.py</PATH>
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/films/tests/test_persons_api.py</PATH>
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/films/tests/tests_films_api.py</PATH>
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/films/urls.py</PATH>
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/films/views.py</PATH>
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/users/api/serializers/vb_user.py</PATH>
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/users/api/user_info.py</PATH>
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/users/api/users.py</PATH>
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/users/models/__init__.py</PATH>
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/users/models/users_pics.py</PATH>
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/users/urls.py</PATH>
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/users/views.py</PATH>
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/configs/db.ini.example</PATH>
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/configs/nginx_local.conf</PATH>
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/crawler/now_ru/loader.py</PATH>
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/crawler/now_ru/parsers.py</PATH>
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/crawler/robot_start.py</PATH>
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/crawler/zoomby_ru/parsers.py</PATH>
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/fabfile.py</PATH>
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/requirements.txt</PATH>
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/templates/api_test.html</PATH>
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/utils/common.py</PATH>
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/videobase/settings.py</PATH>
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/videobase/urls.py</PATH>
-          </FILE-GROUP>
-          <FILE-GROUP>
-            <option name="myUpdateName" value="Created" />
-            <option name="myStatusName" value="Created" />
-            <option name="mySupportsDeletion" value="false" />
-            <option name="myCanBeAbsent" value="false" />
-            <option name="myId" value="CREATED" />
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/films/tests/factories_films_api.py</PATH>
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/users/models/signals.py</PATH>
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/users/tests/__init__.py</PATH>
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/users/tests/factories.py</PATH>
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/users/tests/factories_auth_api.py</PATH>
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/users/tests/test_auth_api.py</PATH>
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/users/tests/tests_user_api.py</PATH>
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/users/tests/tests_users_api.py</PATH>
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/crawler/tasks.py</PATH>
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/sql_dump/videobase_2014-03-21.sql</PATH>
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/sql_dump/videobase_2014-04-22.sql</PATH>
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/utils/tokens.py</PATH>
-          </FILE-GROUP>
-          <FILE-GROUP>
-            <option name="myUpdateName" value="Deleted" />
-            <option name="myStatusName" value="Deleted" />
-            <option name="mySupportsDeletion" value="false" />
-            <option name="myCanBeAbsent" value="true" />
-            <option name="myId" value="REMOVED_FROM_REPOSITORY" />
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/.idea/dataSources.xml</PATH>
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/.idea/jsLibraryMappings.xml</PATH>
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/.idea/libraries/compass_library.xml</PATH>
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/users/tests.py</PATH>
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/configs/nginx</PATH>
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/sql_dump/videobase_21-03-2014.sql</PATH>
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/templates/profile.html</PATH>
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/templates/register.html</PATH>
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/templates/restore_password_email.html</PATH>
-            <PATH vcs="Git" revision="">$PROJECT_DIR$/templates/restore_password_form.html</PATH>
-          </FILE-GROUP>
-          <FILE-GROUP>
-            <option name="myUpdateName" value="Restored" />
-            <option name="myStatusName" value="Will be restored" />
-            <option name="mySupportsDeletion" value="false" />
-            <option name="myCanBeAbsent" value="false" />
-            <option name="myId" value="RESTORED" />
-          </FILE-GROUP>
-        </FILE-GROUP>
-        <FILE-GROUP>
-          <option name="myUpdateName" value="Modified" />
-          <option name="myStatusName" value="Modified" />
-          <option name="mySupportsDeletion" value="false" />
-          <option name="myCanBeAbsent" value="false" />
-          <option name="myId" value="MODIFIED" />
-        </FILE-GROUP>
-        <FILE-GROUP>
-          <option name="myUpdateName" value="Skipped" />
-          <option name="myStatusName" value="Skipped" />
-          <option name="mySupportsDeletion" value="false" />
-          <option name="myCanBeAbsent" value="false" />
-          <option name="myId" value="SKIPPED" />
-        </FILE-GROUP>
-        <FILE-GROUP>
-          <option name="myUpdateName" value="Merged with conflicts" />
-          <option name="myStatusName" value="Will be merged with conflicts" />
-          <option name="mySupportsDeletion" value="false" />
-          <option name="myCanBeAbsent" value="false" />
-          <option name="myId" value="MERGED_WITH_CONFLICTS" />
-        </FILE-GROUP>
-        <FILE-GROUP>
-          <option name="myUpdateName" value="Merged with tree conflicts" />
-          <option name="myStatusName" value="Merged with tree conflicts" />
-          <option name="mySupportsDeletion" value="false" />
-          <option name="myCanBeAbsent" value="false" />
-          <option name="myId" value="MERGED_WITH_TREE_CONFLICT" />
-        </FILE-GROUP>
-        <FILE-GROUP>
-          <option name="myUpdateName" value="Merged with property conflicts" />
-          <option name="myStatusName" value="Will be merged with property conflicts" />
-          <option name="mySupportsDeletion" value="false" />
-          <option name="myCanBeAbsent" value="false" />
-          <option name="myId" value="MERGED_WITH_PROPERTY_CONFLICT" />
-        </FILE-GROUP>
-        <FILE-GROUP>
-          <option name="myUpdateName" value="Merged" />
-          <option name="myStatusName" value="Will be merged" />
-          <option name="mySupportsDeletion" value="false" />
-          <option name="myCanBeAbsent" value="false" />
-          <option name="myId" value="MERGED" />
-        </FILE-GROUP>
-        <FILE-GROUP>
-          <option name="myUpdateName" value="Not in repository" />
-          <option name="myStatusName" value="Not in repository" />
-          <option name="mySupportsDeletion" value="true" />
-          <option name="myCanBeAbsent" value="false" />
-          <option name="myId" value="UNKNOWN" />
-        </FILE-GROUP>
-        <FILE-GROUP>
-          <option name="myUpdateName" value="Locally added" />
-          <option name="myStatusName" value="Locally added" />
-          <option name="mySupportsDeletion" value="false" />
-          <option name="myCanBeAbsent" value="false" />
-          <option name="myId" value="LOCALLY_ADDED" />
-        </FILE-GROUP>
-        <FILE-GROUP>
-          <option name="myUpdateName" value="Locally removed" />
-          <option name="myStatusName" value="Locally removed" />
-          <option name="mySupportsDeletion" value="false" />
-          <option name="myCanBeAbsent" value="false" />
-          <option name="myId" value="LOCALLY_REMOVED" />
-        </FILE-GROUP>
-        <FILE-GROUP>
-          <option name="myUpdateName" value="Switched" />
-          <option name="myStatusName" value="Switched" />
-          <option name="mySupportsDeletion" value="false" />
-          <option name="myCanBeAbsent" value="false" />
-          <option name="myId" value="SWITCHED" />
-        </FILE-GROUP>
-      </UpdatedFiles>
-    </UpdateInfo>
   </component>
   <component name="RunManager" selected="Django server.run tests">
     <configuration default="false" name="Unittests in $PROJECT_DIR$" type="tests" factoryName="Unittests" temporary="true" nameIsGenerated="true">
@@ -1426,30 +1418,54 @@
       <created>1398342333571</created>
       <updated>1398342333571</updated>
     </task>
-    <option name="localTasksCounter" value="149" />
+    <task id="LOCAL-00149" summary="- current version interfaces files">
+      <created>1398346118322</created>
+      <updated>1398346118322</updated>
+    </task>
+    <option name="localTasksCounter" value="150" />
     <servers />
+  </component>
+  <component name="TodoView" selected-index="4">
+    <todo-panel id="selected-file">
+      <are-packages-shown value="false" />
+      <are-modules-shown value="false" />
+      <flatten-packages value="false" />
+      <is-autoscroll-to-source value="false" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="false" />
+      <are-modules-shown value="false" />
+      <flatten-packages value="false" />
+      <is-autoscroll-to-source value="false" />
+    </todo-panel>
+    <todo-panel id="default-changelist">
+      <are-packages-shown value="false" />
+      <are-modules-shown value="false" />
+      <flatten-packages value="false" />
+      <is-autoscroll-to-source value="false" />
+    </todo-panel>
   </component>
   <component name="ToolWindowManager">
     <frame x="1431" y="-4" width="1855" height="1084" extended-state="6" />
     <editor active="false" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2280514" sideWeight="0.4991708" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.23161969" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32976446" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.60278374" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.23954985" sideWeight="0.5011952" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32946378" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.5149893" sideWeight="0.4991708" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.30513918" sideWeight="0.49800798" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Coverage" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32946378" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.48715204" sideWeight="0.4997236" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.22885571" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32946378" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.48715204" sideWeight="0.4997236" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.43576017" sideWeight="0.4991708" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Coverage" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32946378" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32976446" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -1488,8 +1504,6 @@
     <option name="myTodoPanelSettings">
       <TodoPanelSettings />
     </option>
-    <MESSAGE value="- similar api" />
-    <MESSAGE value="- optimize vbFilm" />
     <MESSAGE value="- optimize detail api" />
     <MESSAGE value="- delete n+1 query" />
     <MESSAGE value="- fixed search by genres in the api films&#10;- deleted extend key in the api films persons" />
@@ -1513,7 +1527,9 @@
     <MESSAGE value="- fixed poster in the vbFilm&#10;" />
     <MESSAGE value="- tests&#10;" />
     <MESSAGE value="-fixed search api by text&#10;" />
-    <option name="LAST_COMMIT_MESSAGE" value="-fixed search api by text&#10;" />
+    <MESSAGE value="- current version interfaces files" />
+    <MESSAGE value="-current version interfaces&#10;" />
+    <option name="LAST_COMMIT_MESSAGE" value="-current version interfaces&#10;" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1536,6 +1552,20 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="2" column="0" selection-start="33" selection-end="33" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="600">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/apps/users/constants.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="4" column="0" selection-start="70" selection-end="70" vertical-scroll-proportion="0.0" vertical-offset="60" max-vertical-offset="555">
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$USER_HOME$/virtualenv/videobase/local/lib/python2.7/site-packages/django/shortcuts/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
         <state line="15" column="4" selection-start="553" selection-end="553" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2842" />
@@ -1628,9 +1658,7 @@
     </entry>
     <entry file="file://$USER_HOME$/virtualenv/videobase/local/lib/python2.7/site-packages/django/forms/fields.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="750" column="17" selection-start="29105" selection-end="29117" vertical-scroll-proportion="0.25404158" vertical-offset="10780" max-vertical-offset="17248">
-          <folding />
-        </state>
+        <state line="750" column="17" selection-start="29105" selection-end="29117" vertical-scroll-proportion="0.25404158" vertical-offset="10780" max-vertical-offset="17248" />
       </provider>
     </entry>
     <entry file="file://$USER_HOME$/virtualenv/videobase/lib/python2.7/site-packages/rest_framework/serializers.py">
@@ -1663,30 +1691,22 @@
     </entry>
     <entry file="file://$USER_HOME$/virtualenv/videobase/lib/python2.7/site-packages/rest_framework/views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="402" column="0" selection-start="14321" selection-end="14321" vertical-scroll-proportion="0.0" vertical-offset="5699" max-vertical-offset="6708">
-          <folding />
-        </state>
+        <state line="402" column="0" selection-start="14321" selection-end="14321" vertical-scroll-proportion="0.0" vertical-offset="5699" max-vertical-offset="6708" />
       </provider>
     </entry>
     <entry file="file://$USER_HOME$/virtualenv/videobase/lib/python2.7/site-packages/django/views/decorators/csrf.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="56" column="0" selection-start="2044" selection-end="2044" vertical-scroll-proportion="0.0" vertical-offset="644" max-vertical-offset="1338">
-          <folding />
-        </state>
+        <state line="56" column="0" selection-start="2044" selection-end="2044" vertical-scroll-proportion="0.0" vertical-offset="644" max-vertical-offset="1338" />
       </provider>
     </entry>
     <entry file="file://$USER_HOME$/virtualenv/videobase/lib/python2.7/site-packages/django/views/generic/base.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="68" column="0" selection-start="2363" selection-end="2363" vertical-scroll-proportion="0.0" vertical-offset="704" max-vertical-offset="3618">
-          <folding />
-        </state>
+        <state line="68" column="0" selection-start="2363" selection-end="2363" vertical-scroll-proportion="0.0" vertical-offset="704" max-vertical-offset="3618" />
       </provider>
     </entry>
     <entry file="file://$USER_HOME$/virtualenv/videobase/lib/python2.7/site-packages/django/core/handlers/base.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="206" column="0" selection-start="9145" selection-end="9145" vertical-scroll-proportion="0.0" vertical-offset="2699" max-vertical-offset="4608">
-          <folding />
-        </state>
+        <state line="206" column="0" selection-start="9145" selection-end="9145" vertical-scroll-proportion="0.0" vertical-offset="2699" max-vertical-offset="4608" />
       </provider>
     </entry>
     <entry file="file://$USER_HOME$/virtualenv/videobase/lib/python2.7/site-packages/django/test/client.py">
@@ -1706,16 +1726,12 @@
     </entry>
     <entry file="file://$USER_HOME$/virtualenv/videobase/lib/python2.7/site-packages/unittest2/case.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="397" column="0" selection-start="13631" selection-end="13631" vertical-scroll-proportion="0.33333334" vertical-offset="5594" max-vertical-offset="16548">
-          <folding />
-        </state>
+        <state line="397" column="0" selection-start="13631" selection-end="13631" vertical-scroll-proportion="0.33333334" vertical-offset="5594" max-vertical-offset="16548" />
       </provider>
     </entry>
     <entry file="file://$USER_HOME$/virtualenv/videobase/lib/python2.7/site-packages/django/test/testcases.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="183" column="0" selection-start="6264" selection-end="6264" vertical-scroll-proportion="0.0" vertical-offset="1734" max-vertical-offset="18003">
-          <folding />
-        </state>
+        <state line="183" column="0" selection-start="6264" selection-end="6264" vertical-scroll-proportion="0.0" vertical-offset="1734" max-vertical-offset="18003" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/apps/films/api/films_persons.py">
@@ -1729,9 +1745,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/apps/films/models/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="9" column="30" selection-start="262" selection-end="262" vertical-scroll-proportion="0.3" vertical-offset="0" max-vertical-offset="645">
-          <folding />
-        </state>
+        <state line="9" column="30" selection-start="262" selection-end="262" vertical-scroll-proportion="0.3" vertical-offset="0" max-vertical-offset="645" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/videobase/settings.py">
@@ -1750,23 +1764,17 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/apps/films/models/persons.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="12" column="6" selection-start="328" selection-end="328" vertical-scroll-proportion="0.23333333" vertical-offset="0" max-vertical-offset="1065">
-          <folding />
-        </state>
+        <state line="12" column="6" selection-start="328" selection-end="328" vertical-scroll-proportion="0.23333333" vertical-offset="0" max-vertical-offset="1065" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/apps/films/api/serializers/vb_person.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="20" column="27" selection-start="553" selection-end="553" vertical-scroll-proportion="0.57555556" vertical-offset="26" max-vertical-offset="855">
-          <folding />
-        </state>
+        <state line="20" column="27" selection-start="553" selection-end="553" vertical-scroll-proportion="0.57555556" vertical-offset="26" max-vertical-offset="855" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/apps/films/models/films.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="225" max-vertical-offset="1653">
-          <folding />
-        </state>
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="225" max-vertical-offset="1653" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/apps/films/models/films_extras.py">
@@ -1799,9 +1807,7 @@
     </entry>
     <entry file="file://$USER_HOME$/virtualenv/videobase/lib/python2.7/site-packages/rest_framework/fields.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="1025" column="0" selection-start="35502" selection-end="35502" vertical-scroll-proportion="0.33333334" vertical-offset="14864" max-vertical-offset="15543">
-          <folding />
-        </state>
+        <state line="1025" column="0" selection-start="35502" selection-end="35502" vertical-scroll-proportion="0.33333334" vertical-offset="14864" max-vertical-offset="15543" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/apps/films/models/persons_films.py">
@@ -1843,7 +1849,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/apps/users/constants.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="4" column="0" selection-start="70" selection-end="70" vertical-scroll-proportion="0.1" vertical-offset="0" max-vertical-offset="960">
+        <state line="4" column="0" selection-start="70" selection-end="70" vertical-scroll-proportion="0.07537688" vertical-offset="0" max-vertical-offset="1107">
           <folding />
         </state>
       </provider>
