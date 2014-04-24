@@ -1,4 +1,5 @@
 #coding: utf-8
+
 from django.contrib.auth.models import User
 
 from apps.contents.constants import *
@@ -96,7 +97,7 @@ class CommentsFactory(factory.DjangoModelFactory):
 
 class FilmsExtrasFactory(factory.DjangoModelFactory):
     FACTORY_FOR = FilmExtras
-    url = factory.Sequence(lambda v: u'http://www.poster.ru/{0}.jpeg'.format(v))
+    photo = factory.django.ImageField(filename=u'the_test_file.jpg')
     film = factory.SubFactory(FilmFactory)
     type = APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER
     name = factory.Sequence(lambda v: u'Постер{0}'.format(v))
