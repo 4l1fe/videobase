@@ -26,6 +26,12 @@ class Persons(PhotoClass):
         full_name = u"{0} ({1})".format(self.name, self.name_orig)
         return full_name.strip()
 
+    # @property
+    # def birthplace(self):
+    #     bp = (self.city_id.name, self.city_id.country_id.name)
+    #     return bp
+
+
     def __unicode__(self):
         return u'[%s] %s' % (self.pk, self.get_full_name)
 
