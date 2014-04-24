@@ -1,0 +1,1868 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="cdfd2ba9-018b-4f8a-acfd-a775bc592f0d" name="Default" comment="-fixed search api by text&#10;">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/dataSources.ids" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/.name" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/encodings.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/jsLinters/gjslint.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/jsLinters/jshint.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/jsLinters/jslint.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/modules.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/scopes/scope_settings.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/dictionaries/tumani1.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/vagrant.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/videobase.iml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/static/upload/filmextras/33648/Moderat_ii.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/static/upload/filmextras/33649/Moderat_ii.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/static/upload/persons/111857/thumbs_60/паспорт24032014.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/static/upload/persons/111857/паспорт24032014.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/static/upload/persons/58997/MTR040_Cover_rgb-600x600.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/static/upload/persons/58997/thumbs_60/MTR040_Cover_rgb-600x600.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/static/upload/persons/59003/Moderat_ii.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/static/upload/persons/59003/thumbs_60/Moderat_ii.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/static/upload/persons/59004/Moderat_ii.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/static/upload/persons/59005/Moderat_ii.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/static/upload/persons/59005/thumbs_60/Moderat_ii.jpg" afterPath="" />
+    </list>
+    <ignored path="videobase.iws" />
+    <ignored path=".idea/workspace.xml" />
+    <option name="TRACKING_ENABLED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ChangesViewManager" flattened_view="true" show_ignored="false" />
+  <component name="CoverageDataManager">
+    <SUITE FILE_PATH="coverage/videobase$Test__apps_films_tests_tests_films_api_FilmsTest_test_api_extras_type_poster_data.coverage" NAME="Test: apps.films.tests.tests_films_api.FilmsTest.test_api_extras_type_poster_data Coverage Results" MODIFIED="1398325181311" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/videobase$Unittests_in__home_tumani1_workspace_videobase.coverage" NAME="Unittests in /home/tumani1/workspace/videobase Coverage Results" MODIFIED="1394194182266" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/videobase$Test__apps_films_tests_tests_films_api_FilmsTest.coverage" NAME="Test: apps.films.tests.tests_films_api.FilmsTest Coverage Results" MODIFIED="1398339472983" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/videobase$pyjade.coverage" NAME="pyjade Coverage Results" MODIFIED="1398161156721" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+  </component>
+  <component name="CreatePatchCommitExecutor">
+    <option name="PATCH_PATH" value="" />
+  </component>
+  <component name="DaemonCodeAnalyzer">
+    <disable_hints />
+  </component>
+  <component name="DjangoConsoleOptions" module-name="videobase" is-module-sdk="true">
+    <option name="myUseModuleSdk" value="true" />
+    <option name="myModuleName" value="videobase" />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
+  <component name="FavoritesManager">
+    <favorites_list name="videobase" />
+  </component>
+  <component name="FileEditorManager">
+    <leaf>
+      <file leaf-file-name=".gitignore" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/.gitignore">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="2" column="0" selection-start="33" selection-end="33" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1175">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="constants.py" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/apps/users/constants.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="4" column="0" selection-start="70" selection-end="70" vertical-scroll-proportion="0.1" vertical-offset="0" max-vertical-offset="960">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="FindManager">
+    <FindUsagesManager>
+      <setting name="OPEN_NEW_TAB" value="false" />
+    </FindUsagesManager>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
+    </option>
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="changedFiles">
+      <list>
+        <option value="$PROJECT_DIR$/apps/films/api/films_comments.py" />
+        <option value="$PROJECT_DIR$/apps/users/urls.py" />
+        <option value="$PROJECT_DIR$/apps/users/api/users.py" />
+        <option value="$PROJECT_DIR$/apps/users/api/users_friends.py" />
+        <option value="$PROJECT_DIR$/apps/films/api/films_action_notwatch.py" />
+        <option value="$PROJECT_DIR$/apps/films/api/films_action_rate.py" />
+        <option value="$PROJECT_DIR$/apps/films/api/films_action_subscribe.py" />
+        <option value="$PROJECT_DIR$/apps/films/api/films_action_comment.py" />
+        <option value="$PROJECT_DIR$/apps/films/models/persons.py" />
+        <option value="$PROJECT_DIR$/interface/film.jade" />
+        <option value="$PROJECT_DIR$/apps/films/api/films_action_playlist.py" />
+        <option value="$PROJECT_DIR$/interface/jade/film1.jade" />
+        <option value="$PROJECT_DIR$/templatetags/__init__.py" />
+        <option value="$PROJECT_DIR$/templatetags/set_var.py" />
+        <option value="$PROJECT_DIR$/apps/films/templatetags/set_var.py" />
+        <option value="$PROJECT_DIR$/interface/film.html" />
+        <option value="$PROJECT_DIR$/interface/jade/part_userplace.jade" />
+        <option value="$PROJECT_DIR$/interface/jade/page_film.html" />
+        <option value="$PROJECT_DIR$/interface/jade/header.jade" />
+        <option value="$USER_HOME$/virtualenv/videobase/local/lib/python2.7/site-packages/pyjade/convert.py" />
+        <option value="$PROJECT_DIR$/interface/jade/page_film1.html" />
+        <option value="$PROJECT_DIR$/interface/jade/globals.jade" />
+        <option value="$PROJECT_DIR$/interface/jade/page_film.jade" />
+        <option value="$PROJECT_DIR$/interface/jade/page_index.jade" />
+        <option value="$PROJECT_DIR$/interface/jade/head.jade" />
+        <option value="$PROJECT_DIR$/interface/jade/config.jade" />
+        <option value="$PROJECT_DIR$/interface/jade/page_index.html" />
+        <option value="$PROJECT_DIR$/interface/jade/head.html" />
+        <option value="$PROJECT_DIR$/interface/jade/mixins.jade" />
+        <option value="$PROJECT_DIR$/interface/jade/mixins.html" />
+        <option value="$PROJECT_DIR$/interface/jade/header.html" />
+        <option value="$PROJECT_DIR$/videobase/urls.py" />
+        <option value="$PROJECT_DIR$/apps/films/urls.py" />
+        <option value="$PROJECT_DIR$/apps/films/views.py" />
+        <option value="$PROJECT_DIR$/configs/db.ini" />
+        <option value="$PROJECT_DIR$/configs/db.ini.example" />
+        <option value="$PROJECT_DIR$/apps/users/signals.py" />
+        <option value="$PROJECT_DIR$/apps/users/models/__init__.py" />
+        <option value="$PROJECT_DIR$/apps/films/constants.py" />
+        <option value="$PROJECT_DIR$/apps/films/forms.py" />
+        <option value="$PROJECT_DIR$/apps/films/api/films_persons.py" />
+        <option value="$PROJECT_DIR$/videobase/settings.py" />
+        <option value="$PROJECT_DIR$/requirements.txt" />
+        <option value="$PROJECT_DIR$/apps/films/models/persons_films.py" />
+        <option value="$PROJECT_DIR$/apps/films/api/serializers/vb_film.py" />
+        <option value="$PROJECT_DIR$/apps/films/models/films_extras.py" />
+        <option value="$PROJECT_DIR$/apps/films/tests/tests_films_api.py" />
+        <option value="$PROJECT_DIR$/apps/films/tests/factories_films_api.py" />
+        <option value="$PROJECT_DIR$/apps/films/api/films_search.py" />
+        <option value="$PROJECT_DIR$/.gitignore" />
+        <option value="$PROJECT_DIR$/apps/users/constants.py" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectFrameBounds">
+    <option name="x" value="1431" />
+    <option name="y" value="-4" />
+    <option name="width" value="1855" />
+    <option name="height" value="1084" />
+  </component>
+  <component name="ProjectInspectionProfilesVisibleTreeState">
+    <entry key="Project Default">
+      <profile-state>
+        <expanded-state>
+          <State>
+            <id />
+          </State>
+          <State>
+            <id>Python</id>
+          </State>
+        </expanded-state>
+        <selected-state>
+          <State>
+            <id>PyMandatoryEncodingInspection</id>
+          </State>
+        </selected-state>
+      </profile-state>
+    </entry>
+  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="false">
+    <OptionsSetting value="true" id="Add" />
+    <OptionsSetting value="true" id="Remove" />
+    <OptionsSetting value="true" id="Checkout" />
+    <OptionsSetting value="true" id="Update" />
+    <OptionsSetting value="true" id="Status" />
+    <OptionsSetting value="true" id="Edit" />
+    <ConfirmationsSetting value="0" id="Add" />
+    <ConfirmationsSetting value="0" id="Remove" />
+  </component>
+  <component name="ProjectReloadState">
+    <option name="STATE" value="0" />
+  </component>
+  <component name="ProjectView">
+    <navigator currentView="ProjectPane" proportions="" version="1" splitterProportion="0.5">
+      <flattenPackages />
+      <showMembers />
+      <showModules />
+      <showLibraryContents />
+      <hideEmptyPackages />
+      <abbreviatePackageNames />
+      <autoscrollToSource />
+      <autoscrollFromSource />
+      <sortByType />
+    </navigator>
+    <panes>
+      <pane id="ProjectPane">
+        <subPane>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="videobase" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="videobase" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="videobase" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="videobase" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="videobase" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="static" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+      </pane>
+      <pane id="Scope" />
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="options.lastSelected" value="preferences.sourceCode.General" />
+    <property name="options.splitter.main.proportions" value="0.3" />
+    <property name="options.splitter.details.proportions" value="0.35131896" />
+    <property name="options.searchVisible" value="true" />
+    <property name="last_opened_file_path" value="$USER_HOME$/virtualenv/videobase/local/lib/python2.7/site-packages/pyjade/ext/django/templatetags.py" />
+    <property name="recentsLimit" value="5" />
+    <property name="JavaScriptLanguageLevel" value="ES5" />
+    <property name="JavaScriptPreferStrict" value="true" />
+    <property name="JavaScriptWeakerCompletionTypeGuess" value="true" />
+    <property name="FullScreen" value="false" />
+    <property name="restartRequiresConfirmation" value="true" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth0" value="192" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder0" value="0" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth1" value="225" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder1" value="1" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth2" value="232" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder2" value="2" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth3" value="1117" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder3" value="3" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth0" value="290" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder0" value="0" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth1" value="303" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder1" value="1" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth2" value="313" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder2" value="2" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth3" value="873" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder3" value="3" />
+    <property name="SearchEverywhereHistory" value="" />
+  </component>
+  <component name="PyConsoleOptionsProvider">
+    <option name="myPythonConsoleState">
+      <console-settings module-name="videobase" is-module-sdk="true">
+        <option name="myUseModuleSdk" value="true" />
+        <option name="myModuleName" value="videobase" />
+      </console-settings>
+    </option>
+    <option name="myShowDebugConsoleByDefault" value="true" />
+  </component>
+  <component name="PyCoverageOptionsProvider">
+    <option name="myUseBundledCoveragePy" value="true" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/configs" />
+      <recent name="$PROJECT_DIR$/videobase/testy_pie" />
+      <recent name="$PROJECT_DIR$/utils/fields" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/apps/users" />
+      <recent name="$PROJECT_DIR$/apps/films" />
+      <recent name="$PROJECT_DIR$/interface" />
+      <recent name="$PROJECT_DIR$/apps/films/api" />
+      <recent name="$PROJECT_DIR$/apps/films/api/serialize" />
+    </key>
+  </component>
+  <component name="RestoreUpdateTree">
+    <UpdateInfo date="Moments ago" ActionInfo="_Update">
+      <UpdatedFiles>
+        <FILE-GROUP>
+          <option name="myUpdateName" value="Updated from server" />
+          <option name="myStatusName" value="Changed on server" />
+          <option name="mySupportsDeletion" value="false" />
+          <option name="myCanBeAbsent" value="false" />
+          <option name="myId" value="CHANGED_ON_SERVER" />
+          <FILE-GROUP>
+            <option name="myUpdateName" value="Updated" />
+            <option name="myStatusName" value="Changed" />
+            <option name="mySupportsDeletion" value="false" />
+            <option name="myCanBeAbsent" value="false" />
+            <option name="myId" value="UPDATED" />
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/.gitignore</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/films/api/films_action_comment.py</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/films/api/films_action_notwatch.py</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/films/api/films_action_playlist.py</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/films/api/films_comments.py</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/films/api/films_extras.py</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/films/api/films_persons.py</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/films/api/films_search.py</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/films/api/films_similar.py</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/films/api/serializers/vb_comment.py</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/films/forms.py</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/films/models/persons_extras.py</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/films/tests/factories.py</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/films/tests/test_persons_api.py</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/films/tests/tests_films_api.py</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/films/urls.py</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/films/views.py</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/users/api/serializers/vb_user.py</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/users/api/user_info.py</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/users/api/users.py</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/users/models/__init__.py</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/users/models/users_pics.py</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/users/urls.py</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/users/views.py</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/configs/db.ini.example</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/configs/nginx_local.conf</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/crawler/now_ru/loader.py</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/crawler/now_ru/parsers.py</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/crawler/robot_start.py</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/crawler/zoomby_ru/parsers.py</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/fabfile.py</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/requirements.txt</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/templates/api_test.html</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/utils/common.py</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/videobase/settings.py</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/videobase/urls.py</PATH>
+          </FILE-GROUP>
+          <FILE-GROUP>
+            <option name="myUpdateName" value="Created" />
+            <option name="myStatusName" value="Created" />
+            <option name="mySupportsDeletion" value="false" />
+            <option name="myCanBeAbsent" value="false" />
+            <option name="myId" value="CREATED" />
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/films/tests/factories_films_api.py</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/users/models/signals.py</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/users/tests/__init__.py</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/users/tests/factories.py</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/users/tests/factories_auth_api.py</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/users/tests/test_auth_api.py</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/users/tests/tests_user_api.py</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/users/tests/tests_users_api.py</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/crawler/tasks.py</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/sql_dump/videobase_2014-03-21.sql</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/sql_dump/videobase_2014-04-22.sql</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/utils/tokens.py</PATH>
+          </FILE-GROUP>
+          <FILE-GROUP>
+            <option name="myUpdateName" value="Deleted" />
+            <option name="myStatusName" value="Deleted" />
+            <option name="mySupportsDeletion" value="false" />
+            <option name="myCanBeAbsent" value="true" />
+            <option name="myId" value="REMOVED_FROM_REPOSITORY" />
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/.idea/dataSources.xml</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/.idea/jsLibraryMappings.xml</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/.idea/libraries/compass_library.xml</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/apps/users/tests.py</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/configs/nginx</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/sql_dump/videobase_21-03-2014.sql</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/templates/profile.html</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/templates/register.html</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/templates/restore_password_email.html</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/templates/restore_password_form.html</PATH>
+          </FILE-GROUP>
+          <FILE-GROUP>
+            <option name="myUpdateName" value="Restored" />
+            <option name="myStatusName" value="Will be restored" />
+            <option name="mySupportsDeletion" value="false" />
+            <option name="myCanBeAbsent" value="false" />
+            <option name="myId" value="RESTORED" />
+          </FILE-GROUP>
+        </FILE-GROUP>
+        <FILE-GROUP>
+          <option name="myUpdateName" value="Modified" />
+          <option name="myStatusName" value="Modified" />
+          <option name="mySupportsDeletion" value="false" />
+          <option name="myCanBeAbsent" value="false" />
+          <option name="myId" value="MODIFIED" />
+        </FILE-GROUP>
+        <FILE-GROUP>
+          <option name="myUpdateName" value="Skipped" />
+          <option name="myStatusName" value="Skipped" />
+          <option name="mySupportsDeletion" value="false" />
+          <option name="myCanBeAbsent" value="false" />
+          <option name="myId" value="SKIPPED" />
+        </FILE-GROUP>
+        <FILE-GROUP>
+          <option name="myUpdateName" value="Merged with conflicts" />
+          <option name="myStatusName" value="Will be merged with conflicts" />
+          <option name="mySupportsDeletion" value="false" />
+          <option name="myCanBeAbsent" value="false" />
+          <option name="myId" value="MERGED_WITH_CONFLICTS" />
+        </FILE-GROUP>
+        <FILE-GROUP>
+          <option name="myUpdateName" value="Merged with tree conflicts" />
+          <option name="myStatusName" value="Merged with tree conflicts" />
+          <option name="mySupportsDeletion" value="false" />
+          <option name="myCanBeAbsent" value="false" />
+          <option name="myId" value="MERGED_WITH_TREE_CONFLICT" />
+        </FILE-GROUP>
+        <FILE-GROUP>
+          <option name="myUpdateName" value="Merged with property conflicts" />
+          <option name="myStatusName" value="Will be merged with property conflicts" />
+          <option name="mySupportsDeletion" value="false" />
+          <option name="myCanBeAbsent" value="false" />
+          <option name="myId" value="MERGED_WITH_PROPERTY_CONFLICT" />
+        </FILE-GROUP>
+        <FILE-GROUP>
+          <option name="myUpdateName" value="Merged" />
+          <option name="myStatusName" value="Will be merged" />
+          <option name="mySupportsDeletion" value="false" />
+          <option name="myCanBeAbsent" value="false" />
+          <option name="myId" value="MERGED" />
+        </FILE-GROUP>
+        <FILE-GROUP>
+          <option name="myUpdateName" value="Not in repository" />
+          <option name="myStatusName" value="Not in repository" />
+          <option name="mySupportsDeletion" value="true" />
+          <option name="myCanBeAbsent" value="false" />
+          <option name="myId" value="UNKNOWN" />
+        </FILE-GROUP>
+        <FILE-GROUP>
+          <option name="myUpdateName" value="Locally added" />
+          <option name="myStatusName" value="Locally added" />
+          <option name="mySupportsDeletion" value="false" />
+          <option name="myCanBeAbsent" value="false" />
+          <option name="myId" value="LOCALLY_ADDED" />
+        </FILE-GROUP>
+        <FILE-GROUP>
+          <option name="myUpdateName" value="Locally removed" />
+          <option name="myStatusName" value="Locally removed" />
+          <option name="mySupportsDeletion" value="false" />
+          <option name="myCanBeAbsent" value="false" />
+          <option name="myId" value="LOCALLY_REMOVED" />
+        </FILE-GROUP>
+        <FILE-GROUP>
+          <option name="myUpdateName" value="Switched" />
+          <option name="myStatusName" value="Switched" />
+          <option name="mySupportsDeletion" value="false" />
+          <option name="myCanBeAbsent" value="false" />
+          <option name="myId" value="SWITCHED" />
+        </FILE-GROUP>
+      </UpdatedFiles>
+    </UpdateInfo>
+  </component>
+  <component name="RunManager" selected="Django server.run tests">
+    <configuration default="false" name="Unittests in $PROJECT_DIR$" type="tests" factoryName="Unittests" temporary="true" nameIsGenerated="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="videobase" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="" />
+      <option name="CLASS_NAME" value="" />
+      <option name="METHOD_NAME" value="" />
+      <option name="FOLDER_NAME" value="$PROJECT_DIR$" />
+      <option name="TEST_TYPE" value="TEST_FOLDER" />
+      <option name="PATTERN" value="" />
+      <option name="USE_PATTERN" value="false" />
+      <option name="PUREUNITTEST" value="true" />
+      <option name="PARAMS" value="" />
+      <option name="USE_PARAM" value="false" />
+      <RunnerSettings RunnerId="PyDebugRunner" />
+      <RunnerSettings RunnerId="PythonRunner" />
+      <ConfigurationWrapper RunnerId="PyDebugRunner" />
+      <ConfigurationWrapper RunnerId="PythonRunner" />
+      <method />
+    </configuration>
+    <configuration default="false" name="Test: apps.films.tests.tests_films_api.FilmsTest.test_api_extras_type_poster_data" type="DjangoTestsConfigurationType" factoryName="Django tests" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="videobase" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="TARGET" value="apps.films.tests.tests_films_api.FilmsTest.test_api_extras_type_poster_data" />
+      <option name="SETTINGS_FILE" value="" />
+      <option name="CUSTOM_SETTINGS" value="false" />
+      <option name="USE_OPTIONS" value="false" />
+      <option name="OPTIONS" value="" />
+      <RunnerSettings RunnerId="PythonRunner" />
+      <ConfigurationWrapper RunnerId="PythonRunner" />
+      <method />
+    </configuration>
+    <configuration default="false" name="Test: apps.films.tests.tests_films_api.FilmsTest" type="DjangoTestsConfigurationType" factoryName="Django tests" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="videobase" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="TARGET" value="apps.films.tests.tests_films_api.FilmsTest" />
+      <option name="SETTINGS_FILE" value="" />
+      <option name="CUSTOM_SETTINGS" value="false" />
+      <option name="USE_OPTIONS" value="false" />
+      <option name="OPTIONS" value="" />
+      <RunnerSettings RunnerId="PyDebugRunner" />
+      <RunnerSettings RunnerId="PythonCover" />
+      <RunnerSettings RunnerId="PythonRunner" />
+      <ConfigurationWrapper RunnerId="PyDebugRunner" />
+      <ConfigurationWrapper RunnerId="PythonCover" />
+      <ConfigurationWrapper RunnerId="PythonRunner" />
+      <method />
+    </configuration>
+    <configuration default="true" type="PythonConfigurationType" factoryName="Python">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="videobase" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="" />
+      <option name="PARAMETERS" value="" />
+      <method />
+    </configuration>
+    <configuration default="true" type="Python.DjangoServer" factoryName="Django server">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="videobase" />
+      <option name="launchJavascriptDebuger" value="false" />
+      <option name="port" value="8000" />
+      <option name="host" value="" />
+      <option name="additionalOptions" value="" />
+      <option name="browserUrl" value="" />
+      <option name="runTestServer" value="false" />
+      <option name="runNoReload" value="false" />
+      <option name="useCustomRunCommand" value="false" />
+      <option name="customRunCommand" value="" />
+      <method />
+    </configuration>
+    <configuration default="true" type="tests" factoryName="Unittests">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="videobase" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="" />
+      <option name="CLASS_NAME" value="" />
+      <option name="METHOD_NAME" value="" />
+      <option name="FOLDER_NAME" value="" />
+      <option name="TEST_TYPE" value="TEST_SCRIPT" />
+      <option name="PATTERN" value="" />
+      <option name="USE_PATTERN" value="false" />
+      <option name="PUREUNITTEST" value="true" />
+      <option name="PARAMS" value="" />
+      <option name="USE_PARAM" value="false" />
+      <method />
+    </configuration>
+    <configuration default="true" type="tests" factoryName="py.test">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="videobase" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="" />
+      <option name="CLASS_NAME" value="" />
+      <option name="METHOD_NAME" value="" />
+      <option name="FOLDER_NAME" value="" />
+      <option name="TEST_TYPE" value="TEST_SCRIPT" />
+      <option name="PATTERN" value="" />
+      <option name="USE_PATTERN" value="false" />
+      <option name="testToRun" value="" />
+      <option name="keywords" value="" />
+      <option name="params" value="" />
+      <option name="USE_PARAM" value="false" />
+      <option name="USE_KEYWORD" value="false" />
+      <method />
+    </configuration>
+    <configuration default="true" type="com.intellij.persistence.run.ConsoleRunConfigurationType" factoryName="Query Language Console">
+      <option name="VM_PARAMETERS" value="" />
+      <option name="USER_CFG_CLASS" />
+      <option name="CONTEXT_PROVIDER" />
+      <method />
+    </configuration>
+    <configuration default="true" type="JavascriptDebugType" factoryName="JavaScript Debug" singleton="true">
+      <method />
+    </configuration>
+    <configuration default="true" type="tests" factoryName="Attests">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="videobase" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="" />
+      <option name="CLASS_NAME" value="" />
+      <option name="METHOD_NAME" value="" />
+      <option name="FOLDER_NAME" value="" />
+      <option name="TEST_TYPE" value="TEST_SCRIPT" />
+      <option name="PATTERN" value="" />
+      <option name="USE_PATTERN" value="false" />
+      <method />
+    </configuration>
+    <configuration default="true" type="tests" factoryName="Doctests">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="videobase" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="" />
+      <option name="CLASS_NAME" value="" />
+      <option name="METHOD_NAME" value="" />
+      <option name="FOLDER_NAME" value="" />
+      <option name="TEST_TYPE" value="TEST_SCRIPT" />
+      <option name="PATTERN" value="" />
+      <option name="USE_PATTERN" value="false" />
+      <method />
+    </configuration>
+    <configuration default="true" type="DjangoTestsConfigurationType" factoryName="Django tests">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="videobase" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="TARGET" value="" />
+      <option name="SETTINGS_FILE" value="" />
+      <option name="CUSTOM_SETTINGS" value="false" />
+      <option name="USE_OPTIONS" value="false" />
+      <option name="OPTIONS" value="" />
+      <method />
+    </configuration>
+    <configuration default="true" type="tests" factoryName="Nosetests">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="videobase" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="" />
+      <option name="CLASS_NAME" value="" />
+      <option name="METHOD_NAME" value="" />
+      <option name="FOLDER_NAME" value="" />
+      <option name="TEST_TYPE" value="TEST_SCRIPT" />
+      <option name="PATTERN" value="" />
+      <option name="USE_PATTERN" value="false" />
+      <option name="PARAMS" value="" />
+      <option name="USE_PARAM" value="false" />
+      <method />
+    </configuration>
+    <configuration default="false" name="run tests" type="Python.DjangoServer" factoryName="Django server">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+        <env name="DJANGO_SETTINGS_MODULE" value="videobase.settings" />
+      </envs>
+      <option name="SDK_HOME" value="$USER_HOME$/virtualenv/videobase/bin/python" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="videobase" />
+      <option name="launchJavascriptDebuger" value="false" />
+      <option name="host" value="" />
+      <option name="additionalOptions" value="" />
+      <option name="browserUrl" value="" />
+      <option name="runTestServer" value="false" />
+      <option name="runNoReload" value="false" />
+      <option name="useCustomRunCommand" value="true" />
+      <option name="customRunCommand" value="test" />
+      <RunnerSettings RunnerId="PyDebugRunner" />
+      <RunnerSettings RunnerId="PythonRunner" />
+      <ConfigurationWrapper RunnerId="PyDebugRunner" />
+      <ConfigurationWrapper RunnerId="PythonRunner" />
+      <method />
+    </configuration>
+    <configuration default="false" name="videobase" type="Python.DjangoServer" factoryName="Django server">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+        <env name="DJANGO_SETTINGS_MODULE" value="videobase.settings" />
+      </envs>
+      <option name="SDK_HOME" value="$USER_HOME$/virtualenv/videobase/bin/python" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="videobase" />
+      <option name="launchJavascriptDebuger" value="false" />
+      <option name="port" value="8000" />
+      <option name="host" value="" />
+      <option name="additionalOptions" value="" />
+      <option name="browserUrl" value="" />
+      <option name="runTestServer" value="false" />
+      <option name="runNoReload" value="false" />
+      <option name="useCustomRunCommand" value="false" />
+      <option name="customRunCommand" value="" />
+      <RunnerSettings RunnerId="PyDebugRunner" />
+      <RunnerSettings RunnerId="PythonRunner" />
+      <ConfigurationWrapper RunnerId="PyDebugRunner" />
+      <ConfigurationWrapper RunnerId="PythonRunner" />
+      <method />
+    </configuration>
+    <configuration default="false" name="pyjade" type="PythonConfigurationType" factoryName="Python">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="$USER_HOME$/virtualenv/videobase/bin/python" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="videobase" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="pyjade" />
+      <option name="PARAMETERS" value="~/workspace/videobase/interface/jade/globals.jade ~/workspace/videobase/interface/jade/globals.html" />
+      <RunnerSettings RunnerId="PythonRunner" />
+      <ConfigurationWrapper RunnerId="PythonRunner" />
+      <method />
+    </configuration>
+    <list size="6">
+      <item index="0" class="java.lang.String" itemvalue="Django server.run tests" />
+      <item index="1" class="java.lang.String" itemvalue="Django server.videobase" />
+      <item index="2" class="java.lang.String" itemvalue="Python.pyjade" />
+      <item index="3" class="java.lang.String" itemvalue="Python tests.Unittests in /home/tumani1/workspace/videobase" />
+      <item index="4" class="java.lang.String" itemvalue="Django tests.Test: apps.films.tests.tests_films_api.FilmsTest.test_api_extras_type_poster_data" />
+      <item index="5" class="java.lang.String" itemvalue="Django tests.Test: apps.films.tests.tests_films_api.FilmsTest" />
+    </list>
+    <recent_temporary>
+      <list size="3">
+        <item index="0" class="java.lang.String" itemvalue="Django tests.Test: apps.films.tests.tests_films_api.FilmsTest" />
+        <item index="1" class="java.lang.String" itemvalue="Django tests.Test: apps.films.tests.tests_films_api.FilmsTest.test_api_extras_type_poster_data" />
+        <item index="2" class="java.lang.String" itemvalue="Python tests.Unittests in /home/tumani1/workspace/videobase" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="ShelveChangesManager" show_recycled="false" />
+  <component name="SvnConfiguration" maxAnnotateRevisions="500" myUseAcceleration="nothing" myAutoUpdateAfterCommit="false" cleanupOnStartRun="false" SSL_PROTOCOLS="all">
+    <option name="USER" value="" />
+    <option name="PASSWORD" value="" />
+    <option name="mySSHConnectionTimeout" value="30000" />
+    <option name="mySSHReadTimeout" value="30000" />
+    <option name="LAST_MERGED_REVISION" />
+    <option name="MERGE_DRY_RUN" value="false" />
+    <option name="MERGE_DIFF_USE_ANCESTRY" value="true" />
+    <option name="UPDATE_LOCK_ON_DEMAND" value="false" />
+    <option name="IGNORE_SPACES_IN_MERGE" value="false" />
+    <option name="CHECK_NESTED_FOR_QUICK_MERGE" value="false" />
+    <option name="IGNORE_SPACES_IN_ANNOTATE" value="true" />
+    <option name="SHOW_MERGE_SOURCES_IN_ANNOTATE" value="true" />
+    <option name="FORCE_UPDATE" value="false" />
+    <option name="IGNORE_EXTERNALS" value="false" />
+    <myIsUseDefaultProxy>false</myIsUseDefaultProxy>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="cdfd2ba9-018b-4f8a-acfd-a775bc592f0d" name="Default" comment="" />
+      <created>1394176885850</created>
+      <updated>1394176885850</updated>
+    </task>
+    <task id="LOCAL-00001" summary="- Реализована модель пользователей">
+      <created>1394183425566</created>
+      <updated>1394183425566</updated>
+    </task>
+    <task id="LOCAL-00002" summary="-  Расширенные имена для полей модели">
+      <created>1394186419297</created>
+      <updated>1394186419297</updated>
+    </task>
+    <task id="LOCAL-00003" summary="-  Отдельное приложение для роботов">
+      <created>1394193442213</created>
+      <updated>1394193442213</updated>
+    </task>
+    <task id="LOCAL-00004" summary="-  модели для запросов пользователей, логов, картинок, social пользователей">
+      <created>1394198163429</created>
+      <updated>1394198163429</updated>
+    </task>
+    <task id="LOCAL-00005" summary="-  модели для персон">
+      <created>1394203515828</created>
+      <updated>1394203515828</updated>
+    </task>
+    <task id="LOCAL-00006" summary="- исправления по модели персон">
+      <created>1394203641040</created>
+      <updated>1394203641040</updated>
+    </task>
+    <task id="LOCAL-00007" summary="- fix foreign key связи">
+      <created>1394520258098</created>
+      <updated>1394520258098</updated>
+    </task>
+    <task id="LOCAL-00008" summary="- правка моделей в приложении films">
+      <created>1394536123077</created>
+      <updated>1394536123077</updated>
+    </task>
+    <task id="LOCAL-00009" summary="- папки с инициализацией миграций по каждому приложению">
+      <created>1394536970882</created>
+      <updated>1394536970882</updated>
+    </task>
+    <task id="LOCAL-00010" summary="- sql dump проета для postgresql">
+      <created>1394538014216</created>
+      <updated>1394538014216</updated>
+    </task>
+    <task id="LOCAL-00011" summary="- настроечные файлы uwsgi для nginx и консоли">
+      <created>1394612800507</created>
+      <updated>1394612800507</updated>
+    </task>
+    <task id="LOCAL-00012" summary="- миграция для  фильмов(исправленная)">
+      <created>1394616677612</created>
+      <updated>1394616677612</updated>
+    </task>
+    <task id="LOCAL-00013" summary="- правка миграции для связи m2m в модели films&#10;- sql dump  с исправлением&#10;- в settings настройки для тестовой базы">
+      <created>1394620420592</created>
+      <updated>1394620420592</updated>
+    </task>
+    <task id="LOCAL-00014" summary="- вынес константы в отдельный файл">
+      <created>1394621506485</created>
+      <updated>1394621506485</updated>
+    </task>
+    <task id="LOCAL-00015" summary="- исправление моего косячного дампа базы&#10;- подключил django-extension к проекту">
+      <created>1394624096208</created>
+      <updated>1394624096208</updated>
+    </task>
+    <task id="LOCAL-00016" summary="- перенес приложение контент в папку apps&#10;- поправил файл моделей на счет импортов других моделей&#10;- поправил поля с foreign key">
+      <created>1394631352945</created>
+      <updated>1394631352945</updated>
+    </task>
+    <task id="LOCAL-00017" summary="- unique field for email field in the users model&#10; - regenerate sql dump for database">
+      <created>1394695458464</created>
+      <updated>1394695458464</updated>
+    </task>
+    <task id="LOCAL-00018" summary="- migration for unique field">
+      <created>1394695676752</created>
+      <updated>1394695676752</updated>
+    </task>
+    <task id="LOCAL-00019" summary="- файл с fixture для модели Users&#10;- файл с простым тестом  для модели Users&#10;- переименование поля passhash на password  в моделе Users">
+      <created>1394704999454</created>
+      <updated>1394704999454</updated>
+    </task>
+    <task id="LOCAL-00020" summary="- Обновление схемы модели для фильмов.">
+      <created>1394713919716</created>
+      <updated>1394713919716</updated>
+    </task>
+    <task id="LOCAL-00021" summary="-  правка миграции&#10;- правка названия полей моделей">
+      <created>1394719754114</created>
+      <updated>1394719754114</updated>
+    </task>
+    <task id="LOCAL-00022" summary="- Добавил уникальный составной ключ&#10;- Переопределил форму в админке для таблицы Season">
+      <created>1394780787930</created>
+      <updated>1394780787930</updated>
+    </task>
+    <task id="LOCAL-00023" summary="- Поправил миграцию&#10;- Добавил префиксы для констант в приложении films">
+      <created>1394781677982</created>
+      <updated>1394781677982</updated>
+    </task>
+    <task id="LOCAL-00024" summary="- Добавил контента в settings(пока закомментировано)&#10;- Переименовал папку с контентом и поправил поля у моделей&#10;">
+      <created>1394783911323</created>
+      <updated>1394783911323</updated>
+    </task>
+    <task id="LOCAL-00025" summary="- Добавил таблицу персон в админку">
+      <created>1394784352430</created>
+      <updated>1394784352430</updated>
+    </task>
+    <task id="LOCAL-00026" summary="- Fix migration">
+      <created>1394798268759</created>
+      <updated>1394798268759</updated>
+    </task>
+    <task id="LOCAL-00027" summary="- переинициализировал миграции и дамп">
+      <created>1394802037331</created>
+      <updated>1394802037331</updated>
+    </task>
+    <task id="LOCAL-00028" summary="- добавил папку для утилит">
+      <created>1395045806727</created>
+      <updated>1395045806727</updated>
+    </task>
+    <task id="LOCAL-00029" summary="- добавил приложение для контента с инициализированными миграциями">
+      <created>1395045863560</created>
+      <updated>1395045863560</updated>
+    </task>
+    <task id="LOCAL-00030" summary="- правки по моделям(формататирование)&#10;- ддобавил таблицу в админку по фильма">
+      <created>1395045950782</created>
+      <updated>1395045950782</updated>
+    </task>
+    <task id="LOCAL-00031" summary="- правка импорта моделей в приложении контента">
+      <created>1395046366386</created>
+      <updated>1395046366386</updated>
+    </task>
+    <task id="LOCAL-00032" summary="- поправил форматирование в моделях">
+      <created>1395047295203</created>
+      <updated>1395047295203</updated>
+    </task>
+    <task id="LOCAL-00033" summary="- перенес модели связанн с Persons из apps.users в apps.films">
+      <created>1395066000276</created>
+      <updated>1395066000277</updated>
+    </task>
+    <task id="LOCAL-00034" summary="- миграции для переноса таблиц">
+      <created>1395067340761</created>
+      <updated>1395067340761</updated>
+    </task>
+    <task id="LOCAL-00035" summary="- в утилитах поля вынесены в подпаку с полями&#10;- сохранение изображение в персонах">
+      <created>1395215478009</created>
+      <updated>1395215478010</updated>
+    </task>
+    <task id="LOCAL-00036" summary="- удалил лишние импорты и функции">
+      <created>1395217402272</created>
+      <updated>1395217402272</updated>
+    </task>
+    <task id="LOCAL-00037" summary="- фильтр и поиск в админке для персон&#10;">
+      <created>1395218724756</created>
+      <updated>1395218724756</updated>
+    </task>
+    <task id="LOCAL-00038" summary="- фильтр и поиск в админке для фильмов">
+      <created>1395218897247</created>
+      <updated>1395218897247</updated>
+    </task>
+    <task id="LOCAL-00039" summary="- правки по фильтру&#10;">
+      <created>1395219355858</created>
+      <updated>1395219355858</updated>
+    </task>
+    <task id="LOCAL-00040" summary="- url для статики в режиме DEBUG&#10;">
+      <created>1395231218288</created>
+      <updated>1395231218288</updated>
+    </task>
+    <task id="LOCAL-00041" summary="- нарезка thumbnail для фото&#10;- исправление url для загрузки фото">
+      <created>1395231386235</created>
+      <updated>1395231386235</updated>
+    </task>
+    <task id="LOCAL-00042" summary="- fix ошибки в сигналах, когда пустое поле с изображением&#10;- сигналы вынесены в отдельный файл&#10;">
+      <created>1395242710757</created>
+      <updated>1395242710757</updated>
+    </task>
+    <task id="LOCAL-00043" summary="- Каждая модель в отдельном файле">
+      <created>1395309173792</created>
+      <updated>1395309173792</updated>
+    </task>
+    <task id="LOCAL-00044" summary="- fix">
+      <created>1395310787436</created>
+      <updated>1395310787436</updated>
+    </task>
+    <task id="LOCAL-00045" summary="- fix import in the robots&#10;- thumbnails">
+      <created>1395318910504</created>
+      <updated>1395318910504</updated>
+    </task>
+    <task id="LOCAL-00046" summary="- Added midelware which called &quot;local_thread&quot;">
+      <created>1395323077755</created>
+      <updated>1395323077755</updated>
+    </task>
+    <task id="LOCAL-00047" summary="- Added support for memcache">
+      <created>1395323214684</created>
+      <updated>1395323214684</updated>
+    </task>
+    <task id="LOCAL-00048" summary="- Added midleware which called &quot;local_thread&quot;">
+      <created>1395323266093</created>
+      <updated>1395323266093</updated>
+    </task>
+    <task id="LOCAL-00049" summary="- installed django-admin-tools">
+      <created>1395328364856</created>
+      <updated>1395328364856</updated>
+    </task>
+    <task id="LOCAL-00050" summary="- руссификация админки">
+      <created>1395389806794</created>
+      <updated>1395389806794</updated>
+    </task>
+    <task id="LOCAL-00051" summary="- закомментировал менеджер(пока не работает)&#10;- rename fixture">
+      <created>1395389921047</created>
+      <updated>1395389921047</updated>
+    </task>
+    <task id="LOCAL-00052" summary="- поправтл конфиг для nginx">
+      <created>1395390535622</created>
+      <updated>1395390535622</updated>
+    </task>
+    <task id="LOCAL-00053" summary="- правка импорта в приложении films">
+      <created>1395390975503</created>
+      <updated>1395390975503</updated>
+    </task>
+    <task id="LOCAL-00054" summary="- правка фильтров и поиска в админке">
+      <created>1395395793168</created>
+      <updated>1395395793168</updated>
+    </task>
+    <task id="LOCAL-00055" summary="- обвернул сигналы в декоратор">
+      <created>1395396270404</created>
+      <updated>1395396270404</updated>
+    </task>
+    <task id="LOCAL-00056" summary="- fix verbose name">
+      <created>1395643293139</created>
+      <updated>1395643293139</updated>
+    </task>
+    <task id="LOCAL-00057" summary="- вывод таблицы с логом в админке&#10;- настройка локации для memcache">
+      <created>1395655540277</created>
+      <updated>1395655540278</updated>
+    </task>
+    <task id="LOCAL-00058" summary="- правка settings&#10;">
+      <created>1395660371697</created>
+      <updated>1395660371697</updated>
+    </task>
+    <task id="LOCAL-00059" summary="- переименовал папки base_models в models&#10;- изменил app_label во всех моделях&#10;- перес сигналы в init models">
+      <created>1395660478244</created>
+      <updated>1395660478244</updated>
+    </task>
+    <task id="LOCAL-00060" summary="- миграция в user app">
+      <created>1395661038193</created>
+      <updated>1395661038193</updated>
+    </task>
+    <task id="LOCAL-00061" summary="- merge form&#10;- доп. валидация для модели FilmExtras">
+      <created>1395749682983</created>
+      <updated>1395749682983</updated>
+    </task>
+    <task id="LOCAL-00062" summary="- до определил save у FilmsExtras">
+      <created>1395749999197</created>
+      <updated>1395749999198</updated>
+    </task>
+    <task id="LOCAL-00063" summary="-  миграция">
+      <created>1395756647877</created>
+      <updated>1395756647877</updated>
+    </task>
+    <task id="LOCAL-00064" summary="-  доустановить для django-extension">
+      <created>1395758700012</created>
+      <updated>1395758700012</updated>
+    </task>
+    <task id="LOCAL-00065" summary="-  install tastypie">
+      <created>1395926160170</created>
+      <updated>1395926160170</updated>
+    </task>
+    <task id="LOCAL-00066" summary="-  install tastypie from github">
+      <created>1395926494811</created>
+      <updated>1395926494812</updated>
+    </task>
+    <task id="LOCAL-00067" summary="-  started api for films">
+      <created>1395932543382</created>
+      <updated>1395932543382</updated>
+    </task>
+    <task id="LOCAL-00068" summary="-  added url for api">
+      <created>1395932567739</created>
+      <updated>1395932567739</updated>
+    </task>
+    <task id="LOCAL-00069" summary="- deleted testy pie file&#10;- created testy pie folder&#10;- suffered all api to the testy pie folder">
+      <created>1395987441906</created>
+      <updated>1395987441906</updated>
+    </task>
+    <task id="LOCAL-00070" summary="- api">
+      <created>1396253164782</created>
+      <updated>1396253164782</updated>
+    </task>
+    <task id="LOCAL-00071" summary="- rename fields in the films models">
+      <created>1396277395586</created>
+      <updated>1396277395587</updated>
+    </task>
+    <task id="LOCAL-00072" summary="- api: search films">
+      <created>1396277445400</created>
+      <updated>1396277445400</updated>
+    </task>
+    <task id="LOCAL-00073" summary="- add constants file in the contents app&#10;- rename filds in the comments and locations models">
+      <created>1396337940813</created>
+      <updated>1396337940814</updated>
+    </task>
+    <task id="LOCAL-00074" summary="- added fild lanf in the locations model">
+      <created>1396366454929</created>
+      <updated>1396366454929</updated>
+    </task>
+    <task id="LOCAL-00075" summary="- first version film search api">
+      <created>1396366493559</created>
+      <updated>1396366493559</updated>
+    </task>
+    <task id="LOCAL-00076" summary="- second version api search film&#10;- takeaway vbFilm resource  in a separate file">
+      <created>1396449273818</created>
+      <updated>1396449273819</updated>
+    </task>
+    <task id="LOCAL-00077" summary="- setup django rest framework&#10;- urls for films">
+      <created>1396529969051</created>
+      <updated>1396529969051</updated>
+    </task>
+    <task id="LOCAL-00078" summary="- simple example for get film detail api">
+      <created>1396530024721</created>
+      <updated>1396530024721</updated>
+    </task>
+    <task id="LOCAL-00079" summary="- edited urls and requirements file">
+      <created>1396532237129</created>
+      <updated>1396532237129</updated>
+    </task>
+    <task id="LOCAL-00080" summary="- fixed unicode functions in the models contents application">
+      <created>1396595034281</created>
+      <updated>1396595034281</updated>
+    </task>
+    <task id="LOCAL-00081" summary="- devided uri for api&#10;- fixed error with default manager in the films application">
+      <created>1396595137851</created>
+      <updated>1396595137851</updated>
+    </task>
+    <task id="LOCAL-00082" summary="- detail api for film&#10;- location api for film">
+      <created>1396595216928</created>
+      <updated>1396595216928</updated>
+    </task>
+    <task id="LOCAL-00083" summary="- added extended fields for films api">
+      <created>1396601470922</created>
+      <updated>1396601470923</updated>
+    </task>
+    <task id="LOCAL-00084" summary="- added  fields for films api">
+      <created>1396611319511</created>
+      <updated>1396611319511</updated>
+    </task>
+    <task id="LOCAL-00085" summary="- added  fields for films api">
+      <created>1396618631820</created>
+      <updated>1396618631821</updated>
+    </task>
+    <task id="LOCAL-00086" summary="- rename field in the FilmExtras model&#10;- api extras&#10;- template for similar api">
+      <created>1396621369823</created>
+      <updated>1396621369823</updated>
+    </task>
+    <task id="LOCAL-00087" summary="- survived all serialization files in the one folder&#10;- migration which set foreign key in the comments model&#10;">
+      <created>1396626720472</created>
+      <updated>1396626720472</updated>
+    </task>
+    <task id="LOCAL-00088" summary="- corrected inheritance in the vbFilm&#10;- added urls for api&#10;-added template views for api">
+      <created>1397116297312</created>
+      <updated>1397116297312</updated>
+    </task>
+    <task id="LOCAL-00089" summary="- added api for films(comment, notwatch, playlist, rate, subscribe)">
+      <created>1397135070904</created>
+      <updated>1397135070904</updated>
+    </task>
+    <task id="LOCAL-00090" summary="- changes by field in the model &#10;- migrations">
+      <created>1397139516429</created>
+      <updated>1397139516429</updated>
+    </task>
+    <task id="LOCAL-00091" summary="- changes by url">
+      <created>1397141818216</created>
+      <updated>1397141818216</updated>
+    </task>
+    <task id="LOCAL-00092" summary="- renamed function and fixed name exception">
+      <created>1397199211312</created>
+      <updated>1397199211312</updated>
+    </task>
+    <task id="LOCAL-00093" summary="- refactoring part api film">
+      <created>1397201256698</created>
+      <updated>1397201256698</updated>
+    </task>
+    <task id="LOCAL-00094" summary="- api comments film">
+      <created>1397201690419</created>
+      <updated>1397201690419</updated>
+    </task>
+    <task id="LOCAL-00095" summary="- right response in the api comments film">
+      <created>1397202285609</created>
+      <updated>1397202285609</updated>
+    </task>
+    <task id="LOCAL-00096" summary="- added try/except on a  paginator in the api comment">
+      <created>1397202640421</created>
+      <updated>1397202640421</updated>
+    </task>
+    <task id="LOCAL-00097" summary="-">
+      <created>1397202727303</created>
+      <updated>1397202727303</updated>
+    </task>
+    <task id="LOCAL-00098" summary="- part api for film semilar">
+      <created>1397203131359</created>
+      <updated>1397203131359</updated>
+    </task>
+    <task id="LOCAL-00099" summary="-deleted url for comments films api">
+      <created>1397203708368</created>
+      <updated>1397203708369</updated>
+    </task>
+    <task id="LOCAL-00100" summary="-part film search api">
+      <created>1397205404499</created>
+      <updated>1397205404500</updated>
+    </task>
+    <task id="LOCAL-00101" summary="-search by name films">
+      <created>1397210557660</created>
+      <updated>1397210557660</updated>
+    </task>
+    <task id="LOCAL-00102" summary="-replace get on the post request">
+      <created>1397210632508</created>
+      <updated>1397210632508</updated>
+    </task>
+    <task id="LOCAL-00103" summary="- fixed migration and imports for tests&#10;- added two options for search api&#10;- fixed paginator in the films comments">
+      <created>1397220037001</created>
+      <updated>1397220037001</updated>
+    </task>
+    <task id="LOCAL-00104" summary="- fixed search by genres">
+      <created>1397220471430</created>
+      <updated>1397220471430</updated>
+    </task>
+    <task id="LOCAL-00105" summary="- added fields for consolidate rating&#10;- added search">
+      <created>1397221370078</created>
+      <updated>1397221370078</updated>
+    </task>
+    <task id="LOCAL-00106" summary="- added check authentication for action films api">
+      <created>1397462297915</created>
+      <updated>1397462297916</updated>
+    </task>
+    <task id="LOCAL-00107" summary="- added flag many=True for collections">
+      <created>1397467936895</created>
+      <updated>1397467936895</updated>
+    </task>
+    <task id="LOCAL-00108" summary="- migration for sesions&#10;- fix style">
+      <created>1397476631361</created>
+      <updated>1397476631362</updated>
+    </task>
+    <task id="LOCAL-00109" summary="- fixed time expiration model&#10;- fixed name url&#10;- fixed etype to type  in the model">
+      <created>1397478700755</created>
+      <updated>1397478700755</updated>
+    </task>
+    <task id="LOCAL-00110" summary="- fixed test">
+      <created>1397484047335</created>
+      <updated>1397484047335</updated>
+    </task>
+    <task id="LOCAL-00111" summary="- fixed urls">
+      <created>1397485517645</created>
+      <updated>1397485517645</updated>
+    </task>
+    <task id="LOCAL-00112" summary="- fixed urls">
+      <created>1397485938479</created>
+      <updated>1397485938479</updated>
+    </task>
+    <task id="LOCAL-00113" summary="- added search by locations">
+      <created>1397566902474</created>
+      <updated>1397566902474</updated>
+    </task>
+    <task id="LOCAL-00114" summary="- renamed similar file">
+      <created>1397566939847</created>
+      <updated>1397566939847</updated>
+    </task>
+    <task id="LOCAL-00115" summary="- started make validation for incoming params in the search">
+      <created>1397567765635</created>
+      <updated>1397567765635</updated>
+    </task>
+    <task id="LOCAL-00116" summary="- form for search">
+      <created>1397575453637</created>
+      <updated>1397575453637</updated>
+    </task>
+    <task id="LOCAL-00117" summary="- form for search">
+      <created>1397575473574</created>
+      <updated>1397575473574</updated>
+    </task>
+    <task id="LOCAL-00118" summary="- fix search&#10;">
+      <created>1397576202506</created>
+      <updated>1397576202506</updated>
+    </task>
+    <task id="LOCAL-00119" summary="- fixed immutable request&#10;">
+      <created>1397632549938</created>
+      <updated>1397632549938</updated>
+    </task>
+    <task id="LOCAL-00120" summary="- replace post on the get">
+      <created>1397646003819</created>
+      <updated>1397646003820</updated>
+    </task>
+    <task id="LOCAL-00121" summary="- similar api">
+      <created>1397650420458</created>
+      <updated>1397650420458</updated>
+    </task>
+    <task id="LOCAL-00122" summary="- change total count">
+      <created>1397650828425</created>
+      <updated>1397650828425</updated>
+    </task>
+    <task id="LOCAL-00123" summary="- search by name and name orig">
+      <created>1397651287185</created>
+      <updated>1397651287185</updated>
+    </task>
+    <task id="LOCAL-00124" summary="- similar api">
+      <created>1397661258187</created>
+      <updated>1397661258187</updated>
+    </task>
+    <task id="LOCAL-00125" summary="- optimize vbFilm">
+      <created>1397731392463</created>
+      <updated>1397731392463</updated>
+    </task>
+    <task id="LOCAL-00126" summary="- optimize detail api">
+      <created>1397736631899</created>
+      <updated>1397736631899</updated>
+    </task>
+    <task id="LOCAL-00127" summary="- delete n+1 query">
+      <created>1397742210344</created>
+      <updated>1397742210345</updated>
+    </task>
+    <task id="LOCAL-00128" summary="- fixed search by genres in the api films&#10;- deleted extend key in the api films persons">
+      <created>1397808024745</created>
+      <updated>1397808024746</updated>
+    </task>
+    <task id="LOCAL-00129" summary="- fixed search by genres and text">
+      <created>1397810695123</created>
+      <updated>1397810695123</updated>
+    </task>
+    <task id="LOCAL-00130" summary="- added cache search">
+      <created>1397813514353</created>
+      <updated>1397813514354</updated>
+    </task>
+    <task id="LOCAL-00131" summary="- added specific key for memcache&#10;- cache will use when debug false&#10;">
+      <created>1397817133302</created>
+      <updated>1397817133303</updated>
+    </task>
+    <task id="LOCAL-00132" summary="- chenge cache key&#10;">
+      <created>1397821007937</created>
+      <updated>1397821007937</updated>
+    </task>
+    <task id="LOCAL-00133" summary="- fixed error in the api&#10;">
+      <created>1398073194487</created>
+      <updated>1398073194487</updated>
+    </task>
+    <task id="LOCAL-00134" summary="- fixed person api&#10;">
+      <created>1398079719941</created>
+      <updated>1398079719941</updated>
+    </task>
+    <task id="LOCAL-00135" summary="- fixed person film api&#10;">
+      <created>1398246894297</created>
+      <updated>1398246894297</updated>
+    </task>
+    <task id="LOCAL-00136" summary="- fixed person film api&#10;">
+      <created>1398246981103</created>
+      <updated>1398246981103</updated>
+    </task>
+    <task id="LOCAL-00137" summary="- fixed error with person api form&#10;">
+      <created>1398255934381</created>
+      <updated>1398255934382</updated>
+    </task>
+    <task id="LOCAL-00138" summary="- changed release date field in the serializers&#10;- fixed tests&#10;">
+      <created>1398256012477</created>
+      <updated>1398256012477</updated>
+    </task>
+    <task id="LOCAL-00139" summary="- carry out signals from models folder to a higher level&#10;">
+      <created>1398256148653</created>
+      <updated>1398256148653</updated>
+    </task>
+    <task id="LOCAL-00140" summary="- added empty field&#10;">
+      <created>1398257366828</created>
+      <updated>1398257366829</updated>
+    </task>
+    <task id="LOCAL-00141" summary="- fixed tests and serializers&#10;">
+      <created>1398258524962</created>
+      <updated>1398258524963</updated>
+    </task>
+    <task id="LOCAL-00142" summary="- added directors and scriptwriters fields to the vbFilm when extend=True&#10;">
+      <created>1398271458017</created>
+      <updated>1398271458017</updated>
+    </task>
+    <task id="LOCAL-00143" summary="- added directors and scriptwriters fields to the vbFilm when extend=True&#10;">
+      <created>1398328402497</created>
+      <updated>1398328402497</updated>
+    </task>
+    <task id="LOCAL-00144" summary="- fixed type  value in the person  films api&#10;">
+      <created>1398329516995</created>
+      <updated>1398329516995</updated>
+    </task>
+    <task id="LOCAL-00145" summary="- reduced query for calculate derector and scriptwriters when  extend=True in the vbFilm  &#10;">
+      <created>1398335865664</created>
+      <updated>1398335865664</updated>
+    </task>
+    <task id="LOCAL-00146" summary="- fixed poster in the vbFilm&#10;">
+      <created>1398337658612</created>
+      <updated>1398337658613</updated>
+    </task>
+    <task id="LOCAL-00147" summary="- tests&#10;">
+      <created>1398340253192</created>
+      <updated>1398340253192</updated>
+    </task>
+    <task id="LOCAL-00148" summary="-fixed search api by text&#10;">
+      <created>1398342333571</created>
+      <updated>1398342333571</updated>
+    </task>
+    <option name="localTasksCounter" value="149" />
+    <servers />
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="1431" y="-4" width="1855" height="1084" extended-state="6" />
+    <editor active="false" />
+    <layout>
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2280514" sideWeight="0.4991708" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.60278374" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.23954985" sideWeight="0.5011952" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.5149893" sideWeight="0.4991708" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.30513918" sideWeight="0.49800798" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Coverage" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32946378" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.48715204" sideWeight="0.4997236" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.22885571" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32946378" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.43576017" sideWeight="0.4991708" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32976446" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+    </layout>
+    <layout-to-restore>
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2280514" sideWeight="0.4991708" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.60278374" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.23954985" sideWeight="0.5011952" order="9" side_tool="true" content_ui="tabs" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.35117772" sideWeight="0.4991708" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.37794432" sideWeight="0.49800798" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.251606" sideWeight="0.4997236" order="11" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24599226" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.17468214" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32976446" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.3672377" sideWeight="0.4991708" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+    </layout-to-restore>
+  </component>
+  <component name="Vcs.Log.UiProperties">
+    <option name="RECENTLY_FILTERED_USER_GROUPS">
+      <collection />
+    </option>
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="myTodoPanelSettings">
+      <TodoPanelSettings />
+    </option>
+    <MESSAGE value="- similar api" />
+    <MESSAGE value="- optimize vbFilm" />
+    <MESSAGE value="- optimize detail api" />
+    <MESSAGE value="- delete n+1 query" />
+    <MESSAGE value="- fixed search by genres in the api films&#10;- deleted extend key in the api films persons" />
+    <MESSAGE value="- fixed search by genres and text" />
+    <MESSAGE value="- added cache search" />
+    <MESSAGE value="Merge remote-tracking branch 'origin/api_films' into test_films_api&#10;&#10;Conflicts:&#10;&#9;requirements.txt&#10;" />
+    <MESSAGE value="- added specific key for memcache&#10;- cache will use when debug false&#10;" />
+    <MESSAGE value="- chenge cache key&#10;" />
+    <MESSAGE value="Merge remote-tracking branch 'origin/master' into api_films&#10;&#10;Conflicts:&#10;&#9;apps/films/api/films_search.py&#10;" />
+    <MESSAGE value="- fixed error in the api&#10;" />
+    <MESSAGE value="- fixed person api&#10;" />
+    <MESSAGE value="- fixed person film api&#10;" />
+    <MESSAGE value="- fixed error with person api form&#10;" />
+    <MESSAGE value="- changed release date field in the serializers&#10;- fixed tests&#10;" />
+    <MESSAGE value="- carry out signals from models folder to a higher level&#10;" />
+    <MESSAGE value="- added empty field&#10;" />
+    <MESSAGE value="- fixed tests and serializers&#10;" />
+    <MESSAGE value="- added directors and scriptwriters fields to the vbFilm when extend=True&#10;" />
+    <MESSAGE value="- fixed type  value in the person  films api&#10;" />
+    <MESSAGE value="- reduced query for calculate derector and scriptwriters when  extend=True in the vbFilm  &#10;" />
+    <MESSAGE value="- fixed poster in the vbFilm&#10;" />
+    <MESSAGE value="- tests&#10;" />
+    <MESSAGE value="-fixed search api by text&#10;" />
+    <option name="LAST_COMMIT_MESSAGE" value="-fixed search api by text&#10;" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="python-line">
+          <url>file://$PROJECT_DIR$/apps/films/tests/tests_films_api.py</url>
+          <line>123</line>
+          <option name="timeStamp" value="395" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="python-line">
+          <url>file://$PROJECT_DIR$/utils/common.py</url>
+          <line>12</line>
+          <option name="timeStamp" value="396" />
+        </line-breakpoint>
+      </breakpoints>
+      <breakpoints-dialog>
+        <breakpoints-dialog />
+      </breakpoints-dialog>
+      <option name="time" value="401" />
+    </breakpoint-manager>
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$USER_HOME$/virtualenv/videobase/local/lib/python2.7/site-packages/django/shortcuts/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="15" column="4" selection-start="553" selection-end="553" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2842" />
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/virtualenv/videobase/local/lib/python2.7/site-packages/django/http/response.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="492" column="26" selection-start="17881" selection-end="17901" vertical-scroll-proportion="0.0" vertical-offset="6743" max-vertical-offset="8077" />
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/virtualenv/videobase/lib/python2.7/site-packages/pyjade/ext/django/templatetags.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="192" column="0" selection-start="5954" selection-end="5954" vertical-scroll-proportion="0.0" vertical-offset="2603" max-vertical-offset="3697" />
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/virtualenv/videobase/lib/python2.7/site-packages/django/core/cache/backends/base.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="107" column="8" selection-start="3356" selection-end="3356" vertical-scroll-proportion="1.0044776" vertical-offset="857" max-vertical-offset="4105" />
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/virtualenv/videobase/local/lib/python2.7/site-packages/django/core/cache/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="94" column="4" selection-start="3247" selection-end="3247" vertical-scroll-proportion="0.0" vertical-offset="1135" max-vertical-offset="2596" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/apps/films/urls.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="23" column="51" selection-start="1526" selection-end="1526" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="905" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/apps/films/models/persons_extras.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="9" column="49" selection-start="358" selection-end="358" vertical-scroll-proportion="0.25092936" vertical-offset="0" max-vertical-offset="1048" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/videobase/urls.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="27" column="46" selection-start="843" selection-end="843" vertical-scroll-proportion="0.0" vertical-offset="75" max-vertical-offset="1063" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/apps/films/views.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="241" column="43" selection-start="6543" selection-end="6543" vertical-scroll-proportion="0.0" vertical-offset="3181" max-vertical-offset="4243" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/apps/films/api/films_similar.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="225" max-vertical-offset="1010" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/apps/films/api/films_detail.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="31" column="77" selection-start="871" selection-end="899" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1363" />
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/virtualenv/videobase/lib/python2.7/site-packages/django/http/request.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="371" column="0" selection-start="14061" selection-end="14061" vertical-scroll-proportion="0.0" vertical-offset="5131" max-vertical-offset="7978" />
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/virtualenv/videobase/lib/python2.7/site-packages/rest_framework/request.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="419" column="0" selection-start="14061" selection-end="14061" vertical-scroll-proportion="0.2993311" vertical-offset="5986" max-vertical-offset="6763" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/apps/films/api/films_comments.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="45" column="0" selection-start="1220" selection-end="1220" vertical-scroll-proportion="0.9480069" vertical-offset="23" max-vertical-offset="1357" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/apps/films/api/films_action_subscribe.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="54" column="27" selection-start="1636" selection-end="1636" vertical-scroll-proportion="0.025996534" vertical-offset="705" max-vertical-offset="1747" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/configs/db.ini.example">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="14" column="0" selection-start="372" selection-end="372" vertical-scroll-proportion="0.36395147" vertical-offset="0" max-vertical-offset="772" />
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/virtualenv/videobase/local/lib/python2.7/site-packages/django/forms/widgets.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="489" column="6" selection-start="17777" selection-end="17777" vertical-scroll-proportion="0.0" vertical-offset="6993" max-vertical-offset="13207" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/apps/users/models/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="7" column="30" selection-start="229" selection-end="229" vertical-scroll-proportion="0.221519" vertical-offset="0" max-vertical-offset="639" />
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/virtualenv/videobase/local/lib/python2.7/site-packages/django/forms/fields.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="750" column="17" selection-start="29105" selection-end="29117" vertical-scroll-proportion="0.25404158" vertical-offset="10780" max-vertical-offset="17248">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/virtualenv/videobase/lib/python2.7/site-packages/rest_framework/serializers.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="346" column="0" selection-start="11364" selection-end="11364" vertical-scroll-proportion="0.0" vertical-offset="4859" max-vertical-offset="16953" />
+      </provider>
+    </entry>
+    <entry file="uml://DATABASE/203ca0eb-2ecf-4274-9c42-cb1d71eea107">
+      <provider selected="true" editor-type-id="UmlEditorProvider">
+        <state>
+          <ID>DATABASE</ID>
+          <OriginalElement>203ca0eb-2ecf-4274-9c42-cb1d71eea107</OriginalElement>
+          <nodes />
+          <notes />
+          <edges />
+          <settings layout="Hierarchic Group" zoom="1.0" x="734.0" y="439.0" />
+          <SelectedNodes />
+          <Categories>
+            <Category>Columns</Category>
+            <Category>Key columns</Category>
+          </Categories>
+          <SCOPE>All</SCOPE>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/apps/users/api/serializers/vb_user.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="-0.24456522" vertical-offset="135" max-vertical-offset="1932" />
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/virtualenv/videobase/lib/python2.7/site-packages/rest_framework/views.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="402" column="0" selection-start="14321" selection-end="14321" vertical-scroll-proportion="0.0" vertical-offset="5699" max-vertical-offset="6708">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/virtualenv/videobase/lib/python2.7/site-packages/django/views/decorators/csrf.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="56" column="0" selection-start="2044" selection-end="2044" vertical-scroll-proportion="0.0" vertical-offset="644" max-vertical-offset="1338">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/virtualenv/videobase/lib/python2.7/site-packages/django/views/generic/base.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="68" column="0" selection-start="2363" selection-end="2363" vertical-scroll-proportion="0.0" vertical-offset="704" max-vertical-offset="3618">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/virtualenv/videobase/lib/python2.7/site-packages/django/core/handlers/base.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="206" column="0" selection-start="9145" selection-end="9145" vertical-scroll-proportion="0.0" vertical-offset="2699" max-vertical-offset="4608">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/virtualenv/videobase/lib/python2.7/site-packages/django/test/client.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="425" column="0" selection-start="15709" selection-end="15709" vertical-scroll-proportion="0.0" vertical-offset="5819" max-vertical-offset="9438" />
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/virtualenv/videobase/lib/python2.7/site-packages/rest_framework/compat.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="487" column="0" selection-start="17904" selection-end="17904" vertical-scroll-proportion="0.0" vertical-offset="7064" max-vertical-offset="9498" />
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/virtualenv/videobase/lib/python2.7/site-packages/rest_framework/test.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="79" column="0" selection-start="2908" selection-end="2908" vertical-scroll-proportion="0.0" vertical-offset="884" max-vertical-offset="2853" />
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/virtualenv/videobase/lib/python2.7/site-packages/unittest2/case.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="397" column="0" selection-start="13631" selection-end="13631" vertical-scroll-proportion="0.33333334" vertical-offset="5594" max-vertical-offset="16548">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/virtualenv/videobase/lib/python2.7/site-packages/django/test/testcases.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="183" column="0" selection-start="6264" selection-end="6264" vertical-scroll-proportion="0.0" vertical-offset="1734" max-vertical-offset="18003">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/apps/films/api/films_persons.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="20" column="11" selection-start="610" selection-end="610" vertical-scroll-proportion="0.21933962" vertical-offset="207" max-vertical-offset="1219">
+          <folding>
+            <element signature="e#17#57#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/apps/films/models/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="9" column="30" selection-start="262" selection-end="262" vertical-scroll-proportion="0.3" vertical-offset="0" max-vertical-offset="645">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/videobase/settings.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="52" column="24" selection-start="1355" selection-end="1355" vertical-scroll-proportion="0.0" vertical-offset="570" max-vertical-offset="3469">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/requirements.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="27" column="13" selection-start="447" selection-end="447" vertical-scroll-proportion="0.53333336" vertical-offset="165" max-vertical-offset="870">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/apps/films/models/persons.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="12" column="6" selection-start="328" selection-end="328" vertical-scroll-proportion="0.23333333" vertical-offset="0" max-vertical-offset="1065">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/apps/films/api/serializers/vb_person.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="20" column="27" selection-start="553" selection-end="553" vertical-scroll-proportion="0.57555556" vertical-offset="26" max-vertical-offset="855">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/apps/films/models/films.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="225" max-vertical-offset="1653">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/apps/films/models/films_extras.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="45" column="36" selection-start="1954" selection-end="1954" vertical-scroll-proportion="0.443038" vertical-offset="390" max-vertical-offset="1314">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/utils/common.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="37" column="0" selection-start="350" selection-end="358" vertical-scroll-proportion="0.939759" vertical-offset="42" max-vertical-offset="2568">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/apps/films/tests/tests_films_api.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="79" column="34" selection-start="3402" selection-end="3486" vertical-scroll-proportion="0.3313253" vertical-offset="900" max-vertical-offset="9858">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/apps/films/constants.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="19" column="0" selection-start="694" selection-end="694" vertical-scroll-proportion="0.33333334" vertical-offset="104" max-vertical-offset="1593">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/virtualenv/videobase/lib/python2.7/site-packages/rest_framework/fields.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="1025" column="0" selection-start="35502" selection-end="35502" vertical-scroll-proportion="0.33333334" vertical-offset="14864" max-vertical-offset="15543">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/apps/films/models/persons_films.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="4" column="0" selection-start="72" selection-end="72" vertical-scroll-proportion="0.1" vertical-offset="0" max-vertical-offset="810">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/apps/films/forms.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="73" column="8" selection-start="2384" selection-end="2384" vertical-scroll-proportion="0.062248997" vertical-offset="974" max-vertical-offset="2523">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/apps/films/api/serializers/vb_film.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="176" column="36" selection-start="5663" selection-end="5663" vertical-scroll-proportion="0.3634538" vertical-offset="2459" max-vertical-offset="3693">
+          <folding>
+            <element signature="e#17#47#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/apps/films/api/films_search.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="140" column="0" selection-start="4993" selection-end="4993" vertical-scroll-proportion="1.5967742" vertical-offset="900" max-vertical-offset="2750">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="2" column="0" selection-start="33" selection-end="33" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1175">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/apps/users/constants.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="4" column="0" selection-start="70" selection-end="70" vertical-scroll-proportion="0.1" vertical-offset="0" max-vertical-offset="960">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+  </component>
+  <component name="masterDetails">
+    <states>
+      <state key="ScopeChooserConfigurable.UI">
+        <settings>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+    </states>
+  </component>
+</project>
+
