@@ -23,7 +23,6 @@ class vbPerson(serializers.ModelSerializer):
             for field_name in new_fields:
                 self.fields.pop(field_name, None)
 
-
     class Meta:
         model = Persons
         fields = ('id', 'name', 'photo', 'bio')

@@ -15,7 +15,7 @@ class UsersRels(models.Model):
     updated = models.DateTimeField(auto_now_add=True, editable=False, verbose_name=u'Дата создания/обновления')
 
     def __unicode__(self):
-        return u'[%s] %s' % (self.pk, self.user.username)
+        return u'[%s] %s - %s' % (self.pk, self.user.username, self.user_rel.username)
 
     class Meta:
         # Имя таблицы в БД
