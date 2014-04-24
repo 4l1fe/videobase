@@ -55,9 +55,7 @@ def get_users_persons(session_token, id, host=HOST):
     url = urljoin(host, 'api/v1/users/{}/persons.json'.format(id))
     data = urlencode(dict())  # Для изменения на тип запроса - POST
     req = Request(url, data)
-    print(req.get_full_url())
     req.add_header('Authorization', 'X-VB-Token ' + session_token)
-    # req.add_header('Authorization', 'Token ' + session_token)
     resp = urlopen(req)
     resp_data = resp.read()
     if python_v == 3:
@@ -66,12 +64,16 @@ def get_users_persons(session_token, id, host=HOST):
     return json_resp
 
 
+def run_test_requests(st, fid, uid):
+    resp = get_films_persons(st, 833)
+    print(resp)
+    resp = get_users_persons(st, 1)
+    print(resp)
+
+
 if __name__ == '__main__':
     mt = get_main_token()
     print(mt)
     st = get_session_token(mt)
     print(st)
-    resp = get_films_persons(st, 833)
-    print(resp)
-    resp = get_users_persons(st, 1)
-    print(resp)
+    # run_test_requests(st, 833, 1)
