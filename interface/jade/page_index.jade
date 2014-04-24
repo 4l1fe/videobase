@@ -6,9 +6,9 @@
 - var filter_rating = {0: "любой рейтинг", 5: "включая плохие", 6: "неплохие", 6.5: "хорошие", 7: "отличные", 8: "самые лучшие"}
 - var filter_sort = {"rating": "рейтингу", "subscribes": "подпискам"}
 html.index-page
-    include jade/head
+    include head
     body
-        include jade/header
+        include header
         .new-wrapper
             .container
                 h2 Новинки
@@ -59,6 +59,6 @@ html.index-page
         .comments-wrapper
             .container
                 h2 Резенции
-        include jade/footer
+        include footer
         script.
             $(document).ready(function () {window.InitApp({}, "Main")})

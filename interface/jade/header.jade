@@ -1,35 +1,29 @@
-- var logo_src = "img/logo.gif"
 header
-    .container
-        .col-md-4.text-left
-            if (isMainPage)
-                img(src= logo_src)
-            else
-                a(href="/")
-                    img(src= logo_src)
-        .col-md-4
-            form#frm_search.form-inline(method="get")
-                .form-group
-                    label.sr-only(for="inp_search" name="q") Поисковая фраза
-                    input(type="search",placeholder="Начинайте вводить...",name="text").form-control#inp_search
-                button.btn.btn-default(type="submit")#inp_button Искать
-        .col-md-4.text-right
-            include part_userplace
-    .container
-        .col-md-8
-            .col-md-4
-                a(href="#")
-                    h2 Фильмы
-            .col-md-4
-                a(href="#")
-                    h2 Сериалы
-        .col-md-4
-            .col-md-4
-                a(href="#")
-                    h3 Плейлист
-            .col-md-4
-                a(href="#")
-                    h3 Лента
-if header_title
+    .top-block-wrapper
+        .container
+            .col-md-3.col-sm-3.top-logo-place
+                img(src=conf.logo_src,alt="Всё видео")
+                &nbsp;
+            .col-md-6.col-sm-6.top-search-place
+                form#frm_search.form-inline(method="get")
+                    .form-group
+                        label.sr-only(for="inp_search" name="q") Поиск по сайту
+                        input(type="search",placeholder="Поиск по сайту",name="text").form-control#inp_search
+                        button.btn.btn-default(type="submit")#btn_submit Поиск
+                &nbsp;
+            .col-md-3.col-sm-3.top-user-place
+                mixin user_place({name: "Василий Пупкин", is_auth: true, id: 2873})
+    .menu-block-wrapper
+        .container.text-center
+            ul
+                li
+                    a(href="#") Фильмы
+                li
+                    a(href="#") Сериалы
+                li
+                    a(href="#") Плейлист
+                li
+                    a(href="#") Лента
+//if header_title
     .container
         h1=header_title
