@@ -160,16 +160,19 @@ class vbFilm(serializers.ModelSerializer):
 
 
     def poster_list(self, obj):
-        result = self.poster_rebuild.get(obj.pk, [])
+        result = self.poster_rebuild.get(obj.pk, '')
         if len(result):
-            return [item.url for item in result if not item.url is None and len(item.url)]
+            for item in result:
+                if not item.photo is None and item.photo:
+                    result = item.photo.url
+                    break;
 
         return result
 
 
     def _rebuild_poster_list(self):
         extras = FilmExtras.objects.filter(film__in=self.list_obj_pk, type=APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER)
-        extras = group_by(extras, 'id', True)
+        extras = group_by(extras, 'film_id', True)
 
         self.poster_rebuild = extras
 
