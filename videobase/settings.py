@@ -51,7 +51,6 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_extensions',
-    'memcache_status',
     'south',
     'rest_framework',
     'rest_framework.authtoken',
@@ -63,7 +62,6 @@ INSTALLED_APPS = (
     'crawler',
     'social_auth',
     'djcelery',
-
 )
 
 MIDDLEWARE_CLASSES = (
