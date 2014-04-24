@@ -80,7 +80,7 @@ class FilmsTest(APITestCase):
             self.assertTrue(False)
 
         for i in range(len(response_data['poster'])):
-            self.assertEqual(response_data['poster'][i], extras[i].url)
+            self.assertEqual(response_data['poster'][i], extras[i].photo.url)
 
         self.assertEqual(response_data['id'], film.id)
         self.assertEqual(response_data['name'], film.name)
