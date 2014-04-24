@@ -10,6 +10,7 @@ from apps.films.views import test_view
 
 
 urlpatterns = patterns('',
+    # API
     url(r'^api/image/resize/', 'apps.films.views.resize_image'),
     url(r'^api/image/brco/', 'apps.films.views.bri_con'),
     url(r'^api/', include('apps.films.urls')),
@@ -17,10 +18,11 @@ urlpatterns = patterns('',
     url(r'^robots/', include('apps.robots.urls')),
     url(r'^api/test', test_view),
     url(r'^auth/login/', 'rest_framework.authtoken.views.obtain_auth_token'),
-    
+
     # Admin
     url(r'^admin_tools/', include('admin_tools.urls')),
     url(r'^admin/', include(admin.site.urls)),
+
     # Social
     url(r'', include('social_auth.urls')),
 
@@ -33,5 +35,5 @@ urlpatterns = patterns('',
 
 if settings.DEBUG:
     urlpatterns += patterns('',
-                            (r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT}),
+        (r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT}),
     )
