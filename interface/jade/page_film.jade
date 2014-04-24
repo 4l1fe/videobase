@@ -1,0 +1,92 @@
+//- header_title= film.name
+//- film_country = film.countries && film.countries.length ?film.countries.join(", "):false
+html
+    include jade/head
+    body.film-page
+        include jade/header
+        .container.pleer-wrapper
+            h1=film.name
+            .col-md-9.pleer-place#pleer_place
+            .col-md-3.locations-place
+                if film.locations
+                    h5 Варианты
+                    #locations
+                        - each item in film.locations
+                            mixin location_thumb(item)
+        .container.film-info-wrapper
+            .col-md-8
+                .col-md-4
+                    mixin film_thumb({id: film.id, name: "", poster: film.poster, relation: film.relation, year: ""}, "film_thumb")
+                .col-md-7
+                    table.table.table-bordered
+                        - if (film_country)
+                            tr
+                                td Страна
+                                td=film_country
+                        - if (film.directors)
+                            tr
+                                td Режиссёр
+                                td
+                                    mixin anchor_list(film.directors, "/persons/%")
+                        - if (film.scriptwriters)
+                            tr
+                                td Сценарист
+                                td
+                                    mixin anchor_list(film.scriptwriters, "/persons/%")
+                        tr
+                            td Дата выхода
+                            td #{date_text(new Date(film.releasedate))}
+                        tr
+                            td Продолжительность
+                            td #{duration_text(film.duration)}
+                - if (film.description)
+                    .clearfix
+                    h5 Описание
+                    .film-description=film.description
+                - if (film.trailer)
+                    .clearefix
+                    h5 Трейлер
+                    .film-trailer
+                        Здесь трейлер
+            .col-md-4
+                .col-md-6
+                    h6 Сводный рейтинг
+                .col-md-3
+                    .film-rating=film.ratings.cons[0]
+                .col-md-3
+                    .film-rating-votes=film.ratings.cons[1]
+                        <br/>голосов
+                .clearfix
+                .col-md-6
+                    .col-md-9 Рейтинг КП
+                    .col-md-3 8.3
+                .col-md-6
+                    .col-md-9 Рейтинг IMDB
+                    .col-md-3 7.9
+                .clearfix
+                .col-md-6
+                    button.btn.btn-default Подписаться
+                .col-md-6
+                    button.btn.btn-default Добавить в плейлист
+                if (film.actors)
+                    .clearfix
+                    h3 Актёры
+                    #actors
+                        each actor in film.actors
+                            mixin person_thumb(actor)
+                        .more-actors-place(class=film.actors.length < 5?"":"display-none")
+                            button.btn.btn-default#btn_moreactors Все актёры
+        .container
+            h3 Комментарии
+            .comments-place
+                if (film.comments)
+                    each item in film.comments
+                        mixin comment_thumb(item)
+        if (film.similar)
+            .container#films_similar
+                h3 Похожие фильмы
+                each item in film.similar
+                    mixin film_thumb(item)
+        include jade/footer
+        script.
+            $(document).ready(function () {window.InitApp({page_conf: !{JSON.stringify(film)}}, "Film")})

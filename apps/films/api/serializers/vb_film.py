@@ -7,7 +7,7 @@ from rest_framework import serializers
 
 from apps.films.models import *
 from apps.films.constants import APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER,\
-                                 APP_PERSON_DIRECTOR, APP_PERSON_SCRIPTWRITER, APP_PERSON_ACTOR
+                                 APP_PERSON_DIRECTOR, APP_PERSON_SCRIPTWRITER
 from apps.contents.models import *
 
 from utils.common import group_by
