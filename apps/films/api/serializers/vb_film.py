@@ -96,22 +96,20 @@ class vbFilm(serializers.ModelSerializer):
         scriptwriters_list = []
 
         if self.extend_sign:
-            o_pf = PersonsFilms.objects.\
-                filter(Q(p_type=APP_PERSON_DIRECTOR) | Q(p_type=APP_PERSON_SCRIPTWRITER), film__in=self.list_obj_pk).\
-                values('person', 'p_type')
+            o_person = Persons.objects.filter(Q(person_film_rel__p_type=APP_PERSON_DIRECTOR) | Q(person_film_rel__p_type=APP_PERSON_SCRIPTWRITER),
+                                              person_film_rel__film__in=self.list_obj_pk).\
+                extra(select={'p_type': "persons_films.p_type"}).order_by('id')
 
-            for item in o_pf:
-                if item['p_type'] == APP_PERSON_DIRECTOR:
-                    directors_list.append(item['person'])
+            for item in o_person:
+                if item.p_type == APP_PERSON_DIRECTOR:
+                    directors_list.append(item)
                 else:
-                    scriptwriters_list.append(item['person'])
+                    scriptwriters_list.append(item)
 
-            # Unique values
-            directors_list = list(set(directors_list))
-            scriptwriters_list = list(set(scriptwriters_list))
-
-        self.directors_list = directors_list
-        self.scriptwriters_list = scriptwriters_list
+        self.tors_list = {
+            'directors': directors_list,
+            'scriptwriters': scriptwriters_list,
+        }
 
 
     def calc_ratings(self, obj):
@@ -189,19 +187,19 @@ class vbFilm(serializers.ModelSerializer):
 
 
     def director_list(self, obj):
-        if len(self.directors_list):
-            o_person = Persons.objects.filter(id__in=self.directors_list)
-            return vbPerson(o_person, many=True).data
+        temp = self.tors_list['directors']
+        if len(temp):
+            return vbPerson(temp, many=True).data
 
-        return []
+        return temp
 
 
     def scriptwriter_list(self, obj):
-        if len(self.scriptwriters_list):
-            o_person = Persons.objects.filter(id__in=self.scriptwriters_list)
-            return vbPerson(o_person, many=True).data
+        temp = self.tors_list['scriptwriters']
+        if len(temp):
+            return vbPerson(temp, many=True).data
 
-        return []
+        return temp
 
 
     class Meta:
