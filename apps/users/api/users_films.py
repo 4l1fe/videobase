@@ -10,6 +10,7 @@ from apps.users.models import User
 from apps.films.models import Films
 from apps.films.constants import APP_FILM_FULL_FILM, APP_FILM_SERIAL, APP_USERFILM_STATUS_SUBS
 from apps.films.api.serializers import vbFilm
+from apps.users.constants import APP_USERS_API_DEFAULT_PAGE, APP_USERS_API_DEFAULT_PER_PAGE
 
 films_type = {
     'f': [APP_FILM_FULL_FILM],
@@ -30,8 +31,8 @@ class UsersFilmsView(APIView):
         except Exception as e:
             return Response({'e': e.message}, status=status.HTTP_400_BAD_REQUEST)
 
-        page = request.DATA.get('page', 1)
-        per_page = request.DATA.get('per_page', 10)
+        page = request.DATA.get('page', APP_USERS_API_DEFAULT_PAGE)
+        per_page = request.DATA.get('per_page', APP_USERS_API_DEFAULT_PER_PAGE)
         type = request.DATA.get('type', 'all')
         try:
             ftype = films_type[type]
