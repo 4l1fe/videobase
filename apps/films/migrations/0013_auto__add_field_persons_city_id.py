@@ -8,21 +8,15 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding model 'Cities'
-        db.create_table('cities', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('country_id', self.gf('django.db.models.fields.related.ForeignKey')(related_name='cities', to=orm['films.Countries'])),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('name_orig', self.gf('django.db.models.fields.CharField')(max_length=255)),
-        ))
-        db.send_create_signal('films', ['Cities'])
-        country = orm.Countries.objects.all()[0]
-        orm.Cities.objects.create(country_id=country, name='default city', name_orig='default city orig')
+        # Adding field 'Persons.city_id'
+        db.add_column('persons', 'city_id',
+                      self.gf('django.db.models.fields.related.ForeignKey')(default=1, related_name='persons', to=orm['films.Cities']),
+                      keep_default=False)
 
 
     def backwards(self, orm):
-        # Deleting model 'Cities'
-        db.delete_table('cities')
+        # Deleting field 'Persons.city_id'
+        db.delete_column('persons', 'city_id_id')
 
 
     models = {
@@ -123,6 +117,7 @@ class Migration(SchemaMigration):
         'films.persons': {
             'Meta': {'object_name': 'Persons', 'db_table': "'persons'"},
             'bio': ('django.db.models.fields.TextField', [], {}),
+            'city_id': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'persons'", 'to': "orm['films.Cities']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'name_orig': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
