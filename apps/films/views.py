@@ -162,6 +162,7 @@ class PersonActionAPIView(APIView):
                               person = person,
                               subscribed=subscribed,
                               upstatus=0 )
+        finally:
             up.save()
         
     def _response_template(self,subscribed, request, format = None, resource_id = None):
@@ -204,7 +205,7 @@ class PersonsExtrasAPIView(APIView):
             else:
                 pes = PersonsExtras.objects.filter(person = person, type = type)
 
-            result = [pe.as_vbExtras for pe in pes]
+            result = [pe.as_vbExtra() for pe in pes]
             
             response = Response(result, status=status.HTTP_200_OK)
             return response
@@ -214,21 +215,6 @@ class PersonsExtrasAPIView(APIView):
             raise Http404
             # Any URL parameters get passed in **kw
         
-
-    def get(self, request, format = None, resource_id = None, per_page = 10, page= 1 ):
-
-        try:
-            film = Films.objects.get(pk=resource_id)
-            content = Contents.objects.get(film=film)
-            vbComments = [comment.as_vbComment() for comment in Comments.objects.filter(content=content.id)]
-
-        except Exception, e:
-            print e
-            raise Http404
-            # Any URL parameters get passed in **kw
-
-        response = Response(vbComments, status=status.HTTP_200_OK)
-        return response
 
 
 def index_view(request):
@@ -241,10 +227,6 @@ def person_view(request, film_id):
 
     return render_to_response('person.html')
 
-def register_view(request):
-        # ... view code here
-
-    return render_to_response('register.html',)
 
 def login_view(request):
         # ... view code here
