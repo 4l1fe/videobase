@@ -11,6 +11,7 @@ from apps.films.models.photoclass import PhotoClass
 #############################################################################################################
 # Модель Персон
 class Persons(PhotoClass):
+    city_id   = models.ForeignKey('Cities', verbose_name=u'Город', related_name='persons')
     name      = models.CharField(max_length=255, verbose_name=u'Имя')
     name_orig = models.CharField(max_length=255, verbose_name=u'Оригинальное имя')
     bio       = models.TextField(verbose_name=u'Биография')
@@ -24,6 +25,12 @@ class Persons(PhotoClass):
     def get_full_name(self):
         full_name = u"{0} ({1})".format(self.name, self.name_orig)
         return full_name.strip()
+
+    # @property
+    # def birthplace(self):
+    #     bp = (self.city_id.name, self.city_id.country_id.name)
+    #     return bp
+
 
     def __unicode__(self):
         return u'[%s] %s' % (self.pk, self.get_full_name)
