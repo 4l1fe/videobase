@@ -1,0 +1,100 @@
+<html>{% include "jade/head.jade" %}
+  <body class="film-page">
+    {% include "jade/header.jade" %}
+    <div class="container pleer-wrapper">
+      <h1>{{film.name|force_escape}}</h1>
+      <div id="pleer_place" class="col-md-9 pleer-place"></div>
+      <div class="col-md-3 locations-place">{% if  film.locations %}
+        <h5>Варианты</h5>
+        <div id="locations">{% for item in film.locations|__pyjade_iter:1 %}{% __pyjade_usekwacro location_thumb item %}{% endfor %}
+        </div>{% endif %}
+      </div>
+    </div>
+    <div class="container film-info-wrapper">
+      <div class="col-md-8">
+        <div class="col-md-4">{% __pyjade_usekwacro film_thumb {id: film.id, name: "", poster: film.poster, relation: film.relation, year: ""}, "film_thumb" %}
+        </div>
+        <div class="col-md-7">
+          <table class="table table-bordered">{% if  (film_country) %}
+            <tr>
+              <td>Страна</td>
+              <td>{{film_country|force_escape}}</td>
+            </tr>{% endif %}{% if  (film.directors) %}
+            <tr>
+              <td>Режиссёр</td>
+              <td>{% __pyjade_usekwacro anchor_list film.directors, "/persons/%" %}
+              </td>
+            </tr>{% endif %}{% if  (film.scriptwriters) %}
+            <tr>
+              <td>Сценарист</td>
+              <td>{% __pyjade_usekwacro anchor_list film.scriptwriters, "/persons/%" %}
+              </td>
+            </tr>{% endif %}
+            <tr>
+              <td>Дата выхода</td>
+              <td>{{date_text(new Date(film.releasedate))|escape}}</td>
+            </tr>
+            <tr>
+              <td>Продолжительность</td>
+              <td>{{duration_text(film.duration)|escape}}</td>
+            </tr>
+          </table>
+        </div>{% if  (film.description) %}
+        <div class="clearfix"></div>
+        <h5>Описание</h5>
+        <div class="film-description">{{film.description|force_escape}}</div>{% endif %}{% if  (film.trailer) %}
+        <div class="clearefix"></div>
+        <h5>Трейлер</h5>
+        <div class="film-trailer">Здесь трейлер
+
+        </div>{% endif %}
+      </div>
+      <div class="col-md-4">
+        <div class="col-md-6">
+          <h6>Сводный рейтинг</h6>
+        </div>
+        <div class="col-md-3">
+          <div class="film-rating">{{film.ratings.cons[0]|force_escape}}</div>
+        </div>
+        <div class="col-md-3">
+          <div class="film-rating-votes">{{film.ratings.cons[1]|force_escape}}<br/>голосов
+</div>
+        </div>
+        <div class="clearfix"></div>
+        <div class="col-md-6">
+          <div class="col-md-9">Рейтинг КП</div>
+          <div class="col-md-3">8.3</div>
+        </div>
+        <div class="col-md-6">
+          <div class="col-md-9">Рейтинг IMDB</div>
+          <div class="col-md-3">7.9</div>
+        </div>
+        <div class="clearfix"></div>
+        <div class="col-md-6">
+          <button class="btn btn-default">Подписаться</button>
+        </div>
+        <div class="col-md-6">
+          <button class="btn btn-default">Добавить в плейлист</button>
+        </div>{% if  (film.actors) %}
+        <div class="clearfix"></div>
+        <h3>Актёры</h3>
+        <div id="actors">{% for actor in film.actors|__pyjade_iter:1 %}{% __pyjade_usekwacro person_thumb actor %}{% endfor %}
+          <div{% __pyjade_attrs attrs=[('< 5?:display-none',(True)), ('class', (("more-actors-place") , (film.actors.length)))] %}>
+            <button id="btn_moreactors" class="btn btn-default">Все актёры</button>
+          </div>
+        </div>{% endif %}
+      </div>
+    </div>
+    <div class="container">
+      <h3>Комментарии</h3>
+      <div class="comments-place">{% if  (film.comments) %}{% for item in film.comments|__pyjade_iter:1 %}{% __pyjade_usekwacro comment_thumb item %}{% endfor %}{% endif %}
+      </div>
+    </div>{% if  (film.similar) %}
+    <div id="films_similar" class="container">
+      <h3>Похожие фильмы</h3>{% for item in film.similar|__pyjade_iter:1 %}{% __pyjade_usekwacro film_thumb item %}{% endfor %}
+    </div>{% endif %}{% include "footer.jade" %}
+    <script>$(document).ready(function () {window.InitApp({page_conf: {{JSON.stringify(film)}}}, "Film")})
+
+</script>
+  </body>
+</html>

@@ -1,0 +1,84 @@
+{% __pyjade_set months = ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"] %}{% __pyjade_set location_names = {"ivi": "IVI.ru", "now": "Now.ru", "megogo": "Megogo", "tvigle": "TVigle", default: "Неизвестно"} %}{% __pyjade_set quality_texts = {"hd": "Отличное", "sd": "Хорошее", "fhd": "Full HD", "default": "Хорошее"} %}{% __pyjade_set date_now = new Date() %}
+<function>how_long(dt, level) {{% __pyjade_set res = "" %}{% if  (level == undefined) { %}{% __pyjade_set level = 0 %}{% endif %}}
+{% __pyjade_set year_diff = date_now.getFullYear() - dt.getFullYear() %}{% __pyjade_set now_month = date_now.getMonth() %}{% __pyjade_set dt_month = dt.getMonth() %}{% __pyjade_set now_date = date_now.getDate() %}{% __pyjade_set dt_date = dt.getDate() %}{% if  ((now_month < dt_month) || (now_month == dt_month && now_date < dt_date)) { %}
+  <year_diff-->;</year_diff-->{% endif %}}
+{% if  (year_diff > 0) { %}{% __pyjade_set res = year_diff + cardinal(year_diff, " год", " года", " лет") %}{% endif %}}
+{% if  (level > 0) { %}{% __pyjade_set month_diff = now_month - dt_month %}{% if  (month_diff < 0) { %}
+  <month_diff>+= 12;</month_diff>{% endif %}}
+{% if  (month_diff == 0) { %}{% __pyjade_set month_diff = 1 %}{% endif %}}
+
+  <res>+= (res?" ":"") + month_diff + cardinal(month_diff, " месяц", " месяца", " месяцев")</res>{% endif %}}
+
+  <return>res</return>
+</function>}
+
+<function>cardinal(val, form1, form2, form3) {
+  <var>d10;</var>{% if  (val > 4 && val < 21) { %}
+  <return>form3;</return>{% endif %}}
+{% __pyjade_set d10 = val % 10 %}{% if  (d10 == 0 || d10 > 4) { %}
+  <return>form3;</return>{% endif %}}
+{% if  (d10 == 1) { %}
+  <return>form1;</return>{% endif %}}
+
+  <return>form2;</return>
+</function>}
+
+<function>quality_text(qual) {if (!qual) return quality_texts["default"]; return quality_texts[qual.toLowerCase()] || quality_texts["default"]}</function>
+<function>location_name(type) {if (!type) return location_names["default"]; return location_names[type.toLowerCase()] || location_names["default"]}</function>
+<!--function price_text(price, price_type) {-->
+<!--   var rub;-->
+<!--   if (isNaN(price)) {-->
+<!--      price = 0;-->
+<!--   }-->
+<!---->
+<!--   if (price_type == "v" || price_type == "s") {-->
+<!--      rub = Math.floor(price);-->
+<!--      cop = Math.round((price - rub) * 100);-->
+<!--      return (rub?rub + " р.":"") + (cop?(rub?" ":"") + cop + " коп.":"");-->
+<!--   } else {-->
+<!--     if (price_type == "f") {-->
+<!--       return "бесплатно";-->
+<!--     } else {-->
+<!--       return "";-->
+<!--     }-->
+<!--   }-->
+<!--}-->
+<function>duration_text(min) {
+  <var>ho, mi;</var>{% __pyjade_set ho = Math.floor(min / 60) %}{% __pyjade_set mi = min - ho*60 %}{% __pyjade_set res = ho ? ho + cardinal(ho, " час", " часа", " часов") : "" %}{% if  (mi) { %}
+  <res>+= (res?" ":"") + mi + cardinal(mi, " минута", " минуты", " минут");</res>{% endif %}}
+
+  <return>res || "0 минут";</return>
+</function>}
+
+<function>date_text(dt) {
+  <return>dt.getDate() + " " + months[dt.getMonth()] + " " + dt.getFullYear();</return>
+</function>}
+
+<!--function time_text(dt) {-->
+<!--   var diff, curday, curtime, ho;-->
+<!--   curtime = dt.getTime();-->
+<!--   diff = (date_now.getTime() - curtime) / 1000;-->
+<!--   if (diff < 60) {-->
+<!--        return "сейчас";-->
+<!--   }-->
+<!--   if (diff < 3600) {-->
+<!--        min = Math.floor(diff / 60);-->
+<!--        return min + cardinal(min, " минуту", " минуты", " минут") + " назад";-->
+<!--   }-->
+<!--   curday = Math.floor(date_now.getTime() / 86400) * 86400;-->
+<!--   if (curday < curtime) {-->
+<!--        ho = Math.floor(diff / 3600);-->
+<!--        if (ho <= 6) {-->
+<!--            return ho + cardinal(ho, " час", " часа", " часов") + " назад";-->
+<!--        } else {-->
+<!--            return "сегодня";-->
+<!--        }-->
+<!--   }-->
+<!--   if ((curday - 86400) < curtime) {-->
+<!--        return "вчера";-->
+<!--   }-->
+<!--   if (dt.getFullYear() == date_now.getFullYear()) {-->
+<!--        return dt.getDate() + " " + months[dt.getMonth()];-->
+<!--   }-->
+<!--   return dt.getDate() + " " + months[dt.getMonth()] + " " + dt.getFullYear();-->
+<!--}-->

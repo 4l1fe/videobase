@@ -1,0 +1,64 @@
+// Created by Mimoid on 28.03.2014.
+- var title = "Всё видео - Фильмы"
+- var filter_genres = {0: "все жанры", 1: "Аниме", 2: "Боевик", 3: "Комедия", 4: "Семейный"}
+- var filter_year_old = {0: "все фильмы", 1: "этого года", 3: "самые свежие", 8: "свежие", 15: "новые", 20: "не старые"}
+- var filter_price = {0: "бесплатно", 50: "до 50 рублей", 100: "до 100 рублей", 200: "до 200 рублей", 9999: "любая стоимость"}
+- var filter_rating = {0: "любой рейтинг", 5: "включая плохие", 6: "неплохие", 6.5: "хорошие", 7: "отличные", 8: "самые лучшие"}
+- var filter_sort = {"rating": "рейтингу", "subscribes": "подпискам"}
+html.index-page
+    include jade/head
+    body
+        include jade/header
+        .new-wrapper
+            .container
+                h2 Новинки
+                #new_place
+                    each item in films_new
+                        mixin film_thumb(item)
+        .recommends-wrapper
+            .container
+                h2 Рекомендации
+                a(name="filter")
+                .filter-place
+                    form.form-inline.frm-filter#frm_filter
+                        .col-md-7
+                            .form-group
+                                label(for="sel_genre").hidden жанры
+                                select.form-control#sel_genre
+                                    each item, i in filter_genres
+                                        option(value=i)= item
+                            .form-group
+                                label(for="sel_year_old").hidden новизна
+                                select.form-control#sel_year_old
+                                    each item, i in filter_year_old
+                                        option(value=i)= item
+                            .form-group
+                                label(for="sel_raiting").hidden рейтинг
+                                select.form-control#sel_rating
+                                    each item, i in filter_rating
+                                        option(value=i)= item
+                            .form-group
+                                label(for="sel_price").hidden стоимость
+                                select.form-control#sel_price
+                                    each item, i in filter_price
+                                        option(value=i)= item
+                        .col-md-5.sort-place
+                                .form-group
+                                    label(for="sel_sort") сортировать по
+                                    select.form-control#sel_sort
+                                        each item, i in filter_sort
+                                            option(value=i)= item
+
+                .clearfix
+                .films-place#films_place
+                    each item in films
+                        mixin film_thumb(item)
+                .clearfix
+                .load-more-place#load_more_place
+                    button#btn_loadmore мало, хочу ещё фильмы
+        .comments-wrapper
+            .container
+                h2 Резенции
+        include jade/footer
+        script.
+            $(document).ready(function () {window.InitApp({}, "Main")})
