@@ -10,3 +10,4 @@ from users_socials import UsersSocials
 from api_session import  UsersApiSessions
 
 from apps.users.signals import *
+from api_session import  SessionToken

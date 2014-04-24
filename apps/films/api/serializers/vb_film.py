@@ -6,9 +6,9 @@ from django.core.paginator import Page
 from rest_framework import serializers
 
 from apps.films.models import *
+from apps.contents.models import *
 from apps.films.constants import APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER,\
                                  APP_PERSON_DIRECTOR, APP_PERSON_SCRIPTWRITER
-from apps.contents.models import *
 
 from utils.common import group_by
 from utils.middlewares.local_thread import get_current_request
@@ -160,19 +160,16 @@ class vbFilm(serializers.ModelSerializer):
 
 
     def poster_list(self, obj):
-        result = self.poster_rebuild.get(obj.pk, '')
+        result = self.poster_rebuild.get(obj.pk, [])
         if len(result):
-            for item in result:
-                if not item.photo is None and item.photo:
-                    result = item.photo.url
-                    break;
+            return [item.url for item in result if not item.url is None and len(item.url)]
 
         return result
 
 
     def _rebuild_poster_list(self):
         extras = FilmExtras.objects.filter(film__in=self.list_obj_pk, type=APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER)
-        extras = group_by(extras, 'film_id', True)
+        extras = group_by(extras, 'id', True)
 
         self.poster_rebuild = extras
 
