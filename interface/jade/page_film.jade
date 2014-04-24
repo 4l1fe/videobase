@@ -1,9 +1,9 @@
-//- header_title= film.name
-//- film_country = film.countries && film.countries.length ?film.countries.join(", "):false
+- header_title= film.name
+- film_country = film.countries && film.countries.length ?film.countries.join(", "):false
 html
-    include jade/head
+    include head
     body.film-page
-        include jade/header
+        include header
         .container.pleer-wrapper
             h1=film.name
             .col-md-9.pleer-place#pleer_place
@@ -87,6 +87,6 @@ html
                 h3 Похожие фильмы
                 each item in film.similar
                     mixin film_thumb(item)
-        include jade/footer
+        include footer
         script.
             $(document).ready(function () {window.InitApp({page_conf: !{JSON.stringify(film)}}, "Film")})
