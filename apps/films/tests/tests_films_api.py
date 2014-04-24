@@ -76,12 +76,7 @@ class FilmsTest(APITestCase):
             self.assertEqual(response_locations[i]['url_view'], locations[i].url_view)
 
     def not_extend_assert(self, response_data, film, extras):
-        if len(response_data['poster']) != len(extras):
-            self.assertTrue(False)
-
-        for i in range(len(response_data['poster'])):
-            self.assertEqual(response_data['poster'][i], extras[i].photo.url)
-
+        self.assertEqual(response_data['poster'], extras.photo.url)
         self.assertEqual(response_data['id'], film.id)
         self.assertEqual(response_data['name'], film.name)
         self.assertEqual(response_data['name_orig'], film.name_orig)
@@ -129,14 +124,15 @@ class FilmsTest(APITestCase):
     def test_api_detail_data_get(self):
         film = self.films[0]
         locations = []
-        extras = []
+        extras = None
         for loc in self.locations:
             if film.id == loc.content.film.id:
                 locations.append(loc)
 
         for ext in self.extras:
-            if film.id == ext.film.id:
-                extras.append(ext)
+            if film.id == ext.film.id and len(ext.photo.url) is not 0:
+                extras = ext
+                break
 
         response = self.client.get(reverse('film_details_view', kwargs={'film_id': film.id, 'format': 'json'}))
         self.locations_assert(response.data['locations'], locations)
@@ -150,14 +146,20 @@ class FilmsTest(APITestCase):
     def test_api_detail_all_data_post(self):
         film = self.films[0]
         locations = []
-        extras = []
+        extras = None
+        directors = []
+        for persf in self.pfilms:
+            if persf.film_id == film.id and persf.p_type == APP_PERSON_DIRECTOR:
+                directors.append(persf.person)
+
         for loc in self.locations:
             if film.id == loc.content.film.id:
                 locations.append(loc)
 
         for ext in self.extras:
-            if film.id == ext.film.id:
-                extras.append(ext)
+            if film.id == ext.film.id and len(ext.photo.url) is not 0:
+                extras = ext
+                break
 
         response = self.client.post(reverse('film_details_view', kwargs={'film_id': film.id, 'format': 'json'}), data={'extend': True, 'persons': True})
         if len(response.data['countries']) != len(film.countries.all().values('id', 'name')):
@@ -166,13 +168,16 @@ class FilmsTest(APITestCase):
             self.assertTrue(False)
         if len(response.data['persons']) != len(film.persons.all().values('id', 'name', 'photo')):
             self.assertTrue(False)
+        if len(response.data['directors']) != len(directors):
+            self.assertTrue(False)
         for i in range(len(response.data['countries'])):
             self.assertEqual(response.data['countries'][i], film.countries.all().values('id', 'name')[i])
         for i in range(len(response.data['genres'])):
             self.assertEqual(response.data['genres'][i], film.genres.all().values('id', 'name')[i])
         for i in range(len(response.data['persons'])):
             self.assertEqual(response.data['persons'][i], film.persons.all().values('id', 'name', 'photo')[i])
-
+        for i in range(len(response.data['directors'])):
+            self.assertEqual(response.data['directors'][i], directors[i])
         self.locations_assert(response.data['locations'], locations)
         self.not_extend_assert(response.data, film, extras)
         self.assertEqual(response.data['description'], film.description)
@@ -180,19 +185,27 @@ class FilmsTest(APITestCase):
     def test_api_detail_extend_data_post(self):
         film = self.films[0]
         locations = []
+        directors = []
+        for persf in self.pfilms:
+            if persf.film_id == film.id and persf.p_type == APP_PERSON_DIRECTOR:
+                directors.append(persf.person)
+
         for loc in self.locations:
             if film.id == loc.content.film.id:
                 locations.append(loc)
 
-        extras = []
+        extras = None
         for ext in self.extras:
-            if film.id == ext.film.id:
-                extras.append(ext)
+            if film.id == ext.film.id and len(ext.photo.url) is not 0:
+                extras = ext
+                break
 
         response = self.client.post(
             reverse('film_details_view', kwargs={'film_id': film.id, 'format': 'json'}),
             data={'extend': True, 'persons': False}
         )
+        if len(response.data['directors']) != len(directors):
+            self.assertTrue(False)
         if len(response.data['countries']) != len(film.countries.all().values('id', 'name')):
             self.assertTrue(False)
 
@@ -204,6 +217,9 @@ class FilmsTest(APITestCase):
 
         for i in range(len(response.data['genres'])):
             self.assertEqual(response.data['genres'][i], film.genres.all().values('id', 'name')[i])
+
+        for i in range(len(response.data['directors'])):
+            self.assertEqual(response.data['directors'][i], directors[i])
 
         self.locations_assert(response.data['locations'], locations)
         self.not_extend_assert(response.data, film, extras)
@@ -216,10 +232,11 @@ class FilmsTest(APITestCase):
             if film.id == loc.content.film.id:
                 locations.append(loc)
 
-        extras = []
+        extras = None
         for ext in self.extras:
-            if film.id == ext.film.id:
-                extras.append(ext)
+            if film.id == ext.film.id and len(ext.photo.url) is not 0:
+                extras = ext
+                break
 
         response = self.client.post(
             reverse('film_details_view', kwargs={'film_id': film.id, 'format': 'json'}),
@@ -235,10 +252,11 @@ class FilmsTest(APITestCase):
             if film.id == loc.content.film.id:
                 locations.append(loc)
 
-        extras = []
+        extras = None
         for ext in self.extras:
-            if film.id == ext.film.id:
-                extras.append(ext)
+            if film.id == ext.film.id and len(ext.photo.url) is not 0:
+                extras = ext
+                break
 
         response = self.client.post(reverse('film_details_view', kwargs={'film_id': film.id, 'format': 'json'}), data={})
         self.locations_assert(response.data['locations'], locations)
@@ -251,12 +269,6 @@ class FilmsTest(APITestCase):
     def test_api_detail_404_get(self):
         response = self.client.get(reverse('film_details_view', kwargs={'film_id': 0, 'format': 'json'}))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
-    def test_api_search(self):
-        film = self.films[0]
-        data = {'text': film.name}
-        response = self.client.get(reverse('film_search_view', kwargs={'format': 'json'}), data=data)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_api_action_comments_add_ok(self):
         film = self.films[0]
@@ -503,13 +515,14 @@ class FilmsTest(APITestCase):
         film = self.films[0]
         sim_film = self.films[1]
         locations = []
-        extras = []
+        extras = None
         for loc in self.locations:
             if sim_film.id == loc.content.film.id:
                 locations.append(loc)
         for ext in self.extras:
-            if sim_film.id == ext.film.id:
-                extras.append(ext)
+            if sim_film.id == ext.film.id and len(ext.photo.url) is not 0:
+                extras = ext
+                break
         response = self.client.get(reverse('film_similar_view', kwargs={'film_id': film.id, 'format': 'json'}))
         if len(response.data) != 1:
             self.assertTrue(False)
@@ -630,4 +643,96 @@ class FilmsTest(APITestCase):
     def test_api_persons_default_param(self):
         film = self.films[0]
         response = self.client.get(reverse('film_persons_view', kwargs={'film_id': film.id, 'format': 'json'}))
-        self.assertTrue(True)
+        persons = []
+        for persf in self.pfilms:
+            if film.id == persf.film_id:
+                persons.append(persf.person)
+        if len(persons) != len(response.data):
+            self.assertTrue(False)
+        for i in range(len(response.data)):
+            self.assertEqual(response.data[i]['id'], persons[i].id)
+            self.assertEqual(response.data[i]['name'], persons[i].name)
+            self.assertEqual(response.data[i]['photo'], persons[i].photo)
+
+    def test_api_persons_with_user_param(self):
+        film = self.films[0]
+        data = {'type': APP_PERSON_ACTOR, 'top': 1, 'limit': 2}
+        persons = []
+        for persf in self.pfilms:
+            if film.id == persf.film_id and persf.p_type == data['type']:
+                persons.append(persf.person)
+        response = self.client.get(reverse('film_persons_view', kwargs={'film_id': film.id, 'format': 'json'}), data=data)
+        for i in range(len(response.data)):
+            self.assertEqual(response.data[i]['id'], persons[data['top'] + i].id)
+            self.assertEqual(response.data[i]['name'], persons[data['top'] + i].name)
+            self.assertEqual(response.data[i]['photo'], persons[data['top'] + i].photo)
+
+    def test_api_search_ok(self):
+        data = {}
+        response = self.client.get(reverse('film_search_view', kwargs={'format': 'json'}), data=data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_api_search_bad(self):
+        data = {'video': 1, 'text': 2, 'page': 'hello'}
+        response = self.client.get(reverse('film_search_view', kwargs={'format': 'json'}), data=data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_api_search_text(self):
+        film = self.films[0]
+        locations = []
+        for loc in self.locations:
+            if film.id == loc.content.film.id:
+                locations.append(loc)
+
+        extras = None
+        for ext in self.extras:
+            if film.id == ext.film.id and len(ext.photo.url) is not 0:
+                extras = ext
+                break
+
+        data = {'text': film.name}
+        response = self.client.get(reverse('film_search_view', kwargs={'format': 'json'}), data=data)
+        self.assertEqual(response.data['total_cnt'], 1)
+        self.assertEqual(response.data['page'], 1)
+        self.assertEqual(response.data['per_page'], 24)
+        self.locations_assert(response.data['items'][0]['locations'], locations)
+        self.not_extend_assert(response.data['items'][0], film, extras)
+
+    def test_api_search_by_genre_and_others(self):
+        film1 = self.films[0]
+        film2 = self.films[1]
+        locations1 = []
+        locations2 = []
+        for loc in self.locations:
+            if film1.id == loc.content.film.id:
+                locations1.append(loc)
+            elif film2.id == loc.content.film.id:
+                locations2.append(loc)
+
+        extras1 = None
+        extras2 = None
+        for ext in self.extras:
+            if film1.id == ext.film.id and len(ext.photo.url) is not 0:
+                extras1 = ext
+                break
+        for ext in self.extras:
+            if film2.id == ext.film.id and len(ext.photo.url) is not 0:
+                extras2 = ext
+                break
+
+        data = {'genre': self.genres[4].id, 'year_old': 0, 'price': 100, 'instock': True, 'per_page': 2}
+        response = self.client.get(reverse('film_search_view', kwargs={'format': 'json'}), data=data)
+        self.assertEqual(response.data['total_cnt'], 2)
+        self.assertEqual(response.data['page'], 1)
+        self.assertEqual(response.data['per_page'], 2)
+        self.locations_assert(response.data['items'][0]['locations'], locations1)
+        self.not_extend_assert(response.data['items'][0], film1, extras1)
+        self.locations_assert(response.data['items'][1]['locations'], locations2)
+        self.not_extend_assert(response.data['items'][1], film2, extras2)
+        data = {'genre': self.genres[4].id, 'year_old': 0, 'price': 100, 'instock': True, 'per_page': 1, 'page': 2}
+        response = self.client.get(reverse('film_search_view', kwargs={'format': 'json'}), data=data)
+        self.assertEqual(response.data['total_cnt'], 2)
+        self.assertEqual(response.data['page'], 2)
+        self.assertEqual(response.data['per_page'], 1)
+        self.locations_assert(response.data['items'][0]['locations'], locations2)
+        self.not_extend_assert(response.data['items'][0], film2, extras2)
