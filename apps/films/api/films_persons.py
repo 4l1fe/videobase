@@ -24,7 +24,7 @@ class PersonsFilmView(APIView):
             'film': film_id,
         }
 
-        if not cleaned_data['type'] is None:
+        if not cleaned_data['type'] is None and cleaned_data['type']:
             filter.update({'p_type': cleaned_data['type']})
 
         result = PersonsFilms.objects.filter(**filter).\
