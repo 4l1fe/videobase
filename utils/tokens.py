@@ -1,3 +1,4 @@
+#coding: utf-8
 import sys
 import json
 
@@ -15,11 +16,12 @@ elif python_v == 3:
 HOST = 'http://vsevi.com'
 
 
-def get_main_token(host=HOST, username='admin', password='admin'):
+def get_main_token(username='admin', password='admin', host=HOST):
     data = urlencode(dict(username=username, password=password))
     if python_v == 3:
         data = data.encode()
-    resp = urlopen(urljoin(host, 'api/v1/auth/login.json'), data=data)
+    req = Request(urljoin(host, 'api/v1/auth/login.json'), data)
+    resp = urlopen(req)
     resp_data = resp.read()
     if python_v == 3:
         resp_data = resp_data.decode()
@@ -38,8 +40,40 @@ def get_session_token(main_token, host=HOST):
     return json_resp['session_token']
 
 
+def get_films_persons(sessiom_token, id, host=HOST):
+    req = Request(urljoin(host, 'api/v1/films/{}/persons.json'.format(id)))
+    req.add_header('Authorization', 'X-VB-Token ' + sessiom_token)
+    resp = urlopen(req)
+    resp_data = resp.read()
+    if python_v == 3:
+        resp_data = resp_data.decode()
+    json_resp = json.loads(resp_data)
+    return json_resp
+
+
+def get_users_persons(session_token, id, host=HOST):
+    url = urljoin(host, 'api/v1/users/{}/persons.json'.format(id))
+    data = urlencode(dict())  # Для изменения на тип запроса - POST
+    req = Request(url, data)
+    req.add_header('Authorization', 'X-VB-Token ' + session_token)
+    resp = urlopen(req)
+    resp_data = resp.read()
+    if python_v == 3:
+        resp_data = resp_data.decode()
+    json_resp = json.loads(resp_data)
+    return json_resp
+
+
+def run_test_requests(st, fid, uid):
+    resp = get_films_persons(st, 833)
+    print(resp)
+    resp = get_users_persons(st, 1)
+    print(resp)
+
+
 if __name__ == '__main__':
     mt = get_main_token()
     print(mt)
     st = get_session_token(mt)
     print(st)
+    # run_test_requests(st, 833, 1)
