@@ -9,14 +9,14 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
         # Adding field 'Persons.city_id'
-        db.add_column('persons', 'city_id',
+        db.add_column('persons', 'city',
                       self.gf('django.db.models.fields.related.ForeignKey')(default=1, related_name='persons', to=orm['films.Cities']),
                       keep_default=False)
 
 
     def backwards(self, orm):
         # Deleting field 'Persons.city_id'
-        db.delete_column('persons', 'city_id_id')
+        db.delete_column('persons', 'city_id')
 
 
     models = {
