@@ -1,0 +1,37 @@
+- header_title = person.name
+html
+    include head
+- person_roles = person.roles && person.roles.length?person.roles.join(", "):false
+- person_birthplace = person.birthplace && person.birthplace.length?person.birthplace.join(", "):false
+- person_birthdate = new Date(person.birthdate)
+- person_years_old = how_long(person_birthdate, 0)
+- person_birthdate_string = date_text(person_birthdate) + " г. (" + person_years_old + ")"
+    body
+        include header
+        .container
+            h1=person.name
+            .col-md-3.text-center
+                img.person-photo.img-responsive(src=person.photo || conf.noperson_big_url)
+                button.btn.btn-default#subscribe_btn Подписаться
+            .col-md-9
+                table.table.table-bordered
+                    - if (person_roles)
+                        tr
+                            td=person_roles
+                    - if (person_birthplace)
+                        tr
+                            td=person_birthplace
+                    tr
+                        td=person_birthdate_string
+                h3 Биография
+                =person.bio
+        .container
+            h3 Фильмография
+            #films
+                each item in filmography
+                    mixin film_thumb(item)
+        .container.text-center#load-more-place
+            button.btn.btn-default#btn_loadmore Загрузить ещё
+        include footer
+        script.
+            $(document).ready(function () {window.InitApp({page_conf: !{JSON.stringify(person)}}, "Person")})
