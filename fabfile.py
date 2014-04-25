@@ -1,14 +1,15 @@
 # coding: utf-8
-from fabric.api import env,roles, run, settings, sudo, cd,local
+from fabric.api import env, roles, run, settings, sudo, cd, local
 import fabric
 from fabtools import require
 import fabtools
-import  os
-from string import  Template
+import os
+from string import Template
 
 env.hosts = ['188.226.191.166',]
 env.user = 'root'
-env.shell= "/bin/bash -c"
+env.shell = "/bin/bash -c"
+
 
 
 def setup():
@@ -67,6 +68,7 @@ def local_db_reset():
     local("""cd sql_dump && sudo -u postgres psql -d videobase -f $(ls -1 *.sql | head -1)""")
     local('''echo "DROP DATABASE test_videobase;" | sudo -u postgres psql ''')
     local('''echo "CREATE USER pgadmin WITH PASSWORD 'qwerty'; CREATE DATABASE test_videobase; GRANT ALL PRIVILEGES ON DATABASE videobase to pgadmin;" |  sudo -u postgres psql''')
+
 
 
 def setup_system_libraries():
@@ -242,6 +244,7 @@ def show_scheme():
     scheme()
     local('feh current.png')
 
+
 def generate_robots_conf(python_interpreter = None, videobase_dir = None, user= None):
 
 
@@ -277,6 +280,7 @@ stdout_logfile=/var/log/$name.log""")
         }) for robot_name in robots_list)
 
     return config
+
 
 def set_local_robot_config():
     with open('configs/robots.conf','w') as fw:
