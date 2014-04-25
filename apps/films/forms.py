@@ -4,6 +4,7 @@ from django.forms import ModelForm, Form
 from django.core.exceptions import ValidationError
 from django.forms import fields
 
+from apps.films.constants import APP_FILM_PERSON_TYPES
 from apps.films.models import Persons, Seasons, Films, FilmExtras
 from apps.films.constants import APP_FILM_ADMIN_CSS, APP_FILM_ADMIN_JS_LIBS, APP_FILM_SERIAL
 
@@ -105,7 +106,7 @@ class RatingForm(Form):
 #############################################################################################################
 class CommentForm(Form):
     """
-    Форма рейтинга для фильмов
+    Форма для комментария к фильму
     """
 
     text = fields.CharField(max_length=255, help_text=u'Комментарий')
@@ -119,3 +120,23 @@ class DetailForm(Form):
 
     extend  = fields.BooleanField(initial=False, required=False, help_text=u'Расширенный')
     persons = fields.BooleanField(initial=False, required=False, help_text=u'Персоны')
+
+
+#############################################################################################################
+class PersonApiForm(Form):
+    """
+    Форма для проверки vbPerson
+    """
+
+    type  = fields.ChoiceField(required=False, choices=APP_FILM_PERSON_TYPES, help_text=u'Тип')
+    top   = fields.IntegerField(initial=0, min_value=0, help_text=u'Сортировать с')
+    limit = fields.IntegerField(initial=12, min_value=1, max_value=20, help_text=u'Ограничение')
+
+    def __init__(self, *args, **kwargs):
+        if not kwargs['data'].get('top'):
+           kwargs['data']['top'] = 0
+
+        if not kwargs['data'].get('limit'):
+           kwargs['data']['limit'] = 12
+
+        super(PersonApiForm, self).__init__(*args, **kwargs)

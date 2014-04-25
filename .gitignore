@@ -1,5 +1,5 @@
-configs/db.ini
-configs/uwsgi.ini
+# Ini
+*.ini
 
 *.py[cod]
 

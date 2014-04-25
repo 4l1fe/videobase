@@ -52,7 +52,7 @@ class SearchFilmsView(APIView):
         o_search = Films.objects.all()
 
         # Поиск по имени
-        if filter.get('name'):
+        if filter.get('text'):
             o_search = o_search.filter(Q(name__icontains=filter['text']) | Q(name_orig__icontains=filter['text']))
 
         # Поиск по количеству прошедших лет
@@ -146,7 +146,11 @@ class SearchFilmsView(APIView):
                     'items': serializer.data,
                 }
 
-                cache.set(cache_key, result, 300)
+                if not settings.DEBUG:
+                    try:
+                        cache.set(cache_key, result, 300)
+                    except:
+                        pass
 
             return Response(result, status=status.HTTP_200_OK)
 

@@ -25,7 +25,7 @@ DEBUG = True
 
 TEMPLATE_DEBUG = DEBUG
 
-ALLOWED_HOSTS = ['*','vsevi.com']
+ALLOWED_HOSTS = ['*', ]
 
 ACCOUNT_ACTIVATION_DAYS = 2
 
@@ -51,10 +51,10 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_extensions',
-    'memcache_status',
     'south',
     'rest_framework',
     'rest_framework.authtoken',
+    'social_auth',
     'csvimport',
     'apps.users',
     'apps.films',
@@ -63,7 +63,6 @@ INSTALLED_APPS = (
     'crawler',
     'social_auth',
     'djcelery',
-
 )
 
 MIDDLEWARE_CLASSES = (
@@ -88,9 +87,9 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.media',
     'django.contrib.messages.context_processors.messages',
     'django.core.context_processors.request',
+    # Social
+    'social_auth.context_processors.social_auth_by_type_backends',
 )
-
-
 
 TEMPLATE_DIRS = (
     os.path.join(BASE_DIR, 'templates/'),
@@ -173,6 +172,31 @@ REST_FRAMEWORK = {
     )
 }
 
+LOGIN_REDIRECT_URL = '/'
+
+# Ключи для OAuth2 авторизации
+# Vkontakte
+VK_APP_ID            = '4296663'
+VKONTAKTE_APP_ID     = VK_APP_ID
+VK_API_SECRET        = 'JAEQddzkBCm554iGXe6S'
+VKONTAKTE_APP_SECRET = VK_API_SECRET
+VK_EXTRA_SCOPE = ['notify', 'friends', 'status', 'groups', 'notifications']
+# Facebook
+FACEBOOK_APP_ID     = '212532105624824'
+FACEBOOK_API_SECRET = 'a99fcef38b7054279d73beb4ebb7b6cc'
+# Twitter
+TWITTER_CONSUMER_KEY    = 'HACuJARrAXJyeHdeD5viHULZR'
+TWITTER_CONSUMER_SECRET = 'Ge0k2rKltyPq3ida76IjTbhesZVdIrvckcNPXzJaBU2ouzixut'
+# Google+
+GOOGLE_OAUTH2_CLIENT_ID     = 'AIzaSyD9C36HCncY0tVWQekEmz5KEarnCzOCCb0'
+GOOGLE_OAUTH2_CLIENT_SECRET = ''
+# Mail.ru
+MAILRU_OAUTH2_APP_KEY = '719516'
+MAILRU_OAUTH2_CLIENT_KEY = '4daa3ed8bef5be08ebd7e25ff5ae806a'
+MAILRU_OAUTH2_CLIENT_SECRET = '8cc7bb50e5b93663774e6584a1251d79'
+
+SOCIAL_AUTH_CREATE_USERS = True
+
 # Backends for social auth
 AUTHENTICATION_BACKENDS = (
     'social_auth.backends.twitter.TwitterBackend',
@@ -208,22 +232,21 @@ SOCIAL_AUTH_PIPELINE = (
 # In minutes
 API_SESSION_EXPIRATION_TIME = 15
 
-RAVEN_CONFIG = {
-    'dsn': 'http://8684bf8b497047d9ac170fd16aefc873:41e89f4666b24f998125370f3d1a1789@sentry.aaysm.com/2'
-}
+if not DEBUG:
+    INSTALLED_APPS += (
+         'raven.contrib.django.raven_compat',  # may be delete later
+    )
 
-# Add raven to the list of installed apps
-INSTALLED_APPS = INSTALLED_APPS + (
-    # ...
-    'raven.contrib.django.raven_compat',
-)
+    RAVEN_CONFIG = {
+        'dsn': 'http://8684bf8b497047d9ac170fd16aefc873:41e89f4666b24f998125370f3d1a1789@sentry.aaysm.com/2'
+    }
 
 from datetime import timedelta
 
 CELERYBEAT_SCHEDULE = {
     'robot-launch': {
         'task': 'robot_launch',
-        'schedule': timedelta(seconds=10),
+        'schedule': timedelta(minutes=5),
     },
 }
 

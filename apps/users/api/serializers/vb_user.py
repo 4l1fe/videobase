@@ -1,19 +1,24 @@
 # coding: utf-8
+
 from rest_framework import serializers
 
 from apps.films.api.serializers import vbUserGenre
 from apps.films.models import Genres
+
 from apps.users.models import User, UsersPics, UsersRels
 from apps.users.constants import APP_USER_REL_TYPE_NONE, APP_USER_REL_TYPE_FRIENDS
 
 
-class vbUser(serializers.HyperlinkedModelSerializer):
+class vbUser(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField('get_name')
     avatar = serializers.SerializerMethodField('path_to_avatar')
+
     # extend
     regdate = serializers.SerializerMethodField('get_regdate')
     friends_cnt = serializers.SerializerMethodField('get_friends_cnt')
     films_watched = serializers.SerializerMethodField('get_films_watched_cnt')
     comments_cnt = serializers.SerializerMethodField('get_comments_cnt')
+
     # genre_fav
     relation = serializers.SerializerMethodField('get_relation')
 
@@ -45,6 +50,9 @@ class vbUser(serializers.HyperlinkedModelSerializer):
             # Drop keys if they exist
             for field_name in del_fields:
                 self.fields.pop(field_name, None)
+
+    def get_name(self, obj):
+        return obj.profile.nickname
 
     def path_to_avatar(self, obj):
         userpic = obj.profile.userpic_id
@@ -86,6 +94,6 @@ class vbUser(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'avatar', 'regdate',
+        fields = ('id', 'name', 'avatar', 'regdate',
                   'friends_cnt', 'films_watched', 'comments_cnt',
                   'relation', 'genres', 'friends')

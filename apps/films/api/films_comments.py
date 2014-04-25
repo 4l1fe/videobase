@@ -6,7 +6,6 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-from apps.films.models import Films
 from apps.contents.models import Comments, Contents
 from apps.films.api.serializers import vbComment
 
@@ -24,7 +23,7 @@ class CommentsFilmView(APIView):
 
         try:
             result = Contents.objects.get(film=film_id)
-        except Films.DoesNotExist:
+        except Contents.DoesNotExist:
             result = Response(status=status.HTTP_404_NOT_FOUND)
 
         return result
