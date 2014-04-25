@@ -9,6 +9,9 @@ renderers =  {
     index: function(context){return jade.renderFile('interface/jade/page_index.jade',context)},
     film: function(context){return jade.renderFile('interface/jade/page_film.jade',context)},
     person: function(context){return jade.renderFile('interface/jade/page_person.jade',context)},
+    register: function(context){return jade.renderFile('interface/jade/page_register.jade',context)},
+    user: function(context){return jade.renderFile('interface/jade/page_user.jade',context)}
+
     //film: jade.compile('include page_film',{filename:'interface/jade/film_test.jade'}),
     //person: jade.compile('include person',{filename:'interface/person_test.jade'})
 }

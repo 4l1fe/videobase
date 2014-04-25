@@ -4,6 +4,7 @@ from django.forms import ModelForm, Form
 from django.core.exceptions import ValidationError
 from django.forms import fields
 
+from apps.films.constants import APP_FILM_PERSON_TYPES
 from apps.films.models import Persons, Seasons, Films, FilmExtras
 from apps.films.constants import APP_FILM_ADMIN_CSS, APP_FILM_ADMIN_JS_LIBS, APP_FILM_SERIAL
 
@@ -122,20 +123,20 @@ class DetailForm(Form):
 
 
 #############################################################################################################
-class PersonForm(Form):
+class PersonApiForm(Form):
     """
-    Форма детализация для vbFilm
+    Форма для проверки vbPerson
     """
 
-    type  = fields.IntegerField(required=False, help_text=u'Тип')
+    type  = fields.ChoiceField(required=False, choices=APP_FILM_PERSON_TYPES, help_text=u'Тип')
     top   = fields.IntegerField(initial=0, min_value=0, help_text=u'Сортировать с')
-    limit = fields.IntegerField(initial=12, min_value=1, help_text=u'Ограничение')
+    limit = fields.IntegerField(initial=12, min_value=1, max_value=20, help_text=u'Ограничение')
 
     def __init__(self, *args, **kwargs):
         if not kwargs['data'].get('top'):
            kwargs['data']['top'] = 0
 
         if not kwargs['data'].get('limit'):
-           kwargs['data']['limit'] = 10
+           kwargs['data']['limit'] = 12
 
-        super(PersonForm, self).__init__(*args, **kwargs)
+        super(PersonApiForm, self).__init__(*args, **kwargs)

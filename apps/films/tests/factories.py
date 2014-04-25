@@ -1,13 +1,12 @@
 #coding: utf-8
-from apps.contents.models import Contents
 
-from apps.films.models import Persons, PersonsFilms, Films, UsersPersons, PersonsExtras
 from django.contrib.auth.models import User
+
+from apps.contents.models import Contents
+from apps.films.models import Persons, PersonsFilms, Films, UsersPersons, PersonsExtras
+
 import datetime
 import factory
-
-
-
 
 
 class PersonFactory(factory.DjangoModelFactory):
