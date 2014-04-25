@@ -9,6 +9,6 @@ class Command(NoArgsCommand):
     def handle_noargs(self, **options):
 
         [robot_try.delete() for robot_try in RobotsTries.objects.all()]
-        for site in ['ivi_ru',]:# sites_crawler: #['now_ru']:
+        for site in ['amediateka_ru',]:# sites_crawler: #['now_ru']:
 
             handle( site, film_id = 65)
