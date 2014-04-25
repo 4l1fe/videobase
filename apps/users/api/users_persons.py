@@ -10,6 +10,7 @@ from rest_framework.response import Response
 from apps.users.models import User
 from apps.films.models import Persons
 from apps.films.api.serializers import vbPerson
+from apps.users.constants import APP_USERS_API_DEFAULT_PAGE, APP_USERS_API_DEFAULT_PER_PAGE
 
 
 class UsersPersonsView(APIView):
@@ -19,13 +20,11 @@ class UsersPersonsView(APIView):
     def post(self, request, user_id, format=None, *args, **kwargs):
         try:
             user = User.objects.get(pk=user_id)
-        except User.DoesNotExist as e:
-            return Response({'e': e.message}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({'e': e.message}, status=status.HTTP_400_BAD_REQUEST)
 
-        page = request.DATA.get('page', 1)
-        per_page = request.DATA.get('per_page', 10)
+        page = request.DATA.get('page', APP_USERS_API_DEFAULT_PAGE)
+        per_page = request.DATA.get('per_page', APP_USERS_API_DEFAULT_PER_PAGE)
         type = request.DATA.get('type', 'all')
 
         persons = Persons.objects.filter(users_persons__user=user)
