@@ -1,14 +1,14 @@
 # coding: utf-8
-from fabric.api import env,roles, run, settings, sudo, cd,local
+from fabric.api import env, roles, run, settings, sudo, cd, local
 import fabric
 from fabtools import require
 import fabtools
-import  os
-from string import  Template
+import os
+from string import Template
 
 env.hosts = ['188.226.191.166',]
 env.user = 'root'
-env.shell= "/bin/bash -c"
+env.shell = "/bin/bash -c"
 
 
 def setup():
@@ -46,18 +46,16 @@ def init_test_db():
 
     """
     with settings(sudo_user = "postgres"):
-        sudo('''echo "CREATE DATABASE test_base; GRANT ALL PRIVILEGES ON DATABASE test_base to pgadmin;" | psql''')
+        sudo('''echo "CREATE USER pgadmin WITH PASSWORD 'qwerty'; CREATE DATABASE videobase_test; GRANT ALL PRIVILEGES ON DATABASE videobase_test to pgadmin;" | psql''')
 
 
 def populate_test_db():
     """
     Заполняет тестовую базу данных из sql_dump который идет с кодом
     """
-    with cd('/var/www/test_base/sql_dump'):
+    with cd('/var/www/videobase_test/sql_dump'):
         with settings(sudo_user = "postgres"):
-            sudo('''psql -d test_base -f $(ls -1 *.sql | head -1)''')
-
-
+            sudo('''psql -d videobase_test -f $(ls -1 *.sql | head -1)''')
 def local_db_reset():
     '''
     Перезаписать локальную базу из репозитория
@@ -134,14 +132,14 @@ def delete_test_db():
 
     with cd('/var/lib/postgresql'):
         with settings(sudo_user = "postgres"):
-            sudo('''echo "DROP DATABASE test_base;" | psql''')
+            sudo('''echo "DROP DATABASE videobase_test;" | psql''')
 
 
 def refresh_test_requirements():
 
     with settings(sudo_user = "www-data"):
-        with cd('/var/www/test_base/'):
-            sudo('/home/virtualenv/test_base/bin/pip install -r requirements.txt')
+        with cd('/var/www/videobase_test/'):
+            sudo('/home/virtualenv/videobase_test/bin/pip install -r requirements.txt')
 
 
 def status():
@@ -173,8 +171,8 @@ def db_migrate_test(appname=''):
     '''
 
     with settings(sudo_user = "www-data"):
-        with cd('/var/www/test_base/'):
-            sudo('/home/virtualenv/test_base/bin/python manage.py migrate %s --no-initial-data' % appname)
+        with cd('/var/www/videobase_test/'):
+            sudo('/home/virtualenv/videobase_test/bin/python manage.py migrate %s --no-initial-data' % appname)
 
 
 def collect_static():
@@ -182,8 +180,8 @@ def collect_static():
     build/update static files
     """
     with settings(sudo_user = "www-data"):
-        with cd('/var/www/test_base/'):
-            sudo('/home/virtualenv/test_base/bin/python manage.py collectstatic --dry-run --noinput')
+        with cd('/var/www/videobase_test/'):
+            sudo('/home/virtualenv/videobase_test/bin/python manage.py collectstatic --dry-run --noinput')
 
 
 def deploy():
@@ -238,9 +236,11 @@ def scheme():
     local('python ./manage.py graph_models -a -g -o current.png')
 
 
+
 def show_scheme():
     scheme()
     local('feh current.png')
+
 
 def generate_robots_conf(python_interpreter = None, videobase_dir = None, user= None):
 
@@ -277,6 +277,7 @@ stdout_logfile=/var/log/$name.log""")
         }) for robot_name in robots_list)
 
     return config
+
 
 def set_local_robot_config():
     with open('configs/robots.conf','w') as fw:

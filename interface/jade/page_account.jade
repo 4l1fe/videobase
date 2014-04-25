@@ -1,0 +1,86 @@
+- header_title = "Мой профиль"
+- private_set = {0: "видны всем", 1: "видны только друзьям", 9: "видны только мне"}
+html
+    include head
+    body
+        include header
+        .container
+            .col-md-3.text-center
+                img.person-photo.img-responsive(src=user.avatar || conf.noavatar_big_url)
+                button.btn.btn-default Изменить аватар
+            .col-md-9
+                form.form-horizontal(role="form",method="post",action="")
+                    h3 Профиль
+                    .form-group
+                        label.col-sm-2.text-left.control-label(for="inp_name") Имя
+                        .col-sm-8
+                            input.form-control#inp_name(type="text",name="name",placeholder="Имя",required,value=user.name)
+                    .form-group
+                        label.col-sm-2.text-left.control-label(for="inp_password") Email
+                        .col-sm-8
+                            input.form-control#inp_password(type="email",name="email",placeholder="Email",required,value=user.email)
+                    .form-group
+                        h3 Настройки уведомлений
+                        .checkbox
+                            label
+                                input(type="checkbox",name="notify[new_video]")
+                                | Появление нового видео в подписках
+                        .checkbox
+                            label
+                                input(type="checkbox",name="notify[person]")
+                                | Появление кино определённого режисёра / с определённым актёром
+                        .checkbox
+                            label
+                                input(type="checkbox",name="notify[friends_rate]")
+                                | Новые оценки ваших друзей
+                        .checkbox
+                            label
+                                input(type="checkbox",name="notify[friends_comments]")
+                                | Новые комментарии ваших друзей
+                        .checkbox
+                            label
+                                input(type="checkbox",name="notify[friends_subscribe]")
+                                | Новые подписки ваших друзей
+                    .form-group.col-sm-5
+                        select.form-control#sel_freq
+                            option(val=1) Присылать уведомления 1 раз в день
+                            option(val=7) Присылать уведомления 1 раз в неделю
+                            option(val=-1) Не присылать уведомления
+                    .clearfix
+                    .form-group
+                        h3 Настройки приватности
+                        label.control-label.col-sm-3(for="sel_subscribes") Мои подписки
+                        .col-sm-5
+                            select.form-control#sel_subscribes
+                                each item, i in private_set
+                                    option(value= i)= item
+                        .clearfix
+                        label.control-label.col-sm-3(for="sel_friends") Мои друзья
+                        .col-sm-5
+                            select.form-control#sel_friends
+                                each item, i in private_set
+                                    option(value= i)= item
+                        .clearfix
+                        label.control-label.col-sm-3(for="sel_genres") Мои любимые жанры
+                        .col-sm-5
+                            select.form-control#sel_genres
+                                each item, i in private_set
+                                    option(value= i)= item
+                        .clearfix
+                        label.control-label.col-sm-3(for="sel_actors") Мои любимые актёры
+                        .col-sm-5
+                            select.form-control#sel_actors
+                                each item, i in private_set
+                                    option(value= i)= item
+                        .clearfix
+                        label.control-label.col-sm-3(for="sel_directors") Мои любимые режисёры
+                        .col-sm-5
+                            select.form-control#sel_driectors
+                                each item, i in private_set
+                                    option(value= i)= item
+                    .form-group
+                        h3 Аккаунты в соц.сетях
+                    button.btn.btn-default(form="submit") Сохранить
+        include footer
+        //script.
+        //   $(document).ready(function () {window.InitApp({page_conf: {person_id: 1}}, "Person")})

@@ -44,9 +44,9 @@ class ActPlaylistFilmView(APIView):
             'status': APP_USERFILM_STATUS_SUBS,
         }
 
-        # Если сериал
+        # Если не сериал
         if o_film.type != APP_FILM_SERIAL:
-            add_params.update({'subscribe': APP_USERFILM_SUBS_TRUE})
+            add_params.update({'subscribed': APP_USERFILM_SUBS_TRUE})
 
         filter = {
             'user': request.user,
@@ -55,11 +55,12 @@ class ActPlaylistFilmView(APIView):
 
         # Устанавливаем в плейлист
         try:
-            o_subs = UsersFilms.object.get(**filter)
+            o_subs = UsersFilms.objects.get(**filter)
             return Response({'error': u'Уже подписан'}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             try:
-                o_subs = UsersFilms(**filter(add_params))
+                filter.update(add_params)
+                o_subs = UsersFilms(**filter)
                 o_subs.save()
             except Exception as e:
                 return Response({'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
@@ -74,6 +75,10 @@ class ActPlaylistFilmView(APIView):
             return o_film
 
         # Удаляем из плейлиста
-        UsersFilms.objects.filter(pk=o_film.pk).delete()
+        filter = {
+            'film': o_film.pk,
+            'user': request.user.pk,
+        }
+        UsersFilms.objects.filter(**filter).delete()
 
         return Response(status=status.HTTP_200_OK)

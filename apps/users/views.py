@@ -6,6 +6,8 @@ from django.shortcuts import render_to_response
 from django.core.context_processors import csrf
 from django.core.mail import EmailMultiAlternatives
 from django.contrib.auth.models import User
+from django.http import HttpResponseBadRequest
+from django.template.loader import render_to_string
 
 from rest_framework.authtoken.models import Token
 from rest_framework.views import APIView
@@ -20,6 +22,7 @@ from .forms import UsersProfileForm, CustomRegisterForm
 
 from apps.users.models.api_session import UsersApiSessions, SessionToken
 from apps.users.api.utils import create_new_session
+
 
 
 
