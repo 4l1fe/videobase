@@ -298,7 +298,7 @@ def calc_similar(o_film):
     try:
         result = film_model.Films.similar_api(o_film)
         for item in result:
-            result_list.append({'id': item.id, 'name': item.name, 'rating': item.rating_cons, 'year': item.release_date})
+            result_list.append({'id': item.id, 'name': item.name, 'rating': item.rating_cons, 'year': item.release_date.strftime("%Y")})
     except Exception, e:
         pass
 
@@ -327,6 +327,6 @@ def film_view(request, film_id, *args, **kwargs):
     resp_dict[0]['actors'] = calc_actors(o_film)
     resp_dict[0]['similar'] = calc_similar(o_film)
     resp_dict[0]['comments'] = calc_comments(o_film)
-    print resp_dict
 
-    return render_to_response('film.html', resp_dict)
+    print resp_dict
+    return HttpResponse(render_page('film', resp_dict))
