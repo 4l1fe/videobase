@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from apps.films.models import PersonsFilms, Persons
-from apps.films.forms import PersonForm
+from apps.films.forms import PersonApiForm
 from apps.films.api.serializers import vbPerson
 
 
@@ -24,7 +24,7 @@ class PersonsFilmView(APIView):
             'film': film_id,
         }
 
-        if not cleaned_data['type'] is None:
+        if not cleaned_data['type'] is None and cleaned_data['type']:
             filter.update({'p_type': cleaned_data['type']})
 
         result = PersonsFilms.objects.filter(**filter).\
@@ -38,7 +38,7 @@ class PersonsFilmView(APIView):
 
     def get(self, request, film_id, format=None, *args, **kwargs):
         self.get_copy = request.GET.copy()
-        form = PersonForm(data=self.get_copy)
+        form = PersonApiForm(data=self.get_copy)
 
         if form.is_valid():
             cleaned_data = form.cleaned_data

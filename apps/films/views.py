@@ -6,7 +6,7 @@ from django.core.files import File
 from django.template import Template, Context
 from django.core.context_processors import csrf
 from django.http import HttpResponse
-
+from django.contrib.auth.models import  User
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -16,6 +16,8 @@ from rest_framework import status
 from apps.films.models import Persons, Films, FilmExtras, PersonsFilms, UsersPersons, PersonsExtras, UsersFilms
 from apps.contents.models import Comments, Contents
 from utils.noderender import render_page
+from apps.users.api.users import vbUser
+
 
 # Do not remove there is something going on when importing, probably models registering itselves
 import apps.films.models
@@ -263,8 +265,6 @@ def person_view(request, resource_id):
                       'roles': ["актер", "режиссёр"],
                       'birthplace': ["Москва", "Россия"]},
 
-                
-            
             'filmography': vbFilms}))
 
 
@@ -276,10 +276,43 @@ def film_view(request,resource_id):
     return render_to_response('person.html')
 
 
-def login_view(request):
+def register_view(request):
         # ... view code here
 
-    return render_to_response('login.html',)
+        return HttpResponse(render_page('register',{}))
+
+def user_view(request, resource_id):
+
+    try:
+        user = User.objects.get(pk=resource_id)
+
+        uvb = vbUser(user)
+
+        default_user = {'id': -1,
+               'friends': [],
+               'genres': [],
+               'regdate':'2014-01-01',
+               }
+
+        default_user.update(uvb.data)
+
+        default={'user':default_user,
+                 'films_subscribed': [],
+                 'actors_fav': [],
+                 'feed': [],
+                 'directors_fav':[],
+                 'user_how_long':[]
+                 }
+
+        return HttpResponse(render_page('user', default))
+
+    except User.DoesNotExist:
+        raise Http404
+
+
+
+
+
 
 
 def test_view(request):
