@@ -25,9 +25,11 @@ class vbPerson(serializers.ModelSerializer):
                 self.fields.pop(field_name, None)
 
     def get_birthplace(self, obj):
-        city = obj.city_id.name
-        country = obj.city_id.country_id.name
-        return (city, country)
+        if not obj.city is None:
+            city = obj.city.name
+            country = obj.city.country.name
+            return [city, country]
+        return []
 
     class Meta:
         model = Persons
