@@ -44,15 +44,7 @@ class FilmFactory(factory.DjangoModelFactory):
 
 class UserFilmsFactory(factory.DjangoModelFactory):
     FACTORY_FOR = UsersFilms
-
-    @factory.post_generation
-    def films(self, create, extracted, **kwargs):
-        if not create:
-            return
-
-        if extracted:
-            for film in extracted:
-                self.film.add(film)
+    film = factory.SubFactory(FilmFactory)
 
 
 class ContetsFactory(factory.DjangoModelFactory):
@@ -75,12 +67,12 @@ class PersonsFactory(factory.DjangoModelFactory):
     FACTORY_FOR = Persons
     name = factory.Sequence(lambda n: u'Персона_{0}'.format(n))
     bio = factory.Sequence(lambda n: u'Биография_{0}'.format(n))
+    photo = ImageField(color='red')
 
 
 class UserPersonsFatory(factory.DjangoModelFactory):
     FACTORY_FOR = UsersPersons
     person = factory.SubFactory(PersonsFactory)
-    photo = ImageField(color='red')
 
 
 class UserPicsFactory(factory.DjangoModelFactory):
