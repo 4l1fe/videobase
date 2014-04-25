@@ -1,17 +1,17 @@
 # coding: utf-8
 import json
-
-from crawler.robot_start import save_location, sane_dict
 import requests
+from apps.films.constants import APP_FILM_SERIAL
+from crawler.robot_start import save_location, sane_dict
 from apps.films.models import Films
 
 
-class Amediateka_Loader(object):
+class Amediateka_robot(object):
     def __init__(self):
         pass
 
     def get_data(self):
-        # self.get_serials_data()
+        self.get_serials_data()
         self.get_film_data()
 
     def get_film_data(self):
@@ -40,17 +40,19 @@ class Amediateka_Loader(object):
         data = Films.objects.values_list('id', 'name').values('name', 'id')
         for s in data_site:
             for serials in data:
-                if s['name'] == u'Родина':
+                if s['name'] == serials['name']:
                     serials_data = Films.objects.filter(id=serials['id'])
                     for dict_serials in serials_data:
-                        save_location(dict_serials, **self.serial_dict(dict_serials, s))
+                        if dict_serials.type == APP_FILM_SERIAL:
+                            list_serial = self.serial_dict(dict_serials, s)
+                            for ser in list_serial:
+                                save_location(**ser)
                     continue
 
     def film_dict(self, film, site_film):
         resp_dict = sane_dict(film)
         resp_dict['url_view'] = self.get_film_url(site_film)
         resp_dict['price'] = 0
-
         return resp_dict
 
     def serial_dict(self, serial, site_serial):
@@ -63,7 +65,6 @@ class Amediateka_Loader(object):
             resp_list.append(resp_dict)
 
         return resp_list
-
 
     def get_film_url(self, site_film):
         return 'http://www.amediateka.ru/film/' + site_film['id']
