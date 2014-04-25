@@ -11,7 +11,6 @@ env.user = 'root'
 env.shell = "/bin/bash -c"
 
 
-
 def setup():
 
     # Require some Debian/Ubuntu packages
@@ -57,8 +56,6 @@ def populate_test_db():
     with cd('/var/www/videobase_test/sql_dump'):
         with settings(sudo_user = "postgres"):
             sudo('''psql -d videobase_test -f $(ls -1 *.sql | head -1)''')
-
-
 def local_db_reset():
     '''
     Перезаписать локальную базу из репозитория
@@ -66,9 +63,8 @@ def local_db_reset():
     local('''echo "DROP DATABASE videobase;" |  sudo -u postgres psql''')
     local('''echo "CREATE USER pgadmin WITH PASSWORD 'qwerty'; CREATE DATABASE videobase; GRANT ALL PRIVILEGES ON DATABASE videobase to pgadmin;" |  sudo -u postgres psql''')
     local("""cd sql_dump && sudo -u postgres psql -d videobase -f $(ls -1 *.sql | head -1)""")
-    local('''echo "DROP DATABASE test_videobase;" | sudo -u postgres psql ''')
-    local('''echo "CREATE USER pgadmin WITH PASSWORD 'qwerty'; CREATE DATABASE test_videobase; GRANT ALL PRIVILEGES ON DATABASE videobase to pgadmin;" |  sudo -u postgres psql''')
-
+    local('''echo "DROP DATABASE test_base;" | sudo -u postgres psql ''')
+    local('''echo "CREATE DATABASE test_base; ALTER DATABASE test_base OWNER TO pgadmin;" |  sudo -u postgres psql''')
 
 
 def setup_system_libraries():
@@ -92,17 +88,17 @@ def deploy_test_code():
         with cd('/var/www'):
 
             result = str(sudo('ls -1')).strip()
-            filtered_array=[s for s in result.split('\r\n') if s=='videobase_test']
+            filtered_array=[s for s in result.split('\r\n') if s=='test_base']
 
             if filtered_array:
                 #sudo("cd videobase_test; git checkout configs/db.ini")
                 #sudo("cd videobase_test; cat configs/db.ini")
-                sudo('cd videobase_test;git pull')
+                sudo('cd test_base;git pull')
                 #sudo("cd videobase_test/configs/ && sed -i 's/videobase/videobase_test/g' db.ini")
                 #sudo("cd videobase_test; cat configs/db.ini")
             else:
-                sudo('git clone git@git.aaysm.com:developers/videobase.git videobase_test')
-                sudo("cd videobase_test/configs/ && cp db.ini.example db.ini && sed -i 's/videobase/videobase_test/g' db.ini")
+                sudo('git clone git@git.aaysm.com:developers/videobase.git test_base')
+                sudo("cd test_base/configs/ && cp db.ini.example db.ini && sed -i 's/videobase/test_base/g' db.ini")
 
 
 def restart_all():
@@ -238,6 +234,7 @@ def init_if_not_exists_task():
 def scheme():
 
     local('python ./manage.py graph_models -a -g -o current.png')
+
 
 
 def show_scheme():

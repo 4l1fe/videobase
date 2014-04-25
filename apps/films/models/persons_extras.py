@@ -17,7 +17,7 @@ class PersonsExtras(models.Model):
     def as_vbExtra(self):
 
         return {'url':self.url,
-                'type':self.type,
+                'type':self.etype,
                 'name':self.name,
                 'name_orig':self.name_orig,
                 'description':self.description

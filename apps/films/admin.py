@@ -79,6 +79,13 @@ class UsersPersonsAdmin(admin.ModelAdmin):
 
 
 #############################################################################################################
+# Администрирование таблицы Города
+class CitiesAdmin(admin.ModelAdmin):
+    raw_id_fields = ('country',)
+    search_fields = ('id', 'name', 'name_orig',)
+
+
+#############################################################################################################
 # Регистрация моделей в админке
 admin.site.register(Countries, CountriesAdmin)
 admin.site.register(Genres, GenresAdmin)
@@ -90,3 +97,4 @@ admin.site.register(Persons, PersonsAdmin)
 admin.site.register(PersonsExtras, PersonsExtrasAdmin)
 admin.site.register(PersonsFilms, PersonsFilmsAdmin)
 admin.site.register(UsersPersons, UsersPersonsAdmin)
+admin.site.register(Cities, CitiesAdmin)

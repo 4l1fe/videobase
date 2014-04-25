@@ -9,4 +9,5 @@ from users_rels import UsersRels
 from users_socials import UsersSocials
 from api_session import  UsersApiSessions
 
-from signals import *
+from apps.users.signals import *
+from api_session import  SessionToken

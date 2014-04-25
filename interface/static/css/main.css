@@ -1,0 +1,107 @@
+/* main elements */
+a:hover {text-decoration: none}
+h2 {text-align: center; text-transform: uppercase; color: #fff; font-size: 22px; font-weight: bold; margin: 40px 0 20px 0}
+.display-none {display: none}
+
+/* header */
+.top-block-wrapper {background: #3C3231}
+.top-logo-place {line-height: 100px; height: 100px}
+.top-logo-place img {vertical-align: middle; max-width: 100%}
+.top-search-place {line-height: 100px; text-align: center; }
+.top-search-place form {vertical-align: middle; display: inline-block; width: 95%}
+.top-search-place form .form-group {width: 100%}
+.top-search-place form #inp_search {background: #5D5354; border: 0; border-radius: 5px; color: #C4BBBC; padding-right: 62px; width: 95%; max-width: 500px}
+.top-search-place form #btn_submit {background: #0069A3; color: #F0F6F2; border: 0; border-radius: 5px; margin-left: -62px; padding-top: 7px; padding-bottom: 7px;}
+
+.top-user-place {text-align: left;}
+.top-user-place .avatar-place {width: 65px; display: inline-block}
+.top-user-place .avatar-place img {max-width: 65px; max-height: 65px;}
+.top-user-place .name-place {margin-left: 10px; display: inline-block;}
+.top-user-place .name-place p {line-height: 1.5em; vertical-align: middle; margin-top: 20px}
+.top-user-place .name-place a {color: #C08B00; border-bottom: 1px solid  #C08B00;}
+.top-user-place .name-place a strong {color: #ECC100; font-weight: bold; border-bottom: 1px solid #ECC100}
+
+.menu-block-wrapper {background: #fff; height: 80px;}
+.menu-block-wrapper ul {margin-top: 30px}
+.menu-block-wrapper li {width: 180px; display: inline-block; border-right: 1px solid #D4D8D9}
+.menu-block-wrapper li:last-child {border: 0}
+.menu-block-wrapper li a {font-size: 18px; color: #545051; border-bottom: 1px solid #545051; text-transform: uppercase}
+
+/* mixins */
+.film-thumb {margin: 0 10px 0 10px; width: 23%}
+.film-thumb .poster-place {height: 300px; background-position: 50% 50%; background-repeat: no-repeat;}
+.film-thumb .rating-place {font-weight: bold; font-size: 24px; text-align: center}
+.film-thumb .rating-place p {display: inline-block; width: 50px; height: 50px; line-height: 50px; background: #D6E2F8; color: #483C3E; margin-top: -25px}
+.film-thumb .name-place {height: 45px; text-align: left}
+.film-thumb .name-place a {font-weight: bold; color: #2C65CC; border-bottom: 1px solid #2C65CC}
+.film-thumb .name-place span {font-size: 13px; color: #CCCDCF}
+.film-thumb .userrel-place {margin: 10px 0 10px 0; text-align: center}
+.film-thumb .button-place {margin-bottom: 10px}
+.film-thumb .action-button {width: 100%; text-align: center; color: #000; text-transform: uppercase; padding: 5px 0 5px 0; font-weight: bold; background: #FFCF00; display: block; height: 48px; border: 0}
+.film-thumb .action-priced {background: #FF9E01}
+.film-thumb .action-subscribe {background: #75B7FF}
+.film-thumb .action-button span {font-weight: normal; color: #674B1C; font-size: 12px; text-transform: lowercase}
+.film-thumb .watchprice {text-align: center; color: #626365}
+.film-thumb .watchprice a {color: #5A88DE; border-bottom: 1px solid #5A88DE}
+
+.location-thumb {margin: 0 0 20px 0;}
+.location-thumb .btn-place {float: left}
+.location-thumb button {width: 120px; height: 40px; background-color: #333333; color: #fff; font-weight: bold; border: 0; border-radius: 0 5px 5px 0}
+.location-thumb .info-place {margin-left: 130px; text-align: left}
+.location-thumb .info-place p {margin: 0}
+
+.person-thumb {line-height: 70px; background-position: 0 50%; background-repeat: no-repeat}
+.person-thumb p {vertical-align: middle; padding-left: 70px; font-size: 20px; font-weight: bold}
+
+.user-thumb {line-height: 70px; background-position: 0 50%; background-repeat: no-repeat}
+.user-thumb p {vertical-align: middle; padding-left: 70px; font-size: 20px; font-weight: bold}
+
+.comment-thumb .avatar-place {float: left; width: 60px; height: 60px}
+.comment-thumb .text-place {margin-left: 65px; min-height: 60px; margin-bottom: 10px}
+.comment-thumb .info {margin-bottom: 10px;}
+.comment-thumb .info .time {float: right; color: #CCCDCF}
+.comment-thumb .info .name {color: #5A88DE; font-weight: bold}
+.comment-thumb .text {}
+
+/* common elements */
+.load-more-place {margin: 30px 0 30px 0}
+.load-more-place button {width: 100%; padding: 20px 0 20px 0; background: #E9E9E9; cursor: pointer; text-transform: uppercase; color: #5A88DE; font-size: 16px; border: 0}
+.pleer-wrapper {margin-bottom: 30px; padding: 0;}
+.pleer-wrapper .pleer-place {min-height: 300px; background-color: #adadad; text-align: center;}
+
+/* index page */
+.index-page .new-wrapper {background: #02669A; padding-bottom: 30px; text-align: center}
+.index-page .new-wrapper .film-thumb .name-place a {color: #FBD300}
+.index-page .new-wrapper .film-thumb .action-button {background: #312728; color: #fff}
+.index-page .new-wrapper .film-thumb .action-button span {color: #fff}
+.index-page .comments-wrapper {background: #473737; padding-bottom: 30px}
+.index-page .recommends-wrapper {padding-bottom: 30px}
+.index-page .recommends-wrapper h2 {color: #000}
+.index-page .filter-place {padding: 20px 0 20px 0; background: #E9E9E9; margin-bottom: 30px;}
+.index-page .filter-place .form-inline .form-group select {border: 0; color: #5A88DE; background:  #E9E9E9; font-weight: bold}
+.index-page .filter-place .sort-place {font-weight: bold; text-align: right}
+.index-page .filter-place .sort-place ul {display: inline; margin-left: 10px}
+.index-page .filter-place .sort-place li {display: inline; border-bottom: 1px dotted #5A88DE}
+.index-page .filter-place .sort-place li:nth-child(1) {margin-right: 30px; border-right: 1px solid #D4D8D9}
+.index-page .filter-place .sort-place li:nth-child(1) {margin-left: 30px;}
+.index-page .filter-place .sort-place li.sort-disabled {color: #616161; border: 0; cursor: default}
+
+/* film page */
+.locations-place {padding-left: 0}
+.film-info-wrapper .film-thumb {width: 100%}
+.film-info-wrapper .film-thumb .name-place {display: none}
+.film-info-wrapper .film-thumb .notinstock {display: none}
+.film-info-wrapper .film-thumb .tolist {display: none}
+
+/* user page */
+.user-page .actors-fav .person-thumb, .user-page .directors-fav .person-thumb {width: 33%; float: left}
+/* footer */
+footer li {display: inline-block}
+footer .container {margin-top: 30px}
+footer .footer-links {text-align: center}
+footer .footer-links ul {margin-top: 20px}
+footer .footer-links a {color: #2866D5; border-bottom: 1px solid #2866D5; font-size: 18px; font-weight: bold}
+footer .footer-links ul li:nth-child(1) {padding-right: 30px; border-right: 1px solid #A79CA0}
+footer .footer-links ul li:nth-child(2) {padding-left: 30px;}
+footer .footer-social {text-align: right; margin-top: 25px}
+footer .copyright {border-top: 1px dashed #BCC0C1; margin-top: 30px; padding: 20px 0 25px 0; color: #C9C9CB}
