@@ -58,9 +58,9 @@ INSTALLED_APPS = (
     'social_auth',
     'csvimport',
     'apps.users',
-    'apps.robots',
     'apps.films',
     'apps.contents',
+    'apps.robots',
     'crawler',
     'social_auth',
     'djcelery',
@@ -248,3 +248,10 @@ CELERYBEAT_SCHEDULE = {
 }
 
 CELERY_TIMEZONE = 'UTC'
+
+
+INSTALLED_APPS += ('django_jenkins',)
+JENKINS_TASKS = ('django_jenkins.tasks.run_pylint',
+                 'django_jenkins.tasks.run_pep8',
+                 'django_jenkins.tasks.run_pyflakes',
+                 'django_jenkins.tasks.with_coverage',)

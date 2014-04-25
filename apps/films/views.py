@@ -1,9 +1,11 @@
+# coding: utf-8
 from django.http import Http404
 from django.shortcuts import render_to_response
 from django.http import HttpResponse
 from django.core.files import File
 from django.template import Template, Context
 from django.core.context_processors import csrf
+from django.http import HttpResponse
 
 
 from rest_framework.views import APIView
@@ -13,6 +15,7 @@ from rest_framework import status
 
 from apps.films.models import Persons, Films, FilmExtras, PersonsFilms, UsersPersons, PersonsExtras, UsersFilms
 from apps.contents.models import Comments, Contents
+from utils.noderender import render_page
 
 # Do not remove there is something going on when importing, probably models registering itselves
 import apps.films.models
@@ -222,8 +225,53 @@ def index_view(request):
 
     return render_to_response('index.html',)
 
-def person_view(request, film_id):
+
+
+def person_view(request, resource_id):
         # ... view code here
+        '''
+        - header_title = person.name
+
+        - person_roles = person.roles && person.roles.length?person.roles.join(", "):false
+        - person_birthplace = person.birthplace && person.birthplace.length?person.birthplace.join(", "):false
+        - person_birthdate = new Date(person.birthdate)
+        - person_years_old = how_long(person_birthdate, 0)
+        - person_birthdate_string = date_text(person_birthdate) + " г. (" + person_years_old + ")"
+        '''
+
+        person = Persons.objects.get(pk =resource_id)
+
+        pfs = PersonsFilms.objects.filter(person = person)
+
+        vbFilms = [pf.film.as_vbFilm() for pf in pfs]
+
+        for vbf in vbFilms:
+            
+            vbf.update({'instock':True,
+                        'hasFree':True,
+                        'year':vbf['release_date'].strftime('%Y'),
+                        'release_date':''
+                    })
+
+            
+        return HttpResponse(render_page('person',{
+            'person' : {'id': resource_id,
+                      'name': person.name,
+                      'photo': "static/img/tmp/person1.jpg",
+                      'bio': person.bio,
+                      'birthdate': "1974-01-22",
+                      'roles': ["актер", "режиссёр"],
+                      'birthplace': ["Москва", "Россия"]},
+
+                
+            
+            'filmography': vbFilms}))
+
+
+
+def film_view(request,resource_id):
+        # ... view code here
+
 
     return render_to_response('person.html')
 
