@@ -73,8 +73,13 @@ class GenreFactory(factory.DjangoModelFactory):
     description = factory.Sequence(lambda b: u'Описание Жанра_{0}'.format(b))
 
 
+class CityFactory(factory.DjangoModelFactory):
+    FACTORY_FOR = Cities
+
+
 class PersonFactory(factory.DjangoModelFactory):
     FACTORY_FOR = Persons
+    # city = factory.SubFactory(CityFactory)
     name = factory.Sequence(lambda u: u'Персона{0}'.format(u))
     name_orig = factory.Sequence(lambda u: u'Person{0}'.format(u))
     bio = u'Биография'

@@ -11,14 +11,11 @@ class Migration(SchemaMigration):
         # Adding model 'Cities'
         db.create_table('cities', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('country_id', self.gf('django.db.models.fields.related.ForeignKey')(related_name='cities', to=orm['films.Countries'])),
+            ('country', self.gf('django.db.models.fields.related.ForeignKey')(related_name='cities', to=orm['films.Countries'])),
             ('name', self.gf('django.db.models.fields.CharField')(max_length=255)),
             ('name_orig', self.gf('django.db.models.fields.CharField')(max_length=255)),
         ))
         db.send_create_signal('films', ['Cities'])
-        country = orm.Countries.objects.all()[0]
-        orm.Cities.objects.create(country_id=country, name='default city', name_orig='default city orig')
-
 
     def backwards(self, orm):
         # Deleting model 'Cities'

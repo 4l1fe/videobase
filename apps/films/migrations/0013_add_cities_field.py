@@ -8,15 +8,15 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding field 'Persons.city_id'
-        db.add_column('persons', 'city_id',
-                      self.gf('django.db.models.fields.related.ForeignKey')(default=1, related_name='persons', to=orm['films.Cities']),
+        # Adding field 'Persons.city'
+        db.add_column('persons', 'city',
+                      self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='persons', null=True, to=orm['films.Cities']),
                       keep_default=False)
 
 
     def backwards(self, orm):
-        # Deleting field 'Persons.city_id'
-        db.delete_column('persons', 'city_id_id')
+        # Deleting field 'Persons.city'
+        db.delete_column('persons', 'city_id')
 
 
     models = {
@@ -58,7 +58,7 @@ class Migration(SchemaMigration):
         },
         'films.cities': {
             'Meta': {'object_name': 'Cities', 'db_table': "'cities'"},
-            'country_id': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'cities'", 'to': "orm['films.Countries']"}),
+            'country': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'cities'", 'to': "orm['films.Countries']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'name_orig': ('django.db.models.fields.CharField', [], {'max_length': '255'})
@@ -117,7 +117,7 @@ class Migration(SchemaMigration):
         'films.persons': {
             'Meta': {'object_name': 'Persons', 'db_table': "'persons'"},
             'bio': ('django.db.models.fields.TextField', [], {}),
-            'city_id': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'persons'", 'to': "orm['films.Cities']"}),
+            'city': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'persons'", 'null': 'True', 'to': "orm['films.Cities']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'name_orig': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
@@ -140,7 +140,7 @@ class Migration(SchemaMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'p_character': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '255'}),
             'p_type': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'person': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['films.Persons']"})
+            'person': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'person_film_rel'", 'to': "orm['films.Persons']"})
         },
         'films.seasons': {
             'Meta': {'unique_together': "(('film', 'number'),)", 'object_name': 'Seasons', 'db_table': "'seasons'"},
