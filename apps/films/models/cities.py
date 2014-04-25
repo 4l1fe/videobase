@@ -4,7 +4,7 @@ from django.db import models
 
 class Cities(models.Model):
 
-    country_id = models.ForeignKey('Countries', verbose_name=u'Название страны', related_name='cities')
+    country    = models.ForeignKey('Countries', verbose_name=u'Название страны', related_name='cities')
     name       = models.CharField(max_length=255, verbose_name=u'Название города')
     name_orig  = models.CharField(max_length=255, verbose_name=u'Оригинальное название города')
 
