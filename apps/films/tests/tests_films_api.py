@@ -171,7 +171,15 @@ class FilmsTest(APITestCase):
         for i in range(len(response.data['genres'])):
             self.assertEqual(response.data['genres'][i], film.genres.all().values('id', 'name')[i])
         for i in range(len(response.data['persons'])):
-            self.assertEqual(response.data['persons'][i], film.persons.all().values('id', 'name', 'photo')[i])
+            p = film.persons.all().values('id', 'name', 'photo', 'city__name', 'city__country__name')[i]
+            if p['city__name'] is None and p['city__country__name'] is None:
+                birthplace = []
+            else:
+                birthplace = [p['city__name'], p['city__country__name']]
+
+            p.update({'birthplace': birthplace})
+            del p['city__name'], p['city__country__name']
+            self.assertEqual(response.data['persons'][i], p)
 
         self.locations_assert(response.data['locations'], locations)
         self.not_extend_assert(response.data, film, extras)
