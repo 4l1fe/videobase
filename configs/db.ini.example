@@ -5,6 +5,7 @@ DATABASE_NAME: videobase
 DATABASE_USER: pgadmin
 DATABASE_PASSWORD: qwerty
 DATABASE_PORT: 5432
+
 [testbase]
 DATABASE_ENGINE: django.db.backends.postgresql_psycopg2
 DATABASE_HOST: localhost
