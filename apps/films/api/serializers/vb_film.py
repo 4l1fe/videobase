@@ -160,11 +160,14 @@ class vbFilm(serializers.ModelSerializer):
 
 
     def poster_list(self, obj):
-        result = self.poster_rebuild.get(obj.pk, [])
+        result = self.poster_rebuild.get(obj.pk, '')
         if len(result):
-            return [item.url for item in result if not item.url is None and len(item.url)]
-
+            for item in result:
+                if not item.photo is None and item.photo:
+                    result = item.photo.url
+                    break
         return result
+
 
 
     def _rebuild_poster_list(self):
