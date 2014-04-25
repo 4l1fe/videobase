@@ -28,7 +28,7 @@ class PersonsFilmView(APIView):
             filter.update({'p_type': cleaned_data['type']})
 
         result = PersonsFilms.objects.filter(**filter).\
-                     values_list('person', flat=True)[cleaned_data['top']:cleaned_data['limit']]
+                     values_list('person', flat=True)
 
         if not len(result):
             return Response(status=status.HTTP_404_NOT_FOUND)
@@ -46,7 +46,7 @@ class PersonsFilmView(APIView):
             if type(person_list) == Response:
                 return person_list
 
-            o_person = Persons.objects.filter(pk__in=person_list)
+            o_person = Persons.objects.filter(pk__in=person_list).order_by('id')[cleaned_data['top']:cleaned_data['limit']]
 
             serializer = vbPerson(o_person, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
