@@ -8,6 +8,7 @@ from cStringIO import StringIO
 from PIL import Image, ImageEnhance
 
 from django.core.files import File
+from django.contrib.auth.models import User
 from django.template import Template, Context
 from django.http import HttpResponse, Http404
 from django.core.context_processors import csrf
@@ -19,7 +20,14 @@ from rest_framework import status
 
 import apps.films.models as film_model
 import apps.contents.models as content_model
+
+from apps.users.api.users import vbUser
 from apps.films.api.serializers import vbFilm, vbComment
+
+from utils.noderender import render_page
+
+# # Do not remove there is something going on when importing, probably models registering itselves
+# import apps.films.models
 
 
 def get_new_namestring(namestring):
@@ -38,22 +46,22 @@ def image_refresh(func):
         url = request.POST.get('image')
         m = re.match('.+[/]static[/]upload[/](?P<type>[^/]+)[/](?P<id>[0-9]+)',url)
 
-        path = re.match('.+(?P<path>[/]static[/].+)',url)
+        path = re.match('.+(?P<path>[/]static[/].+)', url)
         d = m.groupdict()
 
         if d['type'] == 'persons':
-            p = film_model.Persons.objects.get(pk = int(d['id']))
+            p = film_model.Persons.objects.get(pk=int(d['id']))
         elif d['type'] == 'filmextras':
-            p = film_model.FilmExtras.objects.get(pk = int(d['id']))
+            p = film_model.FilmExtras.objects.get(pk=int(d['id']))
         else:
             warnings.warn("Unknown type {} of requests for image manipulation")
 
-        im = Image.open('.'+path.groupdict()['path'])
+        im = Image.open('.' + path.groupdict()['path'])
         imc = func(d, im, request)
 
         imfile = StringIO()
 
-        imc.save(imfile,"PNG")
+        imc.save(imfile, "PNG")
         imfile.seek(0)
 
         p.photo.save(get_new_namestring(os.path.basename(path.groupdict()['path'])), File(imfile))
@@ -74,7 +82,7 @@ def resize_image(d,im,request):
 
 
 @image_refresh
-def bri_con(d,im,request):
+def bri_con(d, im, request):
     br = request.POST.get('br')
     co = request.POST.get('co')
     bre = ImageEnhance.Brightness(im)
@@ -91,6 +99,9 @@ def bri_con(d,im,request):
 
 
 class PersonAPIView(APIView):
+    """
+
+    """
 
     def get(self, request, format=None, resource_id=None, extend=False):
         # Process any get params that you may need
@@ -187,16 +198,83 @@ def index_view(request):
 
     return render_to_response('index.html',)
 
-def person_view(request, film_id):
-    # ... view code here
 
-    return render_to_response('person.html')
+def person_view(request, resource_id):
+        # ... view code here
+        '''
+        - header_title = person.name
+
+        - person_roles = person.roles && person.roles.length?person.roles.join(", "):false
+        - person_birthplace = person.birthplace && person.birthplace.length?person.birthplace.join(", "):false
+        - person_birthdate = new Date(person.birthdate)
+        - person_years_old = how_long(person_birthdate, 0)
+        - person_birthdate_string = date_text(person_birthdate) + " г. (" + person_years_old + ")"
+        '''
+
+        person = film_model.Persons.objects.get(pk =resource_id)
+
+        pfs = film_model.PersonsFilms.objects.filter(person = person)
+
+        vbFilms = [pf.film.as_vbFilm() for pf in pfs]
+
+        for vbf in vbFilms:
+            
+            vbf.update({'instock':True,
+                        'hasFree':True,
+                        'year':vbf['release_date'].strftime('%Y'),
+                        'release_date':''
+                    })
+
+            
+        return HttpResponse(render_page('person',{
+            'person' : {'id': resource_id,
+                      'name': person.name,
+                      'photo': "static/img/tmp/person1.jpg",
+                      'bio': person.bio,
+                      'birthdate': "1974-01-22",
+                      'roles': ["актер", "режиссёр"],
+                      'birthplace': ["Москва", "Россия"]},
+
+            'filmography': vbFilms}))
 
 
 def login_view(request):
     # ... view code here
+    pass
 
-    return render_to_response('login.html',)
+
+def register_view(request):
+    # ... view code here
+    return HttpResponse(render_page('register',{}))
+
+
+def user_view(request, resource_id):
+
+    try:
+        user = User.objects.get(pk=resource_id)
+
+        uvb = vbUser(user)
+
+        default_user = {'id': -1,
+               'friends': [],
+               'genres': [],
+               'regdate':'2014-01-01',
+               }
+
+        default_user.update(uvb.data)
+
+        default={'user':default_user,
+                 'films_subscribed': [],
+                 'actors_fav': [],
+                 'feed': [],
+                 'directors_fav':[],
+                 'user_how_long':[]
+                 }
+
+        return HttpResponse(render_page('user', default))
+
+    except User.DoesNotExist:
+        raise Http404
 
 
 def test_view(request):
@@ -239,8 +317,8 @@ def film_view(request, film_id, *args, **kwargs):
     resp_dict = {}
     o_film = film_model.Films.objects.filter(pk=film_id).prefetch_related('genres', 'countries')
 
-
-     # 404
+    if not len(o_film):
+        raise Http404
 
     resp_dict = vbFilm(o_film, extend=True)
     resp_dict = resp_dict.data
@@ -249,5 +327,6 @@ def film_view(request, film_id, *args, **kwargs):
     resp_dict[0]['actors'] = calc_actors(o_film)
     resp_dict[0]['similar'] = calc_similar(o_film)
     resp_dict[0]['comments'] = calc_comments(o_film)
+    print resp_dict
 
     return render_to_response('film.html', resp_dict)

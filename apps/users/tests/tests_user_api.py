@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
 
-from .factories import UserFactory, UserProfileFactory
+from .factories import UserFactory
 from apps.users.models.api_session import SessionToken, UsersApiSessions
 from apps.users.models import User
 from utils.common import random_string
