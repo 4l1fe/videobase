@@ -1,25 +1,75 @@
 # coding: utf-8
-from crawler.core.exceptions import NoSuchFilm
+import json
+
+from crawler.robot_start import save_location, sane_dict
 import requests
-import parsers
-from ..core import BaseLoader
-import urllib
-
-HOST = 'www.amediateka.ru'
-URL_LOAD = ''
+from apps.films.models import Films
 
 
+class Amediateka_Loader(object):
+    def __init__(self):
+        pass
 
-class Amediateka_Loader(BaseLoader):
-    def __init__(self, film, host=HOST, url_load=URL_LOAD):
-        super(Amediateka_Loader, self).__init__(film, host, url_load)
-        self.search_url = 'search?{}'.format(urllib.urlencode({'type':'','q': self.film}))
+    def get_data(self):
+        # self.get_serials_data()
+        self.get_film_data()
 
-    def get_url(self, load_function):
-        url = "http://%s/%s" % (self.host, self.search_url, )
-        response = load_function(url)
-        filmLink = parsers.parse_search(response,self.film.name)
-        if filmLink is None:
-            raise NoSuchFilm(self.film)
-        self.url_load = filmLink
-        return "http://%s%s" % (self.host, self.url_load)
+    def get_film_data(self):
+        search_film_url = '/hbo/api/v1/films.json?'
+        filter_film_search = 'limit=1000&offset=0&expand=genres&client_id=amediateka&platform=desktop'
+        url = "http://%s%s%s" % ('www.amediateka.ru', search_film_url, filter_film_search)
+        response = requests.get(url)
+        data_site = json.loads(response.content)['films']
+        film = Films.objects.values_list('id', 'name')
+        data = film.values('name', 'id')
+        for f in data_site:
+            for film in data:
+                if f['name'] == film['name']:
+                    film_data = Films.objects.filter(id=film['id'])
+                    for dict_film in film_data:
+                        d = self.film_dict(dict_film, f)
+                        save_location(**d)
+                    continue
+
+    def get_serials_data(self):
+        search_serials_url = '/hbo/api/v1/serials.json?'
+        filter_serials_search = 'limit=1000&offset=0&expand=seasons,genres&client_id=amediateka&platform=desktop'
+        url = "http://%s%s%s" % ('www.amediateka.ru', search_serials_url, filter_serials_search)
+        response = requests.get(url)
+        data_site = json.loads(response.content)['serials']
+        data = Films.objects.values_list('id', 'name').values('name', 'id')
+        for s in data_site:
+            for serials in data:
+                if s['name'] == u'Родина':
+                    serials_data = Films.objects.filter(id=serials['id'])
+                    for dict_serials in serials_data:
+                        save_location(dict_serials, **self.serial_dict(dict_serials, s))
+                    continue
+
+    def film_dict(self, film, site_film):
+        resp_dict = sane_dict(film)
+        resp_dict['url_view'] = self.get_film_url(site_film)
+        resp_dict['price'] = 0
+
+        return resp_dict
+
+    def serial_dict(self, serial, site_serial):
+        resp_list = []
+        for s in site_serial['seasons']:
+            resp_dict = sane_dict(serial)
+            resp_dict['url_view'] = self.get_serial_url(site_serial, s)
+            resp_dict['price'] = 0
+            resp_dict['number'] = s['number']
+            resp_list.append(resp_dict)
+
+        return resp_list
+
+
+    def get_film_url(self, site_film):
+        return 'http://www.amediateka.ru/film/' + site_film['id']
+
+    def get_serial_url(self, site_serial, s):
+        return 'http://www.amediateka.ru/serial/' + site_serial['id'] + '/' + s['id']
+
+
+
