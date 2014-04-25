@@ -1,12 +1,14 @@
 # coding: utf-8
 
+from django.db.models import Q
 from django.core.paginator import Page
 
 from rest_framework import serializers
 
 from apps.films.models import *
-from apps.films.constants import APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER
 from apps.contents.models import *
+from apps.films.constants import APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER,\
+                                 APP_PERSON_DIRECTOR, APP_PERSON_SCRIPTWRITER
 
 from utils.common import group_by
 from utils.middlewares.local_thread import get_current_request
@@ -48,23 +50,31 @@ class ContentSerializer(serializers.ModelSerializer):
 
 #############################################################################################################
 class vbFilm(serializers.ModelSerializer):
+    poster = serializers.SerializerMethodField('poster_list')
+    ratings = serializers.SerializerMethodField('calc_ratings')
+    relation = serializers.SerializerMethodField('relation_list')
+    releasedate = serializers.SerializerMethodField('calc_release')
+    locations = serializers.SerializerMethodField('locations_list')
+
+    # Признак extend
     countries = CountriesSerializer()
     genres = GentriesSerializer()
+    directors = serializers.SerializerMethodField('director_list')
+    scriptwriters = serializers.SerializerMethodField('scriptwriter_list')
+
+    # Признак person
     persons = vbPerson()
-    ratings = serializers.SerializerMethodField('calc_ratings')
-    locations = serializers.SerializerMethodField('locations_list')
-    poster = serializers.SerializerMethodField('poster_list')
-    relation = serializers.SerializerMethodField('relation_list')
+
 
     def __init__(self, *args, **kwargs):
         new_fields = []
 
-        extend = kwargs.pop('extend', False)
-        if not extend:
-            new_fields += ['description', 'genres', 'countries']
+        self.extend_sign = kwargs.pop('extend', False)
+        if not self.extend_sign:
+            new_fields += ['description', 'genres', 'countries', 'directors', 'scriptwriters']
 
-        persons = kwargs.pop('persons', False)
-        if not persons:
+        self.persons_sign = kwargs.pop('persons', False)
+        if not self.persons_sign:
             new_fields += ['persons']
 
         # Instantiate the superclass normally
@@ -78,6 +88,28 @@ class vbFilm(serializers.ModelSerializer):
         self._get_obj_list()
         self._rebuild_location()
         self._rebuild_poster_list()
+        self._rebuild_tors_list()
+
+
+    def _rebuild_tors_list(self):
+        directors_list = []
+        scriptwriters_list = []
+
+        if self.extend_sign:
+            o_person = Persons.objects.filter(Q(person_film_rel__p_type=APP_PERSON_DIRECTOR) | Q(person_film_rel__p_type=APP_PERSON_SCRIPTWRITER),
+                                              person_film_rel__film__in=self.list_obj_pk).\
+                extra(select={'p_type': "persons_films.p_type"}).order_by('id')
+
+            for item in o_person:
+                if item.p_type == APP_PERSON_DIRECTOR:
+                    directors_list.append(item)
+                else:
+                    scriptwriters_list.append(item)
+
+        self.tors_list = {
+            'directors': directors_list,
+            'scriptwriters': scriptwriters_list,
+        }
 
 
     def calc_ratings(self, obj):
@@ -86,6 +118,10 @@ class vbFilm(serializers.ModelSerializer):
             'kp': [obj.rating_kinopoisk, obj.rating_kinopoisk_cnt],
             'cons': [0, 0],
         }
+
+
+    def calc_release(self, obj):
+        return obj.release_date
 
 
     def _get_obj_list(self):
@@ -101,8 +137,6 @@ class vbFilm(serializers.ModelSerializer):
 
 
     def _rebuild_location(self):
-        self.location_rebuild = {}
-
         locations = Locations.objects.filter(content__film__in=self.list_obj_pk)\
             .order_by('content__film').select_related('content')
             # .values('content__film', 'content', 'type', 'lang', 'quality', 'subtitles', 'price', 'price_type', 'url_view')
@@ -141,23 +175,37 @@ class vbFilm(serializers.ModelSerializer):
 
 
     def relation_list(self, obj):
-        req = get_current_request()
-        if req.user.is_authenticated():
-            pass
+        request = get_current_request()
+        if request.user.is_authenticated():
+            return {
+                'subscribed': True,
+                'status': True,
+                'rating': True,
+            }
 
-        return []
+        return {}
 
-    # def to_native(self, obj):
-    #     self._get_obj_list()
-    #     self._rebuild_location()
-    #     self._rebuild_poster_list()
-    #
-    #     super(vbFilm, self).to_native(*args, **kwargs)
+
+    def director_list(self, obj):
+        temp = self.tors_list['directors']
+        if len(temp):
+            return vbPerson(temp, many=True).data
+
+        return temp
+
+
+    def scriptwriter_list(self, obj):
+        temp = self.tors_list['scriptwriters']
+        if len(temp):
+            return vbPerson(temp, many=True).data
+
+        return temp
 
 
     class Meta:
         model = Films
-        fields = ['id', 'name', 'name_orig', 'release_date', \
+        fields = ['id', 'name', 'name_orig', 'releasedate', \
                   'ratings', 'duration', 'locations', 'poster', 'relation', \
-                  'description', 'countries', 'genres', 'persons',
+                  'description', 'countries', 'directors', 'scriptwriters', \
+                  'genres', 'persons',
                  ]

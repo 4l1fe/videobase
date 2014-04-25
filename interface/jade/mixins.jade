@@ -1,0 +1,80 @@
+mixin anchor_list(list, url)
+    - anchor_first_element = true
+    - each item in list
+        =anchor_first_element?"":", "
+        a(href=url.replace("%", item.id))=item.name
+        - anchor_first_element = false
+//- {name: - name of actor, id - id of actor, photo - photo of actor}
+mixin person_thumb(person, id)
+    .person-thumb(id=id?id:("person_thumb_" + person.id),style='background-image:url("' + (person.photo || conf.noperson_url) + '")')
+        p
+            a(href="/person/"+person.id).name=person.name
+
+mixin user_thumb(user, id)
+    .user-thumb(id=id?id:("user_thumb_" + user.id),style='background-image:url("' + (user.avatar || conf.noavatar_url) + '")')
+        p
+            a(href="/user/"+user.id).name=user.name
+
+mixin film_thumb(item,id)
+    .film-thumb(id=id?id:("film_thumb_"+item.id)).col-md-3
+        .poster-place(style='background-image: url("' + (item.poster?item.poster:conf.noposter_url) + '")')
+        .rating-place(class = item.rating?"":"invisible")
+            p.rating
+                =item.rating
+        .name-place
+            a(href="#").name
+                =item.name
+            span!=' (<span class="year">' + item.year + "</span>)"
+        .userrel-place
+            .rateit.rate(data-rateit-max=10,data-rateit-resetable=0,data-rateit-value=relation && relation.rating?relation.rating:0)
+            button.notwatch-btn N
+        .button-place
+            .instock(class=item.instock?"":"display-none")
+                - var out_watch = "СМОТРЕТЬ" + (item.hasFree?"<br/>БЕСПЛАТНО":'<br/><span>от <span class="price">' + item.price + "</span> р. без рекламы</span>")
+                button.action-button(class=item.hasFree?"":"action-priced") !{out_watch}
+                .watchprice(class=(item.hasFree && item.price)?"":"invisible")
+                    или<br/>
+                    a(href="#") от <span class="price">#{item.price}</span> р. без рекламы
+            .notinstock(class=item.instock?"display-none":"")
+                button.action-button.action-subscribe ПОДПИСАТЬСЯ
+                .watchprice &nbsp;<br/>&nbsp;
+
+mixin comment_thumb(item, id)
+    .comment-thumb(id=id?id:("comment_" + item.id))
+        .avatar-place
+            img.img-responsive.img-circle(src=item.user.avatar || conf.noavatar_url)
+        .text-place
+            .info
+                .time=time_text(new Date(item.created))
+                .name
+                    a(href="/user/"+item.user.id,data-user-id=item.id)=item.user.name
+            .text!=item.text
+
+mixin location_thumb(item,id)
+    .location-thumb(id=id?id:(item.id?"loc_thumb_" + item.id:""))
+        .btn-place
+            button #{quality_text(item.quality)}
+        .info-place
+            p.name #{location_name(item.type)}
+            p.price
+                - if (item.price_type=="f")
+                    смотреть бесплатно
+                - else if (item.price)
+                    =item.price + " р."
+
+mixin user_place(user)
+    #usr_reg_place(class=user.is_auth?"":"display-none")
+        .avatar-place
+            img.img-circle(src=conf.noavatar_url)
+        .name-place
+            p
+                a(href="account.html")
+                    strong #{user.name}<br/>
+                a(href="logout.html") Выйти
+    #usr_guest_place(class=user.is_auth?"display-none":"")
+        ul.list-inline.list-unstyled
+            li
+                a(href="register.html") Регистрация
+            li
+                a(href="login.html") Войти
+
