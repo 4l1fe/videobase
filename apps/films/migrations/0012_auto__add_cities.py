@@ -16,8 +16,8 @@ class Migration(SchemaMigration):
             ('name_orig', self.gf('django.db.models.fields.CharField')(max_length=255)),
         ))
         db.send_create_signal('films', ['Cities'])
-        country = orm.Countries.objects.all()[0]
-        orm.Cities.objects.create(country_id=country, name='default city', name_orig='default city orig')
+        # country = orm.Countries.objects.all()[0]
+        # orm.Cities.objects.create(country_id=country, name='default city', name_orig='default city orig')
 
 
     def backwards(self, orm):
@@ -64,7 +64,7 @@ class Migration(SchemaMigration):
         },
         'films.cities': {
             'Meta': {'object_name': 'Cities', 'db_table': "'cities'"},
-            'country_id': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'cities'", 'to': "orm['films.Countries']"}),
+            'country': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'cities'", 'to': "orm['films.Countries']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'name_orig': ('django.db.models.fields.CharField', [], {'max_length': '255'})

@@ -63,7 +63,6 @@ INSTALLED_APPS = (
     'crawler',
     'social_auth',
     'djcelery',
-    'raven.contrib.django.raven_compat',  # may be delete later
 )
 
 MIDDLEWARE_CLASSES = (
@@ -233,9 +232,14 @@ SOCIAL_AUTH_PIPELINE = (
 # In minutes
 API_SESSION_EXPIRATION_TIME = 15
 
-RAVEN_CONFIG = {
-    'dsn': 'http://8684bf8b497047d9ac170fd16aefc873:41e89f4666b24f998125370f3d1a1789@sentry.aaysm.com/2'
-}
+if not DEBUG:
+    INSTALLED_APPS += (
+         'raven.contrib.django.raven_compat',  # may be delete later
+    )
+
+    RAVEN_CONFIG = {
+        'dsn': 'http://8684bf8b497047d9ac170fd16aefc873:41e89f4666b24f998125370f3d1a1789@sentry.aaysm.com/2'
+    }
 
 from datetime import timedelta
 
