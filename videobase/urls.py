@@ -27,6 +27,7 @@ urlpatterns = patterns('',
 
     # Interface
     url(r'^person/', 'apps.films.views.person_view'),
+    url(r'^film/(?P<film_id>\d+)', 'apps.films.views.film_view'),
     # url(r'^register/', 'apps.films.views.register_view'),
     url(r'^login/', 'apps.films.views.login_view'),
     url(r'^$', 'apps.films.views.index_view'),
