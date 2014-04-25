@@ -1,6 +1,6 @@
 Django==1.6.2
 South==0.8.4
-argparse==1.2.1
+argparse
 psycopg2==2.5.2
 wsgiref==0.1.2
 microdata==0.4.1
@@ -26,5 +26,6 @@ factory_boy
 coverage
 celery
 django-celery
+raven
 git+git://github.com/bartTC/django-memcache-status.git
-#sudo apt-get install -y mercurial memcached libmemcached-dev zlib1g-dev libssl-dev python-dev build-essential libjpeg-dev libfreetype6-dev zlib1g-dev libpng12-dev libpq-dev libgraphviz-dev graphviz
+#sudo apt-get install -y mercurial memcached libmemcached-dev zlib1g-dev libssl-dev python-dev build-essential libjpeg-dev libfreetype6-dev zlib1g-dev libpng12-dev libpq-dev libgraphviz-dev graphviz nginx
