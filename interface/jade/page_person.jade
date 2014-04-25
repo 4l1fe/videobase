@@ -1,6 +1,8 @@
 - header_title = person.name
 html
     include head
+    include globals
+    include mixins
 - person_roles = person.roles && person.roles.length?person.roles.join(", "):false
 - person_birthplace = person.birthplace && person.birthplace.length?person.birthplace.join(", "):false
 - person_birthdate = new Date(person.birthdate)
