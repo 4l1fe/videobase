@@ -106,11 +106,18 @@ class Command(BaseCommand):
                 - если rating_imdb и rating_kinopoisk не установлены, то формула становится 100% rating_local
         """
 
-        result = 0
-        rating_imdb = instance.rating_imdb
-        rating_local = instance.rating_local
-        rating_kinopoisk = instance.rating_kinopoisk
+        #result = 0
 
+        values = ((6, instance.rating_kinopoisk), (3, instance.rating_imdb), (1, instance.rating_local))
+        divisor = float(sum(t[0] for t in values if t[1]))
+        result = sum([t[0]/divisor*t[1] for t in values if t[1]])
+
+        #rating_imdb = instance.rating_imdb
+        #rating_local = instance.rating_local
+        #rating_kinopoisk = instance.rating_kinopoisk
+
+
+        '''
         if rating_imdb is None or rating_local is None or rating_kinopoisk is None:
             if rating_imdb is None and rating_kinopoisk is None:
                 result = rating_local
@@ -125,7 +132,7 @@ class Command(BaseCommand):
 
         else:
             result = 0.6 * rating_kinopoisk + 0.3 * rating_imdb + 0.1 * rating_local
-
+        '''
         return result
 
 
