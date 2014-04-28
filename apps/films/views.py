@@ -192,11 +192,25 @@ class PersonsExtrasAPIView(APIView):
         except Exception, e:
             raise Http404
 
+def transform_vbFilms(vbf):
+
+    vbf.update({'instock':True,
+        'hasFree':True,
+        'year':vbf['release_date'].strftime('%Y'),
+        'release_date':vbf['release_date'].strftime('%Y-%m-%d')
+        })
 
 def index_view(request):
     # ... view code here
 
-    return render_to_response('index.html',)
+
+    new_vbFilms = [pf.as_vbFilm() for pf in film_model.Films.objects.order_by('-release_date').all()[:4]]
+
+    for vbf in new_vbFilms:
+        transform_vbFilms(vbf)
+
+
+    return HttpResponse(render_page('index',{'new_films':new_vbFilms}),status.HTTP_200_OK)
 
 
 def person_view(request, resource_id):
@@ -222,7 +236,7 @@ def person_view(request, resource_id):
             vbf.update({'instock':True,
                         'hasFree':True,
                         'year':vbf['release_date'].strftime('%Y'),
-                        'release_date':''
+                        'release_date':vbf['release_date'].strftime('%Y-%m-%d')
                     })
 
             
