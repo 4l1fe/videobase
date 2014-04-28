@@ -25,13 +25,14 @@ YANDEX_KP_FILMS_TEMPLATE = "http://st.kp.yandex.net/images/film_big/{}.jpg"
 
 headers = {'User-Agent': 'Mozilla/5.0'}
 
+
 def crawler_get(url):
     if USE_SOCKS5_PROXY:
         session = requests.session()
-        session.proxies = {'http':SOCKS5_PROXY_ADDRESS}
-        return session.get(url,headers = headers)
+        session.proxies = {'http': SOCKS5_PROXY_ADDRESS}
+        return session.get(url, headers=headers)
     else:
-        return requests.get(url,headers=headers)
+        return requests.get(url, headers=headers)
 
 
 def commatlst(tag):
@@ -131,10 +132,11 @@ def extract_names(soup):
 
 
 def actors_wrap(actors_names):
-   return [('Persons',{'name': an ,'p_type': APP_PERSON_ACTOR,
+   return [('Persons', {'name': an , 'p_type': APP_PERSON_ACTOR,
                        'photo': get_photo(re.match('[/]name[/](?P<id>[0-9]+)[/]',ai).groupdict()['id'])
 
-                   }) for an,ai in actors_names]
+                   }) for an, ai in actors_names]
+
 
 def acquire_page(page_id):
 

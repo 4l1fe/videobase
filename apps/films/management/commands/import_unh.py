@@ -1,21 +1,14 @@
 # coding: utf-8
 
-#from guppy import hpy
-import os, csv, re
-from datetime import datetime
+import os
+import re
+import csv
 import codecs
-import chardet
 import datetime
-import warnings
 import HTMLParser
 
-from django.db import DatabaseError
-from django.core.exceptions import ObjectDoesNotExist
-from django.core.management.base import LabelCommand, BaseCommand, CommandError
-from optparse import make_option
-from django.db import models
-from django.contrib.contenttypes.models import ContentType
-from django.db import IntegrityError, transaction
+from django.db import transaction
+from django.core.management.base import BaseCommand, CommandError
 
 from apps.films.constants import *
 from apps.films.models import Films, Genres, Countries, PersonsFilms, FilmExtras, Persons
