@@ -1,8 +1,8 @@
 - header_title="Регистрация"
 html
+    include config
     include head
 - user_regdate = new Date(user.regdate)
-- user_how_long = how_long(user_regdate, 1)
     body.user-page
         include header
         .container
