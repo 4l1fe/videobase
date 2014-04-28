@@ -30,7 +30,7 @@ urlpatterns = patterns('',
 
     # Interface
     url(r'^person/(?P<resource_id>.*)/?$', 'apps.films.views.person_view'),
-    url(r'^films?/(?P<film_id>\d+)$', 'apps.films.views.film_view'),
+    url(r'^films?/(?P<film_id>\d+)/?$', 'apps.films.views.film_view'),
     url(r'^register/', 'apps.films.views.register_view'),
     url(r'^user/(?P<resource_id>.*)/?$', 'apps.films.views.user_view'),
     # url(r'^regi/', 'apps.films.views.login_view'),
