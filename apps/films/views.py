@@ -313,6 +313,11 @@ def calc_comments(o_film):
     result_list = content_model.Comments.objects.filter(content=content.film_id)[:5]
     return result_list
 
+def transform_to_json_serializable(rdict):
+    rdict['releasedate'] = rdict['releasedate'].strftime("%d-%m-%Y")
+    rdict['actors'] = [dict(actor) for actor in rdict['actors']]
+    return rdict
+
 def film_view(request, film_id, *args, **kwargs):
     resp_dict = {}
     o_film = film_model.Films.objects.filter(pk=film_id).prefetch_related('genres', 'countries')
@@ -328,5 +333,9 @@ def film_view(request, film_id, *args, **kwargs):
     resp_dict[0]['similar'] = calc_similar(o_film)
     resp_dict[0]['comments'] = calc_comments(o_film)
 
-    print resp_dict
-    return HttpResponse(render_page('film', resp_dict))
+
+
+
+
+    film =transform_to_json_serializable(resp_dict[0])
+    return HttpResponse(render_page('film', {'film':film}))
