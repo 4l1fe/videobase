@@ -12,7 +12,6 @@ class vbPerson(serializers.ModelSerializer):
     roles = serializers.SerializerMethodField('get_roles')
 
     def __init__(self, *args, **kwargs):  # TODO: подготовить список городов, стран для получения места рождения
-                                          # TODO: подготовить список ролей, для получения их по каждой персоне
         extended_fields = []
 
         extend = kwargs.pop('extend', False)
@@ -27,10 +26,25 @@ class vbPerson(serializers.ModelSerializer):
             for field_name in extended_fields:
                 self.fields.pop(field_name, None)
 
-        self.prepared_roles = self._get_roles()
+        self.prep_person_roles = self._get_roles()
+
+    def _get_roles(self):
+        """Подготовим словарь из ролей, под которыми человек принимал участие в фильме.
+        Далее будем использовать его для того, чтобы уже выбирать роли только по отдельному человеку."""
+
+        persons_list = self.object  # должен быть список из объектов - Persons
+        person_roles = PersonsFilms.objects.filter(person__in=persons_list).\
+                                            distinct('person', 'p_type').values_list('person', 'p_type')
+        prep_person_roles = {}
+        for p, r in person_roles.items():
+            if p not in prep_person_roles:
+                prep_person_roles[p] = [r]
+            else:
+                prep_person_roles[p].append(r)
+        return prep_person_roles
 
     def get_relation(self, obj):
-        pass
+        return 'relation'
 
     def get_birthplace(self, obj):
         if not obj.city is None:
@@ -39,13 +53,9 @@ class vbPerson(serializers.ModelSerializer):
             return [city, country]
         return []
 
-    def _get_roles(self):
-        persons_list = self.object
-        person_roles = PersonsFilms.objects.filter(person__in=persons_list).distinct('person', 'p_type')
-
     def get_roles(self, obj):
-        if obj.person_film_rel is not None:
-            return (pf.p_type for pf in obj.person_film_rel.distinct('p_type'))
+        if obj.pk in self.prep_person_roles:
+            return self.prep_person_roles[obj.pk]
         return []
 
     class Meta:
