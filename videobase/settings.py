@@ -21,7 +21,7 @@ CONFIGS_PATH = os.path.join(BASE_PATH, '..', 'configs')
 SECRET_KEY = '7-dsc0--i_ej94w9as#-5p_5a)ql*9o80v1rs9krx!_-9%^b5$'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 TEMPLATE_DEBUG = DEBUG
 
@@ -252,9 +252,9 @@ CELERYBEAT_SCHEDULE = {
 
 CELERY_TIMEZONE = 'UTC'
 
-
 INSTALLED_APPS += ('django_jenkins',)
 JENKINS_TASKS = ('django_jenkins.tasks.run_pylint',
                  'django_jenkins.tasks.run_pep8',
                  'django_jenkins.tasks.run_pyflakes',
                  'django_jenkins.tasks.with_coverage',)
+CELERY_RESULT_BACKEND='djcelery.backends.database:DatabaseBackend'
