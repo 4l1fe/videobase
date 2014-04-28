@@ -15,8 +15,8 @@ class RobotsTries(models.Model):
     '''
 
     domain = models.CharField(max_length=255, verbose_name=u'Домен')
-    film = models.ForeignKey(Films, verbose_name=u'Фильм')
-    url = models.URLField(max_length=255, verbose_name=u'URL to film information')
+    film = models.ForeignKey(Films, verbose_name=u'Фильм', related_name='robots_tries')
+    url = models.URLField(max_length=255, verbose_name=u'URL to film information', null=True, blank=True)
     outcome = models.CharField(max_length=255, choices=APP_ROBOTS_TRY_OUTCOME, verbose_name=u'Результат')
 
     def __unicode__(self):
