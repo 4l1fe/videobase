@@ -26,12 +26,12 @@ html
                             tr
                                 td Страна
                                 td=film_country
-//                        - if (film.directors)
+                        - if (film.directors)
                             tr
                                 td Режиссёр
                                 td
                                     mixin anchor_list(film.directors, "/persons/%")
-//                        - if (film.scriptwriters)
+                        - if (film.scriptwriters)
                             tr
                                 td Сценарист
                                 td
