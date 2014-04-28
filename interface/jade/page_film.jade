@@ -2,6 +2,9 @@
 - film_country = film.countries && film.countries.length ?film.countries.join(", "):false
 html
     include head
+    include mixins
+    include globals
+    include config
     body.film-page
         include header
         .container.pleer-wrapper
@@ -23,12 +26,12 @@ html
                             tr
                                 td Страна
                                 td=film_country
-                        - if (film.directors)
+//                        - if (film.directors)
                             tr
                                 td Режиссёр
                                 td
                                     mixin anchor_list(film.directors, "/persons/%")
-                        - if (film.scriptwriters)
+//                        - if (film.scriptwriters)
                             tr
                                 td Сценарист
                                 td
