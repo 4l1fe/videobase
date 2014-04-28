@@ -70,7 +70,16 @@ class Films(models.Model):
             pass
 
         return f_dict
-                  
+
+    @classmethod
+    def similar_api(self, o_film):
+        list_genres = [i.pk for i in o_film.genres.all()]
+
+        o_similar = Films.objects.distinct().filter(genres__in=list_genres).\
+                        exclude(pk=o_film.pk).order_by('-rating_cons')[:12]
+
+        return o_similar
+
     class Meta(object):
         # Имя таблицы в БД
         db_table = 'films'

@@ -92,24 +92,29 @@ class vbFilm(serializers.ModelSerializer):
 
 
     def _rebuild_tors_list(self):
-        directors_list = []
-        scriptwriters_list = []
+        result = {}
 
         if self.extend_sign:
             o_person = Persons.objects.filter(Q(person_film_rel__p_type=APP_PERSON_DIRECTOR) | Q(person_film_rel__p_type=APP_PERSON_SCRIPTWRITER),
                                               person_film_rel__film__in=self.list_obj_pk).\
-                extra(select={'p_type': "persons_films.p_type"}).order_by('id')
+                extra(select={'p_type': "persons_films.p_type", 'film': "persons_films.film_id"}).order_by('id')
 
-            for item in o_person:
-                if item.p_type == APP_PERSON_DIRECTOR:
-                    directors_list.append(item)
-                else:
-                    scriptwriters_list.append(item)
+            o_person = group_by(o_person, 'film', True)
 
-        self.tors_list = {
-            'directors': directors_list,
-            'scriptwriters': scriptwriters_list,
-        }
+            for key, value in o_person.items():
+                if not key in result:
+                    result[key] = {
+                        'directors': [],
+                        'scriptwriters': [],
+                    }
+
+                for item in value:
+                    if item.p_type == APP_PERSON_DIRECTOR:
+                        result[key]['directors'].append(item)
+                    else:
+                        result[key]['scriptwriters'].append(item)
+
+        self.tors_list = result
 
 
     def calc_ratings(self, obj):
@@ -160,9 +165,12 @@ class vbFilm(serializers.ModelSerializer):
 
 
     def poster_list(self, obj):
-        result = self.poster_rebuild.get(obj.pk, [])
+        result = self.poster_rebuild.get(obj.pk, '')
         if len(result):
-            return [item.url for item in result if not item.url is None and len(item.url)]
+            for item in result:
+                if not item.photo is None and item.photo:
+                    result = item.photo.url
+                    break
 
         return result
 
@@ -187,17 +195,23 @@ class vbFilm(serializers.ModelSerializer):
 
 
     def director_list(self, obj):
-        temp = self.tors_list['directors']
+        temp = self.tors_list.get(obj.pk, [])
         if len(temp):
-            return vbPerson(temp, many=True).data
+            if len(temp['directors']):
+                return vbPerson(temp['directors'], many=True).data
+            else:
+                return []
 
         return temp
 
 
     def scriptwriter_list(self, obj):
-        temp = self.tors_list['scriptwriters']
+        temp = self.tors_list.get(obj.pk, [])
         if len(temp):
-            return vbPerson(temp, many=True).data
+            if len(temp['scriptwriters']):
+                return vbPerson(temp['scriptwriters'], many=True).data
+            else:
+                return []
 
         return temp
 

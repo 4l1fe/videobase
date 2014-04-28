@@ -1,0 +1,109 @@
+input {padding: 12px; border-radius: 5px; border: 0; font-size: 18px}
+a, a:hover {text-decoration: none}
+
+.md-vmiddle {height: 100%}
+.md-vmiddle img {vertical-align: middle}
+.md-vmiddle .md-vmiddle-helper{display: inline-block;  vertical-align: middle; height: 100%}
+.display-none {display: none}
+/* main styles */
+body {background: url("../img/common-bg.jpg") repeat}
+
+.film-thumb {text-align: center;}
+.film-thumb .poster-wrapper {padding-bottom: 10px; background: url("../img/film-new-poster-bg.png") no-repeat 50% 0; margin: 0 auto 0 auto}
+.film-thumb .poster-wrapper .poster-place {width: 260px; height: 360px; background-position: 50% 50%; background-repeat: no-repeat; margin: auto}
+.film-thumb .rating-place {border-radius: 50%; width: 50px; height: 50px; background: #dee5f8; color: #7d7a7f; margin: -35px auto 0 auto; font-size: 18px; font-weight: bold}
+.film-thumb .rating-place .rating {margin: 0; padding: 0; line-height: 50px}
+.film-thumb .notwatch-btn {border: 0; background: url("../img/notwatch.png") 50% 50% no-repeat; width: 16px; height: 15px; color: transparent; float: left}
+.film-thumb .name-place {font-size: 16px; margin-top: 10px; text-align: left; min-height: 45px}
+.film-thumb .name-place a {color: #4868cd; font-weight: bold; border-bottom: 1px solid #4868cd}
+.film-thumb .name-place span {color: #7e7f7f}
+.film-thumb .rel-place {margin: 10px auto 10px auto; height: 20px; width: 210px}
+.film-thumb .button-place {width: 210px; margin: 0 auto 0 auto; height: 120px}
+.film-thumb .button-place button {border: 0; font-size: 16px; float:left; height: 50px; padding: 0}
+.film-thumb .button-place button.watch-btn {width: 160px; background: url("../img/film-btn.png") no-repeat 0 0; color: #282828; text-transform: uppercase; font-weight: bold}
+.film-thumb .button-priced button.watch-btn {background: url("../img/film-btn-priced.png") no-repeat 0 0;}
+.film-thumb .button-place button.watch-btn span {color: #474747; font-size: 12px; text-transform: none; font-weight: normal}
+.film-thumb .button-place button.playlist-btn {background: url("../img/film-btn.png") no-repeat -160px 0; width: 48px; color: #594500;}
+.film-thumb .button-priced button.playlist-btn {background: url("../img/film-btn-priced.png") no-repeat -160px 0;}
+.film-thumb .button-place button.subscribe-btn {width: 210px; background: url("../img/film-subscribe-btn.png") no-repeat 0 0; color: #282828; text-transform: uppercase; font-weight: bold}
+.film-thumb .watchprice {color: #757575}
+.film-thumb .watchprice a {color: #4868cd; border-bottom: 1px solid #4868cd}
+
+.films-new .film-thumb .poster-wrapper {background: url("../img/film-new-poster-bg.png") no-repeat 50% 0;}
+.films-new .film-thumb .rating-place {background: #007ebc; color: #fff;}
+.films-new .film-thumb .name-place a {color: #fff; border-bottom: 1px solid #fff}
+.films-new .film-thumb .name-place span {color: #94b5c5}
+.films-new .film-thumb .button-place button.watch-btn {background: url("../img/film-new-btn.png") no-repeat 0 0; color: #fff;}
+.films-new .film-thumb .button-place button.watch-btn span {color: #bdb3b3;}
+.films-new .film-thumb .button-place button.playlist-btn {background: url("../img/film-new-btn.png") no-repeat -160px 0; color: #e6b300;}
+.films-new .film-thumb .button-place button.subscribe-btn {color: #fff}
+.films-new .film-thumb .watchprice {color: #94b5c5}
+.films-new .film-thumb .watchprice a {color: #fff; border-bottom: 1px solid #fff}
+
+
+.header-top {min-height: 100px; background: url("../img/header-bg.png")}
+.header-top .logo {height: 100px;}
+.header-top .search {text-align: center; height: 100px; line-height: 100px}
+.header-top .search input {line-height: 1em; height: 42px}
+.header-top .search input.inp-search {color: #c2bdbd; background: #5e5858; width: 70%; max-width: 450px; padding-right: 80px; display: inline-block}
+.header-top .search input.btn-submit {color: #fff; text-transform: uppercase; width: 80px; margin-left: -80px; background: #0077ad; display: inline-block; cursor: pointer}
+.header-top .user-place {float: right; height: 100px}
+.header-top .user-place .avatar {width: 70px; height: 70px; float: left; margin-top: 20px}
+.header-top .user-place ul {margin-left: 60px; margin-top: 30px}
+.header-top .user-place li {list-style-type: none}
+.header-top .user-place li:first-child a {color: #f2c203; border-bottom: 1px solid #f2c203; font-weight: bold}
+.header-top .user-place li:last-child a {color: #806815; border-bottom: 1px solid #806815}
+.header-top ul {min-height: 100px}
+
+.header-menu {min-height: 100px; background: url("../img/menu-bg.png")}
+.header-menu li div {text-align: center; background-position: 50% 50%; background-repeat: no-repeat; padding-top: 65px;}
+.header-menu li p {border-right: 1px solid #c8c8c8; padding: 0 30px 0 30px; font-weight: bold}
+.header-menu li:last-child p {border-right: 0; color: #635e5e;}
+.header-menu li p a {text-transform: uppercase; text-decoration: none; border-bottom: 1px solid #635e5e; color: #635e5e;}
+.header-menu li.active p a {color: #1f7fad}
+.header-menu .films {background-image: url("../img/ico-films.png")}
+.header-menu .serials {background-image: url("../img/ico-serials.png")}
+.header-menu .tv {background-image: url("../img/ico-tv.png")}
+.header-menu .stream {background-image: url("../img/ico-stream.png")}
+.header-menu .playlist {background-image: url("../img/ico-playlist.png")}
+.header-menu .feed {background-image: url("../img/ico-feed.png")}
+
+footer .logo {height: 90px}
+footer .links {height: 90px; font-size: 14px; text-align: center; line-height: 90px}
+footer .links a {text-decoration: none; border-bottom: 1px solid #4868cd; font-weight: bold}
+footer .links li {line-height: 1em}
+footer .links li:first-child {padding-right: 20px; border-right: 1px solid #c8c8c8}
+footer .links li:last-child {padding-left: 20px}
+footer .social {line-height: 90px}
+footer .copyright {color: #7a7a7a; margin-bottom: 20px}
+
+/* index page */
+h2 {font-size: 20px; text-transform: uppercase; text-align: center; margin: 40px 0 20px 0; font-weight: bold; background-position: 50% 50%; background-repeat: no-repeat}
+.films-new-wrapper {background: url("../img/new-bg.jpg") repeat;}
+.films-new-wrapper h2 {color: white; background-image: url("../img/film-new-h-bg.png")}
+.films-wrapper h2 {color: #282828; background-image: url("../img/films-h-bg.png")}
+
+.filter-place, .films-more {width: 100%; height: 60px; }
+.filter-place .shadow, .films-more .shadow {height: 10px; background: url("../img/shadow.png") repeat-x 0 100%; margin: 0 5px 0 5px; border-radius: 0 0 40px 40px}
+.films-more {text-align: center; margin-bottom: 20px}
+.films-more button {border: 0; color: #5b78d0; text-transform: uppercase; font-weight: bold; font-size: 20px; background: url("../img/more-bg.png") repeat-x; border-radius: 5px; width: 100%; height: 50px}
+.films-more button span {border-bottom: 1px dashed #5b78d0}
+.films-wrapper .films {margin-top: 30px}
+.filter {background: url("../img/more-bg.png") repeat-x; border-radius: 5px; height: 50px; margin: 0; padding: 0 15px 0 15px}
+.select-wrapper select {background: transparent; font-size: 16px; border: 0; border-bottom: 1px dashed #4868cd; color: #4868cd; -webkit-appearance: none; margin-right: 10px; font-weight: bold; }
+.select-wrapper {background: url("../img/dropdown.png") right 50% no-repeat;  display: inline-block;}
+.filter-sort {float: right; font-weight: bold; font-size: 16px; margin-top: 13px}
+.filter-main .select-wrapper {margin-left: 20px; border-left: 1px solid #c8c8c8; padding-left: 20px; margin-top: 13px}
+.filter-main .select-wrapper:first-child {border: 0}
+.comments-wrapper {background: url("../img/comments-bg.jpg") repeat}
+.comments-wrapper h2 {color: white; background-image: url("../img/comments-h-bg.png")}
+.comment-place {margin-bottom: 20px}
+.comment-place .comment-wrapper {background-color: #2e2727; border-radius: 10px; padding-bottom: 5px;}
+.comment-place .comment {background: #fff; border-radius: 10px; padding: 20px}
+.comment-place .comment .rating {margin-bottom: 5px}
+.comment-place .user {text-align: center}
+.comment-place .user .avatar {width: 130px; background: url("../img/comment-who.png") no-repeat; text-align: center; margin: -5px auto 0 auto; padding-top: 20px;}
+.comment-place .user .avatar img {max-height: 70px; max-width: 70px}
+.comment-place .user .name {margin: 20px 0 5px 0}
+.comment-place .user .name a {color: #e6b908; border-bottom: 1px solid #e6b908; font-weight: bold}
+.comment-place .user .city {color: #716c6c}
