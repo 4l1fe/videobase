@@ -284,13 +284,13 @@ def test_view(request):
     return render_to_response('api_test.html', c)
 
 def calc_actors(o_film):
-        result_list = []
-        try:
-            result_list = film_model.Persons.objects.filter(person_film_rel__film=o_film.pk).values('id', 'name')
-        except Exception, e:
-            pass
+    result_list = []
+    try:
+        result_list = film_model.Persons.objects.filter(person_film_rel__film=o_film.pk).values('id', 'name')[:5]
+    except Exception, e:
+        pass
 
-        return result_list
+    return result_list
 
 def calc_similar(o_film):
     result_list = []
@@ -325,17 +325,18 @@ def film_view(request, film_id, *args, **kwargs):
     if not len(o_film):
         raise Http404
 
-    resp_dict = vbFilm(o_film, extend=True)
-    resp_dict = resp_dict.data
-
     o_film = o_film[0]
-    resp_dict[0]['actors'] = calc_actors(o_film)
-    resp_dict[0]['similar'] = calc_similar(o_film)
-    resp_dict[0]['comments'] = calc_comments(o_film)
+    resp_dict = vbFilm(o_film, extend=True)
+
+    try:
+        resp_dict = resp_dict.data
+    except Exception, e:
+        raise Http404
+
+    resp_dict['actors'] = calc_actors(o_film)
+    resp_dict['similar'] = calc_similar(o_film)
+    resp_dict['comments'] = calc_comments(o_film)
 
 
-
-
-
-    film =transform_to_json_serializable(resp_dict[0])
+    film =transform_to_json_serializable(resp_dict)
     return HttpResponse(render_page('film', {'film':film}))
