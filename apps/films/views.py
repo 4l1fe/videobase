@@ -337,6 +337,5 @@ def film_view(request, film_id, *args, **kwargs):
     resp_dict['similar'] = calc_similar(o_film)
     resp_dict['comments'] = calc_comments(o_film)
 
-
-    film =transform_to_json_serializable(resp_dict)
+    film = transform_to_json_serializable(resp_dict)
     return HttpResponse(render_page('film', {'film':film}))
