@@ -225,30 +225,28 @@ def person_view(request, resource_id):
         - person_birthdate_string = date_text(person_birthdate) + " г. (" + person_years_old + ")"
         '''
 
-        person = film_model.Persons.objects.get(pk =resource_id)
+        person = film_model.Persons.objects.get(pk=resource_id)
 
-        pfs = film_model.PersonsFilms.objects.filter(person = person)
+        pfs = film_model.PersonsFilms.objects.filter(person=person)
 
         vbFilms = [pf.film.as_vbFilm() for pf in pfs]
 
         for vbf in vbFilms:
             
-            vbf.update({'instock':True,
-                        'hasFree':True,
-                        'year':vbf['release_date'].strftime('%Y'),
-                        'release_date':vbf['release_date'].strftime('%Y-%m-%d')
-                    })
+            vbf.update({'instock': True,
+                        'hasFree': True,
+                        'year': vbf['release_date'].strftime('%Y'),
+                        'release_date': vbf['release_date'].strftime('%Y-%m-%d')
+            })
 
-            
-        return HttpResponse(render_page('person',{
-            'person' : {'id': resource_id,
-                      'name': person.name,
-                      'photo': "static/img/tmp/person1.jpg",
-                      'bio': person.bio,
-                      'birthdate': "1974-01-22",
-                      'roles': ["актер", "режиссёр"],
-                      'birthplace': ["Москва", "Россия"]},
-
+        return HttpResponse(render_page('person', {
+            'person': {'id': resource_id,
+                       'name': person.name,
+                       'photo': "static/img/tmp/person1.jpg",
+                       'bio': person.bio,
+                       'birthdate': "1974-01-22",
+                       'roles': ["актер", "режиссёр"],
+                       'birthplace': ["Москва", "Россия"]},
             'filmography': vbFilms}))
 
 
