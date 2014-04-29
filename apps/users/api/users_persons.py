@@ -23,9 +23,9 @@ class UsersPersonsView(APIView):
         except Exception as e:
             return Response({'e': e.message}, status=status.HTTP_400_BAD_REQUEST)
 
-        page = request.DATA.get('page', APP_USERS_API_DEFAULT_PAGE)
-        per_page = request.DATA.get('per_page', APP_USERS_API_DEFAULT_PER_PAGE)
-        type = request.DATA.get('type', 'all')
+        page = request.DATA.get('page', APP_USERS_API_DEFAULT_PAGE)  # TODO: делать преобразование к int(вдруг символы)
+        per_page = request.DATA.get('per_page', APP_USERS_API_DEFAULT_PER_PAGE) # TODO: то же самое
+        type = request.DATA.get('type', 'all')  # TODO: нигде не используется
 
         persons = Persons.objects.filter(users_persons__user=user)
         try:
@@ -33,7 +33,7 @@ class UsersPersonsView(APIView):
         except Exception as e:
             return Response({'e': e.message}, status=status.HTTP_400_BAD_REQUEST)
 
-        serializer = vbPerson(page.object_list, many=True)
+        serializer = vbPerson(page.object_list, user=user, many=True)
         result = {
             'page': page.number,
             'per_page': page.paginator.per_page,
