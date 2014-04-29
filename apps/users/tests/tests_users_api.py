@@ -5,11 +5,13 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 from rest_framework.reverse import reverse
 
-from apps.films.constants import APP_FILM_FULL_FILM, APP_FILM_SERIAL, APP_USERFILM_STATUS_SUBS
+from apps.films.constants import APP_FILM_FULL_FILM, APP_FILM_SERIAL, APP_USERFILM_STATUS_SUBS, \
+    APP_PERSON_DIRECTOR, APP_PERSON_ACTOR, APP_PERSON_SCRIPTWRITER, APP_PERSON_PRODUCER
 from apps.users.constants import APP_USER_REL_TYPE_FRIENDS, APP_USER_REL_TYPE_NONE,\
     APP_USERS_API_DEFAULT_PER_PAGE, APP_USERS_API_DEFAULT_PAGE
 from apps.users.models.api_session import SessionToken, UsersApiSessions
 from apps.users.tests.factories_users_api import *
+from apps.users.api.users_persons import persons_type
 
 import random
 
@@ -406,6 +408,11 @@ class APIUsersPersonsTestCase(APITestCase):
         self.kwargs = {'format': 'json', 'user_id': self.user.pk}
         for i in range(10):
             UserPersonsFatory.create(user=self.user)
+        persons = Persons.objects.all()
+        for person in persons:
+            PersonsFilmsFactory.create(person=person, p_type=random.choice((
+                APP_PERSON_PRODUCER, APP_PERSON_SCRIPTWRITER,
+                APP_PERSON_DIRECTOR, APP_PERSON_ACTOR, )))
         s_token = SessionToken.objects.create(user=self.user)
         UsersApiSessions.objects.create(token=s_token)
         self.headers = "%s %s" % ('X-VB-Token', s_token.key)
@@ -419,19 +426,48 @@ class APIUsersPersonsTestCase(APITestCase):
         kw = self.kwargs.copy()
         kw['user_id'] = pk + 1
         response = self.client.post(reverse(self.url_name, kwargs=kw),
-                        HTTP_AUTHORIZATION=self.headers)
+                                    HTTP_AUTHORIZATION=self.headers)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_api_users_genres_200_post(self):
         response = self.client.post(reverse(self.url_name, kwargs=self.kwargs),
-                                   HTTP_AUTHORIZATION=self.headers)
-        persons = Persons.objects.filter(users_persons__user=self.user)
-
+                                    HTTP_AUTHORIZATION=self.headers)
+        ftype = persons_type['all']
+        persons = Persons.objects.filter(users_persons__user=self.user,
+                                         person_film_rel__p_type__in=ftype)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         for i in range(len(persons)):
+            sub = UsersPersons.objects.get(person=persons[i], user=self.user).subscribed
             self.assertEqual(response.data['items'][i]['id'], persons[i].pk)
             self.assertEqual(response.data['items'][i]['name'], persons[i].name)
             self.assertEqual(response.data['items'][i]['photo'], persons[i].photo)
+            self.assertEqual(response.data['items'][i]['relation'], sub)
+            self.assertEqual(response.data['items'][i]['birthdate'], persons[i].birthdate)
+            self.assertEqual(response.data['items'][i]['birthplace'][0], persons[i].city.name)
+            self.assertEqual(response.data['items'][i]['birthplace'][1], persons[i].city.country.name)
+
+    def test_api_users_genres_with_type_200_post(self):
+        response = self.client.post(reverse(self.url_name, kwargs=self.kwargs),
+                                    HTTP_AUTHORIZATION=self.headers,
+                                    data={'type': 'a'})
+        ftype = persons_type['a']
+        persons = Persons.objects.filter(users_persons__user=self.user, person_film_rel__p_type__in=ftype)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        for i in range(len(persons)):
+            sub = UsersPersons.objects.get(person=persons[i], user=self.user).subscribed
+            self.assertEqual(response.data['items'][i]['id'], persons[i].pk)
+            self.assertEqual(response.data['items'][i]['name'], persons[i].name)
+            self.assertEqual(response.data['items'][i]['photo'], persons[i].photo)
+            self.assertEqual(response.data['items'][i]['relation'], sub)
+            self.assertEqual(response.data['items'][i]['birthdate'], persons[i].birthdate)
+            self.assertEqual(response.data['items'][i]['birthplace'][0], persons[i].city.name)
+            self.assertEqual(response.data['items'][i]['birthplace'][1], persons[i].city.country.name)
+
+    def test_api_users_genres_with_bad_type_200_post(self):
+        response = self.client.post(reverse(self.url_name, kwargs=self.kwargs),
+                                    HTTP_AUTHORIZATION=self.headers,
+                                    data={'type': '1'})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 
 class APIUsersFilmsTestCase(APITestCase):
@@ -441,8 +477,12 @@ class APIUsersFilmsTestCase(APITestCase):
         self.kwargs = {'format': 'json', 'user_id': self.user.pk}
         films = []
         for i in range(10):
-            films.append(FilmFactory.create(type=random.choice((APP_FILM_SERIAL,
-                                                       APP_FILM_FULL_FILM))))
+            film = FilmFactory.create(type=random.choice((APP_FILM_SERIAL,
+                                                          APP_FILM_FULL_FILM)))
+            films.append(film)
+            content = ContetsFactory.create(film=film)
+            LocationsFactory.create(content=content)
+
         for i in range(10):
             UserFilmsFactory.create(user=self.user, status=APP_USERFILM_STATUS_SUBS, film=films[i])
         s_token = SessionToken.objects.create(user=self.user)
@@ -469,11 +509,25 @@ class APIUsersFilmsTestCase(APITestCase):
                                      users_films__status=APP_USERFILM_STATUS_SUBS)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         for i in range(len(films)):
+            loc = Locations.objects.get(content__film=films[i])
             self.assertEqual(response.data['items'][i]['id'], films[i].pk)
             self.assertEqual(response.data['items'][i]['name'], films[i].name)
             self.assertEqual(response.data['items'][i]['name_orig'], films[i].name_orig)
             self.assertEqual(response.data['items'][i]['releasedate'], films[i].release_date)
             self.assertEqual(response.data['items'][i]['duration'], films[i].duration)
+            self.assertEqual(response.data['items'][i]['locations'][0]['type'], loc.type)
+            self.assertEqual(response.data['items'][i]['locations'][0]['lang'], loc.lang)
+            self.assertEqual(response.data['items'][i]['locations'][0]['quality'], loc.quality)
+            self.assertEqual(response.data['items'][i]['locations'][0]['price'], loc.price)
+            self.assertEqual(response.data['items'][i]['locations'][0]['subtitles'], loc.subtitles)
+            self.assertEqual(response.data['items'][i]['locations'][0]['price_type'], loc.price_type)
+            self.assertEqual(response.data['items'][i]['locations'][0]['id'], loc.pk)
+            self.assertEqual(response.data['items'][i]['ratings']['imdb'][0], films[i].rating_imdb)
+            self.assertEqual(response.data['items'][i]['ratings']['imdb'][0], films[i].rating_imdb_cnt)
+            self.assertEqual(response.data['items'][i]['ratings']['kp'][0], films[i].rating_kinopoisk)
+            self.assertEqual(response.data['items'][i]['ratings']['kp'][0], films[i].rating_kinopoisk_cnt)
+            self.assertEqual(response.data['items'][i]['ratings']['cons'][0], films[i].rating_cons)
+            self.assertEqual(response.data['items'][i]['ratings']['cons'][0], films[i].rating_cons_cnt)
 
     def test_api_users_films_200_serial_post(self):
         response = self.client.post(reverse(self.url_name, kwargs=self.kwargs),
@@ -483,11 +537,25 @@ class APIUsersFilmsTestCase(APITestCase):
                                      users_films__status=APP_USERFILM_STATUS_SUBS)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         for i in range(len(films)):
+            loc = Locations.objects.get(content__film=films[i])
             self.assertEqual(response.data['items'][i]['id'], films[i].pk)
             self.assertEqual(response.data['items'][i]['name'], films[i].name)
             self.assertEqual(response.data['items'][i]['name_orig'], films[i].name_orig)
             self.assertEqual(response.data['items'][i]['releasedate'], films[i].release_date)
             self.assertEqual(response.data['items'][i]['duration'], films[i].duration)
+            self.assertEqual(response.data['items'][i]['locations'][0]['type'], loc.type)
+            self.assertEqual(response.data['items'][i]['locations'][0]['lang'], loc.lang)
+            self.assertEqual(response.data['items'][i]['locations'][0]['quality'], loc.quality)
+            self.assertEqual(response.data['items'][i]['locations'][0]['price'], loc.price)
+            self.assertEqual(response.data['items'][i]['locations'][0]['subtitles'], loc.subtitles)
+            self.assertEqual(response.data['items'][i]['locations'][0]['price_type'], loc.price_type)
+            self.assertEqual(response.data['items'][i]['locations'][0]['id'], loc.pk)
+            self.assertEqual(response.data['items'][i]['ratings']['imdb'][0], films[i].rating_imdb)
+            self.assertEqual(response.data['items'][i]['ratings']['imdb'][0], films[i].rating_imdb_cnt)
+            self.assertEqual(response.data['items'][i]['ratings']['kp'][0], films[i].rating_kinopoisk)
+            self.assertEqual(response.data['items'][i]['ratings']['kp'][0], films[i].rating_kinopoisk_cnt)
+            self.assertEqual(response.data['items'][i]['ratings']['cons'][0], films[i].rating_cons)
+            self.assertEqual(response.data['items'][i]['ratings']['cons'][0], films[i].rating_cons_cnt)
 
     def test_api_users_films_200_full_film_post(self):
         response = self.client.post(reverse(self.url_name, kwargs=self.kwargs),
@@ -497,8 +565,22 @@ class APIUsersFilmsTestCase(APITestCase):
                                      users_films__status=APP_USERFILM_STATUS_SUBS)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         for i in range(len(films)):
+            loc = Locations.objects.get(content__film=films[i])
             self.assertEqual(response.data['items'][i]['id'], films[i].pk)
             self.assertEqual(response.data['items'][i]['name'], films[i].name)
             self.assertEqual(response.data['items'][i]['name_orig'], films[i].name_orig)
             self.assertEqual(response.data['items'][i]['releasedate'], films[i].release_date)
             self.assertEqual(response.data['items'][i]['duration'], films[i].duration)
+            self.assertEqual(response.data['items'][i]['locations'][0]['type'], loc.type)
+            self.assertEqual(response.data['items'][i]['locations'][0]['lang'], loc.lang)
+            self.assertEqual(response.data['items'][i]['locations'][0]['quality'], loc.quality)
+            self.assertEqual(response.data['items'][i]['locations'][0]['price'], loc.price)
+            self.assertEqual(response.data['items'][i]['locations'][0]['subtitles'], loc.subtitles)
+            self.assertEqual(response.data['items'][i]['locations'][0]['price_type'], loc.price_type)
+            self.assertEqual(response.data['items'][i]['locations'][0]['id'], loc.pk)
+            self.assertEqual(response.data['items'][i]['ratings']['imdb'][0], films[i].rating_imdb)
+            self.assertEqual(response.data['items'][i]['ratings']['imdb'][0], films[i].rating_imdb_cnt)
+            self.assertEqual(response.data['items'][i]['ratings']['kp'][0], films[i].rating_kinopoisk)
+            self.assertEqual(response.data['items'][i]['ratings']['kp'][0], films[i].rating_kinopoisk_cnt)
+            self.assertEqual(response.data['items'][i]['ratings']['cons'][0], films[i].rating_cons)
+            self.assertEqual(response.data['items'][i]['ratings']['cons'][0], films[i].rating_cons_cnt)
