@@ -177,7 +177,7 @@ class vbFilm(serializers.ModelSerializer):
 
     def _rebuild_poster_list(self):
         extras = FilmExtras.objects.filter(film__in=self.list_obj_pk, type=APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER)
-        extras = group_by(extras, 'id', True)
+        extras = group_by(extras, 'film_id', True)
 
         self.poster_rebuild = extras
 
