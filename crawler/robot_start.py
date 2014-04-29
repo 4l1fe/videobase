@@ -23,8 +23,6 @@ from crawler.playfamily_dot_ru.loader import playfamily_loader
 from crawler.playfamily_dot_ru.parser import PlayfamilyParser
 from crawler.tvigle_ru.loader import TVIGLE_Loader
 from crawler.tvigle_ru.parsers import ParseTvigleFilm
-from crawler.viaplay_ru.parsers import ParseViaplayFilm
-from crawler.viaplay_ru.loader import VIAPLAY_RU_Loader
 from requests.exceptions import ConnectionError
 from apps.robots.constants import APP_ROBOTS_TRY_SITE_UNAVAILABLE, APP_ROBOTS_TRY_NO_SUCH_PAGE, \
     APP_ROBOTS_TRY_PARSE_ERROR
@@ -58,9 +56,7 @@ sites_crawler = {
     'tvigle_ru': {'loader': TVIGLE_Loader,
                   'parser': ParseTvigleFilm()},
     'stream_ru': {'loader': STREAM_RU_Loader,
-                  'parser': ParseStreamFilm},
-    'viaplay_ru': {'loader': VIAPLAY_RU_Loader,
-                   'parser': ParseViaplayFilm}
+                  'parser': ParseStreamFilm}
 }
 sites = sites_crawler.keys()
 
