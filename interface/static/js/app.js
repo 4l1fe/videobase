@@ -223,7 +223,7 @@
         };
       }
       if (opts.vals.ratings && opts.vals.ratings.cons) {
-        opts.vals.rating = opts.vals.ratings.cons;
+        opts.vals.rating = opts.vals.ratings.cons[0];
       }
       if (opts.vals.release_date) {
         opts.vals.year = opts.vals.release_date.substr(0, 4);
