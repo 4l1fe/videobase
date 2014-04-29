@@ -16,6 +16,7 @@ class Persons(PhotoClass):
     name_orig = models.CharField(max_length=255, verbose_name=u'Оригинальное имя')
     bio       = models.TextField(verbose_name=u'Биография')
     photo     = models.ImageField(upload_to=get_image_path, blank=True, null=True, verbose_name=u'Фото')
+    birthdate = models.DateField(verbose_name=u'Дата дня рождения', null=True, blank=True)
 
     @property
     def get_upload_to(self):
@@ -25,12 +26,6 @@ class Persons(PhotoClass):
     def get_full_name(self):
         full_name = u"{0} ({1})".format(self.name, self.name_orig)
         return full_name.strip()
-
-    # @property
-    # def birthplace(self):
-    #     bp = (self.city_id.name, self.city_id.country_id.name)
-    #     return bp
-
 
     def __unicode__(self):
         return u'[%s] %s' % (self.pk, self.get_full_name)
