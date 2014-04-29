@@ -1,7 +1,7 @@
 # coding: utf-8
 from apps.users.models import User, UsersPics, UsersRels
 from apps.contents.models import Comments, Contents
-from apps.films.models import Films, Genres, UsersFilms, UsersPersons, Persons
+from apps.films.models import Films, Genres, UsersFilms, UsersPersons, Persons, Countries, Cities
 from apps.films.constants import APP_FILM_FULL_FILM
 
 import datetime
@@ -63,11 +63,25 @@ class CommentsFactory(factory.DjangoModelFactory):
     text = factory.Sequence(lambda i: u'Text{0}'.format(i))
 
 
+class CountriesFactory(factory.DjangoModelFactory):
+    FACTORY_FOR = Countries
+    name = factory.Sequence(lambda n: u'Имя_{0}'.format(n))
+    name_orig = factory.Sequence(lambda n: u'ОригинальноеИмя_{0}'.format(n))
+    description = factory.Sequence(lambda n: u'Описание_{0}'.format(n))
+
+
+class CitiesFactory(factory.DjangoModelFactory):
+    FACTORY_FOR = Cities
+    name = factory.Sequence(lambda n: u'Имя_{0}'.format(n))
+    name_orig = factory.Sequence(lambda n: u'ОригинальноеИмя_{0}'.format(n))
+
+
 class PersonsFactory(factory.DjangoModelFactory):
     FACTORY_FOR = Persons
     name = factory.Sequence(lambda n: u'Персона_{0}'.format(n))
     bio = factory.Sequence(lambda n: u'Биография_{0}'.format(n))
     photo = ImageField(color='red')
+    city = factory.SubFactory(CitiesFactory)
 
 
 class UserPersonsFatory(factory.DjangoModelFactory):

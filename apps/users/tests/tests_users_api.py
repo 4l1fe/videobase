@@ -9,7 +9,7 @@ from apps.films.constants import APP_FILM_FULL_FILM, APP_FILM_SERIAL, APP_USERFI
 from apps.users.constants import APP_USER_REL_TYPE_FRIENDS, APP_USER_REL_TYPE_NONE,\
     APP_USERS_API_DEFAULT_PER_PAGE, APP_USERS_API_DEFAULT_PAGE
 from apps.users.models.api_session import SessionToken, UsersApiSessions
-from apps.users.tests.factories import *
+from apps.users.tests.factories_users_api import *
 
 import random
 
