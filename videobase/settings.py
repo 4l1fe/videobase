@@ -256,7 +256,11 @@ CELERYBEAT_SCHEDULE = {
     },
     'kinopoisk-get_id': {
         'task': 'kinopoisk_get_id',
-        'shedule': timedelta(minutes=5),
+        'schedule': timedelta(minutes = 5),
+    },
+    'kinopoisk-set_poster': {
+        'task': 'kinopoisk_set_poster',
+        'schedule': timedelta(minutes = 5),
     },
 }
 
