@@ -1,6 +1,7 @@
 #coding: utf-8
 import sys
 import json
+from pprint import pprint as pp
 
 python_v = sys.version_info[0]
 
@@ -51,9 +52,9 @@ def get_films_persons(sessiom_token, id, host=HOST):
     return json_resp
 
 
-def get_users_persons(session_token, id, host=HOST):
+def get_users_persons(session_token, id, page=1, per_page=10, type_='all', host=HOST):
     url = urljoin(host, 'api/v1/users/{}/persons.json'.format(id))
-    data = urlencode(dict())  # Для изменения на тип запроса - POST
+    data = urlencode(dict(page=page, per_page=per_page, type=type_))
     req = Request(url, data)
     req.add_header('Authorization', 'X-VB-Token ' + session_token)
     resp = urlopen(req)
@@ -64,16 +65,12 @@ def get_users_persons(session_token, id, host=HOST):
     return json_resp
 
 
-def run_test_requests(st, fid, uid):
-    resp = get_films_persons(st, 833)
-    print(resp)
-    resp = get_users_persons(st, 1)
-    print(resp)
-
-
 if __name__ == '__main__':
     mt = get_main_token()
-    print(mt)
+    # print(mt)
     st = get_session_token(mt)
-    print(st)
-    # run_test_requests(st, 833, 1)
+    # print(st)
+    resp = get_films_persons(st, 3)
+    pp(resp)
+    resp = get_users_persons(st, 1, 1, 10)
+    pp(resp)
