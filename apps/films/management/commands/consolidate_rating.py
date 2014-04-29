@@ -1,10 +1,14 @@
 # coding: utf-8
 
+import sys
 import datetime
+import traceback
+
+from time import time
 from optparse import make_option
 
 from django.db import connection
-from django.db import IntegrityError, transaction
+from django.db import transaction
 from django.core.management.base import BaseCommand, CommandError
 
 from apps.films.models import Films, UsersFilms
@@ -12,7 +16,63 @@ from apps.films.models import Films, UsersFilms
 
 class Command(BaseCommand):
 
+    help = u'Обсчет локального и консолидированного рейтинга'
     requires_model_validation = True
+
+    step_limit = 100
+
+    def handle(self, *args, **options):
+        main_time = time()
+        print u"Start calculate rating...."
+
+        # Вычисляем локальный рейтинг
+        self.calculate_local_rating()
+
+        # Вычисляем консолидированный рейтинг
+        count_films = Films.objects.count()
+        for index, offset in enumerate(xrange(0, count_films, self.step_limit), start=1):
+            start = time()
+
+            try:
+                self.calc_our_ratings_for_chunk(offset)
+            except Exception, e:
+                exc_type, exc_value, exc_traceback = sys.exc_info()
+                trace_msg = u''.join(traceback.format_tb(exc_traceback))
+
+                error_msg = u"=============================\n"
+                error_msg += u"Error: %s\n" % e
+                error_msg += u"=============================\n"
+                error_msg += u"Traceback:\n%s\n" % trace_msg
+                error_msg += u"=============================\n"
+
+                print error_msg
+
+            print u"Elapsed time: {0}, Chunk: {1}".format(time() - start, index * self.step_limit)
+
+        print u"Main Elapsed time: {0}".format(time() - main_time)
+
+
+    @transaction.commit_on_success
+    def calc_our_ratings_for_chunk(self, offset):
+        # list_values = ['id', 'release_date', 'rating_local', 'rating_local_cnt', 'rating_imdb',
+        #                'rating_imdb_cnt', 'rating_cons', 'rating_cons_cnt', 'rating_sort', 'kinopoisk_id'
+        # ]
+        # .values(*list_values)
+
+        o_film = Films.objects.order_by('id')[offset:offset + self.step_limit]
+
+        for item in o_film:
+            rating_cons_cnt = self.calc_rating_cons_cnt(item)
+            item.rating_cons_cnt = rating_cons_cnt
+
+            rating_cons = self.calc_rating_cons(item)
+            item.rating_cons = rating_cons
+
+            rating_sort = self.calc_rating_sort(item)
+            item.rating_sort = rating_sort
+
+            item.save()
+
 
     def sort_cnt(self, rating_cons_cnt):
         """
@@ -80,7 +140,8 @@ class Command(BaseCommand):
             except:
                 pass
 
-            Films.objects.filter().update(rating_local_cnt=item['count_films'], rating_local=sum)
+            # Обновляем локальный рейтинг
+            Films.objects.update(rating_local_cnt=item['count_films'], rating_local=sum)
 
 
     def calc_rating_cons_cnt(self, instance):
@@ -106,25 +167,9 @@ class Command(BaseCommand):
                 - если rating_imdb и rating_kinopoisk не установлены, то формула становится 100% rating_local
         """
 
-        result = 0
-        rating_imdb = instance.rating_imdb
-        rating_local = instance.rating_local
-        rating_kinopoisk = instance.rating_kinopoisk
-
-        if rating_imdb is None or rating_local is None or rating_kinopoisk is None:
-            if rating_imdb is None and rating_kinopoisk is None:
-                result = rating_local
-
-            else:
-                if rating_imdb is None:
-                    result = 0.857 * rating_kinopoisk + 0.143 * rating_local
-                elif rating_kinopoisk is None:
-                    result = 0.75 * rating_imdb + 0.25 * rating_local
-                elif rating_local is None:
-                    result = 0.667 * rating_kinopoisk + 0.333 * rating_imdb
-
-        else:
-            result = 0.6 * rating_kinopoisk + 0.3 * rating_imdb + 0.1 * rating_local
+        values = ((6, instance.rating_kinopoisk), (3, instance.rating_imdb), (1, instance.rating_local),)
+        divisor = float(sum(t[0] for t in values if t[1]))
+        result = sum([t[0] / divisor * t[1] for t in values if t[1]])
 
         return result
 
@@ -139,22 +184,3 @@ class Command(BaseCommand):
                       instance.rating_cons
 
         return rating_sort
-
-
-    def handle(self, *args, **options):
-        # Вычисляем локальный рейтинг
-        self.calculate_local_rating()
-
-        # Вычисляем консолидированный рейтинг
-        o_film = Films.objects.all()
-        for item in o_film:
-            rating_cons_cnt = self.calc_rating_cons_cnt(item)
-            item.rating_cons_cnt = rating_cons_cnt
-
-            rating_cons = self.calc_rating_cons(item)
-            item.rating_cons = rating_cons
-
-            rating_sort = self.calc_rating_sort(item)
-            item.rating_sort = rating_sort
-
-            item.save()

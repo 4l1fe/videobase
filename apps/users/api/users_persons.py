@@ -22,7 +22,6 @@ persons_type = {
             APP_PERSON_ACTOR, APP_PERSON_DIRECTOR, ),
 }
 
-
 class UsersPersonsView(APIView):
 
     permission_classes = (IsAuthenticated, )

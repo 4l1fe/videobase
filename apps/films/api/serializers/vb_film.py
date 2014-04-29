@@ -121,7 +121,7 @@ class vbFilm(serializers.ModelSerializer):
         return {
             'imdb': [obj.rating_imdb, obj.rating_imdb_cnt],
             'kp': [obj.rating_kinopoisk, obj.rating_kinopoisk_cnt],
-            'cons': [0, 0],
+            'cons': [obj.rating_cons, obj.rating_cons_cnt],
         }
 
 
@@ -132,9 +132,9 @@ class vbFilm(serializers.ModelSerializer):
     def _get_obj_list(self):
         list_pk = []
         instance = self.object
-        if hasattr(instance, '__iter__') and not isinstance(instance, (Page, dict)):
-            for item in instance:
-                list_pk.append(item.pk)
+        if hasattr(instance, '__iter__') and not isinstance(instance, (Page, dict)):  #WARNING: Если в instance придёт dict,
+            for item in instance:                                              # такое возможно при десериализации,
+                list_pk.append(item.pk)                                        # то поломается добрая половина методов
         else:
             list_pk.append(instance.pk)
 
@@ -177,7 +177,7 @@ class vbFilm(serializers.ModelSerializer):
 
     def _rebuild_poster_list(self):
         extras = FilmExtras.objects.filter(film__in=self.list_obj_pk, type=APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER)
-        extras = group_by(extras, 'id', True)
+        extras = group_by(extras, 'film_id', True)
 
         self.poster_rebuild = extras
 
