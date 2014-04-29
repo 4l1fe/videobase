@@ -15,7 +15,7 @@ mixin film_thumb(item,id)
         .rating-place(class = item.ratings?"":"invisible")
             p.rating
 
-                =item.ratings.cons
+                =item.ratings.cons[0]
         .name-place
             a(href="#").name
                 =item.name
