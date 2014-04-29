@@ -18,6 +18,8 @@ from crawler.now_ru.loader import NOW_Loader
 from crawler.now_ru.parsers import ParseNowFilmPage
 from crawler.megogo_net.loader import MEGOGO_Loader
 from crawler.megogo_net.parsers import ParseMegogoFilm
+from crawler.stream_ru.loader import STREAM_RU_Loader
+from crawler.stream_ru.parsers import *
 from crawler.core.exceptions import *
 from crawler.playfamily_dot_ru.loader import playfamily_loader
 from crawler.playfamily_dot_ru.parser import PlayfamilyParser
@@ -54,7 +56,9 @@ sites_crawler = {
     'playfamily_ru': {'loader': playfamily_loader,
                       'parser': PlayfamilyParser()},
     'tvigle_ru': {'loader': TVIGLE_Loader,
-                  'parser': ParseTvigleFilm()}
+                  'parser': ParseTvigleFilm()},
+    'stream_ru': {'loader': STREAM_RU_Loader,
+                  'parser': ParseStreamFilm}
 }
 sites = sites_crawler.keys()
 
