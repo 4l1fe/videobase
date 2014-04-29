@@ -5,12 +5,10 @@ from apps.films.models import Films, PersonsFilms, Persons, Genres, FilmExtras, 
 from apps.films.constants import APP_PERSON_PHOTO_DIR,APP_FILM_CRAWLER_LIMIT,APP_FILM_CRAWLER_DELAY,APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER
 from apps.robots.models import KinopoiskTries
 from apps.robots.constants import APP_ROBOT_FAIL, APP_ROBOT_SUCCESS
-from crawler.parse_page import acquire_page, parse_one_page, get_poster
+from crawler.parse_page import acquire_page, parse_one_page
 from django.core.files import File
-from itertools import chain
 from optparse import make_option
-import datetime
-import os
+from crawler.kinopoisk_poster import set_kinopoisk_poster
 from time import sleep
 from django.utils.timezone import now
 import logging
@@ -97,16 +95,7 @@ def process_film(film, pdata):
         if not(co in film.countries.all()):
             film.countries.add(co)
 
-    poster = get_poster(film.kinopoisk_id)
-
-    if poster:
-        logging.debug("Adding poster for %s", film)
-        fe = FilmExtras(film=film, type=APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER, name=u"Постер для {}".format(film.name),
-                        name_orig=u"Poster for {}".format(film.name), description=" ")
-        fe.save()
-        logging.debug("Created film extras %d", fe.pk)
-        fe.photo.save('poster.jpg', File(poster))
-
+    set_kinopoisk_poster(film)
 
 class Command(BaseCommand):
 
