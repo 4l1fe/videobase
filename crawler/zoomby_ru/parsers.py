@@ -1,7 +1,6 @@
 # coding: utf-8
 from ..core import BaseParse
 from bs4 import BeautifulSoup
-from social.backends.ubuntu import UbuntuOpenId
 
 URL_FILM = ''
 HOST = 'http://www.zoomby.ru'
