@@ -254,6 +254,10 @@ CELERYBEAT_SCHEDULE = {
         'task': 'robot_launch',
         'schedule': timedelta(minutes=5),
     },
+    'kinopoisk-get_id': {
+        'task': 'kinopoisk_get_id',
+        'schedule': timedelta(seconds = 5),
+    },
 }
 
 CELERY_TIMEZONE = 'UTC'

@@ -192,11 +192,25 @@ class PersonsExtrasAPIView(APIView):
         except Exception, e:
             raise Http404
 
+def transform_vbFilms(vbf):
+
+    vbf.update({'instock':True,
+        'hasFree':True,
+        'year':vbf['release_date'].strftime('%Y'),
+        'release_date':vbf['release_date'].strftime('%Y-%m-%d')
+        })
 
 def index_view(request):
     # ... view code here
 
-    return render_to_response('index.html',)
+
+    new_vbFilms = [pf.as_vbFilm() for pf in film_model.Films.objects.order_by('-release_date').all()[:4]]
+
+    for vbf in new_vbFilms:
+        transform_vbFilms(vbf)
+
+
+    return HttpResponse(render_page('index',{'new_films':new_vbFilms}),status.HTTP_200_OK)
 
 
 def person_view(request, resource_id):
@@ -211,30 +225,28 @@ def person_view(request, resource_id):
         - person_birthdate_string = date_text(person_birthdate) + " г. (" + person_years_old + ")"
         '''
 
-        person = film_model.Persons.objects.get(pk =resource_id)
+        person = film_model.Persons.objects.get(pk=resource_id)
 
-        pfs = film_model.PersonsFilms.objects.filter(person = person)
+        pfs = film_model.PersonsFilms.objects.filter(person=person)
 
         vbFilms = [pf.film.as_vbFilm() for pf in pfs]
 
         for vbf in vbFilms:
             
-            vbf.update({'instock':True,
-                        'hasFree':True,
-                        'year':vbf['release_date'].strftime('%Y'),
-                        'release_date':''
-                    })
+            vbf.update({'instock': True,
+                        'hasFree': True,
+                        'year': vbf['release_date'].strftime('%Y'),
+                        'release_date': vbf['release_date'].strftime('%Y-%m-%d')
+            })
 
-            
-        return HttpResponse(render_page('person',{
-            'person' : {'id': resource_id,
-                      'name': person.name,
-                      'photo': "static/img/tmp/person1.jpg",
-                      'bio': person.bio,
-                      'birthdate': "1974-01-22",
-                      'roles': ["актер", "режиссёр"],
-                      'birthplace': ["Москва", "Россия"]},
-
+        return HttpResponse(render_page('person', {
+            'person': {'id': resource_id,
+                       'name': person.name,
+                       'photo': "static/img/tmp/person1.jpg",
+                       'bio': person.bio,
+                       'birthdate': "1974-01-22",
+                       'roles': ["актер", "режиссёр"],
+                       'birthplace': ["Москва", "Россия"]},
             'filmography': vbFilms}))
 
 
@@ -337,6 +349,5 @@ def film_view(request, film_id, *args, **kwargs):
     resp_dict['similar'] = calc_similar(o_film)
     resp_dict['comments'] = calc_comments(o_film)
 
-
-    film =transform_to_json_serializable(resp_dict)
+    film = transform_to_json_serializable(resp_dict)
     return HttpResponse(render_page('film', {'film':film}))
