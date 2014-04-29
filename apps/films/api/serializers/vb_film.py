@@ -132,9 +132,9 @@ class vbFilm(serializers.ModelSerializer):
     def _get_obj_list(self):
         list_pk = []
         instance = self.object
-        if hasattr(instance, '__iter__') and not isinstance(instance, (Page, dict)):
-            for item in instance:
-                list_pk.append(item.pk)
+        if hasattr(instance, '__iter__') and not isinstance(instance, (Page, dict)):  #WARNING: Если в instance придёт dict,
+            for item in instance:                                              # такое возможно при десериализации,
+                list_pk.append(item.pk)                                        # то поломается добрая половина методов
         else:
             list_pk.append(instance.pk)
 
