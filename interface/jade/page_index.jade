@@ -1,64 +1,117 @@
-// Created by Mimoid on 28.03.2014.
-- var title = "Всё видео - Фильмы"
-- var filter_genres = {0: "все жанры", 1: "Аниме", 2: "Боевик", 3: "Комедия", 4: "Семейный"}
-- var filter_year_old = {0: "все фильмы", 1: "этого года", 3: "самые свежие", 8: "свежие", 15: "новые", 20: "не старые"}
-- var filter_price = {0: "бесплатно", 50: "до 50 рублей", 100: "до 100 рублей", 200: "до 200 рублей", 9999: "любая стоимость"}
-- var filter_rating = {0: "любой рейтинг", 5: "включая плохие", 6: "неплохие", 6.5: "хорошие", 7: "отличные", 8: "самые лучшие"}
-- var filter_sort = {"rating": "рейтингу", "subscribes": "подпискам"}
-html.index-page
+doctype html5
+include mixins
+html(lang="ru")
     include head
     body
         include header
-        .new-wrapper
+        .films-new-wrapper
             .container
                 h2 Новинки
-                #new_place
-                    each item in films_new
+                .films-new#films_new
+                    each item in new_films
                         mixin film_thumb(item)
-        .recommends-wrapper
+        .films-wrapper
             .container
-                h2 Рекомендации
-                a(name="filter")
+                h2 Рекомендуемое
                 .filter-place
-                    form.form-inline.frm-filter#frm_filter
-                        .col-md-7
-                            .form-group
-                                label(for="sel_genre").hidden жанры
-                                select.form-control#sel_genre
-                                    each item, i in filter_genres
-                                        option(value=i)= item
-                            .form-group
-                                label(for="sel_year_old").hidden новизна
-                                select.form-control#sel_year_old
-                                    each item, i in filter_year_old
-                                        option(value=i)= item
-                            .form-group
-                                label(for="sel_raiting").hidden рейтинг
-                                select.form-control#sel_rating
-                                    each item, i in filter_rating
-                                        option(value=i)= item
-                            .form-group
-                                label(for="sel_price").hidden стоимость
-                                select.form-control#sel_price
-                                    each item, i in filter_price
-                                        option(value=i)= item
-                        .col-md-5.sort-place
-                                .form-group
-                                    label(for="sel_sort") сортировать по
-                                    select.form-control#sel_sort
-                                        each item, i in filter_sort
-                                            option(value=i)= item
+                    form.filter#frm_filter
+                        .filter-sort
+                            | сортировать по
+                            .select-wrapper
+                                select#sel_sort(name="sort")
+                                    option(value="rating") рейтингу
+                                    option(value="subscribes") подпискам
+                        .filter-main
+                            .select-wrapper
+                                select#sel_genre(name="genre")
+                                    option(value="1") любого жанра
+                                    option(value="2") аниме
+                                    option(value="3") боевик
+                            .select-wrapper
+                                select#sel_rating(name="rating")
+                                    option(value="0") любого рейтинга
+                                    option(value="5") включая плохие
+                                    option(value="6") неплохие
+                                    option(value="7") хорошие
+                                    option(value="7.5") отличные
+                                    option(value="8") самые лучшие
+                            .select-wrapper
+                                select#sel_price(name="price")
+                                    option(value="999") любой стоимости
+                                    option(value="0") только бесплатные
+                                    option(value="50") не дороже 50 руб.
+                                    option(value="100") не дороже 100 руб.
+                                    option(value="150") не дороже 150 руб.
+                            .select-wrapper
+                                select#sel_year_old(name="year_old")
+                                    option(value="999") любого года
+                                    option(value="1") этого года
+                                    option(value="3") самые свежие
+                                    option(value="5") свежие
+                                    option(value="10") новые
+                                    option(value="15") не старые
 
-                .clearfix
-                .films-place#films_place
-                    each item in films
-                        mixin film_thumb(item)
-                .clearfix
-                .load-more-place#load_more_place
-                    button#btn_loadmore мало, хочу ещё фильмы
+                    .shadow
+            .container.films#films
+            .container
+                .films-more#films_more_place
+                    button#films_more_btn
+                       span Мало, хочу ещё фильмов
+                    .shadow
         .comments-wrapper
             .container
-                h2 Резенции
+                h2 Рецензии
+                .comments-place
+                    .col-md-4.comment-place
+                        .comment-wrapper
+                            .comment
+                                a(href="#")
+                                    h4 Первый мститель: Другая война
+                                .rating
+                                    strong Оценка:
+                                    | Отлично
+                                .text
+                                    | Очень жду выхода второй части этого фильма. Думаю, что очень понравится. Я даже не сомневаюсь в этом. Как только выйдет сразу в кино побегу=)
+                        .user
+                            .avatar
+                                img(src="static/img/tmp/user.gif").img-circle
+                            .name
+                                a(href="#") Анна Иванова
+                            .city Москва
+                .comments-place
+                    .col-md-4.comment-place
+                        .comment-wrapper
+                            .comment
+                                a(href="#")
+                                    h4 Робокоп
+                                .rating
+                                    strong Оценка:
+                                    | Хорошо
+                                .text
+                                    | Марти Макфлай, ты ли это? Я уже ничему не удивляюсь, вон - народ уже Хоббита вовсю оценивает. А на самом деле оценивайте то, что вы смотрели, а именно короткий 20-ти минутный мультфильм &quot;Как приручить дракона: дар ночной фурии&quot;. Ибо так ваши оценки и отзывы к мультфильму, который еще не вышел и трейлер которого (трейлер аж на 20 минут - вот так новость! ) вы якобы видели, не соизволив как следует разобраться, а трейлер ли это был, выглядят как минимум смешно.
+                        .user
+                            .avatar
+                                img(src="static/img/tmp/user.gif").img-circle
+                            .name
+                                a(href="#") Вася Капуста
+                            .city Брянск
+                .comments-place
+                    .col-md-4.comment-place
+                        .comment-wrapper
+                            .comment
+                                a(href="#")
+                                    h4 Звёздные войны IV
+                                .rating
+                                    strong Оценка:
+                                    | Отлично
+                                .text
+                                    | Очень понравилась первая часть, но я считаю, что в ней была полная и оконченная история, снимать дальше уже не надо. Что там можно продолжать? Почему бы не придумать другую историю?
+                        .user
+                            .avatar
+                                img(src="static/img/tmp/user.gif").img-circle
+                            .name
+                                a(href="#") Максим Перцев
+                            .city Москва
         include footer
         script.
             $(document).ready(function () {window.InitApp({}, "Main")})
