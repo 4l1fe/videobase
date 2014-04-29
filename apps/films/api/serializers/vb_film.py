@@ -121,7 +121,7 @@ class vbFilm(serializers.ModelSerializer):
         return {
             'imdb': [obj.rating_imdb, obj.rating_imdb_cnt],
             'kp': [obj.rating_kinopoisk, obj.rating_kinopoisk_cnt],
-            'cons': [0, 0],
+            'cons': [obj.rating_cons, obj.rating_cons_cnt],
         }
 
 
