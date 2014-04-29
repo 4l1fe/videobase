@@ -30,7 +30,6 @@ class FilmsAdmin(admin.ModelAdmin):
 # Администрирование таблицы
 class UsersFilmsAdmin(admin.ModelAdmin):
     raw_id_fields = ('user', 'film',)
-    search_fields = ('user', 'film',)
 
 
 #############################################################################################################
@@ -38,7 +37,7 @@ class UsersFilmsAdmin(admin.ModelAdmin):
 class FilmExtrasAdmin(admin.ModelAdmin):
     form = FilmExtrasImageForm
     raw_id_fields = ('film',)
-    search_fields = ('film',)
+    search_fields = ('film__pk',)
 
 
 #############################################################################################################
