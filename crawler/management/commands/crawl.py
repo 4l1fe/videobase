@@ -101,7 +101,7 @@ def process_film(film, pdata):
 
     if poster:
         logging.debug("Adding poster for %s", film)
-        fe = FilmExtras(film=film, etype=APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER, name=u"Постер для {}".format(film.name),
+        fe = FilmExtras(film=film, type=APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER, name=u"Постер для {}".format(film.name),
                         name_orig=u"Poster for {}".format(film.name), description=" ")
         fe.save()
         logging.debug("Created film extras %d", fe.pk)
