@@ -19,7 +19,7 @@ html
         .container.film-info-wrapper
             .col-md-8
                 .col-md-4
-                    mixin film_thumb({id: film.id, name: "", poster: film.poster, relation: film.relation, year: ""}, "film_thumb")
+                    mixin film_thumb({id: film.id, name: "", poster: film.poster, relation: film.relation, year: "", ratings:film.ratings}, "film_thumb")
                 .col-md-7
                     table.table.table-bordered
                         - if (film_country)
@@ -30,12 +30,12 @@ html
                             tr
                                 td Режиссёр
                                 td
-                                    mixin anchor_list(film.directors, "/persons/%")
+
                         - if (film.scriptwriters)
                             tr
                                 td Сценарист
                                 td
-                                    mixin anchor_list(film.scriptwriters, "/persons/%")
+
                         tr
                             td Дата выхода
                             td #{date_text(new Date(film.releasedate))}
@@ -88,8 +88,7 @@ html
         if (film.similar)
             .container#films_similar
                 h3 Похожие фильмы
-                each item in film.similar
-                    mixin film_thumb(item)
+
         include footer
         script.
             $(document).ready(function () {window.InitApp({page_conf: !{JSON.stringify(film)}}, "Film")})
