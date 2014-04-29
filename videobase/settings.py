@@ -234,12 +234,18 @@ API_SESSION_EXPIRATION_TIME = 15
 
 if not DEBUG:
     INSTALLED_APPS += (
-         'raven.contrib.django.raven_compat',  # may be delete later
+        'django_jenkins',
+        'raven.contrib.django.raven_compat',  # may be delete later
     )
 
     RAVEN_CONFIG = {
         'dsn': 'http://8684bf8b497047d9ac170fd16aefc873:41e89f4666b24f998125370f3d1a1789@sentry.aaysm.com/2'
     }
+
+    JENKINS_TASKS = ('django_jenkins.tasks.run_pylint',
+                     'django_jenkins.tasks.run_pep8',
+                     'django_jenkins.tasks.run_pyflakes',
+                     'django_jenkins.tasks.with_coverage',)
 
 from datetime import timedelta
 
@@ -247,6 +253,10 @@ CELERYBEAT_SCHEDULE = {
     'robot-launch': {
         'task': 'robot_launch',
         'schedule': timedelta(minutes=5),
+    },
+    'kinopoisk-get_id': {
+        'task': 'kinopoisk_get_id',
+        'schedule': timedelta(seconds = 5),
     },
 }
 
