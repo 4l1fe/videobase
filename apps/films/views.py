@@ -208,21 +208,28 @@ def transform_vbFilms(vbf):
 
     vbf.update({'instock':True,
         'hasFree':True,
-        'year':vbf['release_date'].strftime('%Y'),
-        'release_date':vbf['release_date'].strftime('%Y-%m-%d')
+        'year':vbf['releasedate'].strftime('%Y'),
+        'releasedate':vbf['releasedate'].strftime('%Y-%m-%d')
         })
+
+    return vbf
 
 def index_view(request):
     # ... view code here
 
+    o_film = film_model.Films.objects.order_by('-release_date').all()[:4]
 
-    new_vbFilms = [pf.as_vbFilm() for pf in film_model.Films.objects.order_by('-release_date').all()[:4]]
+    resp_dict = vbFilm(o_film, extend=True, many=True)
+    data = resp_dict.data
 
-    for vbf in new_vbFilms:
-        transform_vbFilms(vbf)
+    #try:
+
+    resp_data = [transform_vbFilms(vbf) for vbf in data]
+    #except:
+    #    raise Http404
 
 
-    return HttpResponse(render_page('index',{'new_films':new_vbFilms}),status.HTTP_200_OK)
+    return HttpResponse(render_page('index',{'new_films':resp_data}),status.HTTP_200_OK)
 
 
 def person_view(request, resource_id):
@@ -361,5 +368,6 @@ def film_view(request, film_id, *args, **kwargs):
     resp_dict['similar'] = calc_similar(o_film)
     resp_dict['comments'] = calc_comments(o_film)
 
-    film = transform_to_json_serializable(resp_dict)
-    return HttpResponse(render_page('film', {'film':film}))
+    film_data = transform_to_json_serializable(resp_dict)
+    print film_data
+    return HttpResponse(render_page('film', {'film': film_data}))
