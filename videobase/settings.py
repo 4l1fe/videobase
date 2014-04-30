@@ -262,6 +262,10 @@ CELERYBEAT_SCHEDULE = {
         'task': 'kinopoisk_set_poster',
         'schedule': timedelta(minutes = 5),
     },
+     'imdb_rating_update_command': {
+        'task': 'imdb_rating_update',
+        'schedule': timedelta(days = 7),
+    },
 }
 
 CELERY_TIMEZONE = 'UTC'
