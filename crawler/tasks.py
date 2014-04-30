@@ -10,6 +10,7 @@ from videobase.celery import app
 from crawler.robot_start import launch_next_robot_try, sites_crawler, launch_next_robot_try_for_kinopoisk, kinopoisk
 from apps.robots.models import Robots
 from crawler.kinopoisk_poster import  poster_robot_wrapper
+from crawler.imdbratings import process_all
 
 import datetime
 import logging
@@ -20,6 +21,32 @@ information_robots = ['kinopoik_robot', 'imdb_robot']
 
 
 logger = get_task_logger(__name__)
+
+def update_robot_state_film_id(robot):
+
+    if robot.state:
+        state = robot.state
+    else:
+        state = '{}'
+
+    try:
+        pstate =json.loads(state)
+    except ValueError:
+            pstate ={}
+    if 'id' in pstate:
+        film_id = pstate['id']
+        pstate['id'] +=1
+    else:
+        pstate['id'] =1
+        film_id =1
+
+
+    robot.state = json.dumps(pstate)
+
+    robot.last_start = timezone.now()
+    robot.save()
+
+    return film_id
 
 
 @app.task(name='robot_launch')
@@ -53,32 +80,19 @@ def kinopoisk_get_id(*args, **kwargs):
 def kinopoisk_set_paster(*args,**kwargs):
     print "Start robot for setting posters"
     robot = Robots.objects.get(name='kinopoisk_set_poster')
-    print u'Checking robot %s' % robot.name
-    print robot.last_start, timezone.now()
 
     if robot.last_start + datetime.timedelta(minutes=robot.delay) < timezone.now():
-            if robot.state:
-                state = robot.state
-            else:
-                state = '{}'
-
-            try:
-                pstate =json.loads(state)
-            except ValueError:
-                pstate ={}
-            if 'id' in pstate:
-                film_id = pstate['id']
-                pstate['id'] +=1
-            else:
-                pstate['id'] =1
-                film_id =1
-
-
-            robot.state = json.dumps(pstate)
-
-            robot.last_start = timezone.now()
-            robot.save()
-            poster_robot_wrapper(film_id)
+        film_id = update_robot_state_film_id(robot)
+        poster_robot_wrapper(film_id)
 
     else:
         print u'Skipping robot %s' % robot.name
+
+@app.task(name='imdb_rating_update')
+def imdb_robot_start(*args,**kwargs):
+    process_all()
+
+
+
+
+
