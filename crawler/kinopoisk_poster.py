@@ -1,10 +1,11 @@
 # coding: utf-8
-from crawler.parse_page import get_poster
-import logging
-from apps.films.models import FilmExtras,Films
 from django.core.files import File
+
+from crawler.parse_page import get_poster
+from apps.films.models import FilmExtras,Films
 from apps.films.constants import APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER
 
+import logging
 
 
 def set_kinopoisk_poster(film):
@@ -18,6 +19,7 @@ def set_kinopoisk_poster(film):
         fe.save()
         print u"Created film extras {}".format(fe.pk)
         fe.photo.save('poster.jpg', File(poster))
+
 
 def poster_robot_wrapper(film_id):
     try:
