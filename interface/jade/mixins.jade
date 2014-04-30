@@ -1,5 +1,7 @@
 mixin person_thumb(person, id)
-    .person-thumb(id=id?id:("person_thumb_" + person.id),style='background-image:url("' + (person.photo || conf.noperson_url) + '")')
+    .person-thumb(id=id?id:("person_thumb_" + person.id))
+        .photo
+            img.img-responsive.img-circle(src=person.photo || "static/img/noperson.jpg")
         p
             a(href="/person/"+person.id).name=person.name
 
@@ -12,10 +14,9 @@ mixin film_thumb(item,id)
     .film-thumb.col-md-3(id="film-thumb-" + item.id)
         .poster-wrapper
             .poster-place(style='background-image: url("' + item.poster + '")')
-        .rating-place(class = item.ratings?"":"invisible")
+        .rating-place(class = item.rating?"":"invisible")
             p.rating
-
-                =item.ratings.cons[0]
+                =item.rating.cons
         .name-place
             a(href="#").name
                 =item.name
@@ -25,24 +26,24 @@ mixin film_thumb(item,id)
             button.notwatch-btn N
         .button-place(class=!item.hasFree && item.price?"button-priced":"")
             .instock(class=item.instock?"":"display-none")
-                button.watch-btn!=("Смотреть" + ((!item.hasFree && item.price)?"<br/><span>от 300 р. без рекламы</span>":"<br/>Бесплатно"))
+                button.watch-btn!=("Смотреть" + ((!item.hasFree && item.price)?"<br/><span>от <span class=\"price\">300</span> р. без рекламы</span>":"<br/>Бесплатно"))
                 button.playlist-btn +
                 .watchprice(class=(item.hasFree && item.price)?"":"invisible")
-                    или<br/>
+                    | или<br/>
                     a(href="#") от <span class="price">#{item.price}</span> р. без рекламы
             .notinstock(class=item.instock?"display-none":"")
                 button.subscribe-btn Подписаться
                 .watchprice &nbsp;<br/>&nbsp;
 
 mixin comment_thumb(item, id)
-    .comment-thumb(id=id?id:("comment_" + item.id))
+    .comment-thumb(id=id?id:("comment_" + item.id),data-mi-uid=item.id)
         .avatar-place
-            img.img-responsive.img-circle(src=item.user.avatar || conf.noavatar_url)
+            img.img-responsive.img-circle(src=item.user.avatar || "static/img/noavatar.jpg")
         .text-place
             .info
-                .time=time_text(new Date(item.created))
+                .time(data-mi-time=item.created)=item.time_text || item.created
                 .name
-                    a(href="/user/"+item.user.id,data-user-id=item.id)=item.user.name
+                    a(href="/user/"+item.user.id)=item.user.name
             .text!=item.text
 
 mixin feed_thumb(item, id)
