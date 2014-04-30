@@ -180,7 +180,6 @@ class FilmsTest(APITestCase):
                 birthplace = []
             else:
                 birthplace = [p['city__name'], p['city__country__name']]
-
             p.update({'birthplace': birthplace})
             del p['city__name'], p['city__country__name']
             self.assertEqual(response.data['persons'][i], p)

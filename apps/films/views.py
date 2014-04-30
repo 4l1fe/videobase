@@ -22,7 +22,7 @@ import apps.films.models as film_model
 import apps.contents.models as content_model
 
 from apps.users.api.users import vbUser
-from apps.films.api.serializers import vbFilm, vbComment
+from apps.films.api.serializers import vbFilm, vbComment, vbPerson
 
 from utils.noderender import render_page
 
@@ -103,21 +103,33 @@ class PersonAPIView(APIView):
 
     """
 
-    def get(self, request, format=None, resource_id=None, extend=False):
+    def get(self, request, format=None, resource_id=None):
         # Process any get params that you may need
         # If you don't need to process get params,
         # you can skip this part
         #extend = request.GET.get('extend', False)
         #p = Persons.objects.get(pk = kw['resource_id'])
         try:
-            p = film_model.Persons.objects.get(pk = resource_id)
+            p = film_model.Persons.objects.get(pk=resource_id)
         except:
-            raise Http404
+            return Response(status=status.HTTP_404_NOT_FOUND)
             # Any URL parameters get passed in **kw
-        
-        response = Response(p.as_vBPerson(extend=='true'), status=status.HTTP_200_OK)
-        return response
-        
+
+        return Response(vbPerson(p).data, status=status.HTTP_200_OK)
+
+    def post(self, request, format=None, resource_id=None):
+        extend = request.DATA.get('extend', '')
+        if extend.lower() == 'true':
+            extend = True
+        else:
+            extend = False
+
+        try:
+            p = film_model.Persons.objects.get(pk=resource_id)
+            return Response(vbPerson(p, extend=extend).data, status=status.HTTP_200_OK)
+        except:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
 
 class PersonFilmographyAPIView(APIView):
     """
