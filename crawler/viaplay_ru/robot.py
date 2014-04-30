@@ -1,4 +1,4 @@
-import re
+
 from apps.films.models import Films
 from bs4 import BeautifulSoup
 from crawler.robot_start import save_location, sane_dict
