@@ -211,7 +211,6 @@ def launch_next_robot_try(site, film_id = None):
     robot.last_start = timezone.now()
     robot.state = json.dumps({'start': film_number})
     robot.save()
-
     if RobotsTries.objects.filter(film=film, domain=site, outcome=APP_ROBOTS_TRY_NO_SUCH_PAGE):
         print u"Skipping this film {} on that site {} as previous attempt was unsuccessful".format(film,site)
 

@@ -29,7 +29,7 @@ class Amediateka_robot(object):
                     for dict_film in film_data:
                         d = self.film_dict(dict_film, f)
                         save_location(**d)
-                    continue
+                    break
 
     def get_serials_data(self):
         search_serials_url = '/hbo/api/v1/serials.json?'
@@ -47,7 +47,7 @@ class Amediateka_robot(object):
                             list_serial = self.serial_dict(dict_serials, s)
                             for ser in list_serial:
                                 save_location(**ser)
-                    continue
+                    break
 
     def film_dict(self, film, site_film):
         resp_dict = sane_dict(film)
