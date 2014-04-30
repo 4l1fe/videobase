@@ -2,14 +2,16 @@ doctype html5
 include mixins
 html(lang="ru")
     include head
-    body
+    body.page-index
         include header
-        .films-new-wrapper
+        .content-blue-wrapper
             .container
                 h2 Новинки
-                .films-new#films_new
-                    each item in new_films
-                        mixin film_thumb(item)
+                #films_new
+                    mixin film_thumb({id: 1, name: "Самый лучший фильм", year: 2014, relation: {rating: 5}, rating: {cons: 5.6}, poster: "static/img/tmp/poster1.jpg", instock: true, price: 100})
+                    mixin film_thumb({id: 2, name: "Самый лучший фильм", year: 2011, relation: {rating: 5}, rating: {cons: 8.6}, poster: "static/img/tmp/poster1.jpg", instock: true, hasFree: true})
+                    mixin film_thumb({id: 3, name: "Самый лучший фильм", year: 2001, relation: {rating: 8}, rating: {cons: 7}, poster: "static/img/tmp/poster1.jpg", instock: false})
+                    mixin film_thumb({id: 4, name: "Самый лучший фильм", year: 1970, relation: {rating: 3}, rating: {cons: 9.1}, poster: "static/img/tmp/poster1.jpg", instock: true, hasFree: true, price: 100})
         .films-wrapper
             .container
                 h2 Рекомендуемое
@@ -53,6 +55,15 @@ html(lang="ru")
 
                     .shadow
             .container.films#films
+                mixin film_thumb({id: 1, name: "Самый лучший фильм лучший фильм", year: 2014, relation: {rating: 5}, rating: {cons: 5.6}, poster: "static/img/tmp/poster1.jpg", instock: true, price: 100})
+                mixin film_thumb({id: 2, name: "Самый лучший фильм", year: 2011, relation: {rating: 5}, rating: {cons: 8.6}, poster: "static/img/tmp/poster1.jpg", instock: true, hasFree: true})
+                mixin film_thumb({id: 3, name: "Самый лучший фильм", year: 2001, relation: {rating: 8}, rating: {cons: 7}, poster: "static/img/tmp/poster1.jpg", instock: false})
+                mixin film_thumb({id: 4, name: "Самый лучший фильм", year: 1970, relation: {rating: 3}, rating: {cons: 9.1}, poster: "static/img/tmp/poster1.jpg", instock: true, hasFree: true, price: 100})
+
+                mixin film_thumb({id: 1, name: "Самый лучший фильм лучший фильм", year: 2014, ralation: {rating: 5}, rating: {cons: 5.6}, poster: "static/img/tmp/poster1.jpg", instock: true, price: 100})
+                mixin film_thumb({id: 2, name: "Самый лучший фильм", year: 2011, relation: {rating: 5}, rating: {cons: 8.6}, poster: "static/img/tmp/poster1.jpg", instock: true, hasFree: true})
+                mixin film_thumb({id: 3, name: "Самый лучший фильм", year: 2001, relation: {rating: 8}, rating: {cons: 7}, poster: "static/img/tmp/poster1.jpg", instock: false})
+                mixin film_thumb({id: 4, name: "Самый лучший фильм", year: 1970, relation: {rating: 3}, rating: {cons: 9.1}, poster: "static/img/tmp/poster1.jpg", instock: true, hasFree: true, price: 100})
             .container
                 .films-more#films_more_place
                     button#films_more_btn

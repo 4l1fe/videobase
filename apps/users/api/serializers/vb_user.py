@@ -13,7 +13,7 @@ class vbUser(serializers.ModelSerializer):
     name = serializers.SerializerMethodField('get_name')
     avatar = serializers.SerializerMethodField('path_to_avatar')
 
-    # extend
+    # Признак extend
     regdate = serializers.SerializerMethodField('get_regdate')
     friends_cnt = serializers.SerializerMethodField('get_friends_cnt')
     films_watched = serializers.SerializerMethodField('get_films_watched_cnt')
@@ -22,10 +22,10 @@ class vbUser(serializers.ModelSerializer):
     # genre_fav
     relation = serializers.SerializerMethodField('get_relation')
 
-    # genres
+    # Признак genres
     genres = serializers.SerializerMethodField('genres_list')
 
-    # friends
+    # Признак friends
     friends = serializers.SerializerMethodField('friends_list')
 
     def __init__(self, *args, **kwargs):

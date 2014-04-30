@@ -1,7 +1,8 @@
 # coding: utf-8
 from apps.users.models import User, UsersPics, UsersRels
-from apps.contents.models import Comments, Contents
-from apps.films.models import Films, Genres, UsersFilms, UsersPersons, Persons
+from apps.contents.models import Comments, Contents, Locations
+from apps.contents.constants import APP_CONTENTS_ONLINE_CINEMA, APP_CONTENTS_PRICE_TYPE_FREE
+from apps.films.models import Films, Genres, UsersFilms, UsersPersons, Persons, Countries, Cities, PersonsFilms
 from apps.films.constants import APP_FILM_FULL_FILM
 
 import datetime
@@ -57,10 +58,36 @@ class ContetsFactory(factory.DjangoModelFactory):
     viewer_lastmonth_cnt = 0
 
 
+class LocationsFactory(factory.DjangoModelFactory):
+    FACTORY_FOR = Locations
+    content = factory.SubFactory(ContetsFactory)
+    type = APP_CONTENTS_ONLINE_CINEMA
+    lang = u'eng'
+    price = float(0)
+    price_type = APP_CONTENTS_PRICE_TYPE_FREE
+    url_view = u'http://www.megogo.net/item/Red.html'
+    quality = u''
+    subtitles = u''
+
+
 class CommentsFactory(factory.DjangoModelFactory):
     FACTORY_FOR = Comments
     content = factory.SubFactory(ContetsFactory)
     text = factory.Sequence(lambda i: u'Text{0}'.format(i))
+
+
+class CountriesFactory(factory.DjangoModelFactory):
+    FACTORY_FOR = Countries
+    name = factory.Sequence(lambda n: u'Имя_{0}'.format(n))
+    name_orig = factory.Sequence(lambda n: u'ОригинальноеИмя_{0}'.format(n))
+    description = factory.Sequence(lambda n: u'Описание_{0}'.format(n))
+
+
+class CitiesFactory(factory.DjangoModelFactory):
+    FACTORY_FOR = Cities
+    name = factory.Sequence(lambda n: u'Имя_{0}'.format(n))
+    name_orig = factory.Sequence(lambda n: u'ОригинальноеИмя_{0}'.format(n))
+    country = factory.SubFactory(CountriesFactory)
 
 
 class PersonsFactory(factory.DjangoModelFactory):
@@ -68,6 +95,14 @@ class PersonsFactory(factory.DjangoModelFactory):
     name = factory.Sequence(lambda n: u'Персона_{0}'.format(n))
     bio = factory.Sequence(lambda n: u'Биография_{0}'.format(n))
     photo = ImageField(color='red')
+    birthdate = datetime.datetime.now()
+    city = factory.SubFactory(CitiesFactory)
+
+
+class PersonsFilmsFactory(factory.DjangoModelFactory):
+    FACTORY_FOR = PersonsFilms
+    film = factory.SubFactory(FilmFactory)
+    person = factory.SubFactory(PersonsFactory)
 
 
 class UserPersonsFatory(factory.DjangoModelFactory):
