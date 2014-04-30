@@ -31,9 +31,9 @@ class UsersFilmsView(APIView):
 
         page = request.DATA.get('page', APP_USERS_API_DEFAULT_PAGE)
         per_page = request.DATA.get('per_page', APP_USERS_API_DEFAULT_PER_PAGE)
-        type = request.DATA.get('type', 'all')
+        type_ = request.DATA.get('type', 'all')
         try:
-            ftype = films_type[type]
+            ftype = films_type[type_]
         except KeyError as e:
             return Response({'e': e.message}, status=status.HTTP_400_BAD_REQUEST)
 
