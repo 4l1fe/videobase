@@ -4,4 +4,4 @@ from crawler.robot_start import launch_next_robot_try
 
 class Command(BaseCommand):
     def handle(self, *args, **kwargs):
-        launch_next_robot_try('tvzavr_ru', 5445)
+        launch_next_robot_try('mosfilm_ru', 5445)
