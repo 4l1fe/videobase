@@ -1,11 +1,16 @@
-import re
+
 import gzip
 import requests
 import StringIO
 from crawler.constants import RATING_GZIP_FILE_URL
 from itertools import dropwhile
 import re
+from apps.films.models import Films
+import HTMLParser
 import logging
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 
 regex = re.compile('[ ]+[.0-9]{10}[ ]+(?P<votes>[0-9]+)[ ]{3}(?P<rating>[0-9][.][0-9])[ ](?P<name>.+)')
@@ -49,3 +54,22 @@ def name_wrapper(dict_list):
 def ny_full_dict(debug=False):
     return dict(name_wrapper(dict_gen(get_rating_source(debug))))
 
+def process_all():
+
+    h = HTMLParser.HTMLParser()
+    full_dict = ny_full_dict(True)
+    name_dict =dict((key[1],value) for key,value in full_dict.items())
+
+    for i,film in enumerate(Films.objects.all()):
+        key = h.unescape(film.name_orig).lower().strip()
+        if len(film.name_orig) < 3:
+            continue
+
+        if key in name_dict:
+            logger.info((u"Found rating for {} ".format(film.name_orig)).encode("utf-8"))
+            rdict = name_dict[key]
+            logger.debug(("Rating before {} Count before {} ".format(film.rating_imdb,film.rating_imdb_cnt)).encode("utf-8"))
+            film.rating_imdb=rdict['rating']
+            film.rating_imdb_cnt=rdict['votes']
+            logger.debug(("Rating after {} Count after {}".format(film.rating_imdb,film.rating_imdb_cnt)).encode("utf-8"))
+            film.save()
