@@ -35,9 +35,9 @@ class vbPerson(serializers.ModelSerializer):
         persons_list = []  # должен быть список из объектов Persons
         if self.object:
             if not hasattr(self.object, '__iter__'):  # если вдруг один экземпляр.
-                persons_list.append(self.object.pk)
+                persons_list.append(self.object)
             else:
-                persons_list.extend((obj.pk for obj in self.object))
+                return self.object
         return persons_list
 
     def _get_roles(self):
