@@ -223,7 +223,7 @@ def launch_next_robot_try(site, film_id = None):
             print u"Skipping this film {} on that site {} as previous attempt was unsuccessful".format(film,site)
         except Exception,e:
             print "Exception raised when tryint to print message"
-        
+
     try:
 
         robot = Robot(films=film, **sites_crawler[site])
