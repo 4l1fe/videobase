@@ -109,6 +109,7 @@ class Item
         $("." + k, @_place).html(v)
 
   user_is_auth: ->
+    alert "Sign in first"
     return @_app.user_is_auth()
 
   reset: ->
@@ -133,12 +134,19 @@ class FilmThumb extends Item
       opts.vals.id = opts.vals.id || opts.place.attr("id").substr(11)
       opts.vals.poster = $(".poster-place", opts.place).background_image()
       opts.vals.name = $(".name", opts.place).text()
-      opts.vals.year = $(".year", opts.place).text()
+      opts.vals.year = $(".year", opts.place).text().substr(1,4)
       opts.vals.rating = $(".rating", opts.place).text()
       opts.vals.relation =
         rating: $(".rateit", opts.place).rateit("value")
-    opts.vals.rating = opts.vals.ratings.cons if opts.vals.ratings && opts.vals.ratings.cons
-    opts.vals.year = opts.vals.release_date.substr(0, 4) if opts.vals.release_date
+    opts.vals.rating = opts.vals.ratings.cons[0] if (opts.vals.ratings && opts.vals.ratings.cons)
+    opts.vals.year = " (" + opts.vals.releasedate.substr(0, 4) + ")" if opts.vals.releasedate
+    if $(".notinstock", opts.place).hasClass("display-none")
+      if !$(".watchprice", opts.place).hasClass("invisible")
+        opts.vals.price = $(".watchprice .price", opts.place).text()
+      if $(".watchbtn .price", opts.place).length
+        opts.vals.price = $(".watchbtn .price", opts.place).text()
+      else
+        opts.vals.hasFree = true
     if opts.vals.locations
       opts.vals.hasFree = false;
       opts.vals.price = 0;
@@ -157,7 +165,6 @@ class FilmThumb extends Item
         .rateit "max", 10
         .bind("beforerated beforereset", (event) =>
           if !@user_is_auth()
-            alert "You have to be signed"
             event.preventDefault()
         )
         .bind "reset rated", (event) => @action_rate(ri.rateit("value"))
@@ -463,7 +470,7 @@ class App
       return conf[name]
 
   user_is_auth: ->
-    return true
+    return false
 
   search_keydown: (event) ->
     if event.which == 13 # enter pressed
@@ -697,7 +704,12 @@ class Page_Main extends Page
 # implementing Login and Register Page class
 class Page_Login extends Page
 
-class Page_Register extends Page
+class Page_Registration extends Page
+  @constructor: ->
+    super
+    $("#frm_reg").submit( ->
+      return false
+    )
 
 class Page_Person extends Page
   _films = []
@@ -771,7 +783,7 @@ class Page_Person extends Page
 class Page_Film extends Page
   locations = []
   current_location = null
-  films_similar = []
+  films = []
   actors = []
   opts = {}
 
@@ -781,23 +793,22 @@ class Page_Film extends Page
     @_app.get_tpl("film-thumb")
     @_app.get_tpl("person-thumb")
     @_e =
-      pleer_place: $("#pleer_place")
-    if opts.locations
-      $(opts.locations).each(
-        (key, item) =>
-          el = $("#loc_thumb_" + item.id)
-          if el.length
-            locations[item.id] = new Location @_e.pleer_place, item
-            $("button", el).click(=>
-              @set_location item.id
-            )
-      )
+      player: $("#player")
+    #if opts.locations
+      #$(opts.locations).each(
+      #  (key, item) =>
+      #    el = $("#loc_thumb_" + item.id)
+      #    if el.length
+      #      locations[item.id] = new Location @_e.pleer_place, item
+      #      $("button", el).click(=>
+      #        @set_location item.id
+      #      )
+      #)
 
-    @_e.film_thumb = $("#film_thumb")
-    new FilmThumb {place: @_e.film_thumb, vals: {id: opts.id}}
-    @_e.films_similar = $("#films_similar")
-    $(".film-thumb", @_e.films_similar).each(->
-       films_similar.push new FilmThumb({place: $(this)})
+
+    @_e.films = $("#films")
+    $(".film-thumb", @_e.films).each(->
+       films.push new FilmThumb({place: $(this)})
     )
 
     @_e.actors = $("#actors")
@@ -838,6 +849,7 @@ class Page_Film extends Page
 
 
   load_more_comments: ->
+    #pass
 
 
 class Page_User extends Page
