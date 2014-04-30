@@ -10,7 +10,7 @@
 
   conf.tpl_url = conf.static_url + 'tpl/';
 
-  conf.api_url = "api/v1/";
+  conf.api_url = "api/";
 
   conf.noposter_url = conf.images_url + "noposter.jpg";
 
