@@ -27,16 +27,17 @@ class SimilarFilmView(APIView):
         return result
 
 
+    def logic_calcultate(self, o_film, data_flag=False):
+        o_similar = Films.similar_api(o_film)
+        serializer = vbFilm(o_similar, many=True)
+        serializer = serializer.data
+        return Response(serializer, status=status.HTTP_200_OK) if not data_flag else serializer
+
+
     def get(self, request, film_id, format=None, *args, **kwargs):
         # Выбираем и проверяем, что фильм существует
         o_film = self.__get_result(film_id)
         if type(o_film) == Response:
             return o_film
 
-        # Логика для выборки похожих фильмов
-        list_genres = [i.pk for i in o_film.genres.all()]
-
-        o_similar = Films.objects.filter(genres__in=list_genres).distinct().exclude(pk=o_film.pk).order_by('-rating_cons')[:10]
-
-        serializer = vbFilm(o_similar, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return self.logic_calcultate(o_film)

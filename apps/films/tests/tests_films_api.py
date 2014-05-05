@@ -85,8 +85,8 @@ class FilmsTest(APITestCase):
         self.assertEqual(response_data['ratings']['kp'][1], film.rating_kinopoisk_cnt)
         self.assertEqual(response_data['ratings']['imdb'][0], film.rating_imdb)
         self.assertEqual(response_data['ratings']['imdb'][1], film.rating_imdb_cnt)
-        self.assertEqual(response_data['ratings']['cons'][0], 0)
-        self.assertEqual(response_data['ratings']['cons'][1], 0)
+        self.assertEqual(response_data['ratings']['cons'][0], film.rating_cons)
+        self.assertEqual(response_data['ratings']['cons'][1], film.rating_cons_cnt)
         self.assertEqual(response_data['duration'], film.duration)
         self.assertEqual(response_data['relation'], {})
 
@@ -180,7 +180,6 @@ class FilmsTest(APITestCase):
                 birthplace = []
             else:
                 birthplace = [p['city__name'], p['city__country__name']]
-
             p.update({'birthplace': birthplace})
             del p['city__name'], p['city__country__name']
             self.assertEqual(response.data['persons'][i], p)

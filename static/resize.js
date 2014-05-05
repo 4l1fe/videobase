@@ -165,21 +165,21 @@ IS_IMAGE_EDITOR_SET = 0;
 function predecision(){
 
     if ($('#id_etype').length >0){
-        if $('#id_etype')[0].value =="POSTER"){
-            load_all()
+        if ($('#id_type')[0].value =="POSTER"){
+            load_all();
             IS_IMAGE_EDITOR_SET = 1;
             $('div.field-url').hide();
         }
         else{
-      $('div.field-photo').hide();}
+            $('div.field-photo').hide();}
 
     }
     else{
-        load_all()
+        load_all();
         IS_IMAGE_EDITOR_SET = 1;
     }
 
-    $('#id_etype').change(function(event){
+    $('#id_type').change(function(event){
 
         if (event.target.value == "POSTER"){
 

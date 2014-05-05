@@ -1,13 +1,15 @@
 - header_title = person.name
 html
-    include head
+    include ../../interface/jade/head
+    include ../../interface/jade/globals
+    include ../../interface/jade/mixins
 - person_roles = person.roles && person.roles.length?person.roles.join(", "):false
 - person_birthplace = person.birthplace && person.birthplace.length?person.birthplace.join(", "):false
 - person_birthdate = new Date(person.birthdate)
 - person_years_old = how_long(person_birthdate, 0)
 - person_birthdate_string = date_text(person_birthdate) + " г. (" + person_years_old + ")"
     body
-        include header
+        include ../../interface/jade/header
         .container
             h1=person.name
             .col-md-3.text-center
@@ -32,6 +34,6 @@ html
                     mixin film_thumb(item)
         .container.text-center#load-more-place
             button.btn.btn-default#btn_loadmore Загрузить ещё
-        include footer
+        include ../../interface/jade/footer
         script.
             $(document).ready(function () {window.InitApp({page_conf: !{JSON.stringify(person)}}, "Person")})

@@ -1,23 +1,19 @@
 # coding: utf-8
 '''
-Stage 1
-
-1.1 collecting all data from page film
-
-1.2 Refreshing and building all possible films, Persons, PersonFilms, finding persons without poster
-
-1.3 Downloading poster, and posters for persons, updating Persons and film
-
-
+Kinopoisk robot
 '''
 
 import re
-import requests
+#import requests
 from bs4 import BeautifulSoup
 import datetime
 from collections import defaultdict
 from apps.films.constants import APP_PERSON_ACTOR, APP_PERSON_DIRECTOR, APP_PERSON_PRODUCER
-from crawler.constants import PAGE_ARCHIVE
+from crawler.constants import PAGE_ARCHIVE, USE_SOCKS5_PROXY,SOCKS5_PROXY_ADDRESS
+if USE_SOCKS5_PROXY:
+    import requesocks as requests
+else:
+    import requests
 import StringIO
 from PIL import Image
 from functools import partial
@@ -28,6 +24,15 @@ YANDEX_KP_ACTORS_TEMPLATE = "http://st.kp.yandex.net/images/actor_iphone/iphone3
 YANDEX_KP_FILMS_TEMPLATE = "http://st.kp.yandex.net/images/film_big/{}.jpg"
 
 headers = {'User-Agent': 'Mozilla/5.0'}
+
+
+def crawler_get(url):
+    if USE_SOCKS5_PROXY:
+        session = requests.session()
+        session.proxies = {'http': SOCKS5_PROXY_ADDRESS}
+        return session.get(url, headers=headers)
+    else:
+        return requests.get(url, headers=headers)
 
 
 def commatlst(tag):
@@ -46,7 +51,7 @@ def get_vote(soup):
     csslink =[ lnk.attrs['href'] for lnk in soup.find_all('link') if 'votes' in lnk.attrs['href']][0]
     # TODO implement caching
 
-    r = requests.get(csslink)
+    r = crawler_get(csslink)
 
     css = r.content
     m = re.search('[.]starbar[ ]{width[:][ ](?P<width>[0-9]+)px', css)
@@ -101,7 +106,7 @@ def transform_data_dict(ddict):
 
 def get_image(template, actor_id):
     try:
-        r = requests.get(template.format(actor_id))
+        r = crawler_get(template.format(actor_id))
         fileobj = StringIO.StringIO()
         fileobj.write(r.content)
         fileobj.seek(0)
@@ -127,10 +132,11 @@ def extract_names(soup):
 
 
 def actors_wrap(actors_names):
-   return [('Persons',{'name': an ,'p_type': APP_PERSON_ACTOR,
+   return [('Persons', {'name': an , 'p_type': APP_PERSON_ACTOR,
                        'photo': get_photo(re.match('[/]name[/](?P<id>[0-9]+)[/]',ai).groupdict()['id'])
 
-                   }) for an,ai in actors_names]
+                   }) for an, ai in actors_names]
+
 
 def acquire_page(page_id):
 
@@ -143,7 +149,7 @@ def acquire_page(page_id):
             page_dump = fd.read()
     else:
         url =u"http://www.kinopoisk.ru/film/%d/" % page_id
-        res = requests.get(url, headers = headers)
+        res = crawler_get(url)
         page_dump = res.content.decode('cp1251')
         with open(dump_path,'w') as fdw:
             fdw.write(page_dump.encode('utf-8'))
