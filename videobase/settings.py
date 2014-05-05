@@ -258,12 +258,18 @@ CELERYBEAT_SCHEDULE = {
     },
     'kinopoisk-get_id': {
         'task': 'kinopoisk_get_id',
-        'schedule': timedelta(minutes = 5),
+        'schedule': timedelta(minutes=5),
     },
     'kinopoisk-set_poster': {
         'task': 'kinopoisk_set_poster',
-        'schedule': timedelta(minutes = 5),
+        'schedule': timedelta(seconds=10),
     },
+     'imdb_rating_update_command': {
+        'task': 'imdb_rating_update',
+        'schedule': timedelta(days=7),
+    }
 }
 
 CELERY_TIMEZONE = 'UTC'
+
+POSTER_URL_PREFIX = '_260x360'

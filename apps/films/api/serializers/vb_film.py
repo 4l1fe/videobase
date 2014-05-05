@@ -1,10 +1,13 @@
 # coding: utf-8
 
+import os
+
 from django.db.models import Q
 from django.core.paginator import Page
 
 from rest_framework import serializers
 
+import videobase.settings as settings
 from apps.films.models import *
 from apps.contents.models import *
 from apps.films.constants import APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER,\
@@ -169,7 +172,9 @@ class vbFilm(serializers.ModelSerializer):
         if len(result):
             for item in result:
                 if not item.photo is None and item.photo:
-                    result = item.photo.url
+                    result = list(os.path.splitext(item.photo.url))
+                    result[0] += settings.POSTER_URL_PREFIX
+                    result = u''.join(result)
                     break
 
         return result
