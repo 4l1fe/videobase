@@ -1,5 +1,7 @@
 # coding: utf-8
 """ Command to crawler sites"""
+from crawler.tvzavr_ru.loader import Tvzavr_Loader
+from crawler.tvzavr_ru.parsers import ParseTvzavrFilmPage
 from crawler.zoomby_ru.loader import ZOOMBY_Loader
 from crawler.zoomby_ru.parsers import ParseFilm
 
@@ -21,6 +23,8 @@ from crawler.megogo_net.parsers import ParseMegogoFilm
 from crawler.stream_ru.loader import STREAM_RU_Loader
 from crawler.stream_ru.parsers import *
 from crawler.core.exceptions import *
+from crawler.play_google_com.loader import PLAY_GOOGLE_Loader
+from crawler.play_google_com.parsers import ParsePlayGoogleFilm
 from crawler.playfamily_dot_ru.loader import playfamily_loader
 from crawler.playfamily_dot_ru.parser import PlayfamilyParser
 from crawler.tvigle_ru.loader import TVIGLE_Loader
@@ -51,19 +55,18 @@ sites_crawler = {
                    'parser': ParseMegogoFilm},
     'now_ru': {'loader': NOW_Loader,
                'parser': ParseNowFilmPage},
-    #'amediateka_ru': {'loader': None,
-    #                  'parser': None},
     'playfamily_ru': {'loader': playfamily_loader,
                       'parser': PlayfamilyParser()},
     'tvigle_ru': {'loader': TVIGLE_Loader,
                   'parser': ParseTvigleFilm()},
+    'tvzavr_ru': {'loader': Tvzavr_Loader,
+                'parser': ParseTvzavrFilmPage()},
     'stream_ru': {'loader': STREAM_RU_Loader,
-                  'parser': ParseStreamFilm}
+                  'parser': ParseStreamFilm},
+    'play_google_com': {'loader': PLAY_GOOGLE_Loader,
+                        'parser': ParsePlayGoogleFilm}
 }
 sites = sites_crawler.keys()
-
-kinopoisk = ('get_id', )
-
 
 def sane_dict(film=None):
     '''
@@ -217,13 +220,12 @@ def launch_next_robot_try(site, film_id = None):
     robot.last_start = timezone.now()
     robot.state = json.dumps({'start': film_number})
     robot.save()
-
     if RobotsTries.objects.filter(film=film, domain=site, outcome=APP_ROBOTS_TRY_NO_SUCH_PAGE):
         try:
             print u"Skipping this film {} on that site {} as previous attempt was unsuccessful".format(film,site)
         except Exception,e:
             print "Exception raised when tryint to print message"
-        
+
     try:
 
         robot = Robot(films=film, **sites_crawler[site])
