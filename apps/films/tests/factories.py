@@ -16,6 +16,8 @@ class PersonFactory(factory.DjangoModelFactory):
     name_orig = u'Nicolas Cage'
     bio = u''
     photo = ''
+    city = ''
+    birthdate = None
     pk = factory.Sequence(lambda n: n)
 
 
