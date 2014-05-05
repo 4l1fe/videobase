@@ -1,5 +1,7 @@
 #coding: utf-8
 
+import os
+
 from django.db import transaction, IntegrityError
 
 from rest_framework import status
@@ -7,6 +9,7 @@ from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
 from rest_framework.authtoken.models import Token
 
+import videobase.settings as settings
 from apps.films.tests.factories_films_api import *
 from apps.users.models.api_session import SessionToken, UsersApiSessions
 
@@ -76,7 +79,12 @@ class FilmsTest(APITestCase):
             self.assertEqual(response_locations[i]['url_view'], locations[i].url_view)
 
     def not_extend_assert(self, response_data, film, extras):
-        self.assertEqual(response_data['poster'], extras.photo.url)
+        extras_photo_url = list(os.path.splitext(extras.photo.url))
+        extras_photo_url[0] += settings.POSTER_URL_PREFIX
+        extras_photo_url = u''.join(extras_photo_url)
+
+
+        self.assertEqual(response_data['poster'], extras_photo_url)
         self.assertEqual(response_data['id'], film.id)
         self.assertEqual(response_data['name'], film.name)
         self.assertEqual(response_data['name_orig'], film.name_orig)
@@ -85,8 +93,8 @@ class FilmsTest(APITestCase):
         self.assertEqual(response_data['ratings']['kp'][1], film.rating_kinopoisk_cnt)
         self.assertEqual(response_data['ratings']['imdb'][0], film.rating_imdb)
         self.assertEqual(response_data['ratings']['imdb'][1], film.rating_imdb_cnt)
-        self.assertEqual(response_data['ratings']['cons'][0], 0)
-        self.assertEqual(response_data['ratings']['cons'][1], 0)
+        self.assertEqual(response_data['ratings']['cons'][0], film.rating_cons)
+        self.assertEqual(response_data['ratings']['cons'][1], film.rating_cons_cnt)
         self.assertEqual(response_data['duration'], film.duration)
         self.assertEqual(response_data['relation'], {})
 
@@ -180,7 +188,6 @@ class FilmsTest(APITestCase):
                 birthplace = []
             else:
                 birthplace = [p['city__name'], p['city__country__name']]
-
             p.update({'birthplace': birthplace})
             del p['city__name'], p['city__country__name']
             self.assertEqual(response.data['persons'][i], p)
