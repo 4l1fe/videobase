@@ -114,7 +114,7 @@ def get_image(template, actor_id):
         fileobj.seek(0)
         img = Image.open(fileobj).convert('RGB')
         conv_file = StringIO.StringIO()
-        img.save(conv_file,'PNG')
+        img.save(conv_file, 'PNG')
         conv_file.seek(0)
         return conv_file
     except requests.ConnectionError:
