@@ -1,7 +1,6 @@
 # coding: utf-8
 
 import json
-from decimal import Decimal
 from subprocess import PIPE, Popen
 
 from django.core.serializers.json import DjangoJSONEncoder
