@@ -8,8 +8,8 @@ APP_PERSON_PHOTO_DIR = os.path.join('upload', 'persons')
 APP_FILM_POSTER_DIR = os.path.join('upload', 'filmextras')
 
 #############################################################################################################
-APP_FILM_FULL_FILM = 'FULL_FILM'
-APP_FILM_SERIAL    = 'SERIAL'
+APP_FILM_FULL_FILM = u'FULL_FILM'
+APP_FILM_SERIAL    = u'SERIAL'
 
 APP_FILM_FILM_TYPES = (
     (APP_FILM_FULL_FILM, u'Полнометражный фильм'),
