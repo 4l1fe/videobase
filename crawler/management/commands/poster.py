@@ -13,14 +13,18 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         films = Films.objects.all()
         for film in films:
-            poster = get_poster(film)
-            if poster:
-                print u"Adding poster for {}".format(film)
-                fe = FilmExtras(film=film, type=APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER,
-                                name=u"Постер для {}".format(film.name),
-                                name_orig=u"Poster for {}".format(film.name),
-                                description=" ")
-                fe.save()
-                print u"Created film extras {}".format(fe.pk)
-                fe.photo.save('poster.jpg', File(poster))
+            try:
+                poster = get_poster(film)
+                if poster:
+                    print u"Adding poster for {}".format(film)
+                    fe = FilmExtras(film=film, type=APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER,
+                                    name=u"Постер для {}".format(film.name),
+                                    name_orig=u"Poster for {}".format(film.name),
+                                    description=" ")
+                    fe.save()
+                    print u"Created film extras {}".format(fe.pk)
+                    fe.photo.save('poster.jpg', File(poster))
+            except Exception as e:
+                print u"Film: {}- error: {}".format(film, e)
+                continue
 
