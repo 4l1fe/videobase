@@ -369,3 +369,4 @@ def film_view(request, film_id, *args, **kwargs):
     resp_dict['comments'] = calc_comments(o_film)
 
     return HttpResponse(render_page('film', {'film': resp_dict}))
+
