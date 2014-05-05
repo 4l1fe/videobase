@@ -1,59 +1,36 @@
-- header_title="Вход на сайт"
-html
+doctype html5
+include mixins
+html(lang="ru")
     include head
-    body
+    body.page-reglog
         include header
-        .container
-            .col-md-9
-                h3 С помощью Email
-                form.form-horizontal(role="form",method="post",action="")
+        .content-blue-wrapper
+            .container
+                h2 Регистрация
+                form#frm_login(method="post")
+                    h4 введите логин и пароль
                     .form-group
-                        label.col-sm-2.control-label(for="inp_email") Email
-                        .col-sm-8
-                            input.form-control#inp_email(type="email",name="email",placeholder="Email",required)
+                        input(type="email",name="email",placeholder="Эл. почта",required="required")#inp_email
                     .form-group
-                        label.col-sm-2.control-label(for="inp_password") Пароль
-                        .col-sm-8
-                            input.form-control#inp_password(type="password",name="password",placeholder="Пароль",required)
-                    .col-sm-offset-2
-                        button.btn.btn-default(type="submit") Войти
-            .col-md-3
-                h3 С помощью соц.сетей
-                    .login_social_place
-                        .col-sm-4
-                            img.img-responsive(src="static/img/vkontakte.png")
-                        .col-sm-8
-                            a(href="#") Вконтакте
-                    .clearfix &nbsp;
-                    .login_social_place
-                        .col-sm-4
-                            img.img-responsive(src="static/img/facebook.png")
-                        .col-sm-8
-                            a(href="#") Фейсбук
-                    .clearfix &nbsp;
-                    .login_social_place
-                        .col-sm-4
-                            img.img-responsive(src="static/img/twitter.png")
-                        .col-sm-8
-                            a(href="#") Твиттер
-                    .clearfix &nbsp;
-                    .login_social_place
-                        .col-sm-4
-                            img.img-responsive(src="static/img/google-plus.png")
-                        .col-sm-8
-                            a(href="#") Google+
-                    .clearfix &nbsp;
-                    .login_social_place
-                        .col-sm-4
-                            img.img-responsive(src="static/img/odnoklassniki.png")
-                        .col-sm-8
-                            a(href="#") Одноклассники
-                    .clearfix &nbsp;
-                    .login_social_place
-                        .col-sm-4
-                            img.img-responsive(src="static/img/mailru.png")
-                        .col-sm-8
-                            a(href="#") Mail.ru
+                        input(type="password",name="password",placeholder="Пароль",required="required")#inp_password
+                    .form-group
+                        p
+                            a(href="#") Забыли пароль?
+                        input(type="submit",value="Войти")#btn_submit
+                h4 или используйте один из сервисов
+                ul.list-inline.social
+                    li
+                        a(href="#")
+                            img(src="static/img/social-fb.png",alt="Зарегистрироваться через Фейсбук")
+                    li
+                        a(href="#")
+                            img(src="static/img/social-twitter.png",alt="Зарегистрироваться через Твиттер")
+                    li
+                        a(href="#")
+                            img(src="static/img/social-rss.png",alt="Зарегистрироваться через Google+")
+                    li
+                        a(href="#")
+                            img(src="static/img/social-vk.png",alt="Зарегистрироваться через ВКонтакте")
         include footer
         script.
             $(document).ready(function () {window.InitApp({}, "Login")})

@@ -8,7 +8,7 @@ from apps.films.models import Films, Seasons
 #############################################################################################################
 # Модель Контента
 class Contents(models.Model):
-    film                 = models.ForeignKey(Films, verbose_name=u'Фильм')
+    film                 = models.ForeignKey(Films, verbose_name=u'Фильм', related_name='contents')
     name                 = models.CharField(max_length=255, verbose_name=u'Название')
     name_orig            = models.CharField(max_length=255, verbose_name=u'Оригинальное название')
     number               = models.IntegerField(null=True, blank=True, verbose_name=u'Номер сезона')
