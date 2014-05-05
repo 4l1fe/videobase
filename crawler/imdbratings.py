@@ -55,7 +55,10 @@ def ny_full_dict(debug=False):
     return dict(name_wrapper(dict_gen(get_rating_source(debug))))
 
 def process_all():
-
+    '''
+    Process all films found in our database and update ratings for them
+    if they exist in downloaded file.
+    '''
     h = HTMLParser.HTMLParser()
     full_dict = ny_full_dict(True)
     name_dict =dict((key[1],value) for key,value in full_dict.items())
