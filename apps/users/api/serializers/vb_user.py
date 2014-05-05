@@ -18,8 +18,7 @@ class vbUser(serializers.ModelSerializer):
     friends_cnt = serializers.SerializerMethodField('get_friends_cnt')
     films_watched = serializers.SerializerMethodField('get_films_watched_cnt')
     comments_cnt = serializers.SerializerMethodField('get_comments_cnt')
-
-    # genre_fav
+    genre_fav = serializers.SerializerMethodField('get_genre_fav')
     relation = serializers.SerializerMethodField('get_relation')
 
     # Признак genres
@@ -53,6 +52,9 @@ class vbUser(serializers.ModelSerializer):
 
     def get_name(self, obj):
         return obj.profile.nickname
+
+    def get_genre_fav(self, obj):
+        return None
 
     def path_to_avatar(self, obj):
         userpic = obj.profile.userpic_id
@@ -98,4 +100,4 @@ class vbUser(serializers.ModelSerializer):
         model = User
         fields = ('id', 'name', 'avatar', 'regdate',
                   'friends_cnt', 'films_watched', 'comments_cnt',
-                  'relation', 'genres', 'friends')
+                  'relation', 'genres', 'friends', 'genre_fav')

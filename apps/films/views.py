@@ -7,6 +7,7 @@ import warnings
 from cStringIO import StringIO
 from PIL import Image, ImageEnhance
 
+from django.utils import timezone
 from django.core.files import File
 from django.contrib.auth.models import User
 from django.template import Template, Context
@@ -19,6 +20,8 @@ from rest_framework.response import Response
 from rest_framework import status
 
 import apps.films.models as film_model
+from apps.films.constants import APP_PERSON_ACTOR, APP_PERSON_DIRECTOR,\
+    APP_FILM_SERIAL, APP_FILM_FULL_FILM, APP_USERFILM_STATUS_SUBS
 import apps.contents.models as content_model
 
 from apps.users.api.users import vbUser
@@ -233,6 +236,7 @@ def index_view(request):
 
 
 def person_view(request, resource_id):
+        # ... view code here
         '''
         - header_title = person.name
 
@@ -243,61 +247,72 @@ def person_view(request, resource_id):
         - person_birthdate_string = date_text(person_birthdate) + " г. (" + person_years_old + ")"
         '''
 
-        resp_dict = {}
+        person = film_model.Persons.objects.get(pk=resource_id)
 
-        try:
-            person = film_model.Persons.objects.get(pk=resource_id)
-            resp_dict['person'] = vbPerson(person, extend=True).data
-        except Exception, e:
-            raise Http404
+        pfs = film_model.PersonsFilms.objects.filter(person=person)
 
-        pfs = film_model.Films.objects.filter(persons__pk=person.pk)
-
-        try:
-            vbFilms = vbFilm(pfs, many=True).data
-        except Exception, e:
-            vbFilms = []
+        vbFilms = [pf.film.as_vbFilm() for pf in pfs]
 
         for vbf in vbFilms:
-            vbf.update({
-                'instock': True,
-                'hasFree': True,
-                'year': vbf['releasedate'].strftime('%Y'),
+            
+            vbf.update({'instock': True,
+                        'hasFree': True,
+                        'year': vbf['release_date'].strftime('%Y'),
+                        'release_date': vbf['release_date'].strftime('%Y-%m-%d')
             })
 
-        resp_dict['filmography'] = vbFilms
-        return HttpResponse(render_page('person', resp_dict))
+        return HttpResponse(render_page('person', {
+            'person': {'id': resource_id,
+                       'name': person.name,
+                       'photo': "static/img/tmp/person1.jpg",
+                       'bio': person.bio,
+                       'birthdate': "1974-01-22",
+                       'roles': ["актер", "режиссёр"],
+                       'birthplace': ["Москва", "Россия"]},
+            'filmography': vbFilms}))
 
 
 def login_view(request):
+    # ... view code here
     pass
 
 
 def register_view(request):
-    return HttpResponse(render_page('register',{}))
+    # ... view code here
+    return HttpResponse(render_page('register', {}))
 
 
 def user_view(request, resource_id):
+
     try:
         user = User.objects.get(pk=resource_id)
-
-        uvb = vbUser(user)
-
-        default_user = {'id': -1,
-               'friends': [],
-               'genres': [],
-               'regdate':'2014-01-01',
-               }
-
+        uvb = vbUser(user, extend=True, genres=True, friends=True)
+        default_user = {'regdate': uvb.data['regdate'].strftime("%Y-%m-%d")}
         default_user.update(uvb.data)
+        delta = timezone.now() - uvb.data['regdate']
+        user_how_long = u"{}".format(delta.days if delta.days != 0 else 1)
+        if delta.days % 10 in [0, 1]:
+            day_title = u"день"
+        elif delta.days % 10 in [2, 3, 4, ]:
+            day_title = u"дня"
+        else:
+            day_title = u"дней"
+        user_how_long += u" {}".format(day_title)
 
-        default={'user':default_user,
-                 'films_subscribed': [],
-                 'actors_fav': [],
-                 'feed': [],
-                 'directors_fav':[],
-                 'user_how_long':[]
-                 }
+        films = film_model.Films.objects.filter(users_films__user=user, type__in=(APP_FILM_SERIAL, APP_FILM_FULL_FILM),
+                                     users_films__status=APP_USERFILM_STATUS_SUBS)
+        vbf = vbFilm(films, many=True)
+        actors = film_model.Persons.objects.filter(users_persons__user=user, person_film_rel__p_type=APP_PERSON_ACTOR)
+        vba = vbPerson(actors, many=True)
+        directors = film_model.Persons.objects.filter(users_persons__user=user, person_film_rel__p_type=APP_PERSON_DIRECTOR)
+        vbd = vbPerson(directors, many=True)
+        default = {'user': default_user,
+                   'films_subscribed': vbf.data,
+                   'actors_fav': vba.data,
+                   'feed': [],
+                   'directors_fav': vbd.data,
+                   'user_how_long': user_how_long,
+                   }
 
         return HttpResponse(render_page('user', default))
 
@@ -311,6 +326,7 @@ def test_view(request):
 
     return render_to_response('api_test.html', c)
 
+
 def calc_actors(o_film):
     result_list = []
     try:
@@ -319,6 +335,7 @@ def calc_actors(o_film):
         pass
 
     return result_list
+
 
 def calc_similar(o_film):
     result_list = []
@@ -331,6 +348,7 @@ def calc_similar(o_film):
         pass
 
     return result_list
+
 
 def calc_comments(o_film):
     try:
@@ -345,6 +363,7 @@ def calc_comments(o_film):
         result_list = []
 
     return result_list
+
 
 def film_view(request, film_id, *args, **kwargs):
     resp_dict = {}
