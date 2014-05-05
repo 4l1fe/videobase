@@ -13,6 +13,7 @@ BASE_DIR = os.path.dirname(BASE_PATH)
 
 STATIC_PATH = os.path.join(BASE_PATH, '..', 'static')
 CONFIGS_PATH = os.path.join(BASE_PATH, '..', 'configs')
+BACKUP_PATH = os.path.join(BASE_PATH, '..', '.backup')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
@@ -63,6 +64,7 @@ INSTALLED_APPS = (
     'crawler',
     'social_auth',
     'djcelery',
+    'backup_system',
 )
 
 MIDDLEWARE_CLASSES = (
