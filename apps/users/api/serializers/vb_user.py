@@ -13,7 +13,7 @@ class vbUser(serializers.ModelSerializer):
     name = serializers.SerializerMethodField('get_name')
     avatar = serializers.SerializerMethodField('path_to_avatar')
 
-    # extend
+    # Признак extend
     regdate = serializers.SerializerMethodField('get_regdate')
     friends_cnt = serializers.SerializerMethodField('get_friends_cnt')
     films_watched = serializers.SerializerMethodField('get_films_watched_cnt')
@@ -22,14 +22,14 @@ class vbUser(serializers.ModelSerializer):
     # genre_fav
     relation = serializers.SerializerMethodField('get_relation')
 
-    # genres
+    # Признак genres
     genres = serializers.SerializerMethodField('genres_list')
 
-    # friends
+    # Признак friends
     friends = serializers.SerializerMethodField('friends_list')
 
     def __init__(self, *args, **kwargs):
-        self.cer_user = kwargs.pop('cer_usre', None)
+        self.cer_user = kwargs.pop('cer_user', None)
         del_fields = []
         extend = kwargs.pop('extend', False)
         if not extend:
@@ -88,8 +88,10 @@ class vbUser(serializers.ModelSerializer):
         return serializer.data
 
     def friends_list(self, obj):
-        friends = UsersRels.objects.filter(user=obj, rel_type=APP_USER_REL_TYPE_FRIENDS)
-        serializer = vbUser(friends, cer_usre=self.cer_user, many=True)
+        friends = User.objects.extra(
+            where=['id IN (SELECT "user_rel_id" FROM "auth_user" INNER JOIN "users_rels" ON ( "auth_user"."id" = "users_rels"."user_id" ) WHERE ("users_rels"."rel_type" =%s  AND "users_rels"."user_id" = %s ))'],
+            params=[APP_USER_REL_TYPE_FRIENDS, obj.pk]).all()
+        serializer = vbUser(friends, cer_user=self.cer_user, many=True)
         return serializer.data
 
     class Meta:

@@ -18,7 +18,7 @@ class UsersView(APIView):
         except Exception as e:
             return Response({'e': e.message}, status=status.HTTP_400_BAD_REQUEST)
 
-        serializer = vbUser(user, cer_usre=request.user)
+        serializer = vbUser(user, cer_user=request.user)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -31,6 +31,7 @@ class UsersView(APIView):
         ser_par = dict(extend=request.DATA.get('extend', False),
                        friends=request.DATA.get('friends', False),
                        genres=request.DATA.get('genres', False),
+                       cer_user=request.user,
                        )
 
         serializer = vbUser(user, **ser_par)
