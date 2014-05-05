@@ -233,7 +233,6 @@ def index_view(request):
 
 
 def person_view(request, resource_id):
-        # ... view code here
         '''
         - header_title = person.name
 
@@ -244,43 +243,41 @@ def person_view(request, resource_id):
         - person_birthdate_string = date_text(person_birthdate) + " г. (" + person_years_old + ")"
         '''
 
-        person = film_model.Persons.objects.get(pk=resource_id)
+        resp_dict = {}
 
-        pfs = film_model.PersonsFilms.objects.filter(person=person)
+        try:
+            person = film_model.Persons.objects.get(pk=resource_id)
+            resp_dict['person'] = vbPerson(person, extend=True).data
+        except Exception, e:
+            raise Http404
 
-        vbFilms = [pf.film.as_vbFilm() for pf in pfs]
+        pfs = film_model.Films.objects.filter(persons__pk=person.pk)
+
+        try:
+            vbFilms = vbFilm(pfs, many=True).data
+        except Exception, e:
+            vbFilms = []
 
         for vbf in vbFilms:
-            
-            vbf.update({'instock': True,
-                        'hasFree': True,
-                        'year': vbf['release_date'].strftime('%Y'),
-                        'release_date': vbf['release_date'].strftime('%Y-%m-%d')
+            vbf.update({
+                'instock': True,
+                'hasFree': True,
+                'year': vbf['releasedate'].strftime('%Y'),
             })
 
-        return HttpResponse(render_page('person', {
-            'person': {'id': resource_id,
-                       'name': person.name,
-                       'photo': "static/img/tmp/person1.jpg",
-                       'bio': person.bio,
-                       'birthdate': "1974-01-22",
-                       'roles': ["актер", "режиссёр"],
-                       'birthplace': ["Москва", "Россия"]},
-            'filmography': vbFilms}))
+        resp_dict['filmography'] = vbFilms
+        return HttpResponse(render_page('person', resp_dict))
 
 
 def login_view(request):
-    # ... view code here
     pass
 
 
 def register_view(request):
-    # ... view code here
     return HttpResponse(render_page('register',{}))
 
 
 def user_view(request, resource_id):
-
     try:
         user = User.objects.get(pk=resource_id)
 
@@ -317,7 +314,7 @@ def test_view(request):
 def calc_actors(o_film):
     result_list = []
     try:
-        result_list = film_model.Persons.objects.filter(person_film_rel__film=o_film.pk).values('id', 'name')[:5]
+        result_list = list(film_model.Persons.objects.filter(person_film_rel__film=o_film.pk).values('id', 'name')[:5])
     except Exception, e:
         pass
 
@@ -342,12 +339,12 @@ def calc_comments(o_film):
         return []
 
     result_list = content_model.Comments.objects.filter(content=content.film_id)[:5]
-    return result_list
+    try:
+        result_list = vbComment(result_list, many=True).data
+    except:
+        result_list = []
 
-def transform_to_json_serializable(rdict):
-    rdict['releasedate'] = rdict['releasedate'].strftime("%d-%m-%Y")
-    rdict['actors'] = [dict(actor) for actor in rdict['actors']]
-    return rdict
+    return result_list
 
 def film_view(request, film_id, *args, **kwargs):
     resp_dict = {}
@@ -368,6 +365,5 @@ def film_view(request, film_id, *args, **kwargs):
     resp_dict['similar'] = calc_similar(o_film)
     resp_dict['comments'] = calc_comments(o_film)
 
-    film_data = transform_to_json_serializable(resp_dict)
-    print film_data
-    return HttpResponse(render_page('film', {'film': film_data}))
+    return HttpResponse(render_page('film', {'film': resp_dict}))
+
