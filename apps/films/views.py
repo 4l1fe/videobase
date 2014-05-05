@@ -251,14 +251,18 @@ def person_view(request, resource_id):
         except Exception, e:
             raise Http404
 
-        pfs = film_model.PersonsFilms.objects.filter(person=person)
-        vbFilms = [pf.film.as_vbFilm() for pf in pfs]
+        pfs = film_model.Films.objects.filter(persons__pk=person.pk)
+
+        try:
+            vbFilms = vbFilm(pfs, many=True).data
+        except Exception, e:
+            vbFilms = []
 
         for vbf in vbFilms:
-            vbf.update({'instock': True,
-                        'hasFree': True,
-                        'year': vbf['release_date'].strftime('%Y'),
-                        'release_date': vbf['release_date'].strftime('%Y-%m-%d')
+            vbf.update({
+                'instock': True,
+                'hasFree': True,
+                'year': vbf['releasedate'].strftime('%Y'),
             })
 
         resp_dict['filmography'] = vbFilms
