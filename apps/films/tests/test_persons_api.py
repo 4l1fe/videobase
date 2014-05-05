@@ -29,10 +29,21 @@ class PersonsTest(APITestCase):
         response = self.client.get(reverse('person_api_view', kwargs={'resource_id': 0, 'format': 'json'}))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_person_api_view(self):
+    def test_person_api_view_get(self):
         response = self.client.get(reverse('person_api_view', kwargs={'resource_id': self.person_filmography.person.id, 'format': 'json'}))
         self.assertEqual(response.data['id'], self.person_filmography.person.id)
         self.assertEqual(response.data['photo'], self.person_filmography.person.photo)
+        self.assertEqual(response.data['name'], self.person_filmography.person.name)
+        self.assertEqual(response.data['city'], self.person_filmography.person.name)
+        self.assertEqual(response.data['birthdate'], self.person_filmography.person.name)
+
+
+    def test_person_api_view_post(self):
+        response = self.client.post(reverse('person_api_view', kwargs={'resource_id': self.person_filmography.person.id, 'format': 'json'}), data={'extend': True})
+        self.assertEqual(response.data['id'], self.person_filmography.person.id)
+        self.assertEqual(response.data['photo'], self.person_filmography.person.photo)
+        self.assertEqual(response.data['name'], self.person_filmography.person.name)
+        self.assertEqual(response.data['name'], self.person_filmography.person.name)
         self.assertEqual(response.data['name'], self.person_filmography.person.name)
 
     def test_person_filmography_view_ok(self):
