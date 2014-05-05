@@ -1,6 +1,7 @@
 #coding: utf-8
 import sys
 import json
+from pprint import pprint as pp
 
 python_v = sys.version_info[0]
 
@@ -51,9 +52,9 @@ def get_films_persons(sessiom_token, id, host=HOST):
     return json_resp
 
 
-def get_users_persons(session_token, id, host=HOST):
+def get_users_persons(session_token, id, page=1, per_page=10, type_='all', host=HOST):
     url = urljoin(host, 'api/v1/users/{}/persons.json'.format(id))
-    data = urlencode(dict())  # Для изменения на тип запроса - POST
+    data = urlencode(dict(page=page, per_page=per_page, type=type_))
     req = Request(url, data)
     req.add_header('Authorization', 'X-VB-Token ' + session_token)
     resp = urlopen(req)
@@ -64,11 +65,18 @@ def get_users_persons(session_token, id, host=HOST):
     return json_resp
 
 
-def run_test_requests(st, fid, uid):
-    resp = get_films_persons(st, 833)
-    print(resp)
-    resp = get_users_persons(st, 1)
-    print(resp)
+def get_person(sessiom_token, id, meth, extend=False, host=HOST):
+    req = Request(urljoin(host, 'api/v1/persons/{}.json'.format(id)))
+    if meth.lower() == 'post':
+        data = urlencode(dict(extend=extend))
+        req.add_data(data)
+    req.add_header('Authorization', 'X-VB-Token ' + sessiom_token)
+    resp = urlopen(req)
+    resp_data = resp.read()
+    if python_v == 3:
+        resp_data = resp_data.decode()
+    json_resp = json.loads(resp_data)
+    return json_resp
 
 
 if __name__ == '__main__':
@@ -76,4 +84,13 @@ if __name__ == '__main__':
     print(mt)
     st = get_session_token(mt)
     print(st)
-    # run_test_requests(st, 833, 1)
+    resp = get_films_persons(st, 3)
+    pp(resp)
+    resp = get_users_persons(st, 1, 1, 10)
+    pp(resp)
+    resp = get_person(st, 12, 'get')
+    pp(resp)
+    resp = get_person(st, 12, 'post')
+    pp(resp)
+    resp = get_person(st, 12, 'post', extend=True)
+    pp(resp)

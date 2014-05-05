@@ -1,92 +1,83 @@
-- header_title= film.name
-- film_country = film.countries && film.countries.length ?film.countries.join(", "):false
-html
+doctype html5
+include mixins
+html(lang="ru")
     include head
-    body.film-page
+    body.page-film
         include header
-        .container.pleer-wrapper
-            h1=film.name
-            .col-md-9.pleer-place#pleer_place
-            .col-md-3.locations-place
-                if film.locations
-                    h5 Варианты
-                    #locations
-                        - each item in film.locations
-                            mixin location_thumb(item)
-        .container.film-info-wrapper
-            .col-md-8
-                .col-md-4
-                    mixin film_thumb({id: film.id, name: "", poster: film.poster, relation: film.relation, year: ""}, "film_thumb")
-                .col-md-7
-                    table.table.table-bordered
-                        - if (film_country)
-                            tr
-                                td Страна
-                                td=film_country
-                        - if (film.directors)
-                            tr
-                                td Режиссёр
-                                td
-                                    mixin anchor_list(film.directors, "/persons/%")
-                        - if (film.scriptwriters)
-                            tr
-                                td Сценарист
-                                td
-                                    mixin anchor_list(film.scriptwriters, "/persons/%")
-                        tr
-                            td Дата выхода
-                            td #{date_text(new Date(film.releasedate))}
-                        tr
-                            td Продолжительность
-                            td #{duration_text(film.duration)}
-                - if (film.description)
-                    .clearfix
-                    h5 Описание
-                    .film-description=film.description
-                - if (film.trailer)
-                    .clearefix
-                    h5 Трейлер
-                    .film-trailer
-                        Здесь трейлер
-            .col-md-4
-                .col-md-6
-                    h6 Сводный рейтинг
-                .col-md-3
-                    .film-rating=film.ratings.cons[0]
-                .col-md-3
-                    .film-rating-votes=film.ratings.cons[1]
-                        <br/>голосов
-                .clearfix
-                .col-md-6
-                    .col-md-9 Рейтинг КП
-                    .col-md-3 8.3
-                .col-md-6
-                    .col-md-9 Рейтинг IMDB
-                    .col-md-3 7.9
-                .clearfix
-                .col-md-6
-                    button.btn.btn-default Подписаться
-                .col-md-6
-                    button.btn.btn-default Добавить в плейлист
-                if (film.actors)
-                    .clearfix
-                    h3 Актёры
-                    #actors
-                        each actor in film.actors
-                            mixin person_thumb(actor)
-                        .more-actors-place(class=film.actors.length < 5?"":"display-none")
-                            button.btn.btn-default#btn_moreactors Все актёры
+        .films-wrapper
+            .container
+                h1 Волк с Уолл-стрит <em>The wolf of Wall Street</em>
+                .player-place
+                    .player#player
+        .container.film-info
+            .col-md-3.poster-place
+                .poster
+                    img.img-responsive(src="static/img/tmp/poster1.jpg")
+            .col-md-6.info-place
+                table
+                    tr
+                        th Страна
+                        td США
+                    tr
+                        th Режиссёр
+                        td
+                            a(href="#") Мартин Скорсезе
+                    tr
+                        th Сценарист
+                        td
+                            a(href="#") Теренс Уинтер
+                            |,
+                            a(href="#") Джордан Белфорт
+                    tr
+                        th Дата выхода
+                        td 1 января
+                    tr
+                        th Время
+                        td 3 часа 10 минут
+            .col-md-3.rating-place
+                .rating-header Сводный рейтинг
+                .rating-cons-cnt
+                    p 8565 голосов
+                .rating-cons-place
+                    .rating-cons 8.5
+                .rating-all
+                    p <strong>8.9</strong> Рейтинг в <em>КП</em>
+                    p <strong>7.5</strong> Рейтинг в <em>IMDB</em>
         .container
-            h3 Комментарии
-            .comments-place
-                if (film.comments)
-                    each item in film.comments
-                        mixin comment_thumb(item)
-        if (film.similar)
-            .container#films_similar
-                h3 Похожие фильмы
-                each item in film.similar
-                    mixin film_thumb(item)
+            .col-md-9
+                .description-place
+                    h2 Описание
+                    .description.
+                        Метод HEAD.<br/>Метод HEAD аналогичен методу GET, за исключением того, что сервер ничего не посылает     в информационной части ответа. Метод HEAD запрашивает только информацию заголовка о
+                        файле и ресурсе. Инфоримация заголовка запроса HEAD должна быть такой же, как в запросе
+                        GET.
+                        Этот метод используется, когда клиент хочет найти информацию о документе, не получая
+                        его. Для метода HEAD существует множество приложений. Например, клиент может
+                        затребовать следующую информацию:
+                        * время изменения документа ( эти данные полезны для запросов, связанных с кэш-памятью);
+                        * размер документа (необходим для компоновки страницы, оценки времени передачи,
+                        определения необходимости запроса более компактной версии документа);
+                        * тип документа (позволяет клиенту изучать документы только определенного типа);
+                        * тип сервера;
+                        Следует отметить, что большая часть информации заголовка, которую посылает сервер, не
+                        является обязательной и может предоставляться не всеми срверами.
+                        Ниже приведен пример HTTP-транакции с использованием запроса HEAD. Клиент посылает
+                .trailer-place
+                .comments-place
+                    h2 Комментарии
+                    #comments
+                        mixin comment_thumb({id: 1, text: "lorem ipsum ipsum lorem", time_text: "5 минут назад", created: "2014-05-01 19:01:02", user: {id: 1, name: "Василий Пастеров"}})
+                        mixin comment_thumb({id: 1, text: "lorem ipsum ipsum lorem", time_text: "5 минут назад", created: "2014-05-01 19:01:02", user: {id: 1, name: "Василий Пастеров"}})
+                .comments-more-place#comments-more-place
+                    button#comments-more-btn
+                        span Показать ещё
+            .col-md-3.actors-place#actors
+                h2 Актёры
+                // actors mixins
+        .clearfix
+        .container.films
+            h2 Рекомендуемое
+            #films
         include footer
         script.
-            $(document).ready(function () {window.InitApp({page_conf: !{JSON.stringify(film)}}, "Film")})
+            $(document).ready(function () {window.InitApp({}, "Film")})
