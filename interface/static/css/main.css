@@ -63,6 +63,28 @@ h2 {text-align: center; text-transform: uppercase; color: #fff; font-size: 22px;
 .comment-thumb .info .name {color: #5A88DE; font-weight: bold}
 .comment-thumb .text {}
 
+.feed-thumb {min-height: 60px; margin-bottom: 10px}
+.feed-thumb .image {float: left; width: 60px; height: 60px; background-position: 50% 50%; background-repeat: no-repeat}
+.feed-thumb .info-place {margin-left: 62px}
+.feed-thumb .info-place .time {float: right; color: #CCCDCF}
+.feed-thumb .cont-place {margin-left: 62px}
+.feed-thumb .cont-place .event {color: #CCCDCF; margin: 5px}
+.feed-thumb .film-info {margin-left: 10px;}
+.feed-thumb .person-info {margin-left: 10px; min-height: 40px;}
+.feed-thumb .person-info .photo {background-position: 50% 50%; background-repeat: no-repeat; width: 40px; height: 40px; float: left}
+.feed-thumb .person-info .name {margin-left: 42px;}
+.feed-pers-o .image {width: 100px; height: 100px}
+.feed-pers-o .cont-place, .feed-pers-o .info-place {margin-left: 110px;}
+.feed-thumb .user-info {margin-left: 10px; min-height: 40px;}
+.feed-thumb .user-info .avatar {background-position: 50% 50%; background-repeat: no-repeat; width: 40px; height: 40px; float: left}
+.feed-thumb .user-info .name {margin-left: 42px;}
+
+.comment-thumb .text-place {margin-left: 65px; min-height: 60px; margin-bottom: 10px}
+.comment-thumb .info {margin-bottom: 10px;}
+.comment-thumb .info .time {float: right; color: #CCCDCF}
+.comment-thumb .info .name {color: #5A88DE; font-weight: bold}
+.comment-thumb .text {}
+
 /* common elements */
 .load-more-place {margin: 30px 0 30px 0}
 .load-more-place button {width: 100%; padding: 20px 0 20px 0; background: #E9E9E9; cursor: pointer; text-transform: uppercase; color: #5A88DE; font-size: 16px; border: 0}

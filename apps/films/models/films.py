@@ -27,8 +27,9 @@ class Films(models.Model):
     imdb_id          = models.IntegerField(null=True, blank=True, verbose_name=u'Порядковый номер на IMDB')
     rating_imdb      = models.FloatField(null=True, blank=True, verbose_name=u'Рейтинг фильма на сайте imdb.com')
     rating_imdb_cnt  = models.IntegerField(null=True, blank=True, verbose_name=u'Количество пользователей imdb.com оценивших этот фильм')
-    rating_cons      = models.FloatField(null=True, blank=True, verbose_name=u'Консолидированный рейтинг')
-    rating_cons_cnt  = models.FloatField(null=True, blank=True, verbose_name=u'Количество в консолидированном рейтинге')
+    rating_cons      = models.SmallIntegerField(null=True, blank=True, verbose_name=u'Консолидированный рейтинг')
+    rating_cons_cnt  = models.IntegerField(null=True, blank=True, verbose_name=u'Количество голосов консолидированного рейтинга')
+    rating_sort      = models.IntegerField(null=True, blank=True, verbose_name=u'Условный рейтинг для сортировки')
     kinopoisk_id     = models.IntegerField(null=True, blank=True, verbose_name=u'Порядковый номер на кинопоиске')
     age_limit        = models.PositiveSmallIntegerField(null=True, blank=True, verbose_name=u'Ограничение по возрасту')
     kinopoisk_lastupdate = models.DateTimeField(null=True, blank=True, verbose_name=u'Дата последнего обновления на кинопоиске')
@@ -44,7 +45,11 @@ class Films(models.Model):
     objects = models.Manager()
         
     def __unicode__(self):
-        return u'[{0}] {1}'.format(self.pk, self.name)
+        if type(self.name) is str:
+            name = unicode(self.name)
+        else:
+            name = self.name
+        return u'[{0}] {1}'.format(self.pk, name)
 
     def as_vbFilm(self,extend=False,persons =False, authorized=False):
 
@@ -70,7 +75,16 @@ class Films(models.Model):
             pass
 
         return f_dict
-                  
+
+    @classmethod
+    def similar_api(self, o_film):
+        list_genres = [i.pk for i in o_film.genres.all()]
+
+        o_similar = Films.objects.distinct().filter(genres__in=list_genres).\
+                        exclude(pk=o_film.pk).order_by('-rating_cons')[:12]
+
+        return o_similar
+
     class Meta(object):
         # Имя таблицы в БД
         db_table = 'films'
