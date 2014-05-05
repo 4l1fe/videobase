@@ -23,7 +23,6 @@ class Location
   show: ->
     if obj == undefined
       html = undefined
-      console.log @vals.type
       if @vals.type == "ivi"
         html = '<iframe src="http://www.ivi.ru/external/stub?videoId=' + @vals.value + '&subsiteId=138" width="860" height="480" frameborder="0"></iframe><div style="top:-200px; z-index:-1; position: relative;">'
       else if @vals.type == "now"
@@ -110,6 +109,7 @@ class Item
         $("." + k, @_place).html(v)
 
   user_is_auth: ->
+    alert "Sign in first"
     return @_app.user_is_auth()
 
   reset: ->
@@ -134,12 +134,19 @@ class FilmThumb extends Item
       opts.vals.id = opts.vals.id || opts.place.attr("id").substr(11)
       opts.vals.poster = $(".poster-place", opts.place).background_image()
       opts.vals.name = $(".name", opts.place).text()
-      opts.vals.year = $(".year", opts.place).text()
+      opts.vals.year = $(".year", opts.place).text().substr(1,4)
       opts.vals.rating = $(".rating", opts.place).text()
       opts.vals.relation =
         rating: $(".rateit", opts.place).rateit("value")
-    opts.vals.rating = opts.vals.ratings.cons if opts.vals.ratings && opts.vals.ratings.cons
-    opts.vals.year = opts.vals.release_date.substr(0, 4) if opts.vals.release_date
+    opts.vals.rating = opts.vals.ratings.cons[0] if (opts.vals.ratings && opts.vals.ratings.cons)
+    opts.vals.year = " (" + opts.vals.releasedate.substr(0, 4) + ")" if opts.vals.releasedate
+    if $(".notinstock", opts.place).hasClass("display-none")
+      if !$(".watchprice", opts.place).hasClass("invisible")
+        opts.vals.price = $(".watchprice .price", opts.place).text()
+      if $(".watchbtn .price", opts.place).length
+        opts.vals.price = $(".watchbtn .price", opts.place).text()
+      else
+        opts.vals.hasFree = true
     if opts.vals.locations
       opts.vals.hasFree = false;
       opts.vals.price = 0;
@@ -158,7 +165,6 @@ class FilmThumb extends Item
         .rateit "max", 10
         .bind("beforerated beforereset", (event) =>
           if !@user_is_auth()
-            alert "You have to be signed"
             event.preventDefault()
         )
         .bind "reset rated", (event) => @action_rate(ri.rateit("value"))
@@ -170,13 +176,33 @@ class FilmThumb extends Item
           rFloor = 0.5 if rel.rating - rInt > 0.5
           ri.rateit "value", rInt + rFloor
       $(".notwatch-btn", @_place).click => @action_toggle_notwatch()
-      $(".notinstock button", @_place).click => @action_toggle_subscribe()
-
+      $(".notinstock button.subscribe-btn", @_place).click => @action_toggle_subscribe()
+      $(".playlist-btn", @_place).click => @action_toggle_playlist()
       callback @ if callback
+
+  action_toggle_playlist: (status) ->
+    if @user_is_auth()
+      rel = @vals("relation")
+      if status != undefined
+        new_playlist = status
+      else
+        new_playlist = true
+        if rel && rel.playlist
+          new_playlist = false
+
+      if new_playlist
+        action = "update"
+      else
+        action = "destroy"
+      @_app.rest.films.action.playlist[action](@vals("id"))
+      .done(
+        ->
+          rel.playlist = new_playlist
+      )
 
   action_toggle_notwatch: (status) ->
     if @user_is_auth()
-      rel = @vals("relation.notwatch")
+      rel = @vals("relation")
       if status != undefined
         new_notwatch = status
       else
@@ -191,7 +217,7 @@ class FilmThumb extends Item
       @_app.rest.films.action.notwatch[action](@vals("id"))
       .done(
         ->
-          rel.new_notwatch = new_notwatch
+          rel.notwatch = new_notwatch
       )
 
   action_toggle_subscribe: (status) ->
@@ -231,7 +257,7 @@ class FilmThumb extends Item
 
   set_vals: ->
     super
-    @_place.attr("id", "film-thumb-" + @_vals.id)
+    @_place.attr("id", @name + "-" + @_vals.id)
     $(".name", @_place).attr("href", "/films/" + @_vals.id)
     $(".poster-place", @_place).background_image(@_vals.poster || @_app.config("noposter_url"))
 
@@ -244,12 +270,12 @@ class FilmThumb extends Item
       instock.removeClass("display-none")
       $(".notinstock", @_place).addClass("display-none")
       if @_vals.hasFree
-        $("button", instock).html("смотреть<br/>бесплатно")
+        $("button.watch-btn", instock).html("смотреть<br/>бесплатно")
         if @_vals.price
           $(".watchprice", instock).visible();
           $("button", instock).addClass("action-priced")
       else
-        $("button", instock).html("СМОТРЕТЬ <br/><span>от <span class=\"price\">" + @_vals.price + "</span> р. без рекламы</span>")
+        $("button.watchbtn", instock).html("СМОТРЕТЬ <br/><span>от <span class=\"price\">" + @_vals.price + "</span> р. без рекламы</span>")
     else
       $(".instock", @_place).addClass("display-none")
       $(".notinstock", @_place).removeClass("display-none")
@@ -275,7 +301,7 @@ class PersonThumb extends Item
 
   set_vals: ->
     super
-    @_place.attr("id", @_name + @_vals.id)
+    @_place.attr("id", @_name + "-" + @_vals.id)
     $(".name", @_place).attr("href", "/person/" + @_vals.id)
     $(@_place).background_image(@_vals.photo || @_app.config("noperson_url"))
 
@@ -300,9 +326,70 @@ class CommentThumb extends Item
 
   set_vals: ->
     super
-    @_place.attr("id", @_name + @_vals.id)
+    @_place.attr("id", @_name + "-" +  @_vals.id)
     $(".name", @_place).attr("href", "/person/" + @_vals.id)
     $(@_place).css("background-image", 'url("' + (@_vals.photo || conf.no_person_url) + '")')
+
+# a Feed class
+class FeedThumb extends Item
+  constructor: (opts = {}, callback) ->
+    @_name = "feed-thumb"
+    opts.vals = {} if opts.vals == undefined
+    if opts && opts.place
+      opts.vals._do_not_set = true
+      opts.vals.id = opts.vals.id || opts.place.attr("id").substr(10)
+      cls = $(".record", opts.place).attr("class").split(" ")
+      for key of cls
+        if cls[key] != "feed-thumb"
+          opts.vals.type = cls[key].substr(5)
+    super opts, =>
+      need_class = "feed-" + opts.vals.type
+      $(".record", @_place).each(
+        ->
+          el = $(this)
+          if !el.hasClass(need_class)
+            el.parent().remove()
+      )
+
+  reset: ->
+    @_vals =
+      id: null
+      user: null
+      object: null
+
+  set_vals: ->
+    super
+    if @_vals._do_not_set
+      return
+    @_place.attr("id", @_name + "-" + @_vals.id)
+    $(".time", @_place).text(time_text(new Date(@_vals.created)))
+    if @_vals.type == "film-o"
+      $(".image", @_place).background_image(@_vals.object.poster || @_app.config("noposter_url"))
+      $(".cont-place a", @_place).attr("href", "/films/" + @_vals.object.id)
+    else if @_vals.type == "pers-o"
+      $(".image", @_place).background_image(@_vals.object.photo || @_app.config("noperson_url"))
+      $(".film-info a", @_place).attr("href", "/films/" + @_vals.object.film.id).text(@_vals.object.film.name)
+      $(".type-" + @_vals.type, @_place).removeClass("display-none")
+    else if @_vals.type == "sys-a"
+      # something here
+    else
+      console.log @_vals.user.name
+      $(".image", @_place).background_image(@_vals.user.avatar || @_app.config("noavatar_url"))
+      $(".info-place .name a", @_place).attr("href", "/users/" + @_vals.user.id).text(@_vals.user.name)
+      if @_vals.type.substr(0,4) == "film"
+        console.log @_vals.object
+        $(".film-info a", @_place).attr("href", "/films/" + @_vals.object.id).text(@_vals.object.name)
+        if @_vals.type == "film-c"
+          $(".text", @_place).text(@_vals.object.text)
+        else if @_vals.type == "film-r"
+          console.log (1)
+            # do something with rating
+      else if @_vals.type == "pers-s"
+        $(".photo", @_place).background_image(@_vals.object.photo || @_app.config("noperson_url"))
+        $(".person-info a", @_place).attr("href", "/persons/" + @_vals.object.id).text(@_vals.object.name)
+      else if @_vals.type.substr(0,4) == "user"
+        $(".avatar", @_place).background_image(@_vals.object.avatar || @_app.config("noavatar_url"))
+        $(".cont-place .name a", @_place).attr("href", "/users/" + @_vals.object.id).text(@_vals.object.name)
 
 # a User class
 class User
@@ -342,6 +429,7 @@ class App
     @rest.users.add("persons")
     @rest.users.add("friendship")
     @rest.users.add("friends")
+    @rest.users.add("feed")
     @rest.add("films")
 #    @rest.films.add("search")
     @rest.films.add("persons")
@@ -349,6 +437,7 @@ class App
     @rest.films.action.add("rate")
     @rest.films.action.add("subscribe")
     @rest.films.action.add("notwatch")
+    @rest.films.action.add("playlist")
     @rest.add("persons")
     @rest.persons.add("filmography", {isSingle: true})
 
@@ -381,7 +470,7 @@ class App
       return conf[name]
 
   user_is_auth: ->
-    return true
+    return false
 
   search_keydown: (event) ->
     if event.which == 13 # enter pressed
@@ -477,7 +566,7 @@ class Page_Main extends Page
     # init parent
     super
     # save places
-    @_e.output_place = $("#films_place")
+    @_e.films = $("#films")
     @_e.filter =
       parent: $("#frm_filter")
       genre: $("#sel_genre")
@@ -489,8 +578,8 @@ class Page_Main extends Page
       el.change (=> @filter_changed_event())
 
     @_e.loadmore =
-      place: $("#load-more-place")
-      btn: $("#btn_loadmore").click(=> @load_more())
+      place: $("#films_more_place")
+      btn: $("#films_more_btn").click(=> @load_more())
 
     @_app.get_tpl("film-thumb")
 # set filter params
@@ -512,12 +601,12 @@ class Page_Main extends Page
     @update_filter_params()
 
 # parse already exists films
-    $(".film-thumb", @_e.output_place).each(
+    $(".film-thumb", @_e.films).each(
       ->
         _films.push new FilmThumb({place: $(this)})
     )
 
-    $(".film-thumb", $("#new_place")).each(
+    $(".film-thumb", $("#films_new")).each(
       ->
         _films_new.push new FilmThumb({place: $(this)})
     )
@@ -589,7 +678,7 @@ class Page_Main extends Page
         i++
 
       _films = []
-      @_e.output_place.empty()
+      @_e.films.empty()
 
     if !opts.page_loading
       @_e.loadmore.place.hide()
@@ -601,7 +690,7 @@ class Page_Main extends Page
           return if current_counter != _load_counter
           if data.items
             for item in data.items
-              _films.push new FilmThumb({parent: @_e.output_place, vals: item})
+              _films.push new FilmThumb({parent: @_e.films, vals: item})
           if Math.ceil(data.total_cnt / data.per_page) > data.page
             @_e.loadmore.place.show()
             @_e.loadmore.btn.prop('disabled', false);
@@ -615,7 +704,12 @@ class Page_Main extends Page
 # implementing Login and Register Page class
 class Page_Login extends Page
 
-class Page_Register extends Page
+class Page_Registration extends Page
+  @constructor: ->
+    super
+    $("#frm_reg").submit( ->
+      return false
+    )
 
 class Page_Person extends Page
   _films = []
@@ -689,7 +783,7 @@ class Page_Person extends Page
 class Page_Film extends Page
   locations = []
   current_location = null
-  films_similar = []
+  films = []
   actors = []
   opts = {}
 
@@ -699,24 +793,22 @@ class Page_Film extends Page
     @_app.get_tpl("film-thumb")
     @_app.get_tpl("person-thumb")
     @_e =
-      pleer_place: $("#pleer_place")
-    if opts.locations
-      $(opts.locations).each(
-        (key, item) =>
-          el = $("#loc_thumb_" + item.id)
-          if el.length
-            locations[item.id] = new Location @_e.pleer_place, item
-            $("button", el).click(=>
-              console.log item
-              @set_location item.id
-            )
-      )
+      player: $("#player")
+    #if opts.locations
+      #$(opts.locations).each(
+      #  (key, item) =>
+      #    el = $("#loc_thumb_" + item.id)
+      #    if el.length
+      #      locations[item.id] = new Location @_e.pleer_place, item
+      #      $("button", el).click(=>
+      #        @set_location item.id
+      #      )
+      #)
 
-    @_e.film_thumb = $("#film_thumb")
-    new FilmThumb {place: @_e.film_thumb, vals: {id: opts.id}}
-    @_e.films_similar = $("#films_similar")
-    $(".film-thumb", @_e.films_similar).each(->
-       films_similar.push new FilmThumb({place: $(this)})
+
+    @_e.films = $("#films")
+    $(".film-thumb", @_e.films).each(->
+       films.push new FilmThumb({place: $(this)})
     )
 
     @_e.actors = $("#actors")
@@ -757,12 +849,15 @@ class Page_Film extends Page
 
 
   load_more_comments: ->
+    #pass
 
 
 class Page_User extends Page
   _friends = []
   _films_subscribed = []
   _films_subscribed_page = 1
+  _feed = []
+  _feed_page = 0
   _actors = []
   _directors = []
   _opts = {}
@@ -787,8 +882,13 @@ class Page_User extends Page
       place: $("#more_directors_fav_place")
       btn: $("#more_directors_fav").click(=> @load_more_directors_fav())
 
+    @_e.feed = $("#feed_place")
+    @_e.more_feed =
+      place: $("#more_feed_place")
+      btn: $("#more_feed_btn").click(=> @load_more_feed())
     @_app.get_tpl("film-thumb")
     @_app.get_tpl("person-thumb")
+    @_app.get_tpl("feed-thumb")
 
     $(".film-thumb", @_e.films_subscribed).each(
       ->
@@ -803,6 +903,11 @@ class Page_User extends Page
     $(".person-thumb", @_e.directors_fav).each(->
       _directors.push new PersonThumb({place: $(this)})
     )
+
+    $(".feed-thumb", @_e.feed).each(->
+      _feed.push new FeedThumb({place: $(this), vals: {_do_not_set: true}})
+    )
+
 
   load_more_films_subscribed: (page_cnt = 1) ->
     @_e.more_films_subscribed.btn.prop('disabled', true);
@@ -838,7 +943,7 @@ class Page_User extends Page
       )
 
   load_more_directors_fav:->
-    @_e.more_actors_fav.place.hide()
+    @_e.more_directors_fav.place.hide()
     @_app.rest.users.persons.read(_opts.id, {type: "d"})
     .done(
       (data)=>
@@ -850,6 +955,19 @@ class Page_User extends Page
             if i >= _directors.length
               _directors.push(new PersonThumb({parent: @_e.directors_fav, vals: item}))
     )
+
+  load_more_feed: ->
+    @_e.more_feed.place.hide()
+    _feed_page++;
+    @_app.rest.users.feed.read(_opts.id, {per_page: 5, page: _feed_page})
+      .done(
+        (data) =>
+          if data && data.length
+            for item in data
+              _feed.push(new FeedThumb({parent: @_e.feed, vals: item}))
+            if data.length >=5
+              @_e.more_feed.place.show()
+      )
 
 window.InitApp =  (opts = {}, page_name) ->
   new App(opts, page_name)

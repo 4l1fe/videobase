@@ -1,10 +1,6 @@
-include config
 meta(charset="utf-8")
 meta(name="viewport",content="width=device-width, initial-scale=1")
-title=title ? title : ("Всё видео" + (header_title?" - " + header_title:""))
-link(href=conf.style_url + 'bootstrap.css', rel='stylesheet')
-link(href=conf.style_url + 'main.css', rel='stylesheet')
-link(href=conf.third_url + 'rateit/rateit.css', rel='stylesheet')
-// link(href='css/bootstrap-theme.min.css', rel='stylesheet')
-include globals
-include mixins
+title Всё видео
+link(href='static/css/bootstrap.css', rel='stylesheet')
+link(href='static/css/style.css', rel='stylesheet')
+link(href='static/3d/rateit/rateit.css', rel='stylesheet')
