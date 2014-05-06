@@ -13,6 +13,7 @@ BASE_DIR = os.path.dirname(BASE_PATH)
 
 STATIC_PATH = os.path.join(BASE_PATH, '..', 'static')
 CONFIGS_PATH = os.path.join(BASE_PATH, '..', 'configs')
+BACKUP_PATH = os.path.join(BASE_PATH, '..', '.backup')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
@@ -63,6 +64,7 @@ INSTALLED_APPS = (
     'crawler',
     'social_auth',
     'djcelery',
+    'backup_system',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -256,16 +258,28 @@ CELERYBEAT_SCHEDULE = {
     },
     'kinopoisk-get_id': {
         'task': 'kinopoisk_get_id',
-        'schedule': timedelta(minutes = 5),
+        'schedule': timedelta(minutes=5),
     },
     'kinopoisk-set_poster': {
         'task': 'kinopoisk_set_poster',
-        'schedule': timedelta(minutes = 5),
+        'schedule': timedelta(seconds=10),
     },
      'imdb_rating_update_command': {
         'task': 'imdb_rating_update',
-        'schedule': timedelta(days = 7),
+        'schedule': timedelta(days=7),
     },
+     'amediateka_ru_update': {
+        'task': 'amediateka_ru_robot_start',
+        'schedule': timedelta(days=7),
+    },
+     'viaplay_ru_robot_start': {
+        'task': 'viaplay_ru_robot_start',
+        'schedule': timedelta(days=7),
+    },
+    
+    
 }
 
 CELERY_TIMEZONE = 'UTC'
+
+POSTER_URL_PREFIX = '_260x360'
