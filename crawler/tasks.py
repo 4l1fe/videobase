@@ -1,6 +1,7 @@
-from crawler.parse_page import crawler_get
 # coding: utf-8
 from __future__ import absolute_import
+from crawler.parse_page import crawler_get
+
 
 from django.utils import timezone
 
