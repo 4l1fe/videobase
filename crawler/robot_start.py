@@ -1,7 +1,5 @@
 # coding: utf-8
 """ Command to crawler sites"""
-from crawler.mosfilm_ru.loader import Mosfilm_Loader
-from crawler.mosfilm_ru.parser import ParseMosfilmPage
 from crawler.tvzavr_ru.loader import Tvzavr_Loader
 from crawler.tvzavr_ru.parsers import ParseTvzavrFilmPage
 from crawler.zoomby_ru.loader import ZOOMBY_Loader
@@ -57,8 +55,6 @@ sites_crawler = {
                   'parser': ParseTvigleFilm()},
     'tvzavr_ru': {'loader': Tvzavr_Loader,
                 'parser': ParseTvzavrFilmPage()},
-    'mosfilm_ru': {'loader': Mosfilm_Loader,
-                   'parser': ParseMosfilmPage()}
 }
 sites = sites_crawler.keys()
 
