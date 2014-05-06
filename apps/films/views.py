@@ -233,7 +233,6 @@ def index_view(request):
 
 
 def person_view(request, resource_id):
-        # ... view code here
         '''
         - header_title = person.name
 
@@ -244,43 +243,41 @@ def person_view(request, resource_id):
         - person_birthdate_string = date_text(person_birthdate) + " г. (" + person_years_old + ")"
         '''
 
-        person = film_model.Persons.objects.get(pk=resource_id)
+        resp_dict = {}
 
-        pfs = film_model.PersonsFilms.objects.filter(person=person)
+        try:
+            person = film_model.Persons.objects.get(pk=resource_id)
+            resp_dict['person'] = vbPerson(person, extend=True).data
+        except Exception, e:
+            raise Http404
 
-        vbFilms = [pf.film.as_vbFilm() for pf in pfs]
+        pfs = film_model.Films.objects.filter(persons__pk=person.pk)
+
+        try:
+            vbFilms = vbFilm(pfs, many=True).data
+        except Exception, e:
+            vbFilms = []
 
         for vbf in vbFilms:
-            
-            vbf.update({'instock': True,
-                        'hasFree': True,
-                        'year': vbf['release_date'].strftime('%Y'),
-                        'release_date': vbf['release_date'].strftime('%Y-%m-%d')
+            vbf.update({
+                'instock': True,
+                'hasFree': True,
+                'year': vbf['releasedate'].strftime('%Y'),
             })
 
-        return HttpResponse(render_page('person', {
-            'person': {'id': resource_id,
-                       'name': person.name,
-                       'photo': "static/img/tmp/person1.jpg",
-                       'bio': person.bio,
-                       'birthdate': "1974-01-22",
-                       'roles': ["актер", "режиссёр"],
-                       'birthplace': ["Москва", "Россия"]},
-            'filmography': vbFilms}))
+        resp_dict['filmography'] = vbFilms
+        return HttpResponse(render_page('person', resp_dict))
 
 
 def login_view(request):
-    # ... view code here
     pass
 
 
 def register_view(request):
-    # ... view code here
     return HttpResponse(render_page('register',{}))
 
 
 def user_view(request, resource_id):
-
     try:
         user = User.objects.get(pk=resource_id)
 
