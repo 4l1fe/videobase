@@ -1,3 +1,4 @@
+from crawler.parse_page import crawler_get
 # coding: utf-8
 from __future__ import absolute_import
 
@@ -7,13 +8,14 @@ from celery import shared_task
 from celery.utils.log import get_task_logger
 
 from videobase.celery import app
-from crawler.robot_start import launch_next_robot_try, sites_crawler, launch_next_robot_try_for_kinopoisk, kinopoisk
+from crawler.robot_start import launch_next_robot_try, sites_crawler, launch_next_robot_try_for_kinopoisk
 from apps.robots.models import Robots
 from crawler.kinopoisk_poster import  poster_robot_wrapper
 from crawler.imdbratings import process_all
+from crawler.amediateka_ru.loader import Amediateka_robot
+from crawler.viaplay_ru.robot import ViaplayRobot
 
 import datetime
-import logging
 import  json
 
 
@@ -93,6 +95,12 @@ def imdb_robot_start(*args,**kwargs):
     process_all()
 
 
+@app.task(name='amediateka_ru_robot_start')
+def amediateka_robot_start(*args,**kwargs):
+    Amediatera_robot.get_film_data()
 
+@app.task(name='viaplay_ru_robot_start')
+def viaplay_robot_start():
+    ViaplayRobot.get_data()
 
 
