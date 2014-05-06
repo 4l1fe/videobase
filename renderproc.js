@@ -4,7 +4,7 @@ var jade = require('jade')
 
 process.stdin.setEncoding('utf8');
 process.stdin.on('data', function(chunk){
-    console.log('dfs');
+
 data = JSON.parse(chunk)
 renderers =  {
     index: function(context){return jade.renderFile('interface/jade/page_index.jade',context)},
