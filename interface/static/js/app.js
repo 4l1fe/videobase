@@ -229,7 +229,7 @@
       if (opts.vals.releasedate) {
         opts.vals.year = " (" + opts.vals.releasedate.substr(0, 4) + ")";
       }
-      if ($(".notinstock", opts.place).hasClass("display-none")) {
+      /*if ($(".notinstock", opts.place).hasClass("display-none")) {
         if (!$(".watchprice", opts.place).hasClass("invisible")) {
           opts.vals.price = $(".watchprice .price", opts.place).text();
         }
@@ -238,7 +238,7 @@
         } else {
           opts.vals.hasFree = true;
         }
-      }
+      }*/
       if (opts.vals.locations) {
         opts.vals.hasFree = false;
         opts.vals.price = 0;
