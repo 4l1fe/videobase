@@ -25,6 +25,8 @@ YANDEX_KP_FILMS_TEMPLATE = "http://st.kp.yandex.net/images/film_big/{}.jpg"
 
 headers = {'User-Agent': 'Mozilla/5.0'}
 
+class ProbablyBanned(Exception):
+    pass
 
 def crawler_get(url):
     if USE_SOCKS5_PROXY:
@@ -112,11 +114,12 @@ def get_image(template, actor_id):
         fileobj.seek(0)
         img = Image.open(fileobj).convert('RGB')
         conv_file = StringIO.StringIO()
-        img.save(conv_file,'PNG')
+        img.save(conv_file, 'PNG')
         conv_file.seek(0)
         return conv_file
-    except:
-        return None
+    except requests.ConnectionError:
+        raise Proba
+        
 
 
 get_poster = partial(get_image, YANDEX_KP_FILMS_TEMPLATE)
