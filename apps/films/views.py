@@ -32,25 +32,25 @@ from apps.films.api.serializers import vbFilm, vbComment, vbPerson
 
 from utils.noderender import render_page
 
-# # Do not remove there is something going on when importing, probably models registering itselves
+# Do not remove there is something going on when importing, probably models registering itselves
 # import apps.films.models
 
 
 def get_new_namestring(namestring):
 
-    m = re.match("(?P<pre>.+)v(?P<version>[0-9]+)[.]png",namestring)
+    m = re.match("(?P<pre>.+)v(?P<version>[0-9]+)[.]png", namestring)
 
     if m is None:
         return namestring + '_v1.png'
     else:
         d = m.groupdict()
-        return  '{:s}v{:d}.{:s}'.format(d['pre'],int(d['version']) +1,'png')
+        return '{:s}v{:d}.{:s}'.format(d['pre'], int(d['version']) + 1, 'png')
 
       
 def image_refresh(func):
     def wrapper(request):
         url = request.POST.get('image')
-        m = re.match('.+[/]static[/]upload[/](?P<type>[^/]+)[/](?P<id>[0-9]+)',url)
+        m = re.match('.+[/]static[/]upload[/](?P<type>[^/]+)[/](?P<id>[0-9]+)', url)
 
         path = re.match('.+(?P<path>[/]static[/].+)', url)
         d = m.groupdict()
@@ -77,7 +77,7 @@ def image_refresh(func):
 
 
 @image_refresh
-def resize_image(d,im,request):
+def resize_image(d, im, request):
     x = int(request.POST.get('x'))
     y = int(request.POST.get('y'))
     x2 = int(request.POST.get('x2'))
@@ -172,7 +172,7 @@ class PersonActionAPIView(APIView):
         finally:
             up.save()
         
-    def _response_template(self,subscribed, request, format=None, resource_id=None):
+    def _response_template(self, subscribed, request, format=None, resource_id=None):
         '''
         Template for responses
         '''
@@ -210,15 +210,17 @@ class PersonsExtrasAPIView(APIView):
         except Exception, e:
             raise Http404
 
+
 def transform_vbFilms(vbf):
 
-    vbf.update({'instock':True,
-        'hasFree':True,
-        'year':vbf['releasedate'].strftime('%Y'),
-        'releasedate':vbf['releasedate'].strftime('%Y-%m-%d')
+    vbf.update({'instock': True,
+        'hasFree': True,
+        'year': vbf['releasedate'].strftime('%Y'),
+        'releasedate': vbf['releasedate'].strftime('%Y-%m-%d'),
         })
 
     return vbf
+
 
 def index_view(request):
     # ... view code here
@@ -234,8 +236,7 @@ def index_view(request):
     #except:
     #    raise Http404
 
-
-    return HttpResponse(render_page('index',{'new_films':resp_data}),status.HTTP_200_OK)
+    return HttpResponse(render_page('index', {'new_films': resp_data}), status.HTTP_200_OK)
 
 
 def person_view(request, resource_id):
@@ -278,11 +279,6 @@ def person_view(request, resource_id):
 def login_view(request):
     # ... view code here
     pass
-
-
-def register_view(request):
-    # ... view code here
-    return HttpResponse(render_page('register', {}))
 
 
 def user_view(request, resource_id):
