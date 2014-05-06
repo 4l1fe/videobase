@@ -267,7 +267,17 @@ CELERYBEAT_SCHEDULE = {
      'imdb_rating_update_command': {
         'task': 'imdb_rating_update',
         'schedule': timedelta(days=7),
-    }
+    },
+     'amediateka_ru_update': {
+        'task': 'amediateka_ru_robot_start',
+        'schedule': timedelta(days=7),
+    },
+     'viaplay_ru_robot_start': {
+        'task': 'viaplay_ru_robot_start',
+        'schedule': timedelta(days=7),
+    },
+    
+    
 }
 
 CELERY_TIMEZONE = 'UTC'
