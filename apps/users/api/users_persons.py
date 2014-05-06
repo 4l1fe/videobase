@@ -25,15 +25,15 @@ persons_type = {
 
 class UsersPersonsView(APIView):
 
-    def post(self, request, user_id, format=None, *args, **kwargs):
+    def get(self, request, user_id, format=None, *args, **kwargs):
         try:
             user = User.objects.get(pk=user_id)
         except Exception as e:
             return Response({'e': e.message}, status=status.HTTP_400_BAD_REQUEST)
 
-        page = request.DATA.get('page', APP_USERS_API_DEFAULT_PAGE)
-        per_page = request.DATA.get('per_page', APP_USERS_API_DEFAULT_PER_PAGE)
-        type_ = request.DATA.get('type', 'all')
+        page = request.QUERY_PARAMS.get('page', APP_USERS_API_DEFAULT_PAGE)
+        per_page = request.QUERY_PARAMS.get('per_page', APP_USERS_API_DEFAULT_PER_PAGE)
+        type_ = request.QUERY_PARAMS.get('type', 'all')
         try:
             ptype = persons_type[type_]
         except KeyError as e:
