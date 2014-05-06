@@ -62,7 +62,7 @@ class vbPerson(serializers.ModelSerializer):
                 up = UsersPersons.objects.get(person=obj, user=self.user)
                 return up.subscribed
             except ObjectDoesNotExist:  # может завалиться при работе в тестах
-                return 0  # должен быть тип поля DoesNotExist.subscribed
+                return 0  # должен быть тип поля UsersPersons.subscribed
 
     def get_birthplace(self, obj):
         if obj.city is not None:
