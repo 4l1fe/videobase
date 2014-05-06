@@ -58,7 +58,7 @@ class SearchFilmsView(APIView):
         # Поиск по количеству прошедших лет
         if filter.get('year_old'):
             o_search = o_search.extra(
-                where=['EXTRACT(year FROM AGE(current_date, "films"."release_date")) <= %s'],
+                where=['EXTRACT(year FROM AGE(current_date, "films"."release_date")) < %s'],
                 params=[filter['year_old']],
             )
 
