@@ -7,13 +7,12 @@ from celery import shared_task
 from celery.utils.log import get_task_logger
 
 from videobase.celery import app
-from crawler.robot_start import launch_next_robot_try, sites_crawler, launch_next_robot_try_for_kinopoisk, kinopoisk
+from crawler.robot_start import launch_next_robot_try, sites_crawler, launch_next_robot_try_for_kinopoisk
 from apps.robots.models import Robots
 from crawler.kinopoisk_poster import  poster_robot_wrapper
 from crawler.imdbratings import process_all
 
 import datetime
-import logging
 import  json
 
 
