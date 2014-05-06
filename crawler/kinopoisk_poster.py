@@ -6,11 +6,8 @@ from django.core.files import File
 from apps.films.constants import APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER
 
 
-
 def set_kinopoisk_poster(film):
-
     poster = get_poster(film.kinopoisk_id)
-
     if poster:
         print u"Adding poster for {}".format(film)
         fe = FilmExtras(film=film, type=APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER, name=u"Постер для {}".format(film.name),

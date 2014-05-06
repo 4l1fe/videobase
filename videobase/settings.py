@@ -256,24 +256,18 @@ CELERYBEAT_SCHEDULE = {
     },
     'kinopoisk-get_id': {
         'task': 'kinopoisk_get_id',
-        'schedule': timedelta(minutes = 5),
+        'schedule': timedelta(minutes=5),
     },
     'kinopoisk-set_poster': {
         'task': 'kinopoisk_set_poster',
-        'schedule': timedelta(minutes = 5),
+        'schedule': timedelta(seconds=10),
     },
      'imdb_rating_update_command': {
         'task': 'imdb_rating_update',
-        'schedule': timedelta(days = 7),
-    },
+        'schedule': timedelta(days=7),
+    }
 }
 
 CELERY_TIMEZONE = 'UTC'
 
-INSTALLED_APPS += ('django_jenkins',)
-JENKINS_TASKS = ('django_jenkins.tasks.run_pylint',
-                 'django_jenkins.tasks.run_pep8',
-                 'django_jenkins.tasks.run_pyflakes',
-                 'django_jenkins.tasks.with_coverage',)
-CELERY_RESULT_BACKEND='djcelery.backends.database:DatabaseBackend'
-
+POSTER_URL_PREFIX = '_260x360'

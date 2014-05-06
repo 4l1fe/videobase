@@ -317,7 +317,7 @@ def test_view(request):
 def calc_actors(o_film):
     result_list = []
     try:
-        result_list = film_model.Persons.objects.filter(person_film_rel__film=o_film.pk).values('id', 'name')[:5]
+        result_list = list(film_model.Persons.objects.filter(person_film_rel__film=o_film.pk).values('id', 'name')[:5])
     except Exception, e:
         pass
 
@@ -342,12 +342,12 @@ def calc_comments(o_film):
         return []
 
     result_list = content_model.Comments.objects.filter(content=content.film_id)[:5]
-    return result_list
+    try:
+        result_list = vbComment(result_list, many=True).data
+    except:
+        result_list = []
 
-def transform_to_json_serializable(rdict):
-    rdict['releasedate'] = rdict['releasedate'].strftime("%d-%m-%Y")
-    rdict['actors'] = [dict(actor) for actor in rdict['actors']]
-    return rdict
+    return result_list
 
 def film_view(request, film_id, *args, **kwargs):
     resp_dict = {}
@@ -368,6 +368,5 @@ def film_view(request, film_id, *args, **kwargs):
     resp_dict['similar'] = calc_similar(o_film)
     resp_dict['comments'] = calc_comments(o_film)
 
-    film_data = transform_to_json_serializable(resp_dict)
-    print film_data
-    return HttpResponse(render_page('film', {'film': film_data}))
+    return HttpResponse(render_page('film', {'film': resp_dict}))
+
