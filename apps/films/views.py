@@ -99,23 +99,18 @@ def bri_con(d, im, request):
 
 
 class PersonAPIView(APIView):
-    """
-
-    """
 
     def get(self, request, format=None, resource_id=None):
-        # Process any get params that you may need
-        # If you don't need to process get params,
-        # you can skip this part
-        #extend = request.GET.get('extend', False)
-        #p = Persons.objects.get(pk = kw['resource_id'])
         try:
             p = film_model.Persons.objects.get(pk=resource_id)
+            data = vbPerson(p).data
+            u = request.user
+            if u and u.is_authenticated():
+                data = vbPerson(p, user=u).data
+            return Response(data, status=status.HTTP_200_OK)
         except:
             return Response(status=status.HTTP_404_NOT_FOUND)
-            # Any URL parameters get passed in **kw
 
-        return Response(vbPerson(p).data, status=status.HTTP_200_OK)
 
     def post(self, request, format=None, resource_id=None):
         extend = request.DATA.get('extend', '')
@@ -126,7 +121,11 @@ class PersonAPIView(APIView):
 
         try:
             p = film_model.Persons.objects.get(pk=resource_id)
-            return Response(vbPerson(p, extend=extend).data, status=status.HTTP_200_OK)
+            data = vbPerson(p, extend=extend).data
+            u = request.user
+            if u and u.is_authenticated():
+                data = vbPerson(p, extend=True, user=u).data
+            return Response(data, status=status.HTTP_200_OK)
         except:
             return Response(status=status.HTTP_404_NOT_FOUND)
 

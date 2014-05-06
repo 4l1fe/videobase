@@ -185,7 +185,7 @@ class vbFilm(serializers.ModelSerializer):
     def relation_list(self, obj):
         request = get_current_request()
         if request.user.is_authenticated():
-            return {
+            return {  # TODO: сделать по значениям полей модели, но не заглушкой
                 'subscribed': True,
                 'status': True,
                 'rating': True,
