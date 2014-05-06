@@ -14,6 +14,7 @@ from django.template import Template, Context
 from django.http import HttpResponse, Http404
 from django.core.context_processors import csrf
 from django.shortcuts import render_to_response
+from django.core.paginator import Paginator
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -25,6 +26,8 @@ from apps.films.constants import APP_PERSON_ACTOR, APP_PERSON_DIRECTOR,\
 import apps.contents.models as content_model
 
 from apps.users.api.users import vbUser
+from apps.users.constants import APP_USERS_API_DEFAULT_PAGE,\
+    APP_USERS_API_DEFAULT_PER_PAGE
 from apps.films.api.serializers import vbFilm, vbComment, vbPerson
 
 from utils.noderender import render_page
@@ -299,13 +302,24 @@ def user_view(request, resource_id):
             day_title = u"дней"
         user_how_long += u" {}".format(day_title)
 
-        films = film_model.Films.objects.filter(users_films__user=user, type__in=(APP_FILM_SERIAL, APP_FILM_FULL_FILM),
-                                     users_films__status=APP_USERFILM_STATUS_SUBS)
-        vbf = vbFilm(films, many=True)
-        actors = film_model.Persons.objects.filter(users_persons__user=user, person_film_rel__p_type=APP_PERSON_ACTOR)
-        vba = vbPerson(actors, many=True)
-        directors = film_model.Persons.objects.filter(users_persons__user=user, person_film_rel__p_type=APP_PERSON_DIRECTOR)
-        vbd = vbPerson(directors, many=True)
+        films = film_model.Films.objects.filter(users_films__user=user,
+                                                type__in=(APP_FILM_SERIAL, APP_FILM_FULL_FILM),
+                                                users_films__status=APP_USERFILM_STATUS_SUBS)
+        page_films = Paginator(films, APP_USERS_API_DEFAULT_PER_PAGE).page(APP_USERS_API_DEFAULT_PAGE)
+        vbf = vbFilm(page_films.object_list, many=True)
+
+        actors = film_model.Persons.objects.filter(users_persons__user=user,
+                                                   person_film_rel__p_type=APP_PERSON_ACTOR)
+        page_actors = Paginator(actors, APP_USERS_API_DEFAULT_PER_PAGE).\
+            page(APP_USERS_API_DEFAULT_PAGE)
+        vba = vbPerson(page_actors.object_list, many=True)
+
+        directors = film_model.Persons.objects.filter(users_persons__user=user,
+                                                      person_film_rel__p_type=APP_PERSON_DIRECTOR)
+        page_directors = Paginator(directors, APP_USERS_API_DEFAULT_PER_PAGE).\
+            page(APP_USERS_API_DEFAULT_PAGE)
+        vbd = vbPerson(page_directors.object_list, many=True)
+
         default = {'user': default_user,
                    'films_subscribed': vbf.data,
                    'actors_fav': vba.data,

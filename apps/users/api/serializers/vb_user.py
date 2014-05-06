@@ -51,10 +51,10 @@ class vbUser(serializers.ModelSerializer):
                 self.fields.pop(field_name, None)
 
     def get_name(self, obj):
-        return obj.profile.nickname
+        return obj.profile.get_name()
 
     def get_genre_fav(self, obj):
-        return None
+        return {}
 
     def path_to_avatar(self, obj):
         userpic = obj.profile.userpic_id
