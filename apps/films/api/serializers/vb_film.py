@@ -1,10 +1,13 @@
 # coding: utf-8
 
+import os
+
 from django.db.models import Q
 from django.core.paginator import Page
 
 from rest_framework import serializers
 
+import videobase.settings as settings
 from apps.films.models import *
 from apps.contents.models import *
 from apps.films.constants import APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER,\
@@ -92,31 +95,36 @@ class vbFilm(serializers.ModelSerializer):
 
 
     def _rebuild_tors_list(self):
-        directors_list = []
-        scriptwriters_list = []
+        result = {}
 
         if self.extend_sign:
             o_person = Persons.objects.filter(Q(person_film_rel__p_type=APP_PERSON_DIRECTOR) | Q(person_film_rel__p_type=APP_PERSON_SCRIPTWRITER),
                                               person_film_rel__film__in=self.list_obj_pk).\
-                extra(select={'p_type': "persons_films.p_type"}).order_by('id')
+                extra(select={'p_type': "persons_films.p_type", 'film': "persons_films.film_id"}).order_by('id')
 
-            for item in o_person:
-                if item.p_type == APP_PERSON_DIRECTOR:
-                    directors_list.append(item)
-                else:
-                    scriptwriters_list.append(item)
+            o_person = group_by(o_person, 'film', True)
 
-        self.tors_list = {
-            'directors': directors_list,
-            'scriptwriters': scriptwriters_list,
-        }
+            for key, value in o_person.items():
+                if not key in result:
+                    result[key] = {
+                        'directors': [],
+                        'scriptwriters': [],
+                    }
+
+                for item in value:
+                    if item.p_type == APP_PERSON_DIRECTOR:
+                        result[key]['directors'].append(item)
+                    else:
+                        result[key]['scriptwriters'].append(item)
+
+        self.tors_list = result
 
 
     def calc_ratings(self, obj):
         return {
             'imdb': [obj.rating_imdb, obj.rating_imdb_cnt],
             'kp': [obj.rating_kinopoisk, obj.rating_kinopoisk_cnt],
-            'cons': [0, 0],
+            'cons': [obj.rating_cons, obj.rating_cons_cnt],
         }
 
 
@@ -127,9 +135,9 @@ class vbFilm(serializers.ModelSerializer):
     def _get_obj_list(self):
         list_pk = []
         instance = self.object
-        if hasattr(instance, '__iter__') and not isinstance(instance, (Page, dict)):
-            for item in instance:
-                list_pk.append(item.pk)
+        if hasattr(instance, '__iter__') and not isinstance(instance, (Page, dict)):  #WARNING: Если в instance придёт dict,
+            for item in instance:                                              # такое возможно при десериализации,
+                list_pk.append(item.pk)                                        # то поломается добрая половина методов
         else:
             list_pk.append(instance.pk)
 
@@ -164,15 +172,17 @@ class vbFilm(serializers.ModelSerializer):
         if len(result):
             for item in result:
                 if not item.photo is None and item.photo:
-                    result = item.photo.url
+                    result = list(os.path.splitext(item.photo.url))
+                    result[0] += settings.POSTER_URL_PREFIX
+                    result = u''.join(result)
                     break
-        return result
 
+        return result
 
 
     def _rebuild_poster_list(self):
         extras = FilmExtras.objects.filter(film__in=self.list_obj_pk, type=APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER)
-        extras = group_by(extras, 'id', True)
+        extras = group_by(extras, 'film_id', True)
 
         self.poster_rebuild = extras
 
@@ -190,17 +200,23 @@ class vbFilm(serializers.ModelSerializer):
 
 
     def director_list(self, obj):
-        temp = self.tors_list['directors']
+        temp = self.tors_list.get(obj.pk, [])
         if len(temp):
-            return vbPerson(temp, many=True).data
+            if len(temp['directors']):
+                return vbPerson(temp['directors'], many=True).data
+            else:
+                return []
 
         return temp
 
 
     def scriptwriter_list(self, obj):
-        temp = self.tors_list['scriptwriters']
+        temp = self.tors_list.get(obj.pk, [])
         if len(temp):
-            return vbPerson(temp, many=True).data
+            if len(temp['scriptwriters']):
+                return vbPerson(temp['scriptwriters'], many=True).data
+            else:
+                return []
 
         return temp
 

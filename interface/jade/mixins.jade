@@ -1,12 +1,7 @@
-mixin anchor_list(list, url)
-    - anchor_first_element = true
-    - each item in list
-        =anchor_first_element?"":", "
-        a(href=url.replace("%", item.id))=item.name
-        - anchor_first_element = false
-//- {name: - name of actor, id - id of actor, photo - photo of actor}
 mixin person_thumb(person, id)
-    .person-thumb(id=id?id:("person_thumb_" + person.id),style='background-image:url("' + (person.photo || conf.noperson_url) + '")')
+    .person-thumb(id=id?id:("person_thumb_" + person.id))
+        .photo
+            img.img-responsive.img-circle(src=person.photo || "static/img/noperson.jpg")
         p
             a(href="/person/"+person.id).name=person.name
 
@@ -16,39 +11,112 @@ mixin user_thumb(user, id)
             a(href="/user/"+user.id).name=user.name
 
 mixin film_thumb(item,id)
-    .film-thumb(id=id?id:("film_thumb_"+item.id)).col-md-3
-        .poster-place(style='background-image: url("' + (item.poster?item.poster:conf.noposter_url) + '")')
+    .film-thumb.col-md-3(id="film-thumb-" + item.id)
+        .poster-wrapper
+            .poster-place(style='background-image: url("' + item.poster + '")')
         .rating-place(class = item.rating?"":"invisible")
             p.rating
-                =item.rating
+                =item.ratings.cons[0]
         .name-place
             a(href="#").name
                 =item.name
-            span!=' (<span class="year">' + item.year + "</span>)"
-        .userrel-place
-            .rateit.rate(data-rateit-max=10,data-rateit-resetable=0,data-rateit-value=relation && relation.rating?relation.rating:0)
+            span.year=" (" + item.year + ")"
+        .rel-place
+            .rateit.rate(data-rateit-max=10,data-rateit-resetable=0,data-rateit-value=(item.relation && item.relation.rating)?item.relation.rating:0)
             button.notwatch-btn N
-        .button-place
+        .button-place(class=!item.hasFree && item.price?"button-priced":"")
             .instock(class=item.instock?"":"display-none")
-                - var out_watch = "СМОТРЕТЬ" + (item.hasFree?"<br/>БЕСПЛАТНО":'<br/><span>от <span class="price">' + item.price + "</span> р. без рекламы</span>")
-                button.action-button(class=item.hasFree?"":"action-priced") !{out_watch}
+                button.watch-btn!=("Смотреть" + ((!item.hasFree && item.price)?"<br/><span>от <span class=\"price\">300</span> р. без рекламы</span>":"<br/>Бесплатно"))
+                button.playlist-btn +
                 .watchprice(class=(item.hasFree && item.price)?"":"invisible")
-                    или<br/>
+                    | или<br/>
                     a(href="#") от <span class="price">#{item.price}</span> р. без рекламы
             .notinstock(class=item.instock?"display-none":"")
-                button.action-button.action-subscribe ПОДПИСАТЬСЯ
+                button.subscribe-btn Подписаться
                 .watchprice &nbsp;<br/>&nbsp;
 
 mixin comment_thumb(item, id)
-    .comment-thumb(id=id?id:("comment_" + item.id))
+    .comment-thumb(id=id?id:("comment_" + item.id),data-mi-uid=item.id)
         .avatar-place
-            img.img-responsive.img-circle(src=item.user.avatar || conf.noavatar_url)
+            img.img-responsive.img-circle(src=item.user.avatar || "static/img/noavatar.jpg")
         .text-place
             .info
-                .time=time_text(new Date(item.created))
+                .time(data-mi-time=item.created)=item.time_text || item.created
                 .name
-                    a(href="/user/"+item.user.id,data-user-id=item.id)=item.user.name
+                    a(href="/user/"+item.user.id)=item.user.name
             .text!=item.text
+
+mixin feed_thumb(item, id)
+    .feed-thumb(id=id?id:("feed_" + item.id))
+        - time = time_text(new Date(item.created))
+        if (item.type == "sys-a")
+            .record.feed-sys-a
+                .info-place
+                    .time=time
+                .cont-place
+                    p.event системное сообщение
+                    .text=item.text || ""
+        else if (item.type == "film-o")
+            .record.feed-film-o
+                .image(style='background-image: url("' + (item.object.poster || conf.noposter_url) + '")')
+                .info-place
+                    .time=time
+                .cont-place
+                    p.event фильм появился в кинотеатре
+                    a(href="/films/" + item.object.id)=item.object.name
+        else if (item.type == "pers-o")
+            .record.film-pers-o
+                .image(style='background-image: url("' + (item.object.photo || conf.noperson_url) + '")')
+                .info-place
+                    .time=time
+                .cont-place
+                    a.name(href="/persons/" + item.object.id)=item.object.name
+                    p.event.type-a(class=type=="a"?"":"display-none")
+                        | появился фильм с актёром
+                    p.event.type-d(class=type=="d"?"":"display-none")
+                        | появился фильм с режиссёром
+                    p.event.type-s(class=type=="s"?"":"display-none")
+                        | появился фильм с сценаристом
+                    .film-info
+                        a(href="/films/" + item.object.film.id)=item.object.film.name
+        else
+            .record(class="feed-" + item.type)
+                .image(style='background-image: url("' + (item.user.avatar || conf.noavatar_url) + '")')
+                .info-place
+                    .time=time
+                    .name
+                        a(href="/users"/ + item.user.id)=item.user.name
+                .cont-place
+                    if (item.type.substr(0,4) == "film")
+                        if (item.type == "film-r")
+                            p.event оценил фильм
+                        else if (item.type == "film-c")
+                            p.event оставил комментарий
+                        else if (item.type == "film-nw")
+                            p.event не будет смотреть фильм
+                        else if (item.type == "film-s")
+                            p.event подписался на фильм
+                        .film-info
+                            a(href="/films/" + item.object.id)=item.object.name
+                        if (item.type == "film-r")
+                            p=item.object.rating
+                        else if (item.type == "film-c")
+                            .text=item.object.text
+                    else if (item.type == "pers-s")
+                        p.event подписался на персону
+                        .person-info
+                            .photo(style='background-image: url("' + (item.object.photo || conf.noperson_url) + '")')
+                            .name
+                                a(href="/person/" + item.object.id)=item.object.name
+                    else if (item.type.substr(0,4) == "user")
+                        if (item.type == "user-a")
+                            p.event создал запрос на дружбу
+                        else if (item.type == "user-f")
+                            p.event теперь друзья
+                        .user-info
+                            .avatar(style='background-image: url("' + (item.object.avatar || conf.noavatar_url) + '")')
+                            .name
+                                a(href="/user/" + item.object.id)=item.object.name
 
 mixin location_thumb(item,id)
     .location-thumb(id=id?id:(item.id?"loc_thumb_" + item.id:""))
@@ -77,4 +145,3 @@ mixin user_place(user)
                 a(href="register.html") Регистрация
             li
                 a(href="login.html") Войти
-
