@@ -16,7 +16,7 @@ mixin film_thumb(item,id)
             .poster-place(style='background-image: url("' + item.poster + '")')
         .rating-place(class = item.rating?"":"invisible")
             p.rating
-                =item.rating.cons
+                =item.ratings.cons[0]
         .name-place
             a(href="#").name
                 =item.name
