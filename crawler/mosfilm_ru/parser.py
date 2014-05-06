@@ -1,4 +1,18 @@
+# coding: utf-8
+from bs4 import BeautifulSoup
+
+HOST = 'cinema.mosfilm.ru'
 
 
-class ParseMosfilmPage(object):
-    pass
+def parse_search(content, filmName):
+    try:
+        soup = BeautifulSoup(content)
+        tag = soup.find('a', text=filmName)
+        link = tag.get('href')
+        film_link = "http://%s%s" % (HOST, link, )
+    except:
+        film_link = None
+    return film_link
+
+
+
