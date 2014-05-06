@@ -105,27 +105,15 @@ dbconf = RawConfigParser()
 dbconf.read(CONFIGS_PATH + '/db.ini')
 
 
-if 'test' in sys.argv:
-    DATABASES = {
-        'default': {
-            'ENGINE':   dbconf.get('testbase', 'DATABASE_ENGINE'),
-            'HOST':     dbconf.get('testbase', 'DATABASE_HOST'),
-            'NAME':     dbconf.get('testbase', 'DATABASE_NAME'),
-            'USER':     dbconf.get('testbase', 'DATABASE_USER'),
-            'PASSWORD': dbconf.get('testbase', 'DATABASE_PASSWORD'),
-            'PORT':     dbconf.get('testbase', 'DATABASE_PORT')
-        }
+DATABASES = {
+    'default': {
+        'ENGINE':   dbconf.get('database', 'DATABASE_ENGINE'),
+        'HOST':     dbconf.get('database', 'DATABASE_HOST'),
+        'NAME':     dbconf.get('database', 'DATABASE_NAME'),
+        'USER':     dbconf.get('database', 'DATABASE_USER'),
+        'PASSWORD': dbconf.get('database', 'DATABASE_PASSWORD'),
+        'PORT':     dbconf.get('database', 'DATABASE_PORT')
     }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE':   dbconf.get('database', 'DATABASE_ENGINE'),
-            'HOST':     dbconf.get('database', 'DATABASE_HOST'),
-            'NAME':     dbconf.get('database', 'DATABASE_NAME'),
-            'USER':     dbconf.get('database', 'DATABASE_USER'),
-            'PASSWORD': dbconf.get('database', 'DATABASE_PASSWORD'),
-            'PORT':     dbconf.get('database', 'DATABASE_PORT')
-        }
 }
 
 CACHES = {
