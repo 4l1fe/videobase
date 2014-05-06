@@ -2,7 +2,6 @@
 
 from django.conf.urls import patterns, url
 
-from apps.users.views import ObtainSessionToken, RevokeSessionToken, ObtainAuthToken
 from apps.users.api import *
 
 from rest_framework.urlpatterns import format_suffix_patterns
