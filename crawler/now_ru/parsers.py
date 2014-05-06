@@ -17,7 +17,7 @@ def parse_search(response, film):
     try:
         content = response.content
         soup = BeautifulSoup(content)
-        if soup.find(attrs={'id': 'noresults'})is not None:
+        if not(soup.find(attrs={'id': 'noresults'}) is None):
             return None
         if search_text_title in soup.head.title.text:
             for tag in soup.select('div.play-about'):

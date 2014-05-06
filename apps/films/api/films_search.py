@@ -58,7 +58,7 @@ class SearchFilmsView(APIView):
         # Поиск по количеству прошедших лет
         if filter.get('year_old'):
             o_search = o_search.extra(
-                where=['EXTRACT(year FROM AGE(current_date, "films"."release_date")) >= %s'],
+                where=['EXTRACT(year FROM AGE(current_date, "films"."release_date")) < %s'],
                 params=[filter['year_old']],
             )
 
@@ -84,7 +84,7 @@ class SearchFilmsView(APIView):
         o_loc = o_loc.distinct('content').values_list('content', flat=True)
 
         if filter.get('price'):
-            o_loc = o_loc.filter(price__gte=filter['price'])
+            o_loc = o_loc.filter(price__lte=filter['price'])
 
         if filter.get('instock'):
             o_loc = o_loc.filter(type=APP_CONTENTS_ONLINE_CINEMA)

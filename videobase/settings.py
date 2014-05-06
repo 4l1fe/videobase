@@ -13,6 +13,7 @@ BASE_DIR = os.path.dirname(BASE_PATH)
 
 STATIC_PATH = os.path.join(BASE_PATH, '..', 'static')
 CONFIGS_PATH = os.path.join(BASE_PATH, '..', 'configs')
+BACKUP_PATH = os.path.join(BASE_PATH, '..', '.backup')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
@@ -63,6 +64,7 @@ INSTALLED_APPS = (
     'crawler',
     'social_auth',
     'djcelery',
+    'backup_system',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -234,12 +236,18 @@ API_SESSION_EXPIRATION_TIME = 15
 
 if not DEBUG:
     INSTALLED_APPS += (
-         'raven.contrib.django.raven_compat',  # may be delete later
+        'django_jenkins',
+        'raven.contrib.django.raven_compat',  # may be delete later
     )
 
     RAVEN_CONFIG = {
         'dsn': 'http://8684bf8b497047d9ac170fd16aefc873:41e89f4666b24f998125370f3d1a1789@sentry.aaysm.com/2'
     }
+
+    JENKINS_TASKS = ('django_jenkins.tasks.run_pylint',
+                     'django_jenkins.tasks.run_pep8',
+                     'django_jenkins.tasks.run_pyflakes',
+                     'django_jenkins.tasks.with_coverage',)
 
 from datetime import timedelta
 
@@ -248,6 +256,30 @@ CELERYBEAT_SCHEDULE = {
         'task': 'robot_launch',
         'schedule': timedelta(minutes=5),
     },
+    'kinopoisk-get_id': {
+        'task': 'kinopoisk_get_id',
+        'schedule': timedelta(minutes=5),
+    },
+    'kinopoisk-set_poster': {
+        'task': 'kinopoisk_set_poster',
+        'schedule': timedelta(seconds=10),
+    },
+     'imdb_rating_update_command': {
+        'task': 'imdb_rating_update',
+        'schedule': timedelta(days=7),
+    },
+     'amediateka_ru_update': {
+        'task': 'amediateka_ru_robot_start',
+        'schedule': timedelta(days=7),
+    },
+     'viaplay_ru_robot_start': {
+        'task': 'viaplay_ru_robot_start',
+        'schedule': timedelta(days=7),
+    },
+    
+    
 }
 
 CELERY_TIMEZONE = 'UTC'
+
+POSTER_URL_PREFIX = '_260x360'

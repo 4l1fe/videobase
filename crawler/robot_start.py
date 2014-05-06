@@ -6,19 +6,25 @@ from crawler.zoomby_ru.loader import ZOOMBY_Loader
 from crawler.zoomby_ru.parsers import ParseFilm
 
 from django.utils import timezone
+from django.db.models import Q
 from django.core.management.base import BaseCommand
 from optparse import make_option
 
 from apps.films.models import Films, Seasons
 from apps.contents.models import Contents, Locations
 from apps.contents.constants import *
+from crawler.kinopoisk import get_id_by_film
 from crawler.ivi_ru.loader import IVI_Loader
 from crawler.ivi_ru.parsers import ParseFilmPage
 from crawler.now_ru.loader import NOW_Loader
 from crawler.now_ru.parsers import ParseNowFilmPage
 from crawler.megogo_net.loader import MEGOGO_Loader
 from crawler.megogo_net.parsers import ParseMegogoFilm
+from crawler.stream_ru.loader import STREAM_RU_Loader
+from crawler.stream_ru.parsers import *
 from crawler.core.exceptions import *
+from crawler.play_google_com.loader import PLAY_GOOGLE_Loader
+from crawler.play_google_com.parsers import ParsePlayGoogleFilm
 from crawler.playfamily_dot_ru.loader import playfamily_loader
 from crawler.playfamily_dot_ru.parser import PlayfamilyParser
 from crawler.tvigle_ru.loader import TVIGLE_Loader
@@ -55,6 +61,10 @@ sites_crawler = {
                   'parser': ParseTvigleFilm()},
     'tvzavr_ru': {'loader': Tvzavr_Loader,
                 'parser': ParseTvzavrFilmPage()},
+    'stream_ru': {'loader': STREAM_RU_Loader,
+                  'parser': ParseStreamFilm},
+    'play_google_com': {'loader': PLAY_GOOGLE_Loader,
+                        'parser': ParsePlayGoogleFilm}
 }
 sites = sites_crawler.keys()
 
@@ -212,7 +222,10 @@ def launch_next_robot_try(site, film_id = None):
     robot.state = json.dumps({'start': film_number})
     robot.save()
     if RobotsTries.objects.filter(film=film, domain=site, outcome=APP_ROBOTS_TRY_NO_SUCH_PAGE):
-        print u"Skipping this film {} on that site {} as previous attempt was unsuccessful".format(film,site)
+        try:
+            print u"Skipping this film {} on that site {} as previous attempt was unsuccessful".format(film,site)
+        except Exception,e:
+            print "Exception raised when tryint to print message"
 
     try:
 
@@ -282,4 +295,37 @@ def launch_next_robot_try(site, film_id = None):
                                 )
 
         robot_try.save()
+
+
+def launch_next_robot_try_for_kinopoisk(robot):
+    robot.last_start = timezone.now()
+    robot.save()
+
+    films = Films.objects.filter(~Q(robots_tries__outcome=APP_ROBOTS_TRY_NO_SUCH_PAGE),
+                                 kinopoisk_id__isnull=True)[:10]
+    for film in films:
+        try:
+            id = get_id_by_film(film)
+            film.kinopoisk_id = id
+            film.save()
+        except RetrievePageException as rexp:
+            # Server responded but not 200
+            print u"RetrievePageException"
+            robot_try = RobotsTries(domain='kinopoisk_ru',
+                                    url=rexp.url,
+                                    film=film[0],
+                                    outcome=APP_ROBOTS_TRY_NO_SUCH_PAGE)
+
+            robot_try.save()
+        except UnicodeDecodeError:
+            print "Unicode error"
+            robot_try = RobotsTries(domain='kinopoisk_ru',
+                                    film=film, outcome=APP_ROBOTS_TRY_PARSE_ERROR)
+
+            robot_try.save()
+        except Exception as e:
+            print "Unknown exception %s", str(e)
+            robot_try = RobotsTries(domain='kinopoisk_ru', film=film,
+                                    outcome=APP_ROBOTS_TRY_PARSE_ERROR)
+            robot_try.save()
 
