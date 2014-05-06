@@ -4,5 +4,5 @@ from crawler.ayyo_ru.robot import AyyoRobot
 
 class Command(NoArgsCommand):
     def handle_noargs(self, **options):
-        viaplay_robot = AyyoRobot(6)
+        viaplay_robot = AyyoRobot(63)
         viaplay_robot.get_data()
