@@ -163,6 +163,7 @@ REST_FRAMEWORK = {
 }
 
 LOGIN_REDIRECT_URL = '/'
+LOGIN_ERROR_URL = '/'
 
 # Ключи для OAuth2 авторизации
 # Vkontakte
@@ -199,6 +200,7 @@ AUTHENTICATION_BACKENDS = (
     'rest_framework.authentication.TokenAuthentication',
     'apps.users.models.api_session.MultipleTokenAuthentication',
 )
+
 
 # Перечислим pipeline, которые последовательно буду обрабатывать респонс
 SOCIAL_AUTH_PIPELINE = (

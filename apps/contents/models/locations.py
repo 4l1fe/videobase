@@ -10,7 +10,7 @@ from apps.contents.constants import APP_CONTENTS_LOC_TYPE, APP_CONTENTS_PRICE_TY
 # Модель Месторасположения контента
 class Locations(models.Model):
     content    = models.ForeignKey('Contents', verbose_name=u'Контент', related_name='location')
-    type       = models.SmallIntegerField(choices=APP_CONTENTS_LOC_TYPE, verbose_name=u'Тип')
+    type       = models.CharField(choices=APP_CONTENTS_LOC_TYPE, verbose_name=u'Тип', max_length=40)
     lang       = models.CharField(max_length=40, verbose_name=u'Язык')
     quality    = models.CharField(max_length=40, verbose_name=u'Качество')
     subtitles  = models.CharField(max_length=40, verbose_name=u'Субтитры')
