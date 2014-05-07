@@ -9,3 +9,4 @@ class Command(NoArgsCommand):
         am_load = Amediateka_robot()
         am_load.get_data()
 
+

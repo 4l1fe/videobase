@@ -1,29 +1,20 @@
 # coding: utf-8
-from django.http import HttpResponseBadRequest, HttpResponseRedirect
-from django.views.generic import CreateView, TemplateView
-from django.template.loader import render_to_string
-from django.shortcuts import render_to_response
 from django.core.context_processors import csrf
+from django.middleware.csrf import CSRF_KEY_LENGTH
+from django.utils.crypto import get_random_string
 from django.core.mail import EmailMultiAlternatives
+from django.http import HttpResponseRedirect, HttpResponse, HttpResponseBadRequest
+from django.shortcuts import render_to_response
 from django.contrib.auth.models import User
-from django.http import HttpResponseBadRequest
 from django.template.loader import render_to_string
-
-from rest_framework.authtoken.models import Token
-from rest_framework.views import APIView
-from rest_framework.authtoken import views
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.decorators import permission_classes
+from django.views.generic import View, TemplateView
+from django.contrib.auth.forms import AuthenticationForm
 
 from constants import SUBJECT_TO_RESTORE_PASSWORD
+from apps.users.api.utils import create_new_session
 from .forms import UsersProfileForm, CustomRegisterForm
 
-from apps.users.models.api_session import UsersApiSessions, SessionToken
-from apps.users.api.utils import create_new_session
-
-
+from utils.noderender import render_page
 
 
 class ProfileEdit(TemplateView):
@@ -43,7 +34,8 @@ class ProfileEdit(TemplateView):
         return resp_dict
 
     def post(self, request, **kwargs):
-        uprofile_form = UsersProfileForm(data=request.POST, files=request.FILES, user=self.user)
+        uprofile_form = UsersProfileForm(data=request.POST, files=request.FILES,
+                                         user=self.user)
         if uprofile_form.is_valid():
             try:
                 uprofile_form.save()
@@ -52,10 +44,30 @@ class ProfileEdit(TemplateView):
         return HttpResponseRedirect('/users/profile/')
 
 
-class RegisterUserView(CreateView):
-    template_name = 'register.html'
-    form_class = CustomRegisterForm
-    success_url = '/'
+class RegisterUserView(View):
+
+    def get(self, *args, **kwargs):
+        csrf_token = get_random_string(CSRF_KEY_LENGTH)
+        resp_dict = {'csrf_token': csrf_token}
+        response = HttpResponse(render_page('register', resp_dict))
+        response.set_cookie("csrftoken", csrf_token)
+        return response
+
+    def post(self, *args, **kwargs):
+        register_form = CustomRegisterForm(data=self.request.POST)
+        if register_form.is_valid():
+            register_form.save()
+        return HttpResponseRedirect("/")
+
+
+class LoginUserView(View):
+
+    def get(self, *args, **kwargs):
+        csrf_token = get_random_string(CSRF_KEY_LENGTH)
+        resp_dict = {'csrf_token': csrf_token}
+        response = HttpResponse(render_page('login', resp_dict))
+        response.set_cookie("csrftoken", csrf_token)
+        return response
 
 
 def restore_password(request):
@@ -78,51 +90,3 @@ def restore_password(request):
             response = HttpResponseBadRequest(e)
 
     return response
-
-
-class ObtainAuthToken(views.ObtainAuthToken):
-
-    def post(self, request, format=None, *args, **kwargs):
-        return super(ObtainAuthToken, self).post(request)
-
-
-class ObtainSessionToken(APIView):
-
-    def get(self, request, format=None, *args, **kwargs):
-        try:
-            session = create_new_session(request.user)
-            response_dict = {
-                'session': session.pk,
-                'expires': session.get_expiration_time(),
-                'session_token': session.token.key,
-            }
-        except Exception as e:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
-        return Response(response_dict, status=status.HTTP_200_OK)
-
-    @permission_classes((IsAuthenticated, ))
-    def delete(self, request, format=None, *args, **kwargs):
-        token = request.auth
-        try:
-            session = UsersApiSessions.objects.get(token=token.pk)
-            session.active = False
-            session.save()
-        except UsersApiSessions.DoesNotExist as e:
-            return Response({'e': e.message}, status=status.HTTP_400_BAD_REQUEST)
-
-        return Response(status=status.HTTP_200_OK)
-
-
-class RevokeSessionToken(APIView):
-
-    permission_classes = (IsAuthenticated, )
-
-    def get(self, request, format=None, *args, **kwargs):
-        user = request.user
-        session_keys = SessionToken.objects.filter(user=user).values_list('key', flat=True)
-        UsersApiSessions.objects.filter(token__in=session_keys).update(active=False)
-        token = user.auth_token
-        token.delete()
-        Token.objects.create(user=user)
-        return Response(status.HTTP_200_OK)
