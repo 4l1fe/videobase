@@ -1,11 +1,27 @@
 # coding: utf-8
 
 ###############################################################################
-APP_CONTENTS_ONLINE_CINEMA = 0
-
 APP_CONTENTS_LOC_TYPE = (
-    (APP_CONTENTS_ONLINE_CINEMA, 'Онлайн кинотеатр'),
+    ('ivi','ivi'),
+    ('zoomby','zoomby'),
+    ('megogo','megogo'),
+    ('tvigle','tvigle'),
+    ('playfamily','playfamily'),
+    ('amediateka','amediateka'),
+    ('molodejj','molodejj'),
+    ('nowru','nowru'),
+    ('streamru','streamru'),
+    ('tvzavr','tvzavr'),
+    ('viaplay','viaplay'),
+    ('zabava','zabava'),
+    ('playgoogle','playgoogle'),
+    ('itunes','itunes'),
+    ('ayyo','ayyo'),
+    ('mosfilm','mosfilm'),
+    ('olltv','olltv'),
+    ('0','0'),
 )
+
 
 ###############################################################################
 APP_CONTENTS_PRICE_TYPE_FREE = 0
