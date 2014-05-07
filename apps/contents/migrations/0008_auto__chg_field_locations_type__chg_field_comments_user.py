@@ -12,16 +12,10 @@ class Migration(SchemaMigration):
         # Changing field 'Locations.type'
         db.alter_column('locations', 'type', self.gf('django.db.models.fields.CharField')(max_length=40))
 
-        # Changing field 'Comments.user'
-        db.alter_column('comments', 'user_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User']))
-
     def backwards(self, orm):
 
         # Changing field 'Locations.type'
         db.alter_column('locations', 'type', self.gf('django.db.models.fields.SmallIntegerField')())
-
-        # Changing field 'Comments.user'
-        db.alter_column('comments', 'user_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['users.Users']))
 
     models = {
         u'auth.group': {
