@@ -82,3 +82,28 @@ class CountriesFactory(factory.DjangoModelFactory):
     name_orig = u'factory_country_orig'
     description = u''
     pk = factory.Sequence(lambda n: n)
+
+
+#--------общие/родительские классы
+# class PersonFactory(factory.DjangoModelFactory):
+#     pass
+#
+#
+# class FilmFactory(factory.DjangoModelFactory):
+#     pass
+#
+#
+# class PersonsFilmFactory(factory.DjangoModelFactory):
+#     pass
+#
+#
+# class UserFactory(factory.DjangoModelFactory):
+#     pass
+#
+#
+# class CitiesFactory(factory.DjangoModelFactory):
+#     pass
+#
+#
+# class CountriesFactory(factory.DjangoModelFactory):
+#     pass
