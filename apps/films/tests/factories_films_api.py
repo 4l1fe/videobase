@@ -121,7 +121,3 @@ class UsersFilmsFactory(factory.DjangoModelFactory):
     user = factory.SubFactory(UserFactory)
     film = factory.SubFactory(FilmFactory)
     status = APP_USERFILM_STATUS_UNDEF
-
-
-
-
