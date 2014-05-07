@@ -29,6 +29,8 @@ from crawler.playfamily_dot_ru.loader import playfamily_loader
 from crawler.playfamily_dot_ru.parser import PlayfamilyParser
 from crawler.tvigle_ru.loader import TVIGLE_Loader
 from crawler.tvigle_ru.parsers import ParseTvigleFilm
+from crawler.zabava_ru.loader import ZABAVAR_RU_Loader
+from crawler.zabava_ru.parsers import ParseZabavaFilm
 from requests.exceptions import ConnectionError
 from apps.robots.constants import APP_ROBOTS_TRY_SITE_UNAVAILABLE, APP_ROBOTS_TRY_NO_SUCH_PAGE, \
     APP_ROBOTS_TRY_PARSE_ERROR
@@ -64,7 +66,9 @@ sites_crawler = {
     'stream_ru': {'loader': STREAM_RU_Loader,
                   'parser': ParseStreamFilm},
     'play_google_com': {'loader': PLAY_GOOGLE_Loader,
-                        'parser': ParsePlayGoogleFilm}
+                        'parser': ParsePlayGoogleFilm},
+    'zabava_ru': {'loader': ZABAVAR_RU_Loader,
+                  'parser': ParseZabavaFilm},
 }
 sites = sites_crawler.keys()
 
