@@ -12,7 +12,7 @@ from apps.films.api.serializers import vbFilm
 from apps.films.models import Films
 from apps.films.forms import SearchForm
 from apps.contents.models import Contents, Locations
-from apps.contents.constants import APP_CONTENTS_ONLINE_CINEMA
+from apps.contents.constants import APP_CONTENTS_LOC_TYPE
 
 import videobase.settings as settings
 
@@ -87,7 +87,7 @@ class SearchFilmsView(APIView):
             o_loc = o_loc.filter(price__lte=filter['price'])
 
         if filter.get('instock'):
-            o_loc = o_loc.filter(type=APP_CONTENTS_ONLINE_CINEMA)
+            o_loc = o_loc.filter()
 
         # Пересечение
         if o_search is None:
