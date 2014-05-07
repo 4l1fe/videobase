@@ -1,11 +1,14 @@
 # coding: utf-8
 from rest_framework import serializers
+
+from apps.films.constants import APP_FILM_PERSON_TYPES
 from apps.films.models import Persons, PersonsFilms, UsersPersons
 
 
 #############################################################################################################
 #
 class vbPerson(serializers.ModelSerializer):
+    photo = serializers.SerializerMethodField('get_path_to_photo')
     birthplace = serializers.SerializerMethodField('get_birthplace')
     relation = serializers.SerializerMethodField('get_relation')
     roles = serializers.SerializerMethodField('get_roles')
@@ -55,6 +58,12 @@ class vbPerson(serializers.ModelSerializer):
                 prep_person_roles[p].append(r)
         return prep_person_roles
 
+    def get_path_to_photo(self, obj):
+        path_to_photo = ''
+        if obj.photo:
+            path_to_photo = obj.photo.storage.url(obj.photo.name)
+        return path_to_photo
+
     def get_relation(self, obj):
         if self.user:
             up = UsersPersons.objects.get(person=obj, user=self.user)
@@ -68,9 +77,13 @@ class vbPerson(serializers.ModelSerializer):
         return []
 
     def get_roles(self, obj):
+        roles_display = []
         if obj.pk in self.prep_person_roles:
-            return self.prep_person_roles[obj.pk]
-        return []
+            d = dict(APP_FILM_PERSON_TYPES)
+            for role in self.prep_person_roles[obj.pk]:
+                roles_display.append(d[role])
+
+        return roles_display
 
     class Meta:
         model = Persons
