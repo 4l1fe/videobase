@@ -60,7 +60,7 @@ class PersonsTest(APITestCase):
         self.assertEqual(response.data['relation'], vbdata['relation'])
         self.assertEqual(response.data['birthplace'], vbdata['birthplace'])
         self.assertEqual(response.data['bio'], vbdata['bio'])
-        self.assertEqual(response.data['roles'], vbdata['roles'])  #TODO: возвращается фигня - [u'']
+        self.assertEqual(response.data['roles'], vbdata['roles'])
 
     def test_person_filmography_view_ok(self):
         response = self.client.get(reverse('person_filmography_view', kwargs={'resource_id': self.person_filmography.person.id, 'format': 'json'}))
