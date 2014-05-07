@@ -12,7 +12,6 @@ from apps.films.api.serializers import vbFilm
 from apps.films.models import Films
 from apps.films.forms import SearchForm
 from apps.contents.models import Contents, Locations
-from apps.contents.constants import APP_CONTENTS_ONLINE_CINEMA
 
 import videobase.settings as settings
 
@@ -40,10 +39,8 @@ class SearchFilmsView(APIView):
                 film_group += 1
                 break
 
-        for i in ['price', 'instock']:
-            if i in data.data:
-                location_group += 1
-                break
+        if 'price' in data.data:
+            location_group += 1
 
         return data.cleaned_data, film_group, location_group
 
@@ -86,9 +83,6 @@ class SearchFilmsView(APIView):
         if filter.get('price'):
             o_loc = o_loc.filter(price__lte=filter['price'])
 
-        if filter.get('instock'):
-            o_loc = o_loc.filter(type=APP_CONTENTS_ONLINE_CINEMA)
-
         # Пересечение
         if o_search is None:
             list_films_by_content = Contents.objects.filter(pk__in=o_loc).\
@@ -118,10 +112,16 @@ class SearchFilmsView(APIView):
                     list_films_by_content = []
                     if location_group > 0:
                         list_films_by_content = self.search_by_location(filter, o_search)
+                    else:
+                        if filter.get('instock'):
+                            list_films_by_content = self.search_by_location(filter, o_search)
 
                     # Пересечение не пусто
                     if len(list_films_by_content):
                         o_search = Films.objects.filter(pk__in=list_films_by_content)
+                    else:
+                        if filter.get('instock'):
+                            list_films_by_content = self.search_by_location(filter, o_search)
 
                 else:
                     list_films_by_content = []
