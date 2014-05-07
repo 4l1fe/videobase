@@ -26,16 +26,15 @@ urlpatterns = patterns('',
     url(r'^admin_tools/', include('admin_tools.urls')),
     url(r'^admin/', include(admin.site.urls)),
 
-    # Social
+    # Social-auth
     url(r'', include('social_auth.urls')),
 
     # Interface
-    url(r'^register/$', views.RegisterUserView.as_view()),
-    url(r'^login/$', views.LoginUserView.as_view()),
+    url(r'^register/?$', views.RegisterUserView.as_view()),
+    url(r'^login/?$', views.LoginUserView.as_view()),
+    url(r'^user/(?P<user_id>\d+)/?$', views.UserView.as_view()),
     url(r'^person/(?P<resource_id>\d+)/?$', 'apps.films.views.person_view'),
     url(r'^films?/(?P<film_id>\d+)/?$', 'apps.films.views.film_view'),
-    url(r'^user/(?P<resource_id>\d+)/?$', 'apps.films.views.user_view'),
-    # url(r'^regi/', 'apps.films.views.login_view'),
     url(r'^$', 'apps.films.views.index_view'),
 )
 
