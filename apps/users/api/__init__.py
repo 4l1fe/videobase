@@ -1,5 +1,6 @@
 # coding: utf-8
 # User API
+from user_token_auth import ObtainAuthToken, ObtainSessionToken, RevokeSessionToken
 from user_info import UserInfoView, UserChangePasswordView
 # Users API
 from users import UsersView
