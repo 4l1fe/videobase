@@ -251,40 +251,26 @@ def index_view(request):
 
 
 def person_view(request, resource_id):
-        # ... view code here
-        '''
-        - header_title = person.name
+    # ... view code here
+    '''
+    - header_title = person.name
+    
+    - person_roles = person.roles && person.roles.length?person.roles.join(", "):false
+    - person_birthplace = person.birthplace && person.birthplace.length?person.birthplace.join(", "):false
+    - person_birthdate = new Date(person.birthdate)
+    - person_years_old = how_long(person_birthdate, 0)
+    - person_birthdate_string = date_text(person_birthdate) + " г. (" + person_years_old + ")"
+    '''
 
-        - person_roles = person.roles && person.roles.length?person.roles.join(", "):false
-        - person_birthplace = person.birthplace && person.birthplace.length?person.birthplace.join(", "):false
-        - person_birthdate = new Date(person.birthdate)
-        - person_years_old = how_long(person_birthdate, 0)
-        - person_birthdate_string = date_text(person_birthdate) + " г. (" + person_years_old + ")"
-        '''
+    person = film_model.Persons.objects.get(pk=resource_id)
+        
+    pfs = film_model.PersonsFilms.objects.filter(person=person)
 
-        person = film_model.Persons.objects.get(pk=resource_id)
 
-        pfs = film_model.PersonsFilms.objects.filter(person=person)
-
-        vbFilms = [pf.film.as_vbFilm() for pf in pfs]
-
-        for vbf in vbFilms:
-            
-            vbf.update({'instock': True,
-                        'hasFree': True,
-                        'year': vbf['release_date'].strftime('%Y'),
-                        'release_date': vbf['release_date'].strftime('%Y-%m-%d')
-            })
-
-        return HttpResponse(render_page('person', {
-            'person': {'id': resource_id,
-                       'name': person.name,
-                       'photo': "static/img/tmp/person1.jpg",
-                       'bio': person.bio,
-                       'birthdate': "1974-01-22",
-                       'roles': ["актер", "режиссёр"],
-                       'birthplace': ["Москва", "Россия"]},
-            'filmography': vbFilms}))
+    
+    return HttpResponse(render_page('person',                                     
+                                    {'person':vbPerson(person).data,
+                                     'filmography': vbFilm([pf.film for pf in pfs], many=True).data}))
 
 
 def login_view(request):
