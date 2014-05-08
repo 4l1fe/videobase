@@ -1,4 +1,3 @@
-- user = {id: 10, firstname: "Владимир", lastname: "Владимиров", how_long: "1 год и 2 месяца", friends_cnt: 129, films_watched: 10, comments_cnt: 1, genre_fav: {id: 1, name: "Анимэ"}}
 doctype html5
 include mixins
 html(lang="ru")
@@ -8,7 +7,7 @@ html(lang="ru")
         .user-wrapper
             .container
                 .col-md-3
-                    img.img-responsive.img-circle(src="static/img/tmp/user.gif")
+                    img.img-responsive.img-circle(src=user.avatar || conf.noavatar_big_url)
                     .button-place
                         button.friendship-btn#friendship_btn Добавить в друзья
                 .col-md-9
