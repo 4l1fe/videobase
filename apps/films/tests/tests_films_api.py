@@ -10,10 +10,11 @@ from rest_framework.test import APITestCase
 from rest_framework.authtoken.models import Token
 
 import videobase.settings as settings
-from apps.films.tests.factories_films_api import UserFactory, GenreFactory, CountriesFactory, PersonFactory, FilmFactory, ContentFactory,LocationFactory, CommentsFactory, FilmsExtrasFactory
-from apps.films.constants import APP_PERSON_PRODUCER,APP_FILM_SERIAL,APP_PERSON_DIRECTOR
+from apps.films.tests.factories_films_api import UserFactory, GenreFactory, CountriesFactory, PersonFactory, FilmFactory, ContentFactory,LocationFactory, CommentsFactory, FilmsExtrasFactory, UsersFilmsFactory, PersonsFilmFactory
+from apps.films.constants import APP_PERSON_PRODUCER,APP_FILM_SERIAL,APP_PERSON_DIRECTOR,APP_PERSON_ACTOR, APP_USERFILM_STATUS_UNDEF, APP_USERFILM_STATUS_NOT_WATCH , APP_USERFILM_STATUS_SUBS , APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER, APP_FILM_TYPE_ADDITIONAL_MATERIAL_TRAILER
 from apps.users.models.api_session import SessionToken, UsersApiSessions
-
+from apps.films.models import UsersFilms
+from apps.contents.models import Comments
 
 class FilmsTest(APITestCase):
     def setUp(self):
