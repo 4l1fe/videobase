@@ -4,7 +4,7 @@ import os
 from videobase.settings import STATIC_PATH
 
 #############################################################################################################
-APP_USER_PIC_DIR = os.path.join(STATIC_PATH, 'upload', 'users', 'user_pic')
+APP_USER_PIC_DIR = os.path.join('upload', 'users', 'user_pic')
 
 #############################################################################################################
 APP_USER_REL_TYPE_FRIENDS              = 'f'
