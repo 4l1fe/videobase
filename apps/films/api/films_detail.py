@@ -10,6 +10,8 @@ from apps.films.models import Films
 from apps.films.forms import DetailForm
 from apps.films.api.serializers import vbFilm
 
+from utils.middlewares.local_thread import set_api_request
+
 
 #############################################################################################################
 class DetailFilmView(APIView):
@@ -41,6 +43,7 @@ class DetailFilmView(APIView):
         if type(o_film) == Response:
             raise Http404
 
+        set_api_request(self.request)
         return vbFilm(o_film, **cleaned_data)
 
 
