@@ -1,4 +1,5 @@
 # coding: utf-8
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
 from apps.films.models import Persons, PersonsFilms, UsersPersons
 
@@ -14,9 +15,9 @@ class vbPerson(serializers.ModelSerializer):
         extended_fields = []
 
         extend = kwargs.pop('extend', False)
+        self.user = kwargs.pop('user', False)
         if not extend:
             extended_fields += ['bio', 'roles']
-        self.user = kwargs.pop('user', False)
 
         # Instantiate the superclass normally
         super(vbPerson, self).__init__(*args, **kwargs)
@@ -57,11 +58,14 @@ class vbPerson(serializers.ModelSerializer):
 
     def get_relation(self, obj):
         if self.user:
-            up = UsersPersons.objects.get(person=obj, user=self.user)
-            return up.subscribed
+            try:
+                up = UsersPersons.objects.get(person=obj, user=self.user)
+                return up.subscribed
+            except ObjectDoesNotExist:  # может завалиться при работе в тестах
+                return 0  # должен быть тип поля UsersPersons.subscribed
 
     def get_birthplace(self, obj):
-        if not obj.city is None:
+        if obj.city is not None:
             city = obj.city.name
             country = obj.city.country.name
             return [city, country]

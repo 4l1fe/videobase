@@ -20,7 +20,6 @@ urlpatterns = patterns('',
     url(r'^api/', include('apps.users.urls')),
     url(r'^robots/', include('apps.robots.urls')),
     url(r'^api/test', test_view),
-    url(r'^auth/login/', 'rest_framework.authtoken.views.obtain_auth_token'),
 
     # Admin
     url(r'^admin_tools/', include('admin_tools.urls')),

@@ -192,8 +192,6 @@ class vbFilm(serializers.ModelSerializer):
     def relation_list(self, obj):
         request = get_current_request()
         if request.user.is_authenticated():
-
-
             return {
                 'subscribed': True,
                 'status': True,
