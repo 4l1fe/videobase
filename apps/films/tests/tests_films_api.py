@@ -8,8 +8,9 @@ from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
 from rest_framework.authtoken.models import Token
 import videobase.settings as settings
-from apps.films.tests.factories_films_api import UserFactory, GenreFactory, CountriesFactory, PersonFactory, FilmFactory, ContentFactory,LocationFactory, CommentsFactory, FilmsExtrasFactory, UsersFilmsFactory, PersonsFilmFactory
-from apps.films.constants import APP_PERSON_PRODUCER,APP_FILM_SERIAL,APP_PERSON_DIRECTOR,APP_PERSON_ACTOR, APP_USERFILM_STATUS_UNDEF, APP_USERFILM_STATUS_NOT_WATCH , APP_USERFILM_STATUS_SUBS , APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER, APP_FILM_TYPE_ADDITIONAL_MATERIAL_TRAILER,  APP_USERFILM_SUBS_TRUE, APP_USERFILM_SUBS_FALSE
+from apps.films.tests.factories import UserFactory, GenreFactory, CountriesFactory, PersonFactory, FilmFactory, ContentFactory,LocationFactory, CommentsFactory, FilmsExtrasFactory, UsersFilmsFactory, PersonsFilmFactory
+from apps.films.constants import APP_PERSON_PRODUCER, APP_FILM_SERIAL, APP_PERSON_DIRECTOR,APP_PERSON_ACTOR, APP_USERFILM_STATUS_UNDEF, APP_USERFILM_STATUS_NOT_WATCH , APP_USERFILM_STATUS_SUBS , \
+    APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER, APP_FILM_TYPE_ADDITIONAL_MATERIAL_TRAILER,  APP_USERFILM_SUBS_TRUE, APP_USERFILM_SUBS_FALSE
 from apps.users.models.api_session import SessionToken, UsersApiSessions
 from apps.films.models import UsersFilms
 from apps.contents.models import Comments
@@ -80,8 +81,6 @@ class FilmsTest(APITestCase):
         extras_photo_url = list(os.path.splitext(extras.photo.url))
         extras_photo_url[0] += settings.POSTER_URL_PREFIX
         extras_photo_url = u''.join(extras_photo_url)
-
-
         self.assertEqual(response_data['poster'], extras_photo_url)
         self.assertEqual(response_data['id'], film.id)
         self.assertEqual(response_data['name'], film.name)
@@ -148,7 +147,6 @@ class FilmsTest(APITestCase):
         response = self.client.post(reverse('film_details_view', kwargs={'film_id': film.id, 'format': 'json'}), data={})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    @skip('пропущен до исправления')
     def test_api_detail_all_data_post(self):
         film = self.films[0]
         locations = []
@@ -177,14 +175,14 @@ class FilmsTest(APITestCase):
         for i in range(len(response.data['genres'])):
             self.assertEqual(response.data['genres'][i], film.genres.all().values('id', 'name')[i])
         for i in range(len(response.data['persons'])):
-            p = film.persons.all().values('id', 'name', 'photo', 'city__name', 'city__country__name')[i]
+            p = film.persons.all().values('id', 'name', 'photo', 'city__name', 'city__country__name', 'birthdate')[i]
             if p['city__name'] is None and p['city__country__name'] is None:
                 birthplace = []
             else:
                 birthplace = [p['city__name'], p['city__country__name']]
             p.update({'birthplace': birthplace})
             del p['city__name'], p['city__country__name']
-            self.assertEqual(response.data['persons'][i], p)
+            self.assertDictEqual(response.data['persons'][i], p)
         for i in range(len(response.data['directors'])):
             self.assertEqual(response.data['directors'][i], directors[i])
         self.locations_assert(response.data['locations'], locations)
@@ -606,7 +604,6 @@ class FilmsTest(APITestCase):
         response = self.client.post(reverse('film_comments_view', kwargs={'film_id': 0, 'format': 'json'}))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    @skip('пропущен до исправления')
     def test_api_comment_default_param(self):
         film = self.films[0]
         comments = []
@@ -620,7 +617,6 @@ class FilmsTest(APITestCase):
 
         self.comment_assert(response.data, comments, film, 0, data, self.user)
 
-    @skip('пропущен до исправления')
     def test_api_comment_with_param(self):
         comments = []
         film = self.films[0]
