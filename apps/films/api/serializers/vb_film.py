@@ -29,7 +29,7 @@ class CountriesSerializer(serializers.ModelSerializer):
 
 
 #############################################################################################################
-class GentriesSerializer(serializers.ModelSerializer):
+class GenresSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Genres
@@ -63,7 +63,7 @@ class vbFilm(serializers.ModelSerializer):
 
     # Признак extend
     countries = CountriesSerializer()
-    genres = GentriesSerializer()
+    genres = GenresSerializer()
     directors = serializers.SerializerMethodField('director_list')
     scriptwriters = serializers.SerializerMethodField('scriptwriter_list')
 
