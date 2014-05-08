@@ -3,7 +3,7 @@
 from django.contrib.auth.models import User
 
 from apps.contents.models import Contents
-from apps.films.models import Persons, PersonsFilms, Films, UsersPersons, PersonsExtras
+from apps.films.models import Persons, PersonsFilms, Films, UsersPersons, PersonsExtras, Cities, Countries
 
 import datetime
 import factory
@@ -16,6 +16,8 @@ class PersonFactory(factory.DjangoModelFactory):
     name_orig = u'Nicolas Cage'
     bio = u''
     photo = ''
+    city = factory.SubFactory('apps.films.tests.factories.CitiesFactory')
+    birthdate = datetime.date.today()
     pk = factory.Sequence(lambda n: n)
 
 
@@ -36,7 +38,7 @@ class PersonsFilmography(factory.DjangoModelFactory):
     FACTORY_FOR = PersonsFilms
     person = factory.SubFactory(PersonFactory)
     film = factory.SubFactory(FilmFactory)
-    p_type = ''
+    p_type = ''  # TODO: не строкой , а вариантом из значений поля модели
     p_character = ''
     description = ''
 
@@ -55,17 +57,6 @@ class UserFactory(factory.DjangoModelFactory):
     password = u'admin'
 
 
-class ContentFactory(factory.DjangoModelFactory):
-    FACTORY_FOR = Contents
-    pk = factory.Sequence(lambda o: o)
-    name = factory.SelfAttribute('film.name')
-    film = factory.SubFactory(FilmFactory)
-    release_date = factory.SelfAttribute('film.release_date')
-    viewer_cnt = 0
-    viewer_lastweek_cnt = 0
-    viewer_lastmonth_cnt = 0
-
-
 class PersonsExtrasFactory(factory.DjangoModelFactory):
     FACTORY_FOR = PersonsExtras
     person = factory.SubFactory(PersonFactory)
@@ -75,24 +66,44 @@ class PersonsExtrasFactory(factory.DjangoModelFactory):
     pk = factory.Sequence(lambda n: n)
 
 
+class CitiesFactory(factory.DjangoModelFactory):
+
+    FACTORY_FOR = Cities
+    country = factory.SubFactory('apps.films.tests.factories.CountriesFactory')
+    name = u'factory_city'
+    name_orig = u'factory_city_orig'
+    pk = factory.Sequence(lambda n: n)
 
 
+class CountriesFactory(factory.DjangoModelFactory):
+
+    FACTORY_FOR = Countries
+    name = u'factory_country'
+    name_orig = u'factory_country_orig'
+    description = u''
+    pk = factory.Sequence(lambda n: n)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#--------общие/родительские классы
+# class PersonFactory(factory.DjangoModelFactory):
+#     pass
+#
+#
+# class FilmFactory(factory.DjangoModelFactory):
+#     pass
+#
+#
+# class PersonsFilmFactory(factory.DjangoModelFactory):
+#     pass
+#
+#
+# class UserFactory(factory.DjangoModelFactory):
+#     pass
+#
+#
+# class CitiesFactory(factory.DjangoModelFactory):
+#     pass
+#
+#
+# class CountriesFactory(factory.DjangoModelFactory):
+#     pass
