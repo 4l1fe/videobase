@@ -7,12 +7,12 @@ from crawler.zoomby_ru.parsers import ParseFilm
 
 from django.utils import timezone
 from django.db.models import Q
-from django.core.management.base import BaseCommand
-from optparse import make_option
+from django.core.validators import URLValidator
+from django.core.exceptions import ValidationError
 
 from apps.films.models import Films, Seasons
 from apps.contents.models import Contents, Locations
-from apps.contents.constants import *
+from apps.contents.constants import APP_CONTENTS_PRICE_TYPE_FREE
 from crawler.kinopoisk import get_id_by_film
 from crawler.ivi_ru.loader import IVI_Loader
 from crawler.ivi_ru.parsers import ParseFilmPage
@@ -21,8 +21,8 @@ from crawler.now_ru.parsers import ParseNowFilmPage
 from crawler.megogo_net.loader import MEGOGO_Loader
 from crawler.megogo_net.parsers import ParseMegogoFilm
 from crawler.stream_ru.loader import STREAM_RU_Loader
-from crawler.stream_ru.parsers import *
-from crawler.core.exceptions import *
+from crawler.stream_ru.parsers import ParseStreamFilm
+from crawler.core.exceptions import NoSuchFilm, RetrievePageException
 from crawler.play_google_com.loader import PLAY_GOOGLE_Loader
 from crawler.play_google_com.parsers import ParsePlayGoogleFilm
 from crawler.playfamily_dot_ru.loader import playfamily_loader
@@ -67,6 +67,7 @@ sites_crawler = {
                         'parser': ParsePlayGoogleFilm}
 }
 sites = sites_crawler.keys()
+
 
 def sane_dict(film=None):
     '''
@@ -133,7 +134,7 @@ def get_content(film, kwargs):
 
             return content
         else:
-             raise NameError(u"Variant with new series for serie not in db not implemented")
+            raise NameError(u"Variant with new series for serie not in db not implemented")
 
     else:
         print season_num
@@ -173,6 +174,12 @@ def get_content(film, kwargs):
 
 def save_location(film, **kwargs):
     content = get_content(film, kwargs)
+    val = URLValidator(verify_exists=False)
+
+    # Validating that given url_view exists
+    val(kwargs['url_view'])
+    
+    
     location = Locations(content=content,
                          type=0,
                          url_view=kwargs['url_view'],
@@ -205,8 +212,6 @@ def launch_next_robot_try(site, film_id = None):
     else:
         film_number = film_id
     film = Films.objects.filter(pk=film_number)
-
-    print film
 
     if not film:
         film_number = 1
@@ -282,7 +287,16 @@ def launch_next_robot_try(site, film_id = None):
                                 outcome=APP_ROBOTS_TRY_NO_SUCH_PAGE)
 
         robot_try.save()
+    except ValidationError as ve:
+
+        print "Tried to save location with invalid URL"
+        robot_try = RobotsTries(domain=site,
+                            film=e.film,
+                            outcome=APP_ROBOTS_TRY_NO_SUCH_PAGE)
+
+        robot_try.save()
     except Exception, e:
+        
         print "Unknown exception %s", str(e)
         # Most likely parsing error
         if site is None:
