@@ -68,6 +68,7 @@ sites_crawler = {
 }
 sites = sites_crawler.keys()
 
+
 def sane_dict(film=None):
     '''
     Template for dict returned by parsers with sane defaults
