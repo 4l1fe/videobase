@@ -174,7 +174,7 @@ def get_content(film, kwargs):
 
 def save_location(film, **kwargs):
     content = get_content(film, kwargs)
-    val = URLValidator(verify_exists=False)
+    val = URLValidator()
 
     # Validating that given url_view exists
     val(kwargs['url_view'])
