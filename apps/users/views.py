@@ -57,17 +57,18 @@ class UserView(View):
             return HttpResponseBadRequest()
         try:
             uvb = vbUser(user, extend=True, genres=True, friends=True)
-            default_user = {'regdate': uvb.data['regdate'].strftime("%Y-%m-%d")}
-            default_user.update(uvb.data)
             delta = timezone.now() - uvb.data['regdate']
-            user_how_long = u"{}".format(delta.days if delta.days != 0 else 1)
+            how_long = u"{}".format(delta.days if delta.days != 0 else 1)
             if delta.days % 10 in [0, 1]:
                 day_title = u"день"
             elif delta.days % 10 in [2, 3, 4, ]:
                 day_title = u"дня"
             else:
                 day_title = u"дней"
-            user_how_long += u" {}".format(day_title)
+            how_long += u" {}".format(day_title)
+            default_user = {'regdate': uvb.data['regdate'].strftime("%Y-%m-%d"),
+                            'how_long': how_long}
+            default_user.update(uvb.data)
 
             films = Films.objects.filter(users_films__user=user,
                                          type__in=(APP_FILM_SERIAL, APP_FILM_FULL_FILM),
@@ -92,7 +93,6 @@ class UserView(View):
                        'actors_fav': vba.data,
                        'feed': [],
                        'directors_fav': vbd.data,
-                       'user_how_long': user_how_long,
                        }
 
             return HttpResponse(render_page('user', default))
