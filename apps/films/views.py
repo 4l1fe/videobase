@@ -29,6 +29,7 @@ from apps.users.api.users import vbUser
 from apps.users.constants import APP_USERS_API_DEFAULT_PAGE,\
     APP_USERS_API_DEFAULT_PER_PAGE
 from apps.films.api.serializers import vbFilm, vbComment, vbPerson
+from apps.films.api.serializers.vb_film import GenresSerializer
 
 from utils.noderender import render_page
 
@@ -229,13 +230,24 @@ def index_view(request):
     resp_dict = vbFilm(o_film, extend=True, many=True)
     data = resp_dict.data
 
+    o_genres = GenresSerializer(film_model.Genres.objects.all(), many=True)
+
+    print "fds", o_genres.data
+    
+    genres = [{'id': g['id'],'name': g['name']} for g in o_genres.data]
+
+    
+    
     #try:
 
     resp_data = [transform_vbFilms(vbf) for vbf in data]
     #except:
     #    raise Http404
+    
+    
 
-    return HttpResponse(render_page('index', {'new_films': resp_data}), status.HTTP_200_OK)
+    
+    return HttpResponse(render_page('index', {'new_films': resp_data, 'genres':o_genres.data}), status.HTTP_200_OK)
 
 
 def person_view(request, resource_id):
