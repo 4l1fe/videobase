@@ -285,7 +285,7 @@ def calc_similar(o_film):
                  'id': item.id,
                  'name': item.name,
                  'ratings': item.get_rating_for_vb_film,
-                 'year': item.release_date.strftime("%Y"),
+                 'releasedate': item.release_date,
                  #TODO: надо вычислять
                  'poster': "static/img/tmp/poster1.jpg",
                  'relation': {'rating': 5},

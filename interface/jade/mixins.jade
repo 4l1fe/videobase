@@ -11,16 +11,18 @@ mixin user_thumb(user, id)
             a(href="/user/"+user.id).name=user.name
 
 mixin film_thumb(item,id)
+    
     .film-thumb.col-md-3(data-mi-id="id",data-mi-val=item.id)
         .poster-wrapper
             .poster-place(data-mi-id="poster",data-mi-atbg="poster",data-mi-default="static/img/noposter.jpg",style='background-image: url("' + item.poster + '")')
             
         .rating-place(class = item.ratings?"":"invisible")
             p.rating(data-mi-name="ratings.cons.0")
-                =item.ratings.cons
+                =item.ratings.cons[0]
         .name-place
+            
             a(href="/films/" + item.id,data-mi-athref="id",data-mi-name="name",data-mi-id="name").name=item.name
-            span.year(data-mi-id="year",data-mi-name="releasedate")=" (" + item.year + ")"
+            span.year(data-mi-id="year",data-mi-name="releasedate")=" (" + item.releasedate.substring(0,4) + ")"
         .rel-place
             .rateit.rate(data-mi-id="relation.rating",data-mi-val=(item.relation && item.relation.rating)?item.relation.rating:0,data-rateit-max=10,data-rateit-resetable=0,data-rateit-value=(item.relation && item.relation.rating)?item.relation.rating:0)
             button.notwatch-btn(data-mi-onclick="toggle_notwatch",data-mi-id="relation.notwatch",data-mi-val=item.relation && item.relation.notwatch?1:0) N
