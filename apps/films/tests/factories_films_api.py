@@ -2,10 +2,10 @@
 
 from django.contrib.auth.models import User
 
-from apps.contents.constants import *
-from apps.films.constants import *
-from apps.contents.models import *
-from apps.films.models import *
+from apps.contents.constants import APP_CONTENTS_LOC_TYPE, APP_CONTENTS_PRICE_TYPE_FREE
+from apps.films.constants import APP_PERSON_ACTOR, APP_USERFILM_STATUS_UNDEF, APP_FILM_FULL_FILM,APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER
+from apps.contents.models import Contents, Locations, Comments
+from apps.films.models import Films, PersonsFilms ,UsersFilms, Genres, Persons, FilmExtras, Cities,Countries
 
 import factory
 import datetime
@@ -58,7 +58,7 @@ class ContentFactory(factory.DjangoModelFactory):
 class LocationFactory(factory.DjangoModelFactory):
     FACTORY_FOR = Locations
     content = factory.SubFactory(ContentFactory)
-    type = APP_CONTENTS_ONLINE_CINEMA
+    type = APP_CONTENTS_LOC_TYPE[0][0]
     lang = u'eng'
     price = float(0)
     price_type = APP_CONTENTS_PRICE_TYPE_FREE
@@ -121,7 +121,3 @@ class UsersFilmsFactory(factory.DjangoModelFactory):
     user = factory.SubFactory(UserFactory)
     film = factory.SubFactory(FilmFactory)
     status = APP_USERFILM_STATUS_UNDEF
-
-
-
-
