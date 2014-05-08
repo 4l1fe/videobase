@@ -1,5 +1,7 @@
 # coding: utf-8
 """ Command to crawler sites"""
+from crawler.oll_tv.loader import Oll_Loader
+from crawler.oll_tv.parser import ParseOllFilm
 from crawler.tvzavr_ru.loader import Tvzavr_Loader
 from crawler.tvzavr_ru.parsers import ParseTvzavrFilmPage
 from crawler.zoomby_ru.loader import ZOOMBY_Loader
@@ -64,7 +66,9 @@ sites_crawler = {
     'stream_ru': {'loader': STREAM_RU_Loader,
                   'parser': ParseStreamFilm},
     'play_google_com': {'loader': PLAY_GOOGLE_Loader,
-                        'parser': ParsePlayGoogleFilm}
+                        'parser': ParsePlayGoogleFilm},
+    'oll_tv': {'loader': Oll_Loader,
+               'parser': ParseOllFilm()}
 }
 sites = sites_crawler.keys()
 
