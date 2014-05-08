@@ -1,10 +1,10 @@
 # coding: utf-8
 from apps.users.models import User, UsersPics, UsersRels
 from apps.contents.models import Comments, Contents, Locations
-from apps.contents.constants import APP_CONTENTS_ONLINE_CINEMA, APP_CONTENTS_PRICE_TYPE_FREE
+from apps.contents.constants import APP_CONTENTS_PRICE_TYPE_FREE
 from apps.films.models import Films, Genres, UsersFilms, UsersPersons, Persons, Countries, Cities, PersonsFilms
 from apps.films.constants import APP_FILM_FULL_FILM
-
+from apps.contents.constants import APP_CONTENTS_LOC_TYPE
 import datetime
 import factory
 from factory.django import ImageField
@@ -61,7 +61,7 @@ class ContetsFactory(factory.DjangoModelFactory):
 class LocationsFactory(factory.DjangoModelFactory):
     FACTORY_FOR = Locations
     content = factory.SubFactory(ContetsFactory)
-    type = APP_CONTENTS_ONLINE_CINEMA
+    type = APP_CONTENTS_LOC_TYPE[0][0]
     lang = u'eng'
     price = float(0)
     price_type = APP_CONTENTS_PRICE_TYPE_FREE
