@@ -99,7 +99,8 @@ class vbFilm(serializers.ModelSerializer):
         result = {}
 
         if self.extend_sign:
-            o_person = Persons.objects.filter(Q(person_film_rel__p_type=APP_PERSON_DIRECTOR) | Q(person_film_rel__p_type=APP_PERSON_SCRIPTWRITER),
+            o_person = Persons.objects.\
+                filter(Q(person_film_rel__p_type=APP_PERSON_DIRECTOR) | Q(person_film_rel__p_type=APP_PERSON_SCRIPTWRITER),
                                               person_film_rel__film__in=self.list_obj_pk).\
                 extra(select={'p_type': "persons_films.p_type", 'film': "persons_films.film_id"}).order_by('id')
 
@@ -224,8 +225,9 @@ class vbFilm(serializers.ModelSerializer):
 
     class Meta:
         model = Films
-        fields = ['id', 'name', 'name_orig', 'releasedate', \
-                  'ratings', 'duration', 'locations', 'poster', 'relation', \
-                  'description', 'countries', 'directors', 'scriptwriters', \
-                  'genres', 'persons',
-                 ]
+        fields = [
+            'id', 'name', 'name_orig', 'releasedate', \
+            'ratings', 'duration', 'locations', 'poster', 'relation', \
+            'description', 'countries', 'directors', 'scriptwriters', \
+            'genres', 'persons',
+        ]
