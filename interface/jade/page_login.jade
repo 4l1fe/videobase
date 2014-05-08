@@ -6,9 +6,8 @@ html(lang="ru")
         include header
         .content-blue-wrapper
             .container
-                h2 Вход на сайт
+                h2 Регистрация
                 form#frm_login(method="post")
-                    input(type="hidden",name="csrfmiddlewaretoken",value=csrf_token)
                     h4 введите логин и пароль
                     .form-group
                         input(type="email",name="email",placeholder="Эл. почта",required="required")#inp_email
@@ -21,16 +20,16 @@ html(lang="ru")
                 h4 или используйте один из сервисов
                 ul.list-inline.social
                     li
-                        a(href="/login/facebook")
+                        a(href="#")
                             img(src="static/img/social-fb.png",alt="Зарегистрироваться через Фейсбук")
                     li
-                        a(href="/login/twitter/")
+                        a(href="#")
                             img(src="static/img/social-twitter.png",alt="Зарегистрироваться через Твиттер")
                     li
-                        a(href="/login/google-oauth2/")
+                        a(href="#")
                             img(src="static/img/social-rss.png",alt="Зарегистрироваться через Google+")
                     li
-                        a(href="/login/vk-oauth/")
+                        a(href="#")
                             img(src="static/img/social-vk.png",alt="Зарегистрироваться через ВКонтакте")
         include footer
         script.

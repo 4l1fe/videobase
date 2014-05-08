@@ -1,7 +1,17 @@
-date_now = new Date()
+
 months = ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"]
 
+function cardinal(val, form1, form2, form3) {
+   var d10;
+   if (val > 4 && val < 21) return form3;
+   d10 = val % 10;
+   if (d10 == 0 || d10 > 4) return form3;
+   if (d10 == 1) return form1;
+   return form2;
+}
+
 function time_text(dt) {
+ var date_now = new Date()
  var diff, curday, curtime, ho, min;
  curtime = dt.getTime();
  diff = (date_now.getTime() - curtime) / 1000;

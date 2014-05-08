@@ -180,7 +180,7 @@ class FilmThumb extends Item
       $(".playlist-btn", @_place).click => @action_toggle_playlist()
       callback @ if callback
 
-  action_toggle_playlist: (status) ->
+  toggle_playlist: (status) ->
     if @user_is_auth()
       rel = @vals("relation")
       if status != undefined
@@ -200,7 +200,7 @@ class FilmThumb extends Item
           rel.playlist = new_playlist
       )
 
-  action_toggle_notwatch: (status) ->
+  toggle_notwatch: (status) ->
     if @user_is_auth()
       rel = @vals("relation")
       if status != undefined
@@ -220,7 +220,7 @@ class FilmThumb extends Item
           rel.notwatch = new_notwatch
       )
 
-  action_toggle_subscribe: (status) ->
+  toggle_subscribe: (status) ->
     if @user_is_auth()
       rel = @vals("relation")
       if status != undefined
@@ -835,7 +835,7 @@ class Page_Film extends Page
 
   load_actors: ->
     @_e.btn_moreactors.parent().hide()
-    @_app.rest.films.persons.read(opts.id, {type: "a"})
+    @_app.rest.films.persons.read(opts.id, {type: "a", top: actors_deck})
       .done(
         (data)=>
           if data && data.length
