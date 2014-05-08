@@ -285,16 +285,12 @@ def launch_next_robot_try(site, film_id = None):
         robot_try = RobotsTries(domain=site,
                                 film=e.film,
                                 outcome=APP_ROBOTS_TRY_NO_SUCH_PAGE)
-
+        
         robot_try.save()
     except ValidationError as ve:
 
         print "Tried to save location with invalid URL"
-        robot_try = RobotsTries(domain=site,
-                            film=e.film,
-                            outcome=APP_ROBOTS_TRY_NO_SUCH_PAGE)
 
-        robot_try.save()
     except Exception, e:
         
         print "Unknown exception %s", str(e)
