@@ -1,15 +1,14 @@
 # coding: utf-8
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 import sys
+
+from datetime import timedelta
 from ConfigParser import RawConfigParser
 
 
 BASE_PATH = os.path.dirname(__file__)
 BASE_DIR = os.path.dirname(BASE_PATH)
-
-#sys.path.insert(0, os.path.join(BASE_PATH, 'apps'))
 
 STATIC_PATH = os.path.join(BASE_PATH, '..', 'static')
 CONFIGS_PATH = os.path.join(BASE_PATH, '..', 'configs')
@@ -26,7 +25,7 @@ DEBUG = True
 
 TEMPLATE_DEBUG = DEBUG
 
-ALLOWED_HOSTS = ['*', ]
+ALLOWED_HOSTS = ['*']
 
 ACCOUNT_ACTIVATION_DAYS = 2
 
@@ -106,7 +105,6 @@ WSGI_APPLICATION = 'videobase.wsgi.application'
 dbconf = RawConfigParser()
 dbconf.read(CONFIGS_PATH + '/db.ini')
 
-
 DATABASES = {
     'default': {
         'ENGINE':   dbconf.get('database', 'DATABASE_ENGINE'),
@@ -172,15 +170,19 @@ VKONTAKTE_APP_ID     = VK_APP_ID
 VK_API_SECRET        = 'JAEQddzkBCm554iGXe6S'
 VKONTAKTE_APP_SECRET = VK_API_SECRET
 VK_EXTRA_SCOPE = ['notify', 'friends', 'status', 'groups', 'notifications']
+
 # Facebook
 FACEBOOK_APP_ID     = '212532105624824'
 FACEBOOK_API_SECRET = 'a99fcef38b7054279d73beb4ebb7b6cc'
+
 # Twitter
 TWITTER_CONSUMER_KEY    = 'HACuJARrAXJyeHdeD5viHULZR'
 TWITTER_CONSUMER_SECRET = 'Ge0k2rKltyPq3ida76IjTbhesZVdIrvckcNPXzJaBU2ouzixut'
+
 # Google+
 GOOGLE_OAUTH2_CLIENT_ID     = 'AIzaSyD9C36HCncY0tVWQekEmz5KEarnCzOCCb0'
 GOOGLE_OAUTH2_CLIENT_SECRET = ''
+
 # Mail.ru
 MAILRU_OAUTH2_APP_KEY = '719516'
 MAILRU_OAUTH2_CLIENT_KEY = '4daa3ed8bef5be08ebd7e25ff5ae806a'
@@ -200,7 +202,6 @@ AUTHENTICATION_BACKENDS = (
     'rest_framework.authentication.TokenAuthentication',
     'apps.users.models.api_session.MultipleTokenAuthentication',
 )
-
 
 # Перечислим pipeline, которые последовательно буду обрабатывать респонс
 SOCIAL_AUTH_PIPELINE = (
@@ -234,12 +235,12 @@ if not DEBUG:
         'dsn': 'http://8684bf8b497047d9ac170fd16aefc873:41e89f4666b24f998125370f3d1a1789@sentry.aaysm.com/2'
     }
 
-    JENKINS_TASKS = ('django_jenkins.tasks.run_pylint',
-                     'django_jenkins.tasks.run_pep8',
-                     'django_jenkins.tasks.run_pyflakes',
-                     'django_jenkins.tasks.with_coverage',)
-
-from datetime import timedelta
+    JENKINS_TASKS = (
+        'django_jenkins.tasks.run_pylint',
+        'django_jenkins.tasks.run_pep8',
+        'django_jenkins.tasks.run_pyflakes',
+        'django_jenkins.tasks.with_coverage',
+    )
 
 CELERYBEAT_SCHEDULE = {
     'robot-launch': {
@@ -254,20 +255,18 @@ CELERYBEAT_SCHEDULE = {
         'task': 'kinopoisk_set_poster',
         'schedule': timedelta(seconds=10),
     },
-     'imdb_rating_update_command': {
+    'imdb_rating_update_command': {
         'task': 'imdb_rating_update',
         'schedule': timedelta(days=7),
     },
-     'amediateka_ru_update': {
+    'amediateka_ru_update': {
         'task': 'amediateka_ru_robot_start',
         'schedule': timedelta(days=7),
     },
-     'viaplay_ru_robot_start': {
+    'viaplay_ru_robot_start': {
         'task': 'viaplay_ru_robot_start',
         'schedule': timedelta(days=7),
     },
-    
-    
 }
 
 CELERY_TIMEZONE = 'UTC'
