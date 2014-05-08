@@ -27,8 +27,8 @@ html(lang="ru")
                                     
                                     option(value="0") любого жанра
                                     each item in genres
-                                         option(value=item.id) item.name
-
+                                         option(value=item.id)
+                                             = item.name
                             .select-wrapper
                                 select#sel_rating(name="rating")
                                     option(value="0") любого рейтинга
