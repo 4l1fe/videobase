@@ -7,29 +7,20 @@ import warnings
 from cStringIO import StringIO
 from PIL import Image, ImageEnhance
 
-from django.utils import timezone
 from django.core.files import File
-from django.contrib.auth.models import User
-from django.template import Template, Context
+from django.core.paginator import Paginator
+from django.template import Context
 from django.http import HttpResponse, Http404
 from django.core.context_processors import csrf
 from django.shortcuts import render_to_response
-from django.core.paginator import Paginator
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
 import apps.films.models as film_model
-from apps.films.constants import APP_PERSON_ACTOR, APP_PERSON_DIRECTOR,\
-    APP_FILM_SERIAL, APP_FILM_FULL_FILM, APP_USERFILM_STATUS_SUBS
-import apps.contents.models as content_model
-
-from apps.users.api.users import vbUser
-from apps.users.constants import APP_USERS_API_DEFAULT_PAGE,\
-    APP_USERS_API_DEFAULT_PER_PAGE
 from apps.films.api.serializers import vbFilm, vbComment, vbPerson
-
+import apps.contents.models as content_model
 from utils.noderender import render_page
 
 # Do not remove there is something going on when importing, probably models registering itselves
@@ -239,94 +230,26 @@ def index_view(request):
 
 
 def person_view(request, resource_id):
-        # ... view code here
-        '''
-        - header_title = person.name
-
-        - person_roles = person.roles && person.roles.length?person.roles.join(", "):false
-        - person_birthplace = person.birthplace && person.birthplace.length?person.birthplace.join(", "):false
-        - person_birthdate = new Date(person.birthdate)
-        - person_years_old = how_long(person_birthdate, 0)
-        - person_birthdate_string = date_text(person_birthdate) + " г. (" + person_years_old + ")"
-        '''
-
-        person = film_model.Persons.objects.get(pk=resource_id)
-
-        pfs = film_model.PersonsFilms.objects.filter(person=person)
-
-        vbFilms = [pf.film.as_vbFilm() for pf in pfs]
-
-        for vbf in vbFilms:
-            
-            vbf.update({'instock': True,
-                        'hasFree': True,
-                        'year': vbf['release_date'].strftime('%Y'),
-                        'release_date': vbf['release_date'].strftime('%Y-%m-%d')
-            })
-
-        return HttpResponse(render_page('person', {
-            'person': {'id': resource_id,
-                       'name': person.name,
-                       'photo': "static/img/tmp/person1.jpg",
-                       'bio': person.bio,
-                       'birthdate': "1974-01-22",
-                       'roles': ["актер", "режиссёр"],
-                       'birthplace': ["Москва", "Россия"]},
-            'filmography': vbFilms}))
-
-
-def login_view(request):
-    # ... view code here
-    pass
-
-
-def user_view(request, resource_id):
-
     try:
-        user = User.objects.get(pk=resource_id)
-        uvb = vbUser(user, extend=True, genres=True, friends=True)
-        default_user = {'regdate': uvb.data['regdate'].strftime("%Y-%m-%d")}
-        default_user.update(uvb.data)
-        delta = timezone.now() - uvb.data['regdate']
-        user_how_long = u"{}".format(delta.days if delta.days != 0 else 1)
-        if delta.days % 10 in [0, 1]:
-            day_title = u"день"
-        elif delta.days % 10 in [2, 3, 4, ]:
-            day_title = u"дня"
-        else:
-            day_title = u"дней"
-        user_how_long += u" {}".format(day_title)
-
-        films = film_model.Films.objects.filter(users_films__user=user,
-                                                type__in=(APP_FILM_SERIAL, APP_FILM_FULL_FILM),
-                                                users_films__status=APP_USERFILM_STATUS_SUBS)
-        page_films = Paginator(films, APP_USERS_API_DEFAULT_PER_PAGE).page(APP_USERS_API_DEFAULT_PAGE)
-        vbf = vbFilm(page_films.object_list, many=True)
-
-        actors = film_model.Persons.objects.filter(users_persons__user=user,
-                                                   person_film_rel__p_type=APP_PERSON_ACTOR)
-        page_actors = Paginator(actors, APP_USERS_API_DEFAULT_PER_PAGE).\
-            page(APP_USERS_API_DEFAULT_PAGE)
-        vba = vbPerson(page_actors.object_list, many=True)
-
-        directors = film_model.Persons.objects.filter(users_persons__user=user,
-                                                      person_film_rel__p_type=APP_PERSON_DIRECTOR)
-        page_directors = Paginator(directors, APP_USERS_API_DEFAULT_PER_PAGE).\
-            page(APP_USERS_API_DEFAULT_PAGE)
-        vbd = vbPerson(page_directors.object_list, many=True)
-
-        default = {'user': default_user,
-                   'films_subscribed': vbf.data,
-                   'actors_fav': vba.data,
-                   'feed': [],
-                   'directors_fav': vbd.data,
-                   'user_how_long': user_how_long,
-                   }
-
-        return HttpResponse(render_page('user', default))
-
-    except User.DoesNotExist:
+        person = film_model.Persons.objects.get(pk=resource_id)
+    except film_model.Persons.DoesNotExist:
         raise Http404
+    vbp = vbPerson(person, extend=True)
+    pfs = film_model.PersonsFilms.objects.filter(person=person)
+    page = Paginator(pfs, 12).page(1)
+    pfs = page.object_list
+    vbFilms = [pf.film.as_vbFilm() for pf in pfs]
+    for vbf in vbFilms:
+
+        vbf.update({'instock': True,
+                    'hasFree': True,
+                    'year': vbf['release_date'].strftime('%Y'),
+                    'release_date': vbf['release_date'].strftime('%Y-%m-%d')
+        })
+
+    return HttpResponse(render_page('person',
+                                    {'person': vbp.data,
+                                     'filmography': vbFilms}))
 
 
 def test_view(request):
