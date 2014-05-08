@@ -229,7 +229,7 @@
       if (opts.vals.releasedate) {
         opts.vals.year = " (" + opts.vals.releasedate.substr(0, 4) + ")";
       }
-      /*if ($(".notinstock", opts.place).hasClass("display-none")) {
+      if ($(".notinstock", opts.place).hasClass("display-none")) {
         if (!$(".watchprice", opts.place).hasClass("invisible")) {
           opts.vals.price = $(".watchprice .price", opts.place).text();
         }
@@ -238,7 +238,7 @@
         } else {
           opts.vals.hasFree = true;
         }
-      }*/
+      }
       if (opts.vals.locations) {
         opts.vals.hasFree = false;
         opts.vals.price = 0;
@@ -295,7 +295,7 @@
       })(this));
     }
 
-    FilmThumb.prototype.action_toggle_playlist = function(status) {
+    FilmThumb.prototype.toggle_playlist = function(status) {
       var action, new_playlist, rel;
       if (this.user_is_auth()) {
         rel = this.vals("relation");
@@ -318,7 +318,7 @@
       }
     };
 
-    FilmThumb.prototype.action_toggle_notwatch = function(status) {
+    FilmThumb.prototype.toggle_notwatch = function(status) {
       var action, new_notwatch, rel;
       if (this.user_is_auth()) {
         rel = this.vals("relation");
@@ -341,7 +341,7 @@
       }
     };
 
-    FilmThumb.prototype.action_toggle_subscribe = function(status) {
+    FilmThumb.prototype.toggle_subscribe = function(status) {
       var action, new_subscribed, rel;
       if (this.user_is_auth()) {
         rel = this.vals("relation");
@@ -1233,7 +1233,8 @@
     Page_Film.prototype.load_actors = function() {
       this._e.btn_moreactors.parent().hide();
       return this._app.rest.films.persons.read(opts.id, {
-        type: "a"
+        type: "a",
+        top: actors_deck
       }).done((function(_this) {
         return function(data) {
           var i, item, _i, _len, _results;
