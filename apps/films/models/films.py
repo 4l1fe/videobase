@@ -85,6 +85,16 @@ class Films(models.Model):
 
         return o_similar
 
+
+    @property
+    def get_rating_for_vb_film(self):
+        return {
+            'imdb': [self.rating_imdb, self.rating_imdb_cnt],
+            'kp': [self.rating_kinopoisk, self.rating_kinopoisk_cnt],
+            'cons': [self.rating_cons, self.rating_cons_cnt],
+        }
+
+
     class Meta(object):
         # Имя таблицы в БД
         db_table = 'films'
