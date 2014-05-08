@@ -1,0 +1,78 @@
+doctype html5
+include mixins
+html(lang="ru")
+    include head
+    body.page-film
+        include header
+        .films-wrapper
+            .container
+                h1 
+                    = film.name
+                .player-place
+                    .player#player
+        .container.film-info
+            .col-md-3.poster-place
+                .poster
+                    img.img-responsive(src=film.poster)
+            .col-md-6.info-place
+                table
+                    tr
+                        th Страна
+                        each country in film.countries
+                           td 
+                               = country.name
+                    tr
+                        th Режиссёр
+                        td
+                            
+                    tr
+                        th Сценарист
+                        td
+                    tr
+                        th Дата выхода
+                        td 
+                            = film.releasedate
+                    tr
+                        th Время
+                        td 
+                            = film.duration +' мин.'
+            .col-md-3.rating-place
+                .rating-header Сводный рейтинг
+                .rating-cons-cnt
+                    p 
+                        = film.ratings.cons[1] + ' голосов'
+                .rating-cons-place
+                    .rating-cons 
+                        = film.ratings.cons[0]
+                .rating-all
+                    p 
+                        strong 
+                            = film.ratings.kp[0] + ' Рейтинг в ' 
+                        em КП
+                    p 
+                        strong
+                            = film.ratings.imdb[0] + ' Рейтинг в '
+                            em IMDB
+        .container
+            .col-md-9
+                .description-place
+                    h2 Описание
+                    .description.
+                    = film.description
+                .trailer-place
+                .comments-place
+                    h2 Комментарии
+                    #comments
+                .comments-more-place#comments-more-place
+                    button#comments-more-btn
+                        span Показать ещё
+            .col-md-3.actors-place#actors
+                h2 Актёры
+                // actors mixins
+        .clearfix
+        .container.films
+            h2 Рекомендуемое
+            #films
+        include footer
+        script.
+            $(document).ready(function () {window.InitApp({}, "Film")})
