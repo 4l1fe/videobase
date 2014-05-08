@@ -45,7 +45,7 @@ class UsersProfileForm(forms.Form):
 
 
 class CustomRegisterForm(forms.ModelForm):
-    real_username = forms.CharField(label='Имя', max_length=128, required=False)
+    password2 = forms.CharField(widget=forms.PasswordInput, required=True)
 
     def __init__(self, **kwargs):
         super(CustomRegisterForm, self).__init__(**kwargs)
@@ -53,22 +53,18 @@ class CustomRegisterForm(forms.ModelForm):
 
     def clean(self):
         self.cleaned_data['username'] = self.cleaned_data['email']
-        return super(CustomRegisterForm, self).clean()
+        if self.cleaned_data['password'] != self.cleaned_data['password2']:
+            raise ValueError("Passwords not coincidence")
+        else:
+            return super(CustomRegisterForm, self).clean()
 
     def save(self, commit=True):
         instance = super(CustomRegisterForm, self).save(commit)
-        username = self.cleaned_data.get('real_username', None)
-        if username is not None:
-            UsersProfile.objects.create(username=username, user=instance)
         return instance
 
     class Meta:
         model = User
-        fields = ['email', 'password', 'username']
-        widgets = {
-            'password': forms.PasswordInput(),
-            'username': forms.HiddenInput(),
-        }
+        fields = ('email', 'password', 'username', )
 
 
 class UserUpdateForm(forms.Form):

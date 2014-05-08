@@ -10,7 +10,8 @@ from rest_framework.test import APITestCase
 from rest_framework.authtoken.models import Token
 
 import videobase.settings as settings
-from apps.films.tests.factories_films_api import *
+from apps.films.tests.factories_films_api import UserFactory, GenreFactory, CountriesFactory, PersonFactory, FilmFactory, ContentFactory,LocationFactory, CommentsFactory, FilmsExtrasFactory
+from apps.films.constants import APP_PERSON_PRODUCER,APP_FILM_SERIAL,APP_PERSON_DIRECTOR
 from apps.users.models.api_session import SessionToken, UsersApiSessions
 
 
