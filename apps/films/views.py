@@ -352,7 +352,17 @@ def calc_similar(o_film):
     try:
         result = film_model.Films.similar_api(o_film)
         for item in result:
-            result_list.append({'id': item.id, 'name': item.name, 'rating': item.rating_cons, 'year': item.release_date.strftime("%Y")})
+             result_list.append({
+                 'id': item.id,
+                 'name': item.name,
+                 'ratings': item.get_rating_for_vb_film,
+                 'year': item.release_date.strftime("%Y"),
+                 #TODO: надо вычислять
+                 'poster': "static/img/tmp/poster1.jpg",
+                 'relation': {'rating': 5},
+                 'instock': True,
+                 'hasFree': True,
+             })
     except Exception, e:
         pass
 
