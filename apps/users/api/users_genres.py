@@ -12,8 +12,6 @@ from apps.films.api.serializers import vbUserGenre
 
 class UsersGenresView(APIView):
 
-    permission_classes = (IsAuthenticated, )
-
     def get(self, request, user_id, format=None, *args, **kwargs):
         try:
             user = User.objects.get(pk=user_id)
