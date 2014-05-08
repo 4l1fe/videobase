@@ -84,6 +84,8 @@ class vbFilm(serializers.ModelSerializer):
         if not self.persons_sign:
             new_fields += ['persons']
 
+        request = kwargs.pop('request', False)
+
         # Instantiate the superclass normally
         super(vbFilm, self).__init__(*args, **kwargs)
 
@@ -95,7 +97,7 @@ class vbFilm(serializers.ModelSerializer):
         self._get_obj_list()
         self._rebuild_location()
         self._rebuild_poster_list()
-        self._rebuild_relation_list(kwargs.get('request', False))
+        self._rebuild_relation_list(request)
         self._rebuild_tors_list()
 
 
