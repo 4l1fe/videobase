@@ -19,7 +19,7 @@ class Command(BaseCommand):
         i = -1
         for i,location in enumerate(Locations.objects.all()):
             try:
-                val = URLValidator(verify_exists=False)
+                val = URLValidator()
                 # Validating that given url_view exists
                 val(location.url_view)
             except ValidationError , ve:
