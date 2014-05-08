@@ -63,7 +63,7 @@ class FilmsAdminForm(ModelForm):
 # Форма поиска
 class SearchForm(Form):
     text     = fields.CharField(max_length='255', required=False)
-    genre    = fields.IntegerField(min_value=1, required=False)
+    genre    = fields.IntegerField(min_value=0, required=False)
     year_old = fields.IntegerField(min_value=0, required=False)
     rating   = fields.FloatField(min_value=0, required=False)
     price    = fields.FloatField(min_value=0, required=False)
