@@ -35,10 +35,11 @@ html(lang="ru")
             .container
                 h2 Фильмография
             .container#films
-                mixin film_thumb({id: 1, name: "Самый лучший фильм лучший фильм", year: 2014, relation: {rating: 5}, rating: {cons: 5.6}, poster: "static/img/tmp/poster1.jpg", instock: true, price: 100})
-                mixin film_thumb({id: 2, name: "Самый лучший фильм", year: 2011, relation: {rating: 5}, rating: {cons: 8.6}, poster: "static/img/tmp/poster1.jpg", instock: true, hasFree: true})
-                mixin film_thumb({id: 3, name: "Самый лучший фильм", year: 2001, relation: {rating: 8}, rating: {cons: 7}, poster: "static/img/tmp/poster1.jpg", instock: false})
-                mixin film_thumb({id: 4, name: "Самый лучший фильм", year: 1970, relation: {rating: 3}, rating: {cons: 9.1}, poster: "static/img/tmp/poster1.jpg", instock: true, hasFree: true, price: 100})
+            
+                
+            
+            each item in filmography
+                mixin film_thumb(item)
             .container
                 .films-more#films_more
                     button
