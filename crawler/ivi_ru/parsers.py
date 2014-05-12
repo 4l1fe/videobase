@@ -75,3 +75,16 @@ class ParseFilmPage(BaseParse):
 
         return price, price_type
 
+    def get_value(self, **kwargs):
+        url = kwargs.get('url', None)
+        if url is None:
+            raise ValueError("Have not url to parse")
+        chanks_url = url.split('/')
+        index = chanks_url.index('watch')
+        if index == -1:
+            return ""
+        else:
+            return chanks_url[index + 1]
+
+
+

@@ -1,24 +1,24 @@
-<div id="film-thumb-NA" class="film-thumb col-md-3">
+<div data-mi-id="id" data-mi-val="NA" class="film-thumb col-md-3">
   <div class="poster-wrapper">
-    <div style="background-image: url(&quot;static/img/noposter.jpg&quot;)" class="poster-place"></div>
+    <div data-mi-id="poster" data-mi-atbg="poster" data-mi-default="static/img/noposter.jpg" style="background-image: url(&quot;static/img/noposter.jpg&quot;)" class="poster-place"></div>
   </div>
   <div class="rating-place">
-    <p class="rating">
+    <p data-mi-name="ratings.cons.0" class="rating">
     </p>
   </div>
-  <div class="name-place"><a href="#" class="name"></a><span class="year"> ()</span></div>
+  <div class="name-place"><a href="/films/NA" data-mi-athref="id" data-mi-name="name" data-mi-id="name" class="name"></a><span data-mi-id="year" data-mi-name="releasedate" class="year"> ()</span></div>
   <div class="rel-place">
-    <div data-rateit-max='10' data-rateit-resetable='0' data-rateit-value='0' class="rateit rate"></div>
-    <button class="notwatch-btn">N</button>
+    <div data-mi-id="relation.rating" data-mi-val='0' data-rateit-max='10' data-rateit-resetable='0' data-rateit-value='0' class="rateit rate"></div>
+    <button data-mi-onclick="toggle_notwatch" data-mi-id="relation.notwatch" data-mi-val='0' class="notwatch-btn">N</button>
   </div>
-  <div class="button-place">
-    <div class="instock display-none">
-      <button class="watch-btn">Смотреть<br/>Бесплатно</button>
-      <button class="playlist-btn">+</button>
-      <div class="watchprice invisible">или<br/><a href="#">от <span class="price"></span> р. без рекламы</a></div>
+  <div data-mi-id="button-place" class="button-place">
+    <div data-mi-id="instock" class="instock display-none">
+      <button data-mi-id="watch_btn" data-mi-onclick="watchfilm" class="watch-btn">Смотреть<br/>Бесплатно</button>
+      <button data-mi-id="relation.playlist" data-mi-onclick="toggle_playlist" data-mi-val='0' class="playlist-btn">+</button>
+      <div data-mi-id="watch_price" class="watchprice invisible">или<br/><a href="/films/NA" data-im-athref="id">от <span class="price" data-mi-name="price"></span> р. без рекламы</a></div>
     </div>
-    <div class="notinstock">
-      <button class="subscribe-btn">Подписаться</button>
+    <div data-mi-id="notinstock" class="notinstock">
+      <button data-mi-id="relation.subscribed" data-mi-onclick="toggle_subscribe" data-mi-val='0' class="subscribe-btn">Подписаться</button>
       <div class="watchprice">&nbsp;<br/>&nbsp;</div>
     </div>
   </div>
