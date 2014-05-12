@@ -25,6 +25,8 @@ class Migration(SchemaMigration):
         db.execute('ALTER TABLE films ALTER COLUMN rating_local_cnt SET DEFAULT 0;')
         db.execute('ALTER TABLE films ALTER COLUMN rating_sort SET DEFAULT 0;')
 
+        db.execute("UPDATE films SET rating_local = %s, rating_local_cnt = %s", [0, 0])
+
 
     def backwards(self, orm):
 
