@@ -2,15 +2,18 @@
 
 import os
 from django.db import transaction, IntegrityError
-from django.utils.unittest import skip
 from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
 from rest_framework.authtoken.models import Token
 import videobase.settings as settings
-from apps.films.tests.factories import UserFactory, GenreFactory, CountriesFactory, PersonFactory, FilmFactory, ContentFactory,LocationFactory, CommentsFactory, FilmsExtrasFactory, UsersFilmsFactory, PersonsFilmFactory
-from apps.films.constants import APP_PERSON_PRODUCER, APP_FILM_SERIAL, APP_PERSON_DIRECTOR,APP_PERSON_ACTOR, APP_USERFILM_STATUS_UNDEF, APP_USERFILM_STATUS_NOT_WATCH , APP_USERFILM_STATUS_SUBS , \
-    APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER, APP_FILM_TYPE_ADDITIONAL_MATERIAL_TRAILER,  APP_USERFILM_SUBS_TRUE, APP_USERFILM_SUBS_FALSE
+from apps.films.tests.factories import (UserFactory, GenreFactory, CountriesFactory, PersonFactory,
+                                        FilmFactory, ContentFactory,LocationFactory, CommentsFactory,
+                                        FilmsExtrasFactory, UsersFilmsFactory, PersonsFilmFactory)
+from apps.films.constants import (APP_PERSON_PRODUCER, APP_FILM_SERIAL, APP_PERSON_DIRECTOR,APP_PERSON_ACTOR,
+                                  APP_USERFILM_STATUS_UNDEF, APP_USERFILM_STATUS_NOT_WATCH, APP_USERFILM_STATUS_SUBS,
+                                  APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER, APP_FILM_TYPE_ADDITIONAL_MATERIAL_TRAILER,
+                                  APP_USERFILM_SUBS_TRUE, APP_USERFILM_SUBS_FALSE)
 from apps.users.models.api_session import SessionToken, UsersApiSessions
 from apps.films.models import UsersFilms
 from apps.contents.models import Comments
