@@ -45,11 +45,6 @@ class Command(BaseCommand):
 
     @transaction.commit_on_success
     def calc_our_ratings_for_chunk(self, offset):
-        # list_values = ['id', 'release_date', 'rating_local', 'rating_local_cnt', 'rating_imdb',
-        #                'rating_imdb_cnt', 'rating_cons', 'rating_cons_cnt', 'rating_sort', 'kinopoisk_id'
-        # ]
-        # .values(*list_values)
-
         o_film = Films.objects.order_by('id')[offset:offset + self.step_limit]
 
         for item in o_film:
@@ -87,13 +82,16 @@ class Command(BaseCommand):
         finally:
             cursor.close()
 
+        print u"Reset local rating"
+        Films.objects.update(rating_local_cnt=0, rating_local=0)
+
         print u"Update local params for films"
         self.update_local_params(o_count)
 
 
     @transaction.commit_on_success
-    def update_local_params(self, o_count):
-        for item in o_count:
+    def update_local_params(self, items):
+        for item in items:
             sum = 0
 
             # Check if not null
