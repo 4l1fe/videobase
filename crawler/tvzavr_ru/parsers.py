@@ -34,6 +34,7 @@ class ParseTvzavrFilmPage(object):
                 resp_dict['url_view'] = link
                 resp_dict['price'] = price
                 resp_dict['price_type'] = APP_CONTENTS_PRICE_TYPE_PAY
+                resp_dict['type'] = 'tvzavr'
                 resp_list.append(resp_dict)
 
         return resp_list

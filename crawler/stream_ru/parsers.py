@@ -74,3 +74,6 @@ class ParseStreamFilm(BaseParse):
             return range(1, len(seasons_li) + 1)
         else:
             return [0]
+
+    def get_type(self, **kwargs):
+        return 'streamru'

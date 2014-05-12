@@ -33,6 +33,7 @@ class ParseFilm(object):
         d['value'] = value
         d['price_type'] = 0
         d['price'] = self.get_price()
+        d['type'] = 'zoomby'
         return [d]
 
     def get_price(self):

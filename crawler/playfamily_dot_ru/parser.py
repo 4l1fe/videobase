@@ -27,6 +27,7 @@ class PlayfamilyParser(object):
                     d['price'] = data[2]
                     d['price_type'] = 0
                     d['url_view'] = data[1]
+                    d['type'] = 'playfamily'
 
                     yield d 
 
