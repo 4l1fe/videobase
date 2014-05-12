@@ -230,8 +230,8 @@ def index_view(request):
         # Form 4 films that have locations and are newest
     
         o_locs = content_model.Locations.objects.all()
-        o_film = reversed(sorted((ol.content.film for ol in o_locs),
-                        key= lambda f: f.release_date))[:4]
+        o_film = sorted((ol.content.film for ol in o_locs),
+                        key= lambda f: f.release_date)[-4:]
 
         resp_dict = vbFilm(o_film, extend=True, many=True)
 
