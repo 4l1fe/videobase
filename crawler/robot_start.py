@@ -93,7 +93,7 @@ def sane_dict(film=None):
             'quality': '',
             'subtitles': '',
             'url_source': '',
-            'value' = ''
+            'value' : ''
             }
 
 
