@@ -1,0 +1,109 @@
+<!DOCTYPE html5>
+<html lang="ru">
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Всё видео</title>
+  <link href="static/css/bootstrap.css" rel="stylesheet"/>
+  <link href="static/css/style.css" rel="stylesheet"/>
+  <link href="static/3d/rateit/rateit.css" rel="stylesheet"/>
+  <body>
+    <header>
+      <div class="header-top">
+        <div class="container">
+          <div class="col-md-3 col-sm-5 user-place">
+            <div class="avatar"><img src="static/img/tmp/user.gif" class="img-circle img-responsive"/></div>
+            <ul class="user-menu">
+              <li><a href="#">Профиль</a></li>
+              <li><a href="#">Выход</a></li>
+            </ul>
+          </div>
+          <div class="col-md-3 col-sm-7 logo">
+            <div class="md-padding md-vmiddle"><span class="md-vmiddle-helper"></span><a href="#"><img src="static/img/logo.png" alt="Всё видео"/></a></div>
+          </div>
+          <form id="frm_search" class="col-md-6 col-sm-12 search">
+            <input type="search" name="text" placeholder="Поиск по сайту" id="inp_search" class="inp-search"/>
+            <input type="submit" value="Найти" id="inp_search" class="btn-submit"/>
+          </form>
+        </div>
+      </div>
+      <div class="header-menu">
+        <div class="container">
+          <div class="col-md-8 main-menu">
+            <ul class="list-inline">
+              <li class="active">
+                <div class="films">
+                  <p><a href="#">Фильмы</a></p>
+                </div>
+              </li>
+              <li>
+                <div class="serials">
+                  <p><a href="#">Сериалы</a></p>
+                </div>
+              </li>
+              <li>
+                <div class="tv">
+                  <p><a href="#">ТВ-программы</a></p>
+                </div>
+              </li>
+              <li>
+                <div class="stream">
+                  <p><a href="#">Онлайн-трансляции</a></p>
+                </div>
+              </li>
+            </ul>
+          </div>
+          <div class="col-md-4 sub-menu">
+            <ul class="list-inline">
+              <li>
+                <div class="playlist">
+                  <p><a href="#">Плейлист</a></p>
+                </div>
+              </li>
+              <li>
+                <div class="feed">
+                  <p><a href="#">Лента</a></p>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </header>
+    <div class="content-blue-wrapper">
+      <div class="container">
+        <h2>Новинки</h2>
+      </div>
+    </div>
+    <footer>
+      <div class="container">
+        <div class="col-md-4 logo">
+          <div class="md-padding md-vmiddle"><span class="md-vmiddle-helper"></span><img src="static/img/logo-footer.png" alt="Всё видео"/></div>
+        </div>
+        <div class="col-md-4 links">
+          <ul class="list-inline">
+            <li><a href="#">Правовая информация</a></li>
+            <li><a href="#">О сервисе</a></li>
+          </ul>
+        </div>
+        <div class="col-md-4 social">
+          <ul class="list-inline">
+            <li><a href="#"><img src="static/img/social-fb.png" alt="Всё видео на Фейсбуке"/></a></li>
+            <li><a href="#"><img src="static/img/social-twitter.png" alt="Всё видео на Твиттере"/></a></li>
+            <li><a href="#"><img src="static/img/social-rss.png" alt="Всё видео RSS"/></a></li>
+            <li><a href="#"><img src="static/img/social-vk.png" alt="Всё видео во ВКонтакте"/></a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="container">
+        <div class="copyright md-col-12">&copy; Всё видео, 2014. Все права защищены</div>
+      </div>
+    </footer>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+    <script src="static/js/config.js"></script>
+    <script src="static/3d/rateit/jquery.rateit.js"></script>
+    <script src="static/js/mi.helper.js"></script>
+    <script src="static/js/mi.rest.js"></script>
+    <script src="static/js/app.js"></script>
+    <script>$(document).ready(function () {window.InitApp({}, "Registration")})</script>
+  </body>
+</html>
