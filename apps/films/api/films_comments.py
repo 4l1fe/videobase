@@ -39,7 +39,7 @@ class CommentsFilmView(APIView):
         per_page = request.DATA.get('per_page', 10)
 
         filter = {
-            'content': content.film_id,
+            'content': content.id,
         }
 
         o_comments = Comments.objects.filter(**filter)
