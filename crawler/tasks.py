@@ -60,7 +60,7 @@ def robot_launcher(*args, **kwargs):
     for robot in Robots.objects.all():
         print u'Checking robot %s' % robot.name
         print robot.last_start, timezone.now()
-        if robot.last_start + datetime.timedelta(minutes=robot.delay) < timezone.now():
+        if robot.last_start + datetime.timedelta(seconds=robot.delay) < timezone.now():
 
             if robot.name in sites_crawler:
                 launch_next_robot_try(site=robot.name)
@@ -74,7 +74,7 @@ def kinopoisk_get_id(*args, **kwargs):
     robot = Robots.objects.get(name='kinopoisk_get_id')
     print u'Checking robot %s' % robot.name
     print robot.last_start, timezone.now()
-    if robot.last_start + datetime.timedelta(minutes=robot.delay) < timezone.now():
+    if robot.last_start + datetime.timedelta(seconds=robot.delay) < timezone.now():
             launch_next_robot_try_for_kinopoisk(robot)
     else:
         print u'Skipping robot %s' % robot.name
@@ -84,7 +84,7 @@ def kinopoisk_set_paster(*args,**kwargs):
     print "Start robot for setting posters"
     robot = Robots.objects.get(name='kinopoisk_set_poster')
 
-    if robot.last_start + datetime.timedelta(minutes=robot.delay) < timezone.now():
+    if robot.last_start + datetime.timedelta(seconds=robot.delay) < timezone.now():
         film_id = update_robot_state_film_id(robot)
         poster_robot_wrapper(film_id)
 

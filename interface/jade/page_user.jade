@@ -1,84 +1,64 @@
-- header_title="Регистрация"
-html
-    include ../../interface/jade/config
-    include ../../interface/jade/head
-    include ../../interface/jade/globals
-    include ../../interface/jade/mixins
-- user_regdate = new Date(user.regdate)
-    body.user-page
-        include ../../interface/jade/header
-        .container
-            h1=user.name
-            .col-md-3.text-center
-                img.person-photo.img-responsive(src=user.avatar || conf.noavatar_big_url)
-                button.btn.btn-default#friendship_btn Добавить в друзья
-                if (user.friends && user.friends.length)
-                    h3 Друзья
-                    .friends-place#friends_place
-                        each item in user.friends
-                            mixin user_thumb(item)
-                    if (user.friends.length >= 0)
-                        .more-friends
-                            button.btn.btn-default#morefriends_btn Показать всех
-                if (user.genres && user.genres.length)
-                    h3 Любимые жанры
-                    .genres-place
-                        each item in user.genres
-                            !=item.name + " " + item.percent + "%<br/>"
-            .col-md-9
-                table.table.table-bordered
-                    tr
-                        td С нами на сайте
-                        td=user_how_long
-                    if (user.friends_cnt)
+doctype html5
+include mixins
+html(lang="ru")
+    include head
+    body.page-user
+        include header
+        .user-wrapper
+            .container
+                .col-md-3
+                    img.img-responsive.img-circle(src=user.avatar || "static/img/tmp/user.gif")
+                    .button-place
+                        button.friendship-btn#friendship_btn Добавить в друзья
+                .col-md-9
+                    h1 #{user.firstname} #{user.lastname}
+                    table
                         tr
-                            td Друзей
+                            th На сайте
+                            td=user.how_long
+                        tr
+                            th Друзей
                             td=user.friends_cnt
-                    if (user.films_watched)
                         tr
-                            td Просмотрел фильмов
+                            th Посмотрел фильмов
                             td=user.films_watched
-                    if (user.comments_cnt)
                         tr
-                            td Оставил комментариев
+                            th Оставил комментариев
                             td=user.comments_cnt
-                    if (user.genre_fav)
-                        tr
-                            td Любимый жанр
-                            td=user.genre_fav.name
-            if (films_subscribed && films_subscribed.length)
-                .clearfix
-                .container
-                    h2 Подписан на фильмы
-                    .films-subscribed#films_subscribed
-                        each item in films_subscribed
-                            mixin film_thumb(item)
-                    if (films_subscribed.length >= 0)
-                        .clearfix
-                        .more-films-subscribed#more_films_subscribed_place
-                            button.btn.btn-default#more_films_subscribed Показать ещё
-            if (actors_fav && actors_fav.length)
-                .clearfix
-                .container
-                    h2 Любимые актёры
-                    .actors-fav#actors_fav
-                        each item in actors_fav
-                            mixin person_thumb(item)
-                    if (actors_fav.length >= 0)
-                        .clearfix
-                        .more-actors-fav#more_actors_fav_place
-                            button.btn.btn-default#more_actors_fav Показать всех
-            if (directors_fav && directors_fav.length)
-                .clearfix
-                .container
-                    h2 Любимые режиссёры
-                    .directors-fav#directors_fav
-                        each item in directors_fav
-                            mixin person_thumb(item)
-                    if (directors_fav.length >= 0)
-                        .clearfix
-                        .more-directors-fav#more_directors_fav_place
-                            button.btn.btn-default#more_directors_fav Показать всех
-        include ../../interface/jade/footer
+                        if user.genre_fav
+                            tr
+                                th Любимый жанр
+                                td=user.genre_fav.name
+        .container
+            .col-md-3
+                h2 Друзья
+                h2 Любимые жанры
+            .col-md-9
+                h2 Лента активности
+        .container
+            h2 Подписан на фильмы
+            #films
+            .clearfix
+            .films-more#films_more
+                button
+                    span Мало, хочу ещё фильмов
+                .shadow
+        .clearfix
+        .container
+            h2 Любимые актёры
+            #actors
+            .films-more#actors_more
+                button
+                    span Показать всех
+                .shadow
+        .clearfix
+        .container
+            h2 Любимые режиссёры
+            #directors
+            .films-more#directors_more
+                button
+                    span Показать всех
+                .shadow
+        include footer
         script.
-            $(document).ready(function () {window.InitApp({page_conf: !{JSON.stringify(user)}}, "User")})
+            $(document).ready(function () {window.InitApp({page_conf: !{JSON.stringify(film)}}, "Film")})
