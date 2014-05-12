@@ -4,7 +4,7 @@ from django.forms import ModelForm, Form
 from django.core.exceptions import ValidationError
 from django.forms import fields
 
-from apps.films.constants import APP_FILM_PERSON_TYPES
+from apps.films.constants import APP_FILM_PERSON_TYPES_OUR
 from apps.films.models import Persons, Seasons, Films, FilmExtras
 from apps.films.constants import APP_FILM_ADMIN_CSS, APP_FILM_ADMIN_JS_LIBS, APP_FILM_SERIAL
 
@@ -63,7 +63,7 @@ class FilmsAdminForm(ModelForm):
 # Форма поиска
 class SearchForm(Form):
     text     = fields.CharField(max_length='255', required=False)
-    genre    = fields.IntegerField(min_value=1, required=False)
+    genre    = fields.IntegerField(min_value=0, required=False)
     year_old = fields.IntegerField(min_value=0, required=False)
     rating   = fields.FloatField(min_value=0, required=False)
     price    = fields.FloatField(min_value=0, required=False)
@@ -129,9 +129,9 @@ class PersonApiForm(Form):
     Форма для проверки vbPerson
     """
 
-    type  = fields.ChoiceField(required=False, choices=APP_FILM_PERSON_TYPES, help_text=u'Тип')
-    top   = fields.IntegerField(initial=0, min_value=0, help_text=u'Сортировать с')
-    limit = fields.IntegerField(initial=12, min_value=1, max_value=20, help_text=u'Ограничение')
+    type  = fields.ChoiceField(choices=APP_FILM_PERSON_TYPES_OUR, help_text=u'Тип')
+    top   = fields.IntegerField(min_value=0, help_text=u'Сортировать с')
+    limit = fields.IntegerField(min_value=1, max_value=20, help_text=u'Ограничение')
 
     def __init__(self, *args, **kwargs):
         if not kwargs['data'].get('top'):
@@ -139,5 +139,8 @@ class PersonApiForm(Form):
 
         if not kwargs['data'].get('limit'):
            kwargs['data']['limit'] = 12
+
+        if not kwargs['data'].get('type'):
+           kwargs['data']['type'] = 'all'
 
         super(PersonApiForm, self).__init__(*args, **kwargs)

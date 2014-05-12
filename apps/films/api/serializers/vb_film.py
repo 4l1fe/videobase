@@ -1,6 +1,7 @@
 # coding: utf-8
 
 import os
+from collections import defaultdict
 
 from django.db.models import Q
 from django.core.paginator import Page
@@ -13,8 +14,9 @@ from apps.contents.models import *
 from apps.films.constants import APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER,\
                                  APP_PERSON_DIRECTOR, APP_PERSON_SCRIPTWRITER
 
+from apps.contents.constants import APP_CONTENTS_PRICE_TYPE_FREE
 from utils.common import group_by
-from utils.middlewares.local_thread import get_current_request
+from utils.middlewares.local_thread import get_api_request
 
 from vb_person import vbPerson
 
@@ -28,7 +30,7 @@ class CountriesSerializer(serializers.ModelSerializer):
 
 
 #############################################################################################################
-class GentriesSerializer(serializers.ModelSerializer):
+class GenresSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Genres
@@ -59,10 +61,12 @@ class vbFilm(serializers.ModelSerializer):
     relation = serializers.SerializerMethodField('relation_list')
     releasedate = serializers.SerializerMethodField('calc_release')
     locations = serializers.SerializerMethodField('locations_list')
+    hasFree = serializers.SerializerMethodField('calc_has_free')
+    instock = serializers.SerializerMethodField('calc_instock')
 
     # Признак extend
     countries = CountriesSerializer()
-    genres = GentriesSerializer()
+    genres = GenresSerializer()
     directors = serializers.SerializerMethodField('director_list')
     scriptwriters = serializers.SerializerMethodField('scriptwriter_list')
 
@@ -73,13 +77,17 @@ class vbFilm(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):
         new_fields = []
 
+        # Get extend sign
         self.extend_sign = kwargs.pop('extend', False)
         if not self.extend_sign:
             new_fields += ['description', 'genres', 'countries', 'directors', 'scriptwriters']
 
+        # Get person sign
         self.persons_sign = kwargs.pop('persons', False)
         if not self.persons_sign:
             new_fields += ['persons']
+
+        request = kwargs.pop('request', False)
 
         # Instantiate the superclass normally
         super(vbFilm, self).__init__(*args, **kwargs)
@@ -92,9 +100,118 @@ class vbFilm(serializers.ModelSerializer):
         self._get_obj_list()
         self._rebuild_location()
         self._rebuild_poster_list()
+        self._rebuild_relation_list(request)
         self._rebuild_tors_list()
 
 
+    def calc_release(self, obj):
+        return obj.release_date
+
+
+    def calc_ratings(self, obj):
+        return obj.get_rating_for_vb_film
+
+    def calc_has_free(self,obj):
+        result = self.location_rebuild.get(obj.pk, [])
+        for loc in result:
+
+            if loc.price_type == APP_CONTENTS_PRICE_TYPE_FREE:
+                return True
+        return False
+
+    def calc_instock(self,obj):
+        result = self.location_rebuild.get(obj.pk, [])
+
+        if len(result):
+            return True
+
+        return False
+
+    def _get_obj_list(self):
+        list_pk = []
+        instance = self.object
+        if hasattr(instance, '__iter__') and not isinstance(instance, (Page, dict)):  #WARNING: Если в instance придёт dict,
+            for item in instance:                                              # такое возможно при десериализации,
+                list_pk.append(item.pk)                                        # то поломается добрая половина методов
+        else:
+            list_pk.append(instance.pk)
+
+        self.list_obj_pk = list_pk
+
+
+    # ---------------------------------------------------------------------------------------
+    def _rebuild_location(self):
+        locations = Locations.objects.filter(content__film__in=self.list_obj_pk)\
+            .order_by('content__film').select_related('content')
+            # .values('content__film', 'content', 'type', 'lang', 'quality', 'subtitles', 'price', 'price_type', 'url_view')
+
+        result = {}
+        for item in locations:
+            v = item.content.film_id
+            if not v in result:
+                result[v] = []
+            result[v].append(item)
+
+        self.location_rebuild = result
+
+
+    def locations_list(self, obj):
+        result = self.location_rebuild.get(obj.pk, [])
+        if len(result):
+            return LocationsSerializer(result, many=True).data
+
+        return result
+
+
+    # ---------------------------------------------------------------------------------------
+    def _rebuild_poster_list(self):
+        extras = FilmExtras.objects.filter(film__in=self.list_obj_pk, type=APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER)
+        extras = group_by(extras, 'film_id', True)
+
+        self.poster_rebuild = extras
+
+
+    def poster_list(self, obj):
+        result = self.poster_rebuild.get(obj.pk, '')
+
+        if len(result):
+            flag = False
+            for item in result:
+                if not item.photo is None and item.photo:
+                    result = list(os.path.splitext(item.photo.url))
+                    result[0] += settings.POSTER_URL_PREFIX
+                    result = u''.join(result)
+                    flag = True
+                    break
+
+            if not flag:
+                return ''
+
+        return result
+
+
+    # ---------------------------------------------------------------------------------------
+    def _rebuild_relation_list(self, request):
+        result = defaultdict()
+
+        if not request:
+            request = auth = get_api_request()
+        else:
+            auth = request.user and request.user.is_authenticated()
+
+        if auth:
+            o_user = UsersFilms.objects.filter(user=request.user, film__in=self.list_obj_pk)
+            for item in o_user:
+                result[item.film_id] = item.relation_for_vb_film
+
+        self.relation_rebuild = result
+
+
+    def relation_list(self, obj):
+        return self.relation_rebuild.get(obj.pk, {})
+
+
+    # ---------------------------------------------------------------------------------------
     def _rebuild_tors_list(self):
         result = {}
 
@@ -120,85 +237,6 @@ class vbFilm(serializers.ModelSerializer):
                         result[key]['scriptwriters'].append(item)
 
         self.tors_list = result
-
-
-    def calc_ratings(self, obj):
-        return {
-            'imdb': [obj.rating_imdb, obj.rating_imdb_cnt],
-            'kp': [obj.rating_kinopoisk, obj.rating_kinopoisk_cnt],
-            'cons': [obj.rating_cons, obj.rating_cons_cnt],
-        }
-
-
-    def calc_release(self, obj):
-        return obj.release_date
-
-
-    def _get_obj_list(self):
-        list_pk = []
-        instance = self.object
-        if hasattr(instance, '__iter__') and not isinstance(instance, (Page, dict)):  #WARNING: Если в instance придёт dict,
-            for item in instance:                                              # такое возможно при десериализации,
-                list_pk.append(item.pk)                                        # то поломается добрая половина методов
-        else:
-            list_pk.append(instance.pk)
-
-        self.list_obj_pk = list_pk
-
-
-    def _rebuild_location(self):
-        locations = Locations.objects.filter(content__film__in=self.list_obj_pk)\
-            .order_by('content__film').select_related('content')
-            # .values('content__film', 'content', 'type', 'lang', 'quality', 'subtitles', 'price', 'price_type', 'url_view')
-
-        result = {}
-        for item in locations:
-            v = item.content.film_id
-            if not v in result:
-                result[v] = []
-            result[v].append(item)
-
-        self.location_rebuild = result
-
-
-    def locations_list(self, obj):
-        result = self.location_rebuild.get(obj.pk, [])
-        if len(result):
-            return LocationsSerializer(result, many=True).data
-
-        return result
-
-
-    def poster_list(self, obj):
-        result = self.poster_rebuild.get(obj.pk, '')
-        if len(result):
-            for item in result:
-                if not item.photo is None and item.photo:
-                    result = list(os.path.splitext(item.photo.url))
-                    result[0] += settings.POSTER_URL_PREFIX
-                    result = u''.join(result)
-                    break
-
-        return result
-
-
-    def _rebuild_poster_list(self):
-        extras = FilmExtras.objects.filter(film__in=self.list_obj_pk, type=APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER)
-        extras = group_by(extras, 'film_id', True)
-
-        self.poster_rebuild = extras
-
-
-    def relation_list(self, obj):
-        request = get_current_request()
-        if request.user.is_authenticated():
-            return {
-                'subscribed': True,
-                'status': True,
-                'rating': True,
-            }
-
-        return {}
 
 
     def director_list(self, obj):
@@ -229,5 +267,5 @@ class vbFilm(serializers.ModelSerializer):
             'id', 'name', 'name_orig', 'releasedate', \
             'ratings', 'duration', 'locations', 'poster', 'relation', \
             'description', 'countries', 'directors', 'scriptwriters', \
-            'genres', 'persons',
+            'genres', 'persons','hasFree','instock'
         ]
