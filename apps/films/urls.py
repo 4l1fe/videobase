@@ -12,7 +12,7 @@ v1_api_patterns = patterns('',
     # Films API
     url(r'^v1/films/search$', SearchFilmsView.as_view(), name='film_search_view'),
     url(r'^v1/films/(?P<film_id>\d+)$', DetailFilmView.as_view(), name='film_details_view'),
-    url(r'^v1/films/(?P<film_id>\d+)/persons$', PersonsFilmView.as_view(), name='film_persons_view'),
+    url(r'^v1/films/(?P<film_id>\d+)/persons', PersonsFilmView.as_view(), name='film_persons_view'),
     url(r'^v1/films/(?P<film_id>\d+)/locations$', LocationsFilmView.as_view(), name='film_locations_view'),
     url(r'^v1/films/(?P<film_id>\d+)/similar$', SimilarFilmView.as_view(), name='film_similar_view'),
     url(r'^v1/films/(?P<film_id>\d+)/extras$', ExtrasFilmView.as_view(), name='film_extras_view'),
