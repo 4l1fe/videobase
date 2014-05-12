@@ -8,16 +8,31 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding field 'Persons.birthdate'
-        db.add_column('persons', 'birthdate',
-                      self.gf('django.db.models.fields.DateField')(null=True, blank=True),
-                      keep_default=False)
+
+        # Changing field 'Films.rating_cons'
+        db.alter_column('films', 'rating_cons', self.gf('django.db.models.fields.SmallIntegerField')(default=0, null=True))
+
+        # Changing field 'Films.rating_cons_cnt'
+        db.alter_column('films', 'rating_cons_cnt', self.gf('django.db.models.fields.IntegerField')(default=0, null=True))
+
+        db.execute('ALTER TABLE films ALTER COLUMN rating_cons SET DEFAULT 0;')
+        db.execute('ALTER TABLE films ALTER COLUMN rating_cons_cnt SET DEFAULT 0;')
+        db.execute('ALTER TABLE films ALTER COLUMN rating_imdb SET DEFAULT 0;')
+        db.execute('ALTER TABLE films ALTER COLUMN rating_imdb_cnt SET DEFAULT 0;')
+        db.execute('ALTER TABLE films ALTER COLUMN rating_kinopoisk SET DEFAULT 0;')
+        db.execute('ALTER TABLE films ALTER COLUMN rating_kinopoisk_cnt SET DEFAULT 0;')
+        db.execute('ALTER TABLE films ALTER COLUMN rating_local SET DEFAULT 0;')
+        db.execute('ALTER TABLE films ALTER COLUMN rating_local_cnt SET DEFAULT 0;')
+        db.execute('ALTER TABLE films ALTER COLUMN rating_sort SET DEFAULT 0;')
 
 
     def backwards(self, orm):
-        # Deleting field 'Persons.birthdate'
-        db.delete_column('persons', 'birthdate')
 
+        # Changing field 'Films.rating_cons'
+        db.alter_column('films', 'rating_cons', self.gf('django.db.models.fields.FloatField')(null=True))
+
+        # Changing field 'Films.rating_cons_cnt'
+        db.alter_column('films', 'rating_cons_cnt', self.gf('django.db.models.fields.FloatField')(null=True))
 
     models = {
         u'auth.group': {
@@ -96,15 +111,15 @@ class Migration(SchemaMigration):
             'name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'name_orig': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '255', 'blank': 'True'}),
             'persons': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'persons'", 'symmetrical': 'False', 'through': "orm['films.PersonsFilms']", 'to': "orm['films.Persons']"}),
-            'rating_cons': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
-            'rating_cons_cnt': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
-            'rating_imdb': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
-            'rating_imdb_cnt': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'rating_cons': ('django.db.models.fields.SmallIntegerField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
+            'rating_cons_cnt': ('django.db.models.fields.IntegerField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
+            'rating_imdb': ('django.db.models.fields.FloatField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
+            'rating_imdb_cnt': ('django.db.models.fields.IntegerField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
             'rating_kinopoisk': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
             'rating_kinopoisk_cnt': ('django.db.models.fields.PositiveSmallIntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'rating_local': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
-            'rating_local_cnt': ('django.db.models.fields.PositiveSmallIntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'rating_sort': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'rating_local': ('django.db.models.fields.FloatField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
+            'rating_local_cnt': ('django.db.models.fields.PositiveSmallIntegerField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
+            'rating_sort': ('django.db.models.fields.IntegerField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
             'release_date': ('django.db.models.fields.DateField', [], {}),
             'seasons_cnt': ('django.db.models.fields.PositiveSmallIntegerField', [], {'null': 'True', 'blank': 'True'}),
             'type': ('django.db.models.fields.CharField', [], {'max_length': '255'})
