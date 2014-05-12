@@ -305,6 +305,8 @@ def calc_similar(o_film):
 
     try:
         result = film_model.Films.similar_api(o_film)
+        
+
         for item in result:
              result_list.append({
                  'id': item.id,
@@ -320,7 +322,7 @@ def calc_similar(o_film):
     except Exception, e:
         pass
 
-    return result_list
+    return vbFilm(result).data
 
 
 def calc_comments(o_film):
