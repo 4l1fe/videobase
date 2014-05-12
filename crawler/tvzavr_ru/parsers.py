@@ -31,7 +31,6 @@ class ParseTvzavrFilmPage(object):
             for season in seasons:
                 resp_dict = dict_gen(film)
                 resp_dict['number'] = season
-                resp_dict['value'] = link
                 resp_dict['url_view'] = link
                 resp_dict['price'] = price
                 resp_dict['price_type'] = APP_CONTENTS_PRICE_TYPE_PAY
