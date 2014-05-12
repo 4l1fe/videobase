@@ -53,11 +53,15 @@ class ParseTvigleFilm(object):
         link = url
         price = self.get_price()
         seasons = self.get_seasons()
+        try:
+            value = url.split('video=')[1]
+        except:
+            value = ''
         if seasons:
             for season in seasons:
                 resp_dict = dict_gen(film)
                 resp_dict['number'] = season
-                resp_dict['value'] = link
+                resp_dict['value'] = value
                 resp_dict['url_view'] = link
                 resp_dict['price'] = price
                 resp_list.append(resp_dict)
