@@ -2,17 +2,22 @@
 
 import os
 from django.db import transaction, IntegrityError
-from django.utils.unittest import skip
 from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
 from rest_framework.authtoken.models import Token
 import videobase.settings as settings
-from apps.films.tests.factories_films_api import UserFactory, GenreFactory, CountriesFactory, PersonFactory, FilmFactory, ContentFactory,LocationFactory, CommentsFactory, FilmsExtrasFactory, UsersFilmsFactory, PersonsFilmFactory
-from apps.films.constants import APP_PERSON_PRODUCER,APP_FILM_SERIAL,APP_PERSON_DIRECTOR,APP_PERSON_ACTOR, APP_USERFILM_STATUS_UNDEF, APP_USERFILM_STATUS_NOT_WATCH , APP_USERFILM_STATUS_SUBS , APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER, APP_FILM_TYPE_ADDITIONAL_MATERIAL_TRAILER
+from apps.films.tests.factories import (UserFactory, GenreFactory, CountriesFactory, PersonFactory,
+                                        FilmFactory, ContentFactory,LocationFactory, CommentsFactory,
+                                        FilmsExtrasFactory, UsersFilmsFactory, PersonsFilmFactory)
+from apps.films.constants import (APP_PERSON_PRODUCER, APP_FILM_SERIAL, APP_PERSON_DIRECTOR,APP_PERSON_ACTOR,
+                                  APP_USERFILM_STATUS_UNDEF, APP_USERFILM_STATUS_NOT_WATCH, APP_USERFILM_STATUS_SUBS,
+                                  APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER, APP_FILM_TYPE_ADDITIONAL_MATERIAL_TRAILER,
+                                  APP_USERFILM_SUBS_TRUE, APP_USERFILM_SUBS_FALSE)
 from apps.users.models.api_session import SessionToken, UsersApiSessions
 from apps.films.models import UsersFilms
 from apps.contents.models import Comments
+
 
 class FilmsTest(APITestCase):
     def setUp(self):
@@ -65,11 +70,8 @@ class FilmsTest(APITestCase):
         self.headers = "%s %s" % ('X-VB-Token', s_token.key)
 
     def locations_assert(self, response_locations, locations):
-        if len(response_locations) != len(locations):
-            self.assertTrue(False)
-
+        self.assertEqual(len(response_locations), len(locations))
         for i in range(len(response_locations)):
-            self.assertEqual(response_locations[i]['id'], locations[i].id)
             self.assertEqual(response_locations[i]['type'], locations[i].type)
             self.assertEqual(response_locations[i]['lang'], locations[i].lang)
             self.assertEqual(response_locations[i]['quality'], locations[i].quality)
@@ -82,8 +84,6 @@ class FilmsTest(APITestCase):
         extras_photo_url = list(os.path.splitext(extras.photo.url))
         extras_photo_url[0] += settings.POSTER_URL_PREFIX
         extras_photo_url = u''.join(extras_photo_url)
-
-
         self.assertEqual(response_data['poster'], extras_photo_url)
         self.assertEqual(response_data['id'], film.id)
         self.assertEqual(response_data['name'], film.name)
@@ -118,8 +118,7 @@ class FilmsTest(APITestCase):
         self.assertEqual(response_data['description'], extras.description)
 
     def extras_iter_assert(self, response_data, extras):
-        if len(response_data) != len(extras):
-            self.assertTrue(False)
+        self.assertEqual(len(response_data), len(extras))
 
         for i in range(len(response_data)):
             self.extras_assert(response_data[i], extras[i])
@@ -151,7 +150,6 @@ class FilmsTest(APITestCase):
         response = self.client.post(reverse('film_details_view', kwargs={'film_id': film.id, 'format': 'json'}), data={})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    @skip('пропущен до исправления')
     def test_api_detail_all_data_post(self):
         film = self.films[0]
         locations = []
@@ -171,27 +169,23 @@ class FilmsTest(APITestCase):
                 break
 
         response = self.client.post(reverse('film_details_view', kwargs={'film_id': film.id, 'format': 'json'}), data={'extend': True, 'persons': True})
-        if len(response.data['countries']) != len(film.countries.all().values('id', 'name')):
-            self.assertTrue(False)
-        if len(response.data['genres']) != len(film.genres.all().values('id', 'name')):
-            self.assertTrue(False)
-        if len(response.data['persons']) != len(film.persons.all().values('id', 'name', 'photo')):
-            self.assertTrue(False)
-        if len(response.data['directors']) != len(directors):
-            self.assertTrue(False)
+        self.assertEqual(len(response.data['countries']), len(film.countries.all().values('id', 'name')))
+        self.assertEqual(len(response.data['genres']), len(film.genres.all().values('id', 'name')))
+        self.assertEqual(len(response.data['persons']), len(film.persons.all().values('id', 'name', 'photo')))
+        self.assertEqual(len(response.data['directors']), len(directors))
         for i in range(len(response.data['countries'])):
             self.assertEqual(response.data['countries'][i], film.countries.all().values('id', 'name')[i])
         for i in range(len(response.data['genres'])):
             self.assertEqual(response.data['genres'][i], film.genres.all().values('id', 'name')[i])
         for i in range(len(response.data['persons'])):
-            p = film.persons.all().values('id', 'name', 'photo', 'city__name', 'city__country__name')[i]
+            p = film.persons.all().values('id', 'name', 'photo', 'city__name', 'city__country__name', 'birthdate')[i]
             if p['city__name'] is None and p['city__country__name'] is None:
                 birthplace = []
             else:
                 birthplace = [p['city__name'], p['city__country__name']]
             p.update({'birthplace': birthplace})
             del p['city__name'], p['city__country__name']
-            self.assertEqual(response.data['persons'][i], p)
+            self.assertDictEqual(response.data['persons'][i], p)
         for i in range(len(response.data['directors'])):
             self.assertEqual(response.data['directors'][i], directors[i])
         self.locations_assert(response.data['locations'], locations)
@@ -220,13 +214,9 @@ class FilmsTest(APITestCase):
             reverse('film_details_view', kwargs={'film_id': film.id, 'format': 'json'}),
             data={'extend': True, 'persons': False}
         )
-        if len(response.data['directors']) != len(directors):
-            self.assertTrue(False)
-        if len(response.data['countries']) != len(film.countries.all().values('id', 'name')):
-            self.assertTrue(False)
-
-        if len(response.data['genres']) != len(film.genres.all().values('id', 'name')):
-            self.assertTrue(False)
+        self.assertEqual(len(response.data['directors']), len(directors))
+        self.assertEqual(len(response.data['countries']), len(film.countries.all().values('id', 'name')))
+        self.assertEqual(len(response.data['genres']), len(film.genres.all().values('id', 'name')))
 
         for i in range(len(response.data['countries'])):
             self.assertEqual(response.data['countries'][i], film.countries.all().values('id', 'name')[i])
@@ -540,8 +530,7 @@ class FilmsTest(APITestCase):
                 extras = ext
                 break
         response = self.client.get(reverse('film_similar_view', kwargs={'film_id': film.id, 'format': 'json'}))
-        if len(response.data) != 1:
-            self.assertTrue(False)
+        self.assertEqual(len(response.data), 1)
         for film in response.data:
             self.locations_assert(film['locations'], locations)
             self.not_extend_assert(film, sim_film, extras)
@@ -618,7 +607,6 @@ class FilmsTest(APITestCase):
         response = self.client.post(reverse('film_comments_view', kwargs={'film_id': 0, 'format': 'json'}))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    @skip('пропущен до исправления')
     def test_api_comment_default_param(self):
         film = self.films[0]
         comments = []
@@ -628,12 +616,10 @@ class FilmsTest(APITestCase):
 
         data = {'page': 1, 'per_page': 10}
         response = self.client.post(reverse('film_comments_view', kwargs={'film_id': film.id, 'format': 'json'}))
-        if len(comments) is not len(response.data['items']):
-            self.assertTrue(False)
+        self.assertEqual(len(comments), len(response.data['items']))
 
         self.comment_assert(response.data, comments, film, 0, data, self.user)
 
-    @skip('пропущен до исправления')
     def test_api_comment_with_param(self):
         comments = []
         film = self.films[0]
@@ -665,8 +651,7 @@ class FilmsTest(APITestCase):
         for persf in self.pfilms:
             if film.id == persf.film_id:
                 persons.append(persf.person)
-        if len(persons) != len(response.data):
-            self.assertTrue(False)
+        self.assertEqual(len(persons), len(response.data))
         for i in range(len(response.data)):
             self.assertEqual(response.data[i]['id'], persons[i].id)
             self.assertEqual(response.data[i]['name'], persons[i].name)
