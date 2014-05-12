@@ -13,7 +13,7 @@ from apps.users import UsersApiSessions
 from apps.users.models.api_session import SessionToken
 
 
-class PersonsTest(APITestCase):
+class PersonsTestCase(APITestCase):
     def setUp(self):
         self.person_filmography = PersonsFilmFactory.create()
         self.persons_extras = PersonsExtrasFactory.create()
