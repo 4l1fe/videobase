@@ -245,11 +245,11 @@ if not DEBUG:
 CELERYBEAT_SCHEDULE = {
     'robot-launch': {
         'task': 'robot_launch',
-        'schedule': timedelta(minutes=5),
+        'schedule': timedelta(minutes=1),
     },
     'kinopoisk-get_id': {
         'task': 'kinopoisk_get_id',
-        'schedule': timedelta(minutes=5),
+        'schedule': timedelta(minutes=1),
     },
     'kinopoisk-set_poster': {
         'task': 'kinopoisk_set_poster',
