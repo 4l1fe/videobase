@@ -23,10 +23,14 @@ class ParseFilm(object):
     def parse(self, response, dict_gen, film, url):
         d = dict_gen(film)
         response = requests.get(url)
-        soup = BeautifulSoup(response.content)
-        tag = soup.find('meta', attrs={'property': 'og:video'})
+        try:
+            soup = BeautifulSoup(response.content)
+            tag = soup.find('meta', attrs={'property': 'og:video'})
+            value = tag.get('content').replace(self.parse_value, '')
+        except:
+            value = ''
         d['url_view'] = url
-        d['value'] = tag.get('content').replace(self.parse_value, '')
+        d['value'] = value
         d['price_type'] = 0
         d['price'] = self.get_price()
         return [d]
