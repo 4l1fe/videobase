@@ -5,8 +5,9 @@ from django.core.urlresolvers import reverse
 from rest_framework.authtoken.models import Token
 from rest_framework import status
 from rest_framework.test import APITestCase
+from apps.films.models import UsersPersons
 
-from apps.films.tests.factories import *
+from apps.films.tests.factories import PersonsFilmFactory, PersonsExtrasFactory, UserFactory
 from apps.films.api.serializers import vbPerson
 from apps.users import UsersApiSessions
 from apps.users.models.api_session import SessionToken
@@ -14,7 +15,7 @@ from apps.users.models.api_session import SessionToken
 
 class PersonsTest(APITestCase):
     def setUp(self):
-        self.person_filmography = PersonsFilmography.create()
+        self.person_filmography = PersonsFilmFactory.create()
         self.persons_extras = PersonsExtrasFactory.create()
         self.user = UserFactory.create()
         Token.objects.get(user=self.user)
