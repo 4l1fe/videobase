@@ -79,3 +79,6 @@ class ParseNowFilmPage(BaseParse):
             return range(1, len(seasons)+1)
         else:
             return [0]
+
+    def get_type(self, **kwargs):
+        return 'nowru'
