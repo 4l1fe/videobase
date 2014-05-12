@@ -9,21 +9,26 @@ from PIL import Image, ImageEnhance
 
 from django.core.files import File
 from django.core.paginator import Paginator
+from django.core.cache import cache
+from django.core.context_processors import csrf
+
 from django.template import Context
 from django.http import HttpResponse, Http404
-from django.core.context_processors import csrf
 from django.shortcuts import render_to_response
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
+
 import apps.films.models as film_model
 from apps.films.api.serializers import vbFilm, vbComment, vbPerson
 from apps.films.api.serializers.vb_film import GenresSerializer
 import apps.contents.models as content_model
-
+from django.core.serializers.json import DjangoJSONEncoder
 from utils.noderender import render_page
+
+import json
 
 # Do not remove there is something going on when importing, probably models registering itselves
 # import apps.films.models
@@ -217,14 +222,34 @@ def transform_vbFilms(vbf):
 def index_view(request):
     # ... view code here
 
-    o_film = film_model.Films.objects.order_by('-release_date').all()[:4]
+    NEW_FILMS_CACHE_KEY = "new_films"
+    resp_dict_serialized = cache.get(NEW_FILMS_CACHE_KEY)
 
-    resp_dict = vbFilm(o_film, extend=True, many=True)
-    data = resp_dict.data
+    if resp_dict_serialized is None:
+        encoder = DjangoJSONEncoder
+        # Form 4 films that have locations and are newest
+    
+        o_locs = content_model.Locations.objects.all()
+        o_film = sorted((ol.content.film for ol in o_locs),
+                        key= lambda f: f.release_date)[:4]
+
+        resp_dict = vbFilm(o_film, extend=True, many=True)
+
+        resp_dict_data = resp_dict.data
+        resp_dict_serialized = json.dumps(resp_dict.data,cls = encoder)
+        
+        cache.set(NEW_FILMS_CACHE_KEY,resp_dict_serialized,9000)
+
+    else:
+
+        resp_dict_data=json.loads(resp_dict_serialized)
+        
+
+    
 
     o_genres = GenresSerializer(film_model.Genres.objects.all(), many=True)
 
-    print "fds", o_genres.data
+    
     
     genres = [{'id': g['id'],'name': g['name']} for g in o_genres.data]
 
@@ -232,14 +257,14 @@ def index_view(request):
     
     #try:
 
-    resp_data = [transform_vbFilms(vbf) for vbf in data]
+    #resp_data = [transform_vbFilms(vbf) for vbf in data]
     #except:
     #    raise Http404
     
     
 
     
-    return HttpResponse(render_page('index', {'new_films': resp_data, 'genres':o_genres.data}), status.HTTP_200_OK)
+    return HttpResponse(render_page('index', {'new_films': resp_dict_data, 'genres':o_genres.data}), status.HTTP_200_OK)
 
 
 def person_view(request, resource_id):
