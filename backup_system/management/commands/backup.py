@@ -28,11 +28,15 @@ class Command(BaseCommand):
         if settings_module is None:
             settings_module = 'videobase.settings'
         settings = __import__(settings_module).settings
-        path = settings.BACKUP_PATH
-        db_name = settings.DATABASES['default']['NAME']
-        db_user = settings.DATABASES['default']['USER']
-        db_host = settings.DATABASES['default']['HOST']
-        db_port = settings.DATABASES['default']['PORT']
+        try:
+            path = settings.BACKUP_PATH
+            db_name = settings.DATABASES['default']['NAME']
+            db_user = settings.DATABASES['default']['USER']
+            db_host = settings.DATABASES['default']['HOST']
+            db_port = settings.DATABASES['default']['PORT']
+        except Exception as e:
+            logger.error("End: Backup DATABASE with error: {0}".format(e))
+            return None
         try:
             os.makedirs(path)
         except os.error:

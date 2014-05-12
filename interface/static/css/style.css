@@ -8,6 +8,16 @@ a, a:hover {text-decoration: none}
 /* main styles */
 body {background: url("../img/common-bg.jpg") repeat}
 
+.button-place {width: 210px; margin: 0 auto 0 auto; height: 120px}
+.button-place button {border: 0; font-size: 16px; float:left; height: 50px; padding: 0}
+.button-place button.watch-btn {width: 160px; background: url("../img/film-btn.png") no-repeat 0 0; color: #282828; text-transform: uppercase; font-weight: bold}
+.button-priced button.watch-btn {background: url("../img/film-btn-priced.png") no-repeat 0 0;}
+.button-place button.watch-btn span {color: #474747; font-size: 12px; text-transform: none; font-weight: normal}
+.button-place button.playlist-btn {background: url("../img/film-btn.png") no-repeat -160px 0; width: 48px; color: #594500;}
+.button-priced button.playlist-btn {background: url("../img/film-btn-priced.png") no-repeat -160px 0;}
+.button-place button.subscribe-btn {width: 210px; background: url("../img/film-subscribe-btn.png") no-repeat 0 0; color: #282828; text-transform: uppercase; font-weight: bold}
+
+
 .film-thumb {text-align: center;}
 .film-thumb .poster-wrapper {padding-bottom: 10px; background: url("../img/film-new-poster-bg.png") no-repeat 50% 0; margin: 0 auto 0 auto}
 .film-thumb .poster-wrapper .poster-place {width: 260px; height: 360px; background-position: 50% 50%; background-repeat: no-repeat; margin: auto}
@@ -18,16 +28,13 @@ body {background: url("../img/common-bg.jpg") repeat}
 .film-thumb .name-place a {color: #4868cd; font-weight: bold; border-bottom: 1px solid #4868cd}
 .film-thumb .name-place span {color: #7e7f7f}
 .film-thumb .rel-place {margin: 10px auto 10px auto; height: 20px; width: 210px}
-.film-thumb .button-place {width: 210px; margin: 0 auto 0 auto; height: 120px}
-.film-thumb .button-place button {border: 0; font-size: 16px; float:left; height: 50px; padding: 0}
-.film-thumb .button-place button.watch-btn {width: 160px; background: url("../img/film-btn.png") no-repeat 0 0; color: #282828; text-transform: uppercase; font-weight: bold}
-.film-thumb .button-priced button.watch-btn {background: url("../img/film-btn-priced.png") no-repeat 0 0;}
-.film-thumb .button-place button.watch-btn span {color: #474747; font-size: 12px; text-transform: none; font-weight: normal}
-.film-thumb .button-place button.playlist-btn {background: url("../img/film-btn.png") no-repeat -160px 0; width: 48px; color: #594500;}
-.film-thumb .button-priced button.playlist-btn {background: url("../img/film-btn-priced.png") no-repeat -160px 0;}
-.film-thumb .button-place button.subscribe-btn {width: 210px; background: url("../img/film-subscribe-btn.png") no-repeat 0 0; color: #282828; text-transform: uppercase; font-weight: bold}
 .film-thumb .watchprice {color: #757575}
 .film-thumb .watchprice a {color: #4868cd; border-bottom: 1px solid #4868cd}
+
+.location-thumb {float: left; margin-right: 20px}
+.location-thumb .btn-place {float: left; }
+.location-thumb button {width: 60px; height: 40px}
+.location-thumb .info-place {margin-left: 70px; color: #fff}
 
 .person-thumb {min-height: 65px;}
 .person-thumb .photo {width: 60px; height: 60px; text-align: center; float: left}
@@ -95,13 +102,16 @@ footer .copyright {color: #7a7a7a; margin-bottom: 20px}
 /* index page */
 h2 {font-size: 20px; text-transform: uppercase; text-align: center; margin: 40px 0 20px 0; font-weight: bold; background-position: 50% 50%; background-repeat: no-repeat}
 
-.page-index .films-wrapper h2 {color: #282828; background-image: url("../img/films-h-bg.png")}
-.page-index .filter-place, .films-more {width: 100%; height: 60px; }
-.page-index .filter-place .shadow, .films-more .shadow {height: 10px; background: url("../img/shadow.png") repeat-x 0 100%; margin: 0 5px 0 5px; border-radius: 0 0 40px 40px}
-.page-index .films-more {text-align: center; margin-bottom: 20px}
-.page-index .films-more button {border: 0; color: #5b78d0; text-transform: uppercase; font-weight: bold; font-size: 20px; background: url("../img/more-bg.png") repeat-x; border-radius: 5px; width: 100%; height: 50px}
-.page-index .films-more button span {border-bottom: 1px dashed #5b78d0}
-.page-index .films-wrapper .films {margin-top: 30px}
+.films-wrapper h2 {color: #282828; background-image: url("../img/films-h-bg.png")}
+.films-wrapper .films-more .shadow {width: 100%; height: 60px; }
+.films-wrapper .films-more {text-align: center; margin-bottom: 20px}
+.films-wrapper .films-more button {border: 0; color: #5b78d0; text-transform: uppercase; font-weight: bold; font-size: 20px; background: url("../img/more-bg.png") repeat-x; border-radius: 5px; width: 100%; height: 50px}
+.films-wrapper .films-more button span {border-bottom: 1px dashed #5b78d0}
+.films-wrapper .films {margin-top: 30px}
+
+.nav-wrapper {padding: 20px 0 20px 0; background: #7a7a7a}
+
+.page-index .filter-place .shadow {height: 10px; background: url("../img/shadow.png") repeat-x 0 100%; margin: 0 5px 0 5px; border-radius: 0 0 40px 40px}
 .page-index .filter {background: url("../img/more-bg.png") repeat-x; border-radius: 5px; height: 50px; margin: 0; padding: 0 15px 0 15px}
 .page-index .select-wrapper select {background: transparent; font-size: 16px; border: 0; border-bottom: 1px dashed #4868cd; color: #4868cd; -webkit-appearance: none; margin-right: 10px; font-weight: bold; }
 .page-index .select-wrapper {background: url("../img/dropdown.png") right 50% no-repeat;  display: inline-block;}
@@ -129,12 +139,10 @@ h2 {font-size: 20px; text-transform: uppercase; text-align: center; margin: 40px
 .page-reglog form input[type="submit"] {color: #fff; background-color: #F2C203; max-width: 230px; text-transform: uppercase; padding: 15px; font-weight: bold}
 
 /* film page */
-.page-film .films-wrapper {background: #282828; padding: 20px 0 20px 0; margin-bottom: 40px}
-.page-film .films-wrapper h1 {color: #fff; font-size: 24px}
-.page-film .films-wrapper h1 em {display: block; color: #C8C8C8; font-size: 20px; font-style: normal}
-.page-film .films-wrapper .player-place {text-align: center;}
-.page-film .films-wrapper .player-place .player {}
-
+.page-film .film-wrapper {background: #282828; padding: 20px 0 20px 0; margin-bottom: 40px}
+.page-film .film-wrapper h1 {color: #fff; font-size: 24px}
+.page-film .film-wrapper h1 em {display: block; color: #C8C8C8; font-size: 20px; font-style: normal}
+.page-film .film-wrapper .player-place {text-align: center;}
 .page-film .film-info table {margin: 0 20px 0 20px; font-size: 16px}
 
 .page-film .film-info table th {color: #C8C8C8; font-weight: normal; padding-right: 40px; padding-bottom: 10px}
@@ -146,3 +154,11 @@ h2 {font-size: 20px; text-transform: uppercase; text-align: center; margin: 40px
 .page-film .film-info .rating-cons-cnt {background: yellow; height: 70px;}
 .page-film .film-info .rating-cons-cnt p {padding-top: 40px;}
 .page-film .film-info .rating-all {margin-top: 40px; background: yellow; padding: 10px 0 20px 0}
+
+.page-person .person-wrapper {background: url("../img/new-bg.jpg") repeat; padding: 20px 0 20px 0}
+.page-person .person-wrapper .button-place {margin-top: 30px}
+.page-person .person-wrapper h1 {color: #fff; font-size: 24px; margin-top: 0;}
+.page-person .person-wrapper h1 em {display: block; color: #C8C8C8; font-size: 20px; font-style: normal}
+.page-person .person-wrapper .bio {color: #fff}
+.page-person .person-wrapper table th {color: #F2C203; font-weight: normal; padding-right: 40px; padding-bottom: 10px}
+.page-person .person-wrapper table td {color: #fff; padding-bottom: 10px}

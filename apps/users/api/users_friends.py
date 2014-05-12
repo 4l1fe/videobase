@@ -14,8 +14,6 @@ from apps.users.constants import APP_USERS_API_DEFAULT_PAGE, APP_USERS_API_DEFAU
 
 class UsersFriendsView(APIView):
 
-    permission_classes = (IsAuthenticated, )
-
     def post(self, request, user_id, format=None, *args, **kwargs):
         try:
             user = User.objects.get(pk=user_id)

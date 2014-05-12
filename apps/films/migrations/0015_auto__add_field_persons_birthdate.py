@@ -104,6 +104,7 @@ class Migration(SchemaMigration):
             'rating_kinopoisk_cnt': ('django.db.models.fields.PositiveSmallIntegerField', [], {'null': 'True', 'blank': 'True'}),
             'rating_local': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
             'rating_local_cnt': ('django.db.models.fields.PositiveSmallIntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'rating_sort': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'release_date': ('django.db.models.fields.DateField', [], {}),
             'seasons_cnt': ('django.db.models.fields.PositiveSmallIntegerField', [], {'null': 'True', 'blank': 'True'}),
             'type': ('django.db.models.fields.CharField', [], {'max_length': '255'})

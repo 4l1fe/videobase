@@ -7,6 +7,7 @@ from rest_framework import status
 from apps.films.models import PersonsFilms, Persons
 from apps.films.forms import PersonApiForm
 from apps.films.api.serializers import vbPerson
+from apps.films.constants import APP_FILM_PERSON_TYPES_OUR
 
 
 #############################################################################################################
@@ -24,8 +25,8 @@ class PersonsFilmView(APIView):
             'film': film_id,
         }
 
-        if not cleaned_data['type'] is None and cleaned_data['type']:
-            filter.update({'p_type': cleaned_data['type']})
+        if cleaned_data['type'] and cleaned_data['type'] != 'all':
+            filter.update({'p_type__in': dict(APP_FILM_PERSON_TYPES_OUR)[cleaned_data['type']]})
 
         result = PersonsFilms.objects.filter(**filter).\
                      values_list('person', flat=True)
