@@ -60,6 +60,7 @@ class ParseTvigleFilm(object):
         if seasons:
             for season in seasons:
                 resp_dict = dict_gen(film)
+                resp_dict['type'] = 'tvigle'
                 resp_dict['number'] = season
                 resp_dict['value'] = value
                 resp_dict['url_view'] = link
