@@ -233,9 +233,9 @@ def index_view(request):
 
     data = {
         'new_films': resp_dict_data,
-        'genres': o_genres.data,
+        'genres': [{'id':genre['id'],'name':genre['name'],'order':i} for i,genre in enumerate(sorted(o_genres.data, key = lambda g: g['name']))],
     }
-
+    
     return HttpResponse(render_page('index', data), status.HTTP_200_OK)
 
 
