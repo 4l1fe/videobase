@@ -7,7 +7,7 @@ from crawler.amediateka_ru.loader import  *
 
 class Command(NoArgsCommand):
     def handle_noargs(self, **options):
-        mosfilm_load = MosfilmRobot(3777)
-        mosfilm_load.get_data()
+        am_load = Amediateka_robot()
+        am_load.get_data()
 
 
