@@ -29,7 +29,7 @@ class Films(models.Model):
     imdb_id          = models.IntegerField(null=True, blank=True, verbose_name=u'Порядковый номер на IMDB')
     rating_imdb      = models.FloatField(null=True, blank=True, default=0, verbose_name=u'Рейтинг фильма на сайте imdb.com')
     rating_imdb_cnt  = models.IntegerField(null=True, blank=True, default=0, verbose_name=u'Количество пользователей imdb.com оценивших этот фильм')
-    rating_cons      = models.SmallIntegerField(null=True, blank=True, default=0, verbose_name=u'Консолидированный рейтинг')
+    rating_cons      = models.FloatField(null=True, blank=True, default=0, verbose_name=u'Консолидированный рейтинг')
     rating_cons_cnt  = models.IntegerField(null=True, blank=True, default=0, verbose_name=u'Количество голосов консолидированного рейтинга')
     rating_sort      = models.IntegerField(null=True, blank=True, default=0, verbose_name=u'Условный рейтинг для сортировки')
     kinopoisk_id     = models.IntegerField(null=True, blank=True, verbose_name=u'Порядковый номер на кинопоиске')
