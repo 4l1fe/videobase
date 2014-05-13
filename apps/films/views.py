@@ -263,8 +263,14 @@ def test_view(request):
 
 def calc_actors(o_film):
     result_list = []
+    filter = {
+        'filter': {'person_film_rel__film': o_film.pk},
+        'offset': 0,
+        'limit': 5,
+    }
+
     try:
-        result_list = list(film_model.Persons.objects.filter(person_film_rel__film=o_film.pk).order_by('name').values('id', 'name')[:5])
+        result_list = list(film_model.Persons.get_sorted_persons_by_name(**filter).values('id', 'name'))
     except Exception, e:
         pass
 
