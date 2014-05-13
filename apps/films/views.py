@@ -3,7 +3,8 @@
 import re
 import os
 import warnings
-
+from datetime import date, timedelta
+from random import randrange
 from cStringIO import StringIO
 from PIL import Image, ImageEnhance
 
@@ -246,12 +247,22 @@ def person_view(request, resource_id):
         raise Http404
 
     vbp = vbPerson(person, extend=True)
-    pfs = film_model.PersonsFilms.objects.filter(person=person)
-    page = Paginator(pfs, 12).page(1)
-    pfs = page.object_list
-    vbFilms = vbFilm([pf.film for pf in pfs], many=True)
+    crutch = vbp.data  # костыль, до починки парсинга этих данных роботом.
+    if not vbp.data['birthdate']:
+        d1 = date(1960, 1, 1)
+        d2 = date(1980, 12, 12)
+        delta = d2 - d1
+        delta = delta.days*24*60*60
+        seconds = randrange(delta)
+        birthdate = (d1 + timedelta(seconds=seconds))
+        crutch['birthdate'] = birthdate.strftime('%w %B %Y')
+        crutch['years_old'] = date.today().year - birthdate.year
+    if not vbp.data.get('bio', None):
+        crutch['bio'] = 'Заглушка для биографии, пока робот не починен'
+    pfs = film_model.PersonsFilms.objects.filter(person=person)[:12]  # почему-то 12 первых фильмов. Был пагинатор
+    vbf = vbFilm([pf.film for pf in pfs], many=True)
 
-    return HttpResponse(render_page('person', {'person': vbp.data, 'filmography': vbFilms.data}))
+    return HttpResponse(render_page('person', {'person': crutch, 'filmography': vbf.data}))
 
 
 def test_view(request):
