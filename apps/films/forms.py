@@ -131,16 +131,18 @@ class PersonApiForm(Form):
 
     type  = fields.ChoiceField(choices=APP_FILM_PERSON_TYPES_OUR, help_text=u'Тип')
     top   = fields.IntegerField(min_value=0, help_text=u'Сортировать с')
-    limit = fields.IntegerField(min_value=1, max_value=20, help_text=u'Ограничение')
+    limit = fields.IntegerField(required=False, min_value=1, help_text=u'Ограничение')
 
     def __init__(self, *args, **kwargs):
         if not kwargs['data'].get('top'):
            kwargs['data']['top'] = 0
 
-        if not kwargs['data'].get('limit'):
-           kwargs['data']['limit'] = 12
-
         if not kwargs['data'].get('type'):
            kwargs['data']['type'] = 'all'
 
         super(PersonApiForm, self).__init__(*args, **kwargs)
+
+        for k,v in self.fields.items():
+            if k in kwargs['data'] and kwargs['data'][k]:
+                if self.fields[k].required == False:
+                    self.fields[k].required = True
