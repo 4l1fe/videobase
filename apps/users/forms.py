@@ -60,6 +60,8 @@ class CustomRegisterForm(forms.ModelForm):
 
     def save(self, commit=True):
         instance = super(CustomRegisterForm, self).save(commit)
+        instance.set_password(self.cleaned_data['password'])
+        instance.save()
         return instance
 
     class Meta:
