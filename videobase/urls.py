@@ -25,9 +25,9 @@ urlpatterns = patterns('',
     url(r'^admin_tools/', include('admin_tools.urls')),
     url(r'^admin/', include(admin.site.urls)),
 
-    # Social-auth
+    # Auth
     url(r'', include('social_auth.urls')),
-    url('^tokenize$',views.tokenize_view),
+    url('^tokenize/?$', views.TokenizeView.as_view(), name="tokenize"),
 
     # Interface
     url(r'^register/?$', views.RegisterUserView.as_view()),
