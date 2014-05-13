@@ -210,20 +210,7 @@ class PersonsExtrasAPIView(APIView):
             raise Http404
 
 
-def transform_vbFilms(vbf):
-
-    vbf.update({'instock': True,
-        'hasFree': True,
-        'year': vbf['releasedate'].strftime('%Y'),
-        'releasedate': vbf['releasedate'].strftime('%Y-%m-%d'),
-        })
-
-    return vbf
-
-
 def index_view(request):
-    # ... view code here
-
     NEW_FILMS_CACHE_KEY = "new_films"
     resp_dict_serialized = cache.get(NEW_FILMS_CACHE_KEY)
 
@@ -233,62 +220,38 @@ def index_view(request):
     
         o_locs = content_model.Locations.objects.all()
         o_film = sorted((ol.content.film for ol in o_locs if ol.content.film.releasedate < timezone.now()),
-                        key= lambda f: f.release_date)[-4:]
+                        key=lambda f: f.release_date)[-4:]
 
-        resp_dict = vbFilm(o_film, extend=True, many=True)
-
-        resp_dict_data = resp_dict.data
-        resp_dict_serialized = json.dumps(resp_dict.data,cls = encoder)
-        
-        cache.set(NEW_FILMS_CACHE_KEY,resp_dict_serialized,9000)
+        resp_dict_data = vbFilm(o_film, extend=True, many=True).data
+        resp_dict_serialized = json.dumps(resp_dict_data, cls=encoder)
+        cache.set(NEW_FILMS_CACHE_KEY, resp_dict_serialized, 9000)
 
     else:
-
-        resp_dict_data=json.loads(resp_dict_serialized)
-        
-
-    
+        resp_dict_data = json.loads(resp_dict_serialized)
 
     o_genres = GenresSerializer(film_model.Genres.objects.all(), many=True)
 
-    
-    
-    genres = [{'id': g['id'],'name': g['name']} for g in sorted(o_genres.data, key=lambda g: g['name'])]
+    data = {
+        'new_films': resp_dict_data,
+        'genres': o_genres.data,
+    }
 
-    #print sorted(o_genres.data, key = lambda g: g['name'])
-    for g in genres:
-        print g['id'], g['name']
-
-    #for g in sorted(o_genres.data, key = lambda g: g['name']):
-    #    print g['name']
-
-        
-    #try:
-
-    #resp_data = [transform_vbFilms(vbf) for vbf in data]
-    #except:
-    #    raise Http404
-    
-    
-
-    
-    return HttpResponse(render_page('index', {'new_films': resp_dict_data, 'genres':o_genres.data}), status.HTTP_200_OK)
+    return HttpResponse(render_page('index', data), status.HTTP_200_OK)
 
 
 def person_view(request, resource_id):
-
     try:
         person = film_model.Persons.objects.get(pk=resource_id)
     except film_model.Persons.DoesNotExist:
         raise Http404
+
     vbp = vbPerson(person, extend=True)
     pfs = film_model.PersonsFilms.objects.filter(person=person)
     page = Paginator(pfs, 12).page(1)
     pfs = page.object_list
-    vbFilms = vbFilm([pf.film for pf in pfs], many =True)
-    return HttpResponse(render_page('person',
-                                    {'person': vbp.data,
-                                     'filmography': vbFilms.data}))
+    vbFilms = vbFilm([pf.film for pf in pfs], many=True)
+
+    return HttpResponse(render_page('person', {'person': vbp.data, 'filmography': vbFilms.data}))
 
 
 def test_view(request):
@@ -301,7 +264,7 @@ def test_view(request):
 def calc_actors(o_film):
     result_list = []
     try:
-        result_list = list(film_model.Persons.objects.filter(person_film_rel__film=o_film.pk).values('id', 'name')[:5])
+        result_list = list(film_model.Persons.objects.filter(person_film_rel__film=o_film.pk).order_by('name').values('id', 'name')[:5])
     except Exception, e:
         pass
 
@@ -309,28 +272,13 @@ def calc_actors(o_film):
 
 
 def calc_similar(o_film):
-    result_list = []
-
     try:
         result = film_model.Films.similar_api(o_film)
-        
-
-        for item in result:
-             result_list.append({
-                 'id': item.id,
-                 'name': item.name,
-                 'ratings': item.get_rating_for_vb_film,
-                 'releasedate': item.release_date,
-                 #TODO: надо вычислять
-                 'poster': "static/img/tmp/poster1.jpg",
-                 'relation': {'rating': 5},
-                 'instock': True,
-                 'hasFree': True,
-             })
+        result = vbFilm(result).data
     except Exception, e:
         pass
 
-    return vbFilm(result).data
+    return result
 
 
 def calc_comments(o_film):
@@ -368,4 +316,3 @@ def film_view(request, film_id, *args, **kwargs):
     resp_dict['comments'] = calc_comments(o_film)
 
     return HttpResponse(render_page('film', {'film': resp_dict}))
-

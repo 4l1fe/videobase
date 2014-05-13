@@ -26,7 +26,7 @@ class PersonsFilmView(APIView):
         }
 
         if cleaned_data['type'] and cleaned_data['type'] != 'all':
-            filter.update({'p_type__in': dict(APP_FILM_PERSON_TYPES_OUR)[cleaned_data['type']]})
+            filter.update({'p_type': dict(APP_FILM_PERSON_TYPES_OUR)[cleaned_data['type']]})
 
         result = PersonsFilms.objects.filter(**filter).\
                      values_list('person', flat=True)
@@ -47,7 +47,7 @@ class PersonsFilmView(APIView):
             if type(person_list) == Response:
                 return person_list
 
-            o_person = Persons.objects.filter(pk__in=person_list).order_by('id')[cleaned_data['top']:cleaned_data['limit']]
+            o_person = Persons.objects.filter(pk__in=person_list).order_by('name')[cleaned_data['top']:cleaned_data['limit']]
 
             serializer = vbPerson(o_person, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
