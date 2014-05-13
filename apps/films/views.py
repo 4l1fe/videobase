@@ -208,17 +208,6 @@ class PersonsExtrasAPIView(APIView):
             raise Http404
 
 
-def transform_vbFilms(vbf):
-
-    vbf.update({'instock': True,
-        'hasFree': True,
-        'year': vbf['releasedate'].strftime('%Y'),
-        'releasedate': vbf['releasedate'].strftime('%Y-%m-%d'),
-        })
-
-    return vbf
-
-
 def index_view(request):
     NEW_FILMS_CACHE_KEY = "new_films"
     resp_dict_serialized = cache.get(NEW_FILMS_CACHE_KEY)
@@ -325,4 +314,3 @@ def film_view(request, film_id, *args, **kwargs):
     resp_dict['comments'] = calc_comments(o_film)
 
     return HttpResponse(render_page('film', {'film': resp_dict}))
-
