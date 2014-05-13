@@ -178,7 +178,7 @@ class FilmsTestCase(APITestCase):
         for i in range(len(response.data['genres'])):
             self.assertEqual(response.data['genres'][i], film.genres.all().values('id', 'name')[i])
         for i in range(len(response.data['persons'])):
-            p = film.persons.all().values('id', 'name', 'photo', 'city__name', 'city__country__name', 'birthdate')[i]
+            p = film.persons.all().values('id', 'name', 'name_orig', 'photo', 'city__name', 'city__country__name', 'birthdate')[i]
             if p['city__name'] is None and p['city__country__name'] is None:
                 birthplace = []
             else:
@@ -653,7 +653,7 @@ class FilmsTestCase(APITestCase):
                 persons.append(persf.person)
         self.assertEqual(len(persons), len(response.data))
         for i in range(len(response.data)):
-            p = film.persons.all().values('id', 'name', 'photo', 'city__name', 'city__country__name', 'birthdate')[i]
+            p = film.persons.all().values('id', 'name', 'name_orig', 'photo', 'city__name', 'city__country__name', 'birthdate')[i]
             if p['city__name'] is None and p['city__country__name'] is None:
                 birthplace = []
             else:
