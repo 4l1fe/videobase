@@ -31,7 +31,11 @@ ACCOUNT_ACTIVATION_DAYS = 2
 
 AUTH_USER_EMAIL_UNIQUE = True
 
-HTTP_SESSION_TOKEN_TYPE = b'X-MI-Session'
+HTTP_SESSION_TOKEN_TYPE = b'X-MI-SESSION'
+HTTP_USER_TOKEN_TYPE = b'X-MI-TOKEN'
+
+STANDART_HTTP_SESSION_TOKEN_HEADER = b'HTTP_{}'.format(HTTP_SESSION_TOKEN_TYPE.replace('-', '_'))
+STANDART_HTTP_USER_TOKEN_HEADER = b'HTTP_{}'.format(HTTP_USER_TOKEN_TYPE.replace('-', '_'))
 
 EMAIL_HOST = 'localhost'
 EMAIL_PORT = 25
@@ -157,10 +161,11 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.TokenAuthentication',
-        'apps.users.models.api_session.MultipleTokenAuthentication',
+        'apps.users.backends.SessionTokenAuthentication',
+        'apps.users.backends.UserTokenAuthentication',
     )
 }
+
 
 LOGIN_REDIRECT_URL = '/tokenize'
 LOGIN_ERROR_URL = '/'
@@ -201,8 +206,8 @@ AUTHENTICATION_BACKENDS = (
     'social_auth.backends.contrib.odnoklassniki.OdnoklassnikiBackend',
     'social_auth.backends.contrib.mailru.MailruBackend',
     'django.contrib.auth.backends.ModelBackend',
-    'rest_framework.authentication.TokenAuthentication',
-    'apps.users.models.api_session.MultipleTokenAuthentication',
+    'apps.users.backends.SessionTokenAuthentication',
+    'apps.users.backends.UserTokenAuthentication',
 )
 
 # Перечислим pipeline, которые последовательно буду обрабатывать респонс

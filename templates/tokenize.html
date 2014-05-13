@@ -1,16 +1,16 @@
-<!DOCTYPE html5>
+<!DOCTYPE html>
 <html>
   <noscript>Для корректной работы сервиса необходим JavaScript.</noscript>
   <script>
     var
         token = "",
         back_url = "/", params, param_arr, days,
-        query_arr = (window.location + "").split("?")
+        query_arr = (window.location + "").split("?");
         
     if (query_arr.length > 1) {
         params = query_arr[1].split("&");
         for (var i = 0; i < params.length; i++) {
-            param_arr = params[i].split("=")
+            param_arr = params[i].split("=");
             if (param_arr[0] == "token")
                 token = decodeURI(param_arr[1]);
             else if (param_arr[0] == "back" || param_arr[0] == "back_url")
