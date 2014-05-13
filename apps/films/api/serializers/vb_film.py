@@ -111,21 +111,23 @@ class vbFilm(serializers.ModelSerializer):
     def calc_ratings(self, obj):
         return obj.get_rating_for_vb_film
 
-    def calc_has_free(self,obj):
+
+    def calc_has_free(self, obj):
         result = self.location_rebuild.get(obj.pk, [])
         for loc in result:
-
-            if loc.price_type == APP_CONTENTS_PRICE_TYPE_FREE:
+            if loc.price_type==APP_CONTENTS_PRICE_TYPE_FREE:
                 return True
+
         return False
 
-    def calc_instock(self,obj):
-        result = self.location_rebuild.get(obj.pk, [])
 
+    def calc_instock(self, obj):
+        result = self.location_rebuild.get(obj.pk, [])
         if len(result):
             return True
 
         return False
+
 
     def _get_obj_list(self):
         list_pk = []
@@ -150,6 +152,7 @@ class vbFilm(serializers.ModelSerializer):
             v = item.content.film_id
             if not v in result:
                 result[v] = []
+
             result[v].append(item)
 
         self.location_rebuild = result
