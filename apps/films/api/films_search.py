@@ -1,5 +1,7 @@
 # coding: utf-8
 
+from datetime import date
+
 from django.db.models import Q
 from django.core.cache import cache
 from django.core.paginator import Paginator
@@ -34,7 +36,7 @@ class SearchFilmsView(APIView):
         film_group = 0
         location_group = 0
 
-        for i in ['text', 'year_old', 'genre', 'rating']:
+        for i in ['text', 'year_old', 'genre', 'rating', 'per_page', 'page']:
             if i in data.data:
                 film_group += 1
                 break
@@ -46,7 +48,10 @@ class SearchFilmsView(APIView):
 
 
     def search_by_films(self, filter):
-        o_search = Films.objects.all()
+        o_search = Films.objects.extra(
+                where=['EXTRACT(year FROM "films"."release_date") <= %s'],
+                params=[date.today().year],
+            )
 
         # Поиск по имени
         if filter.get('text'):
@@ -106,37 +111,27 @@ class SearchFilmsView(APIView):
             result = cache.get(cache_key) if not settings.DEBUG else None
 
             if result is None:
-                if film_group > 0:
-                    o_search = self.search_by_films(filter)
+                o_search = self.search_by_films(filter)
 
-                    list_films_by_content = []
-                    if location_group > 0:
-                        list_films_by_content = self.search_by_location(filter, o_search)
-                    else:
-                        if filter.get('instock'):
-                            list_films_by_content = self.search_by_location(filter, o_search)
-
-                    # Пересечение не пусто
-                    if len(list_films_by_content):
-                        o_search = Films.objects.filter(pk__in=list_films_by_content)
-                    else:
-                        if filter.get('instock'):
-                            list_films_by_content = self.search_by_location(filter, o_search)
-
-                            if len(list_films_by_content):
-                                o_search = Films.objects.filter(pk__in=list_films_by_content)
-
+                list_films_by_content = []
+                if location_group > 0:
+                    list_films_by_content = self.search_by_location(filter, o_search)
                 else:
-                    list_films_by_content = []
-                    if location_group > 0:
-                        list_films_by_content = self.search_by_location(filter)
+                    if filter.get('instock'):
+                        list_films_by_content = self.search_by_location(filter, o_search)
 
-                    o_search = Films.objects.all()
-                    if len(list_films_by_content):
-                        o_search = o_search.filter(pk__in=list_films_by_content)
+                # Пересечение не пусто
+                if len(list_films_by_content):
+                    o_search = Films.objects.filter(pk__in=list_films_by_content)
+                else:
+                    if filter.get('instock'):
+                        list_films_by_content = self.search_by_location(filter, o_search)
+
+                        if len(list_films_by_content):
+                            o_search = Films.objects.filter(pk__in=list_films_by_content)
 
                 try:
-                    page = Paginator(o_search.order_by('rating_cons'), per_page=filter['per_page']).page(filter['page'])
+                    page = Paginator(o_search.order_by('-rating_sort'), per_page=filter['per_page']).page(filter['page'])
                 except Exception as e:
                     return Response({'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
 
