@@ -32,4 +32,5 @@ class ViaplayRobot(object):
         resp_dict['url_view'] = film_link
         resp_dict['price_type'] = self.price_type
         resp_dict['price'] = self.price
+        resp_dict['type'] = 'viaplay'
         return resp_dict
