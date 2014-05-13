@@ -15,6 +15,7 @@ from django.core.context_processors import csrf
 from django.template import Context
 from django.http import HttpResponse, Http404
 from django.shortcuts import render_to_response
+from django.utils import timezone
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -27,6 +28,7 @@ from apps.films.api.serializers.vb_film import GenresSerializer
 import apps.contents.models as content_model
 from django.core.serializers.json import DjangoJSONEncoder
 from utils.noderender import render_page
+
 
 import json
 
@@ -227,10 +229,10 @@ def index_view(request):
 
     if resp_dict_serialized is None:
         encoder = DjangoJSONEncoder
-        # Form 4 films that have locations and are newest
+        # Form 4 films that have locations and are newest and have release date less than now.
     
         o_locs = content_model.Locations.objects.all()
-        o_film = sorted((ol.content.film for ol in o_locs),
+        o_film = sorted((ol.content.film for ol in o_locs if ol.content.film.releasedate < timezone.now()),
                         key= lambda f: f.release_date)[-4:]
 
         resp_dict = vbFilm(o_film, extend=True, many=True)
@@ -251,10 +253,16 @@ def index_view(request):
 
     
     
-    genres = [{'id': g['id'],'name': g['name']} for g in o_genres.data]
+    genres = [{'id': g['id'],'name': g['name']} for g in sorted(o_genres.data, key=lambda g: g['name'])]
 
-    
-    
+    #print sorted(o_genres.data, key = lambda g: g['name'])
+    for g in genres:
+        print g['id'], g['name']
+
+    #for g in sorted(o_genres.data, key = lambda g: g['name']):
+    #    print g['name']
+
+        
     #try:
 
     #resp_data = [transform_vbFilms(vbf) for vbf in data]
