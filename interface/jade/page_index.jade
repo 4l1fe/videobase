@@ -23,7 +23,6 @@ html(lang="ru")
                                     option(value="subscribes") подпискам
                         .filter-main
                             .select-wrapper
-                                - console.log(genres.sort(function (a,b){return a.name.localeCompare(b.name)}))
                                 select#sel_genre(name="genre")
                                     
                                     option(value="0") любого жанра
