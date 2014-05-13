@@ -47,8 +47,13 @@ class PersonsFilmView(APIView):
             if type(person_list) == Response:
                 return person_list
 
-            o_person = Persons.objects.filter(pk__in=person_list).order_by('id')[cleaned_data['top']:cleaned_data['top'] + cleaned_data['limit']]
+            filter = {
+                'filter': {'pk__in': person_list},
+                'offset': cleaned_data['top'],
+                'limit': cleaned_data['limit'],
+            }
 
+            o_person = Persons.get_sorted_persons_by_name(**filter)
             serializer = vbPerson(o_person, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
