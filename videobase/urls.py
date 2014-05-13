@@ -27,6 +27,7 @@ urlpatterns = patterns('',
 
     # Social-auth
     url(r'', include('social_auth.urls')),
+    url('^tokenize$',views.tokenize_view),
 
     # Interface
     url(r'^register/?$', views.RegisterUserView.as_view()),
@@ -35,6 +36,8 @@ urlpatterns = patterns('',
     url(r'^person/(?P<resource_id>\d+)/?$', 'apps.films.views.person_view'),
     url(r'^films?/(?P<film_id>\d+)/?$', 'apps.films.views.film_view'),
     url(r'^$', 'apps.films.views.index_view'),
+                       
+                       
 )
 
 if settings.DEBUG:
