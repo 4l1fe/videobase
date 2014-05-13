@@ -50,8 +50,10 @@ class PersonsFilmView(APIView):
             filter = {
                 'filter': {'pk__in': person_list},
                 'offset': cleaned_data['top'],
-                'limit': cleaned_data['limit'],
             }
+
+            if cleaned_data['limit']:
+                filter.update({'limit': cleaned_data['limit'] + cleaned_data['top']})
 
             o_person = Persons.get_sorted_persons_by_name(**filter)
             serializer = vbPerson(o_person, many=True)

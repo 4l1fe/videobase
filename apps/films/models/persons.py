@@ -36,10 +36,7 @@ class Persons(PhotoClass):
 
     @classmethod
     def get_sorted_persons_by_name(self, filter={}, offset=None, limit=None, *args, **kwargs):
-        obj = self.objects.filter(**filter).order_by('name')
-
-        if not offset is None and not limit is None:
-            obj = obj[offset:limit+offset]
+        obj = self.objects.filter(**filter).order_by('name')[slice(offset, limit)]
 
         return obj
 
