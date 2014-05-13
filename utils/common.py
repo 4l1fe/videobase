@@ -4,6 +4,7 @@ import os
 import random
 import string
 from PIL import Image
+import urllib
 
 
 def get_image_path(instance, filename):
@@ -123,21 +124,9 @@ def group_by(list, key, objects=False):
     return result_dict
 
 
-def get_authorization_header(request):
-    """
-    Return request's 'Authorization:' header, as a bytestring.
-    Hide some test client ickyness where the header can be unicode.
-    """
-
-    from rest_framework import HTTP_HEADER_ENCODING
-
-    auth = request.META.get('HTTP_AUTHORIZATION', b'')
-    if type(auth) == type(''):
-        # Work around django test client oddness
-        auth = auth.encode(HTTP_HEADER_ENCODING)
-
-    return auth
-
-
 def random_string(size=30, chars=string.ascii_letters+string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
+
+
+def url_with_querystring(path, **kwargs):
+    return path + '?' + urllib.urlencode(kwargs)

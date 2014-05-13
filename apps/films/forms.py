@@ -101,7 +101,7 @@ class RatingForm(Form):
     Форма рейтинга для фильмов
     """
 
-    rating = fields.IntegerField(min_value=1, max_value=10, help_text=u'Оценка')
+    rating = fields.FloatField(min_value=1.0, max_value=10.0, help_text=u'Оценка')
 
 
 #############################################################################################################

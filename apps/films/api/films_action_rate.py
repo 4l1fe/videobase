@@ -32,7 +32,7 @@ class ActRateFilmView(APIView):
 
         return result
 
-    def post(self, request, film_id, format=None, *args, **kwargs):
+    def put(self, request, film_id, format=None, *args, **kwargs):
         form = RatingForm(request.DATA)
         if form.is_valid():
             # Выбираем и проверяем, что фильм существует
@@ -53,7 +53,7 @@ class ActRateFilmView(APIView):
                 o_user_film.save()
             except Exception as e:
                 try:
-                    UsersFilms(**filter).update(rating=rating)
+                    UsersFilms.objects.filter(**filter).update(rating=rating)
                 except Exception as e:
                     return Response({'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
 
