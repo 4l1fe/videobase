@@ -316,8 +316,6 @@ class FilmThumb extends Item
     super
 
   action_rate: (val) ->
-    console.log @
-
     @_app.film_action @vals.id, "rate", {
       rel: @vals.relation
       value: val
@@ -519,7 +517,6 @@ class App
 
   film_action: (id, action, opts = {}) ->
     if @user_is_auth()
-      console.log id, action
       rel = opts.rel || {}
       action_str = action
       action_str+= "d" if action == "subscribe"
@@ -575,9 +572,12 @@ class App
       return conf[name]
 
   user_is_auth: (ask_sign_in = true) ->
-    # if ask_sign_in
-      # alert("sign in first")
-    return true # false
+    if !@rest.has_auth()
+      if ask_sign_in
+        alert("sign in first")
+      false
+    else
+      true
 
   query_params: (name) ->
     if !query_params

@@ -175,7 +175,6 @@
       if (this.custom) {
         url += this.opts.url || this.name;
       }
-      console.log(url);
       return this.parent.ajax.call(this, this.method, url, data);
     };
 
@@ -211,7 +210,71 @@
       this.urlNoId = this.url;
       this.cache = new Cache(this);
       this.parent = null;
-      return this.name = this.opts.name || 'ROOT';
+      this.name = this.opts.name || 'ROOT';
+      this.token = $.cookie("x-token");
+      this.session_token = $.cookie("x-session");
+      this._updating_session = false;
+      this._session_callback_queue = [];
+      if (this.token && !this.session_token) {
+        return this.refreshSession();
+      }
+    };
+
+    Resource.prototype.revokeSession = function(callback) {
+      if (this.name !== 'ROOT') {
+        return this.root.revokeSession(callback);
+      } else {
+        return pass;
+      }
+    };
+
+    Resource.prototype.refreshSession = function(callback) {
+      if (this.name !== 'ROOT') {
+        return this.root.refreshSession(callback);
+      } else {
+        if (callback) {
+          this._session_callback_queue.push(callback);
+        }
+        if (!this._updating_session) {
+          this._updating_session = true;
+          return $.ajax(this.url + "auth/session.json", {
+            cache: false,
+            headers: {
+              "X-MI-Token": this.token
+            },
+            complete: (function(_this) {
+              return function(xhr) {
+                var cb, _i, _len, _ref;
+                if (xhr.status === 200 && xhr.responseJSON && xhr.responseJSON.session_token) {
+                  _this.session_token = xhr.responseJSON.session_token;
+                  _ref = _this._session_callback_queue;
+                  for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+                    cb = _ref[_i];
+                    cb(true);
+                  }
+                } else {
+                  _this.token = "";
+                  _this.session_token = "";
+                  if (_this.opts.auth_error) {
+                    _this.opts.auth_error(xhr);
+                  }
+                }
+                _this._session_callback_queue = [];
+                return _this._updating_session = false;
+              };
+            })(this),
+            type: "GET"
+          });
+        }
+      }
+    };
+
+    Resource.prototype.has_auth = function() {
+      if (this.root.token && this.root.session_token) {
+        return true;
+      } else {
+        return false;
+      }
     };
 
     Resource.prototype.constructChild = function(parent, options) {
@@ -260,9 +323,6 @@
       }
       if (d > 25) {
         error("Plugin Bug! Recursion Fail");
-      }
-      if (this.name) {
-        console.log(s(d) + this.name + ": " + this.url);
       }
       $.each(this, function(name, fn) {
         if ($.type(fn) === 'function' && fn.instance instanceof Verb && name !== 'del') {
@@ -331,8 +391,8 @@
       };
     };
 
-    Resource.prototype.ajax = function(method, url, data) {
-      var ajaxOpts, encoded, escapedUrl, headers, key, req, useCache;
+    Resource.prototype.ajax = function(method, url, data, noloop) {
+      var ajaxOpts, encoded, escapedUrl, headers, key, req, self, useCache;
       if (!method) {
         error("method missing");
       }
@@ -352,6 +412,7 @@
         headers['X-HTTP-Method-Override'] = method;
         method = 'POST';
       }
+      headers['X-MI-Session'] = this.root.session_token;
       url = url.replace(/\/$/, this.opts.ext);
       ajaxOpts = {
         url: url,
@@ -373,6 +434,21 @@
       if (this.opts.cache && this.opts.autoClearCache && $.inArray(method, this.opts.cachableMethods) === -1) {
         escapedUrl = url.replace(/([.?*+^$[\]\\(){}|-])/g, "\\$1");
         this.root.cache.clear(new RegExp(escapedUrl));
+      }
+      if (!noloop) {
+        error = ajaxOpts.error || void 0;
+        self = this.parent;
+        ajaxOpts.error = function(xhr) {
+          if (xhr.status === 401) {
+            return self.refreshSession(function(success) {
+              if (success) {
+                return self.ajax(method, url, data, true);
+              } else {
+                return error(xhr);
+              }
+            });
+          }
+        };
       }
       req = this.opts.request(this.parent, ajaxOpts);
       if (useCache) {

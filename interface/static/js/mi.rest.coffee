@@ -106,7 +106,6 @@ class Verb
     #will execute in the context of the parent resource
     {url,data} = @parent.extractUrlData @method, arguments
     url += @opts.url or @name if @custom
-    console.log(url)
     @parent.ajax.call @, @method, url, data
 
   show: (d) ->
@@ -135,6 +134,51 @@ class Resource
     @cache = new Cache @
     @parent = null
     @name = @opts.name or 'ROOT'
+
+    @token = $.cookie("x-token")
+    @session_token = $.cookie("x-session")
+    @_updating_session = false
+    @_session_callback_queue = []
+
+    if (@token && !@session_token)
+      @refreshSession()
+
+  revokeSession: (callback) ->
+    if @name != 'ROOT'
+      @root.revokeSession(callback)
+    else
+      pass
+
+  refreshSession: (callback) ->
+    if @name != 'ROOT'
+      @root.refreshSession(callback)
+    else
+      @_session_callback_queue.push(callback) if callback
+      if !@_updating_session
+        @_updating_session = true
+        $.ajax(@url + "auth/session.json", {
+          cache: false
+          headers: {"X-MI-Token": @token}
+          complete: (xhr) =>
+            if xhr.status == 200 && xhr.responseJSON && xhr.responseJSON.session_token
+              @session_token = xhr.responseJSON.session_token
+              for cb in @_session_callback_queue
+                cb(true)
+            else
+              @token = ""
+              @session_token = ""
+              if @opts.auth_error
+                @opts.auth_error(xhr)
+            @_session_callback_queue = []
+            @_updating_session = false
+          type: "GET"
+        })
+
+  has_auth: () ->
+    if @root.token && @root.session_token
+      true
+    else
+      false
 
   constructChild: (@parent, options) ->
     validateStr 'name', @name
@@ -173,7 +217,6 @@ class Resource
 
   show: (d=0)->
     error "Plugin Bug! Recursion Fail" if d > 25
-    console.log(s(d)+@name+": " + @url) if @name
     $.each @, (name, fn) ->
       fn.instance.show(d+1) if $.type(fn) is 'function' and fn.instance instanceof Verb and name isnt 'del'
     $.each @, (name,res) ->
@@ -219,11 +262,10 @@ class Resource
 
     {url, data}
 
-  ajax: (method, url, data) ->
+  ajax: (method, url, data, noloop) ->
     error "method missing"  unless method
     error "url missing"  unless url
     headers = {}
-    # console.log method, url, data
     if @opts.username and @opts.password
       encoded = encode64 @opts.username + ":" + @opts.password
       headers.Authorization = "Basic #{encoded}"
@@ -236,6 +278,7 @@ class Resource
       headers['X-HTTP-Method-Override'] = method
       method = 'POST'
 
+    headers['X-MI-Session'] = @root.session_token
     # KT: add extension to the end of url
 
     #if @opts.stripTrailingSlash
@@ -258,6 +301,17 @@ class Resource
     if @opts.cache and @opts.autoClearCache and $.inArray(method, @opts.cachableMethods) is -1
       escapedUrl = url.replace(/([.?*+^$[\]\\(){}|-])/g, "\\$1")
       @root.cache.clear(new RegExp(escapedUrl))
+
+    if !noloop
+      error = ajaxOpts.error || undefined
+      self = @parent
+      ajaxOpts.error = (xhr) ->
+        if xhr.status == 401
+          self.refreshSession (success) ->
+            if success
+              self.ajax method, url, data, true
+            else
+              error(xhr)
 
     req = @opts.request @parent, ajaxOpts
 
