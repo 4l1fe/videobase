@@ -53,28 +53,16 @@ class Films(models.Model):
             name = self.name
         return u'[{0}] {1}'.format(self.pk, name)
 
-    def as_vbFilm(self,extend=False,persons =False, authorized=False):
-
-        f_dict = {'id':self.pk,
-                  'name': self.name,
-                  'name_orig':self.name_orig,
-                  'release_date': self.release_date,
-                  'poster': [],
-                  'ratings': {'imdb':(self.rating_imdb,
-                                      self.rating_imdb_cnt),
-                              'kp': (self.rating_kinopoisk,
-                                     self.rating_kinopoisk_cnt),
-                              'cons':(0,0)},
-                  'duration' : self.duration,
-                  #TODO Implement locations
-                 
-                  
-                  'locations': [],} 
-        if extend:
-
-            pass
-        if persons:
-            pass
+    def as_vbFilm(self, extend=False, persons=False, authorized=False):
+        f_dict = {
+            'id':self.pk,
+            'name': self.name,
+            'name_orig': self.name_orig,
+            'releasedate': self.release_date,
+            'poster': [],
+            'ratings': self.get_rating_for_vb_film,
+            'duration': self.duration,
+        }
 
         return f_dict
 
@@ -84,7 +72,7 @@ class Films(models.Model):
         list_genres = [i.pk for i in o_film.genres.all()]
 
         o_similar = Films.objects.distinct().filter(genres__in=list_genres).\
-                        exclude(pk=o_film.pk).order_by('-rating_cons')[:12]
+                        exclude(pk=o_film.pk).order_by('-rating_sort')[:12]
 
         return o_similar
 
