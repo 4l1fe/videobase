@@ -47,7 +47,7 @@ class PersonsFilmView(APIView):
             if type(person_list) == Response:
                 return person_list
 
-            o_person = Persons.objects.filter(pk__in=person_list).order_by('id')[cleaned_data['top']:cleaned_data['limit']]
+            o_person = Persons.objects.filter(pk__in=person_list).order_by('name')[cleaned_data['top']:cleaned_data['limit']]
 
             serializer = vbPerson(o_person, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
