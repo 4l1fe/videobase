@@ -19,7 +19,7 @@ from apps.films.models import UsersFilms
 from apps.contents.models import Comments
 
 
-class FilmsTest(APITestCase):
+class FilmsTestCase(APITestCase):
     def setUp(self):
         self.user = UserFactory.create()
         self.genres = []
@@ -653,22 +653,33 @@ class FilmsTest(APITestCase):
                 persons.append(persf.person)
         self.assertEqual(len(persons), len(response.data))
         for i in range(len(response.data)):
-            self.assertEqual(response.data[i]['id'], persons[i].id)
-            self.assertEqual(response.data[i]['name'], persons[i].name)
-            self.assertEqual(response.data[i]['photo'], persons[i].photo)
+            p = film.persons.all().values('id', 'name', 'photo', 'city__name', 'city__country__name', 'birthdate')[i]
+            if p['city__name'] is None and p['city__country__name'] is None:
+                birthplace = []
+            else:
+                birthplace = [p['city__name'], p['city__country__name']]
+            p.update({'birthplace': birthplace})
+            del p['city__name'], p['city__country__name']
+            self.assertDictEqual(response.data[i], p)
 
     def test_api_persons_with_user_param(self):
         film = self.films[0]
-        data = {'type': APP_PERSON_ACTOR, 'top': 1, 'limit': 2}
+        data = {'type': APP_PERSON_ACTOR[0], 'top': 1, 'limit': 2}
         persons = []
         for persf in self.pfilms:
-            if film.id == persf.film_id and persf.p_type == data['type']:
+            if film.id == persf.film_id and persf.p_type == APP_PERSON_ACTOR:
                 persons.append(persf.person)
         response = self.client.get(reverse('film_persons_view', kwargs={'film_id': film.id, 'format': 'json'}), data=data)
         for i in range(len(response.data)):
+            if persons[data['top'] + i].city is None:
+                birthplace = []
+            else:
+                birthplace = [persons[data['top'] + i].city__name, persons[data['top'] + i].city__country__name]
             self.assertEqual(response.data[i]['id'], persons[data['top'] + i].id)
             self.assertEqual(response.data[i]['name'], persons[data['top'] + i].name)
             self.assertEqual(response.data[i]['photo'], persons[data['top'] + i].photo)
+            self.assertEqual(response.data[i]['birthdate'], persons[data['top'] + i].birthdate)
+            self.assertEqual(response.data[i]['birthplace'], birthplace)
 
     def test_api_search_ok(self):
         data = {}

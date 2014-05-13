@@ -16,7 +16,7 @@ from apps.films.forms import SearchForm
 from apps.contents.models import Contents, Locations
 
 import videobase.settings as settings
-
+import sys
 
 #############################################################################################################
 class SearchFilmsView(APIView):
@@ -97,6 +97,12 @@ class SearchFilmsView(APIView):
 
         return list_films_by_content
 
+    def use_cache(self):
+        if 'test' in sys.argv:
+            return False
+        else:
+            return not settings.DEBUG
+
 
     def get(self, request, format=None, *args, **kwargs):
         # Copy post request
@@ -108,7 +114,7 @@ class SearchFilmsView(APIView):
             filter, film_group, location_group = self.parse_post(form)
             cache_key = u'{0}({1})'.format(self.__class__.__name__,
                                           ':'.join([i if isinstance(i, basestring) else str(i) for i in filter.values()]))
-            result = cache.get(cache_key) if not settings.DEBUG else None
+            result = cache.get(cache_key) if self.use_cache() else None
 
             if result is None:
                 o_search = self.search_by_films(filter)
