@@ -15,6 +15,7 @@ from rest_framework import exceptions
 from utils.common import get_authorization_header
 
 
+
 AUTH_USER_MODEL = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
 
 
@@ -61,7 +62,7 @@ class MultipleTokenAuthentication(BaseAuthentication):
     def authenticate(self, request):
         auth = get_authorization_header(request).split()
 
-        if not auth or auth[0].lower() != b'x-vb-token':
+        if not auth or auth[0].lower() != settings.HTTP_SESSION_TOKEN_TYPE.lower():
             return None
 
         if len(auth) == 1:
@@ -96,7 +97,7 @@ class MultipleTokenAuthentication(BaseAuthentication):
         return token.user, token
 
     def authenticate_header(self, request):
-        return 'X-VB-Token'
+        return settings.HTTP_SESSION_TOKEN_TYPE
 
 
 class UsersApiSessions(models.Model):
