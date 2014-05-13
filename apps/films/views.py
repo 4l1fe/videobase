@@ -262,7 +262,7 @@ def test_view(request):
 def calc_actors(o_film):
     result_list = []
     try:
-        result_list = list(film_model.Persons.objects.filter(person_film_rel__film=o_film.pk).values('id', 'name')[:5])
+        result_list = list(film_model.Persons.objects.filter(person_film_rel__film=o_film.pk).order_by('name').values('id', 'name')[:5])
     except Exception, e:
         pass
 
