@@ -22,6 +22,7 @@ BeautifulSoup4
 html5lib
 djangorestframework
 requests
+requesocks
 factory_boy
 coverage
 celery
