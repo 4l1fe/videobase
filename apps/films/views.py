@@ -274,13 +274,10 @@ def person_view(request, resource_id):
     except film_model.Persons.DoesNotExist:
         raise Http404
     vbp = vbPerson(person, extend=True)
-    pfs = film_model.PersonsFilms.objects.filter(person=person)
-    page = Paginator(pfs, 12).page(1)
-    pfs = page.object_list
-    vbFilms = vbFilm([pf.film for pf in pfs], many =True)
-    return HttpResponse(render_page('person',
-                                    {'person': vbp.data,
-                                     'filmography': vbFilms.data}))
+    pfs = film_model.PersonsFilms.objects.filter(person=person)[:12]  # почему-то 12 первых фильов.
+    vbf = vbFilm([pf.film for pf in pfs], many=True)
+
+    return HttpResponse(render_page('person', {'person': vbp.data[0], 'filmography': vbf.data}))
 
 
 def test_view(request):
