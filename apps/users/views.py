@@ -7,6 +7,7 @@ from django.utils.crypto import get_random_string
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.views.generic import View
+from django.shortcuts import render_to_response
 
 from constants import APP_USERS_API_DEFAULT_PAGE, APP_USERS_API_DEFAULT_PER_PAGE
 from .forms import CustomRegisterForm
@@ -32,7 +33,7 @@ class RegisterUserView(View):
         register_form = CustomRegisterForm(data=self.request.POST)
         if register_form.is_valid():
             register_form.save()
-        return HttpResponseRedirect("/")
+        return HttpResponseRedirect("/tokenize")
 
 
 class LoginUserView(View):
@@ -148,3 +149,6 @@ class UserView(View):
 #             response = HttpResponseBadRequest(e)
 #
 #     return response
+
+def tokenize_view(request):
+    return render_to_response('tokenize.html')

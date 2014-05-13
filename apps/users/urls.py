@@ -3,14 +3,14 @@
 from django.conf.urls import patterns, url
 
 from apps.users.api import *
-
+from apps.users.views import tokenize_view
 from rest_framework.urlpatterns import format_suffix_patterns
 
 v1_api_patterns = patterns('',
     # Auth API
-    url(r'^v1/auth/session?$', ObtainSessionToken.as_view(), name='session'),
-    url(r'^v1/auth/login?$', ObtainAuthToken.as_view(), name='login'),
-    url(r'^v1/auth/revoke?$', RevokeSessionToken.as_view(), name='revoke'),
+    url(r'^v1/auth/session$', ObtainSessionToken.as_view(), name='session'),
+    url(r'^v1/auth/login$', ObtainAuthToken.as_view(), name='login'),
+    url(r'^v1/auth/revoke$', RevokeSessionToken.as_view(), name='revoke'),
     # User API
     url(r'^v1/user/info?$', UserInfoView.as_view(), name='user_info'),
     url(r'^v1/user/password?$', UserChangePasswordView.as_view(), name='user_change_password'),
