@@ -6,15 +6,7 @@ import binascii
 
 from django.db import models
 from django.conf import settings
-from django.utils import timezone
 from django.contrib.auth.models import User
-
-from rest_framework.authentication import BaseAuthentication
-from rest_framework import exceptions
-
-from utils.common import get_authorization_header
-
-
 
 AUTH_USER_MODEL = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
 
@@ -47,57 +39,6 @@ class SessionToken(models.Model):
         app_label = 'users'
         verbose_name = u'API сессия'
         verbose_name_plural = u'API Сессии'
-
-
-class MultipleTokenAuthentication(BaseAuthentication):
-    """
-    A custom token model may be used, but must have the following properties.
-
-    * key -- The string identifying the token
-    * user -- The user to which the token belongs
-    """
-
-    model = SessionToken
-
-    def authenticate(self, request):
-        auth = get_authorization_header(request).split()
-
-        if not auth or auth[0].lower() != settings.HTTP_SESSION_TOKEN_TYPE.lower():
-            return None
-
-        if len(auth) == 1:
-            msg = 'Invalid token header. No credentials provided.'
-            raise exceptions.AuthenticationFailed(msg)
-        elif len(auth) > 2:
-            msg = 'Invalid token header. Token string should not contain spaces.'
-            raise exceptions.AuthenticationFailed(msg)
-
-        return self.authenticate_credentials(auth[1])
-
-    def authenticate_credentials(self, key):
-        try:
-            token = self.model.objects.get(key=key)
-        except self.model.DoesNotExist:
-            raise exceptions.AuthenticationFailed('Invalid token')
-
-        if not token.user.is_active:
-            raise exceptions.AuthenticationFailed('User inactive or deleted')
-
-        try:
-            uas = UsersApiSessions.objects.get(token=token)
-
-            if uas.get_expiration_time() < timezone.now():
-                raise exceptions.AuthenticationFailed('Session expired')
-            if not uas.active:
-                raise exceptions.AuthenticationFailed('Session not active')
-
-        except UsersApiSessions.DoesNotExist:
-            raise exceptions.AuthenticationFailed('There is no session associated with this token')
-
-        return token.user, token
-
-    def authenticate_header(self, request):
-        return settings.HTTP_SESSION_TOKEN_TYPE
 
 
 class UsersApiSessions(models.Model):
