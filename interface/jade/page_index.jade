@@ -24,9 +24,8 @@ html(lang="ru")
                         .filter-main
                             .select-wrapper
                                 select#sel_genre(name="genre")
-                                    
                                     option(value="0") любого жанра
-                                    each item in genres.sort(function (a,b){return a.name>b.name})
+                                    each item in genres.sort(function (a,b){return a.order - b.order})
                                          option(value=item.id)
                                              = item.name
                             .select-wrapper

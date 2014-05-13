@@ -219,7 +219,7 @@ def index_view(request):
         # Form 4 films that have locations and are newest and have release date less than now.
     
         o_locs = content_model.Locations.objects.all()
-        o_film = sorted((ol.content.film for ol in o_locs if ol.content.film.releasedate < timezone.now()),
+        o_film = sorted((ol.content.film for ol in o_locs if ol.content.film.release_date < timezone.now().date()),
                         key=lambda f: f.release_date)[-4:]
 
         resp_dict_data = vbFilm(o_film, extend=True, many=True).data
@@ -233,9 +233,9 @@ def index_view(request):
 
     data = {
         'new_films': resp_dict_data,
-        'genres': o_genres.data,
+        'genres': [{'id':genre['id'],'name':genre['name'],'order':i} for i,genre in enumerate(sorted(o_genres.data, key = lambda g: g['name']))],
     }
-
+    
     return HttpResponse(render_page('index', data), status.HTTP_200_OK)
 
 
