@@ -26,7 +26,7 @@ class PersonsFilmView(APIView):
         }
 
         if cleaned_data['type'] and cleaned_data['type'] != 'all':
-            filter.update({'p_type__in': dict(APP_FILM_PERSON_TYPES_OUR)[cleaned_data['type']]})
+            filter.update({'p_type': dict(APP_FILM_PERSON_TYPES_OUR)[cleaned_data['type']]})
 
         result = PersonsFilms.objects.filter(**filter).\
                      values_list('person', flat=True)
