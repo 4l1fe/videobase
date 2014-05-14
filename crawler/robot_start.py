@@ -1,5 +1,7 @@
 # coding: utf-8
-""" Command to crawler sites"""
+""" Module containing general functionality for crawler robots
+and run function for robots written as loader parser combo
+"""
 from crawler.oll_tv.loader import Oll_Loader
 from crawler.oll_tv.parser import ParseOllFilm
 from crawler.tvzavr_ru.loader import Tvzavr_Loader
@@ -41,12 +43,8 @@ from crawler import Robot
 import json
 
 
-
-# Список допустимых сайтов
-
-
 # Словарь сайтов:
-# louder: загрузчик страници
+# loader: загрузчик страници
 # parser: парсер страници фильма
 sites_crawler = {
     'ivi_ru': {'loader': IVI_Loader,
@@ -140,7 +138,7 @@ def get_content(film, kwargs):
 
             return content
         else:
-            raise NameError(u"Variant with new series for serie not in db not implemented")
+            raise NameError(u"Variant with new series currently not in db is not implemented")
 
     else:
         print season_num
@@ -179,6 +177,14 @@ def get_content(film, kwargs):
 
 
 def save_location(film, **kwargs):
+    '''
+    Creating content if necessary and creating location
+
+    for given dictionary based on one produced by sane_dict
+
+    
+    '''
+    
     content = get_content(film, kwargs)
     val = URLValidator()
 
