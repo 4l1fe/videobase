@@ -1,5 +1,7 @@
 # coding: utf-8
-""" Command to crawler sites"""
+""" Module containing general functionality for crawler robots
+and run function for robots written as loader parser combo
+"""
 from crawler.oll_tv.loader import Oll_Loader
 from crawler.oll_tv.parser import ParseOllFilm
 from crawler.tvzavr_ru.loader import Tvzavr_Loader
@@ -31,6 +33,8 @@ from crawler.playfamily_dot_ru.loader import playfamily_loader
 from crawler.playfamily_dot_ru.parser import PlayfamilyParser
 from crawler.tvigle_ru.loader import TVIGLE_Loader
 from crawler.tvigle_ru.parsers import ParseTvigleFilm
+from crawler.zabava_ru.loader import ZABAVAR_RU_Loader
+from crawler.zabava_ru.parsers import ParseZabavaFilm
 from requests.exceptions import ConnectionError
 from apps.robots.constants import APP_ROBOTS_TRY_SITE_UNAVAILABLE, APP_ROBOTS_TRY_NO_SUCH_PAGE, \
     APP_ROBOTS_TRY_PARSE_ERROR
@@ -41,12 +45,8 @@ from crawler import Robot
 import json
 
 
-
-# Список допустимых сайтов
-
-
 # Словарь сайтов:
-# louder: загрузчик страници
+# loader: загрузчик страници
 # parser: парсер страници фильма
 sites_crawler = {
     'ivi_ru': {'loader': IVI_Loader,
@@ -68,7 +68,9 @@ sites_crawler = {
     'play_google_com': {'loader': PLAY_GOOGLE_Loader,
                         'parser': ParsePlayGoogleFilm},
     'oll_tv': {'loader': Oll_Loader,
-               'parser': ParseOllFilm()}
+               'parser': ParseOllFilm()},
+    'zabava_ru': {'loader': ZABAVAR_RU_Loader,
+                  'parser': ParseZabavaFilm},
 }
 sites = sites_crawler.keys()
 
@@ -140,7 +142,7 @@ def get_content(film, kwargs):
 
             return content
         else:
-            raise NameError(u"Variant with new series for serie not in db not implemented")
+            raise NameError(u"Variant with new series currently not in db is not implemented")
 
     else:
         print season_num
@@ -179,6 +181,14 @@ def get_content(film, kwargs):
 
 
 def save_location(film, **kwargs):
+    '''
+    Creating content if necessary and creating location
+
+    for given dictionary based on one produced by sane_dict
+
+    
+    '''
+    
     content = get_content(film, kwargs)
     val = URLValidator()
 
