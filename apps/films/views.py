@@ -3,34 +3,35 @@
 import re
 import os
 import warnings
-
+from datetime import date, timedelta
+from random import randrange
 from cStringIO import StringIO
 from PIL import Image, ImageEnhance
 
-from django.utils import timezone
 from django.core.files import File
-from django.contrib.auth.models import User
-from django.template import Template, Context
-from django.http import HttpResponse, Http404
-from django.core.context_processors import csrf
-from django.shortcuts import render_to_response
 from django.core.paginator import Paginator
+from django.core.cache import cache
+from django.core.context_processors import csrf
+
+from django.template import Context
+from django.http import HttpResponse, Http404
+from django.shortcuts import render_to_response
+from django.utils import timezone
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
+
 import apps.films.models as film_model
-from apps.films.constants import APP_PERSON_ACTOR, APP_PERSON_DIRECTOR,\
-    APP_FILM_SERIAL, APP_FILM_FULL_FILM, APP_USERFILM_STATUS_SUBS
-import apps.contents.models as content_model
-
-from apps.users.api.users import vbUser
-from apps.users.constants import APP_USERS_API_DEFAULT_PAGE,\
-    APP_USERS_API_DEFAULT_PER_PAGE
 from apps.films.api.serializers import vbFilm, vbComment, vbPerson
-
+from apps.films.api.serializers.vb_film import GenresSerializer
+import apps.contents.models as content_model
+from django.core.serializers.json import DjangoJSONEncoder
 from utils.noderender import render_page
+
+
+import json
 
 # Do not remove there is something going on when importing, probably models registering itselves
 # import apps.films.models
@@ -105,23 +106,18 @@ def bri_con(d, im, request):
 
 
 class PersonAPIView(APIView):
-    """
-
-    """
 
     def get(self, request, format=None, resource_id=None):
-        # Process any get params that you may need
-        # If you don't need to process get params,
-        # you can skip this part
-        #extend = request.GET.get('extend', False)
-        #p = Persons.objects.get(pk = kw['resource_id'])
         try:
             p = film_model.Persons.objects.get(pk=resource_id)
+            data = vbPerson(p).data
+            u = request.user
+            if u and u.is_authenticated():
+                data = vbPerson(p, user=u).data
+            return Response(data, status=status.HTTP_200_OK)
         except:
             return Response(status=status.HTTP_404_NOT_FOUND)
-            # Any URL parameters get passed in **kw
 
-        return Response(vbPerson(p).data, status=status.HTTP_200_OK)
 
     def post(self, request, format=None, resource_id=None):
         extend = request.DATA.get('extend', '')
@@ -132,7 +128,11 @@ class PersonAPIView(APIView):
 
         try:
             p = film_model.Persons.objects.get(pk=resource_id)
-            return Response(vbPerson(p, extend=extend).data, status=status.HTTP_200_OK)
+            data = vbPerson(p, extend=extend).data
+            u = request.user
+            if u and u.is_authenticated():
+                data = vbPerson(p, extend=True, user=u).data
+            return Response(data, status=status.HTTP_200_OK)
         except:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -211,123 +211,58 @@ class PersonsExtrasAPIView(APIView):
             raise Http404
 
 
-def transform_vbFilms(vbf):
-
-    vbf.update({'instock': True,
-        'hasFree': True,
-        'year': vbf['releasedate'].strftime('%Y'),
-        'releasedate': vbf['releasedate'].strftime('%Y-%m-%d'),
-        })
-
-    return vbf
-
-
 def index_view(request):
-    # ... view code here
+    NEW_FILMS_CACHE_KEY = "new_films"
+    resp_dict_serialized = cache.get(NEW_FILMS_CACHE_KEY)
 
-    o_film = film_model.Films.objects.order_by('-release_date').all()[:4]
+    if resp_dict_serialized is None:
+        encoder = DjangoJSONEncoder
+        # Form 4 films that have locations and are newest and have release date less than now.
+    
+        o_locs = content_model.Locations.objects.all()
+        o_film = sorted((ol.content.film for ol in o_locs if ol.content.film.release_date < timezone.now().date()),
+                        key=lambda f: f.release_date)[-4:]
 
-    resp_dict = vbFilm(o_film, extend=True, many=True)
-    data = resp_dict.data
+        resp_dict_data = vbFilm(o_film, extend=True, many=True).data
+        resp_dict_serialized = json.dumps(resp_dict_data, cls=encoder)
+        cache.set(NEW_FILMS_CACHE_KEY, resp_dict_serialized, 9000)
 
-    #try:
+    else:
+        resp_dict_data = json.loads(resp_dict_serialized)
 
-    resp_data = [transform_vbFilms(vbf) for vbf in data]
-    #except:
-    #    raise Http404
+    o_genres = GenresSerializer(film_model.Genres.objects.all(), many=True)
 
-    return HttpResponse(render_page('index', {'new_films': resp_data}), status.HTTP_200_OK)
+    data = {
+        'new_films': resp_dict_data,
+        'genres': [{'id':genre['id'],'name':genre['name'],'order':i} for i,genre in enumerate(sorted(o_genres.data, key = lambda g: g['name']))],
+    }
+    
+    return HttpResponse(render_page('index', data), status.HTTP_200_OK)
 
 
 def person_view(request, resource_id):
-        # ... view code here
-        '''
-        - header_title = person.name
-
-        - person_roles = person.roles && person.roles.length?person.roles.join(", "):false
-        - person_birthplace = person.birthplace && person.birthplace.length?person.birthplace.join(", "):false
-        - person_birthdate = new Date(person.birthdate)
-        - person_years_old = how_long(person_birthdate, 0)
-        - person_birthdate_string = date_text(person_birthdate) + " г. (" + person_years_old + ")"
-        '''
-
-        person = film_model.Persons.objects.get(pk=resource_id)
-
-        pfs = film_model.PersonsFilms.objects.filter(person=person)
-
-        vbFilms = [pf.film.as_vbFilm() for pf in pfs]
-
-        for vbf in vbFilms:
-            
-            vbf.update({'instock': True,
-                        'hasFree': True,
-                        'year': vbf['release_date'].strftime('%Y'),
-                        'release_date': vbf['release_date'].strftime('%Y-%m-%d')
-            })
-
-        return HttpResponse(render_page('person', {
-            'person': {'id': resource_id,
-                       'name': person.name,
-                       'photo': "static/img/tmp/person1.jpg",
-                       'bio': person.bio,
-                       'birthdate': "1974-01-22",
-                       'roles': ["актер", "режиссёр"],
-                       'birthplace': ["Москва", "Россия"]},
-            'filmography': vbFilms}))
-
-
-def login_view(request):
-    # ... view code here
-    pass
-
-
-def user_view(request, resource_id):
-
     try:
-        user = User.objects.get(pk=resource_id)
-        uvb = vbUser(user, extend=True, genres=True, friends=True)
-        default_user = {'regdate': uvb.data['regdate'].strftime("%Y-%m-%d")}
-        default_user.update(uvb.data)
-        delta = timezone.now() - uvb.data['regdate']
-        user_how_long = u"{}".format(delta.days if delta.days != 0 else 1)
-        if delta.days % 10 in [0, 1]:
-            day_title = u"день"
-        elif delta.days % 10 in [2, 3, 4, ]:
-            day_title = u"дня"
-        else:
-            day_title = u"дней"
-        user_how_long += u" {}".format(day_title)
-
-        films = film_model.Films.objects.filter(users_films__user=user,
-                                                type__in=(APP_FILM_SERIAL, APP_FILM_FULL_FILM),
-                                                users_films__status=APP_USERFILM_STATUS_SUBS)
-        page_films = Paginator(films, APP_USERS_API_DEFAULT_PER_PAGE).page(APP_USERS_API_DEFAULT_PAGE)
-        vbf = vbFilm(page_films.object_list, many=True)
-
-        actors = film_model.Persons.objects.filter(users_persons__user=user,
-                                                   person_film_rel__p_type=APP_PERSON_ACTOR)
-        page_actors = Paginator(actors, APP_USERS_API_DEFAULT_PER_PAGE).\
-            page(APP_USERS_API_DEFAULT_PAGE)
-        vba = vbPerson(page_actors.object_list, many=True)
-
-        directors = film_model.Persons.objects.filter(users_persons__user=user,
-                                                      person_film_rel__p_type=APP_PERSON_DIRECTOR)
-        page_directors = Paginator(directors, APP_USERS_API_DEFAULT_PER_PAGE).\
-            page(APP_USERS_API_DEFAULT_PAGE)
-        vbd = vbPerson(page_directors.object_list, many=True)
-
-        default = {'user': default_user,
-                   'films_subscribed': vbf.data,
-                   'actors_fav': vba.data,
-                   'feed': [],
-                   'directors_fav': vbd.data,
-                   'user_how_long': user_how_long,
-                   }
-
-        return HttpResponse(render_page('user', default))
-
-    except User.DoesNotExist:
+        person = film_model.Persons.objects.get(pk=resource_id)
+    except film_model.Persons.DoesNotExist:
         raise Http404
+
+    vbp = vbPerson(person, extend=True)
+    crutch = vbp.data  # костыль, до починки парсинга этих данных роботом.
+    if not vbp.data['birthdate']:
+        d1 = date(1960, 1, 1)
+        d2 = date(1980, 12, 12)
+        delta = d2 - d1
+        delta = delta.days*24*60*60
+        seconds = randrange(delta)
+        birthdate = (d1 + timedelta(seconds=seconds))
+        crutch['birthdate'] = birthdate.strftime('%w %B %Y')
+        crutch['years_old'] = date.today().year - birthdate.year
+    if not vbp.data.get('bio', None):
+        crutch['bio'] = 'Заглушка для биографии, пока робот не починен'
+    pfs = film_model.PersonsFilms.objects.filter(person=person)[:12]  # почему-то 12 первых фильмов. Был пагинатор
+    vbf = vbFilm([pf.film for pf in pfs], many=True)
+
+    return HttpResponse(render_page('person', {'person': crutch, 'filmography': vbf.data}))
 
 
 def test_view(request):
@@ -339,8 +274,14 @@ def test_view(request):
 
 def calc_actors(o_film):
     result_list = []
+    filter = {
+        'filter': {'person_film_rel__film': o_film.pk},
+        'offset': 0,
+        'limit': 5,
+    }
+
     try:
-        result_list = list(film_model.Persons.objects.filter(person_film_rel__film=o_film.pk).values('id', 'name')[:5])
+        result_list = list(film_model.Persons.get_sorted_persons_by_name(**filter).values('id', 'name'))
     except Exception, e:
         pass
 
@@ -348,16 +289,13 @@ def calc_actors(o_film):
 
 
 def calc_similar(o_film):
-    result_list = []
-
     try:
         result = film_model.Films.similar_api(o_film)
-        for item in result:
-            result_list.append({'id': item.id, 'name': item.name, 'rating': item.rating_cons, 'year': item.release_date.strftime("%Y")})
+        result = vbFilm(result).data
     except Exception, e:
         pass
 
-    return result_list
+    return result
 
 
 def calc_comments(o_film):
@@ -395,4 +333,3 @@ def film_view(request, film_id, *args, **kwargs):
     resp_dict['comments'] = calc_comments(o_film)
 
     return HttpResponse(render_page('film', {'film': resp_dict}))
-

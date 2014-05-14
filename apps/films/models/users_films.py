@@ -21,6 +21,25 @@ class UsersFilms(models.Model):
     def __unicode__(self):
         return u'[{0}] {1} - {2} ({3})'.format(self.pk, self.user.username, self.film.name, self.status)
 
+
+    @property
+    def check_subscribed(self):
+        return True if self.subscribed == APP_USERFILM_SUBS else False
+
+
+    @property
+    def get_name_status(self):
+        return dict(APP_USERFILM_STATUS).get(self.status)
+
+    @property
+    def relation_for_vb_film(self):
+        return {
+            'subscribed': self.check_subscribed,
+            'status': self.get_name_status if not self.status is None else None,
+            'rating': self.rating,
+        }
+
+
     class  Meta(object):
         # Имя таблицы в БД
         db_table = 'users_films'

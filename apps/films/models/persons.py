@@ -18,28 +18,37 @@ class Persons(PhotoClass):
     photo     = models.ImageField(upload_to=get_image_path, blank=True, null=True, verbose_name=u'Фото')
     birthdate = models.DateField(verbose_name=u'Дата дня рождения', null=True, blank=True)
 
+
     @property
     def get_upload_to(self):
         return APP_PERSON_PHOTO_DIR
+
 
     @property
     def get_full_name(self):
         full_name = u"{0} ({1})".format(self.name, self.name_orig)
         return full_name.strip()
 
+
     def __unicode__(self):
         return u'[%s] %s' % (self.pk, self.get_full_name)
 
-    def as_vBPerson(self, extend = False):
 
-        p_dict ={'id': self.pk,
-                'name': self.name,
-                'photo': self.photo if self.photo else '',
-        }
+    @classmethod
+    def get_sorted_persons_by_name(self, filter={}, offset=None, limit=None, *args, **kwargs):
+        obj = self.objects.filter(**filter).order_by('name')[slice(offset, limit)]
+
+        return obj
+
+    def as_vBPerson(self, extend=False):
+
+        p_dict = {'id': self.pk,
+                  'name': self.name,
+                  'photo': self.photo if self.photo else '',
+                  }
         if extend:
             p_dict['bio'] = self.bio
         return p_dict
-
         
     class Meta:
         # Имя таблицы в БД

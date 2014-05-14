@@ -72,7 +72,8 @@ def process_all():
             logger.info((u"Found rating for {} ".format(film.name_orig)).encode("utf-8"))
             rdict = name_dict[key]
             logger.debug(("Rating before {} Count before {} ".format(film.rating_imdb,film.rating_imdb_cnt)).encode("utf-8"))
-            film.rating_imdb=rdict['rating']
-            film.rating_imdb_cnt=rdict['votes']
+            
+            film.rating_imdb=0 if  rdict['rating'] is None else rdict['rating']
+            film.rating_imdb_cnt=0 if rdict['votes'] is None else rdict['votes']
             logger.debug(("Rating after {} Count after {}".format(film.rating_imdb,film.rating_imdb_cnt)).encode("utf-8"))
             film.save()
