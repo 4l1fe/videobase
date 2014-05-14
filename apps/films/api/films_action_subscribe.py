@@ -6,6 +6,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
 from apps.films.models import Films, UsersFilms
+from apps.contents.models import Locations
 from apps.films.constants import APP_USERFILM_SUBS_TRUE, APP_USERFILM_SUBS_FALSE, APP_FILM_SERIAL
 
 
@@ -41,7 +42,9 @@ class ActSubscribeFilmView(APIView):
 
         # Проверка, что это сериал
         if o_film.type != APP_FILM_SERIAL:
-            return Response({'error': u'Нельзя подписаться на фильм'}, status=status.HTTP_400_BAD_REQUEST)
+            result = Locations.exist_location(film_id)
+            if result:
+                return Response({'error': u'Нельзя подписаться на фильм'}, status=status.HTTP_400_BAD_REQUEST)
 
         # Init data
         subscribed = APP_USERFILM_SUBS_TRUE
