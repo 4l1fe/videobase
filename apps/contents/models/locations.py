@@ -44,13 +44,14 @@ class Locations(models.Model):
 
             cursor.execute(query, [pk])
             result = cursor.fetchone()
+
+            if result:
+                return True
+
         except Exception, e:
             return e
         finally:
             cursor.close()
-
-        if result:
-            return True
 
         return False
 
