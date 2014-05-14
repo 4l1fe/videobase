@@ -21,6 +21,7 @@ from django.utils import timezone
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from apps.films.constants import APP_FILM_PERSON_TYPES_OUR
 from apps.films.forms import PersonFilmographyApiForm
 
 import apps.films.models as film_model
@@ -145,14 +146,17 @@ class PersonFilmographyAPIView(APIView):
         if form.is_valid():
             try:
                 c_d = form.cleaned_data
-                films = [pf.film for pf in PersonsFilms.objects.filter(person__id=person_id, p_type=c_d['type'])]
+                pfs = PersonsFilms.objects.filter(person__id=person_id)
+                if c_d['type'] != 'all':
+                    pfs = pfs.filter(p_type=dict(APP_FILM_PERSON_TYPES_OUR)[c_d['type']])
+                films = [pf.film for pf in pfs]
                 paginator = Paginator(films, per_page=c_d['per_page']).page(c_d['page'])
                 data = vbFilm(paginator.object_list, many=True).data
                 return Response(data, status=status.HTTP_200_OK)
             except Exception as e:
                 return Response(status=status.HTTP_400_BAD_REQUEST)
 
-        return Response(form.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class PersonActionAPIView(APIView):

@@ -161,7 +161,7 @@ class PersonFilmographyApiForm(Form):
            kwargs['data']['page'] = 1
 
         if not kwargs['data'].get('per_page'):
-           kwargs['data']['page'] = 12
+           kwargs['data']['per_page'] = 12
 
         if not kwargs['data'].get('type'):
            kwargs['data']['type'] = 'all'
