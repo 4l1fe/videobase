@@ -1,7 +1,10 @@
 # coding: utf-8
 from __future__ import absolute_import
-from crawler.parse_page import crawler_get
-
+from apps.films.models import Persons
+from bs4 import BeautifulSoup
+from crawler.parse_page import crawler_get, get_photo
+from django.core.files import File
+from django.db import transaction
 
 from django.utils import timezone
 
@@ -27,9 +30,9 @@ logger = get_task_logger(__name__)
 
 def get_robot_by_name(robot_name):
     try:
-        return Robots.objects.get(robot_name)
+        return Robots.objects.get(name=robot_name)
     except Robots.DoesNotExist:
-        robot = Robots(name=robot_name, description='', delay=1, rstatus=0, state={"id": 1})
+        robot = Robots(name=robot_name, last_start=timezone.now() , description=' ', delay=1, rstatus=0, state={"id": 1})
         robot.save()
         return robot
 
@@ -40,10 +43,12 @@ def update_robot_state_film_id(robot):
         state = robot.state
     else:
         state = '{}'
-
-    try:
-        pstate =json.loads(state)
-    except ValueError:
+    if type(state) is dict:
+        pstate = state
+    else:
+        try:
+            pstate =json.loads(state)
+        except ValueError:
             pstate ={}
     if 'id' in pstate:
         film_id = pstate['id']
@@ -61,15 +66,40 @@ def update_robot_state_film_id(robot):
     return film_id
 
 def robot_task(robot_name):
-    @app.task(name=robot_name)
     def decor(func):
-
-        robot = get_robot_by_name(robot_name)
-        item_id =update_robot_state_film_id(robot)
-        print "Starting robot {} for id = {}".format(robot_name,item_id)
-        func(item_id)
-
+        @app.task(name=robot_name)
+        def wrapper():
+            robot = get_robot_by_name(robot_name)
+            item_id =update_robot_state_film_id(robot)
+            print "Starting robot {} for id = {}".format(robot_name,item_id)
+            func(item_id)
+        return wrapper
     return decor
+
+
+@robot_task('kinopoisk_poster')
+def get_person_poster(person_id):
+    try:
+        p = Persons.objects.get(id=person_id)
+        if p.photo == '' and p.kinopoisk_id != None:
+            p.photo.save('profile.jpg', File(get_photo(p.kinopoisk_id)))
+    except Robots.DoesNotExist:
+        pass
+
+
+@robot_task('kinopoisk_id_person')
+@transaction.commit_on_success
+def parse_id_persons(id):
+        try:
+            response = crawler_get('http://www.kinopoisk.ru/name/' + str(id))
+            soup = BeautifulSoup(response.content)
+            tag = soup.find('span', attrs={'itemprop': 'alternativeHeadline'})
+            person_name = tag.text.strip()
+            f = Persons.objects.get(name=person_name)
+            f.kinopoisk_id = id
+            f.save()
+        except Exception:
+            pass
 
 
 @app.task(name='robot_launch')
