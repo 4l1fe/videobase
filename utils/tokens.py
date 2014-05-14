@@ -1,4 +1,8 @@
 #coding: utf-8
+"""Содержит пару удобных методов для получения токенов по клиентским запросам через urllib.
+Так же есть методы на просмотрт возвращаемых значений от API проекта.
+"""
+
 import sys
 import json
 from pprint import pprint as pp
@@ -86,7 +90,7 @@ def get_person_films(id_, meth, page=1, per_page=12, type_='a', host=HOST):
         req = Request(urljoin(host, 'api/v1/persons/{}/filmography.json'.format(id_)))
         req.add_data(data)
     else:
-        req = Request(urljoin(host, 'api/v1/persons/{}/filmography.json?{}'.format(id_, data)))
+        req = Request(urljoin(host, 'api/v1/persons/{}/filmography.json?'.format(id_)))
 
     # req.add_header('Authorization', 'X-VB-Token ' + session_token)
     resp = urlopen(req)
@@ -100,8 +104,8 @@ def get_person_films(id_, meth, page=1, per_page=12, type_='a', host=HOST):
 if __name__ == '__main__':
     mt = get_main_token()
     print(mt)
-    # st = get_session_token(mt)
-    # print(st)
+    st = get_session_token(mt)
+    print(st)
     # resp = get_films_persons(st, 3)
     # pp(resp)
     # resp = get_users_persons(st, 1, 1, 10)
@@ -112,5 +116,5 @@ if __name__ == '__main__':
     # pp(resp)
     # resp = get_person(st, 12, 'post', extend=True)
     # pp(resp)
-    resp = get_person_films(2, 'get', 1, 12, 'all')
-    pp(resp)
+    # resp = get_person_films(2, 'get')
+    # pp(resp)
