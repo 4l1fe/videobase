@@ -31,7 +31,7 @@ def get_person(name):
     if f:
         return f[0]
     else:
-        p = Persons(name=name,photo='')
+        p = Persons(name=name, photo='')
         p.save()
         logging.debug(u'Added Person {}'.format(name))
         return p
@@ -75,8 +75,8 @@ def process_film(film, pdata):
     for p in pdata['Persons']:
         po = get_person(p['name'])
         if 'photo' in p:
-            if not (po.photo or (p['photo'] is None)):
-                po.photo.save('profile.jpg',File(p['photo']))
+            if not (po.photo != '' or (p['photo'] is None)):
+                po.photo.save('profile.jpg', File(p['photo']))
 
         if PersonsFilms.objects.filter(film=film,person=po):
             pass
