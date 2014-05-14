@@ -53,3 +53,6 @@ class ParseMegogoFilm(BaseParse):
         else:
             return [0]
 
+    def get_type(self, **kwargs):
+        return 'megogo'
+
