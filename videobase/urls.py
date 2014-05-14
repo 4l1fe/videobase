@@ -27,7 +27,6 @@ urlpatterns = patterns('',
 
     # Auth
     url(r'', include('social_auth.urls')),
-    url(r'^oauth-redirect/?$', views.RedirectOAuthView.as_view(), name='oauth-redirect'),
     url('^tokenize/?$', views.TokenizeView.as_view(), name="tokenize"),
 
     # Interface
