@@ -145,7 +145,6 @@ class vbFilm(serializers.ModelSerializer):
     def _rebuild_location(self):
         locations = Locations.objects.filter(content__film__in=self.list_obj_pk)\
             .order_by('content__film').select_related('content')
-            # .values('content__film', 'content', 'type', 'lang', 'quality', 'subtitles', 'price', 'price_type', 'url_view')
 
         result = {}
         for item in locations:
@@ -268,7 +267,7 @@ class vbFilm(serializers.ModelSerializer):
         model = Films
         fields = [
             'id', 'name', 'name_orig', 'releasedate', \
-            'ratings', 'duration', 'locations', 'poster', 'relation', \
-            'description', 'countries', 'directors', 'scriptwriters', \
-            'genres', 'persons','hasFree','instock'
+            'ratings', 'duration', 'locations', 'hasFree', 'instock',\
+            'poster', 'relation', 'description', 'countries', \
+            'directors', 'scriptwriters', 'genres', 'persons'
         ]
