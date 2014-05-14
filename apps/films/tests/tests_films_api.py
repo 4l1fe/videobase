@@ -13,7 +13,7 @@ from apps.films.tests.factories import (UserFactory, GenreFactory, CountriesFact
 from apps.films.constants import (APP_PERSON_PRODUCER, APP_FILM_SERIAL, APP_PERSON_DIRECTOR,APP_PERSON_ACTOR,
                                   APP_USERFILM_STATUS_UNDEF, APP_USERFILM_STATUS_NOT_WATCH, APP_USERFILM_STATUS_SUBS,
                                   APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER, APP_FILM_TYPE_ADDITIONAL_MATERIAL_TRAILER,
-                                  APP_USERFILM_SUBS_TRUE, APP_USERFILM_SUBS_FALSE)
+                                  APP_USERFILM_SUBS_TRUE, APP_USERFILM_SUBS_FALSE, APP_USERFILM_STATUS)
 from apps.users.models.api_session import SessionToken, UsersApiSessions
 from apps.films.models import UsersFilms
 from apps.contents.models import Comments
@@ -96,7 +96,9 @@ class FilmsTestCase(APITestCase):
         self.assertEqual(response_data['ratings']['cons'][0], film.rating_cons)
         self.assertEqual(response_data['ratings']['cons'][1], film.rating_cons_cnt)
         self.assertEqual(response_data['duration'], film.duration)
-        self.assertEqual(response_data['relation'], {})
+        user_film = UsersFilms.objects.last()
+        self.assertDictEqual(response_data['relation'], ({'status': dict(APP_USERFILM_STATUS).get(user_film.status),\
+        'rating': user_film.rating, 'subscribed': False if user_film.subscribed == APP_USERFILM_SUBS_FALSE else True}) if user_film else {})
 
     def comment_assert(self, response_data, comments, film, start_count, data, user):
         self.assertEqual(response_data['page'], data['page'])
@@ -150,7 +152,7 @@ class FilmsTestCase(APITestCase):
         response = self.client.post(reverse('film_details_view', kwargs={'film_id': film.id, 'format': 'json'}), data={})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_api_detail_all_data_post(self):
+    def api_detail_all_data_post(self, auth):
         film = self.films[0]
         locations = []
         extras = None
@@ -167,8 +169,12 @@ class FilmsTestCase(APITestCase):
             if film.id == ext.film.id and len(ext.photo.url) is not 0:
                 extras = ext
                 break
-
-        response = self.client.post(reverse('film_details_view', kwargs={'film_id': film.id, 'format': 'json'}), data={'extend': True, 'persons': True})
+        if auth:
+            UsersFilmsFactory.create(user=self.user, film=film, status=APP_USERFILM_STATUS_SUBS)
+            token = self.headers
+        else:
+            token = ''
+        response = self.client.post(reverse('film_details_view', kwargs={'film_id': film.id, 'format': 'json'}), data={'extend': True, 'persons': True}, HTTP_X_MI_SESSION=token)
         self.assertEqual(len(response.data['countries']), len(film.countries.all().values('id', 'name')))
         self.assertEqual(len(response.data['genres']), len(film.genres.all().values('id', 'name')))
         self.assertEqual(len(response.data['persons']), len(film.persons.all().values('id', 'name', 'photo')))
@@ -191,6 +197,12 @@ class FilmsTestCase(APITestCase):
         self.locations_assert(response.data['locations'], locations)
         self.not_extend_assert(response.data, film, extras)
         self.assertEqual(response.data['description'], film.description)
+
+    def test_api_detail_all_data_post_with_auth(self):
+        self.api_detail_all_data_post(True)
+
+    def test_api_detail_all_data_post_without_auth(self):
+        self.api_detail_all_data_post(False)
 
     def test_api_detail_extend_data_post(self):
         film = self.films[0]
