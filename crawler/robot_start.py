@@ -70,7 +70,7 @@ sites_crawler = {
     'oll_tv': {'loader': Oll_Loader,
                'parser': ParseOllFilm()},
     'zabava_ru': {'loader': ZABAVAR_RU_Loader,
-                  'parser': ParseZabavaFilm},
+                  'parser': ParseZabavaFilm}
 }
 sites = sites_crawler.keys()
 
