@@ -94,7 +94,8 @@
         value = value.substr(0, value.indexOf("#"));
         ratio = 640 / 360;
         height = parseInt(width / ratio);
-        html = '<object id="DigitalaccessVideoPlayer" classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" width="100%" height="100%" type="application/x-shockwave-flash" data="http://www.ivi.ru/video/player?siteId=s138&amp;_isB2C=1&amp;autoStart=1&amp;videoId=' + value + '&amp;allowSeriesPlaylist=1&amp;disableiviredirect=0&amp;share_embed=0"><param name="movie" value="http://www.ivi.ru/video/player?siteId=s138&amp;_isB2C=1&amp;autoStart=1&amp;videoId=' + value + '&amp;allowSeriesPlaylist=1&amp;disableiviredirect=0&amp;share_embed=0"><param name="allowScriptAccess" value="always"><param name="allowFullScreen" value="true"><param name="bgcolor" value="#000000"><param name="wmode" value="opaque"><embed quality="high" allowscriptaccess="always" allowfullscreen="true" wmode="opaque" width="100%" height="100%" type="application/x-shockwave-flash" src="http://www.ivi.ru/video/player?siteId=s138&amp;_isB2C=1&amp;autoStart=1&amp;videoId=' + value + '&amp;allowSeriesPlaylist=1&amp;disableiviredirect=0&amp;share_embed=0"></object>';
+        console.log(value);
+        html = '<object id="DigitalaccessVideoPlayer" classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" width="100%" height="100%" type="application/x-shockwave-flash" data="http://www.ivi.ru/video/player?siteId=s138&amp;_isB2C=1&amp;autoStart=1&amp;videoId=' + value + '&amp;allowSeriesPlaylist=1&amp;disableiviredirect=0&amp;share_embed=0"><param name="movie" value="http://www.ivi.ru/video/player?siteId=s138&amp;_isB2C=1&amp;autoStart=1&amp;videoId=' + value + '&amp;allowSeriesPlaylist=1&amp;disableiviredirect=0&amp;share_embed=0"><param name="allowScriptAccess" value="always"><param name="allowFullScreen" value="true"><param name="bgcolor" value="#000000"><param name="wmode" value="opaque"><embed allowscriptaccess="always" allowfullscreen="true" wmode="opaque" width="100%" height="100%" type="application/x-shockwave-flash" src="http://www.ivi.ru/video/player?siteId=s138&amp;_isB2C=1&amp;autoStart=1&amp;videoId=' + value + '&amp;allowSeriesPlaylist=1&amp;disableiviredirect=0&amp;share_embed=0"></object>';
       } else if (type === "nowru") {
         arr = loc.url_view.split("/");
         value = arr[arr.length - 1];
@@ -765,6 +766,7 @@
     query_params = void 0;
 
     function App(opts, name) {
+      var q;
       if (opts == null) {
         opts = {};
       }
@@ -802,6 +804,17 @@
         isSingle: true
       });
       this.rest.persons.action.add("subscribe");
+      this._e = {
+        search: {
+          frm: $("#frm_search")
+        }
+      };
+      this._e.search.input = $(".inp-search", this._e.search.frm);
+      this._e.search.btn = $(".btn-search", this._e.search.frm);
+      q = this.query_params("q");
+      if (q) {
+        this._e.search.input.val(q);
+      }
       if (name !== void 0) {
         this.show_page(name, conf.page_conf);
       }
@@ -961,7 +974,7 @@
           return error("Page " + name + " is not active");
         }
       } else {
-        return error("No page " + name + "found");
+        return error("No page " + name + " found");
       }
     };
 
@@ -1061,7 +1074,20 @@
         }
       }
       this.update_filter_params();
-      films_deck.load_more();
+      if (films_deck.get_items().length >= 12) {
+        this.load_more_films(films_deck, {
+          clear_output: true
+        });
+      } else {
+        films_deck.load_more_hide();
+      }
+      this._app._e.search.frm.submit(function(event) {
+        event.preventDefault();
+        self.filter_changed(self._app._e.search.input.val());
+        return $("html, body").animate({
+          scrollTop: $("#films").offset().top
+        }, 1000);
+      });
     }
 
     Page_Main.prototype.filter_changed_event = function() {
@@ -1097,7 +1123,7 @@
         update_href = true;
       }
       if (_filter_params.text) {
-        query_string = "text=" + encodeURI(_filter_params.text);
+        query_string = "q=" + encodeURI(_filter_params.text);
       } else {
         query_string = "";
       }
@@ -1133,28 +1159,30 @@
     };
 
     Page_Main.prototype.load_more_films = function(deck, opts) {
-      var current_counter;
+      var current_counter, params;
       if (opts == null) {
         opts = {};
       }
+      deck.load_more_hide();
+      params = $.extend(_filter_params, opts.params || {});
       if (opts.clear_output) {
         deck.clear();
+        params.page = 0;
+      } else {
+        params.page = deck.page + 1;
       }
       current_counter = deck.load_counter;
-      deck.load_more_hide();
-      if (!opts.params) {
-        opts.params = {};
-      }
-      return self._app.rest.films.read("search", opts.params).done((function(_this) {
+      console.log(params);
+      return self._app.rest.films.read("search", params).done((function(_this) {
         return function(data) {
           if (current_counter !== deck.load_counter) {
             return;
           }
           if (data.items) {
             deck.add_items(data.items);
-          }
-          if (Math.ceil(data.total_cnt / data.per_page) > data.page) {
-            deck.load_more_show();
+            if (data.items.length >= 12) {
+              deck.load_more_show();
+            }
             deck.page = data.page;
           }
           if (opts.callback) {
@@ -1242,6 +1270,9 @@
           return _this.action_rate(_this._e.rateit.rateit("value"));
         };
       })(this));
+      if (this.conf.relation && this.conf.relation.rating) {
+        this._e.rateit.rateit("value", this.conf.relation.rating);
+      }
       this._e.notwatch_btn = $("#notwatch_btn");
       if (this._e.notwatch_btn.length) {
         this._e.notwatch_btn.bind("click", (function(_this) {
@@ -1418,17 +1449,20 @@
       var current_counter;
       current_counter = deck.load_counter;
       deck.load_more_hide();
-      return this._app.rest.persons.filmography.read(this.conf.id, {}).done((function(_this) {
+      console.log(deck.page);
+      return this._app.rest.persons.filmography.read(this.conf.id, {
+        page: deck.page + 1
+      }).done((function(_this) {
         return function(data) {
           if (current_counter !== deck.load_counter) {
             return;
           }
           if (data.items) {
             deck.add_items(data.items);
-          }
-          if (Math.ceil(data.total_cnt / data.per_page) > data.page) {
-            deck.load_more_show();
-            return deck.page = data.page;
+            if (data.items.length >= 12) {
+              deck.load_more_show();
+              return deck.page = data.page;
+            }
           }
         };
       })(this)).fail((function(_this) {
