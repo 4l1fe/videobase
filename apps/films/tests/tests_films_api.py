@@ -67,7 +67,7 @@ class FilmsTestCase(APITestCase):
         token = Token.objects.get(user=self.user)
         s_token = SessionToken.objects.create(user=self.user)
         UsersApiSessions.objects.create(token=s_token)
-        self.headers = "%s %s" % ('X-VB-Token', s_token.key)
+        self.headers = s_token.key
 
     def locations_assert(self, response_locations, locations):
         self.assertEqual(len(response_locations), len(locations))
@@ -281,7 +281,7 @@ class FilmsTestCase(APITestCase):
         data = {'text': u'Отличный фильм'}
         response = self.client.post(
             reverse('act_film_comment_view', kwargs={'film_id': film.id, 'format': 'json'}),
-            HTTP_AUTHORIZATION=self.headers, data=data
+            HTTP_X_MI_SESSION=self.headers, data=data
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         comment = Comments.objects.all().last()
@@ -293,13 +293,13 @@ class FilmsTestCase(APITestCase):
         film = self.films[0]
         response = self.client.post(
             reverse('act_film_comment_view', kwargs={'film_id': film.id, 'format': 'json'}),
-            HTTP_AUTHORIZATION=self.headers
+            HTTP_X_MI_SESSION=self.headers
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_api_action_comments_add_404(self):
         data = {'text': u'Отличный фильм'}
-        response = self.client.post(reverse('act_film_comment_view', kwargs={'film_id': 0, 'format': 'json'}), HTTP_AUTHORIZATION=self.headers, data=data)
+        response = self.client.post(reverse('act_film_comment_view', kwargs={'film_id': 0, 'format': 'json'}), HTTP_X_MI_SESSION=self.headers, data=data)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_api_action_comments_add_not_authenticated(self):
@@ -310,7 +310,7 @@ class FilmsTestCase(APITestCase):
 
     def test_api_action_not_watch_add_new(self):
         film = self.films[0]
-        response = self.client.get(reverse('act_film_notwatch_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_AUTHORIZATION=self.headers)
+        response = self.client.get(reverse('act_film_notwatch_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_X_MI_SESSION=self.headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         user_film = UsersFilms.objects.all().last()
         self.assertEqual(user_film.film, film)
@@ -320,7 +320,7 @@ class FilmsTestCase(APITestCase):
     def test_api_action_not_watch_update(self):
         film = self.films[0]
         with self.assertRaises(IntegrityError):
-            response = self.client.get(reverse('act_film_notwatch_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_AUTHORIZATION=self.headers)
+            response = self.client.get(reverse('act_film_notwatch_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_X_MI_SESSION=self.headers)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             user_film = UsersFilms.objects.all().last()
             self.assertEqual(user_film.film, film)
@@ -339,7 +339,7 @@ class FilmsTestCase(APITestCase):
     def test_api_action_not_watch_delete_ok(self):
         film = self.films[0]
         UsersFilmsFactory.create(user=self.user, film=film, status=APP_USERFILM_STATUS_NOT_WATCH)
-        response = self.client.delete(reverse('act_film_notwatch_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_AUTHORIZATION=self.headers)
+        response = self.client.delete(reverse('act_film_notwatch_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_X_MI_SESSION=self.headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         user_film = UsersFilms.objects.all().last()
         self.assertEqual(user_film.film, film)
@@ -348,18 +348,18 @@ class FilmsTestCase(APITestCase):
 
     def test_api_action_not_watch_delete_without_users_films_ok(self):
         film = self.films[0]
-        response = self.client.delete(reverse('act_film_notwatch_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_AUTHORIZATION=self.headers)
+        response = self.client.delete(reverse('act_film_notwatch_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_X_MI_SESSION=self.headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_api_action_not_watch_404(self):
-        response = self.client.delete(reverse('act_film_notwatch_view', kwargs={'film_id': 0, 'format': 'json'}), HTTP_AUTHORIZATION=self.headers)
+        response = self.client.delete(reverse('act_film_notwatch_view', kwargs={'film_id': 0, 'format': 'json'}), HTTP_X_MI_SESSION=self.headers)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        response = self.client.get(reverse('act_film_notwatch_view', kwargs={'film_id': 0, 'format': 'json'}), HTTP_AUTHORIZATION=self.headers)
+        response = self.client.get(reverse('act_film_notwatch_view', kwargs={'film_id': 0, 'format': 'json'}), HTTP_X_MI_SESSION=self.headers)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_api_action_playlist_add(self):
         film = self.films[0]
-        response = self.client.get(reverse('act_film_playlist_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_AUTHORIZATION=self.headers)
+        response = self.client.get(reverse('act_film_playlist_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_X_MI_SESSION=self.headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         users_films = UsersFilms.objects.all().last()
         self.assertEqual(users_films.film, film)
@@ -370,13 +370,13 @@ class FilmsTestCase(APITestCase):
     def test_api_action_playlist_already_exist(self):
         film = self.films[0]
         UsersFilmsFactory.create(user=self.user, film=film, status=APP_USERFILM_STATUS_SUBS, subscribed=APP_USERFILM_SUBS_TRUE)
-        response = self.client.get(reverse('act_film_playlist_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_AUTHORIZATION=self.headers)
+        response = self.client.get(reverse('act_film_playlist_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_X_MI_SESSION=self.headers)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_api_action_playlist_404(self):
-        response = self.client.get(reverse('act_film_playlist_view', kwargs={'film_id': 0, 'format': 'json'}), HTTP_AUTHORIZATION=self.headers)
+        response = self.client.get(reverse('act_film_playlist_view', kwargs={'film_id': 0, 'format': 'json'}), HTTP_X_MI_SESSION=self.headers)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        response = self.client.delete(reverse('act_film_playlist_view', kwargs={'film_id': 0, 'format': 'json'}), HTTP_AUTHORIZATION=self.headers)
+        response = self.client.delete(reverse('act_film_playlist_view', kwargs={'film_id': 0, 'format': 'json'}), HTTP_X_MI_SESSION=self.headers)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_api_action_playlist_not_authenticated(self):
@@ -389,13 +389,13 @@ class FilmsTestCase(APITestCase):
     def test_api_action_playlist_delete(self):
         film = self.films[0]
         UsersFilmsFactory.create(user=self.user, film=film, status=APP_USERFILM_STATUS_SUBS, subscribed=APP_USERFILM_SUBS_TRUE)
-        response = self.client.delete(reverse('act_film_playlist_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_AUTHORIZATION=self.headers)
+        response = self.client.delete(reverse('act_film_playlist_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_X_MI_SESSION=self.headers)
         self.assertTrue(not UsersFilms.objects.all())
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_api_action_playlist_add_serial(self):
         film = self.films[1]
-        response = self.client.get(reverse('act_film_playlist_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_AUTHORIZATION=self.headers)
+        response = self.client.get(reverse('act_film_playlist_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_X_MI_SESSION=self.headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         users_films = UsersFilms.objects.all().last()
         self.assertEqual(users_films.film, film)
@@ -406,7 +406,7 @@ class FilmsTestCase(APITestCase):
     def test_api_action_rate_add(self):
         film = self.films[0]
         data = {'rating': 10}
-        response = self.client.post(reverse('act_film_rate_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_AUTHORIZATION=self.headers, data=data)
+        response = self.client.put(reverse('act_film_rate_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_X_MI_SESSION=self.headers, data=data)
         users_films = UsersFilms.objects.all().last()
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(users_films.film, film)
@@ -417,7 +417,7 @@ class FilmsTestCase(APITestCase):
         film = self.films[0]
         data = {'rating': 10}
         with self.assertRaises(IntegrityError):
-            response = self.client.post(reverse('act_film_rate_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_AUTHORIZATION=self.headers, data=data)
+            response = self.client.put(reverse('act_film_rate_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_X_MI_SESSION=self.headers, data=data)
             users_films = UsersFilms.objects.all().last()
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self.assertEqual(users_films.film, film)
@@ -428,12 +428,12 @@ class FilmsTestCase(APITestCase):
 
     def test_api_action_rate_bad(self):
         film = self.films[0]
-        response = self.client.post(reverse('act_film_rate_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_AUTHORIZATION=self.headers)
+        response = self.client.put(reverse('act_film_rate_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_X_MI_SESSION=self.headers)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_api_action_rate_not_authenticated(self):
         film = self.films[0]
-        response = self.client.post(reverse('act_film_rate_view', kwargs={'film_id': film.id, 'format': 'json'}))
+        response = self.client.put(reverse('act_film_rate_view', kwargs={'film_id': film.id, 'format': 'json'}))
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
         response = self.client.delete(reverse('act_film_rate_view', kwargs={'film_id': film.id, 'format': 'json'}))
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
@@ -441,7 +441,7 @@ class FilmsTestCase(APITestCase):
     def test_api_action_rate_delete(self):
         film = self.films[0]
         UsersFilmsFactory.create(user=self.user, film=film, rating=10)
-        response = self.client.delete(reverse('act_film_rate_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_AUTHORIZATION=self.headers)
+        response = self.client.delete(reverse('act_film_rate_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_X_MI_SESSION=self.headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         users_films = UsersFilms.objects.all().last()
         self.assertEqual(users_films.film, film)
@@ -450,19 +450,19 @@ class FilmsTestCase(APITestCase):
 
     def test_api_action_rate_404(self):
         data = {'rating': 10}
-        response = self.client.delete(reverse('act_film_rate_view', kwargs={'film_id': 0, 'format': 'json'}), HTTP_AUTHORIZATION=self.headers)
+        response = self.client.delete(reverse('act_film_rate_view', kwargs={'film_id': 0, 'format': 'json'}), HTTP_X_MI_SESSION=self.headers)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        response = self.client.post(reverse('act_film_rate_view', kwargs={'film_id': 0, 'format': 'json'}), HTTP_AUTHORIZATION=self.headers, data=data)
+        response = self.client.put(reverse('act_film_rate_view', kwargs={'film_id': 0, 'format': 'json'}), HTTP_X_MI_SESSION=self.headers, data=data)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_api_action_subscribe_film(self):
         film = self.films[0]
-        response = self.client.get(reverse('act_film_subscribe_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_AUTHORIZATION=self.headers)
+        response = self.client.get(reverse('act_film_subscribe_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_X_MI_SESSION=self.headers)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_api_action_subscribe_serial_add(self):
         film = self.films[1]
-        response = self.client.get(reverse('act_film_subscribe_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_AUTHORIZATION=self.headers)
+        response = self.client.get(reverse('act_film_subscribe_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_X_MI_SESSION=self.headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         users_films = UsersFilms.objects.all().last()
         self.assertEqual(users_films.film, film)
@@ -472,7 +472,7 @@ class FilmsTestCase(APITestCase):
     def test_api_action_subscribe_serial_update(self):
         film = self.films[1]
         with self.assertRaises(IntegrityError):
-            response = self.client.get(reverse('act_film_subscribe_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_AUTHORIZATION=self.headers)
+            response = self.client.get(reverse('act_film_subscribe_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_X_MI_SESSION=self.headers)
             users_films = UsersFilms.objects.all().last()
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self.assertEqual(users_films.film, film)
@@ -482,9 +482,9 @@ class FilmsTestCase(APITestCase):
                 UsersFilmsFactory.create(user=self.user, film=film)
 
     def test_api_action_subscribe_404(self):
-        response = self.client.get(reverse('act_film_subscribe_view', kwargs={'film_id': 0, 'format': 'json'}), HTTP_AUTHORIZATION=self.headers)
+        response = self.client.get(reverse('act_film_subscribe_view', kwargs={'film_id': 0, 'format': 'json'}), HTTP_X_MI_SESSION=self.headers)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        response = self.client.delete(reverse('act_film_subscribe_view', kwargs={'film_id': 0, 'format': 'json'}), HTTP_AUTHORIZATION=self.headers)
+        response = self.client.delete(reverse('act_film_subscribe_view', kwargs={'film_id': 0, 'format': 'json'}), HTTP_X_MI_SESSION=self.headers)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_api_action_subscribe_not_authenticated(self):
@@ -499,7 +499,7 @@ class FilmsTestCase(APITestCase):
         film = self.films[0]
         response = self.client.delete(
             reverse('act_film_subscribe_view', kwargs={'film_id': film.id, 'format': 'json'}),
-            HTTP_AUTHORIZATION=self.headers
+            HTTP_X_MI_SESSION=self.headers
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -509,7 +509,7 @@ class FilmsTestCase(APITestCase):
 
         response = self.client.delete(
             reverse('act_film_subscribe_view', kwargs={'film_id': film.id, 'format': 'json'}),
-            HTTP_AUTHORIZATION=self.headers
+            HTTP_X_MI_SESSION=self.headers
         )
         users_films = UsersFilms.objects.all().last()
         self.assertEqual(users_films.film, film)
