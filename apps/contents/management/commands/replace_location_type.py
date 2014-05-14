@@ -40,12 +40,12 @@ class Command(BaseCommand):
     @transaction.commit_on_success
     def replace_type_chunk(self, offset):
         o_loc = Locations.objects.order_by('id')[offset:offset + self.step_limit]
-        t = dict(APP_CONTENTS_LOC_TYPE)
+        loc_type = dict(APP_CONTENTS_LOC_TYPE)
 
         for item in o_loc:
             pattern = urlparse.urlsplit(item.url_view).netloc
 
-            for i in t.keys():
+            for i in loc_type.keys():
                 if i in pattern:
                     item.type = i
                     item.save()
