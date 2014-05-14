@@ -21,9 +21,10 @@ from django.utils import timezone
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-
+from apps.films.forms import PersonFilmographyApiForm
 
 import apps.films.models as film_model
+from apps.films.models import PersonsFilms
 from apps.films.api.serializers import vbFilm, vbComment, vbPerson
 from apps.films.api.serializers.vb_film import GenresSerializer
 import apps.contents.models as content_model
@@ -138,19 +139,20 @@ class PersonAPIView(APIView):
 
 
 class PersonFilmographyAPIView(APIView):
-    """
 
-    """
+    def get(self, request, person_id, format=None):
+        form = PersonFilmographyApiForm(data=request.GET.copy())
+        if form.is_valid():
+            try:
+                c_d = form.cleaned_data
+                films = [pf.film for pf in PersonsFilms.objects.filter(person__id=person_id, p_type=c_d['type'])]
+                paginator = Paginator(films, per_page=c_d['per_page']).page(c_d['page'])
+                data = vbFilm(paginator.object_list, many=True).data
+                return Response(data, status=status.HTTP_200_OK)
+            except Exception as e:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
 
-    def get(self, request, format=None, resource_id=None, extend=False):
-        try:
-            p = film_model.Persons.objects.get(pk=resource_id)
-            pfs = film_model.PersonsFilms.objects.filter(person=p)
-            vbFilms = [pf.film.as_vbFilm() for pf in pfs]
-        except Exception,e:
-            raise Http404
-
-        return Response(vbFilms, status=status.HTTP_200_OK)
+        return Response(form.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class PersonActionAPIView(APIView):
