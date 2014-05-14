@@ -14,6 +14,7 @@ from apps.contents.models import *
 from apps.films.constants import APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER,\
                                  APP_PERSON_DIRECTOR, APP_PERSON_SCRIPTWRITER
 
+from apps.contents.constants import APP_CONTENTS_PRICE_TYPE_FREE
 from utils.common import group_by
 from utils.middlewares.local_thread import get_api_request
 
@@ -60,6 +61,8 @@ class vbFilm(serializers.ModelSerializer):
     relation = serializers.SerializerMethodField('relation_list')
     releasedate = serializers.SerializerMethodField('calc_release')
     locations = serializers.SerializerMethodField('locations_list')
+    hasFree = serializers.SerializerMethodField('calc_has_free')
+    instock = serializers.SerializerMethodField('calc_instock')
 
     # Признак extend
     countries = CountriesSerializer()
@@ -109,6 +112,23 @@ class vbFilm(serializers.ModelSerializer):
         return obj.get_rating_for_vb_film
 
 
+    def calc_has_free(self, obj):
+        result = self.location_rebuild.get(obj.pk, [])
+        for loc in result:
+            if loc.price_type==APP_CONTENTS_PRICE_TYPE_FREE:
+                return True
+
+        return False
+
+
+    def calc_instock(self, obj):
+        result = self.location_rebuild.get(obj.pk, [])
+        if len(result):
+            return True
+
+        return False
+
+
     def _get_obj_list(self):
         list_pk = []
         instance = self.object
@@ -132,6 +152,7 @@ class vbFilm(serializers.ModelSerializer):
             v = item.content.film_id
             if not v in result:
                 result[v] = []
+
             result[v].append(item)
 
         self.location_rebuild = result
@@ -249,5 +270,5 @@ class vbFilm(serializers.ModelSerializer):
             'id', 'name', 'name_orig', 'releasedate', \
             'ratings', 'duration', 'locations', 'poster', 'relation', \
             'description', 'countries', 'directors', 'scriptwriters', \
-            'genres', 'persons',
+            'genres', 'persons','hasFree','instock'
         ]

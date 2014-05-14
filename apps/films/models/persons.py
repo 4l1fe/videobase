@@ -19,17 +19,27 @@ class Persons(PhotoClass):
     birthdate = models.DateField(verbose_name=u'Дата дня рождения', null=True, blank=True)
     kinopoisk_id = models.IntegerField(blank=True, null=True)
 
+
     @property
     def get_upload_to(self):
         return APP_PERSON_PHOTO_DIR
+
 
     @property
     def get_full_name(self):
         full_name = u"{0} ({1})".format(self.name, self.name_orig)
         return full_name.strip()
 
+
     def __unicode__(self):
         return u'[%s] %s' % (self.pk, self.get_full_name)
+
+
+    @classmethod
+    def get_sorted_persons_by_name(self, filter={}, offset=None, limit=None, *args, **kwargs):
+        obj = self.objects.filter(**filter).order_by('name')[slice(offset, limit)]
+
+        return obj
 
     def as_vBPerson(self, extend=False):
 

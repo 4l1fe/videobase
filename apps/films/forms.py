@@ -4,7 +4,7 @@ from django.forms import ModelForm, Form
 from django.core.exceptions import ValidationError
 from django.forms import fields
 
-from apps.films.constants import APP_FILM_PERSON_TYPES
+from apps.films.constants import APP_FILM_PERSON_TYPES_OUR
 from apps.films.models import Persons, Seasons, Films, FilmExtras
 from apps.films.constants import APP_FILM_ADMIN_CSS, APP_FILM_ADMIN_JS_LIBS, APP_FILM_SERIAL
 
@@ -101,7 +101,7 @@ class RatingForm(Form):
     Форма рейтинга для фильмов
     """
 
-    rating = fields.IntegerField(min_value=1, max_value=10, help_text=u'Оценка')
+    rating = fields.FloatField(min_value=1.0, max_value=10.0, help_text=u'Оценка')
 
 
 #############################################################################################################
@@ -129,15 +129,20 @@ class PersonApiForm(Form):
     Форма для проверки vbPerson
     """
 
-    type  = fields.ChoiceField(required=False, choices=APP_FILM_PERSON_TYPES, help_text=u'Тип')
-    top   = fields.IntegerField(initial=0, min_value=0, help_text=u'Сортировать с')
-    limit = fields.IntegerField(initial=12, min_value=1, max_value=20, help_text=u'Ограничение')
+    type  = fields.ChoiceField(choices=APP_FILM_PERSON_TYPES_OUR, help_text=u'Тип')
+    top   = fields.IntegerField(min_value=0, help_text=u'Сортировать с')
+    limit = fields.IntegerField(required=False, min_value=1, help_text=u'Ограничение')
 
     def __init__(self, *args, **kwargs):
         if not kwargs['data'].get('top'):
            kwargs['data']['top'] = 0
 
-        if not kwargs['data'].get('limit'):
-           kwargs['data']['limit'] = 12
+        if not kwargs['data'].get('type'):
+           kwargs['data']['type'] = 'all'
 
         super(PersonApiForm, self).__init__(*args, **kwargs)
+
+        for k,v in self.fields.items():
+            if k in kwargs['data'] and kwargs['data'][k]:
+                if self.fields[k].required == False:
+                    self.fields[k].required = True
