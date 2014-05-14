@@ -1,5 +1,7 @@
 # coding: utf-8
 
+import datetime
+
 from django.db import models
 from ..constants import *
 
@@ -22,14 +24,14 @@ class Films(models.Model):
     duration         = models.IntegerField(null=True, blank=True, verbose_name=u'Продолжительность фильма')
     budget           = models.IntegerField(null=True, blank=True, verbose_name=u'Бюджет фильма')
     description      = models.TextField(default='', blank=True, verbose_name=u'Описание фильма')
-    rating_local     = models.FloatField(null=True, blank=True, verbose_name=u'Рейтинг фильма по мнению пользователей нашего сайта')
-    rating_local_cnt = models.PositiveSmallIntegerField(null=True, blank=True, verbose_name=u'Количество пользователей нашего сайта оценивших фильм')
+    rating_local     = models.FloatField(null=True, blank=True, default=0, verbose_name=u'Рейтинг фильма по мнению пользователей нашего сайта')
+    rating_local_cnt = models.PositiveSmallIntegerField(null=True, blank=True, default=0, verbose_name=u'Количество пользователей нашего сайта оценивших фильм')
     imdb_id          = models.IntegerField(null=True, blank=True, verbose_name=u'Порядковый номер на IMDB')
-    rating_imdb      = models.FloatField(null=True, blank=True, verbose_name=u'Рейтинг фильма на сайте imdb.com')
-    rating_imdb_cnt  = models.IntegerField(null=True, blank=True, verbose_name=u'Количество пользователей imdb.com оценивших этот фильм')
-    rating_cons      = models.SmallIntegerField(null=True, blank=True, verbose_name=u'Консолидированный рейтинг')
-    rating_cons_cnt  = models.IntegerField(null=True, blank=True, verbose_name=u'Количество голосов консолидированного рейтинга')
-    rating_sort      = models.IntegerField(null=True, blank=True, verbose_name=u'Условный рейтинг для сортировки')
+    rating_imdb      = models.FloatField(null=True, blank=True, default=0, verbose_name=u'Рейтинг фильма на сайте imdb.com')
+    rating_imdb_cnt  = models.IntegerField(null=True, blank=True, default=0, verbose_name=u'Количество пользователей imdb.com оценивших этот фильм')
+    rating_cons      = models.FloatField(null=True, blank=True, default=0, verbose_name=u'Консолидированный рейтинг')
+    rating_cons_cnt  = models.IntegerField(null=True, blank=True, default=0, verbose_name=u'Количество голосов консолидированного рейтинга')
+    rating_sort      = models.IntegerField(null=True, blank=True, default=0, verbose_name=u'Условный рейтинг для сортировки')
     kinopoisk_id     = models.IntegerField(null=True, blank=True, verbose_name=u'Порядковый номер на кинопоиске')
     age_limit        = models.PositiveSmallIntegerField(null=True, blank=True, verbose_name=u'Ограничение по возрасту')
     kinopoisk_lastupdate = models.DateTimeField(null=True, blank=True, verbose_name=u'Дата последнего обновления на кинопоиске')
@@ -51,39 +53,138 @@ class Films(models.Model):
             name = self.name
         return u'[{0}] {1}'.format(self.pk, name)
 
-    def as_vbFilm(self,extend=False,persons =False, authorized=False):
-
-        f_dict = {'id':self.pk,
-                  'name': self.name,
-                  'name_orig':self.name_orig,
-                  'release_date': self.release_date,
-                  'poster': [],
-                  'ratings': {'imdb':(self.rating_imdb,
-                                      self.rating_imdb_cnt),
-                              'kp': (self.rating_kinopoisk,
-                                     self.rating_kinopoisk_cnt),
-                              'cons':(0,0)},
-                  'duration' : self.duration,
-                  #TODO Implement locations
-                 
-                  
-                  'locations': [],} 
-        if extend:
-
-            pass
-        if persons:
-            pass
+    def as_vbFilm(self, extend=False, persons=False, authorized=False):
+        f_dict = {
+            'id':self.pk,
+            'name': self.name,
+            'name_orig': self.name_orig,
+            'releasedate': self.release_date,
+            'poster': [],
+            'ratings': self.get_rating_for_vb_film,
+            'duration': self.duration,
+        }
 
         return f_dict
+
 
     @classmethod
     def similar_api(self, o_film):
         list_genres = [i.pk for i in o_film.genres.all()]
 
         o_similar = Films.objects.distinct().filter(genres__in=list_genres).\
-                        exclude(pk=o_film.pk).order_by('-rating_cons')[:12]
+                        exclude(pk=o_film.pk).order_by('-rating_sort')[:12]
 
         return o_similar
+
+
+    @property
+    def get_rating_for_vb_film(self):
+        return {
+            'imdb': [self.get_rating_imdb, self.rating_imdb_cnt],
+            'kp': [self.get_rating_kinopoisk, self.rating_kinopoisk_cnt],
+            'cons': [self.get_rating_cons, self.rating_cons_cnt],
+        }
+
+    @property
+    def get_rating_imdb(self):
+        rating_imdb = self.rating_imdb
+        return round(rating_imdb, 1) if not rating_imdb is None else rating_imdb
+
+    @property
+    def get_rating_kinopoisk(self):
+        rating_kinopoisk = self.rating_kinopoisk
+        return round(rating_kinopoisk, 1) if not rating_kinopoisk is None else rating_kinopoisk
+
+    @property
+    def get_rating_cons(self):
+        rating_cons = self.rating_cons
+        return round(rating_cons, 1) if not rating_cons is None else rating_cons
+
+    @property
+    def get_rating_local_cnt(self):
+        rating_local_cnt = self.rating_local_cnt
+        return rating_local_cnt if not rating_local_cnt is None else 0
+
+
+    @property
+    def get_rating_imdb_cnt(self):
+        rating_imdb_cnt = self.rating_imdb_cnt
+        return rating_imdb_cnt if not rating_imdb_cnt is None else 0
+
+
+    @property
+    def get_rating_kinopoisk_cnt(self):
+        rating_kinopoisk_cnt = self.rating_kinopoisk_cnt
+        return rating_kinopoisk_cnt if not rating_kinopoisk_cnt is None else 0
+
+
+    @property
+    def get_calc_rating_cons_cnt(self):
+        """
+            Высчитывается как сумма значений rating_local_cnt, rating_imdb_cnt, rating_kinopoisk_imdb
+        """
+
+        return self.get_rating_local_cnt + self.get_rating_imdb_cnt + self.get_rating_kinopoisk_cnt
+
+
+    @property
+    def get_time_factor(self):
+        """
+            - если release_date - текущая дата >= 700 дней, то time_factor = 1
+            - если release_date - текущая дата < 700 дней, но больше 1, то time_factor = 1.5 - 0.5 * (release_date - текущая дата дней) / 700
+            - если release_date - текущая дата <= 1, то time_factor = 1.5
+        """
+
+        days = (datetime.date.today() - self.release_date).days
+
+        if days >= 700:
+            time_factor = 1
+        elif 1 < days < 700:
+            time_factor = 1.5 - 0.5 * (-days) / 700
+        else:
+            time_factor = 1.5
+
+        return time_factor
+
+
+    @property
+    def get_calc_rating_cons(self):
+        """
+            Высчисление rating_cons по следующей формуле: 60% rating_kinopoisk + 30% rating_imdb + 10% rating_local.
+            причём, если какое-то значение отсутствует или нулевое,
+            то его доля распределяется между остальными значениями, например:
+                - если rating_imdb не установлен, то формула становится 85.7% rating_kinpoisk + 14.3% rating_local
+                - если rating_kinopoisk не установлен, то формула становится 75% rating_imdb + 25% rating_local
+                - если rating_local не установлен, то формула становится 66.7% rating_kinopoisk + 33.3% rating_imdb
+                - если rating_imdb и rating_kinopoisk не установлены, то формула становится 100% rating_local
+        """
+
+        values = ((6, self.rating_kinopoisk), (3, self.rating_imdb), (1, self.rating_local),)
+        divisor = float(sum(t[0] for t in values if t[1]))
+        result = sum([t[0] / divisor * t[1] for t in values if t[1]])
+
+        return result
+
+
+    def get_sort_cnt(self, rating_cons_cnt):
+        """
+            - если rating_cons_cnt больше 30 000, то sort_cnt = 5 000 + (sort_cnt - 30 000) / 150 + 15 000 / 50 + 10 000 / 20
+            - если rating_cons_cnt больше 15 000, но меньше 30 000, sort_cnt = 5 000 + (rating_cons_cnt - 15000) / 50 + 10 000 / 20
+            - если rating_cons_cnt больше 5 000, но меньше 15 000, то sort_cnt = 5 000 + (rating_cons_cnt - 5000) / 20
+            - если rating_cons меньше или равно 5 000, то sort_cnt = rating_cons_cnt
+        """
+
+        if rating_cons_cnt > 30000:
+            sort_cnt = 5000 + (rating_cons_cnt - 30000) / 150 + 15000 / 50 + 10000 / 20
+        elif 15000 < rating_cons_cnt <= 30000:
+            sort_cnt = 5000 + (rating_cons_cnt - 15000) / 50 + 10000 / 20
+        elif 5000 < rating_cons_cnt <= 15000:
+            sort_cnt = 5000 + (rating_cons_cnt - 5000) / 20
+        else:
+            sort_cnt = rating_cons_cnt
+
+        return sort_cnt
+
 
     class Meta(object):
         # Имя таблицы в БД

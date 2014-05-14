@@ -1,15 +1,14 @@
 # coding: utf-8
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 import sys
+
+from datetime import timedelta
 from ConfigParser import RawConfigParser
 
 
 BASE_PATH = os.path.dirname(__file__)
 BASE_DIR = os.path.dirname(BASE_PATH)
-
-#sys.path.insert(0, os.path.join(BASE_PATH, 'apps'))
 
 STATIC_PATH = os.path.join(BASE_PATH, '..', 'static')
 CONFIGS_PATH = os.path.join(BASE_PATH, '..', 'configs')
@@ -26,11 +25,17 @@ DEBUG = True
 
 TEMPLATE_DEBUG = DEBUG
 
-ALLOWED_HOSTS = ['*', ]
+ALLOWED_HOSTS = ['*']
 
 ACCOUNT_ACTIVATION_DAYS = 2
 
 AUTH_USER_EMAIL_UNIQUE = True
+
+HTTP_SESSION_TOKEN_TYPE = b'X-MI-SESSION'
+HTTP_USER_TOKEN_TYPE = b'X-MI-TOKEN'
+
+STANDART_HTTP_SESSION_TOKEN_HEADER = b'HTTP_{}'.format(HTTP_SESSION_TOKEN_TYPE.replace('-', '_'))
+STANDART_HTTP_USER_TOKEN_HEADER = b'HTTP_{}'.format(HTTP_USER_TOKEN_TYPE.replace('-', '_'))
 
 EMAIL_HOST = 'localhost'
 EMAIL_PORT = 25
@@ -106,28 +111,15 @@ WSGI_APPLICATION = 'videobase.wsgi.application'
 dbconf = RawConfigParser()
 dbconf.read(CONFIGS_PATH + '/db.ini')
 
-
-if 'test' in sys.argv:
-    DATABASES = {
-        'default': {
-            'ENGINE':   dbconf.get('testbase', 'DATABASE_ENGINE'),
-            'HOST':     dbconf.get('testbase', 'DATABASE_HOST'),
-            'NAME':     dbconf.get('testbase', 'DATABASE_NAME'),
-            'USER':     dbconf.get('testbase', 'DATABASE_USER'),
-            'PASSWORD': dbconf.get('testbase', 'DATABASE_PASSWORD'),
-            'PORT':     dbconf.get('testbase', 'DATABASE_PORT')
-        }
+DATABASES = {
+    'default': {
+        'ENGINE':   dbconf.get('database', 'DATABASE_ENGINE'),
+        'HOST':     dbconf.get('database', 'DATABASE_HOST'),
+        'NAME':     dbconf.get('database', 'DATABASE_NAME'),
+        'USER':     dbconf.get('database', 'DATABASE_USER'),
+        'PASSWORD': dbconf.get('database', 'DATABASE_PASSWORD'),
+        'PORT':     dbconf.get('database', 'DATABASE_PORT')
     }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE':   dbconf.get('database', 'DATABASE_ENGINE'),
-            'HOST':     dbconf.get('database', 'DATABASE_HOST'),
-            'NAME':     dbconf.get('database', 'DATABASE_NAME'),
-            'USER':     dbconf.get('database', 'DATABASE_USER'),
-            'PASSWORD': dbconf.get('database', 'DATABASE_PASSWORD'),
-            'PORT':     dbconf.get('database', 'DATABASE_PORT')
-        }
 }
 
 CACHES = {
@@ -169,12 +161,14 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.TokenAuthentication',
-        'apps.users.models.api_session.MultipleTokenAuthentication',
+        'apps.users.backends.SessionTokenAuthentication',
+        'apps.users.backends.UserTokenAuthentication',
     )
 }
 
-LOGIN_REDIRECT_URL = '/'
+
+# LOGIN_REDIRECT_URL = '/oauth-redirect/'
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/oauth-redirect/'
 LOGIN_ERROR_URL = '/'
 
 # Ключи для OAuth2 авторизации
@@ -184,35 +178,40 @@ VKONTAKTE_APP_ID     = VK_APP_ID
 VK_API_SECRET        = 'JAEQddzkBCm554iGXe6S'
 VKONTAKTE_APP_SECRET = VK_API_SECRET
 VK_EXTRA_SCOPE = ['notify', 'friends', 'status', 'groups', 'notifications']
+
 # Facebook
 FACEBOOK_APP_ID     = '212532105624824'
 FACEBOOK_API_SECRET = 'a99fcef38b7054279d73beb4ebb7b6cc'
+
 # Twitter
 TWITTER_CONSUMER_KEY    = 'HACuJARrAXJyeHdeD5viHULZR'
 TWITTER_CONSUMER_SECRET = 'Ge0k2rKltyPq3ida76IjTbhesZVdIrvckcNPXzJaBU2ouzixut'
+
 # Google+
 GOOGLE_OAUTH2_CLIENT_ID     = 'AIzaSyD9C36HCncY0tVWQekEmz5KEarnCzOCCb0'
 GOOGLE_OAUTH2_CLIENT_SECRET = ''
+
 # Mail.ru
 MAILRU_OAUTH2_APP_KEY = '719516'
 MAILRU_OAUTH2_CLIENT_KEY = '4daa3ed8bef5be08ebd7e25ff5ae806a'
 MAILRU_OAUTH2_CLIENT_SECRET = '8cc7bb50e5b93663774e6584a1251d79'
 
 SOCIAL_AUTH_CREATE_USERS = True
+SOCIAL_AUTH_USERNAME_IS_FULL_EMAIL = True
 
 # Backends for social auth
 AUTHENTICATION_BACKENDS = (
+    # OAuth
     'social_auth.backends.twitter.TwitterBackend',
     'social_auth.backends.facebook.FacebookBackend',
     'social_auth.backends.contrib.vk.VKOAuth2Backend',
     'social_auth.backends.google.GoogleOAuth2Backend',
-    'social_auth.backends.contrib.odnoklassniki.OdnoklassnikiBackend',
-    'social_auth.backends.contrib.mailru.MailruBackend',
+    # Token
+    'apps.users.backends.SessionTokenAuthentication',
+    'apps.users.backends.UserTokenAuthentication',
+    # Django
     'django.contrib.auth.backends.ModelBackend',
-    'rest_framework.authentication.TokenAuthentication',
-    'apps.users.models.api_session.MultipleTokenAuthentication',
 )
-
 
 # Перечислим pipeline, которые последовательно буду обрабатывать респонс
 SOCIAL_AUTH_PIPELINE = (
@@ -238,7 +237,6 @@ API_SESSION_EXPIRATION_TIME = 15
 
 if not DEBUG:
     INSTALLED_APPS += (
-        'django_jenkins',
         'raven.contrib.django.raven_compat',  # may be delete later
     )
 
@@ -246,40 +244,31 @@ if not DEBUG:
         'dsn': 'http://8684bf8b497047d9ac170fd16aefc873:41e89f4666b24f998125370f3d1a1789@sentry.aaysm.com/2'
     }
 
-    JENKINS_TASKS = ('django_jenkins.tasks.run_pylint',
-                     'django_jenkins.tasks.run_pep8',
-                     'django_jenkins.tasks.run_pyflakes',
-                     'django_jenkins.tasks.with_coverage',)
-
-from datetime import timedelta
-
 CELERYBEAT_SCHEDULE = {
     'robot-launch': {
         'task': 'robot_launch',
-        'schedule': timedelta(minutes=5),
+        'schedule': timedelta(minutes=1),
     },
     'kinopoisk-get_id': {
         'task': 'kinopoisk_get_id',
-        'schedule': timedelta(minutes=5),
+        'schedule': timedelta(minutes=1),
     },
     'kinopoisk-set_poster': {
         'task': 'kinopoisk_set_poster',
         'schedule': timedelta(seconds=10),
     },
-     'imdb_rating_update_command': {
+    'imdb_rating_update_command': {
         'task': 'imdb_rating_update',
         'schedule': timedelta(days=7),
     },
-     'amediateka_ru_update': {
+    'amediateka_ru_update': {
         'task': 'amediateka_ru_robot_start',
         'schedule': timedelta(days=7),
     },
-     'viaplay_ru_robot_start': {
+    'viaplay_ru_robot_start': {
         'task': 'viaplay_ru_robot_start',
         'schedule': timedelta(days=7),
     },
-    
-    
 }
 
 CELERY_TIMEZONE = 'UTC'

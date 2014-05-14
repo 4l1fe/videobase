@@ -93,25 +93,16 @@ class APIUsersGenresTestCase(APITestCase):
 
         self.url_name = 'users_genres'
         self.kwargs = {'format': 'json', 'user_id': self.user.pk}
-        s_token = SessionToken.objects.create(user=self.user)
-        UsersApiSessions.objects.create(token=s_token)
-        self.headers = "%s %s" % ('X-VB-Token', s_token.key)
-
-    def test_api_users_genres_401_get(self):
-        response = self.client.get(reverse(self.url_name, kwargs=self.kwargs))
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_api_users_genres_400_get(self):
         pk = User.objects.latest('id').pk
         kw = self.kwargs.copy()
         kw['user_id'] = pk + 1
-        response = self.client.get(reverse(self.url_name, kwargs=kw),
-                        HTTP_AUTHORIZATION=self.headers)
+        response = self.client.get(reverse(self.url_name, kwargs=kw))
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_api_users_genres_200_get(self):
-        response = self.client.get(reverse(self.url_name, kwargs=self.kwargs),
-                                   HTTP_AUTHORIZATION=self.headers)
+        response = self.client.get(reverse(self.url_name, kwargs=self.kwargs))
         genres = Genres.objects.filter(genres__users_films__user=self.user).distinct()
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -332,27 +323,19 @@ class APIUsersFriendsTestCase(APITestCase):
             UserRelsFactory.create(user=self.user, user_rel=new_user,
                                    rel_type=random.choice((APP_USER_REL_TYPE_FRIENDS,
                                                            APP_USER_REL_TYPE_NONE, )))
-        s_token = SessionToken.objects.create(user=self.user)
-        UsersApiSessions.objects.create(token=s_token)
-        self.headers = "%s %s" % ('X-VB-Token', s_token.key)
-
-    def test_api_users_friends_401_post(self):
-        response = self.client.post(reverse(self.url_name, kwargs=self.kwargs))
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_api_users_friends_400_bad_user_post(self):
         pk = User.objects.latest('id').pk
         kw = self.kwargs.copy()
         kw['user_id'] = pk + 1
-        response = self.client.post(reverse(self.url_name, kwargs=kw),
-                        HTTP_AUTHORIZATION=self.headers)
+        response = self.client.post(reverse(self.url_name, kwargs=kw))
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_api_users_friends_400_bad_page_post(self):
         page_obj = Paginator(self.friends, APP_USERS_API_DEFAULT_PER_PAGE)
         page_num = page_obj.num_pages + 1
         response = self.client.post(reverse(self.url_name, kwargs=self.kwargs),
-                                    HTTP_AUTHORIZATION=self.headers, data={'page': page_num})
+                                    data={'page': page_num})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_api_users_friends_200_without_page_post(self):
@@ -361,8 +344,7 @@ class APIUsersFriendsTestCase(APITestCase):
             params=[APP_USER_REL_TYPE_FRIENDS, self.user.pk]).all()
         page_obj = Paginator(friends, APP_USERS_API_DEFAULT_PER_PAGE).\
             page(APP_USERS_API_DEFAULT_PAGE)
-        response = self.client.post(reverse(self.url_name, kwargs=self.kwargs),
-                                    HTTP_AUTHORIZATION=self.headers)
+        response = self.client.post(reverse(self.url_name, kwargs=self.kwargs))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['per_page'], APP_USERS_API_DEFAULT_PER_PAGE)
         self.assertEqual(response.data['page'], APP_USERS_API_DEFAULT_PAGE)
@@ -384,8 +366,7 @@ class APIUsersFriendsTestCase(APITestCase):
         page_obj = Paginator(friends, 5).\
             page(2)
         response = self.client.post(reverse(self.url_name, kwargs=self.kwargs),
-                                    HTTP_AUTHORIZATION=self.headers, data={'per_page': 5,
-                                                                           'page': 2})
+                                    data={'per_page': 5, 'page': 2})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['per_page'], 5)
         self.assertEqual(response.data['page'], 2)
@@ -413,25 +394,20 @@ class APIUsersPersonsTestCase(APITestCase):
             PersonsFilmsFactory.create(person=person, p_type=random.choice((
                 APP_PERSON_PRODUCER, APP_PERSON_SCRIPTWRITER,
                 APP_PERSON_DIRECTOR, APP_PERSON_ACTOR, )))
-        s_token = SessionToken.objects.create(user=self.user)
-        UsersApiSessions.objects.create(token=s_token)
-        self.headers = "%s %s" % ('X-VB-Token', s_token.key)
 
-    def test_api_users_genres_401_post(self):
-        response = self.client.post(reverse(self.url_name, kwargs=self.kwargs))
+    def test_api_users_genres_401_get(self):
+        response = self.client.get(reverse(self.url_name, kwargs=self.kwargs))
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def test_api_users_genres_400_post(self):
+    def test_api_users_genres_400_get(self):
         pk = User.objects.latest('id').pk
         kw = self.kwargs.copy()
         kw['user_id'] = pk + 1
-        response = self.client.post(reverse(self.url_name, kwargs=kw),
-                                    HTTP_AUTHORIZATION=self.headers)
+        response = self.client.get(reverse(self.url_name, kwargs=kw))
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_api_users_genres_200_post(self):
-        response = self.client.post(reverse(self.url_name, kwargs=self.kwargs),
-                                    HTTP_AUTHORIZATION=self.headers)
+        response = self.client.get(reverse(self.url_name, kwargs=self.kwargs))
         ftype = persons_type['all']
         persons = Persons.objects.filter(users_persons__user=self.user,
                                          person_film_rel__p_type__in=ftype)
@@ -446,10 +422,9 @@ class APIUsersPersonsTestCase(APITestCase):
             self.assertEqual(response.data['items'][i]['birthplace'][0], persons[i].city.name)
             self.assertEqual(response.data['items'][i]['birthplace'][1], persons[i].city.country.name)
 
-    def test_api_users_genres_with_type_200_post(self):
-        response = self.client.post(reverse(self.url_name, kwargs=self.kwargs),
-                                    HTTP_AUTHORIZATION=self.headers,
-                                    data={'type': 'a'})
+    def test_api_users_genres_with_type_200_get(self):
+        response = self.client.get(reverse(self.url_name, kwargs=self.kwargs),
+                                   data={'type': 'a'})
         ftype = persons_type['a']
         persons = Persons.objects.filter(users_persons__user=self.user, person_film_rel__p_type__in=ftype)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -463,10 +438,9 @@ class APIUsersPersonsTestCase(APITestCase):
             self.assertEqual(response.data['items'][i]['birthplace'][0], persons[i].city.name)
             self.assertEqual(response.data['items'][i]['birthplace'][1], persons[i].city.country.name)
 
-    def test_api_users_genres_with_bad_type_200_post(self):
-        response = self.client.post(reverse(self.url_name, kwargs=self.kwargs),
-                                    HTTP_AUTHORIZATION=self.headers,
-                                    data={'type': '1'})
+    def test_api_users_genres_with_bad_type_200_get(self):
+        response = self.client.get(reverse(self.url_name, kwargs=self.kwargs),
+                                   data={'type': '1'})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 
@@ -485,25 +459,17 @@ class APIUsersFilmsTestCase(APITestCase):
 
         for i in range(10):
             UserFilmsFactory.create(user=self.user, status=APP_USERFILM_STATUS_SUBS, film=films[i])
-        s_token = SessionToken.objects.create(user=self.user)
-        UsersApiSessions.objects.create(token=s_token)
-        self.headers = "%s %s" % ('X-VB-Token', s_token.key)
 
-    def test_api_users_films_401_post(self):
-        response = self.client.post(reverse(self.url_name, kwargs=self.kwargs))
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-
-    def test_api_users_films_400_post(self):
+    def test_api_users_films_400_get(self):
         pk = User.objects.latest('id').pk
         kw = self.kwargs.copy()
         kw['user_id'] = pk + 1
-        response = self.client.post(reverse(self.url_name, kwargs=kw),
-                        HTTP_AUTHORIZATION=self.headers)
+        response = self.client.get(reverse(self.url_name, kwargs=kw))
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_api_users_films_200_all_post(self):
-        response = self.client.post(reverse(self.url_name, kwargs=self.kwargs),
-                                   HTTP_AUTHORIZATION=self.headers, data={'type': 's'})
+    def test_api_users_films_200_all_get(self):
+        response = self.client.get(reverse(self.url_name, kwargs=self.kwargs),
+                                   data={'type': 's'})
         ftype = [APP_FILM_SERIAL]
         films = Films.objects.filter(users_films__user=self.user, type__in=ftype,
                                      users_films__status=APP_USERFILM_STATUS_SUBS)
@@ -529,9 +495,8 @@ class APIUsersFilmsTestCase(APITestCase):
             self.assertEqual(response.data['items'][i]['ratings']['cons'][0], films[i].rating_cons)
             self.assertEqual(response.data['items'][i]['ratings']['cons'][0], films[i].rating_cons_cnt)
 
-    def test_api_users_films_200_serial_post(self):
-        response = self.client.post(reverse(self.url_name, kwargs=self.kwargs),
-                                   HTTP_AUTHORIZATION=self.headers)
+    def test_api_users_films_200_serial_get(self):
+        response = self.client.get(reverse(self.url_name, kwargs=self.kwargs))
         ftype = [APP_FILM_SERIAL, APP_FILM_FULL_FILM]
         films = Films.objects.filter(users_films__user=self.user, type__in=ftype,
                                      users_films__status=APP_USERFILM_STATUS_SUBS)
@@ -557,9 +522,9 @@ class APIUsersFilmsTestCase(APITestCase):
             self.assertEqual(response.data['items'][i]['ratings']['cons'][0], films[i].rating_cons)
             self.assertEqual(response.data['items'][i]['ratings']['cons'][0], films[i].rating_cons_cnt)
 
-    def test_api_users_films_200_full_film_post(self):
+    def test_api_users_films_200_full_film_get(self):
         response = self.client.post(reverse(self.url_name, kwargs=self.kwargs),
-                                   HTTP_AUTHORIZATION=self.headers, data={'type': 'f'})
+                                    data={'type': 'f'})
         ftype = [APP_FILM_FULL_FILM]
         films = Films.objects.filter(users_films__user=self.user, type__in=ftype,
                                      users_films__status=APP_USERFILM_STATUS_SUBS)

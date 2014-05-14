@@ -42,7 +42,7 @@ class UsersFilmsView(APIView):
         except Exception as e:
             return Response({'e': e.message}, status=status.HTTP_400_BAD_REQUEST)
 
-        serializer = vbFilm(page.object_list, many=True)
+        serializer = vbFilm(page.object_list, request=self.request, many=True)
 
         result = {
             'per_page': page.paginator.per_page,

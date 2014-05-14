@@ -30,6 +30,7 @@ class MosfilmRobot(object):
     def get_dict(self, film, film_link):
         link = film_link
         resp_dict = sane_dict(film)
+        resp_dict['type'] = 'mosfilm'
         resp_dict['value'] = link
         resp_dict['url_view'] = link
         resp_dict['price'] = 0
