@@ -61,6 +61,8 @@ class ActNotwatchFilmView(APIView):
 
         return Response(status=status.HTTP_200_OK)
 
+    def put(self, request, film_id, format=None, *args, **kwargs):
+        return self.get(request, film_id, format=None, *args, **kwargs)
 
     def delete(self, request, film_id, format=None, *args, **kwargs):
         o_film = self.__get_object(film_id)
