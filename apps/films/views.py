@@ -320,7 +320,6 @@ def calc_comments(o_film):
 
 
 def film_view(request, film_id, *args, **kwargs):
-    resp_dict = {}
     o_film = film_model.Films.objects.filter(pk=film_id).prefetch_related('genres', 'countries')
 
     if not len(o_film):
