@@ -30,8 +30,30 @@ class Locations(models.Model):
                 'price_type':str(self.type),
                 'value':self.value
         }
-                
-        
+
+    @classmethod
+    def exist_location(self, pk):
+        from django.db import connection
+        cursor = connection.cursor()
+
+        try:
+            query = """
+                SELECT * FROM "locations" LEFT JOIN "content" ON ("locations"."content_id" = "content"."id")
+                WHERE "content"."film_id" = %s
+            """
+
+            cursor.execute(query, [pk])
+            result = cursor.fetchone()
+        except Exception, e:
+            return e
+        finally:
+            cursor.close()
+
+        if result:
+            return True
+
+        return False
+
     def __unicode__(self):
         return u'[{0}] {1} {2}'.format(self.pk, self.content.name, self.type)
 
