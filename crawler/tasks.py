@@ -25,6 +25,16 @@ information_robots = ['kinopoik_robot', 'imdb_robot']
 
 logger = get_task_logger(__name__)
 
+
+def get_robot_by_name(robot_name):
+    try:
+        return Robots.objects.get(robot_name)
+    except Robots.DoesNotExist:
+        robot = Robots(name=robot_name, description='', delay=1, rstatus=0, state={"id": 1})
+        robot.save()
+        return robot
+
+
 def update_robot_state_film_id(robot):
 
     if robot.state:
