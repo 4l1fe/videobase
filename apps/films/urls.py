@@ -25,7 +25,7 @@ v1_api_patterns = patterns('',
 
     # Person API
     url(r'^v1/persons/(?P<resource_id>\d+)$', PersonAPIView.as_view(), name='person_api_view'),
-    url(r'^v1/persons/(?P<resource_id>\d+)/filmography$', PersonFilmographyAPIView.as_view(), name='person_filmography_view'),
+    url(r'^v1/persons/(?P<person_id>\d+)/filmography$', PersonFilmographyAPIView.as_view(), name='person_filmography_view'),
     url(r'^v1/persons/(?P<resource_id>\d+)/action/subscribe$', PersonActionAPIView.as_view(), name='person_action_view'),
     url(r'^v1/persons/(?P<resource_id>\d+)/extras$', PersonsExtrasAPIView.as_view(), name='person_extras_view'),
 )
