@@ -25,7 +25,6 @@ information_robots = ['kinopoik_robot', 'imdb_robot']
 
 logger = get_task_logger(__name__)
 
-
 def get_robot_by_name(robot_name):
     try:
         return Robots.objects.get(robot_name)
@@ -60,6 +59,17 @@ def update_robot_state_film_id(robot):
     robot.save()
 
     return film_id
+
+def robot_task(robot_name):
+    @app.task(name=robot_name)
+    def decor(func):
+
+        robot = get_robot_by_name(robot_name)
+        item_id =update_robot_state_film_id(robot)
+        print "Starting robot {} for id = {}".format(robot_name,item_id)
+        func(item_id)
+
+    return decor
 
 
 @app.task(name='robot_launch')
