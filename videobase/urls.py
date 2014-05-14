@@ -25,8 +25,10 @@ urlpatterns = patterns('',
     url(r'^admin_tools/', include('admin_tools.urls')),
     url(r'^admin/', include(admin.site.urls)),
 
-    # Social-auth
+    # Auth
     url(r'', include('social_auth.urls')),
+    url(r'^oauth-redirect/?$', views.RedirectOAuthView.as_view(), name='oauth-redirect'),
+    url('^tokenize/?$', views.TokenizeView.as_view(), name="tokenize"),
 
     # Interface
     url(r'^register/?$', views.RegisterUserView.as_view()),
@@ -35,6 +37,8 @@ urlpatterns = patterns('',
     url(r'^person/(?P<resource_id>\d+)/?$', 'apps.films.views.person_view'),
     url(r'^films?/(?P<film_id>\d+)/?$', 'apps.films.views.film_view'),
     url(r'^$', 'apps.films.views.index_view'),
+                       
+                       
 )
 
 if settings.DEBUG:

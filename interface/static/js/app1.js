@@ -470,7 +470,6 @@
     };
 
     FilmThumb.prototype.action_rate = function(val) {
-      console.log(this);
       return this._app.film_action(this.vals.id, "rate", {
         rel: this.vals.relation,
         value: val,
@@ -814,7 +813,6 @@
         opts = {};
       }
       if (this.user_is_auth()) {
-        console.log(id, action);
         rel = opts.rel || {};
         action_str = action;
         if (action === "subscribe") {
@@ -901,7 +899,14 @@
       if (ask_sign_in == null) {
         ask_sign_in = true;
       }
-      return true;
+      if (!this.rest.has_auth()) {
+        if (ask_sign_in) {
+          alert("sign in first");
+        }
+        return false;
+      } else {
+        return true;
+      }
     };
 
     App.prototype.query_params = function(name) {

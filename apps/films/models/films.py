@@ -29,7 +29,7 @@ class Films(models.Model):
     imdb_id          = models.IntegerField(null=True, blank=True, verbose_name=u'Порядковый номер на IMDB')
     rating_imdb      = models.FloatField(null=True, blank=True, default=0, verbose_name=u'Рейтинг фильма на сайте imdb.com')
     rating_imdb_cnt  = models.IntegerField(null=True, blank=True, default=0, verbose_name=u'Количество пользователей imdb.com оценивших этот фильм')
-    rating_cons      = models.SmallIntegerField(null=True, blank=True, default=0, verbose_name=u'Консолидированный рейтинг')
+    rating_cons      = models.FloatField(null=True, blank=True, default=0, verbose_name=u'Консолидированный рейтинг')
     rating_cons_cnt  = models.IntegerField(null=True, blank=True, default=0, verbose_name=u'Количество голосов консолидированного рейтинга')
     rating_sort      = models.IntegerField(null=True, blank=True, default=0, verbose_name=u'Условный рейтинг для сортировки')
     kinopoisk_id     = models.IntegerField(null=True, blank=True, verbose_name=u'Порядковый номер на кинопоиске')
@@ -53,28 +53,16 @@ class Films(models.Model):
             name = self.name
         return u'[{0}] {1}'.format(self.pk, name)
 
-    def as_vbFilm(self,extend=False,persons =False, authorized=False):
-
-        f_dict = {'id':self.pk,
-                  'name': self.name,
-                  'name_orig':self.name_orig,
-                  'release_date': self.release_date,
-                  'poster': [],
-                  'ratings': {'imdb':(self.rating_imdb,
-                                      self.rating_imdb_cnt),
-                              'kp': (self.rating_kinopoisk,
-                                     self.rating_kinopoisk_cnt),
-                              'cons':(0,0)},
-                  'duration' : self.duration,
-                  #TODO Implement locations
-                 
-                  
-                  'locations': [],} 
-        if extend:
-
-            pass
-        if persons:
-            pass
+    def as_vbFilm(self, extend=False, persons=False, authorized=False):
+        f_dict = {
+            'id':self.pk,
+            'name': self.name,
+            'name_orig': self.name_orig,
+            'releasedate': self.release_date,
+            'poster': [],
+            'ratings': self.get_rating_for_vb_film,
+            'duration': self.duration,
+        }
 
         return f_dict
 
@@ -84,7 +72,7 @@ class Films(models.Model):
         list_genres = [i.pk for i in o_film.genres.all()]
 
         o_similar = Films.objects.distinct().filter(genres__in=list_genres).\
-                        exclude(pk=o_film.pk).order_by('-rating_cons')[:12]
+                        exclude(pk=o_film.pk).order_by('-rating_sort')[:12]
 
         return o_similar
 
@@ -92,11 +80,25 @@ class Films(models.Model):
     @property
     def get_rating_for_vb_film(self):
         return {
-            'imdb': [self.rating_imdb, self.rating_imdb_cnt],
-            'kp': [self.rating_kinopoisk, self.rating_kinopoisk_cnt],
-            'cons': [self.rating_cons, self.rating_cons_cnt],
+            'imdb': [self.get_rating_imdb, self.rating_imdb_cnt],
+            'kp': [self.get_rating_kinopoisk, self.rating_kinopoisk_cnt],
+            'cons': [self.get_rating_cons, self.rating_cons_cnt],
         }
 
+    @property
+    def get_rating_imdb(self):
+        rating_imdb = self.rating_imdb
+        return round(rating_imdb, 1) if not rating_imdb is None else rating_imdb
+
+    @property
+    def get_rating_kinopoisk(self):
+        rating_kinopoisk = self.rating_kinopoisk
+        return round(rating_kinopoisk, 1) if not rating_kinopoisk is None else rating_kinopoisk
+
+    @property
+    def get_rating_cons(self):
+        rating_cons = self.rating_cons
+        return round(rating_cons, 1) if not rating_cons is None else rating_cons
 
     @property
     def get_rating_local_cnt(self):
