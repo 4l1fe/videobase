@@ -24,7 +24,7 @@ class UsersFilms(models.Model):
 
     @property
     def check_subscribed(self):
-        return True if self.subscribed == APP_USERFILM_SUBS else False
+        return False if self.subscribed == APP_USERFILM_SUBS_FALSE else True
 
 
     @property
