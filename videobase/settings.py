@@ -167,7 +167,8 @@ REST_FRAMEWORK = {
 }
 
 
-LOGIN_REDIRECT_URL = '/tokenize'
+# LOGIN_REDIRECT_URL = '/oauth-redirect/'
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/oauth-redirect/'
 LOGIN_ERROR_URL = '/'
 
 # Ключи для OAuth2 авторизации
@@ -196,18 +197,20 @@ MAILRU_OAUTH2_CLIENT_KEY = '4daa3ed8bef5be08ebd7e25ff5ae806a'
 MAILRU_OAUTH2_CLIENT_SECRET = '8cc7bb50e5b93663774e6584a1251d79'
 
 SOCIAL_AUTH_CREATE_USERS = True
+SOCIAL_AUTH_USERNAME_IS_FULL_EMAIL = True
 
 # Backends for social auth
 AUTHENTICATION_BACKENDS = (
+    # OAuth
     'social_auth.backends.twitter.TwitterBackend',
     'social_auth.backends.facebook.FacebookBackend',
     'social_auth.backends.contrib.vk.VKOAuth2Backend',
     'social_auth.backends.google.GoogleOAuth2Backend',
-    'social_auth.backends.contrib.odnoklassniki.OdnoklassnikiBackend',
-    'social_auth.backends.contrib.mailru.MailruBackend',
-    'django.contrib.auth.backends.ModelBackend',
+    # Token
     'apps.users.backends.SessionTokenAuthentication',
     'apps.users.backends.UserTokenAuthentication',
+    # Django
+    'django.contrib.auth.backends.ModelBackend',
 )
 
 # Перечислим pipeline, которые последовательно буду обрабатывать респонс

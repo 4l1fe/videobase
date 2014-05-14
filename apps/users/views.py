@@ -7,7 +7,7 @@ from django.middleware.csrf import CSRF_KEY_LENGTH
 from django.utils.crypto import get_random_string
 from django.utils import timezone
 from django.contrib.auth.models import User
-from django.views.generic import View
+from django.views.generic import View, RedirectView
 from django.shortcuts import render_to_response, RequestContext
 from django.contrib.auth.forms import AuthenticationForm
 
@@ -60,6 +60,20 @@ class LoginUserView(View):
             return HttpResponseRedirect(url)
         else:
             return HttpResponseBadRequest()
+
+
+class RedirectOAuthView(RedirectView):
+
+    url = 'tokenize'
+
+    def get_redirect_url(self, *args, **kwargs):
+        if self.request.user:
+            kw = {'token': self.request.user.auth_token.key}
+            url = url_with_querystring(reverse(self.url), **kw)
+        else:
+            return None
+
+        return url
 
 
 class TokenizeView(View):
