@@ -270,6 +270,14 @@ CELERYBEAT_SCHEDULE = {
         'task': 'viaplay_ru_robot_start',
         'schedule': timedelta(days=7),
     },
+        'kinopoisk_poster': {
+        'task': 'kinopoisk_poster',
+        'schedule': timedelta(seconds=10),
+    },
+        'kinopoisk_id_person': {
+        'task': 'kinopoisk_id_person',
+        'schedule': timedelta(seconds=10),
+    },
 }
 
 CELERY_TIMEZONE = 'UTC'
