@@ -93,7 +93,8 @@ def sane_dict(film=None):
             'quality': '',
             'subtitles': '',
             'url_source': '',
-            'value' : ''
+            'value': '',
+            'type': ''
             }
 
 
@@ -186,8 +187,8 @@ def save_location(film, **kwargs):
     
     
     location = Locations(content=content,
-                         type=0,
-                         value = kwargs['value'],
+                         type=kwargs['type'],
+                         value=kwargs['value'],
                          url_view=kwargs['url_view'],
                          quality=kwargs['quality'],
                          subtitles=kwargs['subtitles'],
