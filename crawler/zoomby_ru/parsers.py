@@ -1,32 +1,39 @@
 # coding: utf-8
-
-from ..core import BaseParse
 from bs4 import BeautifulSoup
+import requests
 
-URL_FILM = ''
 HOST = 'http://www.zoomby.ru'
 
-def parse_search(response, filmName):
+
+def parse_search(response, film_name):
     try:
         soup = BeautifulSoup(response.content)
-        tag = soup.find(attrs={'class':'element_row_3'},text=filmName)
-        tagA = tag.a
-        filmLink = tagA.get('href')
-        URL_FILM = HOST + filmLink
+        tag = soup.find(attrs={'class': 'element_row_3'}, text=film_name)
+        tag_a = tag.a
+        film_link = tag_a.get('href')
     except:
-        filmLink = None
-    return filmLink
-
+        film_link = None
+    return film_link
 
 
 class ParseFilm(object):
     def __init__(self):
-        pass
-    def parse(self, response, dict_gen, film,url):
+        self.parse_value = 'http://www.zoomby.ru/v/'
+
+    def parse(self, response, dict_gen, film, url):
         d = dict_gen(film)
+        response = requests.get(url)
+        try:
+            soup = BeautifulSoup(response.content)
+            tag = soup.find('meta', attrs={'property': 'og:video'})
+            value = tag.get('content').replace(self.parse_value, '')
+        except:
+            value = ''
         d['url_view'] = url
+        d['value'] = value
         d['price_type'] = 0
         d['price'] = self.get_price()
+        d['type'] = 'zoomby'
         return [d]
 
     def get_price(self):
@@ -34,7 +41,3 @@ class ParseFilm(object):
 
     def get_seasons(self):
         return [0, ]
-
-    def get_link(self):
-        pass
-
