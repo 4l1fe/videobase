@@ -34,10 +34,12 @@ class UsersPersonsView(APIView):
         page = request.QUERY_PARAMS.get('page', APP_USERS_API_DEFAULT_PAGE)
         per_page = request.QUERY_PARAMS.get('per_page', APP_USERS_API_DEFAULT_PER_PAGE)
         type_ = request.QUERY_PARAMS.get('type', 'all')
+
         try:
             ptype = persons_type[type_]
         except KeyError as e:
             return Response({'e': e.message}, status=status.HTTP_400_BAD_REQUEST)
+
         persons = Persons.objects.filter(users_persons__user=user, person_film_rel__p_type__in=ptype)
         try:
             page = Paginator(persons, per_page).page(page)
