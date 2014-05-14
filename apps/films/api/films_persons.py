@@ -7,6 +7,7 @@ from rest_framework import status
 from apps.films.models import PersonsFilms, Persons
 from apps.films.forms import PersonApiForm
 from apps.films.api.serializers import vbPerson
+from apps.films.constants import APP_FILM_PERSON_TYPES_OUR
 
 
 #############################################################################################################
@@ -24,8 +25,8 @@ class PersonsFilmView(APIView):
             'film': film_id,
         }
 
-        if not cleaned_data['type'] is None and cleaned_data['type']:
-            filter.update({'p_type': cleaned_data['type']})
+        if cleaned_data['type'] and cleaned_data['type'] != 'all':
+            filter.update({'p_type': dict(APP_FILM_PERSON_TYPES_OUR)[cleaned_data['type']]})
 
         result = PersonsFilms.objects.filter(**filter).\
                      values_list('person', flat=True)
@@ -46,8 +47,15 @@ class PersonsFilmView(APIView):
             if type(person_list) == Response:
                 return person_list
 
-            o_person = Persons.objects.filter(pk__in=person_list).order_by('id')[cleaned_data['top']:cleaned_data['limit']]
+            filter = {
+                'filter': {'pk__in': person_list},
+                'offset': cleaned_data['top'],
+            }
 
+            if cleaned_data['limit']:
+                filter.update({'limit': cleaned_data['limit'] + cleaned_data['top']})
+
+            o_person = Persons.get_sorted_persons_by_name(**filter)
             serializer = vbPerson(o_person, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
 

@@ -91,4 +91,4 @@ class vbPerson(serializers.ModelSerializer):
 
     class Meta:
         model = Persons
-        fields = ('id', 'name', 'photo', 'relation', 'birthdate', 'birthplace', 'bio', 'roles')
+        fields = ('id', 'name', 'name_orig', 'photo', 'relation', 'birthdate', 'birthplace', 'bio', 'roles')

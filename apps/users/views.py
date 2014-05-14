@@ -1,12 +1,15 @@
 # coding: utf-8
 from django.core.paginator import Paginator
+from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponse,\
     HttpResponseBadRequest, HttpResponseServerError
 from django.middleware.csrf import CSRF_KEY_LENGTH
 from django.utils.crypto import get_random_string
 from django.utils import timezone
 from django.contrib.auth.models import User
-from django.views.generic import View
+from django.views.generic import View, RedirectView
+from django.shortcuts import render_to_response, RequestContext
+from django.contrib.auth.forms import AuthenticationForm
 
 from constants import APP_USERS_API_DEFAULT_PAGE, APP_USERS_API_DEFAULT_PER_PAGE
 from .forms import CustomRegisterForm
@@ -15,7 +18,7 @@ from apps.films.models import Films, Persons
 from apps.films.constants import APP_PERSON_DIRECTOR, APP_PERSON_ACTOR, \
     APP_FILM_FULL_FILM, APP_FILM_SERIAL, APP_USERFILM_STATUS_SUBS
 from apps.films.api.serializers import vbFilm, vbPerson
-
+from utils.common import url_with_querystring
 from utils.noderender import render_page
 
 
@@ -31,8 +34,12 @@ class RegisterUserView(View):
     def post(self, *args, **kwargs):
         register_form = CustomRegisterForm(data=self.request.POST)
         if register_form.is_valid():
-            register_form.save()
-        return HttpResponseRedirect("/")
+            user = register_form.save()
+            kw = {'token': user.auth_token.key}
+            url = url_with_querystring(reverse('tokenize'), **kw)
+            return HttpResponseRedirect(url)
+        else:
+            return HttpResponseBadRequest()
 
 
 class LoginUserView(View):
@@ -43,6 +50,38 @@ class LoginUserView(View):
         response = HttpResponse(render_page('login', resp_dict))
         response.set_cookie("csrftoken", csrf_token)
         return response
+
+    def post(self, *args, **kwargs):
+        login_form = AuthenticationForm(data=self.request.POST)
+        if login_form.is_valid():
+            user = login_form.get_user()
+            kw = {'token': user.auth_token.key}
+            url = url_with_querystring(reverse('tokenize'), **kw)
+            return HttpResponseRedirect(url)
+        else:
+            return HttpResponseBadRequest()
+
+
+class RedirectOAuthView(RedirectView):
+
+    url = 'tokenize'
+
+    def get_redirect_url(self, *args, **kwargs):
+        if self.request.user:
+            kw = {'token': self.request.user.auth_token.key}
+            url = url_with_querystring(reverse(self.url), **kw)
+        else:
+            return None
+
+        return url
+
+
+class TokenizeView(View):
+
+    def get(self, *args, **kwargs):
+        context = RequestContext(self.request)
+        response_dict = {}
+        return render_to_response('tokenize.html', response_dict, context_instance=context)
 
 
 class UserView(View):
@@ -99,6 +138,7 @@ class UserView(View):
 
         except Exception as e:
             return HttpResponseServerError()
+
 
 # TODO: DONT DELETE THIS COMMENTS!
 # class ProfileEdit(TemplateView):

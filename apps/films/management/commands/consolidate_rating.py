@@ -1,17 +1,13 @@
 # coding: utf-8
 
 import sys
-import datetime
 import traceback
-
 from time import time
-from optparse import make_option
 
-from django.db import connection
-from django.db import transaction
+from django.db import connection, transaction
 from django.core.management.base import BaseCommand, CommandError
 
-from apps.films.models import Films, UsersFilms
+from apps.films.models import Films
 
 
 class Command(BaseCommand):

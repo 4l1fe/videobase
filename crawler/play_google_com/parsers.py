@@ -46,3 +46,6 @@ class ParsePlayGoogleFilm(BaseParse):
 
     def get_seasons(self, **kwargs):
          return [0]
+
+    def get_type(self, **kwargs):
+        return 'playgoogle'

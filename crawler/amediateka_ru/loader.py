@@ -53,6 +53,7 @@ class Amediateka_robot(object):
         resp_dict = sane_dict(film)
         resp_dict['url_view'] = self.get_film_url(site_film)
         resp_dict['price'] = 0
+        resp_dict['type'] = 'amediateka'
         return resp_dict
 
     def serial_dict(self, serial, site_serial):
@@ -62,6 +63,7 @@ class Amediateka_robot(object):
             resp_dict['url_view'] = self.get_serial_url(site_serial, s)
             resp_dict['price'] = 0
             resp_dict['number'] = s['number']
+            resp_dict['type'] = 'amediateka'
             resp_list.append(resp_dict)
 
         return resp_list

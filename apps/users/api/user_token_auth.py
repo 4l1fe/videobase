@@ -9,12 +9,17 @@ from rest_framework.decorators import permission_classes
 
 from apps.users.models.api_session import UsersApiSessions, SessionToken
 from apps.users.api.utils import create_new_session
+from videobase.settings import HTTP_USER_TOKEN_TYPE
 
 
 class ObtainAuthToken(views.ObtainAuthToken):
 
     def post(self, request, format=None, *args, **kwargs):
-        return super(ObtainAuthToken, self).post(request)
+        serializer = self.serializer_class(data=request.DATA)
+        if serializer.is_valid():
+            token, created = Token.objects.get_or_create(user=serializer.object['user'])
+            return Response({HTTP_USER_TOKEN_TYPE: token.key})
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ObtainSessionToken(APIView):

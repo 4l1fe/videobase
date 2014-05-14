@@ -31,6 +31,12 @@ ACCOUNT_ACTIVATION_DAYS = 2
 
 AUTH_USER_EMAIL_UNIQUE = True
 
+HTTP_SESSION_TOKEN_TYPE = b'X-MI-SESSION'
+HTTP_USER_TOKEN_TYPE = b'X-MI-TOKEN'
+
+STANDART_HTTP_SESSION_TOKEN_HEADER = b'HTTP_{}'.format(HTTP_SESSION_TOKEN_TYPE.replace('-', '_'))
+STANDART_HTTP_USER_TOKEN_HEADER = b'HTTP_{}'.format(HTTP_USER_TOKEN_TYPE.replace('-', '_'))
+
 EMAIL_HOST = 'localhost'
 EMAIL_PORT = 25
 EMAIL_HOST_USER = ''
@@ -155,12 +161,14 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.TokenAuthentication',
-        'apps.users.models.api_session.MultipleTokenAuthentication',
+        'apps.users.backends.SessionTokenAuthentication',
+        'apps.users.backends.UserTokenAuthentication',
     )
 }
 
-LOGIN_REDIRECT_URL = '/'
+
+# LOGIN_REDIRECT_URL = '/oauth-redirect/'
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/oauth-redirect/'
 LOGIN_ERROR_URL = '/'
 
 # Ключи для OAuth2 авторизации
@@ -189,18 +197,20 @@ MAILRU_OAUTH2_CLIENT_KEY = '4daa3ed8bef5be08ebd7e25ff5ae806a'
 MAILRU_OAUTH2_CLIENT_SECRET = '8cc7bb50e5b93663774e6584a1251d79'
 
 SOCIAL_AUTH_CREATE_USERS = True
+SOCIAL_AUTH_USERNAME_IS_FULL_EMAIL = True
 
 # Backends for social auth
 AUTHENTICATION_BACKENDS = (
+    # OAuth
     'social_auth.backends.twitter.TwitterBackend',
     'social_auth.backends.facebook.FacebookBackend',
     'social_auth.backends.contrib.vk.VKOAuth2Backend',
     'social_auth.backends.google.GoogleOAuth2Backend',
-    'social_auth.backends.contrib.odnoklassniki.OdnoklassnikiBackend',
-    'social_auth.backends.contrib.mailru.MailruBackend',
+    # Token
+    'apps.users.backends.SessionTokenAuthentication',
+    'apps.users.backends.UserTokenAuthentication',
+    # Django
     'django.contrib.auth.backends.ModelBackend',
-    'rest_framework.authentication.TokenAuthentication',
-    'apps.users.models.api_session.MultipleTokenAuthentication',
 )
 
 # Перечислим pipeline, которые последовательно буду обрабатывать респонс
@@ -227,7 +237,6 @@ API_SESSION_EXPIRATION_TIME = 15
 
 if not DEBUG:
     INSTALLED_APPS += (
-        'django_jenkins',
         'raven.contrib.django.raven_compat',  # may be delete later
     )
 
@@ -235,21 +244,14 @@ if not DEBUG:
         'dsn': 'http://8684bf8b497047d9ac170fd16aefc873:41e89f4666b24f998125370f3d1a1789@sentry.aaysm.com/2'
     }
 
-    JENKINS_TASKS = (
-        'django_jenkins.tasks.run_pylint',
-        'django_jenkins.tasks.run_pep8',
-        'django_jenkins.tasks.run_pyflakes',
-        'django_jenkins.tasks.with_coverage',
-    )
-
 CELERYBEAT_SCHEDULE = {
     'robot-launch': {
         'task': 'robot_launch',
-        'schedule': timedelta(minutes=5),
+        'schedule': timedelta(minutes=1),
     },
     'kinopoisk-get_id': {
         'task': 'kinopoisk_get_id',
-        'schedule': timedelta(minutes=5),
+        'schedule': timedelta(minutes=1),
     },
     'kinopoisk-set_poster': {
         'task': 'kinopoisk_set_poster',
