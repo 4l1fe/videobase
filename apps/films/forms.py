@@ -146,3 +146,24 @@ class PersonApiForm(Form):
             if k in kwargs['data'] and kwargs['data'][k]:
                 if self.fields[k].required == False:
                     self.fields[k].required = True
+
+
+#############################################################################################################
+class PersonFilmographyApiForm(Form):
+    """Форма для валидации в PersonFilmographyAPIView
+    """
+    type = fields.ChoiceField(choices=APP_FILM_PERSON_TYPES_OUR, help_text=u'Тип')
+    page = fields.IntegerField(initial=1, min_value=1)
+    per_page = fields.IntegerField(initial=12, min_value=1)
+
+    def __init__(self, *args, **kwargs):
+        if not kwargs['data'].get('page'):
+           kwargs['data']['page'] = 1
+
+        if not kwargs['data'].get('per_page'):
+           kwargs['data']['per_page'] = 12
+
+        if not kwargs['data'].get('type'):
+           kwargs['data']['type'] = 'all'
+
+        super(PersonFilmographyApiForm, self).__init__(*args, **kwargs)
