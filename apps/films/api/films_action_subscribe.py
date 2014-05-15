@@ -73,7 +73,9 @@ class ActSubscribeFilmView(APIView):
 
         # Проверка, что это сериал
         if o_film.type != APP_FILM_SERIAL:
-            return Response({'error': u'Нельзя отписаться от фильма'}, status=status.HTTP_400_BAD_REQUEST)
+            result = Locations.exist_location(film_id)
+            if result:
+                return Response({'error': u'Нельзя отписаться от фильма'}, status=status.HTTP_400_BAD_REQUEST)
 
         # Init data
         subscribed = APP_USERFILM_SUBS_FALSE
