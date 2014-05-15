@@ -16,7 +16,7 @@ class APIUserTestCase(APITestCase):
         self.url_name = ''
         s_token = SessionToken.objects.create(user=self.user)
         UsersApiSessions.objects.create(token=s_token)
-        self.headers = "%s %s" % ('X-VB-Token', s_token.key)
+        self.headers = s_token.key
 
     def test_api_user_401_post(self):
         if self.url_name:
@@ -44,7 +44,7 @@ class APIUserInfoTestCase(APIUserTestCase):
         name = 'admin_admin'
         response = self.client.post(reverse(self.url_name, kwargs={'format': 'json'}),
                                     data={'name': name},
-                                    HTTP_AUTHORIZATION=self.headers)
+                                    HTTP_X_MI_SESSION=self.headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         user = User.objects.get(pk=self.user.pk)
         self.assertEqual(user.profile.nickname, name)
@@ -53,7 +53,7 @@ class APIUserInfoTestCase(APIUserTestCase):
         not_valid_name = random_string(size=31)
         response = self.client.post(reverse(self.url_name, kwargs={'format': 'json'}),
                                     data={'name': not_valid_name},
-                                    HTTP_AUTHORIZATION=self.headers)
+                                    HTTP_X_MI_SESSION=self.headers)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         user = User.objects.get(pk=self.user.pk)
         self.assertNotEqual(user.profile.nickname, not_valid_name)
@@ -62,7 +62,7 @@ class APIUserInfoTestCase(APIUserTestCase):
         email = 'wolko_dav@mail.ru'
         response = self.client.post(reverse(self.url_name, kwargs={'format': 'json'}),
                                     data={'email': email},
-                                    HTTP_AUTHORIZATION=self.headers)
+                                    HTTP_X_MI_SESSION=self.headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         user = User.objects.get(pk=self.user.pk)
         self.assertEqual(user.email, email)
@@ -71,7 +71,7 @@ class APIUserInfoTestCase(APIUserTestCase):
         not_valid_email = 'admin'
         response = self.client.post(reverse(self.url_name, kwargs={'format': 'json'}),
                                     data={'email': not_valid_email},
-                                    HTTP_AUTHORIZATION=self.headers)
+                                    HTTP_X_MI_SESSION=self.headers)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         user = User.objects.get(pk=self.user.pk)
         self.assertNotEqual(user.email, not_valid_email)
@@ -82,7 +82,7 @@ class APIUserInfoTestCase(APIUserTestCase):
         response = self.client.post(reverse(self.url_name, kwargs={'format': 'json'}),
                                     data={'email': email,
                                           'name': name},
-                                    HTTP_AUTHORIZATION=self.headers)
+                                    HTTP_X_MI_SESSION=self.headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         user = User.objects.get(pk=self.user.pk)
         self.assertEqual(user.email, email)
@@ -96,7 +96,7 @@ class APIUserPasswordTestCase(APIUserTestCase):
 
     def test_api_user_password_change_password(self):
         response = self.client.post(reverse(self.url_name, kwargs={'format': 'json'}),
-                                    HTTP_AUTHORIZATION=self.headers)
+                                    HTTP_X_MI_SESSION=self.headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         password = response.data['password']
         response = self.client.post(reverse('login', kwargs={'format': 'json'}),
