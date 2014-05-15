@@ -23,7 +23,7 @@ class APIUsersFriendShipActionTestCase(APITestCase):
         self.kwargs = {'format': 'json', 'user_id': self.user.pk}
         s_token = SessionToken.objects.create(user=self.user)
         UsersApiSessions.objects.create(token=s_token)
-        self.headers = "%s %s" % ('X-VB-Token', s_token.key)
+        self.headers = s_token.key
 
     def test_api_users_friendship_401_get(self):
         response = self.client.get(reverse(self.url_name, kwargs=self.kwargs))
@@ -38,7 +38,7 @@ class APIUsersFriendShipActionTestCase(APITestCase):
         kw = self.kwargs.copy()
         kw['user_id'] = user.pk
         response = self.client.get(reverse(self.url_name, kwargs=kw),
-                                   HTTP_AUTHORIZATION=self.headers)
+                                   HTTP_X_MI_SESSION=self.headers)
         flag = UsersRels.objects.filter(user=self.user, user_rel=user).exists()
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(flag, True)
@@ -49,7 +49,7 @@ class APIUsersFriendShipActionTestCase(APITestCase):
         kw['user_id'] = user.pk
         UserRelsFactory.create(user=self.user, user_rel=user)
         response = self.client.delete(reverse(self.url_name, kwargs=kw),
-                                   HTTP_AUTHORIZATION=self.headers)
+                                   HTTP_X_MI_SESSION=self.headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_api_user_friendship_200_without_rel_delete(self):
@@ -57,7 +57,7 @@ class APIUsersFriendShipActionTestCase(APITestCase):
         kw = self.kwargs.copy()
         kw['user_id'] = user.pk
         response = self.client.delete(reverse(self.url_name, kwargs=kw),
-                                   HTTP_AUTHORIZATION=self.headers)
+                                   HTTP_X_MI_SESSION=self.headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_api_user_friendship_400_bad_user_get(self):
@@ -65,7 +65,7 @@ class APIUsersFriendShipActionTestCase(APITestCase):
         kw = self.kwargs.copy()
         kw['user_id'] = pk + 1
         response = self.client.get(reverse(self.url_name, kwargs=kw),
-                        HTTP_AUTHORIZATION=self.headers)
+                        HTTP_X_MI_SESSION=self.headers)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_api_user_friendship_400_bad_user_delete(self):
@@ -73,7 +73,7 @@ class APIUsersFriendShipActionTestCase(APITestCase):
         kw = self.kwargs.copy()
         kw['user_id'] = pk + 1
         response = self.client.delete(reverse(self.url_name, kwargs=kw),
-                        HTTP_AUTHORIZATION=self.headers)
+                        HTTP_X_MI_SESSION=self.headers)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 
@@ -141,7 +141,7 @@ class APIUsersTestCase(APITestCase):
         self.kwargs = {'format': 'json', 'user_id': self.user.pk}
         s_token = SessionToken.objects.create(user=self.user)
         UsersApiSessions.objects.create(token=s_token)
-        self.headers = "%s %s" % ('X-VB-Token', s_token.key)
+        self.headers = s_token.key
 
     def test_api_users_401_get(self):
         response = self.client.get(reverse(self.url_name, kwargs=self.kwargs))
@@ -151,15 +151,15 @@ class APIUsersTestCase(APITestCase):
         pk = User.objects.latest('id').pk
         self.kwargs['user_id'] = int(pk) + 1
         response = self.client.get(reverse(self.url_name, kwargs=self.kwargs),
-                                   HTTP_AUTHORIZATION=self.headers)
+                                   HTTP_X_MI_SESSION=self.headers)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_api_users_200_get(self):
         response = self.client.get(reverse(self.url_name, kwargs=self.kwargs),
-                                   HTTP_AUTHORIZATION=self.headers)
+                                   HTTP_X_MI_SESSION=self.headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['id'], self.user.pk)
-        self.assertEqual(response.data['name'], self.profile.nickname)
+        self.assertEqual(response.data['name'], self.profile.get_name())
         pic = UsersPics.objects.get(pk=self.profile.userpic_id)
         self.assertEqual(response.data['avatar'], pic.image.storage.url(pic.image.name))
 
@@ -171,16 +171,19 @@ class APIUsersTestCase(APITestCase):
         pk = User.objects.latest('id').pk
         self.kwargs['user_id'] = int(pk) + 1
         response = self.client.post(reverse(self.url_name, kwargs=self.kwargs),
-                                   HTTP_AUTHORIZATION=self.headers)
+                                   HTTP_X_MI_SESSION=self.headers)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_api_users_200_post_extend_without_reltype(self):
         user = UserFactory.create()
+
         s_token = SessionToken.objects.create(user=self.user)
         UsersApiSessions.objects.create(token=s_token)
-        headers = "%s %s" % ('X-VB-Token', s_token.key)
+        headers = s_token.key
+
         response = self.client.post(reverse(self.url_name, kwargs=self.kwargs),
-                                   HTTP_AUTHORIZATION=headers, data={'extend': True})
+                                   HTTP_X_MI_SESSION=headers, data={'extend': True})
+
         comments_cnt = Comments.objects.filter(user=self.user).count()
         friends_cnt = UsersRels.objects.filter(user=self.user,
                                                rel_type=APP_USER_REL_TYPE_FRIENDS).count()
@@ -192,7 +195,7 @@ class APIUsersTestCase(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['id'], self.user.pk)
-        self.assertEqual(response.data['name'], self.profile.nickname)
+        self.assertEqual(response.data['name'], self.profile.get_name())
         self.assertEqual(response.data['avatar'], pic.image.storage.url(pic.image.name))
         self.assertEqual(response.data['regdate'], self.user.date_joined)
         self.assertEqual(response.data['friends_cnt'], friends_cnt)
@@ -202,12 +205,15 @@ class APIUsersTestCase(APITestCase):
 
     def test_api_users_200_post_extend_with_reltype(self):
         user = UserFactory.create()
+
         UserRelsFactory.create(user=self.user, user_rel=user, rel_type=APP_USER_REL_TYPE_FRIENDS)
         s_token = SessionToken.objects.create(user=user)
         UsersApiSessions.objects.create(token=s_token)
-        headers = "%s %s" % ('X-VB-Token', s_token.key)
+        headers = s_token.key
+
         response = self.client.post(reverse(self.url_name, kwargs=self.kwargs),
-                                   HTTP_AUTHORIZATION=headers, data={'extend': True})
+                                   HTTP_X_MI_SESSION=headers, data={'extend': True})
+
         comments_cnt = Comments.objects.filter(user=self.user).count()
         friends_cnt = UsersRels.objects.filter(user=self.user,
                                                rel_type=APP_USER_REL_TYPE_FRIENDS).count()
@@ -219,7 +225,7 @@ class APIUsersTestCase(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['id'], self.user.pk)
-        self.assertEqual(response.data['name'], self.profile.nickname)
+        self.assertEqual(response.data['name'], self.profile.get_name())
         self.assertEqual(response.data['avatar'], pic.image.storage.url(pic.image.name))
         self.assertEqual(response.data['regdate'], self.user.date_joined)
         self.assertEqual(response.data['friends_cnt'], friends_cnt)
@@ -229,10 +235,10 @@ class APIUsersTestCase(APITestCase):
 
     def test_api_users_200_post_genres(self):
         response = self.client.post(reverse(self.url_name, kwargs=self.kwargs),
-                                   HTTP_AUTHORIZATION=self.headers, data={'genres': True})
+                                   HTTP_X_MI_SESSION=self.headers, data={'genres': True})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['id'], self.user.pk)
-        self.assertEqual(response.data['name'], self.profile.nickname)
+        self.assertEqual(response.data['name'], self.profile.get_name())
         pic = UsersPics.objects.get(pk=self.profile.userpic_id)
         self.assertEqual(response.data['avatar'], pic.image.storage.url(pic.image.name))
 
@@ -243,10 +249,10 @@ class APIUsersTestCase(APITestCase):
 
     def test_api_users_200_post_friends(self):
         response = self.client.post(reverse(self.url_name, kwargs=self.kwargs),
-                                   HTTP_AUTHORIZATION=self.headers, data={'friends': True})
+                                   HTTP_X_MI_SESSION=self.headers, data={'friends': True})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['id'], self.user.pk)
-        self.assertEqual(response.data['name'], self.profile.nickname)
+        self.assertEqual(response.data['name'], self.profile.get_name())
         pic = UsersPics.objects.get(pk=self.profile.userpic_id)
         self.assertEqual(response.data['avatar'], pic.image.storage.url(pic.image.name))
         friends = User.objects.extra(
@@ -254,7 +260,7 @@ class APIUsersTestCase(APITestCase):
             params=[APP_USER_REL_TYPE_FRIENDS, self.user.pk]).all()
         for i in range(friends.count()):
             self.assertEqual(response.data['friends'][i]['id'], friends[i].pk)
-            self.assertEqual(response.data['friends'][i]['name'], friends[i].profile.nickname)
+            self.assertEqual(response.data['friends'][i]['name'], friends[i].profile.get_name())
             try:
                 pic = UsersPics.objects.get(pk=friends[i].profile.userpic_id)
                 path = pic.image.storage.url(pic.image.name)
@@ -264,14 +270,19 @@ class APIUsersTestCase(APITestCase):
 
     def test_api_users_200_post_extend_genres_friends(self):
         user = UserFactory.create()
+
         s_token = SessionToken.objects.create(user=self.user)
         UsersApiSessions.objects.create(token=s_token)
-        headers = "%s %s" % ('X-VB-Token', s_token.key)
+        headers = s_token.key
+
         response = self.client.post(reverse(self.url_name, kwargs=self.kwargs),
-                                   HTTP_AUTHORIZATION=headers, data={'extend': True,
-                                                                     'genres': True,
-                                                                     'friends': True,
-                                                                     })
+                                   HTTP_X_MI_SESSION=headers,
+                                   data={
+                                       'extend': True,
+                                       'genres': True,
+                                       'friends': True,
+                                   })
+
         comments_cnt = Comments.objects.filter(user=self.user).count()
         friends_cnt = UsersRels.objects.filter(user=self.user,
                                                rel_type=APP_USER_REL_TYPE_FRIENDS).count()
@@ -283,7 +294,7 @@ class APIUsersTestCase(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['id'], self.user.pk)
-        self.assertEqual(response.data['name'], self.profile.nickname)
+        self.assertEqual(response.data['name'], self.profile.get_name())
         self.assertEqual(response.data['avatar'], pic.image.storage.url(pic.image.name))
         self.assertEqual(response.data['regdate'], self.user.date_joined)
         self.assertEqual(response.data['friends_cnt'], friends_cnt)
@@ -301,7 +312,7 @@ class APIUsersTestCase(APITestCase):
             params=[APP_USER_REL_TYPE_FRIENDS, self.user.pk]).all()
         for i in range(friends.count()):
             self.assertEqual(response.data['friends'][i]['id'], friends[i].pk)
-            self.assertEqual(response.data['friends'][i]['name'], friends[i].profile.nickname)
+            self.assertEqual(response.data['friends'][i]['name'], friends[i].profile.get_name())
             try:
                 pic = UsersPics.objects.get(pk=friends[i].profile.userpic_id)
                 path = pic.image.storage.url(pic.image.name)
@@ -351,7 +362,7 @@ class APIUsersFriendsTestCase(APITestCase):
         for i in range(len(page_obj.object_list)):
             user = page_obj.object_list[i]
             self.assertEqual(response.data['items'][i]['id'], user.pk)
-            self.assertEqual(response.data['items'][i]['name'], user.profile.nickname)
+            self.assertEqual(response.data['items'][i]['name'], user.profile.get_name())
             try:
                 pic = UsersPics.objects.get(pk=user.profile.userpic_id)
                 path = pic.image.storage.url(pic.image.name)
@@ -363,17 +374,18 @@ class APIUsersFriendsTestCase(APITestCase):
         friends = User.objects.extra(
             where=['id IN (SELECT "user_rel_id" FROM "auth_user" INNER JOIN "users_rels" ON ( "auth_user"."id" = "users_rels"."user_id" ) WHERE ("users_rels"."rel_type" =%s  AND "users_rels"."user_id" = %s ))'],
             params=[APP_USER_REL_TYPE_FRIENDS, self.user.pk]).all()
-        page_obj = Paginator(friends, 5).\
-            page(2)
-        response = self.client.post(reverse(self.url_name, kwargs=self.kwargs),
-                                    data={'per_page': 5, 'page': 2})
+
+        page_obj = Paginator(friends, 5).page(2)
+        response = self.client.post(reverse(self.url_name, kwargs=self.kwargs), data={'per_page': 5, 'page': 2})
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['per_page'], 5)
         self.assertEqual(response.data['page'], 2)
+
         for i in range(len(page_obj.object_list)):
             user = page_obj.object_list[i]
             self.assertEqual(response.data['items'][i]['id'], user.pk)
-            self.assertEqual(response.data['items'][i]['name'], user.profile.nickname)
+            self.assertEqual(response.data['items'][i]['name'], user.profile.get_name())
             try:
                 pic = UsersPics.objects.get(pk=user.profile.userpic_id)
                 path = pic.image.storage.url(pic.image.name)
@@ -395,10 +407,6 @@ class APIUsersPersonsTestCase(APITestCase):
                 APP_PERSON_PRODUCER, APP_PERSON_SCRIPTWRITER,
                 APP_PERSON_DIRECTOR, APP_PERSON_ACTOR, )))
 
-    def test_api_users_genres_401_get(self):
-        response = self.client.get(reverse(self.url_name, kwargs=self.kwargs))
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-
     def test_api_users_genres_400_get(self):
         pk = User.objects.latest('id').pk
         kw = self.kwargs.copy()
@@ -416,7 +424,7 @@ class APIUsersPersonsTestCase(APITestCase):
             sub = UsersPersons.objects.get(person=persons[i], user=self.user).subscribed
             self.assertEqual(response.data['items'][i]['id'], persons[i].pk)
             self.assertEqual(response.data['items'][i]['name'], persons[i].name)
-            self.assertEqual(response.data['items'][i]['photo'], persons[i].photo)
+            self.assertEqual(response.data['items'][i]['photo'], persons[i].photo.url)
             self.assertEqual(response.data['items'][i]['relation'], sub)
             self.assertEqual(response.data['items'][i]['birthdate'], persons[i].birthdate)
             self.assertEqual(response.data['items'][i]['birthplace'][0], persons[i].city.name)
@@ -432,7 +440,7 @@ class APIUsersPersonsTestCase(APITestCase):
             sub = UsersPersons.objects.get(person=persons[i], user=self.user).subscribed
             self.assertEqual(response.data['items'][i]['id'], persons[i].pk)
             self.assertEqual(response.data['items'][i]['name'], persons[i].name)
-            self.assertEqual(response.data['items'][i]['photo'], persons[i].photo)
+            self.assertEqual(response.data['items'][i]['photo'], persons[i].photo.url)
             self.assertEqual(response.data['items'][i]['relation'], sub)
             self.assertEqual(response.data['items'][i]['birthdate'], persons[i].birthdate)
             self.assertEqual(response.data['items'][i]['birthplace'][0], persons[i].city.name)
@@ -487,7 +495,6 @@ class APIUsersFilmsTestCase(APITestCase):
             self.assertEqual(response.data['items'][i]['locations'][0]['price'], loc.price)
             self.assertEqual(response.data['items'][i]['locations'][0]['subtitles'], loc.subtitles)
             self.assertEqual(response.data['items'][i]['locations'][0]['price_type'], loc.price_type)
-            self.assertEqual(response.data['items'][i]['locations'][0]['id'], loc.pk)
             self.assertEqual(response.data['items'][i]['ratings']['imdb'][0], films[i].rating_imdb)
             self.assertEqual(response.data['items'][i]['ratings']['imdb'][0], films[i].rating_imdb_cnt)
             self.assertEqual(response.data['items'][i]['ratings']['kp'][0], films[i].rating_kinopoisk)
@@ -514,7 +521,6 @@ class APIUsersFilmsTestCase(APITestCase):
             self.assertEqual(response.data['items'][i]['locations'][0]['price'], loc.price)
             self.assertEqual(response.data['items'][i]['locations'][0]['subtitles'], loc.subtitles)
             self.assertEqual(response.data['items'][i]['locations'][0]['price_type'], loc.price_type)
-            self.assertEqual(response.data['items'][i]['locations'][0]['id'], loc.pk)
             self.assertEqual(response.data['items'][i]['ratings']['imdb'][0], films[i].rating_imdb)
             self.assertEqual(response.data['items'][i]['ratings']['imdb'][0], films[i].rating_imdb_cnt)
             self.assertEqual(response.data['items'][i]['ratings']['kp'][0], films[i].rating_kinopoisk)
@@ -523,12 +529,12 @@ class APIUsersFilmsTestCase(APITestCase):
             self.assertEqual(response.data['items'][i]['ratings']['cons'][0], films[i].rating_cons_cnt)
 
     def test_api_users_films_200_full_film_get(self):
-        response = self.client.post(reverse(self.url_name, kwargs=self.kwargs),
-                                    data={'type': 'f'})
-        ftype = [APP_FILM_FULL_FILM]
-        films = Films.objects.filter(users_films__user=self.user, type__in=ftype,
+        response = self.client.get(reverse(self.url_name, kwargs=self.kwargs), data={'type': 'f'})
+        films = Films.objects.filter(users_films__user=self.user,
+                                     type__in=[APP_FILM_FULL_FILM],
                                      users_films__status=APP_USERFILM_STATUS_SUBS)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
         for i in range(len(films)):
             loc = Locations.objects.get(content__film=films[i])
             self.assertEqual(response.data['items'][i]['id'], films[i].pk)
@@ -542,7 +548,6 @@ class APIUsersFilmsTestCase(APITestCase):
             self.assertEqual(response.data['items'][i]['locations'][0]['price'], loc.price)
             self.assertEqual(response.data['items'][i]['locations'][0]['subtitles'], loc.subtitles)
             self.assertEqual(response.data['items'][i]['locations'][0]['price_type'], loc.price_type)
-            self.assertEqual(response.data['items'][i]['locations'][0]['id'], loc.pk)
             self.assertEqual(response.data['items'][i]['ratings']['imdb'][0], films[i].rating_imdb)
             self.assertEqual(response.data['items'][i]['ratings']['imdb'][0], films[i].rating_imdb_cnt)
             self.assertEqual(response.data['items'][i]['ratings']['kp'][0], films[i].rating_kinopoisk)
