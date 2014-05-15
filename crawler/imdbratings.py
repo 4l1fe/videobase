@@ -8,6 +8,7 @@ import re
 from apps.films.models import Films
 import HTMLParser
 import logging
+import datetime
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -53,22 +54,34 @@ def name_wrapper(dict_list):
 
 def ny_full_dict(debug=False):
     return dict(name_wrapper(dict_gen(get_rating_source(debug))))
-
+def value_dict_update(year,value):
+    value.update({'year':year})
+    return value
+    
 def process_all():
     '''
     Process all films found in our database and update ratings for them
     if they exist in downloaded file.
     '''
     h = HTMLParser.HTMLParser()
-    full_dict = ny_full_dict(True)
-    name_dict =dict((key[1],value) for key,value in full_dict.items())
+    full_dict = ny_full_dict(False)
+    
+    name_dict =dict((key[1],value_dict_update(key[0],value)) for key,value in full_dict.items())
 
+    
+    changed_ratings =0
+    fail_years = 0
     for i,film in enumerate(Films.objects.all()):
         key = h.unescape(film.name_orig).lower().strip()
         if len(film.name_orig) < 3:
             continue
-
+        
         if key in name_dict:
+            imdb_date = datetime.datetime.strptime(name_dict[key]['year'],"%Y").date()
+            if film.release_date - imdb_date > datetime.timedelta(days =350):
+                fail_years +=1
+                film.release_date = imdb_date
+            changed_ratings +=1
             logger.info((u"Found rating for {} ".format(film.name_orig)).encode("utf-8"))
             rdict = name_dict[key]
             logger.debug(("Rating before {} Count before {} ".format(film.rating_imdb,film.rating_imdb_cnt)).encode("utf-8"))
@@ -77,3 +90,9 @@ def process_all():
             film.rating_imdb_cnt=0 if rdict['votes'] is None else rdict['votes']
             logger.debug(("Rating after {} Count after {}".format(film.rating_imdb,film.rating_imdb_cnt)).encode("utf-8"))
             film.save()
+
+        
+        
+    print "Failed years %d" % fail_years
+    print "Films ratings found {}".format(changed_ratings)
+    print "Films overall {}".format(i+1)
