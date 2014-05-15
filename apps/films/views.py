@@ -25,7 +25,6 @@ from apps.films.constants import APP_FILM_PERSON_TYPES_OUR
 from apps.films.forms import PersonFilmographyApiForm
 
 import apps.films.models as film_model
-from apps.films.models import PersonsFilms
 from apps.films.api.serializers import vbFilm, vbComment, vbPerson
 from apps.films.api.serializers.vb_film import GenresSerializer
 import apps.contents.models as content_model
@@ -146,11 +145,14 @@ class PersonFilmographyAPIView(APIView):
         if form.is_valid():
             try:
                 c_d = form.cleaned_data
-                pfs = PersonsFilms.objects.filter(person__id=resource_id)
+                pfs = film_model.PersonsFilms.objects.filter(person__id=resource_id).values_list('film', flat=True)
                 if c_d['type'] != 'all':
                     pfs = pfs.filter(p_type=dict(APP_FILM_PERSON_TYPES_OUR)[c_d['type']])
-                films = [pf.film for pf in pfs]
-                page = Paginator(films, per_page=c_d['per_page']).page(c_d['page'])
+
+                if not len(pfs):
+                    return Response(status=status.HTTP_404_NOT_FOUND)
+
+                page = Paginator(film_model.Films.objects.filter(id__in=pfs), per_page=c_d['per_page']).page(c_d['page'])
                 data = vbFilm(page.object_list, many=True).data
                 result = {
                     'total_cnt': page.paginator.count,
