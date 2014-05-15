@@ -166,9 +166,10 @@ REST_FRAMEWORK = {
     )
 }
 
+SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 
 # LOGIN_REDIRECT_URL = '/oauth-redirect/'
-SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/oauth-redirect/'
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/tokenize'
 LOGIN_ERROR_URL = '/'
 
 # Ключи для OAuth2 авторизации
@@ -188,8 +189,8 @@ TWITTER_CONSUMER_KEY    = 'HACuJARrAXJyeHdeD5viHULZR'
 TWITTER_CONSUMER_SECRET = 'Ge0k2rKltyPq3ida76IjTbhesZVdIrvckcNPXzJaBU2ouzixut'
 
 # Google+
-GOOGLE_OAUTH2_CLIENT_ID     = 'AIzaSyD9C36HCncY0tVWQekEmz5KEarnCzOCCb0'
-GOOGLE_OAUTH2_CLIENT_SECRET = ''
+GOOGLE_OAUTH2_CLIENT_ID     = '729866043170.apps.googleusercontent.com'
+GOOGLE_OAUTH2_CLIENT_SECRET = 'Ga91PMNEXi28egLsTUy5Wqhw'
 
 # Mail.ru
 MAILRU_OAUTH2_APP_KEY = '719516'
@@ -268,6 +269,14 @@ CELERYBEAT_SCHEDULE = {
     'viaplay_ru_robot_start': {
         'task': 'viaplay_ru_robot_start',
         'schedule': timedelta(days=7),
+    },
+        'kinopoisk_poster': {
+        'task': 'kinopoisk_poster',
+        'schedule': timedelta(seconds=10),
+    },
+        'kinopoisk_id_person': {
+        'task': 'kinopoisk_id_person',
+        'schedule': timedelta(seconds=10),
     },
 }
 
