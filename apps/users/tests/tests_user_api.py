@@ -34,7 +34,7 @@ class APIUserInfoTestCase(APIUserTestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_api_user_info_get(self):
-        response = self.client.get(reverse(self.url_name, kwargs={'format': 'json'}), HTTP_AUTHORIZATION=self.headers)
+        response = self.client.get(reverse(self.url_name, kwargs={'format': 'json'}), HTTP_X_MI_SESSION=self.headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(self.profile.nickname, response.data['name'])
         self.assertEqual(self.user.id, response.data['id'])
@@ -43,36 +43,36 @@ class APIUserInfoTestCase(APIUserTestCase):
     def test_api_user_info_post_valid_name(self):
         name = 'admin_admin'
         response = self.client.post(reverse(self.url_name, kwargs={'format': 'json'}),
-                                    data={'name': name},
-                                    HTTP_X_MI_SESSION=self.headers)
+                                    data={'name': name}, HTTP_X_MI_SESSION=self.headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
         user = User.objects.get(pk=self.user.pk)
         self.assertEqual(user.profile.nickname, name)
 
     def test_api_user_info_post_not_valid_name(self):
         not_valid_name = random_string(size=31)
         response = self.client.post(reverse(self.url_name, kwargs={'format': 'json'}),
-                                    data={'name': not_valid_name},
-                                    HTTP_X_MI_SESSION=self.headers)
+                                    data={'name': not_valid_name}, HTTP_X_MI_SESSION=self.headers)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
         user = User.objects.get(pk=self.user.pk)
         self.assertNotEqual(user.profile.nickname, not_valid_name)
 
     def test_api_user_info_post_valid_email(self):
         email = 'wolko_dav@mail.ru'
         response = self.client.post(reverse(self.url_name, kwargs={'format': 'json'}),
-                                    data={'email': email},
-                                    HTTP_X_MI_SESSION=self.headers)
+                                    data={'email': email}, HTTP_X_MI_SESSION=self.headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
         user = User.objects.get(pk=self.user.pk)
         self.assertEqual(user.email, email)
 
     def test_api_user_info_post_not_valid_email(self):
         not_valid_email = 'admin'
         response = self.client.post(reverse(self.url_name, kwargs={'format': 'json'}),
-                                    data={'email': not_valid_email},
-                                    HTTP_X_MI_SESSION=self.headers)
+                                    data={'email': not_valid_email}, HTTP_X_MI_SESSION=self.headers)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
         user = User.objects.get(pk=self.user.pk)
         self.assertNotEqual(user.email, not_valid_email)
 
@@ -84,6 +84,7 @@ class APIUserInfoTestCase(APIUserTestCase):
                                           'name': name},
                                     HTTP_X_MI_SESSION=self.headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
         user = User.objects.get(pk=self.user.pk)
         self.assertEqual(user.email, email)
         self.assertEqual(user.profile.nickname, name)
@@ -98,8 +99,8 @@ class APIUserPasswordTestCase(APIUserTestCase):
         response = self.client.post(reverse(self.url_name, kwargs={'format': 'json'}),
                                     HTTP_X_MI_SESSION=self.headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
         password = response.data['password']
         response = self.client.post(reverse('login', kwargs={'format': 'json'}),
-                                    data={'username': self.user.username,
-                                          'password': password})
+                                    data={'username': self.user.username, 'password': password})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
