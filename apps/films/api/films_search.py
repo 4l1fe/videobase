@@ -101,6 +101,10 @@ class SearchFilmsView(APIView):
         if 'test' in sys.argv:
             return False
         else:
+            auth = self.request.user and self.request.user.is_authenticated()
+            if auth:
+                return False
+
             return not settings.DEBUG
 
 
@@ -150,7 +154,7 @@ class SearchFilmsView(APIView):
                     'items': serializer.data,
                 }
 
-                if not settings.DEBUG:
+                if self.use_cache():
                     try:
                         cache.set(cache_key, result, 300)
                     except:
