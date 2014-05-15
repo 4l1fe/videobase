@@ -141,12 +141,12 @@ class PersonAPIView(APIView):
 
 class PersonFilmographyAPIView(APIView):
 
-    def get(self, request, person_id, format=None):
+    def get(self, request, resource_id, format=None):
         form = PersonFilmographyApiForm(data=request.GET.copy())
         if form.is_valid():
             try:
                 c_d = form.cleaned_data
-                pfs = PersonsFilms.objects.filter(person__id=person_id)
+                pfs = PersonsFilms.objects.filter(person__id=resource_id)
                 if c_d['type'] != 'all':
                     pfs = pfs.filter(p_type=dict(APP_FILM_PERSON_TYPES_OUR)[c_d['type']])
                 films = [pf.film for pf in pfs]
