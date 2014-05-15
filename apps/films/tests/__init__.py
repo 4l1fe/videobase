@@ -1,3 +1,3 @@
 __author__ = 'eugene'
 
-from test_persons_api import *
+from tests_persons_api import *
