@@ -351,7 +351,7 @@ class APIUsersFriendsTestCase(APITestCase):
         for i in range(len(page_obj.object_list)):
             user = page_obj.object_list[i]
             self.assertEqual(response.data['items'][i]['id'], user.pk)
-            self.assertEqual(response.data['items'][i]['name'], user.profile.nickname)
+            self.assertEqual(response.data['items'][i]['name'], user.profile.get_name())
             try:
                 pic = UsersPics.objects.get(pk=user.profile.userpic_id)
                 path = pic.image.storage.url(pic.image.name)
@@ -373,7 +373,7 @@ class APIUsersFriendsTestCase(APITestCase):
         for i in range(len(page_obj.object_list)):
             user = page_obj.object_list[i]
             self.assertEqual(response.data['items'][i]['id'], user.pk)
-            self.assertEqual(response.data['items'][i]['name'], user.profile.nickname)
+            self.assertEqual(response.data['items'][i]['name'], user.profile.get_name())
             try:
                 pic = UsersPics.objects.get(pk=user.profile.userpic_id)
                 path = pic.image.storage.url(pic.image.name)
@@ -416,7 +416,7 @@ class APIUsersPersonsTestCase(APITestCase):
             sub = UsersPersons.objects.get(person=persons[i], user=self.user).subscribed
             self.assertEqual(response.data['items'][i]['id'], persons[i].pk)
             self.assertEqual(response.data['items'][i]['name'], persons[i].name)
-            self.assertEqual(response.data['items'][i]['photo'], persons[i].photo)
+            self.assertEqual(response.data['items'][i]['photo'], persons[i].photo.url)
             self.assertEqual(response.data['items'][i]['relation'], sub)
             self.assertEqual(response.data['items'][i]['birthdate'], persons[i].birthdate)
             self.assertEqual(response.data['items'][i]['birthplace'][0], persons[i].city.name)
@@ -432,7 +432,7 @@ class APIUsersPersonsTestCase(APITestCase):
             sub = UsersPersons.objects.get(person=persons[i], user=self.user).subscribed
             self.assertEqual(response.data['items'][i]['id'], persons[i].pk)
             self.assertEqual(response.data['items'][i]['name'], persons[i].name)
-            self.assertEqual(response.data['items'][i]['photo'], persons[i].photo)
+            self.assertEqual(response.data['items'][i]['photo'], persons[i].photo.url)
             self.assertEqual(response.data['items'][i]['relation'], sub)
             self.assertEqual(response.data['items'][i]['birthdate'], persons[i].birthdate)
             self.assertEqual(response.data['items'][i]['birthplace'][0], persons[i].city.name)
@@ -487,7 +487,6 @@ class APIUsersFilmsTestCase(APITestCase):
             self.assertEqual(response.data['items'][i]['locations'][0]['price'], loc.price)
             self.assertEqual(response.data['items'][i]['locations'][0]['subtitles'], loc.subtitles)
             self.assertEqual(response.data['items'][i]['locations'][0]['price_type'], loc.price_type)
-            self.assertEqual(response.data['items'][i]['locations'][0]['id'], loc.pk)
             self.assertEqual(response.data['items'][i]['ratings']['imdb'][0], films[i].rating_imdb)
             self.assertEqual(response.data['items'][i]['ratings']['imdb'][0], films[i].rating_imdb_cnt)
             self.assertEqual(response.data['items'][i]['ratings']['kp'][0], films[i].rating_kinopoisk)
@@ -514,7 +513,6 @@ class APIUsersFilmsTestCase(APITestCase):
             self.assertEqual(response.data['items'][i]['locations'][0]['price'], loc.price)
             self.assertEqual(response.data['items'][i]['locations'][0]['subtitles'], loc.subtitles)
             self.assertEqual(response.data['items'][i]['locations'][0]['price_type'], loc.price_type)
-            self.assertEqual(response.data['items'][i]['locations'][0]['id'], loc.pk)
             self.assertEqual(response.data['items'][i]['ratings']['imdb'][0], films[i].rating_imdb)
             self.assertEqual(response.data['items'][i]['ratings']['imdb'][0], films[i].rating_imdb_cnt)
             self.assertEqual(response.data['items'][i]['ratings']['kp'][0], films[i].rating_kinopoisk)
