@@ -137,7 +137,7 @@ class SearchFilmsView(APIView):
                             o_search = Films.objects.filter(pk__in=list_films_by_content)
 
                 try:
-                    page = Paginator(o_search.order_by('-rating_sort'), per_page=filter['per_page']).page(filter['page'])
+                    page = Paginator(o_search.order_by('-rating_sort'), per_page=filter['per_page']).page(filter['page']+1)
                 except Exception as e:
                     return Response({'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
 
