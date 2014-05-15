@@ -407,10 +407,6 @@ class APIUsersPersonsTestCase(APITestCase):
                 APP_PERSON_PRODUCER, APP_PERSON_SCRIPTWRITER,
                 APP_PERSON_DIRECTOR, APP_PERSON_ACTOR, )))
 
-    def test_api_users_genres_401_get(self):
-        response = self.client.get(reverse(self.url_name, kwargs=self.kwargs))
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-
     def test_api_users_genres_400_get(self):
         pk = User.objects.latest('id').pk
         kw = self.kwargs.copy()
@@ -533,8 +529,9 @@ class APIUsersFilmsTestCase(APITestCase):
             self.assertEqual(response.data['items'][i]['ratings']['cons'][0], films[i].rating_cons_cnt)
 
     def test_api_users_films_200_full_film_get(self):
-        response = self.client.post(reverse(self.url_name, kwargs=self.kwargs), data={'type': 'f'})
-        films = Films.objects.filter(users_films__user=self.user, type__in=[APP_FILM_FULL_FILM],
+        response = self.client.get(reverse(self.url_name, kwargs=self.kwargs), data={'type': 'f'})
+        films = Films.objects.filter(users_films__user=self.user,
+                                     type__in=[APP_FILM_FULL_FILM],
                                      users_films__status=APP_USERFILM_STATUS_SUBS)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -551,7 +548,6 @@ class APIUsersFilmsTestCase(APITestCase):
             self.assertEqual(response.data['items'][i]['locations'][0]['price'], loc.price)
             self.assertEqual(response.data['items'][i]['locations'][0]['subtitles'], loc.subtitles)
             self.assertEqual(response.data['items'][i]['locations'][0]['price_type'], loc.price_type)
-            self.assertEqual(response.data['items'][i]['locations'][0]['id'], loc.pk)
             self.assertEqual(response.data['items'][i]['ratings']['imdb'][0], films[i].rating_imdb)
             self.assertEqual(response.data['items'][i]['ratings']['imdb'][0], films[i].rating_imdb_cnt)
             self.assertEqual(response.data['items'][i]['ratings']['kp'][0], films[i].rating_kinopoisk)
