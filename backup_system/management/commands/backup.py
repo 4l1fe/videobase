@@ -4,6 +4,7 @@ from django.core.management import BaseCommand
 from backup_system.constants import APP_BACKUP_FILENAME_TEMPLATE
 
 from optparse import make_option
+import subprocess
 import logging
 import os
 import time
@@ -47,11 +48,11 @@ class Command(BaseCommand):
         logger.info("Start: backup for DATABASE: {0}".format(db_name))
         try:
             backup_file = APP_BACKUP_FILENAME_TEMPLATE.format(db_name=db_name,
-                                                             time=str(time.strftime("%Y-%m-%d-%H-%M")))
-            dumper = "pg_dump {name} --username {user} --host={host} --port={port} -F c > {filename} ".\
+                                                              time=str(time.strftime("%Y-%m-%d-%H-%M")))
+            command = "pg_dump {name} --username {user} --host={host} --port={port} -F c > {filename} ".\
                 format(name=db_name, user=db_user, host=db_host,
                        port=db_port, filename=os.path.join(path, backup_file))
-            os.popen(dumper)
+            p = subprocess.Popen(command, shell=True).wait()
             logger.info("End: Backup for DATABASE: {0}".format(db_name))
         except Exception as e:
             logger.error("""End: Backup for DATABASE:{0}
