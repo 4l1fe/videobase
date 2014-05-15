@@ -16,8 +16,3 @@ def render_page(page_type, context):
 
     html, status = render_proc.communicate(json.dumps(data, cls=encoder))
     return html
-
-
-
-
-
