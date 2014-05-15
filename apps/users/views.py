@@ -36,7 +36,8 @@ class RegisterUserView(View):
         register_form = CustomRegisterForm(data=self.request.POST)
         if register_form.is_valid():
             user = register_form.save()
-            kw = {'token': user.auth_token.key}
+            kw = {'token': user.auth_token.key,
+                  '_': timezone.now().date().strftime("%H%M%S")}
             url = url_with_querystring(reverse('tokenize'), **kw)
             return HttpResponseRedirect(url)
         else:
@@ -56,7 +57,8 @@ class LoginUserView(View):
         login_form = AuthenticationForm(data=self.request.POST)
         if login_form.is_valid():
             user = login_form.get_user()
-            kw = {'token': user.auth_token.key}
+            kw = {'token': user.auth_token.key,
+                  '_': timezone.now().date().strftime("%H%M%S")}
             url = url_with_querystring(reverse('tokenize'), **kw)
             return HttpResponseRedirect(url)
         else:
