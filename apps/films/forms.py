@@ -68,12 +68,12 @@ class SearchForm(Form):
     rating   = fields.FloatField(min_value=0, required=False)
     price    = fields.FloatField(min_value=0, required=False)
     per_page = fields.IntegerField(initial=24, min_value=1)
-    page     = fields.IntegerField(min_value=0)
+    page     = fields.IntegerField(min_value=1)
     instock  = fields.BooleanField(required=False)
 
     def __init__(self, *args, **kwargs):
         if not kwargs['data'].get('page'):
-           kwargs['data']['page'] = 0
+           kwargs['data']['page'] = 1
 
         if not kwargs['data'].get('per_page'):
            kwargs['data']['per_page'] = 24
