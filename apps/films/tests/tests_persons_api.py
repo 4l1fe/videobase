@@ -73,10 +73,11 @@ class PersonsTestCase(APITestCase):
 
     def test_person_filmography_view(self):
         response = self.client.get(reverse('person_filmography_view', kwargs={'resource_id': self.person_filmography.person.id, 'format': 'json'}))
-        self.assertEqual(response.data[0]['id'], self.person_filmography.film.id)
-        self.assertEqual(response.data[0]['name'], self.person_filmography.film.name)
-        self.assertEqual(response.data[0]['name_orig'], self.person_filmography.film.name_orig)
-        self.assertEqual(response.data[0]['release_date'], self.person_filmography.film.release_date)
+        for i in range(len(response.data['items'])):
+            self.assertEqual(response.data['items'][i]['id'], self.person_filmography.film.id)
+            self.assertEqual(response.data['items'][i]['name'], self.person_filmography.film.name)
+            self.assertEqual(response.data['items'][i]['name_orig'], self.person_filmography.film.name_orig)
+            self.assertEqual(response.data['items'][i]['releasedate'], self.person_filmography.film.release_date)
 
     def test_person_action_subscribe_api_view_ok(self):
         UsersApiSessions.objects.create(token=self.s_token)
