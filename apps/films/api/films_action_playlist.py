@@ -56,7 +56,8 @@ class ActPlaylistFilmView(APIView):
         # Устанавливаем в плейлист
         try:
             o_subs = UsersFilms.objects.get(**filter)
-            return Response({'error': u'Уже подписан'}, status=status.HTTP_400_BAD_REQUEST)
+            # Исправлена логика ответа на ошибочное действие
+            return Response(status=status.HTTP_200_OK)
         except Exception as e:
             try:
                 filter.update(add_params)
