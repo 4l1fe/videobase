@@ -38,6 +38,7 @@ import json
 # Do not remove there is something going on when importing, probably models registering itselves
 # import apps.films.models
 
+NEW_FILMS_CACHE_KEY = "new_films"
 
 def get_new_namestring(namestring):
 
@@ -224,7 +225,6 @@ class PersonsExtrasAPIView(APIView):
 
 
 def index_view(request):
-    NEW_FILMS_CACHE_KEY = "new_films"
     resp_dict_serialized = cache.get(NEW_FILMS_CACHE_KEY)
 
     if resp_dict_serialized is None:
@@ -246,7 +246,9 @@ def index_view(request):
 
     data = {
         'new_films': resp_dict_data,
-        'genres': [{'id':genre['id'],'name':genre['name'],'order':i} for i,genre in enumerate(sorted(o_genres.data, key = lambda g: g['name']))],
+        'genres': [{'id': genre['id'],
+                    'name': genre['name'],
+                    'order': i} for i, genre in enumerate(sorted(o_genres.data, key=lambda g: g['name']))],
     }
     
     return HttpResponse(render_page('index', data), status.HTTP_200_OK)
