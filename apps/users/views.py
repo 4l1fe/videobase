@@ -12,9 +12,12 @@ from django.views.decorators.cache import never_cache
 from django.shortcuts import render_to_response, RequestContext
 from django.contrib.auth.forms import AuthenticationForm
 
+from rest_framework.authtoken.models import Token
+
 from constants import APP_USERS_API_DEFAULT_PAGE, APP_USERS_API_DEFAULT_PER_PAGE
 from .forms import CustomRegisterForm
 from .api.serializers import vbUser
+from apps.users.api.utils import create_new_session
 from apps.films.models import Films, Persons
 from apps.films.constants import APP_PERSON_DIRECTOR, APP_PERSON_ACTOR, \
     APP_FILM_FULL_FILM, APP_FILM_SERIAL, APP_USERFILM_STATUS_SUBS
@@ -76,6 +79,14 @@ class TokenizeView(View):
             response_dict['token'] = self.request.GET['token']
         else:
             response_dict['token'] = self.request.user.auth_token.key
+
+        try:
+            user = Token.objects.get(key=response_dict['token']).user
+        except:
+            return HttpResponseBadRequest()
+
+        session = create_new_session(user)
+        response_dict['session_key'] = session.token.key
 
         return render_to_response('tokenize.html', response_dict, context_instance=context)
 
