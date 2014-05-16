@@ -33,6 +33,8 @@ class Command(BaseCommand):
         settings = __import__(settings_module).settings
         try:
             path = settings.BACKUP_PATH
+            if not os.path.exists(path):
+                raise Exception("{0} not exists".format(path))
             db_name = settings.DATABASES['default']['NAME']
             db_user = settings.DATABASES['default']['USER']
             db_host = settings.DATABASES['default']['HOST']
