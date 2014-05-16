@@ -78,9 +78,6 @@ def process_all():
         
         if key in name_dict:
             imdb_date = datetime.datetime.strptime(name_dict[key]['year'],"%Y").date()
-            if film.release_date - imdb_date > datetime.timedelta(days =350):
-                fail_years +=1
-                film.release_date = imdb_date
             changed_ratings +=1
             logger.info((u"Found rating for {} ".format(film.name_orig)).encode("utf-8"))
             rdict = name_dict[key]
@@ -93,6 +90,6 @@ def process_all():
 
         
         
-    print "Failed years %d" % fail_years
+    
     print "Films ratings found {}".format(changed_ratings)
     print "Films overall {}".format(i+1)
