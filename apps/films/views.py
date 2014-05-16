@@ -232,7 +232,7 @@ def index_view(request):
         # Form 4 films that have locations and are newest and have release date less than now.
     
         o_locs = content_model.Locations.objects.all()
-        o_film = sorted((ol.content.film for ol in o_locs if ol.content.film.release_date < timezone.now().date()),
+        o_film = sorted(set((ol.content.film for ol in o_locs if ol.content.film.release_date < timezone.now().date())),
                         key=lambda f: f.release_date)[-4:]
 
         resp_dict_data = vbFilm(o_film, extend=True, many=True).data
@@ -269,7 +269,7 @@ def person_view(request, resource_id):
         delta = delta.days*24*60*60
         seconds = randrange(delta)
         birthdate = (d1 + timedelta(seconds=seconds))
-        crutch['birthdate'] = birthdate.strftime('%w %B %Y')
+        crutch['birthdate'] = birthdate.strftime('%d %B %Y')
         crutch['years_old'] = date.today().year - birthdate.year
     if not vbp.data.get('bio', None):
         crutch['bio'] = 'Заглушка для биографии, пока робот не починен'

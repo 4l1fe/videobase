@@ -71,7 +71,8 @@ class vbFilm(serializers.ModelSerializer):
     scriptwriters = serializers.SerializerMethodField('scriptwriter_list')
 
     # Признак person
-    persons = vbPerson()
+    persons = serializers.SerializerMethodField('persons_list')
+    # persons = vbPerson()
 
 
     def __init__(self, *args, **kwargs):
@@ -106,6 +107,12 @@ class vbFilm(serializers.ModelSerializer):
 
     def calc_release(self, obj):
         return obj.release_date
+
+    def persons_list(self, obj):
+        return vbPerson(Persons.objects.\
+                exclude(Q(person_film_rel__p_type=APP_PERSON_DIRECTOR) | Q(person_film_rel__p_type=APP_PERSON_SCRIPTWRITER)).\
+                filter(person_film_rel__film=obj).\
+                extra(select={'p_type': "persons_films.p_type", 'film': "persons_films.film_id"}).order_by('id')).data
 
 
     def calc_ratings(self, obj):
