@@ -267,7 +267,7 @@ def person_view(request, resource_id):
         delta = delta.days*24*60*60
         seconds = randrange(delta)
         birthdate = (d1 + timedelta(seconds=seconds))
-        crutch['birthdate'] = birthdate.strftime('%w %B %Y')
+        crutch['birthdate'] = birthdate.strftime('%d %B %Y')
         crutch['years_old'] = date.today().year - birthdate.year
     if not vbp.data.get('bio', None):
         crutch['bio'] = 'Заглушка для биографии, пока робот не починен'
