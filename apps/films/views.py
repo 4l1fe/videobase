@@ -18,11 +18,7 @@ from django.http import HttpResponse, Http404
 from django.shortcuts import render_to_response
 from django.utils import timezone
 
-from rest_framework.views import APIView
-from rest_framework.response import Response
 from rest_framework import status
-from apps.films.constants import APP_FILM_PERSON_TYPES_OUR
-from apps.films.forms import PersonFilmographyApiForm
 
 import apps.films.models as film_model
 from apps.films.models import PersonsFilms
@@ -106,122 +102,6 @@ def bri_con(d, im, request):
         imc = coe.enhance(2*(int(co))/100.0)
 
     return imc
-
-
-class PersonAPIView(APIView):
-
-    def get(self, request, format=None, resource_id=None):
-        try:
-            p = film_model.Persons.objects.get(pk=resource_id)
-            data = vbPerson(p).data
-            u = request.user
-            if u and u.is_authenticated():
-                data = vbPerson(p, user=u).data
-            return Response(data, status=status.HTTP_200_OK)
-        except:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
-
-    def post(self, request, format=None, resource_id=None):
-        extend = request.DATA.get('extend', '')
-        if extend.lower() == 'true':
-            extend = True
-        else:
-            extend = False
-
-        try:
-            p = film_model.Persons.objects.get(pk=resource_id)
-            data = vbPerson(p, extend=extend).data
-            u = request.user
-            if u and u.is_authenticated():
-                data = vbPerson(p, extend=True, user=u).data
-            return Response(data, status=status.HTTP_200_OK)
-        except:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
-
-class PersonFilmographyAPIView(APIView):
-
-    def get(self, request, resource_id, format=None):
-        form = PersonFilmographyApiForm(data=request.GET.copy())
-        if form.is_valid():
-            try:
-                c_d = form.cleaned_data
-                pfs = PersonsFilms.objects.filter(person__id=resource_id)
-                if c_d['type'] != 'all':
-                    pfs = pfs.filter(p_type=dict(APP_FILM_PERSON_TYPES_OUR)[c_d['type']])
-                films = [pf.film for pf in pfs]
-                page = Paginator(films, per_page=c_d['per_page']).page(c_d['page'])
-                data = vbFilm(page.object_list, many=True).data
-                result = {
-                    'total_cnt': page.paginator.count,
-                    'per_page': page.paginator.per_page,
-                    'page': page.number,
-                    'items': data,
-                }
-                return Response(result, status=status.HTTP_200_OK)
-            except Exception as e:
-                return Response(status=status.HTTP_400_BAD_REQUEST)
-
-        return Response(status=status.HTTP_400_BAD_REQUEST)
-
-
-class PersonActionAPIView(APIView):
-    '''
-
-    '''
-
-    def __users_person_set(self, user, person, subscribed):
-        filter = {
-            'user': user,
-            'person': person,
-        }
-
-        try:
-            up = film_model.UsersPersons.objects.get(**filter)
-            up.subscribed = subscribed
-        except film_model.UsersPersons.DoesNotExist, ue:
-            up = film_model.UsersPersons(subscribed=subscribed, upstatus=0, **filter)
-        finally:
-            up.save()
-        
-    def _response_template(self, subscribed, request, format=None, resource_id=None):
-        '''
-        Template for responses
-        '''
-
-        try:
-            person = film_model.Persons.objects.get(id=resource_id)
-            self.__users_person_set(request.user, person, subscribed)
-            return Response(status=status.HTTP_200_OK)
-        except Exception, e:
-            raise Http404
-
-    def post(self, request, format=None, resource_id=None):
-        return self._response_template(1, request, format, resource_id)
-
-    def delete(self, request, format=None, resource_id=None):
-        return self._response_template(0, request, format, resource_id)
-
-
-class PersonsExtrasAPIView(APIView):
-    """
-
-    """
-
-    def get(self, request, format=None, resource_id=None, extend=False, type=None):
-        try:
-            filter = {
-                'person': film_model.Persons.objects.get(id=resource_id)
-            }
-            if not type is None:
-                filter.update({'type': type})
-
-            pes = film_model.PersonsExtras.objects.filter(**filter)
-            result = [pe.as_vbExtra() for pe in pes]
-            return Response(result, status=status.HTTP_200_OK)
-        except Exception, e:
-            raise Http404
 
 
 def index_view(request):
