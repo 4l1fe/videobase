@@ -25,6 +25,7 @@ from apps.films.constants import APP_FILM_PERSON_TYPES_OUR
 from apps.films.forms import PersonFilmographyApiForm
 
 import apps.films.models as film_model
+from apps.films.models import PersonsFilms
 from apps.films.api.serializers import vbFilm, vbComment, vbPerson
 from apps.films.api.serializers.vb_film import GenresSerializer
 import apps.contents.models as content_model
@@ -234,7 +235,7 @@ def index_view(request):
         # Form 4 films that have locations and are newest and have release date less than now.
     
         o_locs = content_model.Locations.objects.all()
-        o_film = sorted((ol.content.film for ol in o_locs if ol.content.film.release_date < timezone.now().date()),
+        o_film = sorted(set((ol.content.film for ol in o_locs if ol.content.film.release_date < timezone.now().date())),
                         key=lambda f: f.release_date)[-4:]
 
         resp_dict_data = vbFilm(o_film, extend=True, many=True).data
@@ -248,7 +249,9 @@ def index_view(request):
 
     data = {
         'new_films': resp_dict_data,
-        'genres': [{'id':genre['id'],'name':genre['name'],'order':i} for i,genre in enumerate(sorted(o_genres.data, key = lambda g: g['name']))],
+        'genres': [{'id': genre['id'],
+                    'name': genre['name'],
+                    'order': i} for i, genre in enumerate(sorted(o_genres.data, key=lambda g: g['name']))],
     }
     
     return HttpResponse(render_page('index', data), status.HTTP_200_OK)
@@ -269,7 +272,7 @@ def person_view(request, resource_id):
         delta = delta.days*24*60*60
         seconds = randrange(delta)
         birthdate = (d1 + timedelta(seconds=seconds))
-        crutch['birthdate'] = birthdate.strftime('%w %B %Y')
+        crutch['birthdate'] = birthdate.strftime('%d %B %Y')
         crutch['years_old'] = date.today().year - birthdate.year
     if not vbp.data.get('bio', None):
         crutch['bio'] = 'Заглушка для биографии, пока робот не починен'

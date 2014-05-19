@@ -16,7 +16,7 @@ from apps.films.constants import APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER,\
 
 from apps.contents.constants import APP_CONTENTS_PRICE_TYPE_FREE
 from utils.common import group_by
-from utils.middlewares.local_thread import get_api_request
+from utils.middlewares.local_thread import get_current_request
 
 from vb_person import vbPerson
 
@@ -71,7 +71,8 @@ class vbFilm(serializers.ModelSerializer):
     scriptwriters = serializers.SerializerMethodField('scriptwriter_list')
 
     # Признак person
-    persons = vbPerson()
+    persons = serializers.SerializerMethodField('persons_list')
+    # persons = vbPerson()
 
 
     def __init__(self, *args, **kwargs):
@@ -100,12 +101,18 @@ class vbFilm(serializers.ModelSerializer):
         self._get_obj_list()
         self._rebuild_location()
         self._rebuild_poster_list()
-        self._rebuild_relation_list(request)
+        self._rebuild_relation_list()
         self._rebuild_tors_list()
 
 
     def calc_release(self, obj):
         return obj.release_date
+
+    def persons_list(self, obj):
+        return vbPerson(Persons.objects.\
+                exclude(Q(person_film_rel__p_type=APP_PERSON_DIRECTOR) | Q(person_film_rel__p_type=APP_PERSON_SCRIPTWRITER)).\
+                filter(person_film_rel__film=obj).\
+                extra(select={'p_type': "persons_films.p_type", 'film': "persons_films.film_id"}).order_by('id')).data
 
 
     def calc_ratings(self, obj):
@@ -193,15 +200,12 @@ class vbFilm(serializers.ModelSerializer):
 
 
     # ---------------------------------------------------------------------------------------
-    def _rebuild_relation_list(self, request):
+    def _rebuild_relation_list(self):
         result = defaultdict()
 
-        if not request:
-            request = auth = get_api_request()
-        else:
-            auth = request.user and request.user.is_authenticated()
+        request = get_current_request()
 
-        if auth:
+        if request.user and request.user.is_authenticated():
             o_user = UsersFilms.objects.filter(user=request.user, film__in=self.list_obj_pk)
             for item in o_user:
                 result[item.film_id] = item.relation_for_vb_film
