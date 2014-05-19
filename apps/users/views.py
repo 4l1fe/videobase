@@ -25,6 +25,8 @@ from apps.films.api.serializers import vbFilm, vbPerson
 from utils.common import url_with_querystring
 from utils.noderender import render_page
 
+from pytils import numeral
+
 
 class RegisterUserView(View):
 
@@ -103,15 +105,8 @@ class UserView(View):
             return HttpResponseBadRequest()
         try:
             uvb = vbUser(user, extend=True, genres=True, friends=True)
-            delta = timezone.now() - uvb.data['regdate']
-            how_long = u"{}".format(delta.days if delta.days != 0 else 1)
-            if delta.days % 10 in [0, 1]:
-                day_title = u"день"
-            elif delta.days % 10 in [2, 3, 4, ]:
-                day_title = u"дня"
-            else:
-                day_title = u"дней"
-            how_long += u" {}".format(day_title)
+            days = (timezone.now() - uvb.data['regdate']).days
+            how_long = numeral.get_plural(days, (u'день', u'дня', u'дней'))
             default_user = {'regdate': uvb.data['regdate'].strftime("%Y-%m-%d"),
                             'how_long': how_long}
             default_user.update(uvb.data)
