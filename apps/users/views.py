@@ -12,9 +12,12 @@ from django.views.decorators.cache import never_cache
 from django.shortcuts import render_to_response, RequestContext
 from django.contrib.auth.forms import AuthenticationForm
 
+from rest_framework.authtoken.models import Token
+
 from constants import APP_USERS_API_DEFAULT_PAGE, APP_USERS_API_DEFAULT_PER_PAGE
 from .forms import CustomRegisterForm
 from .api.serializers import vbUser
+from apps.users.api.utils import create_new_session
 from apps.films.models import Films, Persons
 from apps.films.constants import APP_PERSON_DIRECTOR, APP_PERSON_ACTOR, \
     APP_FILM_FULL_FILM, APP_FILM_SERIAL, APP_USERFILM_STATUS_SUBS
@@ -36,7 +39,8 @@ class RegisterUserView(View):
         register_form = CustomRegisterForm(data=self.request.POST)
         if register_form.is_valid():
             user = register_form.save()
-            kw = {'token': user.auth_token.key}
+            kw = {'token': user.auth_token.key,
+                  '_': timezone.now().date().strftime("%H%M%S")}
             url = url_with_querystring(reverse('tokenize'), **kw)
             return HttpResponseRedirect(url)
         else:
@@ -47,7 +51,7 @@ class LoginUserView(View):
 
     def get(self, *args, **kwargs):
         csrf_token = get_random_string(CSRF_KEY_LENGTH)
-        resp_dict = {'csrf_token': csrf_token}
+        resp_dict = {'csrf_token': csrf_token,}
         response = HttpResponse(render_page('login', resp_dict))
         response.set_cookie("csrftoken", csrf_token)
         return response
@@ -56,11 +60,12 @@ class LoginUserView(View):
         login_form = AuthenticationForm(data=self.request.POST)
         if login_form.is_valid():
             user = login_form.get_user()
-            kw = {'token': user.auth_token.key}
+            kw = {'token': user.auth_token.key,
+                  '_': timezone.now().date().strftime("%H%M%S")}
             url = url_with_querystring(reverse('tokenize'), **kw)
             return HttpResponseRedirect(url)
         else:
-            return HttpResponseBadRequest()
+            return HttpResponse(render_page('login', {'error': {'password': 'True'}}))
 
 
 class TokenizeView(View):
@@ -74,6 +79,14 @@ class TokenizeView(View):
             response_dict['token'] = self.request.GET['token']
         else:
             response_dict['token'] = self.request.user.auth_token.key
+
+        try:
+            user = Token.objects.get(key=response_dict['token']).user
+        except:
+            return HttpResponseBadRequest()
+
+        session = create_new_session(user)
+        response_dict['session_key'] = session.token.key
 
         return render_to_response('tokenize.html', response_dict, context_instance=context)
 

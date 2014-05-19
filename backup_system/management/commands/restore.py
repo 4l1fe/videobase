@@ -4,6 +4,7 @@ from django.core.management import BaseCommand
 from backup_system.constants import APP_BACKUP_FILENAME_TEMPLATE
 
 from optparse import make_option
+import subprocess
 import logging
 import os
 import time
@@ -32,6 +33,8 @@ class Command(BaseCommand):
         settings = __import__(settings_module).settings
         try:
             path = settings.BACKUP_PATH
+            if not os.path.exists(path):
+                raise Exception("{0} not exists".format(path))
             db_name = settings.DATABASES['default']['NAME']
             db_user = settings.DATABASES['default']['USER']
             db_host = settings.DATABASES['default']['HOST']
@@ -52,12 +55,28 @@ class Command(BaseCommand):
         if not os.path.exists(file_path):
             logger.error("File doesn't exists: {0}".format(file_path))
             return None
+        try:
+            logger.info("Start: drop and create schema 'public' in DATABASE: {}".format(db_name))
+            command = """psql --username={user} --dbname={name} --host={host} --port={port} --command='DROP SCHEMA IF EXISTS public CASCADE;'""".\
+                format(name=db_name, user=db_user, host=db_host, port=db_port)
+            p = subprocess.Popen(command, shell=True).wait()
+            logger.info("Delete schema.")
+            command = """psql --username={user} --dbname={name} --host={host} --port={port} --command='CREATE SCHEMA public AUTHORIZATION {user};'""".\
+                format(name=db_name, user=db_user, host=db_host, port=db_port)
+            p = subprocess.Popen(command, shell=True).wait()
+            logger.info("Create schema.")
+            logger.info("End: drop and create schema 'public' in DATABASE: {}".format(db_name))
+        except Exception as e:
+            logger.error("""End: drop and create schema 'public' in DATABASE: {1}
+                            error: {2}""".format(db_name, e))
+            return None
+
         logger.info("Start: restore DATABASE: {0} from {1}".format(db_name, file_path))
         try:
-            restore_command = "pg_restore --dbname={name} --username={user} --host={host} --port={port} -F c {filename}".\
+            command = "pg_restore --dbname={name} --username={user} --host={host} --port={port} -F c {filename}".\
                 format(filename=file_path, name=db_name, user=db_user,
                        host=db_host, port=db_port)
-            os.popen(restore_command)
+            p = subprocess.Popen(command, shell=True).wait()
             logger.info("End: restore DATABASE: {0} from {1}".format(db_name, file_path))
         except Exception as e:
             logger.error("""End: restore DATABASE: {0} from {1}
