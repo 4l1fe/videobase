@@ -27,6 +27,8 @@ import apps.contents.models as content_model
 from django.core.serializers.json import DjangoJSONEncoder
 from utils.noderender import render_page
 
+from apps.films.constants import APP_USERFILM_SUBS_TRUE
+
 
 import json
 
@@ -226,3 +228,52 @@ def film_view(request, film_id, *args, **kwargs):
     resp_dict['comments'] = calc_comments(o_film)
 
     return HttpResponse(render_page('film', {'film': resp_dict}))
+
+
+def playlist_view(request, data_id, *args, **kwargs):
+    film_data, o_film = film_to_view(data_id)
+    playlist = {'items': [], 'next': [], 'previous': [], 'total_cnt': 0,'film': film_data, }
+
+    if request.user.is_authenticated():
+        playlist_data = film_model.Films.objects.\
+            filter(users_films__user=request.user.id, users_films__subscribed=APP_USERFILM_SUBS_TRUE).\
+            order_by('users_films__created')
+        # playlist_data = list(playlist_data)
+
+        in_playlist = False
+        for index, film in enumerate(playlist_data):
+            if film.id == int(data_id):
+                in_playlist = True
+                break
+
+        if in_playlist:
+            if index < len(playlist_data):
+                next_film = playlist_data[index + 1]
+                playlist['next'] = {'id': next_film.id, 'name': next_film.name}
+            if index != 0:
+                previous_film = playlist_data[index - 1]
+                playlist['previous'] = {'id': previous_film.id, 'name': previous_film.name}
+
+        playlist['items'] = vbFilm(playlist_data, many=True).data
+        playlist['total_cnt'] = len(playlist_data)
+
+    return HttpResponse(render_page('playlist', {'playlist': playlist, 'film': film_data}))
+
+
+def film_to_view(film_id):
+    o_film = film_model.Films.objects.filter(pk=film_id).prefetch_related('genres', 'countries')
+
+    if not len(o_film):
+        raise Http404
+
+    o_film = o_film[0]
+    resp_dict = vbFilm(o_film, extend=True)
+
+    try:
+        resp_dict = resp_dict.data
+    except Exception, e:
+        raise Http404
+
+    resp_dict['actors'] = calc_actors(o_film)
+    resp_dict['comments'] = calc_comments(o_film)
+    return resp_dict, o_film

@@ -8,7 +8,7 @@ class AuthTokenMiddleware(object):
 
     def process_request(self, request):
         token = request.COOKIES.get('x-session', None)
-        if request.user is AnonymousUser:
+        if isinstance(request.user, AnonymousUser):
             try:
                 request.user = SessionToken.objects.get(key=token).user
             except Exception:
