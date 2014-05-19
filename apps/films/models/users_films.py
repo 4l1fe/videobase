@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.core.validators import MaxValueValidator, MinValueValidator
 
 from apps.films.constants import APP_USERFILM_STATUS, APP_USERFILM_STATUS_UNDEF, \
-                                 APP_USERFILM_SUBS_FALSE, APP_USERFILM_SUBS
+                                 APP_USERFILM_SUBS_FALSE, APP_USERFILM_SUBS, APP_USERFILM_SUBS_TRUE
 
 
 #############################################################################################################
@@ -16,6 +16,7 @@ class UsersFilms(models.Model):
     status     = models.PositiveSmallIntegerField(null=True, blank=True, default=APP_USERFILM_STATUS_UNDEF, choices=APP_USERFILM_STATUS, verbose_name=u'Статус фильма с т.з. пользователя')
     rating     = models.PositiveSmallIntegerField(null=True, blank=True, verbose_name=u'Рейтинг фильма поставленный пользователем')
     subscribed = models.PositiveSmallIntegerField(null=True, blank=True, default=APP_USERFILM_SUBS_FALSE, choices=APP_USERFILM_SUBS, verbose_name=u'Статус подписки')
+    created = models.DateTimeField(auto_now_add=True)
 
 
     def __unicode__(self):
@@ -38,6 +39,11 @@ class UsersFilms(models.Model):
             'status': self.get_name_status if not self.status is None else None,
             'rating': self.rating,
         }
+
+    @classmethod
+    def get_subscribed_films_by_user(self, user_id):
+        return self.objects.filter(user=user_id, subscribed=APP_USERFILM_SUBS_TRUE).order_by('created')
+
 
 
     class  Meta(object):
