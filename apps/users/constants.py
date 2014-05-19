@@ -33,7 +33,8 @@ APP_USER_PIC_TYPES = (
     ('LOCAL', 'Сохранные изображения')
 )
 
-SUBJECT_TO_RESTORE_PASSWORD = u'Востановление пароля'
+APP_SUBJECT_TO_RESTORE_PASSWORD = u'Востановление пароля'
+APP_SUBJECT_TO_CONFIRM_REGISTER = u'Подтверждение регистрации'
 
 APP_USERS_API_DEFAULT_PER_PAGE = 10
 APP_USERS_API_DEFAULT_PAGE = 1
