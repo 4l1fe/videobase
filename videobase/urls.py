@@ -31,6 +31,7 @@ urlpatterns = patterns('',
 
     # Interface
     url(r'^register/?$', views.RegisterUserView.as_view()),
+    url(r'^restore-password/$', views.RestorePasswordView.as_view()),
     url(r'^login/?$', views.LoginUserView.as_view()),
     url(r'^user/(?P<user_id>\d+)/?$', views.UserView.as_view()),
     url(r'^person/(?P<resource_id>\d+)/?$', 'apps.films.views.person_view'),
