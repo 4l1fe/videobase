@@ -13,9 +13,17 @@ from films_action_playlist import ActPlaylistFilmView
 from films_action_rate import ActRateFilmView
 from films_action_subscribe import ActSubscribeFilmView
 
+from persons import PersonAPIView
+from persons_filmography import PersonFilmographyAPIView
+from persons_action import PersonActionAPIView
+from persons_extras import PersonsExtrasAPIView
+
 
 __all__ = [
     'SearchFilmsView', 'DetailFilmView', 'LocationsFilmView', 'PersonsFilmView', \
     'SimilarFilmView', 'ExtrasFilmView', 'CommentsFilmView', 'ActSubscribeFilmView', \
     'ActPlaylistFilmView', 'ActNotwatchFilmView', 'ActRateFilmView', 'ActCommentFilmView', \
+    # Persons API
+    'PersonAPIView', 'PersonFilmographyAPIView', 'PersonActionAPIView',
+    'PersonsExtrasAPIView'
 ]
