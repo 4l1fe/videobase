@@ -42,7 +42,7 @@ class LocationsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Locations
-        fields = ('type', 'lang', 'quality', 'subtitles', 'price', 'price_type', 'url_view',)
+        fields = ('id','type', 'lang', 'quality', 'subtitles', 'price', 'price_type', 'url_view',)
 
 
 #############################################################################################################
