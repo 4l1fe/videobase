@@ -88,8 +88,6 @@ class vbFilm(serializers.ModelSerializer):
         if not self.persons_sign:
             new_fields += ['persons']
 
-        request = kwargs.pop('request', False)
-
         # Instantiate the superclass normally
         super(vbFilm, self).__init__(*args, **kwargs)
 
