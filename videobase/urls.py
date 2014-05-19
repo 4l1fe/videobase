@@ -35,8 +35,9 @@ urlpatterns = patterns('',
     url(r'^login/?$', views.LoginUserView.as_view()),
     url(r'^user/(?P<user_id>\d+)/?$', views.UserView.as_view()),
     url(r'^person/(?P<resource_id>\d+)/?$', 'apps.films.views.person_view'),
-    url(r'^films?/(?P<film_id>\d+)/?$', 'apps.films.views.film_view'),
+    url(r'^films/(?P<film_id>\d+)/?$', 'apps.films.views.film_view'),
     url(r'^$', 'apps.films.views.index_view'),
+    url(r'^playlist/(?P<data_id>\d+)$','apps.films.views.playlist_view')
                        
                        
 )

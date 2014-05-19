@@ -13,7 +13,8 @@ process.stdin.on('data', function(chunk) {
         person: function(context) {return jade.renderFile(tmpl_path + 'page_person.jade', context)},
         register: function(context) {return jade.renderFile(tmpl_path + 'page_registration.jade', context)},
         user: function(context) {return jade.renderFile(tmpl_path + 'page_user.jade', context)},
-        login: function(context) {return jade.renderFile(tmpl_path + 'page_login.jade', context)}
+        login: function(context) {return jade.renderFile(tmpl_path + 'page_login.jade', context)},
+        playlist: function(context) {return jade.renderFile(tmpl_path + 'page_playlist.jade', context)}
     }
 
     console.log(renderers[data.template](data.context));
