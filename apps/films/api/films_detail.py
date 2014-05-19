@@ -41,7 +41,7 @@ class DetailFilmView(APIView):
         if type(o_film) == Response:
             raise Http404
 
-        return vbFilm(o_film, request=self.request, **cleaned_data)
+        return vbFilm(o_film, **cleaned_data)
 
 
     def post(self, request, film_id, format=None, *args, **kwargs):
