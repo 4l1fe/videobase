@@ -1076,7 +1076,7 @@
       this.update_filter_params();
       if (films_deck.get_items().length >= 12) {
         this.load_more_films(films_deck, {
-          clear_output: true
+          page: 2
         });
       } else {
         films_deck.load_more_hide();
@@ -1167,12 +1167,11 @@
       params = $.extend(_filter_params, opts.params || {});
       if (opts.clear_output) {
         deck.clear();
-        params.page = 0;
+        params.page = 1;
       } else {
-        params.page = deck.page + 1;
+        params.page = opts.page || (deck.page + 1);
       }
       current_counter = deck.load_counter;
-      console.log(params);
       return self._app.rest.films.read("search", params).done((function(_this) {
         return function(data) {
           if (current_counter !== deck.load_counter) {
@@ -1426,6 +1425,7 @@
         })(this)
       });
       films_deck.load_more_bind($("#films_more"));
+      films_deck.page = 1;
       this._e.subscribe_btn = $("#subscribe_btn").click((function(_this) {
         return function() {
           return _this.action_subscribe();
@@ -1449,7 +1449,6 @@
       var current_counter;
       current_counter = deck.load_counter;
       deck.load_more_hide();
-      console.log(deck.page);
       return this._app.rest.persons.filmography.read(this.conf.id, {
         page: deck.page + 1
       }).done((function(_this) {

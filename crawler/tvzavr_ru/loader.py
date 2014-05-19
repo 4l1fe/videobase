@@ -5,6 +5,8 @@ from crawler.core import BaseLoader
 from crawler.core.exceptions import NoSuchFilm
 from crawler.tvzavr_ru.parsers import parse_source
 from selenium import webdriver
+from pyvirtualdisplay import Display
+
 
 HOST = 'http://www.tvzavr.ru'
 URL_LOAD = ''
@@ -15,6 +17,10 @@ class Tvzavr_Loader(BaseLoader):
         super(Tvzavr_Loader, self).__init__(film, host, url_load)
 
     def get_url(self, load_function):
+
+        
+        display = Display(visible=0, size=(800, 600))
+        display.start()
         browser = webdriver.Firefox()
         browser.get(self.host)
         time.sleep(2)
@@ -22,7 +28,9 @@ class Tvzavr_Loader(BaseLoader):
         browser.find_element_by_id('search_button').click()
         time.sleep(2)
         source = browser.page_source
-        browser.close()
+        browser.quit()
+        display.stop()
+        
         time.sleep(2)
         film_link = parse_source(source, self.film.name, self.host)
         if film_link is None:

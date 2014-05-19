@@ -79,6 +79,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'utils.middlewares.auth_token_middleware.AuthTokenMiddleware',
     'utils.middlewares.local_thread.ThreadLocals',
 )
 
@@ -207,9 +208,6 @@ AUTHENTICATION_BACKENDS = (
     'social_auth.backends.facebook.FacebookBackend',
     'social_auth.backends.contrib.vk.VKOAuth2Backend',
     'social_auth.backends.google.GoogleOAuth2Backend',
-    # Token
-    'apps.users.backends.SessionTokenAuthentication',
-    'apps.users.backends.UserTokenAuthentication',
     # Django
     'django.contrib.auth.backends.ModelBackend',
 )
@@ -283,3 +281,4 @@ CELERYBEAT_SCHEDULE = {
 CELERY_TIMEZONE = 'UTC'
 
 POSTER_URL_PREFIX = '_260x360'
+
