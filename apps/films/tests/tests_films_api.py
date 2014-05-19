@@ -435,7 +435,7 @@ class FilmsTestCase(APITestCase):
         film = self.films[0]
         UsersFilmsFactory.create(user=self.user, film=film, status=APP_USERFILM_STATUS_SUBS, subscribed=APP_USERFILM_SUBS_TRUE)
         response = self.client.get(reverse('act_film_playlist_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_X_MI_SESSION=self.headers)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_api_action_playlist_404(self):
         response = self.client.get(reverse('act_film_playlist_view', kwargs={'film_id': 0, 'format': 'json'}), HTTP_X_MI_SESSION=self.headers)
