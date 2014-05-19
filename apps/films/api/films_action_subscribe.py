@@ -33,7 +33,6 @@ class ActSubscribeFilmView(APIView):
 
         return result
 
-    
     def get(self, request, film_id, format=None, *args, **kwargs):
         # Выбираем и проверяем, что фильм существует
         o_film = self.__get_object(film_id)
@@ -89,6 +88,5 @@ class ActSubscribeFilmView(APIView):
 
         return Response(status=status.HTTP_200_OK)
 
-    def put(self,request, film_id, format=None, *args, **kwargs):
-        return self.get(request, film_id, format=None, *args, **kwargs)
-        
+    def put(self, request, film_id, format=None, *args, **kwargs):
+        return self.get(request, film_id, format=format, *args, **kwargs)

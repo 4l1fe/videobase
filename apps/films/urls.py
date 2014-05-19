@@ -3,7 +3,6 @@
 from django.conf.urls import *
 from rest_framework.urlpatterns import format_suffix_patterns
 
-from apps.films.views import PersonAPIView, PersonFilmographyAPIView, PersonActionAPIView, PersonsExtrasAPIView
 from apps.films.api import *
 
 
