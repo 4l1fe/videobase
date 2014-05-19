@@ -51,7 +51,7 @@ class LoginUserView(View):
 
     def get(self, *args, **kwargs):
         csrf_token = get_random_string(CSRF_KEY_LENGTH)
-        resp_dict = {'csrf_token': csrf_token}
+        resp_dict = {'csrf_token': csrf_token,}
         response = HttpResponse(render_page('login', resp_dict))
         response.set_cookie("csrftoken", csrf_token)
         return response
@@ -65,7 +65,7 @@ class LoginUserView(View):
             url = url_with_querystring(reverse('tokenize'), **kw)
             return HttpResponseRedirect(url)
         else:
-            return HttpResponseBadRequest()
+            return HttpResponse(render_page('login', {'error': {'password': 'True'}}))
 
 
 class TokenizeView(View):
