@@ -11,10 +11,12 @@ from django.views.generic import View
 from django.views.decorators.cache import never_cache
 from django.shortcuts import render_to_response, RequestContext
 from django.contrib.auth.forms import AuthenticationForm
+from tasks import send_template_mail
+from django.db import transaction
 
 from rest_framework.authtoken.models import Token
 
-from constants import APP_USERS_API_DEFAULT_PAGE, APP_USERS_API_DEFAULT_PER_PAGE
+from constants import APP_USERS_API_DEFAULT_PAGE, APP_USERS_API_DEFAULT_PER_PAGE, APP_SUBJECT_TO_CONFIRM_REGISTER
 from .forms import CustomRegisterForm
 from .api.serializers import vbUser
 from apps.users.api.utils import create_new_session
@@ -37,6 +39,7 @@ class RegisterUserView(View):
         response.set_cookie("csrftoken", csrf_token)
         return response
 
+    @transaction.commit_manually
     def post(self, *args, **kwargs):
         register_form = CustomRegisterForm(data=self.request.POST)
         if register_form.is_valid():
@@ -44,8 +47,21 @@ class RegisterUserView(View):
             kw = {'token': user.auth_token.key,
                   '_': timezone.now().date().strftime("%H%M%S")}
             url = url_with_querystring(reverse('tokenize'), **kw)
-            return HttpResponseRedirect(url)
+            url = "http://{host}{url}".format(host=self.request.get_host(), url=url)
+            context = {'user': user, 'redirect_url': url}
+            try:
+                kw = dict(subject=APP_SUBJECT_TO_CONFIRM_REGISTER,
+                          tpl_name='confirmation_register.html',
+                          context=context,
+                          to=[user.email])
+                send_template_mail.apply_async(kwargs=kw)
+            except Exception as e:
+                transaction.rollback()
+                return HttpResponseBadRequest
+            transaction.commit()
+            return HttpResponseRedirect("/")
         else:
+            transaction.rollback()
             return HttpResponseBadRequest()
 
 
@@ -53,7 +69,7 @@ class LoginUserView(View):
 
     def get(self, *args, **kwargs):
         csrf_token = get_random_string(CSRF_KEY_LENGTH)
-        resp_dict = {'csrf_token': csrf_token,}
+        resp_dict = {'csrf_token': csrf_token}
         response = HttpResponse(render_page('login', resp_dict))
         response.set_cookie("csrftoken", csrf_token)
         return response
@@ -62,6 +78,8 @@ class LoginUserView(View):
         login_form = AuthenticationForm(data=self.request.POST)
         if login_form.is_valid():
             user = login_form.get_user()
+            if not user.is_active:
+                return HttpResponse(render_page('login', {'error': {'password': 'True'}}))
             kw = {'token': user.auth_token.key,
                   '_': timezone.now().date().strftime("%H%M%S")}
             url = url_with_querystring(reverse('tokenize'), **kw)
@@ -84,6 +102,8 @@ class TokenizeView(View):
 
         try:
             user = Token.objects.get(key=response_dict['token']).user
+            user.is_active = True
+            user.save()
         except:
             return HttpResponseBadRequest()
 
