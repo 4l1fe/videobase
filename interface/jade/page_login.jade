@@ -13,6 +13,8 @@ html(lang="ru")
                     .form-group
                         input(type="email",name="username",placeholder="Эл. почта",required="required")#inp_email
                     .form-group
+                        if (error && error.password)
+                            div(style="color: red") wrong password
                         input(type="password",name="password",placeholder="Пароль",required="required")#inp_password
                     .form-group
                         p
