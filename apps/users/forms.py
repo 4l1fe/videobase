@@ -46,6 +46,7 @@ class UsersProfileForm(forms.Form):
 
 class CustomRegisterForm(forms.ModelForm):
     password2 = forms.CharField(widget=forms.PasswordInput, required=True)
+    is_active = forms.BooleanField(widget=forms.HiddenInput, initial=False, required=False)
 
     def __init__(self, **kwargs):
         super(CustomRegisterForm, self).__init__(**kwargs)
@@ -66,7 +67,7 @@ class CustomRegisterForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ('email', 'password', 'username', )
+        fields = ('email', 'password', 'username', 'is_active')
 
 
 class UserUpdateForm(forms.Form):

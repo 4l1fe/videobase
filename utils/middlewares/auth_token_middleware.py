@@ -10,7 +10,11 @@ class AuthTokenMiddleware(object):
         token = request.COOKIES.get('x-session', None)
         if isinstance(request.user, AnonymousUser):
             try:
-                request.user = SessionToken.objects.get(key=token).user
+                user = SessionToken.objects.get(key=token).user
+                if user.is_active:
+                    request.user =user
+                else:
+                    request.user = AnonymousUser()
             except Exception:
                 request.user = AnonymousUser()
 
