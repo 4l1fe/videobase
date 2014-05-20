@@ -21,14 +21,6 @@ urlpatterns = patterns('',
     url(r'^robots/', include('apps.robots.urls')),
     url(r'^api/test', test_view),
 
-    # Admin
-    url(r'^admin_tools/', include('admin_tools.urls')),
-    url(r'^admin/', include(admin.site.urls)),
-
-    # Auth
-    url(r'', include('social_auth.urls')),
-    url('^tokenize/?$', views.TokenizeView.as_view(), name="tokenize"),
-
     # Interface
     url(r'^register/?$', views.RegisterUserView.as_view()),
     url(r'^restore-password/$', views.RestorePasswordView.as_view()),
@@ -37,9 +29,15 @@ urlpatterns = patterns('',
     url(r'^person/(?P<resource_id>\d+)/?$', 'apps.films.views.person_view'),
     url(r'^films/(?P<film_id>\d+)/?$', 'apps.films.views.film_view'),
     url(r'^$', 'apps.films.views.index_view'),
-    url(r'^playlist/(?P<data_id>\d+)$','apps.films.views.playlist_view')
-                       
-                       
+    url(r'^playlist/(?P<film_id>\d+)/$', 'apps.films.views.playlist_view'),
+
+    # Auth
+    url(r'', include('social_auth.urls')),
+    url('^tokenize/?$', views.TokenizeView.as_view(), name="tokenize"),
+
+    # Admin
+    url(r'^admin_tools/', include('admin_tools.urls')),
+    url(r'^admin/', include(admin.site.urls)),
 )
 
 if settings.DEBUG:
