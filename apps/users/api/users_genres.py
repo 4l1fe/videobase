@@ -20,6 +20,6 @@ class UsersGenresView(APIView):
 
         genres = Genres.objects.filter(genres__users_films__user=user).distinct()
 
-        serializer = vbUserGenre(genres, many=True)
+        serializer = vbUserGenre(genres, user=user, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
