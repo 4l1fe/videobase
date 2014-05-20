@@ -120,12 +120,12 @@ def index_view(request):
     else:
         resp_dict_data = json.loads(resp_dict_serialized)
 
-    GENRES_CACHE_KEY = 'all_genres'
-    genres_data = cache.get(GENRES_CACHE_KEY)
+    genres_cache_key = film_model.Genres.get_cache_key()
+    genres_data = cache.get(genres_cache_key)
     if genres_data is None:
         try:
             genres_data = GenresSerializer(film_model.Genres.objects.all(), many=True).data
-            cache.set(GENRES_CACHE_KEY, genres_data, 86400)
+            cache.set(genres_cache_key, genres_data, 86400)
         except:
             genres_data = []
 

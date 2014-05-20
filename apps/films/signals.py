@@ -26,5 +26,4 @@ def pre_delete_handler(sender, **kwargs):
 def erase_cache_genre_handler(sender, **kwargs):
     from django.core.cache import cache
 
-    GENRES_CACHE_KEY = 'all_genres'
-    cache.delete(GENRES_CACHE_KEY)
+    cache.delete(Genres.get_cache_key())
