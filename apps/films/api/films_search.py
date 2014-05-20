@@ -76,10 +76,10 @@ class SearchFilmsView(APIView):
 
         # Персоноализация выборки
         if self.request.user.is_authenticated():
-             o_search = o_search.filter(
-                Q(users_films__user=self.request.user),
-                ~Q(users_films__status=APP_USERFILM_STATUS_NOT_WATCH)
-            )
+             o_search = o_search.extra(
+                 where=['NOT "films"."id" IN (SELECT "users_films"."film_id" FROM "users_films" WHERE "users_films"."user_id" = %s AND "users_films"."status" = %s)'],
+                 params=[self.request.user.pk, APP_USERFILM_STATUS_NOT_WATCH],
+             )
 
         return o_search
 
