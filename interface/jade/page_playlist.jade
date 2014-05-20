@@ -7,11 +7,11 @@ html(lang="ru")
         .nav-wrapper
             .container
                 .col-md-3
-                    a(href="playlist/" + playlist.previous.id)=playlist.previous.name
+                    a(href="/playlist/" + playlist.previous.id)=playlist.previous.name
                 .col-md-6.text-center
                     strong Плейлист (#{playlist.id}/#{playlist.total_cnt})
                 .col-md-3
-                    a(href="playlist/" + playlist.next.id)=playlist.next.name
+                    a(href="/playlist/" + playlist.next.id)=playlist.next.name
         .film-wrapper
             .container
                 h1.col-md-6 #{film.name} <span>#{film.year}</span><em>#{film.name_orig}</em>
