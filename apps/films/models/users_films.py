@@ -16,7 +16,7 @@ class UsersFilms(models.Model):
     status     = models.PositiveSmallIntegerField(null=True, blank=True, default=APP_USERFILM_STATUS_UNDEF, choices=APP_USERFILM_STATUS, verbose_name=u'Статус фильма с т.з. пользователя')
     rating     = models.PositiveSmallIntegerField(null=True, blank=True, verbose_name=u'Рейтинг фильма поставленный пользователем')
     subscribed = models.PositiveSmallIntegerField(null=True, blank=True, default=APP_USERFILM_SUBS_FALSE, choices=APP_USERFILM_SUBS, verbose_name=u'Статус подписки')
-    created = models.DateTimeField(auto_now_add=True)
+    created    = models.DateTimeField(auto_now_add=True, verbose_name=u'Дата создания')
 
 
     def __unicode__(self):
