@@ -102,12 +102,11 @@ def bri_con(d, im, request):
 
 
 def index_view(request):
+    # Выбираем 4 новых фильма, у которых есть локации
     NEW_FILMS_CACHE_KEY = 'new_films'
     resp_dict_serialized = cache.get(NEW_FILMS_CACHE_KEY)
 
     if resp_dict_serialized is None:
-        # Form 4 films that have locations and are newest and have release date less than now.
-
         current_date = timezone.now().date()
         o_locs = content_model.Locations.objects.all()
         o_film = sorted(set((ol.content.film for ol in o_locs if ol.content.film.release_date < current_date)),
@@ -122,7 +121,9 @@ def index_view(request):
 
     # Найдем relation для фильмов, если пользователь авторизован
     if request.user.is_authenticated():
-        o_user = film_model.UsersFilms.objects.filter(user=request.user, film__in=[item['id'] for item in resp_dict_data])
+        o_user = film_model.UsersFilms.objects.filter(
+            user=request.user, film__in=[item['id'] for item in resp_dict_data]
+        )
         o_user = reindex_by(o_user, 'film_id', True)
 
         for index, item in enumerate(resp_dict_data):
@@ -132,6 +133,7 @@ def index_view(request):
     # Выборка жанров
     genres_cache_key = film_model.Genres.get_cache_key()
     genres_data = cache.get(genres_cache_key)
+
     if genres_data is None:
         try:
             genres_data = film_model.Genres.objects.all().values('id', 'name')
