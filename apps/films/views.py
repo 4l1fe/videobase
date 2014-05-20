@@ -189,7 +189,6 @@ def test_view(request):
 
 
 def calc_actors(o_film):
-    result_list = []
     filter = {
         'filter': {'person_film_rel__film': o_film.pk},
         'offset': 0,
@@ -197,11 +196,11 @@ def calc_actors(o_film):
     }
 
     try:
-        result_list = list(film_model.Persons.get_sorted_persons_by_name(**filter).values('id', 'name'))
+        result = list(film_model.Persons.get_sorted_persons_by_name(**filter).values('id', 'name'))
     except Exception, e:
-        pass
+        result = []
 
-    return result_list
+    return result
 
 
 def calc_similar(o_film):
@@ -209,7 +208,7 @@ def calc_similar(o_film):
         result = film_model.Films.similar_api(o_film)
         result = vbFilm(result).data
     except Exception, e:
-        pass
+        result = []
 
     return result
 
