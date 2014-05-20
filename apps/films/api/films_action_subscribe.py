@@ -50,7 +50,7 @@ class ActSubscribeFilmView(APIView):
 
         # Init data
         subscribed = APP_USERFILM_SUBS_TRUE
-        pair = {
+        filter_ = {
             'user': request.user,
             'film': o_film,
         }
@@ -58,12 +58,12 @@ class ActSubscribeFilmView(APIView):
 
         # Устанавливаем подписку
         try:
-            o_subs = UsersFilms(subscribed=subscribed, **pair)
+            o_subs = UsersFilms(subscribed=subscribed, **filter_)
             o_subs.save()
             Feed.objects.create(user=request.user, type='film-s', object=obj_val)
         except Exception as e:
             try:
-                UsersFilms.objects.filter(**pair).update(subscribed=subscribed)
+                UsersFilms.objects.filter(**filter_).update(subscribed=subscribed)
             except Exception as e:
                 return Response({'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
 
