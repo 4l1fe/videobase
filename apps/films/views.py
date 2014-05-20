@@ -2,7 +2,9 @@
 
 import re
 import os
+import json
 import warnings
+
 from datetime import date, timedelta
 from random import randrange
 from cStringIO import StringIO
@@ -11,6 +13,7 @@ from PIL import Image, ImageEnhance
 from django.core.files import File
 from django.core.cache import cache
 from django.core.context_processors import csrf
+from django.core.serializers.json import DjangoJSONEncoder
 
 from django.template import Context
 from django.http import HttpResponse, Http404
@@ -20,33 +23,27 @@ from django.utils import timezone
 from rest_framework import status
 
 import apps.films.models as film_model
-from apps.films.models import PersonsFilms
+import apps.contents.models as content_model
+
 from apps.films.api.serializers import vbFilm, vbComment, vbPerson
 from apps.films.api.serializers.vb_film import GenresSerializer
-import apps.contents.models as content_model
-from django.core.serializers.json import DjangoJSONEncoder
+
 from utils.noderender import render_page
 
 from apps.films.constants import APP_USERFILM_SUBS_TRUE
 
-
-import json
-
-# Do not remove there is something going on when importing, probably models registering itselves
-# import apps.films.models
-
-
 def get_new_namestring(namestring):
-
     m = re.match("(?P<pre>.+)v(?P<version>[0-9]+)[.]png", namestring)
 
     if m is None:
-        return namestring + '_v1.png'
+         filename = namestring + '_v1.png'
     else:
         d = m.groupdict()
-        return '{:s}v{:d}.{:s}'.format(d['pre'], int(d['version']) + 1, 'png')
+        filename = '{:s}v{:d}.{:s}'.format(d['pre'], int(d['version']) + 1, 'png')
 
-      
+    return filename
+
+
 def image_refresh(func):
     def wrapper(request):
         url = request.POST.get('image')
@@ -104,35 +101,42 @@ def bri_con(d, im, request):
     return imc
 
 
-
 def index_view(request):
-    NEW_FILMS_CACHE_KEY = "new_films"
+    NEW_FILMS_CACHE_KEY = 'new_films'
     resp_dict_serialized = cache.get(NEW_FILMS_CACHE_KEY)
 
     if resp_dict_serialized is None:
-        encoder = DjangoJSONEncoder
         # Form 4 films that have locations and are newest and have release date less than now.
-    
+
+        current_date = timezone.now().date()
         o_locs = content_model.Locations.objects.all()
-        o_film = sorted(set((ol.content.film for ol in o_locs if ol.content.film.release_date < timezone.now().date())),
+        o_film = sorted(set((ol.content.film for ol in o_locs if ol.content.film.release_date < current_date)),
                         key=lambda f: f.release_date)[-4:]
 
         resp_dict_data = vbFilm(o_film, extend=True, many=True).data
-        resp_dict_serialized = json.dumps(resp_dict_data, cls=encoder)
+        resp_dict_serialized = json.dumps(resp_dict_data, cls=DjangoJSONEncoder)
         cache.set(NEW_FILMS_CACHE_KEY, resp_dict_serialized, 9000)
 
     else:
         resp_dict_data = json.loads(resp_dict_serialized)
 
-    o_genres = GenresSerializer(film_model.Genres.objects.all(), many=True)
+    GENRES_CACHE_KEY = 'all_genres'
+    genres_data = cache.get(GENRES_CACHE_KEY)
+    if genres_data is None:
+        try:
+            genres_data = GenresSerializer(film_model.Genres.objects.all(), many=True).data
+            cache.set(GENRES_CACHE_KEY, genres_data, 86400)
+        except:
+            genres_data = []
 
     data = {
         'new_films': resp_dict_data,
-        'genres': [{'id': genre['id'],
-                    'name': genre['name'],
-                    'order': i} for i, genre in enumerate(sorted(o_genres.data, key=lambda g: g['name']))],
+        'genres': [
+            {'id': genre['id'], 'name': genre['name'], 'order': i}
+            for i, genre in enumerate(sorted(genres_data, key=lambda g: g['name']))
+        ],
     }
-    
+
     return HttpResponse(render_page('index', data), status.HTTP_200_OK)
 
 
@@ -153,8 +157,10 @@ def person_view(request, resource_id):
         birthdate = (d1 + timedelta(seconds=seconds))
         crutch['birthdate'] = birthdate.strftime('%d %B %Y')
         crutch['years_old'] = date.today().year - birthdate.year
+
     if not vbp.data.get('bio', None):
         crutch['bio'] = 'Заглушка для биографии, пока робот не починен'
+
     pfs = film_model.PersonsFilms.objects.filter(person=person)[:12]  # почему-то 12 первых фильмов. Был пагинатор
     vbf = vbFilm([pf.film for pf in pfs], many=True)
 
@@ -210,49 +216,36 @@ def calc_comments(o_film):
 
 
 def film_view(request, film_id, *args, **kwargs):
-    o_film = film_model.Films.objects.filter(pk=film_id).prefetch_related('genres', 'countries')
-
-    if not len(o_film):
-        raise Http404
-
-    o_film = o_film[0]
-    resp_dict = vbFilm(o_film, extend=True)
-
-    try:
-        resp_dict = resp_dict.data
-    except Exception, e:
-        raise Http404
-
-    resp_dict['actors'] = calc_actors(o_film)
+    resp_dict, o_film = film_to_view(film_id)
     resp_dict['similar'] = calc_similar(o_film)
-    resp_dict['comments'] = calc_comments(o_film)
 
     return HttpResponse(render_page('film', {'film': resp_dict}))
 
 
-def playlist_view(request, data_id, *args, **kwargs):
-    film_data, o_film = film_to_view(data_id)
-    playlist = {'items': [], 'next': [], 'previous': [], 'total_cnt': 0,'film': film_data, }
+def playlist_view(request, film_id, *args, **kwargs):
+    film_data, o_film = film_to_view(film_id)
+    playlist = {'items': [], 'next': [], 'previous': [], 'total_cnt': 0}
 
     if request.user.is_authenticated():
         playlist_data = film_model.Films.objects.\
             filter(users_films__user=request.user.id, users_films__subscribed=APP_USERFILM_SUBS_TRUE).\
             order_by('users_films__created')
-        # playlist_data = list(playlist_data)
 
         in_playlist = False
         for index, film in enumerate(playlist_data):
-            if film.id == int(data_id):
+            if film.id == int(film_id):
                 in_playlist = True
                 break
 
         if in_playlist:
+            def arrow_data(data):
+                return {'id': data.id, 'name': data.name}
+
             if index < len(playlist_data):
-                next_film = playlist_data[index + 1]
-                playlist['next'] = {'id': next_film.id, 'name': next_film.name}
+                playlist['next'] = arrow_data(playlist_data[index + 1])
+
             if index != 0:
-                previous_film = playlist_data[index - 1]
-                playlist['previous'] = {'id': previous_film.id, 'name': previous_film.name}
+                playlist['previous'] = arrow_data(playlist_data[index - 1])
 
         playlist['items'] = vbFilm(playlist_data, many=True).data
         playlist['total_cnt'] = len(playlist_data)
@@ -276,4 +269,5 @@ def film_to_view(film_id):
 
     resp_dict['actors'] = calc_actors(o_film)
     resp_dict['comments'] = calc_comments(o_film)
+
     return resp_dict, o_film
