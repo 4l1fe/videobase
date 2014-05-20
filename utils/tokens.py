@@ -6,6 +6,7 @@
 import sys
 import json
 from pprint import pprint as pp
+import httplib
 
 python_v = sys.version_info[0]
 
@@ -19,7 +20,7 @@ elif python_v == 3:
 
 
 HOST = 'http://dmitriy-book.com'
-# HOST = 'http://127.0.0.1:8000'
+# HOST = 'http://127.0.0.1:9000'
 
 
 def get_main_token(username='admin', password='admin', host=HOST):
@@ -37,13 +38,13 @@ def get_main_token(username='admin', password='admin', host=HOST):
 
 def get_session_token(main_token, host=HOST):
     req = Request(urljoin(host, 'api/v1/auth/session.json'))
-    req.add_header('Authorization', 'Token ' + main_token)
+    req.add_header('X-MI-TOKEN', main_token)
     resp = urlopen(req)
     resp_data = resp.read()
     if python_v == 3:
         resp_data = resp_data.decode()
     json_resp = json.loads(resp_data)
-    return json_resp
+    return json_resp['session_token']
 
 
 def get_films_persons(sessiom_token, id, host=HOST):
@@ -101,8 +102,17 @@ def get_person_films(id_, meth, page=1, per_page=12, type_='a', host=HOST):
     return json_resp
 
 
+def film_unsubscribe(session_token, id_, host=HOST):
+    cl = httplib.HTTPConnection(host)
+    headers = {'X-MI-SESSION': session_token}
+    cl.request('DELETE', '/api/v1/films/{}/action/subscribe.json'.format(id_), headers=headers)
+    resp = cl.getresponse()
+    return resp.read()
+
+
+
 if __name__ == '__main__':
-    mt = get_main_token()
+    mt = get_main_token(username='nana@nana.na', password='nana')
     print(mt)
     st = get_session_token(mt)
     print(st)
@@ -118,3 +128,5 @@ if __name__ == '__main__':
     # pp(resp)
     # resp = get_person_films(2, 'get')
     # pp(resp)
+    resp = film_unsubscribe(st, 71)
+    pp(resp)
