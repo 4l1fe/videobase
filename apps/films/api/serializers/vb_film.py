@@ -206,7 +206,7 @@ class vbFilm(serializers.ModelSerializer):
 
         if require_relation:
             def check_auth(request):
-                return request.user and request.user.is_authenticated()
+                return request.user.is_authenticated()
 
             if request:
                 is_auth = check_auth(request)
