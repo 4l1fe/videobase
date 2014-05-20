@@ -12,6 +12,7 @@ class Genres(models.Model):
     def __unicode__(self):
         return u'[{0}] {1}'.format(self.pk, self.name)
 
+    @classmethod
     def get_cache_key(self):
         return u'{0}-{1}-{2}'.format(self._meta.app_label, self._meta.db_table, 'all')
 
