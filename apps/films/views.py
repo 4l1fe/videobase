@@ -26,11 +26,11 @@ import apps.films.models as film_model
 import apps.contents.models as content_model
 
 from apps.films.api.serializers import vbFilm, vbComment, vbPerson
-from apps.films.api.serializers.vb_film import GenresSerializer
+from apps.films.constants import APP_USERFILM_SUBS_TRUE
 
 from utils.noderender import render_page
+from utils.common import reindex_by
 
-from apps.films.constants import APP_USERFILM_SUBS_TRUE
 
 def get_new_namestring(namestring):
     m = re.match("(?P<pre>.+)v(?P<version>[0-9]+)[.]png", namestring)
@@ -113,22 +113,34 @@ def index_view(request):
         o_film = sorted(set((ol.content.film for ol in o_locs if ol.content.film.release_date < current_date)),
                         key=lambda f: f.release_date)[-4:]
 
-        resp_dict_data = vbFilm(o_film, extend=True, many=True).data
+        resp_dict_data = vbFilm(o_film, require_relation=False, extend=True, many=True).data
         resp_dict_serialized = json.dumps(resp_dict_data, cls=DjangoJSONEncoder)
         cache.set(NEW_FILMS_CACHE_KEY, resp_dict_serialized, 9000)
 
     else:
         resp_dict_data = json.loads(resp_dict_serialized)
 
+    # Найдем relation для фильмов, если пользователь авторизован
+    if request.user.is_authenticated():
+        list_obj_pk = [item['id'] for item in resp_dict_data]
+        o_user = film_model.UsersFilms.objects.filter(user=request.user, film__in=list_obj_pk)
+        o_user = reindex_by(o_user, 'film_id', True)
+
+        for index, item in enumerate(resp_dict_data):
+            if item['id'] in o_user:
+                resp_dict_data[index]['relation'] = o_user[item['id']].relation_for_vb_film
+
+    # Выборка жанров
     genres_cache_key = film_model.Genres.get_cache_key()
     genres_data = cache.get(genres_cache_key)
     if genres_data is None:
         try:
-            genres_data = GenresSerializer(film_model.Genres.objects.all(), many=True).data
+            genres_data = film_model.Genres.objects.all().values('id', 'name')
             cache.set(genres_cache_key, genres_data, 86400)
         except:
             genres_data = []
 
+    # Init response
     data = {
         'new_films': resp_dict_data,
         'genres': [
