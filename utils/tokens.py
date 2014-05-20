@@ -110,6 +110,14 @@ def film_unsubscribe(session_token, id_, host=HOST):
     return resp.read()
 
 
+def person_unsubscribe(session_token, id_, host=HOST):
+    cl = httplib.HTTPConnection('127.0.0.1:9000')
+    headers = {'X-MI-SESSION': session_token}
+    cl.request('DELETE', '/api/v1/persons/{}/action/subscribe.json'.format(id_), headers=headers)
+    resp = cl.getresponse()
+    return resp.read()
+
+
 
 if __name__ == '__main__':
     mt = get_main_token(username='nana@nana.na', password='nana')
@@ -128,5 +136,8 @@ if __name__ == '__main__':
     # pp(resp)
     # resp = get_person_films(2, 'get')
     # pp(resp)
-    resp = film_unsubscribe(st, 71)
+    # resp = film_unsubscribe(st, 71)
+    # pp(resp)
+    resp = person_unsubscribe(st, 6509)
     pp(resp)
+
