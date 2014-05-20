@@ -122,8 +122,7 @@ def index_view(request):
 
     # Найдем relation для фильмов, если пользователь авторизован
     if request.user.is_authenticated():
-        list_obj_pk = [item['id'] for item in resp_dict_data]
-        o_user = film_model.UsersFilms.objects.filter(user=request.user, film__in=list_obj_pk)
+        o_user = film_model.UsersFilms.objects.filter(user=request.user, film__in=[item['id'] for item in resp_dict_data])
         o_user = reindex_by(o_user, 'film_id', True)
 
         for index, item in enumerate(resp_dict_data):
@@ -136,6 +135,10 @@ def index_view(request):
     if genres_data is None:
         try:
             genres_data = film_model.Genres.objects.all().values('id', 'name')
+            genres_data = [
+                {'id': genre['id'], 'name': genre['name'], 'order': i}
+                for i, genre in enumerate(sorted(genres_data, key=lambda g: g['name']))
+            ]
             cache.set(genres_cache_key, genres_data, 86400)
         except:
             genres_data = []
@@ -143,10 +146,7 @@ def index_view(request):
     # Init response
     data = {
         'new_films': resp_dict_data,
-        'genres': [
-            {'id': genre['id'], 'name': genre['name'], 'order': i}
-            for i, genre in enumerate(sorted(genres_data, key=lambda g: g['name']))
-        ],
+        'genres': genres_data,
     }
 
     return HttpResponse(render_page('index', data), status.HTTP_200_OK)
