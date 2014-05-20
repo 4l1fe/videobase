@@ -42,7 +42,7 @@ class LocationsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Locations
-        fields = ('type', 'lang', 'quality', 'subtitles', 'price', 'price_type', 'url_view',)
+        fields = ('id','type', 'lang', 'quality', 'subtitles', 'price', 'price_type', 'url_view',)
 
 
 #############################################################################################################
@@ -89,6 +89,7 @@ class vbFilm(serializers.ModelSerializer):
             new_fields += ['persons']
 
         request = kwargs.pop('request', False)
+        require_relation = kwargs.pop('require_relation', True)
 
         # Instantiate the superclass normally
         super(vbFilm, self).__init__(*args, **kwargs)
@@ -101,7 +102,7 @@ class vbFilm(serializers.ModelSerializer):
         self._get_obj_list()
         self._rebuild_location()
         self._rebuild_poster_list()
-        self._rebuild_relation_list(request)
+        self._rebuild_relation_list(request, require_relation)
         self._rebuild_tors_list()
 
 
@@ -200,23 +201,23 @@ class vbFilm(serializers.ModelSerializer):
 
 
     # ---------------------------------------------------------------------------------------
-    def _rebuild_relation_list(self, request):
+    def _rebuild_relation_list(self, request, require_relation):
         result = defaultdict()
 
-        def check_auth(request):
-            return request.user and request.user.is_authenticated()
+        if require_relation:
+            def check_auth(request):
+                return request.user.is_authenticated()
 
-        is_auth = False
-        if request:
-            is_auth = check_auth(request)
-        else:
-            request = get_current_request()
-            is_auth = check_auth(request)
+            if request:
+                is_auth = check_auth(request)
+            else:
+                request = get_current_request()
+                is_auth = check_auth(request)
 
-        if is_auth:
-            o_user = UsersFilms.objects.filter(user=request.user, film__in=self.list_obj_pk)
-            for item in o_user:
-                result[item.film_id] = item.relation_for_vb_film
+            if is_auth:
+                o_user = UsersFilms.objects.filter(user=request.user, film__in=self.list_obj_pk)
+                for item in o_user:
+                    result[item.film_id] = item.relation_for_vb_film
 
         self.relation_rebuild = result
 

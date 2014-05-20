@@ -1,5 +1,6 @@
 # coding: utf-8
 
+import sys
 from datetime import date
 
 from django.db.models import Q
@@ -11,12 +12,13 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from apps.films.api.serializers import vbFilm
-from apps.films.models import Films
+from apps.films.models import Films, UsersFilms
 from apps.films.forms import SearchForm
+from apps.films.constants import APP_USERFILM_STATUS_NOT_WATCH
 from apps.contents.models import Contents, Locations
 
 import videobase.settings as settings
-import sys
+
 
 #############################################################################################################
 class SearchFilmsView(APIView):
@@ -72,11 +74,21 @@ class SearchFilmsView(APIView):
         if filter.get('genre'):
             o_search = o_search.filter(genres=filter['genre'])
 
+        # Персоноализация выборки
+        if self.request.user.is_authenticated():
+             o_search = o_search.filter(
+                Q(users_films__user=self.request.user),
+                ~Q(users_films__status=APP_USERFILM_STATUS_NOT_WATCH)
+            )
+
         return o_search
 
 
     def search_by_location(self, filter, o_search=None):
         o_loc = Locations.objects.all()
+
+        if filter.get('price'):
+            o_loc = o_loc.filter(price__lte=filter['price'])
 
         if not o_search is None:
             list_film_pk = set(o_search.values_list('id', flat=True))
@@ -84,9 +96,6 @@ class SearchFilmsView(APIView):
             o_loc = o_loc.filter(content__in=conts_dict.keys())
 
         o_loc = o_loc.distinct('content').values_list('content', flat=True)
-
-        if filter.get('price'):
-            o_loc = o_loc.filter(price__lte=filter['price'])
 
         # Пересечение
         if o_search is None:
@@ -101,8 +110,7 @@ class SearchFilmsView(APIView):
         if 'test' in sys.argv:
             return False
         else:
-            auth = self.request.user and self.request.user.is_authenticated()
-            if auth:
+            if self.request.user.is_authenticated():
                 return False
 
             return not settings.DEBUG
@@ -116,10 +124,15 @@ class SearchFilmsView(APIView):
         if form.is_valid():
             # Init data
             filter, film_group, location_group = self.parse_post(form)
-            cache_key = u'{0}({1})'.format(self.__class__.__name__,
-                                          ':'.join([i if isinstance(i, basestring) else str(i) for i in filter.values()]))
-            result = cache.get(cache_key) if self.use_cache() else None
 
+            # Init cache params
+            use_cache = self.use_cache()
+            cache_key = u'{0}({1})'.format(
+                self.__class__.__name__,
+                ':'.join([i if isinstance(i, basestring) else str(i) for i in filter.values()])
+            )
+
+            result = cache.get(cache_key) if use_cache else None
             if result is None:
                 o_search = self.search_by_films(filter)
 
@@ -141,8 +154,10 @@ class SearchFilmsView(APIView):
                             o_search = Films.objects.filter(pk__in=list_films_by_content)
 
                 try:
-                    page = Paginator(o_search.order_by('-rating_sort'), per_page=filter['per_page']).page(filter['page'])
-                except Exception as e:
+                    page = Paginator(
+                        o_search.order_by('-rating_sort'), per_page=filter['per_page']
+                    ).page(filter['page'])
+                except Exception, e:
                     return Response({'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
 
                 serializer = vbFilm(page.object_list, request=self.request, many=True)
@@ -154,10 +169,10 @@ class SearchFilmsView(APIView):
                     'items': serializer.data,
                 }
 
-                if self.use_cache():
+                if use_cache:
                     try:
                         cache.set(cache_key, result, 300)
-                    except:
+                    except Exception, e:
                         pass
 
             return Response(result, status=status.HTTP_200_OK)
