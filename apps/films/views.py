@@ -26,11 +26,11 @@ import apps.films.models as film_model
 import apps.contents.models as content_model
 
 from apps.films.api.serializers import vbFilm, vbComment, vbPerson
-from apps.films.api.serializers.vb_film import GenresSerializer
+from apps.films.constants import APP_USERFILM_SUBS_TRUE
 
 from utils.noderender import render_page
+from utils.common import reindex_by
 
-from apps.films.constants import APP_USERFILM_SUBS_TRUE
 
 def get_new_namestring(namestring):
     m = re.match("(?P<pre>.+)v(?P<version>[0-9]+)[.]png", namestring)
@@ -102,39 +102,53 @@ def bri_con(d, im, request):
 
 
 def index_view(request):
+    # Выбираем 4 новых фильма, у которых есть локации
     NEW_FILMS_CACHE_KEY = 'new_films'
     resp_dict_serialized = cache.get(NEW_FILMS_CACHE_KEY)
 
     if resp_dict_serialized is None:
-        # Form 4 films that have locations and are newest and have release date less than now.
-
         current_date = timezone.now().date()
         o_locs = content_model.Locations.objects.all()
         o_film = sorted(set((ol.content.film for ol in o_locs if ol.content.film.release_date < current_date)),
                         key=lambda f: f.release_date)[-4:]
 
-        resp_dict_data = vbFilm(o_film, extend=True, many=True).data
+        resp_dict_data = vbFilm(o_film, require_relation=False, extend=True, many=True).data
         resp_dict_serialized = json.dumps(resp_dict_data, cls=DjangoJSONEncoder)
         cache.set(NEW_FILMS_CACHE_KEY, resp_dict_serialized, 9000)
 
     else:
         resp_dict_data = json.loads(resp_dict_serialized)
 
+    # Найдем relation для фильмов, если пользователь авторизован
+    if request.user.is_authenticated():
+        o_user = film_model.UsersFilms.objects.filter(
+            user=request.user, film__in=[item['id'] for item in resp_dict_data]
+        )
+        o_user = reindex_by(o_user, 'film_id', True)
+
+        for index, item in enumerate(resp_dict_data):
+            if item['id'] in o_user:
+                resp_dict_data[index]['relation'] = o_user[item['id']].relation_for_vb_film
+
+    # Выборка жанров
     genres_cache_key = film_model.Genres.get_cache_key()
     genres_data = cache.get(genres_cache_key)
+
     if genres_data is None:
         try:
-            genres_data = GenresSerializer(film_model.Genres.objects.all(), many=True).data
+            genres_data = film_model.Genres.objects.all().values('id', 'name')
+            genres_data = [
+                {'id': genre['id'], 'name': genre['name'], 'order': i}
+                for i, genre in enumerate(sorted(genres_data, key=lambda g: g['name']))
+            ]
             cache.set(genres_cache_key, genres_data, 86400)
         except:
             genres_data = []
 
+    # Init response
     data = {
         'new_films': resp_dict_data,
-        'genres': [
-            {'id': genre['id'], 'name': genre['name'], 'order': i}
-            for i, genre in enumerate(sorted(genres_data, key=lambda g: g['name']))
-        ],
+        'genres': genres_data,
     }
 
     return HttpResponse(render_page('index', data), status.HTTP_200_OK)
@@ -175,7 +189,6 @@ def test_view(request):
 
 
 def calc_actors(o_film):
-    result_list = []
     filter = {
         'filter': {'person_film_rel__film': o_film.pk},
         'offset': 0,
@@ -183,11 +196,11 @@ def calc_actors(o_film):
     }
 
     try:
-        result_list = list(film_model.Persons.get_sorted_persons_by_name(**filter).values('id', 'name'))
+        result = list(film_model.Persons.get_sorted_persons_by_name(**filter).values('id', 'name'))
     except Exception, e:
-        pass
+        result = []
 
-    return result_list
+    return result
 
 
 def calc_similar(o_film):
@@ -195,7 +208,7 @@ def calc_similar(o_film):
         result = film_model.Films.similar_api(o_film)
         result = vbFilm(result).data
     except Exception, e:
-        pass
+        result = []
 
     return result
 
