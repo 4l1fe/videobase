@@ -33,7 +33,7 @@ html(lang="ru")
                 - for (var i = 0; i < items_cnt; i++)
                     .col-md-2
                         - item = playlist.items[i]
-                        a(href="playlist/" + (i+1))
+                        a(href="/playlist/" + (i+1))
                             img.img-responsive(src=item.poster || "static/img/noposter.jpg")
                             =item.name + "1"
         .container.film-info
