@@ -88,6 +88,8 @@ class vbFilm(serializers.ModelSerializer):
         if not self.persons_sign:
             new_fields += ['persons']
 
+        request = kwargs.pop('request', False)
+
         # Instantiate the superclass normally
         super(vbFilm, self).__init__(*args, **kwargs)
 
@@ -99,7 +101,7 @@ class vbFilm(serializers.ModelSerializer):
         self._get_obj_list()
         self._rebuild_location()
         self._rebuild_poster_list()
-        self._rebuild_relation_list()
+        self._rebuild_relation_list(request)
         self._rebuild_tors_list()
 
 
@@ -198,12 +200,20 @@ class vbFilm(serializers.ModelSerializer):
 
 
     # ---------------------------------------------------------------------------------------
-    def _rebuild_relation_list(self):
+    def _rebuild_relation_list(self, request):
         result = defaultdict()
 
-        request = get_current_request()
+        def check_auth(request):
+            return request.user and request.user.is_authenticated()
 
-        if request.user and request.user.is_authenticated():
+        is_auth = False
+        if request:
+            is_auth = check_auth(request)
+        else:
+            request = get_current_request()
+            is_auth = check_auth(request)
+
+        if is_auth:
             o_user = UsersFilms.objects.filter(user=request.user, film__in=self.list_obj_pk)
             for item in o_user:
                 result[item.film_id] = item.relation_for_vb_film

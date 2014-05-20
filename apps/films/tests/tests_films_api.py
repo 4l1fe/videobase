@@ -571,13 +571,14 @@ class FilmsTestCase(APITestCase):
         response = self.client.delete(reverse('act_film_subscribe_view', kwargs={'film_id': film.id, 'format': 'json'}))
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def test_api_action_subscribe_delete_film_bad(self):
-        film = self.films[0]
-        response = self.client.delete(
-            reverse('act_film_subscribe_view', kwargs={'film_id': film.id, 'format': 'json'}),
-            HTTP_X_MI_SESSION=self.headers
-        )
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+    # Deprecated
+    # def test_api_action_subscribe_delete_film_bad(self):
+    #     film = self.films[0]
+    #     response = self.client.delete(
+    #         reverse('act_film_subscribe_view', kwargs={'film_id': film.id, 'format': 'json'}),
+    #         HTTP_X_MI_SESSION=self.headers
+    #     )
+    #     self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def subscribe_delete_ok(self, film):
         film = film
