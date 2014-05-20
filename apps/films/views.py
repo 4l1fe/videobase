@@ -223,6 +223,7 @@ def film_view(request, film_id, *args, **kwargs):
 
 
 def playlist_view(request, film_id, *args, **kwargs):
+    film_id = int(film_id)
     film_data, o_film = film_to_view(film_id)
     playlist = {'items': [], 'next': [], 'previous': [], 'total_cnt': 0}
 
@@ -233,7 +234,7 @@ def playlist_view(request, film_id, *args, **kwargs):
 
         in_playlist = False
         for index, film in enumerate(playlist_data):
-            if film.id == int(film_id):
+            if film.id == film_id:
                 in_playlist = True
                 break
 
