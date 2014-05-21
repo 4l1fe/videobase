@@ -287,6 +287,11 @@ CELERYBEAT_SCHEDULE = {
         'task': 'kinopoisk_persons',
         'schedule': timedelta(seconds=10),
     },
+
+    'kinopoisk_news': {
+        'task': 'kinopoisk_news',
+        'schedule': timedelta(days=3),
+    },
 }
 
 CELERY_TIMEZONE = 'UTC'

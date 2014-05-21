@@ -174,12 +174,21 @@ def viaplay_robot_start():
 
 @app.task(name = 'kinopoisk_parse_film_by_id')
 def kinopoisk_parse_one_film(kinopoisk_id,name):
+    '''
+    Task for parsing particual kinopoisk id
+    
+    '''
 
     parse_from_kinopoisk(kinopoisk_id=kinopoisk_id, name = name)
 
 
 @app.task(name= 'kinopoisk_news')
 def parse_kinopoisk_news():
+    '''
+    Periodic task for parsing new films from kinopoisk
+
+    For each film found on premiere page, parser called asynchronously
+    '''
     for name,kinopoisk_id in kinopoisk_news():
         kinopoisk_parse_one_film.apply_async((kinopoisk_id,name))
         
