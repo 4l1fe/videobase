@@ -10,6 +10,7 @@ from django.utils import timezone
 
 from celery import shared_task
 from celery.utils.log import get_task_logger
+import requests
 
 from videobase.celery import app
 from crawler.robot_start import launch_next_robot_try, sites_crawler, launch_next_robot_try_for_kinopoisk
@@ -81,26 +82,40 @@ def robot_task(robot_name):
 def get_person_poster(person_id):
     try:
         p = Persons.objects.get(id=person_id)
-        if p.photo == '' and p.kinopoisk_id != None:
+        if p.photo == '' and p.kinopoisk_id != 0:
             p.photo.save('profile.jpg', File(get_photo(p.kinopoisk_id)))
-    except Robots.DoesNotExist:
-        pass
+    except Robots.DoesNotExist as e:
+        print e
 
 
-@robot_task('kinopoisk_id_person')
-@transaction.commit_on_success
-def parse_id_persons(id):
+
+@robot_task('kinopoisk_persons')
+def parse_kinopoisk_persons(id):
         try:
-            response = crawler_get('http://www.kinopoisk.ru/name/' + str(id))
+            response = crawler_get('http://www.kinopoisk.ru/name/{}/view_info/ok/#trivia'.format(id))
             soup = BeautifulSoup(response.content)
             tag = soup.find('span', attrs={'itemprop': 'alternativeHeadline'})
             person_name = tag.text.strip()
-            f = Persons.objects.get(name=person_name)
-            f.kinopoisk_id = id
-            f.save()
-        except Exception:
-            pass
-
+            p = Persons.objects.get(name=person_name)
+            tag_birthdate = soup.find('td', attrs={'class': 'birth'})
+            birthdate = ''
+            if not (tag_birthdate is None):
+                birthdate = tag_birthdate.get('birthdate')
+            else:
+                print 'No data birthdate for this person id = %s' % id
+            tags_bio = soup.findAll('li', attrs={'class': 'trivia'})
+            bio = ''
+            if len(tags_bio):
+                for li in tags_bio:
+                    bio = bio + ' ' + li.text
+            else:
+                print 'No biography for this person id = %s' % id
+            p.birthdate = birthdate
+            p.bio = bio
+            p.kinopoisk_id = id
+            p.save()
+        except Exception, e:
+            print e
 
 @app.task(name='robot_launch')
 def robot_launcher(*args, **kwargs):
