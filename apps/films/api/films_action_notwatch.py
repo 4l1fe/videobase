@@ -1,6 +1,5 @@
 # coding: utf-8
-
-from django.db import transaction
+import json
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -12,6 +11,9 @@ from apps.films.constants import APP_USERFILM_STATUS_NOT_WATCH, APP_USERFILM_STA
 
 
 #############################################################################################################
+from apps.users import Feed
+
+
 class ActNotwatchFilmView(APIView):
     """
     Method get:
@@ -28,36 +30,33 @@ class ActNotwatchFilmView(APIView):
         Return object Films or Response object with 404 error
         """
         try:
-            result = Films.objects.get(pk=film_id)
+            return Films.objects.get(pk=film_id)
         except Films.DoesNotExist:
-            result = Response(status=status.HTTP_404_NOT_FOUND)
-
-        return result
-
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
     def get(self, request, film_id, format=None, *args, **kwargs):
         # Выбираем и проверяем, что фильм существует
         o_film = self.__get_object(film_id)
-        if type(o_film) == Response:
+        if isinstance(o_film, Response):
             return o_film
 
         # Init data
         not_watch = APP_USERFILM_STATUS_NOT_WATCH
-        filter = {
-            'user': request.user,
-            'film': o_film,
-        }
+        filter = {'user': request.user,
+                  'film': o_film}
+        obj_val = json.dumps({'id': o_film.pk, 'name': o_film.name})
 
         # Устанавливаем подписку
-        # with transaction.atomic():
         try:
             o_subs = UsersFilms(status=not_watch, **filter)
             o_subs.save()
+            Feed.objects.create(user=request.user, type='film-nw', object=obj_val)
         except Exception as e:
             try:
                 UsersFilms.objects.filter(**filter).update(status=not_watch)
             except Exception as e:
                 return Response({'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
+
 
         return Response(status=status.HTTP_200_OK)
 
@@ -70,12 +69,14 @@ class ActNotwatchFilmView(APIView):
             return o_film
 
         # Init data
-        filter = {
-            'user': request.user.pk,
-            'film': o_film.pk,
-        }
-
+        filter = {'user': request.user.pk,
+                  'film': o_film.pk}
+        obj_val = json.dumps({'id': o_film.pk, 'name': o_film.name})
         # Удалим подписку
         UsersFilms.objects.filter(**filter).update(status=APP_USERFILM_STATUS_UNDEF)
+        try:
+            Feed.objects.get(user=request.user, type='film-nw', object=obj_val).delete()
+        except Feed.DoesNotExist:
+            pass
 
         return Response(status=status.HTTP_200_OK)
