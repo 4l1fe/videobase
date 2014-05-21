@@ -245,29 +245,22 @@ def feed_view(request):
                 filter(user=user_id, subscribed=APP_PERSONFILM_SUBS_TRUE).\
                 values_list('person', flat=True)
 
-            # Собираем лишние записи и удаляем
-            del_index_films = []
-            del_index_persons = []
+            # Собираем лишние записи и удаляем их
             for index, item in enumerate(o_feed):
                 if item.type == 'film_o':
                     tmp = json.loads(item.objects)
                     tmp_value = tmp.get('id')
 
                     if not tmp_value in sub_films:
-                        del_index_films.append(index)
+                        del o_feed[index]
 
                 elif item.type == 'pers_o':
                     tmp = json.loads(item.objects)
                     tmp_value = tmp.get('id')
 
                     if not tmp_value in sub_persons:
-                         del_index_persons.append(index)
+                         del o_feed[index]
 
-            # Соединяем списки и делаем уникальные значения
-            merge_list = sorted(list(set(del_index_films + del_index_persons)), reverse=True)
-
-            # Удалим фиды по индексу с конца
-            for item in merge_list:
-                del o_feed[item]
-
-        result = vbFeedElement(o_feed, many=True).data
+        # Сериализуем
+        o_feed = vbFeedElement(o_feed, many=True).data
+        return HttpResponse(render_page('feed', {'feed': o_feed}))
