@@ -6,8 +6,8 @@ from django.db import models
 class Feed(models.Model):
     """Содержит имена полей, которые переопределяют питоновские стандартные объекты.
     """
-    user = models.ForeignKey(User)
-    created = models.DateField(auto_now_add=True)
+    user = models.ForeignKey(User, blank=True, null=True, )
+    created = models.DateTimeField(auto_now=True)
     type = models.CharField(max_length=255, name='type')
     object = models.TextField(name='object')
     text = models.TextField()
