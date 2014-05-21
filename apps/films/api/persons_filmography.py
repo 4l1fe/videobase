@@ -23,7 +23,7 @@ class PersonFilmographyAPIView(APIView):
                     pfs = pfs.filter(p_type=dict(APP_FILM_PERSON_TYPES_OUR)[c_d['type']])
                 films = [pf.film for pf in pfs]
                 page = Paginator(films, per_page=c_d['per_page']).page(c_d['page'])
-                data = vbFilm(page.object_list, many=True).data
+                data = vbFilm(page.object_list, request=self.request, many=True).data
                 result = {
                     'total_cnt': page.paginator.count,
                     'per_page': page.paginator.per_page,

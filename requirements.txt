@@ -1,4 +1,4 @@
-Django==1.6.2
+Django==1.6.3
 South==0.8.4
 argparse
 psycopg2==2.5.2
@@ -29,6 +29,7 @@ celery
 django-celery
 raven
 selenium
+pytils
 pyvirtualdisplay
 #sudo apt-get install -y mercurial memcached libmemcached-dev zlib1g-dev libssl-dev python-dev build-essential libjpeg-dev libfreetype6-dev zlib1g-dev libpng12-dev libpq-dev libgraphviz-dev graphviz nginx python-virtualenv python-pygraphviz pkg-config postgresql npm nodejs git-flow
 #sudo npm install jade
