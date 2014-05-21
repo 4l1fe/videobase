@@ -150,11 +150,11 @@ def imdb_robot_start(*args,**kwargs):
 
 @app.task(name='amediateka_ru_robot_start')
 def amediateka_robot_start(*args,**kwargs):
-    Amediatera_robot.get_film_data()
+    Amediateka_robot().get_film_data()
 
 @app.task(name='viaplay_ru_robot_start')
 def viaplay_robot_start():
-    ViaplayRobot.get_data()
+    ViaplayRobot().get_data()
 
 
 @app.task(name = 'kinopoisk_parse_film_by_id')
@@ -165,9 +165,8 @@ def kinopoisk_parse_one_film(kinopoisk_id,name):
 
 @app.task(name= 'kinopoisk_news')
 def parse_kinopoisk_news():
-
     for name,kinopoisk_id in kinopoisk_news():
-
         kinopoisk_parse_one_film.apply_async((kinopoisk_id,name))
+        
 
         
