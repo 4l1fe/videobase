@@ -7,11 +7,11 @@ html(lang="ru")
         .nav-wrapper
             .container
                 .col-md-3
-                    a(href="playlist/" + playlist.previous.id)=playlist.previous.name
+                    a(href="/playlist/" + playlist.previous.id)=playlist.previous.name
                 .col-md-6.text-center
                     strong Плейлист (#{playlist.id}/#{playlist.total_cnt})
                 .col-md-3
-                    a(href="playlist/" + playlist.next.id)=playlist.next.name
+                    a(href="/playlist/" + playlist.next.id)=playlist.next.name
         .film-wrapper
             .container
                 h1.col-md-6 #{film.name} <span>#{film.year}</span><em>#{film.name_orig}</em>
@@ -33,7 +33,7 @@ html(lang="ru")
                 - for (var i = 0; i < items_cnt; i++)
                     .col-md-2
                         - item = playlist.items[i]
-                        a(href="playlist/" + (i+1))
+                        a(href="/playlist/" + (i+1))
                             img.img-responsive(src=item.poster || "static/img/noposter.jpg")
                             =item.name + "1"
         .container.film-info
