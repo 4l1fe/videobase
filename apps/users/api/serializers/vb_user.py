@@ -1,10 +1,11 @@
 # coding: utf-8
+from django.db.models import Count, Max
 
 from rest_framework import serializers
 
 from apps.films.api.serializers import vbUserGenre
-from apps.films.models import Genres
-
+from apps.films.models import Genres, UsersFilms, Films
+from apps.films.constants import APP_USERFILM_STATUS_NOT_WATCH
 from apps.users.models import User, UsersPics, UsersRels
 from apps.users.constants import APP_USER_REL_TYPE_NONE, APP_USER_REL_TYPE_FRIENDS
 
@@ -54,7 +55,14 @@ class vbUser(serializers.ModelSerializer):
         return obj.profile.get_name()
 
     def get_genre_fav(self, obj):
-        return {}
+        genre = max(Genres.objects.filter(genres__users_films__user=obj).\
+            exclude(genres__users_films__status=APP_USERFILM_STATUS_NOT_WATCH).\
+            distinct().values("id", "name").annotate(count=Count("genres__id")),
+            key=lambda g: g['count'])
+        if 'id' in genre and 'name' in genre:
+            return {'id': genre['id'], 'name': genre['name']}
+        else:
+            return {}
 
     def path_to_avatar(self, obj):
         userpic = obj.profile.userpic_id
@@ -72,7 +80,7 @@ class vbUser(serializers.ModelSerializer):
         return UsersRels.objects.filter(user=obj, rel_type=APP_USER_REL_TYPE_FRIENDS).count()
 
     def get_films_watched_cnt(self, obj):
-        return 0
+        return UsersFilms.objects.filter(user=obj).exclude(status=APP_USERFILM_STATUS_NOT_WATCH).count()
 
     def get_comments_cnt(self, obj):
         return obj.comments.all().count()
@@ -85,8 +93,10 @@ class vbUser(serializers.ModelSerializer):
         return rel
 
     def genres_list(self, obj):
-        genres = Genres.objects.filter(genres__users_films__user=obj)
-        serializer = vbUserGenre(genres, many=True)
+        genres = Genres.objects.filter(genres__users_films__user=obj).\
+            exclude(genres__users_films__status=APP_USERFILM_STATUS_NOT_WATCH).\
+            distinct()
+        serializer = vbUserGenre(genres, user=obj, many=True)
         return serializer.data
 
     def friends_list(self, obj):
