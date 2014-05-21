@@ -1,4 +1,10 @@
 # coding: utf-8
+
+from pytils import numeral
+from datetime import datetime
+
+from django.db import transaction
+from django.db.models import Q
 from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponse,\
@@ -12,23 +18,24 @@ from django.views.decorators.cache import never_cache
 from django.shortcuts import render_to_response, RequestContext
 from django.contrib.auth.forms import AuthenticationForm
 from tasks import send_template_mail
-from django.db import transaction
 
 from rest_framework.authtoken.models import Token
 
-from constants import APP_USERS_API_DEFAULT_PAGE, APP_USERS_API_DEFAULT_PER_PAGE,\
-    APP_SUBJECT_TO_CONFIRM_REGISTER, APP_SUBJECT_TO_RESTORE_PASSWORD
-from .forms import CustomRegisterForm
-from .api.serializers import vbUser
+from apps.users.models import Feed
+from apps.users.api.serializers import vbUser
+from apps.users.forms import CustomRegisterForm
 from apps.users.api.utils import create_new_session
-from apps.films.models import Films, Persons
+from apps.users.constants import APP_USERS_API_DEFAULT_PAGE, APP_USERS_API_DEFAULT_PER_PAGE,\
+    APP_SUBJECT_TO_CONFIRM_REGISTER, APP_SUBJECT_TO_RESTORE_PASSWORD
+
+from apps.films.models import Films, Persons, UsersFilms, UsersPersons
 from apps.films.constants import APP_PERSON_DIRECTOR, APP_PERSON_ACTOR, \
-    APP_FILM_FULL_FILM, APP_FILM_SERIAL, APP_USERFILM_STATUS_SUBS
+    APP_FILM_FULL_FILM, APP_FILM_SERIAL, APP_USERFILM_STATUS_SUBS, \
+    APP_PERSONFILM_SUBS_TRUE, APP_USERFILM_SUBS_TRUE
 from apps.films.api.serializers import vbFilm, vbPerson
+
 from utils.common import url_with_querystring
 from utils.noderender import render_page
-
-from pytils import numeral
 
 
 class RegisterUserView(View):
@@ -218,3 +225,53 @@ class RestorePasswordView(View):
 #             except Exception as e:
 #                 print e
 #         return HttpResponseRedirect('/users/profile/')
+
+
+def feed_view(request):
+    if request.user.is_authenticated():
+        import json
+        user_id = request.user.id
+        o_feed = Feed.objects.filter(Q(user=user_id) | Q(user=None), created__gte=datetime.now().date())
+
+        if len(o_feed):
+            # Список подписок на фильм
+            sub_films = UsersFilms.objects.\
+                filter(user=user_id, subscribed=APP_USERFILM_SUBS_TRUE).\
+                values_list('film', flat=True) #film__in=films.values(),
+
+            # Список подписок на персону
+            sub_persons = UsersPersons.objects.\
+                filter(user=user_id, subscribed=APP_PERSONFILM_SUBS_TRUE).\
+                values_list('person', flat=True) # person__in=persons.values(),
+
+
+            del_index_films = []
+            del_index_persons = []
+            for index, item in enumerate(o_feed):
+                if item.type == 'film_o':
+                    tmp = json.loads(item.objects)
+                    tmp_value = tmp.get('id')
+
+                    if tmp_value in sub_films:
+                        del_index_films.append(index)
+
+                elif item.type == 'pers_o':
+                    tmp = json.loads(item.objects)
+                    tmp_value = tmp.get('id')
+
+                    if tmp_value:
+                         del_index_persons.append(index)
+
+            # Соединяем списки и делаем уникальные значения
+            merge_list = sorted(list(set(del_index_films + del_index_persons)), reverse=True)
+
+            # Удалим фиды по индексу с конца
+            for item in merge_list:
+                del o_feed[item]
+
+            vb
+
+
+
+
+
