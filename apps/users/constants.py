@@ -38,3 +38,15 @@ APP_SUBJECT_TO_CONFIRM_REGISTER = u'Подтверждение регистра�
 
 APP_USERS_API_DEFAULT_PER_PAGE = 10
 APP_USERS_API_DEFAULT_PAGE = 1
+
+#############################################################################################################
+FILM_RATE = 'film-r'
+FILM_SUBSCRIBE = 'film-s'
+FILM_NOTWATCH = 'film-nw'
+FILM_COMMENT = 'film-c'
+FILM_O = 'film-o'
+PERSON_SUBSCRIBE = 'pers-s'
+PERSON_O = 'pers=o'
+USER_ASK = 'user-a'
+USER_FRIENDSHIP = 'user-f'
+SYS_ALL = 'sys-a'

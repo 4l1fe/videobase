@@ -81,3 +81,12 @@ APP_USERFILM_SUBS = (
     (APP_USERFILM_SUBS_FALSE, u'Не подписан'),
     (APP_USERFILM_SUBS_TRUE, u'Подписан'),
 )
+
+#############################################################################################################
+APP_PERSONFILM_SUBS_FALSE = 0
+APP_PERSONFILM_SUBS_TRUE = 1
+
+APP_PERSONFILM_SUBS = (
+    (APP_PERSONFILM_SUBS_FALSE, u'Не подписан'),
+    (APP_PERSONFILM_SUBS_TRUE, u'Подписан'),
+)
