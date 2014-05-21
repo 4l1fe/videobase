@@ -103,7 +103,7 @@ def get_person_films(id_, meth, page=1, per_page=12, type_='a', host=HOST):
 
 
 def film_unsubscribe(session_token, id_, host=HOST):
-    cl = httplib.HTTPConnection(host)
+    cl = httplib.HTTPConnection('127.0.0.1:9000')
     headers = {'X-MI-SESSION': session_token}
     cl.request('DELETE', '/api/v1/films/{}/action/subscribe.json'.format(id_), headers=headers)
     resp = cl.getresponse()
@@ -116,6 +116,15 @@ def person_unsubscribe(session_token, id_, host=HOST):
     cl.request('DELETE', '/api/v1/persons/{}/action/subscribe.json'.format(id_), headers=headers)
     resp = cl.getresponse()
     return resp.read()
+
+
+def film_comment(session_token, id_, host=HOST):
+    headers = {'X-MI-SESSION': session_token}
+    data = urlencode({'text': 'some comment from utils'})
+    req = Request(urljoin(host, 'api/v1/films/{}/action/comment.json'.format(id_)), data=data, headers=headers)
+    resp = urlopen(req)
+    return resp.read()
+
 
 
 
@@ -138,6 +147,8 @@ if __name__ == '__main__':
     # pp(resp)
     # resp = film_unsubscribe(st, 71)
     # pp(resp)
-    resp = person_unsubscribe(st, 6509)
+    # resp = person_unsubscribe(st, 6509)
+    # pp(resp)
+    resp = film_comment(st, 15155)
     pp(resp)
 

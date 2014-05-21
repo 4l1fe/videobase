@@ -10,7 +10,6 @@ from apps.films.models import Films, UsersFilms
 from apps.contents.models import Locations
 from apps.films.constants import APP_USERFILM_SUBS_TRUE, APP_USERFILM_SUBS_FALSE, APP_FILM_SERIAL
 from apps.users.models import Feed
-from django.core.exceptions import ObjectDoesNotExist
 
 
 #############################################################################################################
@@ -69,7 +68,6 @@ class ActSubscribeFilmView(APIView):
 
         return Response(status=status.HTTP_200_OK)
 
-
     def delete(self, request, film_id, format=None, *args, **kwargs):
         o_film = self.__get_object(film_id)
         if type(o_film) == Response:
@@ -92,7 +90,7 @@ class ActSubscribeFilmView(APIView):
         # Удалим подписку
         UsersFilms.objects.filter(**filter).update(subscribed=subscribed)
         try:
-            Feed.objects.get(user=request.user, object=obj_val).delete()
+            Feed.objects.get(user=request.user, type='film-s', object=obj_val).delete()
         except Feed.DoesNotExist as e:  # если записи события вдруг нету, нет смысла что-либо делать.
             pass
 
