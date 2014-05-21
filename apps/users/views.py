@@ -22,7 +22,7 @@ from tasks import send_template_mail
 from rest_framework.authtoken.models import Token
 
 from apps.users.models import Feed
-from apps.users.api.serializers import vbUser
+from apps.users.api.serializers import vbUser, vbFeedElement
 from apps.users.forms import CustomRegisterForm
 from apps.users.api.utils import create_new_session
 from apps.users.constants import APP_USERS_API_DEFAULT_PAGE, APP_USERS_API_DEFAULT_PER_PAGE,\
@@ -231,20 +231,21 @@ def feed_view(request):
     if request.user.is_authenticated():
         import json
         user_id = request.user.id
-        o_feed = Feed.objects.filter(Q(user=user_id) | Q(user=None), created__gte=datetime.now().date())
+        period = datetime.date.today() - datetime.timedelta(weeks=2)
+        o_feed = Feed.objects.filter(Q(user=user_id) | Q(user=None), created__gte=period)
 
-        if len(o_feed):
+        if o_feed.count():
             # Список подписок на фильм
             sub_films = UsersFilms.objects.\
                 filter(user=user_id, subscribed=APP_USERFILM_SUBS_TRUE).\
-                values_list('film', flat=True) #film__in=films.values(),
+                values_list('film', flat=True)
 
             # Список подписок на персону
             sub_persons = UsersPersons.objects.\
                 filter(user=user_id, subscribed=APP_PERSONFILM_SUBS_TRUE).\
-                values_list('person', flat=True) # person__in=persons.values(),
+                values_list('person', flat=True)
 
-
+            # Собираем лишние записи и удаляем
             del_index_films = []
             del_index_persons = []
             for index, item in enumerate(o_feed):
@@ -252,14 +253,14 @@ def feed_view(request):
                     tmp = json.loads(item.objects)
                     tmp_value = tmp.get('id')
 
-                    if tmp_value in sub_films:
+                    if not tmp_value in sub_films:
                         del_index_films.append(index)
 
                 elif item.type == 'pers_o':
                     tmp = json.loads(item.objects)
                     tmp_value = tmp.get('id')
 
-                    if tmp_value:
+                    if not tmp_value in sub_persons:
                          del_index_persons.append(index)
 
             # Соединяем списки и делаем уникальные значения
@@ -269,9 +270,4 @@ def feed_view(request):
             for item in merge_list:
                 del o_feed[item]
 
-            vb
-
-
-
-
-
+        result = vbFeedElement(o_feed, many=True).data
