@@ -2,12 +2,6 @@
 """ Module containing general functionality for crawler robots
 and run function for robots written as loader parser combo
 """
-from crawler.oll_tv.loader import Oll_Loader
-from crawler.oll_tv.parser import ParseOllFilm
-from crawler.tvzavr_ru.loader import Tvzavr_Loader
-from crawler.tvzavr_ru.parsers import ParseTvzavrFilmPage
-from crawler.zoomby_ru.loader import ZOOMBY_Loader
-from crawler.zoomby_ru.parsers import ParseFilm
 
 from django.utils import timezone
 from django.db.models import Q
@@ -17,6 +11,8 @@ from django.core.exceptions import ValidationError
 from apps.films.models import Films, Seasons
 from apps.contents.models import Contents, Locations
 from apps.contents.constants import APP_CONTENTS_PRICE_TYPE_FREE
+
+
 from crawler.kinopoisk import get_id_by_film
 from crawler.ivi_ru.loader import IVI_Loader
 from crawler.ivi_ru.parsers import ParseFilmPage
@@ -35,6 +31,15 @@ from crawler.tvigle_ru.loader import TVIGLE_Loader
 from crawler.tvigle_ru.parsers import ParseTvigleFilm
 from crawler.zabava_ru.loader import ZABAVAR_RU_Loader
 from crawler.zabava_ru.parsers import ParseZabavaFilm
+from crawler.oll_tv.loader import Oll_Loader
+from crawler.oll_tv.parser import ParseOllFilm
+from crawler.tvzavr_ru.loader import Tvzavr_Loader
+from crawler.tvzavr_ru.parsers import ParseTvzavrFilmPage
+from crawler.zoomby_ru.loader import ZOOMBY_Loader
+from crawler.zoomby_ru.parsers import ParseFilm
+
+
+
 from requests.exceptions import ConnectionError
 from apps.robots.constants import APP_ROBOTS_TRY_SITE_UNAVAILABLE, APP_ROBOTS_TRY_NO_SUCH_PAGE, \
     APP_ROBOTS_TRY_PARSE_ERROR

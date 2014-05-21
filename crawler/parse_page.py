@@ -127,11 +127,11 @@ get_photo = partial(get_image, YANDEX_KP_ACTORS_TEMPLATE)
 
 
 def extract_names(soup):
-    nametag=soup.select('h1.moviename-big')[0]
+    nametag = soup.select('h1.moviename-big')[0]
     moviename = ('Films', {'name':nametag.text})
     orig_movie_name = ('Films', {'name_orig':nametag.select('span')[0].text if len(nametag.select('span')) else ''})
 
-    return moviename,orig_movie_name
+    return moviename, orig_movie_name
 
 
 def actors_wrap(actors_names):
@@ -149,7 +149,7 @@ def acquire_page(page_id):
     dump_path = os.path.join(PAGE_ARCHIVE,str(page_id))
     if os.path.exists(dump_path):
         with open(dump_path) as fd:
-            page_dump = fd.read()
+            page_dump = fd.read().decode('utf-8')
     else:
         url =u"http://www.kinopoisk.ru/film/%d/" % page_id
         res = crawler_get(url)
@@ -182,12 +182,12 @@ def parse_one_page(page_dump):
 
     brand_words = ('Films', {'description': soup.select("div.brand_words")[0].text})
 
-    moviename,orig_movie_name = extract_names(soup)
+    moviename, orig_movie_name = extract_names(soup)
     vote = ('Films',{'rating_kinopoisk': get_vote(soup)})
 
     parsed_data.extend(transform_data_dict(data_dict))
     parsed_data.extend(actors_wrap(actors_n_l))
-    parsed_data.extend([brand_words,moviename,orig_movie_name,vote])
+    parsed_data.extend([brand_words, moviename, orig_movie_name, vote])
 
     ddict = defaultdict(list)
 
