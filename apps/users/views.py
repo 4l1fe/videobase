@@ -1,5 +1,6 @@
 # coding: utf-8
 
+import json
 from pytils import numeral
 from datetime import datetime
 
@@ -229,7 +230,6 @@ class RestorePasswordView(View):
 
 def feed_view(request):
     if request.user.is_authenticated():
-        import json
         user_id = request.user.id
         period = datetime.date.today() - datetime.timedelta(weeks=2)
         o_feed = Feed.objects.filter(Q(user=user_id) | Q(user=None), created__gte=period)
