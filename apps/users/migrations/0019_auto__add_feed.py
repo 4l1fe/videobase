@@ -11,8 +11,8 @@ class Migration(SchemaMigration):
         # Adding model 'Feed'
         db.create_table('users_feed', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('created', self.gf('django.db.models.fields.DateField')(auto_now_add=True, blank=True)),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], null=True, blank=True)),
+            ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
             ('type', self.gf('django.db.models.fields.CharField')(max_length=255)),
             ('object', self.gf('django.db.models.fields.TextField')()),
             ('text', self.gf('django.db.models.fields.TextField')()),
@@ -64,12 +64,12 @@ class Migration(SchemaMigration):
         },
         'users.feed': {
             'Meta': {'object_name': 'Feed'},
-            'created': ('django.db.models.fields.DateField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'object': ('django.db.models.fields.TextField', [], {}),
             'text': ('django.db.models.fields.TextField', [], {}),
             'type': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"})
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']", 'null': 'True', 'blank': 'True'})
         },
         'users.sessiontoken': {
             'Meta': {'object_name': 'SessionToken', 'db_table': "'users_api_session_tokens'"},
