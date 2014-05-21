@@ -20,10 +20,11 @@ from persons_extras import PersonsExtrasAPIView
 
 
 __all__ = [
+    # Films API
     'SearchFilmsView', 'DetailFilmView', 'LocationsFilmView', 'PersonsFilmView', \
     'SimilarFilmView', 'ExtrasFilmView', 'CommentsFilmView', 'ActSubscribeFilmView', \
     'ActPlaylistFilmView', 'ActNotwatchFilmView', 'ActRateFilmView', 'ActCommentFilmView', \
+
     # Persons API
-    'PersonAPIView', 'PersonFilmographyAPIView', 'PersonActionAPIView',
-    'PersonsExtrasAPIView'
+    'PersonAPIView', 'PersonFilmographyAPIView', 'PersonActionAPIView', 'PersonsExtrasAPIView'
 ]
