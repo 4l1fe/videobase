@@ -13,3 +13,5 @@ class CookiesSessionAuthentication(SessionTokenAuthentication):
                 return self.authenticate_credentials(token)[0]
             except Exception:
                 return AnonymousUser()
+        else:
+            return request.user
