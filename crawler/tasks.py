@@ -19,6 +19,9 @@ from crawler.kinopoisk_poster import  poster_robot_wrapper
 from crawler.imdbratings import process_all
 from crawler.amediateka_ru.loader import Amediateka_robot
 from crawler.viaplay_ru.robot import ViaplayRobot
+from crawler.kinopoisk import parse_from_kinopoisk
+from crawler.kinopoisk_premiere import kinopoisk_news
+
 
 import datetime
 import  json
@@ -124,7 +127,6 @@ def robot_launcher(*args, **kwargs):
 
     for robot in Robots.objects.all():
         print u'Checking robot %s' % robot.name
-        print robot.last_start, timezone.now()
         if robot.last_start + datetime.timedelta(seconds=robot.delay) < timezone.now():
 
             if robot.name in sites_crawler:
@@ -163,10 +165,23 @@ def imdb_robot_start(*args,**kwargs):
 
 @app.task(name='amediateka_ru_robot_start')
 def amediateka_robot_start(*args,**kwargs):
-    Amediatera_robot.get_film_data()
+    Amediateka_robot().get_film_data()
 
 @app.task(name='viaplay_ru_robot_start')
 def viaplay_robot_start():
-    ViaplayRobot.get_data()
+    ViaplayRobot().get_data()
 
 
+@app.task(name = 'kinopoisk_parse_film_by_id')
+def kinopoisk_parse_one_film(kinopoisk_id,name):
+
+    parse_from_kinopoisk(kinopoisk_id=kinopoisk_id, name = name)
+
+
+@app.task(name= 'kinopoisk_news')
+def parse_kinopoisk_news():
+    for name,kinopoisk_id in kinopoisk_news():
+        kinopoisk_parse_one_film.apply_async((kinopoisk_id,name))
+        
+
+        

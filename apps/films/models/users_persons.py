@@ -3,6 +3,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+from apps.films.constants import APP_PERSONFILM_SUBS_FALSE, APP_PERSONFILM_SUBS
+
 
 #############################################################################################################
 # Модель связи Пользователей и Персон
@@ -10,7 +12,7 @@ class UsersPersons(models.Model):
     user       = models.ForeignKey(User, max_length=255, verbose_name=u'Пользователь', related_name='persons')
     person     = models.ForeignKey('Persons', max_length=255, verbose_name=u'Персона', related_name='users_persons')
     upstatus   = models.IntegerField(verbose_name=u'Статус', default=0)
-    subscribed = models.IntegerField(verbose_name=u'Подписка', default=0)
+    subscribed = models.IntegerField(verbose_name=u'Подписка', default=APP_PERSONFILM_SUBS_FALSE, choices=APP_PERSONFILM_SUBS)
 
     def __unicode__(self):
         return u'[%s %s]' % (self.user, self.person)

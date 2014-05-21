@@ -1,44 +1,39 @@
 # coding: utf-8
+import json
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from apps.films.models import UsersPersons, Persons
+from apps.users import Feed
 
 
 class PersonActionAPIView(APIView):
-    '''
 
-    '''
+    permission_classes = (IsAuthenticated, )
 
-    def __users_person_set(self, user, person, subscribed):
-        filter = {
-            'user': user,
-            'person': person,
-        }
-
-        try:
-            up = UsersPersons.objects.get(**filter)
-            up.subscribed = subscribed
-        except UsersPersons.DoesNotExist, ue:
-            up = UsersPersons(subscribed=subscribed, upstatus=0, **filter)
-        finally:
-            up.save()
-
-    def _response_template(self, subscribed, request, format=None, resource_id=None):
-        '''
-        Template for responses
-        '''
-
+    def _handle(self, subscribed, request, format=None, resource_id=None):
         try:
             person = Persons.objects.get(id=resource_id)
-            self.__users_person_set(request.user, person, subscribed)
+            filter_ = {'user': request.user,
+                      'person': person}
+            photo_url = '' if not person.photo else person.photo.url
+            obj_val = json.dumps(dict(id=person.id, name=person.name, photo=photo_url))
+
+            up, up_created = UsersPersons.objects.get_or_create(**filter_)
+            up.subscribed = subscribed
+            up.save()
+            f, f_created = Feed.objects.get_or_create(user=request.user, type='pers-s', object=obj_val)
+            if not subscribed:
+                f.delete()
+
             return Response(status=status.HTTP_200_OK)
         except Exception, e:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, format=None, resource_id=None):
-        return self._response_template(1, request, format, resource_id)
+        return self._handle(1, request, format, resource_id)
 
     def delete(self, request, format=None, resource_id=None):
-        return self._response_template(0, request, format, resource_id)
+        return self._handle(0, request, format, resource_id)
