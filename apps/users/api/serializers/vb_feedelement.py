@@ -1,3 +1,5 @@
+# coding: utf-8
+
 from rest_framework import serializers
 from apps.users.models.users_feed import Feed
 from .vb_user import vbUser
