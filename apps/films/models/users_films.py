@@ -27,7 +27,6 @@ class UsersFilms(models.Model):
     def check_subscribed(self):
         return False if self.subscribed == APP_USERFILM_SUBS_FALSE else True
 
-
     @property
     def get_name_status(self):
         return dict(APP_USERFILM_STATUS).get(self.status)
