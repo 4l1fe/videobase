@@ -83,6 +83,9 @@ class LogEntryAdmin(admin.ModelAdmin):
         return super(LogEntryAdmin, self).queryset(request).select_related('content_type')
 
 
+class FeedAdmin(admin.ModelAdmin):
+    pass
+
 #############################################################################################################
 # Регистрация моделей в админке
 #admin.site.register(User, UsersAdmin)
@@ -90,3 +93,4 @@ admin.site.register(UsersProfile, UsersProfileAdmin)
 admin.site.register(UsersRels, UsersRelsAdmin)
 admin.site.register(UsersPics, UsersPicsAdmin)
 admin.site.register(LogEntry, LogEntryAdmin)
+admin.site.register(Feed, FeedAdmin)
