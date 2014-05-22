@@ -219,7 +219,11 @@ def robot_exceptions(func):
         try:
 
             func(*args,**kwargs)
-
+            if 'site' in kwargs:
+                site = kwargs['site']
+            else:
+                site = None
+            
         except ConnectionError, ce:
             # Couldn't conect to server
             print u"Connection error"
