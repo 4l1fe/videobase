@@ -67,7 +67,7 @@ APP_FEED_TYPE = (
 )
 
 APP_NOTIFICATION_TEMPLATE = {
-    FILM_O: "notifcation_film.html",
+    FILM_O: "notification_film.html",
     PERSON_O: "notification_person.html",
 }
 
