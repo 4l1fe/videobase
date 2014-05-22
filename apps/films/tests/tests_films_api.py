@@ -571,13 +571,14 @@ class FilmsTestCase(APITestCase):
         response = self.client.delete(reverse('act_film_subscribe_view', kwargs={'film_id': film.id, 'format': 'json'}))
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def test_api_action_subscribe_delete_film_bad(self):
-        film = self.films[0]
-        response = self.client.delete(
-            reverse('act_film_subscribe_view', kwargs={'film_id': film.id, 'format': 'json'}),
-            HTTP_X_MI_SESSION=self.headers
-        )
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+    # Deprecated
+    # def test_api_action_subscribe_delete_film_bad(self):
+    #     film = self.films[0]
+    #     response = self.client.delete(
+    #         reverse('act_film_subscribe_view', kwargs={'film_id': film.id, 'format': 'json'}),
+    #         HTTP_X_MI_SESSION=self.headers
+    #     )
+    #     self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def subscribe_delete_ok(self, film):
         film = film
@@ -823,27 +824,34 @@ class FilmsTestCase(APITestCase):
 
         data = {'genre': self.genres[4].id, 'year_old': 0, 'price': 100, 'instock': True, 'per_page': 2}
         if auth:
+            UsersFilmsFactory.create(user=self.user, film=film1, status=APP_USERFILM_STATUS_NOT_WATCH)
             UsersFilmsFactory.create(user=self.user, film=film2, status=APP_USERFILM_STATUS_SUBS)
             response = self.client.get(reverse('film_search_view', kwargs={'format': 'json'}), data=data, HTTP_X_MI_SESSION=self.headers)
         else:
             response = self.client.get(reverse('film_search_view', kwargs={'format': 'json'}), data=data)
-        self.assertEqual(response.data['total_cnt'], 2)
+
+        self.assertEqual(response.data['total_cnt'], 1 if auth else 2)
         self.assertEqual(response.data['page'], 1)
         self.assertEqual(response.data['per_page'], 2)
-        self.locations_assert(response.data['items'][0]['locations'], locations1)
-        self.not_extend_assert(response.data['items'][0], film1, extras1)
-        self.locations_assert(response.data['items'][1]['locations'], locations2)
-        self.not_extend_assert(response.data['items'][1], film2, extras2)
+        if auth:
+            self.locations_assert(response.data['items'][0]['locations'], locations2)
+            self.not_extend_assert(response.data['items'][0], film2, extras2)
+        else:
+            self.locations_assert(response.data['items'][0]['locations'], locations1)
+            self.not_extend_assert(response.data['items'][0], film1, extras1)
+            self.locations_assert(response.data['items'][1]['locations'], locations2)
+            self.not_extend_assert(response.data['items'][1], film2, extras2)
         data = {'genre': self.genres[4].id, 'year_old': 0, 'price': 100, 'instock': True, 'per_page': 1, 'page': 2}
         if auth:
             response = self.client.get(reverse('film_search_view', kwargs={'format': 'json'}), data=data, HTTP_X_MI_SESSION=self.headers)
+            self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         else:
             response = self.client.get(reverse('film_search_view', kwargs={'format': 'json'}), data=data)
-        self.assertEqual(response.data['total_cnt'], 2)
-        self.assertEqual(response.data['page'], 2)
-        self.assertEqual(response.data['per_page'], 1)
-        self.locations_assert(response.data['items'][0]['locations'], locations2)
-        self.not_extend_assert(response.data['items'][0], film2, extras2)
+            self.assertEqual(response.data['total_cnt'], 2)
+            self.assertEqual(response.data['page'], 2)
+            self.assertEqual(response.data['per_page'], 1)
+            self.locations_assert(response.data['items'][0]['locations'], locations2)
+            self.not_extend_assert(response.data['items'][0], film2, extras2)
 
     def test_api_search_by_genre_and_others_with_auth(self):
         self.api_search_by_genre_and_others(True)

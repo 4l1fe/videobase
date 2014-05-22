@@ -10,6 +10,7 @@ from django.utils import timezone
 
 from celery import shared_task
 from celery.utils.log import get_task_logger
+import requests
 
 from videobase.celery import app
 from crawler.robot_start import launch_next_robot_try, sites_crawler, launch_next_robot_try_for_kinopoisk
@@ -18,6 +19,9 @@ from crawler.kinopoisk_poster import  poster_robot_wrapper
 from crawler.imdbratings import process_all
 from crawler.amediateka_ru.loader import Amediateka_robot
 from crawler.viaplay_ru.robot import ViaplayRobot
+from crawler.kinopoisk import parse_from_kinopoisk
+from crawler.kinopoisk_premiere import kinopoisk_news
+
 
 import datetime
 import  json
@@ -81,26 +85,40 @@ def robot_task(robot_name):
 def get_person_poster(person_id):
     try:
         p = Persons.objects.get(id=person_id)
-        if p.photo == '' and p.kinopoisk_id != None:
+        if p.photo == '' and p.kinopoisk_id != 0:
             p.photo.save('profile.jpg', File(get_photo(p.kinopoisk_id)))
-    except Robots.DoesNotExist:
-        pass
+    except Robots.DoesNotExist as e:
+        print e
 
 
-@robot_task('kinopoisk_id_person')
-@transaction.commit_on_success
-def parse_id_persons(id):
+
+@robot_task('kinopoisk_persons')
+def parse_kinopoisk_persons(id):
         try:
-            response = crawler_get('http://www.kinopoisk.ru/name/' + str(id))
+            response = crawler_get('http://www.kinopoisk.ru/name/{}/view_info/ok/#trivia'.format(id))
             soup = BeautifulSoup(response.content)
             tag = soup.find('span', attrs={'itemprop': 'alternativeHeadline'})
             person_name = tag.text.strip()
-            f = Persons.objects.get(name=person_name)
-            f.kinopoisk_id = id
-            f.save()
-        except Exception:
-            pass
-
+            p = Persons.objects.get(name=person_name)
+            tag_birthdate = soup.find('td', attrs={'class': 'birth'})
+            birthdate = ''
+            if not (tag_birthdate is None):
+                birthdate = tag_birthdate.get('birthdate')
+            else:
+                print 'No data birthdate for this person id = %s' % id
+            tags_bio = soup.findAll('li', attrs={'class': 'trivia'})
+            bio = ''
+            if len(tags_bio):
+                for li in tags_bio:
+                    bio = bio + ' ' + li.text
+            else:
+                print 'No biography for this person id = %s' % id
+            p.birthdate = birthdate
+            p.bio = bio
+            p.kinopoisk_id = id
+            p.save()
+        except Exception, e:
+            print e
 
 @app.task(name='robot_launch')
 def robot_launcher(*args, **kwargs):
@@ -109,7 +127,6 @@ def robot_launcher(*args, **kwargs):
 
     for robot in Robots.objects.all():
         print u'Checking robot %s' % robot.name
-        print robot.last_start, timezone.now()
         if robot.last_start + datetime.timedelta(seconds=robot.delay) < timezone.now():
 
             if robot.name in sites_crawler:
@@ -148,10 +165,32 @@ def imdb_robot_start(*args,**kwargs):
 
 @app.task(name='amediateka_ru_robot_start')
 def amediateka_robot_start(*args,**kwargs):
-    Amediatera_robot.get_film_data()
+    Amediateka_robot().get_film_data()
 
 @app.task(name='viaplay_ru_robot_start')
 def viaplay_robot_start():
-    ViaplayRobot.get_data()
+    ViaplayRobot().get_data()
 
 
+@app.task(name = 'kinopoisk_parse_film_by_id')
+def kinopoisk_parse_one_film(kinopoisk_id,name):
+    '''
+    Task for parsing particual kinopoisk id
+    
+    '''
+
+    parse_from_kinopoisk(kinopoisk_id=kinopoisk_id, name = name)
+
+
+@app.task(name= 'kinopoisk_news')
+def parse_kinopoisk_news():
+    '''
+    Periodic task for parsing new films from kinopoisk
+
+    For each film found on premiere page, parser called asynchronously
+    '''
+    for name,kinopoisk_id in kinopoisk_news():
+        kinopoisk_parse_one_film.apply_async((kinopoisk_id,name))
+        
+
+        

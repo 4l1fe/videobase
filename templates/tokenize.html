@@ -10,7 +10,7 @@
         var date = new Date();
         date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
         document.cookie = "x-token=" + escape(token) + "; expires=" + date.toGMTString() + "; path=/";
-        date.setTime(new Date().getTime() + (days * 24 * 60 * 60 * 1000));
+        date.setTime(new Date().getTime() + (15 * 60 * 1000));
         document.cookie = "x-session=" + escape(session_key) + "; expires=" + date.toGMTString() + "; path=/";
 
         window.location.href = back_url || "/";

@@ -16,11 +16,13 @@ class PersonsExtrasAPIView(APIView):
             filter = {
                 'person': Persons.objects.get(id=resource_id)
             }
+
             if not type is None:
                 filter.update({'type': type})
 
             pes = PersonsExtras.objects.filter(**filter)
             result = [pe.as_vbExtra() for pe in pes]
             return Response(result, status=status.HTTP_200_OK)
+
         except Exception, e:
             return Response(status=status.HTTP_404_NOT_FOUND)
