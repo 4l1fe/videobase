@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.db import models
 
 from apps.users.constants import APP_FEED_TYPE, APP_USERS_API_DEFAULT_PER_PAGE
+import jsonfield
 
 
 class Feed(models.Model):
@@ -15,7 +16,7 @@ class Feed(models.Model):
     created = models.DateTimeField(verbose_name="Дата создания", auto_now=True)
     type = models.CharField(verbose_name="Тип связанного объекта", choices=APP_FEED_TYPE, max_length=255, name='type')
     object = models.TextField(verbose_name="Связанный объект", name='object')
-    text = models.TextField(verbose_name="Текст", null=True, blank=True)
+    text = jsonfield.JSONField(verbose_name="Текст", null=True, blank=True)
 
 
     def __unicode__(self):
@@ -41,7 +42,6 @@ class Feed(models.Model):
         params = [user_id,  'film_o', tuple(uf), 'pers_o', tuple(up), offset, limit]
 
         return self.objects.raw(sql, params)
-
 
     class Meta:
         db_table = 'users_feed'
