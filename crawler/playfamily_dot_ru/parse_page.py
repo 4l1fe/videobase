@@ -61,9 +61,11 @@ def parse_page(page_dump):
         if items:
             item = items[0]
         else:
+            return (None,'')
             print "No items with property 'name'"
     else:
         print "Empty microdata"
+        return (None,'')
     try:
         soup = BeautifulSoup(page_dump)
         price = extract_price(soup)
