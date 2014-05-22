@@ -238,12 +238,15 @@ def film_view(request, film_id, *args, **kwargs):
 def playlist_view(request, film_id=None, *args, **kwargs):
     if not film_id:
         film_id = 1
+
     film_id = int(film_id)
     if request.user.is_authenticated():
         playlist = {'items': [], 'next': [], 'previous': [], 'total_cnt': 0}
         playlist_data = film_model.Films.objects.\
             filter(users_films__user=request.user.id, users_films__subscribed=APP_USERFILM_SUBS_TRUE).\
             order_by('users_films__created')
+
+        film_data = {}
         if len(playlist_data) > 0:
             if film_id > len(playlist_data) or film_id < 1:
                 return redirect('playlist_view', film_id=1)
@@ -256,10 +259,13 @@ def playlist_view(request, film_id=None, *args, **kwargs):
 
             if film_id > 1:
                 playlist['previous'] = arrow_data(playlist_data[film_id - 2], film_id - 1)
+
             film = playlist_data[film_id-1]
             film_data, o_film = film_to_view(film.id)
+
         playlist['items'] = vbFilm(playlist_data, many=True).data
         playlist['total_cnt'] = len(playlist_data)
+
         return HttpResponse(render_page('playlist', {'playlist': playlist, 'film': film_data}))
     return redirect('login_view')
 
