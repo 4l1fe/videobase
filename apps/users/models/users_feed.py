@@ -3,7 +3,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 
-from apps.users.constants import APP_FEED_TYPE
+from apps.users.constants import APP_FEED_TYPE, APP_USERS_API_DEFAULT_PER_PAGE
 
 
 class Feed(models.Model):
@@ -23,7 +23,7 @@ class Feed(models.Model):
 
 
     @classmethod
-    def get_feeds_by_user(self, user_id, uf=[], up=[], offset=0, limit=20, *args, **kwargs):
+    def get_feeds_by_user(self, user_id, uf=[], up=[], offset=0, limit=APP_USERS_API_DEFAULT_PER_PAGE, *args, **kwargs):
         sql = """
           SELECT * FROM "users_feed"
           WHERE ("users_feed"."user_id"=%s OR "users_feed"."user_id" IS NULL) AND (
