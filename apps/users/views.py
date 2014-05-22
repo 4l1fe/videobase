@@ -1,7 +1,6 @@
 # coding: utf-8
 
 from pytils import numeral
-from datetime import datetime
 
 from django.db import transaction
 from django.core.paginator import Paginator
@@ -238,28 +237,19 @@ class RestorePasswordView(View):
 def feed_view(request):
     if request.user.is_authenticated():
         user_id = request.user.id
-        period = datetime.date.today() - datetime.timedelta(weeks=2)
 
         # Список подписок на фильм
-        sub_films = UsersFilms.objects.\
+        uf = UsersFilms.objects.\
             filter(user=user_id, subscribed=APP_USERFILM_SUBS_TRUE).\
             values_list('film', flat=True)
 
         # Список подписок на персону
-        sub_persons = UsersPersons.objects.\
+        up = UsersPersons.objects.\
             filter(user=user_id, subscribed=APP_PERSONFILM_SUBS_TRUE).\
             values_list('person', flat=True)
 
         # Выборка фидов
-        sql = """
-          SELECT * FROM "users_feed" WHERE ("users_feed"."user_id"=%s OR "users_feed"."user_id" IS NULL) AND (CASE
-            WHEN "users_feed"."user_id" IS NULL AND "users_feed"."type"=%s THEN
-              CAST(coalesce(our_data->>'id', '0') AS integer) IN %s
-            WHEN "users_feed"."user_id" IS NULL AND "users_feed"."type"=%s THEN
-              CAST(coalesce(our_data->>'id', '0') AS integer) IN %s
-            ELSE true END) ORDER BY "users_feed"."created" DESC OFFSET 0 LIMIT 20;
-        """
-        o_feed = Feed.objects.raw(sql, [user_id, 'film_o', tuple(sub_films), 'pers_o', tuple(sub_persons)])
+        o_feed = Feed.get_feeds_by_user(user_id, uf=uf, up=up)
 
         # Сериализуем
         try:
