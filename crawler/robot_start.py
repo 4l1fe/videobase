@@ -278,6 +278,13 @@ def robot_exceptions(func):
                                     outcome=APP_ROBOTS_TRY_NO_SUCH_PAGE)
             
             robot_try.save()
+        except Exception,e:
+            robot_try = RobotsTries(domain=site,
+                                    film=e.film,
+                                    outcome=APP_ROBOTS_TRY_NO_SUCH_PAGE)
+            
+            robot_try.save()
+            
     return wrapper
     
 
