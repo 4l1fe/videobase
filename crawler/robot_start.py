@@ -220,7 +220,7 @@ def robot_exceptions(func):
         if 'site' in kwargs:
             site = kwargs['site']
         else:
-            site = None
+            site = args[1]
         try:
 
             func(*args,**kwargs)
