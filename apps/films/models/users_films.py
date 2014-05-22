@@ -40,8 +40,12 @@ class UsersFilms(models.Model):
         }
 
     @classmethod
-    def get_subscribed_films_by_user(self, user_id):
-        return self.objects.filter(user=user_id, subscribed=APP_USERFILM_SUBS_TRUE).order_by('created')
+    def get_subscribed_films_by_user(self, user_id, flat=False, *args, **kwargs):
+        result = self.objects.filter(user=user_id, subscribed=APP_USERFILM_SUBS_TRUE).order_by('created')
+        if flat:
+            result = result.values_list('film', flat=True)
+
+        return result
 
 
 
