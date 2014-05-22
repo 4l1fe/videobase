@@ -1,11 +1,19 @@
 # coding: utf-8
 
 import os
-import sys
+
+import djcelery
 
 from datetime import timedelta
 from ConfigParser import RawConfigParser
 
+
+# Celery settings
+os.environ["CELERY_LOADER"] = "django"
+djcelery.setup_loader()
+AMQP_HOST = 'localhost'
+BROKER_HOST = 'localhost'
+BROKER_PORT = 5672
 
 BASE_PATH = os.path.dirname(__file__)
 BASE_DIR = os.path.dirname(BASE_PATH)
@@ -37,12 +45,15 @@ HTTP_USER_TOKEN_TYPE = b'X-MI-TOKEN'
 STANDART_HTTP_SESSION_TOKEN_HEADER = b'HTTP_{}'.format(HTTP_SESSION_TOKEN_TYPE.replace('-', '_'))
 STANDART_HTTP_USER_TOKEN_HEADER = b'HTTP_{}'.format(HTTP_USER_TOKEN_TYPE.replace('-', '_'))
 
-EMAIL_HOST = 'localhost'
-EMAIL_PORT = 25
-EMAIL_HOST_USER = ''
-EMAIL_HOST_PASSWORD = ''
-EMAIL_USE_TLS = False
-DEFAULT_FROM_EMAIL = 'info@aasym.com'
+emailconf = RawConfigParser()
+emailconf.read(CONFIGS_PATH + '/email.ini')
+EMAIL_HOST = emailconf.get('email', 'EMAIL_HOST')
+EMAIL_PORT = emailconf.getint('email', 'EMAIL_PORT')
+EMAIL_HOST_USER = emailconf.get('email', 'EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = emailconf.get('email', 'EMAIL_HOST_PASSWORD')
+EMAIL_USE_TLS = emailconf.getboolean('email', 'EMAIL_USE_TLS')
+EMAIL_BACKEND = emailconf.get('email', 'EMAIL_BACKEND')
+DEFAULT_FROM_EMAIL = emailconf.get('email', 'DEFAULT_FROM_EMAIL')
 
 # Application definition
 INSTALLED_APPS = (
@@ -268,17 +279,23 @@ CELERYBEAT_SCHEDULE = {
         'task': 'viaplay_ru_robot_start',
         'schedule': timedelta(days=7),
     },
-        'kinopoisk_poster': {
+    'kinopoisk_poster': {
         'task': 'kinopoisk_poster',
         'schedule': timedelta(seconds=10),
     },
-        'kinopoisk_id_person': {
-        'task': 'kinopoisk_id_person',
+    'kinopoisk_persons': {
+        'task': 'kinopoisk_persons',
         'schedule': timedelta(seconds=10),
+    },
+
+    'kinopoisk_news': {
+        'task': 'kinopoisk_news',
+        'schedule': timedelta(days=3),
     },
 }
 
 CELERY_TIMEZONE = 'UTC'
 
 POSTER_URL_PREFIX = '_260x360'
+
 

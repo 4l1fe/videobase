@@ -21,23 +21,25 @@ urlpatterns = patterns('',
     url(r'^robots/', include('apps.robots.urls')),
     url(r'^api/test', test_view),
 
-    # Admin
-    url(r'^admin_tools/', include('admin_tools.urls')),
-    url(r'^admin/', include(admin.site.urls)),
+    # Interface
+    url(r'^$', 'apps.films.views.index_view', name='index_view'),
+    url(r'^register/?$', views.RegisterUserView.as_view()),
+    url(r'^restore-password/$', views.RestorePasswordView.as_view()),
+    url(r'^login/?$', views.LoginUserView.as_view(), name='login_view'),
+    url(r'^user/(?P<user_id>\d+)/?$', views.UserView.as_view()),
+    url(r'^user/feed/?$', 'apps.users.views.feed_view', name='user_feed_view'),
+    url(r'^person/(?P<resource_id>\d+)/?$', 'apps.films.views.person_view'),
+    url(r'^films/(?P<film_id>\d+)/?$', 'apps.films.views.film_view'),
+    url(r'^playlist/(?P<film_id>\d+)/$', 'apps.films.views.playlist_view', name='playlist_view'),
+    url(r'^playlist/$', 'apps.films.views.playlist_view'),
 
     # Auth
     url(r'', include('social_auth.urls')),
     url('^tokenize/?$', views.TokenizeView.as_view(), name="tokenize"),
 
-    # Interface
-    url(r'^register/?$', views.RegisterUserView.as_view()),
-    url(r'^login/?$', views.LoginUserView.as_view()),
-    url(r'^user/(?P<user_id>\d+)/?$', views.UserView.as_view()),
-    url(r'^person/(?P<resource_id>\d+)/?$', 'apps.films.views.person_view'),
-    url(r'^films?/(?P<film_id>\d+)/?$', 'apps.films.views.film_view'),
-    url(r'^$', 'apps.films.views.index_view'),
-                       
-                       
+    # Admin
+    url(r'^admin_tools/', include('admin_tools.urls')),
+    url(r'^admin/', include(admin.site.urls)),
 )
 
 if settings.DEBUG:
