@@ -3,19 +3,22 @@ from south.utils import datetime_utils as datetime
 from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
+import jsonfield
 
 
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
 
-        # Changing field 'UsersRels.updated'
-        db.alter_column('users_rels', 'updated', self.gf('django.db.models.fields.DateTimeField')(auto_now=True))
+        # Changing field 'Feed.object'
+        db.delete_column('users_feed', 'object')
+        db.add_column('users_feed', 'object', jsonfield.JSONField(verbose_name="Связанный объект", name='object'))
 
     def backwards(self, orm):
 
-        # Changing field 'UsersRels.updated'
-        db.alter_column('users_rels', 'updated', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True))
+        # Changing field 'Feed.object'
+        db.delete_column('users_feed', 'object')
+        db.add_column('users_feed', 'object', self.gf('django.db.models.fields.TextField')())
 
     models = {
         u'auth.group': {
@@ -58,7 +61,7 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'Feed'},
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'object': ('django.db.models.fields.TextField', [], {}),
+            'object': ('jsonfield.fields.JSONField', [], {'default': '{}'}),
             'text': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'type': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']", 'null': 'True', 'blank': 'True'})
