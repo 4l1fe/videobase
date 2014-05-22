@@ -12,7 +12,7 @@ class UsersRels(models.Model):
     user = models.ForeignKey(User, verbose_name=u'Пользователи', related_name='rels')
     user_rel = models.ForeignKey(User, related_name='user_rel', verbose_name=u'Пользователи')
     rel_type = models.CharField(max_length=255, choices=APP_USER_REL_TYPES, verbose_name=u'Тип отношений')
-    updated = models.DateTimeField(auto_now_add=True, editable=False, verbose_name=u'Дата создания/обновления')
+    updated = models.DateTimeField(auto_now=True, editable=False, verbose_name=u'Дата создания/обновления')
 
     def __unicode__(self):
         return u'[%s] %s - %s' % (self.pk, self.user.username, self.user_rel.username)

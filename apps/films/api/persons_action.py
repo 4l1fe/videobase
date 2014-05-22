@@ -18,7 +18,7 @@ class PersonActionAPIView(APIView):
             person = Persons.objects.get(id=resource_id)
             filter_ = {'user': request.user,
                       'person': person}
-            photo_url = '' if not person.photo else person.photo.url
+            photo_url = person.photo.storage.url(person.photo.name)
             obj_val = json.dumps(dict(id=person.id, name=person.name, photo=photo_url))
 
             up, up_created = UsersPersons.objects.get_or_create(**filter_)
