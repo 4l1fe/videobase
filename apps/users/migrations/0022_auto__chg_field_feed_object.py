@@ -3,6 +3,7 @@ from south.utils import datetime_utils as datetime
 from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
+import jsonfield
 
 
 class Migration(SchemaMigration):
@@ -10,12 +11,14 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
 
         # Changing field 'Feed.object'
-        db.alter_column('users_feed', 'object', self.gf('jsonfield.fields.JSONField')())
+        db.delete_column('users_feed', 'object')
+        db.add_column('users_feed', 'object', jsonfield.JSONField(verbose_name="Связанный объект", name='object'))
 
     def backwards(self, orm):
 
         # Changing field 'Feed.object'
-        db.alter_column('users_feed', 'object', self.gf('django.db.models.fields.TextField')())
+        db.delete_column('users_feed', 'object')
+        db.add_column('users_feed', 'object', self.gf('django.db.models.fields.TextField')())
 
     models = {
         u'auth.group': {
