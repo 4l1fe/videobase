@@ -263,34 +263,21 @@ def robot_exceptions(func):
                                 )
 
             robot_try.save()
+
+        except ValidationError as ve:
+
+            print "Tried to save location with invalid URL"
+
         except NoSuchFilm as e:
             robot_try = RobotsTries(domain=site,
                                     film=e.film,
                                     outcome=APP_ROBOTS_TRY_NO_SUCH_PAGE)
             
             robot_try.save()
-        except ValidationError as ve:
-
-            print "Tried to save location with invalid URL"
-
-        except Exception, e:
-        
-            print "Unknown exception %s", str(e)
-            # Most likely parsing error
-            if site is None:
-                site = 'unknown'
-
-            robot_try = RobotsTries(domain=site,
-                                film=film[0],
-                                outcome=APP_ROBOTS_TRY_PARSE_ERROR
-                                )
-
-            robot_try.save()
-
     return wrapper
     
 
-#@robot_exceptions    
+@robot_exceptions    
 def process_film_on_site(film,site):
 
     robot = Robot(films=film, **sites_crawler[site])
