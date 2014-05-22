@@ -12,6 +12,8 @@ from apps.users.models import User, Feed
 from apps.users.api.serializers import vbFeedElement
 from apps.users.constants import APP_USERS_API_DEFAULT_PAGE, APP_USERS_API_DEFAULT_FEED_PER_PAGE
 
+feed_type_api = ['f', 'u', 'all']
+
 
 class UsersFeedsView(APIView):
 
@@ -21,9 +23,15 @@ class UsersFeedsView(APIView):
         except Exception, e:
             return Response({'e': e.message}, status=status.HTTP_400_BAD_REQUEST)
 
-        user_id = user.id
         page = request.QUERY_PARAMS.get('page', APP_USERS_API_DEFAULT_PAGE)
         per_page = request.QUERY_PARAMS.get('per_page', APP_USERS_API_DEFAULT_FEED_PER_PAGE)
+
+        feed_type = request.QUERY_PARAMS.get('type', 'u')
+        if not feed_type in feed_type_api:
+            return Response({'e': u'Неизвестный тип фида'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Init data
+        user_id = user.id
 
         # Список подписок на фильм
         uf = UsersFilms.get_subscribed_films_by_user(user_id, flat=True)
@@ -36,9 +44,16 @@ class UsersFeedsView(APIView):
             page = Paginator(o_feed, per_page).page(page)
 
             # Сериализуем данные
-            serializer = vbFeedElement(page.object_list, request=self.request, many=True)
-            result = serializer.data
+            serializer = vbFeedElement(page.object_list, request=self.request, many=True).data
+
         except Exception as e:
             return Response({'e': e.message}, status=status.HTTP_400_BAD_REQUEST)
+
+        result = {
+            'per_page': page.paginator.per_page,
+            'page': page.number,
+            'total_cnt': page.paginator.count,
+            'items': serializer,
+        }
 
         return Response(result, status=status.HTTP_200_OK)
