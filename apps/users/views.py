@@ -239,14 +239,10 @@ def feed_view(request):
         user_id = request.user.id
 
         # Список подписок на фильм
-        uf = UsersFilms.objects.\
-            filter(user=user_id, subscribed=APP_USERFILM_SUBS_TRUE).\
-            values_list('film', flat=True)
+        uf = UsersFilms.get_subscribed_films_by_user(user_id, flat=True)
 
         # Список подписок на персону
-        up = UsersPersons.objects.\
-            filter(user=user_id, subscribed=APP_PERSONFILM_SUBS_TRUE).\
-            values_list('person', flat=True)
+        up = UsersPersons.get_subscribed_persons_by_user(user_id, flat=True)
 
         # Выборка фидов
         o_feed = Feed.get_feeds_by_user(user_id, uf=uf, up=up)
