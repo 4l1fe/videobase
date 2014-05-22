@@ -23,7 +23,7 @@ class UsersPersons(models.Model):
     def get_subscribed_persons_by_user(self, user_id, flat=False):
         result = self.objects.filter(user=user_id, subscribed=APP_PERSONFILM_SUBS_TRUE).order_by('created')
         if flat:
-            result = result.values_list('film', flat=True)
+            result = result.values_list('person', flat=True)
 
         return result
 
