@@ -220,7 +220,7 @@ def robot_exceptions(func):
         if 'site' in kwargs:
             site = kwargs['site']
         else:
-            site = None
+            site = args[1]
         try:
 
             func(*args,**kwargs)
@@ -236,7 +236,7 @@ def robot_exceptions(func):
 
             robot_try = RobotsTries(domain=host,
                                 url='http://' + host + url,
-                                film=film[0],
+                                film=args[0][0],
                                 outcome=APP_ROBOTS_TRY_SITE_UNAVAILABLE
                                 )
 
@@ -250,7 +250,7 @@ def robot_exceptions(func):
 
                 robot_try = RobotsTries(domain=site,
                                 url=rexp.url,
-                                film=film[0],
+                                film=args[0][0],
                                 outcome=APP_ROBOTS_TRY_NO_SUCH_PAGE
                                 )
 
@@ -262,7 +262,7 @@ def robot_exceptions(func):
                 site = 'unknown'
 
                 robot_try = RobotsTries(domain=site,
-                                film=film[0],
+                                film=args[0][0],
                                 outcome=APP_ROBOTS_TRY_PARSE_ERROR
                                 )
 
