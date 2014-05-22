@@ -212,6 +212,94 @@ def save_location(film, **kwargs):
     location.save()
 
 
+
+
+def robot_exceptions(func):
+    def wrapper(*args,**kwargs):
+        try:
+
+            func(*args,**kwargs)
+
+        except ConnectionError, ce:
+            # Couldn't conect to server
+            print u"Connection error"
+            m = re.match(".+host[=][']([^']+)['].+", ce.message.message)
+
+            host = m.groups()[0]
+            url = ce.message.url
+            if host is None:
+                host = 'unknown'
+
+            robot_try = RobotsTries(domain=host,
+                                url='http://' + host + url,
+                                film=film[0],
+                                outcome=APP_ROBOTS_TRY_SITE_UNAVAILABLE
+                                )
+
+            robot_try.save()
+
+        except RetrievePageException, rexp:
+            # Server responded but not 200
+            print u"RetrievePageException"
+            if site is None:
+                site = 'unknown'
+
+                robot_try = RobotsTries(domain=site,
+                                url=rexp.url,
+                                film=film[0],
+                                outcome=APP_ROBOTS_TRY_NO_SUCH_PAGE
+                                )
+
+                robot_try.save()
+
+        except UnicodeDecodeError:
+            print "Unicode error"
+            if site is None:
+                site = 'unknown'
+
+                robot_try = RobotsTries(domain=site,
+                                film=film[0],
+                                outcome=APP_ROBOTS_TRY_PARSE_ERROR
+                                )
+
+            robot_try.save()
+        except NoSuchFilm as e:
+            robot_try = RobotsTries(domain=site,
+                                    film=e.film,
+                                    outcome=APP_ROBOTS_TRY_NO_SUCH_PAGE)
+            
+            robot_try.save()
+        except ValidationError as ve:
+
+            print "Tried to save location with invalid URL"
+
+        except Exception, e:
+        
+            print "Unknown exception %s", str(e)
+            # Most likely parsing error
+            if site is None:
+                site = 'unknown'
+
+            robot_try = RobotsTries(domain=site,
+                                film=film[0],
+                                outcome=APP_ROBOTS_TRY_PARSE_ERROR
+                                )
+
+            robot_try.save()
+
+    return wrapper
+    
+
+#@robot_exceptions    
+def process_film_on_site(film,site):
+
+    robot = Robot(films=film, **sites_crawler[site])
+    for data in robot.get_data(sane_dict):
+        print u"Trying to put data from %s for %s to db" % (site, unicode(data['film']))
+        save_location(**data)
+    
+
+    
 def launch_next_robot_try(site, film_id = None):
     '''
     This will launch next robot iteration according to its setting stored in db
@@ -253,80 +341,7 @@ def launch_next_robot_try(site, film_id = None):
         except Exception,e:
             print "Exception raised when tryint to print message"
 
-    try:
-
-        robot = Robot(films=film, **sites_crawler[site])
-        for data in robot.get_data(sane_dict):
-            print u"Trying to put data from %s for %s to db" % (site, unicode(data['film']))
-            save_location(**data)
-
-    except ConnectionError, ce:
-        # Couldn't conect to server
-        print u"Connection error"
-        m = re.match(".+host[=][']([^']+)['].+", ce.message.message)
-
-        host = m.groups()[0]
-        url = ce.message.url
-        if host is None:
-            host = 'unknown'
-
-        robot_try = RobotsTries(domain=host,
-                                url='http://' + host + url,
-                                film=film[0],
-                                outcome=APP_ROBOTS_TRY_SITE_UNAVAILABLE
-                                )
-
-        robot_try.save()
-
-    except RetrievePageException, rexp:
-        # Server responded but not 200
-        print u"RetrievePageException"
-        if site is None:
-            site = 'unknown'
-
-        robot_try = RobotsTries(domain=site,
-                                url=rexp.url,
-                                film=film[0],
-                                outcome=APP_ROBOTS_TRY_NO_SUCH_PAGE
-                                )
-
-        robot_try.save()
-
-    except UnicodeDecodeError:
-        print "Unicode error"
-        if site is None:
-            site = 'unknown'
-
-        robot_try = RobotsTries(domain=site,
-                                film=film[0],
-                                outcome=APP_ROBOTS_TRY_PARSE_ERROR
-                                )
-
-        robot_try.save()
-    except NoSuchFilm as e:
-        robot_try = RobotsTries(domain=site,
-                                film=e.film,
-                                outcome=APP_ROBOTS_TRY_NO_SUCH_PAGE)
-        
-        robot_try.save()
-    except ValidationError as ve:
-
-        print "Tried to save location with invalid URL"
-
-    except Exception, e:
-        
-        print "Unknown exception %s", str(e)
-        # Most likely parsing error
-        if site is None:
-            site = 'unknown'
-
-        robot_try = RobotsTries(domain=site,
-                                film=film[0],
-                                outcome=APP_ROBOTS_TRY_PARSE_ERROR
-                                )
-
-        robot_try.save()
-
+    process_film_on_site(film,site)
 
 def launch_next_robot_try_for_kinopoisk(robot):
     robot.last_start = timezone.now()
