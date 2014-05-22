@@ -56,10 +56,13 @@ class vbUser(serializers.ModelSerializer):
         return obj.profile.get_name()
 
     def get_genre_fav(self, obj):
-        genre = max(Genres.objects.filter(genres__users_films__user=obj).\
-            exclude(genres__users_films__status=APP_USERFILM_STATUS_NOT_WATCH).\
-            distinct().values("id", "name").annotate(count=Count("genres__id")),
-            key=lambda g: g['count'])
+        try:
+            genre = max(Genres.objects.filter(genres__users_films__user=obj).\
+                exclude(genres__users_films__status=APP_USERFILM_STATUS_NOT_WATCH).\
+                distinct().values("id", "name").annotate(count=Count("genres__id")),
+                key=lambda g: g['count'])
+        except:
+            return {}
         if 'id' in genre and 'name' in genre:
             return {'id': genre['id'], 'name': genre['name']}
         else:
