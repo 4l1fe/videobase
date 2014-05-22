@@ -216,14 +216,14 @@ def save_location(film, **kwargs):
 
 def robot_exceptions(func):
     def wrapper(*args,**kwargs):
+
+        if 'site' in kwargs:
+            site = kwargs['site']
+        else:
+            site = None
         try:
 
             func(*args,**kwargs)
-            if 'site' in kwargs:
-                site = kwargs['site']
-            else:
-                site = None
-            
         except ConnectionError, ce:
             # Couldn't conect to server
             print u"Connection error"
