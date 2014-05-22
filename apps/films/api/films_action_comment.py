@@ -40,7 +40,6 @@ class ActCommentFilmView(APIView):
 
     def post(self, request, film_id, format=None, *args, **kwargs):
         form = CommentForm(request.DATA)
-        print(request.DATA)
         if form.is_valid():
             # Выбираем и проверяем, что фильм существует
             o_content = self.__get_object(film_id)
