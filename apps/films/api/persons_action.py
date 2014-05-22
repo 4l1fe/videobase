@@ -19,7 +19,7 @@ class PersonActionAPIView(APIView):
             filter_ = {'user': request.user,
                       'person': person}
             photo_url = person.photo.storage.url(person.photo.name)
-            obj_val = json.dumps(dict(id=person.id, name=person.name, photo=photo_url))
+            obj_val = {'id': person.id, 'name': person.name, 'photo': photo_url}
 
             up, up_created = UsersPersons.objects.get_or_create(**filter_)
             up.subscribed = subscribed
