@@ -9,8 +9,8 @@ APP_CONTENTS_LOC_TYPE = (
     ('playfamily','playfamily'),
     ('amediateka','amediateka'),
     ('molodejj','molodejj'),
-    ('now','now'),
-    ('stream','stream'),
+    ('nowru','nowru'),
+    ('streamru','streamru'),
     ('tvzavr','tvzavr'),
     ('viaplay','viaplay'),
     ('zabava','zabava'),
@@ -18,7 +18,7 @@ APP_CONTENTS_LOC_TYPE = (
     ('itunes','itunes'),
     ('ayyo','ayyo'),
     ('mosfilm','mosfilm'),
-    ('oll','oll'),
+    ('olltv','olltv'),
     ('0','0'),
 )
 
