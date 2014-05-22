@@ -15,6 +15,7 @@ class PlayfamilyParser(object):
             d['price'] = data[0]
             d['price_type'] = 0
             d['url_view'] = form_url_from_name(film.name_orig)
+            d['type']='playfamily'
             yield d
 
         if html.page_type == 'search_page':
