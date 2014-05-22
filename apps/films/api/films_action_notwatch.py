@@ -44,7 +44,7 @@ class ActNotwatchFilmView(APIView):
         not_watch = APP_USERFILM_STATUS_NOT_WATCH
         filter = {'user': request.user,
                   'film': o_film}
-        obj_val = json.dumps({'id': o_film.pk, 'name': o_film.name})
+        obj_val = json.dumps({'id': o_film.id, 'name': o_film.name})
 
         # Устанавливаем подписку
         try:
@@ -71,7 +71,7 @@ class ActNotwatchFilmView(APIView):
         # Init data
         filter = {'user': request.user.pk,
                   'film': o_film.pk}
-        obj_val = json.dumps({'id': o_film.pk, 'name': o_film.name})
+        obj_val = json.dumps({'id': o_film.id, 'name': o_film.name})
         # Удалим подписку
         UsersFilms.objects.filter(**filter).update(status=APP_USERFILM_STATUS_UNDEF)
         try:
