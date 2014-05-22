@@ -247,6 +247,10 @@
                 var cb, _i, _len, _ref;
                 if (xhr.status === 200 && xhr.responseJSON && xhr.responseJSON.session_token) {
                   _this.session_token = xhr.responseJSON.session_token;
+                  $.cookie("x-session", _this.session_token, {
+                    secure: true,
+                    path: "/"
+                  });
                   _ref = _this._session_callback_queue;
                   for (_i = 0, _len = _ref.length; _i < _len; _i++) {
                     cb = _ref[_i];
