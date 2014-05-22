@@ -15,8 +15,8 @@ class Feed(models.Model):
     user = models.ForeignKey(User, verbose_name="Пользователь", null=True, blank=True)
     created = models.DateTimeField(verbose_name="Дата создания", auto_now=True)
     type = models.CharField(verbose_name="Тип связанного объекта", choices=APP_FEED_TYPE, max_length=255, name='type')
-    object = models.TextField(verbose_name="Связанный объект", name='object')
-    text = jsonfield.JSONField(verbose_name="Текст", null=True, blank=True)
+    object = jsonfield.JSONField(verbose_name="Связанный объект", name='object')
+    text = models.TextField(verbose_name="Текст", null=True, blank=True)
 
 
     def __unicode__(self):
