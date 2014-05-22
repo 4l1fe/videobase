@@ -10,7 +10,7 @@ from apps.films.models import UsersFilms, UsersPersons
 
 from apps.users.models import User, Feed
 from apps.users.api.serializers import vbFeedElement
-from apps.users.constants import APP_USERS_API_DEFAULT_PAGE, APP_USERS_API_DEFAULT_FEED_PER_PAGE
+from apps.users.constants import APP_USERS_API_DEFAULT_PAGE, APP_USERS_API_DEFAULT_PER_PAGE
 
 feed_type_api = ['f', 'u', 'all']
 
@@ -24,7 +24,7 @@ class UsersFeedsView(APIView):
             return Response({'e': e.message}, status=status.HTTP_400_BAD_REQUEST)
 
         page = request.QUERY_PARAMS.get('page', APP_USERS_API_DEFAULT_PAGE)
-        per_page = request.QUERY_PARAMS.get('per_page', APP_USERS_API_DEFAULT_FEED_PER_PAGE)
+        per_page = request.QUERY_PARAMS.get('per_page', APP_USERS_API_DEFAULT_PER_PAGE)
 
         feed_type = request.QUERY_PARAMS.get('type', 'u')
         if not feed_type in feed_type_api:
