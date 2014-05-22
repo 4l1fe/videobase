@@ -23,6 +23,7 @@ v1_api_patterns = patterns('',
     url(r'^v1/users/(?P<user_id>\d+)/films$', UsersFilmsView.as_view(), name='users_films'),
     url(r'^v1/users/(?P<user_id>\d+)/persons$', UsersPersonsView.as_view(), name='users_persons'),
     url(r'^v1/users/(?P<user_id>\d+)/genres$', UsersGenresView.as_view(), name='users_genres'),
+    url(r'^v1/users/(?P<user_id>\d+)/feed$', UsersFeedsView.as_view(), name='users_feeds'),
 )
 
 urlpatterns = format_suffix_patterns(v1_api_patterns, suffix_required=True)
