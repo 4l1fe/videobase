@@ -9,13 +9,13 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
 
-        # Changing field 'Feed.text'
-        db.alter_column('users_feed', 'text', self.gf('jsonfield.fields.JSONField')(null=True))
+        # Changing field 'Feed.object'
+        db.alter_column('users_feed', 'object', self.gf('jsonfield.fields.JSONField')())
 
     def backwards(self, orm):
 
-        # Changing field 'Feed.text'
-        db.alter_column('users_feed', 'text', self.gf('django.db.models.fields.TextField')(null=True))
+        # Changing field 'Feed.object'
+        db.alter_column('users_feed', 'object', self.gf('django.db.models.fields.TextField')())
 
     models = {
         u'auth.group': {
@@ -58,8 +58,8 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'Feed'},
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'object': ('django.db.models.fields.TextField', [], {}),
-            'text': ('jsonfield.fields.JSONField', [], {'null': 'True', 'blank': 'True'}),
+            'object': ('jsonfield.fields.JSONField', [], {'default': '{}'}),
+            'text': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'type': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']", 'null': 'True', 'blank': 'True'})
         },
