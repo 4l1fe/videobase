@@ -25,21 +25,21 @@ class Feed(models.Model):
     @classmethod
     def get_feeds_by_user(self, user_id, uf=[], up=[], offset=0, limit=APP_USERS_API_DEFAULT_PER_PAGE, *args, **kwargs):
         try:
-            uf_str = ",".join(str(i) for i in uf)
+            uf_str = '{' + ','.join(str(i) for i in uf) + '}'
         except:
-            uf_str = ""
+            uf_str = '{}'
 
         try:
-            up_str = ",".join(str(i) for i in up)
+            up_str = '{' + ','.join(str(i) for i in up) + '}'
         except:
-            up_str = ""
+            up_str = '{}'
 
         sql = """SELECT * FROM "users_feed"
           WHERE ("users_feed"."user_id"=%s OR "users_feed"."user_id" IS NULL) AND (CASE
             WHEN "users_feed"."user_id" IS NULL AND "users_feed"."type"=%s THEN
-              CAST(coalesce(object->>'id', '0') AS integer) = ANY ('{%s}'::integer[])
+              CAST(coalesce(object->>'id', '0') AS integer) = ANY (%s::integer[])
             WHEN "users_feed"."user_id" IS NULL AND "users_feed"."type"=%s THEN
-              CAST(coalesce(object->>'id', '0') AS integer) IN %s
+              CAST(coalesce(object->>'id', '0') AS integer) = ANY (%s::integer[])
             ELSE true END)
           ORDER BY "users_feed"."created" DESC OFFSET %s LIMIT %s;"""
         params = [user_id, 'film_o', uf_str, 'pers_o', up_str, offset, limit]
