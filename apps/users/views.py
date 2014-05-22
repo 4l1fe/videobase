@@ -1,22 +1,20 @@
 # coding: utf-8
 
-import json
 from pytils import numeral
 from datetime import datetime
 
 from django.db import transaction
-from django.db.models import Q
 from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponse,\
-    HttpResponseBadRequest, HttpResponseServerError
+    HttpResponseBadRequest, HttpResponseServerError, Http404
 from django.middleware.csrf import CSRF_KEY_LENGTH
 from django.utils.crypto import get_random_string
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.views.generic import View
 from django.views.decorators.cache import never_cache
-from django.shortcuts import render_to_response, RequestContext
+from django.shortcuts import render_to_response, redirect, RequestContext
 from django.contrib.auth.forms import AuthenticationForm
 from tasks import send_template_mail
 
@@ -58,6 +56,7 @@ class RegisterUserView(View):
             url = url_with_querystring(reverse('tokenize'), **kw)
             url = "http://{host}{url}".format(host=self.request.get_host(), url=url)
             context = {'user': user, 'redirect_url': url}
+
             try:
                 kw = dict(subject=APP_SUBJECT_TO_CONFIRM_REGISTER,
                           tpl_name='confirmation_register.html',
@@ -67,8 +66,10 @@ class RegisterUserView(View):
             except Exception as e:
                 transaction.rollback()
                 return HttpResponseBadRequest
+
             transaction.commit()
-            return HttpResponseRedirect("/")
+            return redirect('index_view')
+
         else:
             transaction.rollback()
             return HttpResponseBadRequest()
@@ -102,8 +103,11 @@ class TokenizeView(View):
     @never_cache
     def get(self, *args, **kwargs):
         context = RequestContext(self.request)
-        response_dict = {'back_url': self.request.GET['back_url'] if 'back_url' in self.request.GET else '',
-                         'token': ''}
+        response_dict = {
+            'back_url': self.request.GET['back_url'] if 'back_url' in self.request.GET else '',
+            'token': ''
+        }
+
         if 'token' in self.request.GET:
             response_dict['token'] = self.request.GET['token']
         else:
@@ -128,10 +132,12 @@ class UserView(View):
             user_id = self.kwargs['user_id']
         except KeyError:
             return HttpResponseBadRequest()
+
         try:
             user = User.objects.get(pk=user_id)
         except User.DoesNotExist:
             return HttpResponseBadRequest()
+
         try:
             uvb = vbUser(user, extend=True, genres=True, friends=True)
             days = (timezone.now() - uvb.data['regdate']).days
@@ -172,6 +178,7 @@ class UserView(View):
 
 
 class RestorePasswordView(View):
+
     def get(self, *args, **kwargs):
         csrf_token = get_random_string(CSRF_KEY_LENGTH)
         resp_dict = {'csrf_token': csrf_token}
@@ -198,7 +205,7 @@ class RestorePasswordView(View):
         except Exception as e:
             return HttpResponseBadRequest(e)
 
-        return HttpResponseRedirect("/login")
+        return redirect('login_view')
 
 # TODO: DONT DELETE THIS COMMENTS!
 # class ProfileEdit(TemplateView):
@@ -232,35 +239,34 @@ def feed_view(request):
     if request.user.is_authenticated():
         user_id = request.user.id
         period = datetime.date.today() - datetime.timedelta(weeks=2)
-        o_feed = Feed.objects.filter(Q(user=user_id) | Q(user=None), created__gte=period)
 
-        if o_feed.count():
-            # Список подписок на фильм
-            sub_films = UsersFilms.objects.\
-                filter(user=user_id, subscribed=APP_USERFILM_SUBS_TRUE).\
-                values_list('film', flat=True)
+        # Список подписок на фильм
+        sub_films = UsersFilms.objects.\
+            filter(user=user_id, subscribed=APP_USERFILM_SUBS_TRUE).\
+            values_list('film', flat=True)
 
-            # Список подписок на персону
-            sub_persons = UsersPersons.objects.\
-                filter(user=user_id, subscribed=APP_PERSONFILM_SUBS_TRUE).\
-                values_list('person', flat=True)
+        # Список подписок на персону
+        sub_persons = UsersPersons.objects.\
+            filter(user=user_id, subscribed=APP_PERSONFILM_SUBS_TRUE).\
+            values_list('person', flat=True)
 
-            # Собираем лишние записи и удаляем их
-            for index, item in enumerate(o_feed):
-                if item.type == 'film_o':
-                    tmp = json.loads(item.objects)
-                    tmp_value = tmp.get('id')
-
-                    if not tmp_value in sub_films:
-                        del o_feed[index]
-
-                elif item.type == 'pers_o':
-                    tmp = json.loads(item.objects)
-                    tmp_value = tmp.get('id')
-
-                    if not tmp_value in sub_persons:
-                         del o_feed[index]
+        # Выборка фидов
+        sql = """
+          SELECT * FROM "users_feed" WHERE ("users_feed"."user_id"=%s OR "users_feed"."user_id" IS NULL) AND (CASE
+            WHEN "users_feed"."user_id" IS NULL AND "users_feed"."type"=%s THEN
+              CAST(coalesce(our_data->>'id', '0') AS integer) IN %s
+            WHEN "users_feed"."user_id" IS NULL AND "users_feed"."type"=%s THEN
+              CAST(coalesce(our_data->>'id', '0') AS integer) IN %s
+            ELSE true END) ORDER BY "users_feed"."created" DESC OFFSET 0 LIMIT 20;
+        """
+        o_feed = Feed.objects.raw(sql, [user_id, 'film_o', tuple(sub_films), 'pers_o', tuple(sub_persons)])
 
         # Сериализуем
-        o_feed = vbFeedElement(o_feed, many=True).data
+        try:
+            o_feed = vbFeedElement(o_feed, many=True).data
+        except Exception, e:
+            raise Http404
+
         return HttpResponse(render_page('feed', {'feed': o_feed}))
+
+    return redirect('login_view')
