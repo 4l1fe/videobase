@@ -41,8 +41,6 @@ APP_SUBJECT_TO_NOTIFICATION_PERSON = u'Новый фильм у персоны'
 APP_USERS_API_DEFAULT_PER_PAGE = 10
 APP_USERS_API_DEFAULT_PAGE = 1
 
-APP_USERS_API_DEFAULT_FEED_PER_PAGE = 20
-
 #############################################################################################################
 FILM_RATE = 'film-r'
 FILM_SUBSCRIBE = 'film-s'
