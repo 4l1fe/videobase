@@ -163,10 +163,27 @@ class UserView(View):
                 page(APP_USERS_API_DEFAULT_PAGE)
             vbd = vbPerson(page_directors.object_list, many=True)
 
+            user_id = user.id
+
+            # Список подписок на фильм
+            uf = UsersFilms.get_subscribed_films_by_user(user_id, flat=True)
+
+            # Список подписок на персону
+            up = UsersPersons.get_subscribed_persons_by_user(user_id, flat=True)
+
+            # Выборка фидов
+            o_feed = Feed.get_feeds_by_user(user_id, uf=uf, up=up)
+
+            # Сериализуем
+            try:
+                o_feed = vbFeedElement(o_feed, many=True).data
+            except Exception, e:
+                raise Http404
+
             default = {'user': default_user,
                        'films_subscribed': vbf.data,
                        'actors_fav': vba.data,
-                       'feed': [],
+                       'feed': o_feed,
                        'directors_fav': vbd.data,
                        }
 

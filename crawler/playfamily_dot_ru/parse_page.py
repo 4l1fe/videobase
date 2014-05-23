@@ -54,7 +54,18 @@ def parse_page(page_dump):
     Parse page
     '''
 
-    item = [i for i in  microdata.get_items(page_dump) if 'name' in i.props][0]
+    parsed_microdata = microdata.get_items(page_dump)
+    if parsed_microdata:
+        items =[i for i in parsed_microdata  if 'name' in i.props]
+        
+        if items:
+            item = items[0]
+        else:
+            return (None,'')
+            print "No items with property 'name'"
+    else:
+        print "Empty microdata"
+        return (None,'')
     try:
         soup = BeautifulSoup(page_dump)
         price = extract_price(soup)

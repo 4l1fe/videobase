@@ -3,7 +3,8 @@
 from django.contrib.auth.models import User
 from django.db import models
 
-from apps.users.constants import APP_FEED_TYPE, APP_USERS_API_DEFAULT_PER_PAGE
+from apps.users.constants import APP_FEED_TYPE, APP_USERS_API_DEFAULT_PER_PAGE,\
+                                 FILM_O, PERSON_O
 import jsonfield
 
 
@@ -43,7 +44,7 @@ class Feed(models.Model):
               CAST(coalesce(object->>'id', '0') AS integer) = ANY (%s::integer[])
             ELSE true END)
           ORDER BY "users_feed"."created" DESC OFFSET %s LIMIT %s;"""
-        params = [user_id, 'film_o', uf_str, 'pers_o', up_str, offset, limit]
+        params = [user_id, FILM_O, uf_str, PERSON_O, up_str, offset, limit]
 
         return self.objects.raw(sql, params)
 
