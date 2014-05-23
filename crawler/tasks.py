@@ -21,6 +21,8 @@ from crawler.amediateka_ru.loader import Amediateka_robot
 from crawler.viaplay_ru.robot import ViaplayRobot
 from crawler.kinopoisk import parse_from_kinopoisk
 from crawler.kinopoisk_premiere import kinopoisk_news
+from crawler.youtube_trailers import process_film
+from apps.films.models import Films
 
 
 import datetime
@@ -191,6 +193,16 @@ def parse_kinopoisk_news():
     '''
     for name,kinopoisk_id in kinopoisk_news():
         kinopoisk_parse_one_film.apply_async((kinopoisk_id,name))
-        
 
+@app.task(name="find_trailer_for_film")
+def find_trailer(film_id):
+
+    film = Films.objects.get(id =film_id)
+    process_film(film)
+        
+@app.task(name = 'youtube_trailers_all')
+def trailer_commands():
+    for film in Films.objects.all():
+        find_trailer.apply_async((film.id))
+        
         
