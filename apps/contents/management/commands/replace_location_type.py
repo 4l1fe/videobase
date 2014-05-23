@@ -46,7 +46,7 @@ class Command(BaseCommand):
             pattern = urlparse.urlsplit(item.url_view).netloc
 
             for i in loc_type.keys():
-                if i in pattern:
+                if i in pattern.replace('.',''):
                     item.type = i
                     item.save()
 
