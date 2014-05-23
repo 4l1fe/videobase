@@ -279,11 +279,7 @@ def robot_exceptions(func):
             
             robot_try.save()
         except Exception,e:
-            robot_try = RobotsTries(domain=site,
-                                    film=e.film,
-                                    outcome=APP_ROBOTS_TRY_NO_SUCH_PAGE)
-            
-            robot_try.save()
+            print "Unknown exception {}".format(e)
             
     return wrapper
     
