@@ -28,14 +28,14 @@ class Feed(models.Model):
         uf_str = "{}"
         try:
             if len(uf):
-                uf_str = "{%s}" % [",".join(str(i) for i in uf)]
+                uf_str = "{%s}" % ','.join(str(i) for i in uf)
         except:
             pass
 
         up_str = "{}"
         try:
             if len(up):
-                up_str = "{%s}" % [",".join(str(i) for i in up)]
+                up_str = "{%s}" % ','.join(str(i) for i in up)
         except:
             pass
 
@@ -60,7 +60,7 @@ class Feed(models.Model):
         ur_str = "{}"
         try:
             if len(ur):
-                ur_str = "{%s}" % [','.join(str(i) for i in ur)]
+                ur_str = "{%s}" % ','.join(str(i) for i in ur)
         except:
             pass
 
