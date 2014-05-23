@@ -262,11 +262,10 @@ def feed_view(request):
         up = UsersPersons.get_subscribed_persons_by_user(user_id, flat=True)
 
         # Выборка фидов
-
+        o_feed = Feed.get_feeds_by_user(user_id, uf=uf, up=up)
 
         # Сериализуем
         try:
-            o_feed = Feed.get_feeds_by_user(user_id, uf=uf, up=up)
             o_feed = vbFeedElement(o_feed, many=True).data
         except Exception, e:
             raise Http404
