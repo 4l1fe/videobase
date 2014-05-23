@@ -103,7 +103,7 @@ def get_person_films(id_, meth, page=1, per_page=12, type_='a', host=SCHEMA_HOST
     return json_resp
 
 
-def film_unsubscribe(session_token, id_, host=SCHEMA_HOST):
+def film_subscribe(session_token, id_, host=SCHEMA_HOST):
     cl = httplib.HTTPConnection('127.0.0.1:9000')
     headers = {'X-MI-SESSION': session_token}
     cl.request('DELETE', '/api/v1/films/{}/action/subscribe.json'.format(id_), headers=headers)
@@ -111,10 +111,18 @@ def film_unsubscribe(session_token, id_, host=SCHEMA_HOST):
     return resp.read()
 
 
-def person_unsubscribe(session_token, id_, host=SCHEMA_HOST):
-    cl = httplib.HTTPConnection('127.0.0.1:9000')
+def film_notwatch(session_token, method, id_, host=HOST):
+    cl = httplib.HTTPConnection(host)
     headers = {'X-MI-SESSION': session_token}
-    cl.request('DELETE', '/api/v1/persons/{}/action/subscribe.json'.format(id_), headers=headers)
+    cl.request(method, '/api/v1/films/{}/action/notwatch.json'.format(id_), headers=headers)
+    resp = cl.getresponse()
+    return resp.read()
+
+
+def person_subscribe(session_token, method, id_, host=HOST):
+    cl = httplib.HTTPConnection(host)
+    headers = {'X-MI-SESSION': session_token}
+    cl.request(method, '/api/v1/persons/{}/action/subscribe.json'.format(id_), headers=headers)
     resp = cl.getresponse()
     return resp.read()
 
@@ -152,13 +160,19 @@ if __name__ == '__main__':
     # pp(resp)
     # resp = get_person_films(2, 'get')
     # pp(resp)
-    # resp = film_unsubscribe(st, 71)
+    # resp = film_subscribe(st, 71)
     # pp(resp)
-    # resp = person_unsubscribe(st, 6509)
+    resp = film_notwatch(st, 'DELETE', 3998)
+    pp(resp)
+    resp = film_notwatch(st, 'PUT', 3998)
+    pp(resp)
+    # resp = person_subscribe(st, 'DELETE', 6509)
+    # pp(resp)
+    # resp = person_subscribe(st, 'PUT', 6509)
     # pp(resp)
     # resp = film_comment(st, 15155)
     # pp(resp)
     # resp = user_friendship(st, 'DELETE', 8)
     # pp(resp)
-    resp = user_friendship(st, 'GET', 8)
-    pp(resp)
+    # resp = user_friendship(st, 'GET', 8)
+    # pp(resp)
