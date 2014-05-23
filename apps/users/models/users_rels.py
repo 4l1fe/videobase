@@ -3,7 +3,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-from ..constants import *
+from apps.users.constants import APP_USER_REL_TYPE_FRIENDS, APP_USER_REL_TYPES
 
 
 ################################################################################
@@ -16,6 +16,14 @@ class UsersRels(models.Model):
 
     def __unicode__(self):
         return u'[%s] %s - %s' % (self.pk, self.user.username, self.user_rel.username)
+
+    @classmethod
+    def get_all_friends_user(self, user_id, flat=False):
+        result = self.objects.filter(rel_type=APP_USER_REL_TYPE_FRIENDS, user=user_id)
+        if flat:
+            result = result.values_list('user_rel', flat=True)
+
+        return result
 
     class Meta:
         # Имя таблицы в БД
