@@ -41,14 +41,16 @@ class UsersFeedsView(APIView):
 
         if feed_type == 'u':
             uf, up = self.get_users_and_persons_info(user_id)
-            o_feed, count = Feed.get_feeds_by_user(user_id, uf=uf, count=True, up=up, offset=offset, limit=per_page)
+            o_feed, count = Feed.get_feeds_by_user(user_id, uf=uf, up=up, count=True, offset=offset, limit=per_page)
 
         elif feed_type == 'f':
             ur = self.get_rels_info(user_id)
             o_feed, count = Feed.get_feeds_by_user_friends(ur=ur, count=True, offset=offset, limit=per_page)
 
         else:
-            pass
+            uf, up = self.get_users_and_persons_info(user_id)
+            ur = self.get_rels_info(user_id)
+            o_feed, count = Feed.get_feeds_by_user_friends(user_id, uf=uf, up=up, ur=ur, count=True, offset=offset, limit=per_page)
 
         try:
             # Сериализуем данные
@@ -77,9 +79,7 @@ class UsersFeedsView(APIView):
 
     def get_rels_info(self, user_id):
         # Список друзей пользователя
-        ur = UsersRels.get_all_friends_user(user_id, flat=True)
-
-        return ur
+        return UsersRels.get_all_friends_user(user_id, flat=True)
 
     def validation(self, page, per_page):
         try:
