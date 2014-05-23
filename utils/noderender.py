@@ -1,18 +1,17 @@
 # coding: utf-8
-
 import json
-from subprocess import PIPE, Popen
+import zerorpc
 
 from django.core.serializers.json import DjangoJSONEncoder
 
 
 def render_page(page_type, context):
-    encoder = DjangoJSONEncoder
     data = {
         'template': page_type,
         'context': context,
     }
-    render_proc = Popen(['nodejs', 'renderproc.js'], stdin=PIPE, stdout=PIPE)
-
-    html, status = render_proc.communicate(json.dumps(data, cls=encoder))
+    client = zerorpc.Client()
+    client.connect("tcp://127.0.0.1:4242", False)
+    html = client.render(json.dumps(data, cls=DjangoJSONEncoder), async=False)
+    client.close()
     return html
