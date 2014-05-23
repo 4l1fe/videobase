@@ -19,6 +19,15 @@ class UsersFriendshipView(APIView):
         except:
             return ''
 
+    def _update_or_create_feed(self, type_, obj_val):
+        feeds = Feed.objects.filter(user=self.request.user, type=type_).iterator()
+        feeds, objs = zip(*[(f, f.object) for f in feeds])
+        try:
+            f = feeds[objs.index(obj_val)]
+            f.save()
+        except ValueError:
+            Feed.objects.create(user=self.request.user, type=type_, object=obj_val)
+
     def get(self, request, user_id, format=None, *args, **kwargs):
         try:
             user_friend = User.objects.get(pk=user_id)
@@ -39,12 +48,11 @@ class UsersFriendshipView(APIView):
             UsersRels.objects.filter(**ur_fields).update(rel_type=APP_USER_REL_TYPE_FRIENDS)
 
         if UsersRels.objects.filter(**ur_fr_fields).exists():
-            Feed.objects.filter(user=request.user, type='user-a', object=obj_val).delete()
-            f, created = Feed.objects.get_or_create(user=request.user, type='user-f', object=obj_val)
-            if not created: f.save()
+            for f in Feed.objects.filter(user=request.user, type='user-a').iterator():
+                if f.object == obj_val: f.delete()
+            self._update_or_create_feed('user-f', obj_val)
         else:
-            f, created = Feed.objects.get_or_create(user=request.user, type='user-a', object=obj_val)
-            if not created: f.save()
+            self._update_or_create_feed('user-a', obj_val)
 
         return Response(status=status.HTTP_200_OK)
 
@@ -56,7 +64,8 @@ class UsersFriendshipView(APIView):
 
         obj_val = {'id': user_friend.id, 'name': user_friend.username}
         UsersRels.objects.filter(user=request.user, user_rel=user_friend).update(rel_type=APP_USER_REL_TYPE_NONE)
-        Feed.objects.filter(user=request.user, type='user-f', object=obj_val).delete()
-        Feed.objects.filter(user=request.user, type='user-a', object=obj_val).delete()
-
+        for f in Feed.objects.filter(user=request.user, type='user-f').iterator():
+            if f.object == obj_val: f.delete()
+        for f in Feed.objects.filter(user=request.user, type='user-a').iterator():
+            if f.object == obj_val: f.delete()
         return Response(status=status.HTTP_200_OK)
