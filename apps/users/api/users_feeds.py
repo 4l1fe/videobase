@@ -41,18 +41,18 @@ class UsersFeedsView(APIView):
 
         if feed_type == 'u':
             uf, up = self.get_users_and_persons_info(user_id)
-            o_feed, count = Feed.get_feeds_by_user(user_id, uf=uf, up=up, offset=offset, limit=per_page)
+            o_feed, count = Feed.get_feeds_by_user(user_id, uf=uf, count=True, up=up, offset=offset, limit=per_page)
 
         elif feed_type == 'f':
             ur = self.get_rels_info(user_id)
-            o_feed, count = Feed.get_feeds_by_user_friends(ur=ur, offset=offset, limit=per_page)
+            o_feed, count = Feed.get_feeds_by_user_friends(ur=ur, count=True, offset=offset, limit=per_page)
 
         else:
             pass
 
         try:
             # Сериализуем данные
-            serializer = vbFeedElement(o_feed, request=self.request, many=True).data
+            serializer = vbFeedElement(o_feed, many=True).data
 
         except Exception as e:
             return Response({'e': e.message}, status=status.HTTP_400_BAD_REQUEST)
@@ -66,7 +66,7 @@ class UsersFeedsView(APIView):
 
         return Response(result, status=status.HTTP_200_OK)
 
-    def get_users_and_persons_info(user_id):
+    def get_users_and_persons_info(self, user_id):
         # Список подписок на фильм
         uf = UsersFilms.get_subscribed_films_by_user(user_id, flat=True)
 
@@ -75,7 +75,7 @@ class UsersFeedsView(APIView):
 
         return uf, up
 
-    def get_rels_info(user_id):
+    def get_rels_info(self, user_id):
         # Список друзей пользователя
         ur = UsersRels.get_all_friends_user(user_id, flat=True)
 
