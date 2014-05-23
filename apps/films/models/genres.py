@@ -16,6 +16,18 @@ class Genres(models.Model):
     def get_cache_key(self):
         return u'{0}-{1}-{2}'.format(self._meta.app_label, self._meta.db_table, 'all')
 
+    @classmethod
+    def get_all_genres(self, order=False):
+        genres_data = self.objects.all().values('id', 'name')
+
+        if order:
+            genres_data = [
+                {'id': genre['id'], 'name': genre['name'], 'order': i}
+                for i, genre in enumerate(sorted(genres_data, key=lambda g: g['name']))
+            ]
+
+        return genres_data
+
     class Meta(object):
         # Имя таблицы в БД
         db_table = 'genres'

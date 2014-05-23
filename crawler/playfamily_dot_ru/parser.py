@@ -12,10 +12,12 @@ class PlayfamilyParser(object):
             d = dict_gen(film)
 
             data = parse_page(html)
-            d['price'] = data[0]
-            d['price_type'] = 0
-            d['url_view'] = form_url_from_name(film.name_orig)
-            yield d
+            if not data[0] is None:
+                d['price'] = data[0]
+                d['price_type'] = 0
+                d['url_view'] = form_url_from_name(film.name_orig)
+                d['type']='playfamily'
+                yield d
 
         if html.page_type == 'search_page':
 
