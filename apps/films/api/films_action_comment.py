@@ -1,5 +1,4 @@
 # coding: utf-8
-import json
 from django.core.exceptions import ObjectDoesNotExist
 
 from rest_framework.views import APIView
