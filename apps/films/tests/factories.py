@@ -7,6 +7,7 @@ from apps.films.constants import APP_PERSON_ACTOR, APP_USERFILM_STATUS_UNDEF, AP
 from apps.contents.models import Contents, Locations, Comments
 from apps.films.models import Films, PersonsFilms ,UsersFilms, Genres, Persons, FilmExtras, Cities,Countries, \
     PersonsExtras, UsersPersons
+from apps.users.models import Feed
 import factory
 import datetime
 
@@ -43,6 +44,11 @@ class UserFactory(factory.DjangoModelFactory):
     FACTORY_FOR = User
     username = factory.Sequence(lambda q: u'name{0}'.format(q))
     password = factory.Sequence(lambda q: u'pass{0}'.format(q))
+
+
+class FeedFactory(factory.DjangoModelFactory):
+    FACTORY_FOR = Feed
+    user = factory.SubFactory(UserFactory)
 
 
 class ContentFactory(factory.DjangoModelFactory):
