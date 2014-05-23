@@ -9,7 +9,7 @@ class vbFeedElement(serializers.ModelSerializer):
     user = serializers.SerializerMethodField('get_vbUser')
 
     def get_vbUser(self, obj):
-        return vbUser(obj.user)
+        return vbUser(obj.user).data
 
     class Meta:
         model = Feed

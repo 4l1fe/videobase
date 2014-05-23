@@ -1,6 +1,4 @@
 # coding: utf-8
-import json
-
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -8,10 +6,10 @@ from rest_framework.permissions import IsAuthenticated
 
 from apps.films.forms import RatingForm
 from apps.films.models import Films, UsersFilms
-
+from apps.users import Feed
 
 #############################################################################################################
-from apps.users import Feed
+
 
 
 class ActRateFilmView(APIView):
