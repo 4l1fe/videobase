@@ -1,5 +1,5 @@
 #coding: utf-8
-
+import json
 import os
 from django.db import transaction, IntegrityError
 from rest_framework import status
@@ -9,14 +9,16 @@ from rest_framework.authtoken.models import Token
 import videobase.settings as settings
 from apps.films.tests.factories import (UserFactory, GenreFactory, CountriesFactory, PersonFactory,
                                         FilmFactory, ContentFactory,LocationFactory, CommentsFactory,
-                                        FilmsExtrasFactory, UsersFilmsFactory, PersonsFilmFactory)
+                                        FilmsExtrasFactory, UsersFilmsFactory, PersonsFilmFactory, FeedFactory)
 from apps.films.constants import (APP_FILM_SERIAL, APP_PERSON_DIRECTOR, APP_PERSON_ACTOR, APP_PERSON_SCRIPTWRITER,
                                   APP_USERFILM_STATUS_UNDEF, APP_USERFILM_STATUS_NOT_WATCH, APP_USERFILM_STATUS_SUBS,
                                   APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER, APP_FILM_TYPE_ADDITIONAL_MATERIAL_TRAILER,
                                   APP_USERFILM_SUBS_TRUE, APP_USERFILM_SUBS_FALSE, APP_USERFILM_STATUS)
 from apps.users.models.api_session import SessionToken, UsersApiSessions
+from apps.users.constants import FILM_SUBSCRIBE, FILM_COMMENT, FILM_NOTWATCH, FILM_RATE
 from apps.films.models import UsersFilms
 from apps.contents.models import Comments
+from apps.users.models import Feed
 
 
 class FilmsTestCase(APITestCase):
@@ -70,6 +72,12 @@ class FilmsTestCase(APITestCase):
         s_token = SessionToken.objects.create(user=self.user)
         UsersApiSessions.objects.create(token=s_token)
         self.headers = s_token.key
+
+    def feed_assert(self, obj_val, f_type):
+        feed = Feed.objects.last()
+        self.assertEqual(feed.user, self.user)
+        self.assertEqual(feed.type, f_type)
+        self.assertEqual(feed.object, obj_val)
 
     def persons_assert(self, response_person, person):
         if person.city is None:
@@ -349,6 +357,12 @@ class FilmsTestCase(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         comment = Comments.objects.all().last()
+        feed = Feed.objects.last()
+        obj_val = json.dumps({'id': comment.id, 'text': data['text'],
+                      'film': {'id': film.id, 'name': film.name}})
+        self.assertEqual(feed.user, self.user)
+        self.assertEqual(feed.type, FILM_COMMENT)
+        self.assertEqual(feed.object, obj_val)
         self.assertEqual(comment.user, self.user)
         self.assertEqual(comment.content.film, film)
         self.assertEqual(comment.text, data['text'])
@@ -376,7 +390,9 @@ class FilmsTestCase(APITestCase):
         film = self.films[0]
         response = self.client.get(reverse('act_film_notwatch_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_X_MI_SESSION=self.headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        obj_val = json.dumps({'id': film.id, 'name': film.name})
         user_film = UsersFilms.objects.all().last()
+        self.feed_assert(obj_val, FILM_NOTWATCH)
         self.assertEqual(user_film.film, film)
         self.assertEqual(user_film.user, self.user)
         self.assertEqual(user_film.status, APP_USERFILM_STATUS_NOT_WATCH)
@@ -386,7 +402,9 @@ class FilmsTestCase(APITestCase):
         with self.assertRaises(IntegrityError):
             response = self.client.get(reverse('act_film_notwatch_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_X_MI_SESSION=self.headers)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
+            obj_val = json.dumps({'id': film.id, 'name': film.name})
             user_film = UsersFilms.objects.all().last()
+            self.feed_assert(obj_val, FILM_NOTWATCH)
             self.assertEqual(user_film.film, film)
             self.assertEqual(user_film.user, self.user)
             self.assertEqual(user_film.status, APP_USERFILM_STATUS_NOT_WATCH)
@@ -402,10 +420,13 @@ class FilmsTestCase(APITestCase):
 
     def test_api_action_not_watch_delete_ok(self):
         film = self.films[0]
+        obj_val = json.dumps({'id': film.id, 'name': film.name})
         UsersFilmsFactory.create(user=self.user, film=film, status=APP_USERFILM_STATUS_NOT_WATCH)
+        FeedFactory.create(user=self.user, type=FILM_NOTWATCH, object=obj_val)
         response = self.client.delete(reverse('act_film_notwatch_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_X_MI_SESSION=self.headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         user_film = UsersFilms.objects.all().last()
+        self.assertEqual(Feed.objects.all().exists(), False)
         self.assertEqual(user_film.film, film)
         self.assertEqual(user_film.user, self.user)
         self.assertEqual(user_film.status, APP_USERFILM_STATUS_UNDEF)
@@ -470,8 +491,10 @@ class FilmsTestCase(APITestCase):
     def test_api_action_rate_add(self):
         film = self.films[0]
         data = {'rating': 10}
+        obj_valr = json.dumps({'id': film.id, 'name': film.name, 'rating': float(data['rating'])})
         response = self.client.put(reverse('act_film_rate_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_X_MI_SESSION=self.headers, data=data)
         users_films = UsersFilms.objects.all().last()
+        self.feed_assert(obj_valr, FILM_RATE)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(users_films.film, film)
         self.assertEqual(users_films.user, self.user)
@@ -483,10 +506,12 @@ class FilmsTestCase(APITestCase):
         with self.assertRaises(IntegrityError):
             response = self.client.put(reverse('act_film_rate_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_X_MI_SESSION=self.headers, data=data)
             users_films = UsersFilms.objects.all().last()
+            obj_valr = json.dumps({'id': film.id, 'name': film.name, 'rating': float(data['rating'])})
+            self.feed_assert(obj_valr, FILM_RATE)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self.assertEqual(users_films.film, film)
             self.assertEqual(users_films.user, self.user)
-            self.assertEqual(users_films.rating, data['rating'])
+            self.assertEqual(users_films.rating, float(data['rating']))
             with transaction.atomic():
                 UsersFilmsFactory.create(user=self.user, film=film)
 
@@ -504,10 +529,13 @@ class FilmsTestCase(APITestCase):
 
     def test_api_action_rate_delete(self):
         film = self.films[0]
+        obj_valr = json.dumps({'id': film.id, 'name': film.name, 'rating': 10})
         UsersFilmsFactory.create(user=self.user, film=film, rating=10)
+        FeedFactory.create(user=self.user, type=FILM_RATE, object=obj_valr)
         response = self.client.delete(reverse('act_film_rate_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_X_MI_SESSION=self.headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         users_films = UsersFilms.objects.all().last()
+        self.assertEqual(Feed.objects.all().exists(), False)
         self.assertEqual(users_films.film, film)
         self.assertEqual(users_films.user, self.user)
         self.assertEqual(users_films.rating, None)
@@ -526,9 +554,11 @@ class FilmsTestCase(APITestCase):
 
     def add_subscribe_ok(self, film):
         film = film
+        obj_val = json.dumps(dict(id=film.id, name=film.name))
         response = self.client.get(reverse('act_film_subscribe_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_X_MI_SESSION=self.headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         users_films = UsersFilms.objects.all().last()
+        self.feed_assert(obj_val, FILM_SUBSCRIBE)
         self.assertEqual(users_films.film, film)
         self.assertEqual(users_films.user, self.user)
         self.assertEqual(users_films.subscribed, APP_USERFILM_SUBS_TRUE)
@@ -541,10 +571,13 @@ class FilmsTestCase(APITestCase):
 
     def subscribe_update(self, film):
         film = film
+        obj_val = json.dumps(dict(id=film.id, name=film.name))
         with self.assertRaises(IntegrityError):
             response = self.client.get(reverse('act_film_subscribe_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_X_MI_SESSION=self.headers)
             users_films = UsersFilms.objects.all().last()
-            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            feed = Feed.objects.last()
+            self.assertEqual(feed.user, self.user)
+            self.feed_assert(obj_val, FILM_SUBSCRIBE)
             self.assertEqual(users_films.film, film)
             self.assertEqual(users_films.user, self.user)
             self.assertEqual(users_films.subscribed, APP_USERFILM_SUBS_TRUE)
@@ -583,12 +616,14 @@ class FilmsTestCase(APITestCase):
     def subscribe_delete_ok(self, film):
         film = film
         UsersFilmsFactory.create(user=self.user, film=film, subscribed=APP_USERFILM_SUBS_TRUE)
-
+        obj_val = json.dumps(dict(id=film.id, name=film.name))
+        FeedFactory.create(user=self.user, type=FILM_SUBSCRIBE, object=obj_val)
         response = self.client.delete(
             reverse('act_film_subscribe_view', kwargs={'film_id': film.id, 'format': 'json'}),
             HTTP_X_MI_SESSION=self.headers
         )
         users_films = UsersFilms.objects.all().last()
+        self.assertEqual(Feed.objects.all().exists(), False)
         self.assertEqual(users_films.film, film)
         self.assertEqual(users_films.user, self.user)
         self.assertEqual(users_films.subscribed, APP_USERFILM_SUBS_FALSE)
