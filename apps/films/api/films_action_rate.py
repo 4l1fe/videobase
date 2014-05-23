@@ -1,6 +1,4 @@
 # coding: utf-8
-import json
-
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -8,10 +6,10 @@ from rest_framework.permissions import IsAuthenticated
 
 from apps.films.forms import RatingForm
 from apps.films.models import Films, UsersFilms
-
+from apps.users import Feed
 
 #############################################################################################################
-from apps.users import Feed
+
 
 
 class ActRateFilmView(APIView):
@@ -46,8 +44,8 @@ class ActRateFilmView(APIView):
             rating = form.cleaned_data['rating']
             filter_ = {'user': request.user,
                       'film': o_film}
-            obj_val = json.dumps({'id': o_film.id, 'name': o_film.name})
-            obj_valr = json.dumps({'id': o_film.id, 'name': o_film.name, 'rating': rating})
+            obj_val = {'id': o_film.id, 'name': o_film.name}
+            obj_valr = {'id': o_film.id, 'name': o_film.name, 'rating': rating}
 
             # Устанавливаем оценку
             try:
@@ -57,7 +55,7 @@ class ActRateFilmView(APIView):
             except Exception as e:
                 try:
                     UsersFilms.objects.filter(**filter_).update(rating=rating)
-                    Feed.objects.filter(user=request.user, type='film-r', object__contains=obj_val).update(rating=rating)
+                    Feed.objects.filter(user=request.user, type='film-r', object__contains=obj_val).update(object=obj_valr)
                 except Exception as e:
                     return Response({'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -73,13 +71,10 @@ class ActRateFilmView(APIView):
         # Init data
         filter_ = {'user': request.user.pk,
                   'film': o_film.pk}
-        obj_val = json.dumps({'id': o_film.id, 'name': o_film.name})
+        obj_val = {'id': o_film.id, 'name': o_film.name}
 
         # Удалим оценку
         UsersFilms.objects.filter(**filter_).update(rating=None)
-        try:
-            Feed.objects.get(user=request.user, type='film-r', object__contains=obj_val).delete()
-        except Feed.DoesNotExist:
-            pass
+        Feed.objects.filter(user=request.user, type='film-r', object__contains=obj_val).delete()
 
         return Response(status=status.HTTP_200_OK)

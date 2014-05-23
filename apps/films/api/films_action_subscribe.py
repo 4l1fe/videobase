@@ -1,6 +1,4 @@
 # coding: utf-8
-import json
-
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -53,7 +51,7 @@ class ActSubscribeFilmView(APIView):
             'user': request.user,
             'film': o_film,
         }
-        obj_val = json.dumps(dict(id=o_film.id, name=o_film.name))
+        obj_val = {'id': o_film.id, 'name': o_film.name}
 
         # Устанавливаем подписку
         try:
@@ -81,18 +79,13 @@ class ActSubscribeFilmView(APIView):
 
         # Init data
         subscribed = APP_USERFILM_SUBS_FALSE
-        filter = {
-            'user': request.user.pk,
-            'film': o_film.pk,
-        }
-        obj_val = json.dumps(dict(id=o_film.id, name=o_film.name))
+        filter_ = {'user': request.user.pk,
+                   'film': o_film.pk}
+        obj_val = {'id': o_film.id, 'name': o_film.name}
 
         # Удалим подписку
-        UsersFilms.objects.filter(**filter).update(subscribed=subscribed)
-        try:
-            Feed.objects.get(user=request.user, type='film-s', object=obj_val).delete()
-        except Feed.DoesNotExist as e:  # если записи события вдруг нету, нет смысла что-либо делать.
-            pass
+        UsersFilms.objects.filter(**filter_).update(subscribed=subscribed)
+        Feed.objects.filter(user=request.user, type='film-s', object=obj_val).delete()
 
         return Response(status=status.HTTP_200_OK)
 

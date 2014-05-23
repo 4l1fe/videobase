@@ -1,5 +1,4 @@
 # coding: utf-8
-import json
 from django.core.exceptions import ObjectDoesNotExist
 
 from rest_framework.views import APIView
@@ -47,13 +46,13 @@ class ActCommentFilmView(APIView):
                 return o_content
 
             # Init data
-            filter = {'user': request.user,
+            filter_ = {'user': request.user,
                       'text': form.cleaned_data['text'],
                       'content': o_content}
 
-            o_com = Comments.objects.create(**filter)
-            obj_val = json.dumps({'id': o_com.id, 'text': o_com.text,
-                                  'film': {'id': o_content.film_id, 'name': o_content.name}})
+            o_com = Comments.objects.create(**filter_)
+            obj_val = {'id': o_com.id, 'text': o_com.text,
+                       'film': {'id': o_content.film_id, 'name': o_content.name}}
             Feed.objects.create(user=request.user, type='film-c', object=obj_val)  # под каждый комент новое событие.
             return Response(status=status.HTTP_200_OK)
 
