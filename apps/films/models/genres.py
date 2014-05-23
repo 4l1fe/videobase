@@ -25,10 +25,6 @@ class Genres(models.Model):
                 {'id': genre['id'], 'name': genre['name'], 'order': i}
                 for i, genre in enumerate(sorted(genres_data, key=lambda g: g['name']))
             ]
-        else:
-            genres_data = [
-                {'id': genre['id'], 'name': genre['name']} for genre in genres_data
-            ]
 
         return genres_data
 
