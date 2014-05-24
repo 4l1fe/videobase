@@ -1,7 +1,5 @@
 # coding: utf-8
 
-from django.core.paginator import Paginator
-
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -50,7 +48,8 @@ class UsersFeedsView(APIView):
         else:
             uf, up = self.get_users_and_persons_info(user_id)
             ur = self.get_rels_info(user_id)
-            o_feed, count = Feed.get_feeds_by_user_friends(user_id, uf=uf, up=up, ur=ur, count=True, offset=offset, limit=per_page)
+            o_feed, count = Feed.get_feeds_by_user_all(user_id, uf=uf, up=up, ur=ur,
+                                                        count=True, offset=offset, limit=per_page)
 
         try:
             # Сериализуем данные
@@ -95,7 +94,7 @@ class UsersFeedsView(APIView):
         except (TypeError, ValueError):
             return Exception('That per page is not an integer')
 
-        if per_page > APP_USERS_API_DEFAULT_PER_PAGE:
+        if 0 < per_page > APP_USERS_API_DEFAULT_PER_PAGE:
             return Exception('That per page is more than default value')
 
         return page, per_page
