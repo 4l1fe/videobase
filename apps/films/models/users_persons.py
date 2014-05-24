@@ -17,7 +17,7 @@ class UsersPersons(models.Model):
 
 
     def __unicode__(self):
-        return u'[%s %s]' % (self.user, self.person)
+        return u'[{0} {1}]'.format(self.user, self.person)
 
     @classmethod
     def get_subscribed_persons_by_user(self, user_id, flat=False):
