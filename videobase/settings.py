@@ -292,6 +292,11 @@ CELERYBEAT_SCHEDULE = {
         'task': 'kinopoisk_news',
         'schedule': timedelta(days=3),
     },
+
+    'youtube_trailers':{
+        'task': 'youtube_trailers_all',
+        'schedule': timedelta(days=1),
+    }
 }
 
 CELERY_TIMEZONE = 'UTC'

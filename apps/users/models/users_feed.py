@@ -24,29 +24,71 @@ class Feed(models.Model):
         return u"[{id}]{type}".format(id=self.pk, type=self.get_type_display())
 
 
+    def list_to_str(self, arr):
+        temp_str = "{}"
+        try:
+            if len(arr):
+                temp_str = "{%s}" % ','.join(str(i) for i in arr)
+        except:
+            pass
+
+        return temp_str
+
     @classmethod
-    def get_feeds_by_user(self, user_id, uf=[], up=[], offset=0, limit=APP_USERS_API_DEFAULT_PER_PAGE, *args, **kwargs):
-        try:
-            uf_str = '{' + ','.join(str(i) for i in uf) + '}'
-        except:
-            uf_str = '{}'
-
-        try:
-            up_str = '{' + ','.join(str(i) for i in up) + '}'
-        except:
-            up_str = '{}'
-
-        sql = """SELECT * FROM "users_feed"
-          WHERE ("users_feed"."user_id"=%s OR "users_feed"."user_id" IS NULL) AND (CASE
+    def get_feeds_by_user(self, user_id, uf=[], up=[], offset=0, limit=APP_USERS_API_DEFAULT_PER_PAGE, count=False, *args, **kwargs):
+        sql = """("users_feed"."user_id"=%s OR "users_feed"."user_id" IS NULL) AND (CASE
             WHEN "users_feed"."user_id" IS NULL AND "users_feed"."type"=%s THEN
-              CAST(coalesce(object->>'id', '0') AS integer) = ANY (%s::integer[])
+              CAST(coalesce(object->>'id', '0') AS integer)=ANY(%s::integer[])
             WHEN "users_feed"."user_id" IS NULL AND "users_feed"."type"=%s THEN
-              CAST(coalesce(object->>'id', '0') AS integer) = ANY (%s::integer[])
+              CAST(coalesce(object->>'id', '0') AS integer)=ANY(%s::integer[])
+            ELSE true END)"""
+
+        o_feed = self.objects.extra(
+            where=[sql],
+            params=[user_id, FILM_O, self.list_to_str(uf), PERSON_O, self.list_to_str(up)]
+        )
+        result = o_feed.order_by('-created')[offset:(limit + offset)]
+
+        if count:
+            return result, o_feed.count()
+
+        return result
+
+    @classmethod
+    def get_feeds_by_user_friends(self, ur=[], count=False, offset=0, limit=APP_USERS_API_DEFAULT_PER_PAGE, *args, **kwargs):
+        o_feed = self.objects.extra(
+            where=['"users_feed"."user_id"=ANY(%s::integer[])'],
+            params=[self.list_to_str(ur)]
+        )
+        result = o_feed.order_by('-created')[offset:(limit + offset)]
+
+        if count:
+            return result, o_feed.count()
+
+        return result
+
+    @classmethod
+    def get_feeds_by_user_all(self, user_id, uf=[], up=[], ur=[], count=False, offset=0, limit=APP_USERS_API_DEFAULT_PER_PAGE, *args, **kwargs):
+        sql = """("users_feed"."user_id"=ANY(%s::integer[]) OR "users_feed"."user_id" IS NULL) AND (CASE
+            WHEN "users_feed"."user_id" IS NULL AND "users_feed"."type"=%s THEN
+              CAST(coalesce(object->>'id', '0') AS integer)=ANY(%s::integer[])
+            WHEN "users_feed"."user_id" IS NULL AND "users_feed"."type"=%s THEN
+              CAST(coalesce(object->>'id', '0') AS integer)=ANY(%s::integer[])
             ELSE true END)
-          ORDER BY "users_feed"."created" DESC OFFSET %s LIMIT %s;"""
-        params = [user_id, FILM_O, uf_str, PERSON_O, up_str, offset, limit]
+        """
 
-        return self.objects.raw(sql, params)
+        o_feed = self.objects.extra(
+            where=[sql],
+            params=[self.list_to_str(ur + [user_id]), FILM_O, self.list_to_str(uf), PERSON_O, self.list_to_str(up)]
+        )
+
+        result = o_feed.order_by('-created')[offset:(limit + offset)]
+
+        if count:
+            return result, o_feed.count()
+
+        return result
+
 
     class Meta:
         db_table = 'users_feed'
