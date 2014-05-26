@@ -25,5 +25,5 @@ def poster_robot_wrapper(film_id):
             set_kinopoisk_poster(film)
         else:
             print "Kinopoisk id not defined for {}".format(film)
-    except Films.DoesNotExist():
+    except Films.DoesNotExist:
         print "Couldn't find that film"
