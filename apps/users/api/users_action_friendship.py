@@ -46,7 +46,6 @@ class UsersFriendshipView(APIView):
             ur.save()
         except IntegrityError:
             UsersRels.objects.filter(**ur_fields).update(rel_type=APP_USER_REL_TYPE_FRIENDS)
-
         if UsersRels.objects.filter(**ur_fr_fields).exists():
             for f in Feed.objects.filter(user=request.user, type='user-a').iterator():
                 if f.object == obj_val: f.delete()
