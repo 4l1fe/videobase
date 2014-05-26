@@ -7,7 +7,7 @@ from apps.contents.models import Locations
 from apps.users.models import Feed
 from apps.users.constants import FILM_O, PERSON_O
 
-from apps.films.models import Persons
+from apps.films.models import Persons, FilmExtras
 
 __all__ = ['post_save_handler']
 
@@ -20,8 +20,16 @@ def post_save_handler(sender, **kwargs):
 
             # Событие появление подписки на фильм
             film = location.content.film
+
+            # Постер
+            poster = ''
+            for item in FilmExtras.get_additional_material_by_film(film.id):
+                if not item.photo is None and item.photo:
+                    poster = item.get_photo_url()
+                    break
+
             film_obj = {
-                'id': film.id, 'name': film.name, 'poster': '',
+                'id': film.id, 'name': film.name, 'poster': poster,
                 'location': {
                     'id': location.id, 'name': location.type,
                     'price': location.price, 'price_type': location.price_type

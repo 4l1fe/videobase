@@ -54,9 +54,9 @@ class ActRateFilmView(APIView):
             except Exception as e:
                 try:
                     UsersFilms.objects.filter(**filter_).update(rating=rating)
-                    for f in Feed.objects.filter(user=request.user, type='film-r').iterator():  # До этого момента Feed
-                        if f.object == obj_val: f.delete()                                      # с типом film-nw может и не быть
-                    Feed.objects.create(user=request.user, type='film-r', object=obj_val)       # значит нечего обновлять
+                    for f in Feed.objects.filter(user=request.user, type='film-r').iterator():   # До этого момента Feed
+                        if all(item in f.object.items() for item in obj_val.items()): f.delete() # с типом film-nw может и не быть
+                    Feed.objects.create(user=request.user, type='film-r', object=obj_valr)       # значит нечего обновлять
                 except Exception as e:
                     return Response({'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
 
