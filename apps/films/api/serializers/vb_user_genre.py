@@ -19,7 +19,7 @@ class vbUserGenre(serializers.ModelSerializer):
         return UsersFilms.objects.filter(user=self.user).exclude(status=APP_USERFILM_STATUS_NOT_WATCH).count()
 
     def calc_percent(self, obj):
-        genre_films_count = Films.objects.filter(users_films__user=self.user, genres=obj).exclude(users_films__status=APP_USERFILM_STATUS_NOT_WATCH).count()
+        genre_films_count = Films.objects.filter(uf_films_rel__user=self.user, genres=obj).exclude(uf_films_rel__status=APP_USERFILM_STATUS_NOT_WATCH).count()
         return (float(genre_films_count) / float(self.user_films_count)) * 100
 
     class Meta:
