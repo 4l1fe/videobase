@@ -28,3 +28,5 @@ class CommentsAdmin(admin.ModelAdmin):
 admin.site.register(Contents, ContentsAdmin)
 admin.site.register(Locations, LocationsAdmin)
 admin.site.register(Comments, CommentsAdmin)
+admin.site.register(About)
+admin.site.register(Legal)
