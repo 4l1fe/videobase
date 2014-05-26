@@ -237,7 +237,7 @@ def playlist_view(request, film_id=None, *args, **kwargs):
 
     film_id = int(film_id)
     if request.user.is_authenticated():
-        playlist = {'items': [], 'next': [], 'previous': [], 'total_cnt': 0}
+        playlist = {'items': [], 'next': [], 'previous': [], 'total_cnt': 0, 'id': 0}
         playlist_data = film_model.Films.objects.\
             filter(uf_films_rel__user=request.user.id, uf_films_rel__subscribed=APP_USERFILM_SUBS_TRUE).\
             order_by('uf_films_rel__created')
@@ -261,6 +261,7 @@ def playlist_view(request, film_id=None, *args, **kwargs):
 
         playlist['items'] = vbFilm(playlist_data, many=True).data
         playlist['total_cnt'] = len(playlist_data)
+        playlist['id'] = film_id
 
         return HttpResponse(render_page('playlist', {'playlist': playlist, 'film': film_data}))
     return redirect('login_view')
