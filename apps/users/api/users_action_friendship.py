@@ -20,8 +20,9 @@ class UsersFriendshipView(APIView):
             return ''
 
     def _update_or_create_feed(self, type_, obj_val):
-        feeds = Feed.objects.filter(user=self.request.user, type=type_).iterator()
-        feeds, objs = zip(*[(f, f.object) for f in feeds])
+        ffeeds = Feed.objects.filter(user=self.request.user, type=type_)
+        feeds = [f for f in ffeeds]
+        objs = [f.object for f in ffeeds]
         try:
             f = feeds[objs.index(obj_val)]
             f.save()
@@ -40,7 +41,6 @@ class UsersFriendshipView(APIView):
         obj_val = {'id': user_friend.id, 'name': user_friend.username, 'avatar': avatar_url}
 
         try:
-            UsersRels.objects.create(**ur_fields)
             ur = UsersRels(**ur_fields)
             ur.rel_type = APP_USER_REL_TYPE_FRIENDS
             ur.save()
