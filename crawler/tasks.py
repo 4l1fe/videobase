@@ -203,6 +203,6 @@ def find_trailer(film_id):
 @app.task(name = 'youtube_trailers_all')
 def trailer_commands():
     for film in Films.objects.all():
-        find_trailer.apply_async((film.id))
+        find_trailer.apply_async((film.id,))
         
         
