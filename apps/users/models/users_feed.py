@@ -23,8 +23,8 @@ class Feed(models.Model):
     def __unicode__(self):
         return u"[{id}]{type}".format(id=self.pk, type=self.get_type_display())
 
-
-    def list_to_str(self, arr):
+    @classmethod
+    def list_to_str(cls, arr):
         temp_str = "{}"
         try:
             if len(arr):
@@ -35,7 +35,7 @@ class Feed(models.Model):
         return temp_str
 
     @classmethod
-    def get_feeds_by_user(self, user_id, uf=[], up=[], offset=0, limit=APP_USERS_API_DEFAULT_PER_PAGE, count=False, *args, **kwargs):
+    def get_feeds_by_user(cls, user_id, uf=[], up=[], offset=0, limit=APP_USERS_API_DEFAULT_PER_PAGE, count=False, *args, **kwargs):
         sql = """("users_feed"."user_id"=%s OR "users_feed"."user_id" IS NULL) AND (CASE
             WHEN "users_feed"."user_id" IS NULL AND "users_feed"."type"=%s THEN
               CAST(coalesce(object->>'id', '0') AS integer)=ANY(%s::integer[])
@@ -43,9 +43,9 @@ class Feed(models.Model):
               CAST(coalesce(object->>'id', '0') AS integer)=ANY(%s::integer[])
             ELSE true END)"""
 
-        o_feed = self.objects.extra(
+        o_feed = cls.objects.extra(
             where=[sql],
-            params=[user_id, FILM_O, self.list_to_str(uf), PERSON_O, self.list_to_str(up)]
+            params=[user_id, FILM_O, cls.list_to_str(uf), PERSON_O, cls.list_to_str(up)]
         )
         result = o_feed.order_by('-created')[offset:(limit + offset)]
 
