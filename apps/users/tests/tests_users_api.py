@@ -103,7 +103,7 @@ class APIUsersGenresTestCase(APITestCase):
 
     def test_api_users_genres_200_get(self):
         response = self.client.get(reverse(self.url_name, kwargs=self.kwargs))
-        genres = Genres.objects.filter(genres__users_films__user=self.user).distinct()
+        genres = Genres.objects.filter(genres__uf_films_rel__user=self.user).distinct()
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         for i in range(len(genres)):
@@ -242,7 +242,7 @@ class APIUsersTestCase(APITestCase):
         pic = UsersPics.objects.get(pk=self.profile.userpic_id)
         self.assertEqual(response.data['avatar'], pic.image.storage.url(pic.image.name))
 
-        genres = Genres.objects.filter(genres__users_films__user=self.user)
+        genres = Genres.objects.filter(genres__uf_films_rel__user=self.user)
         for i in range(len(genres)):
             self.assertEqual(response.data['genres'][i]['id'], genres[i].pk)
             self.assertEqual(response.data['genres'][i]['name'], genres[i].name)
@@ -302,7 +302,7 @@ class APIUsersTestCase(APITestCase):
         self.assertEqual(response.data['relation'], rel)
         self.assertEqual(response.data['relation'], APP_USER_REL_TYPE_NONE)
 
-        genres = Genres.objects.filter(genres__users_films__user=self.user)
+        genres = Genres.objects.filter(genres__uf_films_rel__user=self.user)
         for i in range(len(genres)):
             self.assertEqual(response.data['genres'][i]['id'], genres[i].pk)
             self.assertEqual(response.data['genres'][i]['name'], genres[i].name)
@@ -417,8 +417,8 @@ class APIUsersPersonsTestCase(APITestCase):
     def test_api_users_genres_200_post(self):
         response = self.client.get(reverse(self.url_name, kwargs=self.kwargs))
         ftype = persons_type['all']
-        persons = Persons.objects.filter(users_persons__user=self.user,
-                                         person_film_rel__p_type__in=ftype)
+        persons = Persons.objects.filter(up_persons_rel__user=self.user,
+                                         pf_persons_rel__p_type__in=ftype)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         for i in range(len(persons)):
             sub = UsersPersons.objects.get(person=persons[i], user=self.user).subscribed
@@ -434,7 +434,7 @@ class APIUsersPersonsTestCase(APITestCase):
         response = self.client.get(reverse(self.url_name, kwargs=self.kwargs),
                                    data={'type': 'a'})
         ftype = persons_type['a']
-        persons = Persons.objects.filter(users_persons__user=self.user, person_film_rel__p_type__in=ftype)
+        persons = Persons.objects.filter(up_persons_rel__user=self.user, person_film_rel__p_type__in=ftype)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         for i in range(len(persons)):
             sub = UsersPersons.objects.get(person=persons[i], user=self.user).subscribed
@@ -479,8 +479,8 @@ class APIUsersFilmsTestCase(APITestCase):
         response = self.client.get(reverse(self.url_name, kwargs=self.kwargs),
                                    data={'type': 's'})
         ftype = [APP_FILM_SERIAL]
-        films = Films.objects.filter(users_films__user=self.user, type__in=ftype,
-                                     users_films__status=APP_USERFILM_STATUS_SUBS)
+        films = Films.objects.filter(uf_films_rel__user=self.user, type__in=ftype,
+                                     uf_films_rel__status=APP_USERFILM_STATUS_SUBS)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         for i in range(len(films)):
             loc = Locations.objects.get(content__film=films[i])
@@ -505,8 +505,8 @@ class APIUsersFilmsTestCase(APITestCase):
     def test_api_users_films_200_serial_get(self):
         response = self.client.get(reverse(self.url_name, kwargs=self.kwargs))
         ftype = [APP_FILM_SERIAL, APP_FILM_FULL_FILM]
-        films = Films.objects.filter(users_films__user=self.user, type__in=ftype,
-                                     users_films__status=APP_USERFILM_STATUS_SUBS)
+        films = Films.objects.filter(uf_films_rel__user=self.user, type__in=ftype,
+                                     uf_films_rel__status=APP_USERFILM_STATUS_SUBS)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         for i in range(len(films)):
             loc = Locations.objects.get(content__film=films[i])
@@ -530,9 +530,9 @@ class APIUsersFilmsTestCase(APITestCase):
 
     def test_api_users_films_200_full_film_get(self):
         response = self.client.get(reverse(self.url_name, kwargs=self.kwargs), data={'type': 'f'})
-        films = Films.objects.filter(users_films__user=self.user,
+        films = Films.objects.filter(uf_films_rel__user=self.user,
                                      type__in=[APP_FILM_FULL_FILM],
-                                     users_films__status=APP_USERFILM_STATUS_SUBS)
+                                     uf_films_rel__status=APP_USERFILM_STATUS_SUBS)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         for i in range(len(films)):
