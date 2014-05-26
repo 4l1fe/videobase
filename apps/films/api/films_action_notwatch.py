@@ -52,6 +52,9 @@ class ActNotwatchFilmView(APIView):
         except Exception as e:
             try:
                 UsersFilms.objects.filter(**filter_).update(status=not_watch)
+                for f in Feed.objects.filter(user=request.user, type='film-nw').iterator(): # До этого момента Feed
+                    if f.object == obj_val: f.delete()                                      # с типом film-nw может и не быть
+                Feed.objects.create(user=request.user, type='film-nw', object=obj_val)      # значит нечего обновлять
             except Exception as e:
                 return Response({'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
 

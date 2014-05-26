@@ -12,6 +12,7 @@ from apps.users.models import Feed
 
 #############################################################################################################
 class ActSubscribeFilmView(APIView):
+
     """
     Method get:
         - Sets subscribe for a serial by user
@@ -61,6 +62,9 @@ class ActSubscribeFilmView(APIView):
         except Exception as e:
             try:
                 UsersFilms.objects.filter(**filter_).update(subscribed=subscribed)
+                for f in Feed.objects.filter(user=request.user, type='film-s').iterator(): # До этого момента Feed
+                    if f.object == obj_val: f.delete()                                      # с типом film-nw может и не быть
+                Feed.objects.create(user=request.user, type='film-s', object=obj_val)      # значит нечего обновлять
             except Exception as e:
                 return Response({'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -85,7 +89,8 @@ class ActSubscribeFilmView(APIView):
 
         # Удалим подписку
         UsersFilms.objects.filter(**filter_).update(subscribed=subscribed)
-        Feed.objects.filter(user=request.user, type='film-s', object=obj_val).delete()
+        for f in Feed.objects.filter(user=request.user, type='film-s').iterator():
+            if f.object == obj_val: f.delete()
 
         return Response(status=status.HTTP_200_OK)
 
