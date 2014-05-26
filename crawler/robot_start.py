@@ -66,8 +66,8 @@ sites_crawler = {
                       'parser': PlayfamilyParser()},
     'tvigle_ru': {'loader': TVIGLE_Loader,
                   'parser': ParseTvigleFilm()},
-    'tvzavr_ru': {'loader': Tvzavr_Loader,
-                'parser': ParseTvzavrFilmPage()},
+    #'tvzavr_ru': {'loader': Tvzavr_Loader,
+    #            'parser': ParseTvzavrFilmPage()},
     'stream_ru': {'loader': STREAM_RU_Loader,
                   'parser': ParseStreamFilm},
     'play_google_com': {'loader': PLAY_GOOGLE_Loader,
@@ -279,11 +279,7 @@ def robot_exceptions(func):
             
             robot_try.save()
         except Exception,e:
-            robot_try = RobotsTries(domain=site,
-                                    film=e.film,
-                                    outcome=APP_ROBOTS_TRY_NO_SUCH_PAGE)
-            
-            robot_try.save()
+            print "Unknown exception {}".format(e)
             
     return wrapper
     

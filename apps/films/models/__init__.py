@@ -11,5 +11,6 @@ from persons_extras import PersonsExtras
 from persons_films import PersonsFilms
 from users_films import UsersFilms
 from users_persons import UsersPersons
+from youtube_trailers_check import YoutubeTrailerCheck
 
 from ..signals import *
