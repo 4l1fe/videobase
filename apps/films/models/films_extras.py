@@ -1,12 +1,17 @@
 # coding: utf-8
 
+import os
+
 from django.db import models
 from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
 
-from ..constants import *
+from apps.films.constants import *
 from apps.films.models.photoclass import PhotoClass
+from apps.films.constants import APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER
+
 from utils.common import get_image_path
 
+import videobase.settings as settings
 
 #############################################################################################################
 #
@@ -17,7 +22,7 @@ class PosterFilmManager(models.Manager):
 #############################################################################################################
 # Модель Расширения фильмов/сериалов
 class FilmExtras(PhotoClass):
-    film        = models.ForeignKey('Films', verbose_name=u'Фильм', related_name="extras")
+    film        = models.ForeignKey('Films', verbose_name=u'Фильм', related_name="fe_film_rel")
     type        = models.CharField(max_length=255, choices=APP_FILM_TYPE_ADDITIONAL_MATERIAL, verbose_name=u'Тип дополнительного материала')
     name        = models.CharField(max_length=255, verbose_name=u'Название')
     name_orig   = models.CharField(max_length=255, verbose_name=u'Оригинальное название')
@@ -50,6 +55,37 @@ class FilmExtras(PhotoClass):
             self.photo = None
 
         super(FilmExtras, self).save(*args, **kwargs)
+
+    @classmethod
+    def get_additional_material_by_film(self, ids):
+        if not isinstance(ids, list):
+            ids = [ids]
+
+        return self.objects.filter(film__in=ids, type=APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER)
+
+    @classmethod
+    def get_poster_by_film(self, list_extras):
+        poster = ''
+        if not isinstance(list_extras, list):
+            list_extras = [list_extras]
+
+        for item in list_extras:
+            if not item.photo is None and item.photo:
+                poster = item.get_photo_url()
+                break
+
+        return poster
+
+    def get_photo_url(self, prefix=True):
+        result = ''
+        if not self.photo is None and self.photo:
+            result = list(os.path.splitext(self.photo.url))
+            if prefix:
+                result[0] += settings.POSTER_URL_PREFIX
+
+            result = u''.join(result)
+
+        return result
 
     def __unicode__(self):
         return u'[{0}] {1}'.format(self.pk, self.name)
