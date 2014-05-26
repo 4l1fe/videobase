@@ -103,10 +103,10 @@ def get_person_films(id_, meth, page=1, per_page=12, type_='a', host=SCHEMA_HOST
     return json_resp
 
 
-def film_subscribe(session_token, id_, host=SCHEMA_HOST):
-    cl = httplib.HTTPConnection('127.0.0.1:9000')
+def film_subscribe(session_token, method, id_, host=HOST):
+    cl = httplib.HTTPConnection(host)
     headers = {'X-MI-SESSION': session_token}
-    cl.request('DELETE', '/api/v1/films/{}/action/subscribe.json'.format(id_), headers=headers)
+    cl.request(method, '/api/v1/films/{}/action/subscribe.json'.format(id_), headers=headers)
     resp = cl.getresponse()
     return resp.read()
 
@@ -135,6 +135,15 @@ def film_comment(session_token, id_, host=SCHEMA_HOST):
     return resp.read()
 
 
+def film_rate(session_token, method, id_, rating=None, host=HOST):
+    cl = httplib.HTTPConnection(host)
+    data = urlencode(dict(rating=rating)) if rating else None
+    headers = {'X-MI-SESSION': session_token, 'Content-type': 'application/x-www-form-urlencoded', 'Accept': 'application/json'}
+    cl.request(method, '/api/v1/films/{}/action/rate.json'.format(id_), headers=headers, body=data)
+    resp = cl.getresponse()
+    return resp.read()
+
+
 def user_friendship(session_token, method, id_, host=HOST):
     cl = httplib.HTTPConnection(host)
     headers = {'X-MI-SESSION': session_token}
@@ -160,11 +169,17 @@ if __name__ == '__main__':
     # pp(resp)
     # resp = get_person_films(2, 'get')
     # pp(resp)
-    # resp = film_subscribe(st, 71)
+    # resp = film_subscribe(st, 'PUT', 71)
     # pp(resp)
-    resp = film_notwatch(st, 'DELETE', 3998)
-    pp(resp)
-    resp = film_notwatch(st, 'PUT', 3998)
+    # resp = film_subscribe(st, 'DELETE', 71)
+    # pp(resp)
+    # resp = film_notwatch(st, 'DELETE', 3998)
+    # pp(resp)
+    # resp = film_notwatch(st, 'PUT', 3998)
+    # pp(resp)
+    # resp = film_rate(st, 'PUT', 2018, 7.7)
+    # pp(resp)
+    resp = film_rate(st, 'DELETE', 2018)
     pp(resp)
     # resp = person_subscribe(st, 'DELETE', 6509)
     # pp(resp)

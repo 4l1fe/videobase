@@ -11,7 +11,6 @@ from apps.users import Feed
 #############################################################################################################
 
 
-
 class ActRateFilmView(APIView):
     """
     Method post:
@@ -55,7 +54,9 @@ class ActRateFilmView(APIView):
             except Exception as e:
                 try:
                     UsersFilms.objects.filter(**filter_).update(rating=rating)
-                    Feed.objects.filter(user=request.user, type='film-r', object__contains=obj_val).update(object=obj_valr)
+                    for f in Feed.objects.filter(user=request.user, type='film-r').iterator():  # До этого момента Feed
+                        if f.object == obj_val: f.delete()                                      # с типом film-nw может и не быть
+                    Feed.objects.create(user=request.user, type='film-r', object=obj_val)       # значит нечего обновлять
                 except Exception as e:
                     return Response({'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -75,6 +76,7 @@ class ActRateFilmView(APIView):
 
         # Удалим оценку
         UsersFilms.objects.filter(**filter_).update(rating=None)
-        Feed.objects.filter(user=request.user, type='film-r', object__contains=obj_val).delete()
+        for f in Feed.objects.filter(user=request.user, type='film-r').iterator():
+            if all(item in f.object.items() for item in obj_val.items()): f.delete()
 
         return Response(status=status.HTTP_200_OK)
