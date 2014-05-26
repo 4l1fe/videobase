@@ -9,8 +9,8 @@ from apps.films.constants import APP_PERSONFILM_SUBS_FALSE, APP_PERSONFILM_SUBS,
 #############################################################################################################
 # Модель связи Пользователей и Персон
 class UsersPersons(models.Model):
-    user       = models.ForeignKey(User, max_length=255, verbose_name=u'Пользователь', related_name='persons')
-    person     = models.ForeignKey('Persons', max_length=255, verbose_name=u'Персона', related_name='users_persons')
+    user       = models.ForeignKey(User, max_length=255, verbose_name=u'Пользователь', related_name='up_users_rel')
+    person     = models.ForeignKey('Persons', max_length=255, verbose_name=u'Персона', related_name='up_persons_rel')
     upstatus   = models.IntegerField(verbose_name=u'Статус', default=0)
     subscribed = models.IntegerField(verbose_name=u'Подписка', default=APP_PERSONFILM_SUBS_FALSE, choices=APP_PERSONFILM_SUBS)
     created    = models.DateTimeField(auto_now_add=True, verbose_name=u'Дата создания')

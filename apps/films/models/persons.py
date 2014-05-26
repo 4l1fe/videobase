@@ -30,6 +30,13 @@ class Persons(PhotoClass):
         full_name = u"{0} ({1})".format(self.name, self.name_orig)
         return full_name.strip()
 
+    @property
+    def get_path_to_photo(self):
+        path_to_photo = ''
+        if self.photo:
+            path_to_photo = self.photo.storage.url(self.photo.name)
+        return path_to_photo
+
 
     def __unicode__(self):
         return u'[%s] %s' % (self.pk, self.get_full_name)

@@ -35,8 +35,8 @@ class UsersFilmsView(APIView):
         except KeyError as e:
             return Response({'e': e.message}, status=status.HTTP_400_BAD_REQUEST)
 
-        films = Films.objects.filter(users_films__user=user, type__in=ftype,
-                                     users_films__status=APP_USERFILM_STATUS_SUBS)
+        films = Films.objects.filter(uf_films_rel__user=user, type__in=ftype,
+                                     uf_films_rel__status=APP_USERFILM_STATUS_SUBS)
         try:
             page = Paginator(films, per_page).page(page)
         except Exception as e:

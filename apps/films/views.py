@@ -186,7 +186,7 @@ def test_view(request):
 
 def calc_actors(o_film):
     filter = {
-        'filter': {'person_film_rel__film': o_film.pk},
+        'filter': {'pf_persons_rel__film': o_film.pk},
         'offset': 0,
         'limit': 5,
     }
@@ -239,8 +239,8 @@ def playlist_view(request, film_id=None, *args, **kwargs):
     if request.user.is_authenticated():
         playlist = {'items': [], 'next': [], 'previous': [], 'total_cnt': 0}
         playlist_data = film_model.Films.objects.\
-            filter(users_films__user=request.user.id, users_films__subscribed=APP_USERFILM_SUBS_TRUE).\
-            order_by('users_films__created')
+            filter(uf_films_rel__user=request.user.id, uf_films_rel__subscribed=APP_USERFILM_SUBS_TRUE).\
+            order_by('uf_films_rel__created')
 
         film_data = {}
         if len(playlist_data) > 0:
