@@ -40,7 +40,7 @@ class UsersPersonsView(APIView):
         except KeyError as e:
             return Response({'e': e.message}, status=status.HTTP_400_BAD_REQUEST)
 
-        persons = Persons.objects.filter(users_persons__user=user, person_film_rel__p_type__in=ptype)
+        persons = Persons.objects.filter(up_persons_rel__user=user, pf_persons_rel__p_type__in=ptype)
         try:
             page = Paginator(persons, per_page).page(page)
         except Exception as e:

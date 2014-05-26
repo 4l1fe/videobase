@@ -111,8 +111,8 @@ class vbFilm(serializers.ModelSerializer):
 
     def persons_list(self, obj):
         return vbPerson(Persons.objects.\
-                exclude(Q(person_film_rel__p_type=APP_PERSON_DIRECTOR) | Q(person_film_rel__p_type=APP_PERSON_SCRIPTWRITER)).\
-                filter(person_film_rel__film=obj).\
+                exclude(Q(pf_persons_rel__p_type=APP_PERSON_DIRECTOR) | Q(pf_persons_rel__p_type=APP_PERSON_SCRIPTWRITER)).\
+                filter(pf_persons_rel__film=obj).\
                 extra(select={'p_type': "persons_films.p_type", 'film': "persons_films.film_id"}).order_by('id')).data
 
 
@@ -232,8 +232,8 @@ class vbFilm(serializers.ModelSerializer):
 
         if self.extend_sign:
             o_person = Persons.objects.\
-                filter(Q(person_film_rel__p_type=APP_PERSON_DIRECTOR) | Q(person_film_rel__p_type=APP_PERSON_SCRIPTWRITER),
-                                              person_film_rel__film__in=self.list_obj_pk).\
+                filter(Q(pf_persons_rel__p_type=APP_PERSON_DIRECTOR) | Q(pf_persons_rel__p_type=APP_PERSON_SCRIPTWRITER),
+                                              pf_persons_rel__film__in=self.list_obj_pk).\
                 extra(select={'p_type': "persons_films.p_type", 'film': "persons_films.film_id"}).order_by('id')
 
             o_person = group_by(o_person, 'film', True)
