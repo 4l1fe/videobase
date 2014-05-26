@@ -245,7 +245,7 @@ def playlist_view(request, film_id=None, *args, **kwargs):
         film_data = {}
         if len(playlist_data) > 0:
             if film_id > len(playlist_data) or film_id < 1:
-                return redirect('playlist_view', film_id=1)
+                return redirect('playlist_film_view', film_id=1)
 
             def arrow_data(data, f_id):
                 return {'id': f_id, 'name': data.name}
