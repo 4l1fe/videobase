@@ -8,11 +8,9 @@ from django.core.paginator import Page
 
 from rest_framework import serializers
 
-import videobase.settings as settings
 from apps.films.models import *
 from apps.contents.models import *
-from apps.films.constants import APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER,\
-                                 APP_PERSON_DIRECTOR, APP_PERSON_SCRIPTWRITER
+from apps.films.constants import APP_PERSON_DIRECTOR, APP_PERSON_SCRIPTWRITER
 
 from apps.contents.constants import APP_CONTENTS_PRICE_TYPE_FREE
 from utils.common import group_by
@@ -175,9 +173,8 @@ class vbFilm(serializers.ModelSerializer):
 
     # ---------------------------------------------------------------------------------------
     def _rebuild_poster_list(self):
-        extras = FilmExtras.objects.filter(film__in=self.list_obj_pk, type=APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER)
+        extras = FilmExtras.get_additional_material_by_film(self.list_obj_pk)
         extras = group_by(extras, 'film_id', True)
-
         self.poster_rebuild = extras
 
 
@@ -185,17 +182,13 @@ class vbFilm(serializers.ModelSerializer):
         result = self.poster_rebuild.get(obj.pk, '')
 
         if len(result):
-            flag = False
+            url_result = ''
             for item in result:
                 if not item.photo is None and item.photo:
-                    result = list(os.path.splitext(item.photo.url))
-                    result[0] += settings.POSTER_URL_PREFIX
-                    result = u''.join(result)
-                    flag = True
+                    url_result = item.get_photo_url()
                     break
 
-            if not flag:
-                return ''
+            return url_result
 
         return result
 
