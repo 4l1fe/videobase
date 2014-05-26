@@ -145,20 +145,20 @@ class UserView(View):
                             'how_long': how_long}
             default_user.update(uvb.data)
 
-            films = Films.objects.filter(users_films__user=user,
+            films = Films.objects.filter(uf_films_rel__user=user,
                                          type__in=(APP_FILM_SERIAL, APP_FILM_FULL_FILM),
-                                         users_films__status=APP_USERFILM_STATUS_SUBS)
+                                         uf_films_rel__status=APP_USERFILM_STATUS_SUBS)
             page_films = Paginator(films, APP_USERS_API_DEFAULT_PER_PAGE).page(APP_USERS_API_DEFAULT_PAGE)
             vbf = vbFilm(page_films.object_list, many=True)
 
-            actors = Persons.objects.filter(users_persons__user=user,
-                                            person_film_rel__p_type=APP_PERSON_ACTOR)
+            actors = Persons.objects.filter(up_persons_rel__user=user,
+                                            pf_persons_rel__p_type=APP_PERSON_ACTOR)
             page_actors = Paginator(actors, APP_USERS_API_DEFAULT_PER_PAGE).\
                 page(APP_USERS_API_DEFAULT_PAGE)
             vba = vbPerson(page_actors.object_list, many=True)
 
-            directors = Persons.objects.filter(users_persons__user=user,
-                                               person_film_rel__p_type=APP_PERSON_DIRECTOR)
+            directors = Persons.objects.filter(up_persons_rel__user=user,
+                                               pf_persons_rel__p_type=APP_PERSON_DIRECTOR)
             page_directors = Paginator(directors, APP_USERS_API_DEFAULT_PER_PAGE).\
                 page(APP_USERS_API_DEFAULT_PAGE)
             vbd = vbPerson(page_directors.object_list, many=True)

@@ -18,7 +18,7 @@ class UsersGenresView(APIView):
         except Exception as e:
             return Response({'e': e.message}, status=status.HTTP_400_BAD_REQUEST)
 
-        genres = Genres.objects.filter(genres__users_films__user=user).distinct()
+        genres = Genres.objects.filter(genres__uf_films_rel__user=user).distinct()
 
         serializer = vbUserGenre(genres, user=user, many=True)
 

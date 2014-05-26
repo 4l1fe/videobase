@@ -57,8 +57,8 @@ class vbUser(serializers.ModelSerializer):
 
     def get_genre_fav(self, obj):
         try:
-            genre = max(Genres.objects.filter(genres__users_films__user=obj).\
-                exclude(genres__users_films__status=APP_USERFILM_STATUS_NOT_WATCH).\
+            genre = max(Genres.objects.filter(genres__uf_films_rel__user=obj).\
+                exclude(genres__uf_films_rel__status=APP_USERFILM_STATUS_NOT_WATCH).\
                 distinct().values("id", "name").annotate(count=Count("genres__id")),
                 key=lambda g: g['count'])
         except:
@@ -97,8 +97,8 @@ class vbUser(serializers.ModelSerializer):
         return rel
 
     def genres_list(self, obj):
-        genres = Genres.objects.filter(genres__users_films__user=obj).\
-            exclude(genres__users_films__status=APP_USERFILM_STATUS_NOT_WATCH).\
+        genres = Genres.objects.filter(genres__uf_films_rel__user=obj).\
+            exclude(genres__uf_films_rel__status=APP_USERFILM_STATUS_NOT_WATCH).\
             distinct()
         serializer = vbUserGenre(genres, user=obj, many=True)
         return serializer.data

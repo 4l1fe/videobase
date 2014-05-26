@@ -60,10 +60,7 @@ class vbPerson(serializers.ModelSerializer):
         return prep_person_roles
 
     def get_path_to_photo(self, obj):
-        path_to_photo = ''
-        if obj.photo:
-            path_to_photo = obj.photo.storage.url(obj.photo.name)
-        return path_to_photo
+        return obj.get_path_to_photo
 
     def get_relation(self, obj):
         if self.user:
