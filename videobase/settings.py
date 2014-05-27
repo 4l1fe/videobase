@@ -279,10 +279,6 @@ CELERYBEAT_SCHEDULE = {
         'task': 'viaplay_ru_robot_start',
         'schedule': timedelta(days=7),
     },
-    'kinopoisk_poster': {
-        'task': 'kinopoisk_poster',
-        'schedule': timedelta(seconds=10),
-    },
     'kinopoisk_persons': {
         'task': 'kinopoisk_persons',
         'schedule': timedelta(seconds=10),
