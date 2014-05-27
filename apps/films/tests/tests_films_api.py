@@ -822,7 +822,7 @@ class FilmsTestCase(APISimpleTestCase):
             response = self.client.get(reverse('film_search_view', kwargs={'format': 'json'}), data=data)
         self.assertEqual(response.data['total_cnt'], 1)
         self.assertEqual(response.data['page'], 1)
-        self.assertEqual(response.data['per_page'], 24)
+        self.assertEqual(response.data['per_page'], 12)
         self.locations_assert(response.data['items'][0]['locations'], locations)
         self.not_extend_assert(response.data['items'][0], film, extras)
 
