@@ -72,7 +72,7 @@ class Films(models.Model):
         list_genres = [i.pk for i in o_film.genres.all()]
 
         o_similar = Films.objects.distinct().filter(genres__in=list_genres).\
-                        exclude(pk=o_film.pk).order_by('-rating_sort')[:12]
+                        exclude(pk=o_film.pk).order_by('-rating_sort')[:APP_FILMS_API_DEFAULT_PER_PAGE]
 
         return o_similar
 

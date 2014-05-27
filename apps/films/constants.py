@@ -90,3 +90,7 @@ APP_PERSONFILM_SUBS = (
     (APP_PERSONFILM_SUBS_FALSE, u'Не подписан'),
     (APP_PERSONFILM_SUBS_TRUE, u'Подписан'),
 )
+
+#############################################################################################################
+APP_FILMS_API_DEFAULT_PAGE = 1
+APP_FILMS_API_DEFAULT_PER_PAGE = 12
