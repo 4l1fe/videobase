@@ -13,7 +13,7 @@ from celery.utils.log import get_task_logger
 import requests
 
 from videobase.celery import app
-from crawler.robot_start import launch_next_robot_try, sites_crawler, launch_next_robot_try_for_kinopoisk
+from crawler.robot_start import sites_crawler, launch_next_robot_try_for_kinopoisk, process_film_on_site
 from apps.robots.models import Robots
 from crawler.kinopoisk_poster import  poster_robot_wrapper
 from crawler.imdbratings import process_all
@@ -27,6 +27,7 @@ from apps.films.models import Films
 
 import datetime
 import  json
+from functools import partial
 
 
 information_robots = ['kinopoik_robot', 'imdb_robot']
@@ -71,14 +72,17 @@ def update_robot_state_film_id(robot):
 
     return film_id
 
+def robot_launch_wrapper(robot_name,func):
+        robot = get_robot_by_name(robot_name)
+        item_id =update_robot_state_film_id(robot)
+        print "Starting robot {} for id = {}".format(robot_name,item_id)
+        func(item_id)
+    
 def robot_task(robot_name):
     def decor(func):
         @app.task(name=robot_name)
         def wrapper():
-            robot = get_robot_by_name(robot_name)
-            item_id =update_robot_state_film_id(robot)
-            print "Starting robot {} for id = {}".format(robot_name,item_id)
-            func(item_id)
+            robot_launch_wrapper(robot_name,func)
         return wrapper
     return decor
 
@@ -122,6 +126,13 @@ def parse_kinopoisk_persons(id):
         except Exception, e:
             print e
 
+@app.task(name='individual_site_film')
+def launch_individual_film_site_task(site):
+    
+    robot_launch_wrapper(site,
+                         partial(process_film_on_site,site))
+
+
 @app.task(name='robot_launch')
 def robot_launcher(*args, **kwargs):
 
@@ -132,7 +143,7 @@ def robot_launcher(*args, **kwargs):
         if robot.last_start + datetime.timedelta(seconds=robot.delay) < timezone.now():
 
             if robot.name in sites_crawler:
-                launch_next_robot_try(site=robot.name)
+                launch_individual_film_site_task.apply_async((robot.name,))
         else:
             print u'Skipping robot %s' % robot.name
 
