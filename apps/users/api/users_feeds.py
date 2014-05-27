@@ -84,17 +84,17 @@ class UsersFeedsView(APIView):
         try:
             page = int(page)
         except (TypeError, ValueError):
-            return Exception('That page is not an integer')
+            page = APP_USERS_API_DEFAULT_PAGE
 
         if page < APP_USERS_API_DEFAULT_PAGE:
-            return Exception('That page is less than default value')
+            page = APP_USERS_API_DEFAULT_PAGE
 
         try:
             per_page = int(per_page)
         except (TypeError, ValueError):
-            return Exception('That per page is not an integer')
+            per_page = APP_USERS_API_DEFAULT_PER_PAGE
 
         if 0 < per_page > APP_USERS_API_DEFAULT_PER_PAGE:
-            return Exception('That per page is more than default value')
+            per_page = APP_USERS_API_DEFAULT_PER_PAGE
 
         return page, per_page

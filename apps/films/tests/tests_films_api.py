@@ -797,7 +797,7 @@ class FilmsTestCase(APISimpleTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_api_search_bad(self):
-        data = {'video': 1, 'text': 2, 'page': 'hello'}
+        data = {'price': 'hello', 'text': 2, 'page': 'hello'}
         response = self.client.get(reverse('film_search_view', kwargs={'format': 'json'}), data=data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
