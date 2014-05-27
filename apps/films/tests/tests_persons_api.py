@@ -7,10 +7,12 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 from apps.films.models import UsersPersons
 
-from apps.films.tests.factories import PersonsFilmFactory, PersonsExtrasFactory, UserFactory
+from apps.films.tests.factories import PersonsFilmFactory, PersonsExtrasFactory, UserFactory, FeedFactory
 from apps.films.api.serializers import vbPerson
 from apps.users import UsersApiSessions
 from apps.users.models.api_session import SessionToken
+from apps.users.models import Feed
+from apps.users.constants import PERSON_SUBSCRIBE, PERSON_O
 
 
 class PersonsTestCase(APITestCase):
@@ -88,8 +90,30 @@ class PersonsTestCase(APITestCase):
     def test_person_action_subscribe_api_view(self):
         UsersApiSessions.objects.create(token=self.s_token)
         headers = self.s_token.key
+        obj_val = dict(id=self.person_filmography.person.id, name=self.person_filmography.person.name, photo=self.person_filmography.person.photo.\
+                       storage.url(self.person_filmography.person.photo.name))
         response = self.client.put(reverse('person_action_view', kwargs={'resource_id': self.person_filmography.person.id, 'format': 'json'}), HTTP_X_MI_SESSION=headers)
         user_person = UsersPersons.objects.all().last()
+        feed = Feed.objects.last()
+        self.assertEqual(feed.user, self.user)
+        self.assertEqual(feed.type, PERSON_SUBSCRIBE)
+        self.assertDictEqual(feed.object, obj_val)
+        self.assertEqual(user_person.person, self.person_filmography.person)
+        self.assertEqual(user_person.user, self.user)
+        self.assertEqual(user_person.subscribed, 1)
+
+    def test_person_action_subscribe_update_api_view(self):
+        UsersApiSessions.objects.create(token=self.s_token)
+        headers = self.s_token.key
+        obj_val = dict(id=self.person_filmography.person.id, name=self.person_filmography.person.name, photo=self.person_filmography.person.photo.\
+                       storage.url(self.person_filmography.person.photo.name))
+        FeedFactory.create(user=self.user, type=PERSON_SUBSCRIBE, object=obj_val)
+        response = self.client.put(reverse('person_action_view', kwargs={'resource_id': self.person_filmography.person.id, 'format': 'json'}), HTTP_X_MI_SESSION=headers)
+        user_person = UsersPersons.objects.all().last()
+        feed = Feed.objects.last()
+        self.assertEqual(feed.user, self.user)
+        self.assertEqual(feed.type, PERSON_SUBSCRIBE)
+        self.assertDictEqual(feed.object, obj_val)
         self.assertEqual(user_person.person, self.person_filmography.person)
         self.assertEqual(user_person.user, self.user)
         self.assertEqual(user_person.subscribed, 1)
@@ -98,8 +122,10 @@ class PersonsTestCase(APITestCase):
         UsersApiSessions.objects.create(token=self.s_token)
         headers = self.s_token.key
         self.client.put(reverse('person_action_view', kwargs={'resource_id': self.person_filmography.person.id, 'format': 'json'}), HTTP_X_MI_SESSION=headers)
+        self.assertTrue(Feed.objects.all().exists())
         self.client.delete(reverse('person_action_view', kwargs={'resource_id': self.person_filmography.person.id, 'format': 'json'}), HTTP_X_MI_SESSION=headers)
         user_person = UsersPersons.objects.last()
+        self.assertFalse(Feed.objects.all().exists())
         self.assertEqual(user_person.subscribed, 0)
         self.assertEqual(user_person.person, self.person_filmography.person)
         self.assertEqual(user_person.user, self.user)
