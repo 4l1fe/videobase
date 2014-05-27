@@ -1,4 +1,5 @@
 # coding: utf-8
+from apps.users import Feed
 from apps.users.models import User, UsersPics, UsersRels
 from apps.contents.models import Comments, Contents, Locations
 from apps.contents.constants import APP_CONTENTS_PRICE_TYPE_FREE
@@ -15,6 +16,10 @@ class UserFactory(factory.DjangoModelFactory):
     username = factory.Sequence(lambda n: u'admin{0}'.format(n))
     password = u'admin'
 
+
+class FeedFactory(factory.DjangoModelFactory):
+    FACTORY_FOR = Feed
+    user = factory.SubFactory(UserFactory)
 
 class UserRelsFactory(factory.DjangoModelFactory):
     FACTORY_FOR = UsersRels
