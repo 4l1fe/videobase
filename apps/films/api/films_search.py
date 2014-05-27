@@ -12,9 +12,10 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from apps.films.api.serializers import vbFilm
-from apps.films.models import Films, UsersFilms
+from apps.films.models import Films
 from apps.films.forms import SearchForm
-from apps.films.constants import APP_USERFILM_STATUS_NOT_WATCH
+from apps.films.constants import APP_USERFILM_STATUS_NOT_WATCH, APP_FILMS_API_DEFAULT_PAGE, \
+                                 APP_FILMS_API_DEFAULT_PER_PAGE
 from apps.contents.models import Contents, Locations
 
 import videobase.settings as settings
@@ -35,18 +36,12 @@ class SearchFilmsView(APIView):
     """
 
     def parse_post(self, data):
-        film_group = 0
         location_group = 0
-
-        for i in ['text', 'year_old', 'genre', 'rating', 'per_page', 'page']:
-            if i in data.data:
-                film_group += 1
-                break
 
         if 'price' in data.data:
             location_group += 1
 
-        return data.cleaned_data, film_group, location_group
+        return data.cleaned_data, location_group
 
 
     def search_by_films(self, filter):
@@ -106,6 +101,7 @@ class SearchFilmsView(APIView):
 
         return list_films_by_content
 
+
     def use_cache(self):
         if 'test' in sys.argv:
             return False
@@ -116,6 +112,27 @@ class SearchFilmsView(APIView):
             return not settings.DEBUG
 
 
+    def validation_pagination(self, page, per_page, filter):
+        try:
+            page = int(page)
+        except (TypeError, ValueError):
+            page = APP_FILMS_API_DEFAULT_PAGE
+
+        if page < APP_FILMS_API_DEFAULT_PAGE:
+            page = APP_FILMS_API_DEFAULT_PAGE
+
+        try:
+            per_page = int(per_page)
+        except (TypeError, ValueError):
+            per_page = APP_FILMS_API_DEFAULT_PER_PAGE
+
+        if 0 < per_page > APP_FILMS_API_DEFAULT_PER_PAGE:
+            per_page = APP_FILMS_API_DEFAULT_PER_PAGE
+
+        filter.update({'per_page': per_page, 'page': page})
+        return filter
+
+
     def get(self, request, format=None, *args, **kwargs):
         # Copy post request
         self.get_copy = request.GET.copy()
@@ -123,7 +140,8 @@ class SearchFilmsView(APIView):
         form = SearchForm(data=self.get_copy)
         if form.is_valid():
             # Init data
-            filter, film_group, location_group = self.parse_post(form)
+            filter, location_group = self.parse_post(form)
+            filter = self.validation_pagination(self.get_copy.get('page'), self.get_copy.get('per_page'), filter)
 
             # Init cache params
             use_cache = self.use_cache()
@@ -154,9 +172,8 @@ class SearchFilmsView(APIView):
                             o_search = Films.objects.filter(pk__in=list_films_by_content)
 
                 try:
-                    page = Paginator(
-                        o_search.order_by('-rating_sort'), per_page=filter['per_page']
-                    ).page(filter['page'])
+                    page = Paginator(o_search.order_by('-rating_sort'), per_page=filter['per_page']).\
+                        page(filter['page'])
                 except Exception, e:
                     return Response({'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
 
