@@ -2,21 +2,23 @@
 from django.core.paginator import Paginator
 
 from rest_framework import status
-from rest_framework.test import APITestCase
+from rest_framework.test import APITestCase, APISimpleTestCase
 from rest_framework.reverse import reverse
 
 from apps.films.constants import APP_FILM_FULL_FILM, APP_FILM_SERIAL, APP_USERFILM_STATUS_SUBS, \
     APP_PERSON_DIRECTOR, APP_PERSON_ACTOR, APP_PERSON_SCRIPTWRITER, APP_PERSON_PRODUCER
+from apps.users import Feed
 from apps.users.constants import APP_USER_REL_TYPE_FRIENDS, APP_USER_REL_TYPE_NONE,\
     APP_USERS_API_DEFAULT_PER_PAGE, APP_USERS_API_DEFAULT_PAGE
 from apps.users.models.api_session import SessionToken, UsersApiSessions
 from apps.users.tests.factories_users_api import *
 from apps.users.api.users_persons import persons_type
-
+from apps.users.constants import USER_ASK, USER_FRIENDSHIP
+from apps.users.constants import APP_USER_REL_TYPE_FRIENDS
 import random
 
 
-class APIUsersFriendShipActionTestCase(APITestCase):
+class APIUsersFriendShipActionTestCase(APISimpleTestCase):
     def setUp(self):
         self.user = UserFactory.create()
         self.url_name = 'users_friendship_action'
@@ -42,15 +44,37 @@ class APIUsersFriendShipActionTestCase(APITestCase):
         flag = UsersRels.objects.filter(user=self.user, user_rel=user).exists()
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(flag, True)
+        feed = Feed.objects.last()
+        obj_val = dict(id=user.id, name=user.profile.get_name(), avatar='')
+        self.assertEqual(feed.user, self.user)
+        self.assertEqual(feed.type, USER_ASK)
+        self.assertDictEqual(feed.object, obj_val)
+
+    def test_api_user_friendship_confirm_200_get(self):
+        user = UserFactory.create()
+        kw = self.kwargs.copy()
+        kw['user_id'] = user.pk
+        obj_val = dict(id=user.id, name=user.profile.get_name(), avatar='')
+        UserRelsFactory.create(user=user, user_rel=self.user, rel_type=APP_USER_REL_TYPE_FRIENDS)
+        FeedFactory.create(user=self.user, type=USER_ASK, object=obj_val)
+        response = self.client.get(reverse(self.url_name, kwargs=kw),
+                                   HTTP_X_MI_SESSION=self.headers)
+        feed = Feed.objects.last()
+        self.assertEqual(feed.user, self.user)
+        self.assertEqual(feed.type, USER_FRIENDSHIP)
+        self.assertDictEqual(feed.object, obj_val)
 
     def test_api_user_friendship_200_with_rel_delete(self):
         user = UserFactory.create()
         kw = self.kwargs.copy()
         kw['user_id'] = user.pk
+        obj_val = dict(id=user.id, name=user.profile.get_name(), avatar='')
         UserRelsFactory.create(user=self.user, user_rel=user)
+        FeedFactory.create(user=self.user, type=USER_ASK, object=obj_val)
         response = self.client.delete(reverse(self.url_name, kwargs=kw),
                                    HTTP_X_MI_SESSION=self.headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertFalse(Feed.objects.all().exists())
 
     def test_api_user_friendship_200_without_rel_delete(self):
         user = UserFactory.create()

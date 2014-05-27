@@ -67,7 +67,7 @@ class SearchForm(Form):
     year_old = fields.IntegerField(min_value=0, required=False)
     rating   = fields.FloatField(min_value=0, required=False)
     price    = fields.FloatField(min_value=0, required=False)
-    per_page = fields.IntegerField(initial=24, min_value=1)
+    per_page = fields.IntegerField(initial=12, min_value=1)
     page     = fields.IntegerField(min_value=1)
     instock  = fields.BooleanField(required=False)
 
@@ -76,7 +76,7 @@ class SearchForm(Form):
            kwargs['data']['page'] = 1
 
         if not kwargs['data'].get('per_page'):
-           kwargs['data']['per_page'] = 24
+           kwargs['data']['per_page'] = 12
 
         super(SearchForm, self).__init__(*args, **kwargs)
 
@@ -87,8 +87,8 @@ class SearchForm(Form):
 
     def clean_per_page(self):
         if 'per_page' in self.cleaned_data:
-            if self.cleaned_data['per_page'] > 30:
-                return 24
+            if self.cleaned_data['per_page'] > 12:
+                return 12
             return self.cleaned_data['per_page']
 
     class Meta:

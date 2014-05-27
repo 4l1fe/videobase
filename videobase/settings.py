@@ -29,7 +29,7 @@ BACKUP_PATH = os.path.join(BASE_PATH, '..', '.backup')
 SECRET_KEY = '7-dsc0--i_ej94w9as#-5p_5a)ql*9o80v1rs9krx!_-9%^b5$'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 TEMPLATE_DEBUG = DEBUG
 
@@ -257,7 +257,7 @@ if not DEBUG:
 CELERYBEAT_SCHEDULE = {
     'robot-launch': {
         'task': 'robot_launch',
-        'schedule': timedelta(minutes=1),
+        'schedule': timedelta(seconds=10),
     },
     'kinopoisk-get_id': {
         'task': 'kinopoisk_get_id',
