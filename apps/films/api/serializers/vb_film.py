@@ -107,11 +107,14 @@ class vbFilm(serializers.ModelSerializer):
     def calc_release(self, obj):
         return obj.release_date
 
+
     def persons_list(self, obj):
-        return vbPerson(Persons.objects.\
-                exclude(Q(pf_persons_rel__p_type=APP_PERSON_DIRECTOR) | Q(pf_persons_rel__p_type=APP_PERSON_SCRIPTWRITER)).\
-                filter(pf_persons_rel__film=obj).\
-                extra(select={'p_type': "persons_films.p_type", 'film': "persons_films.film_id"}).order_by('id')).data
+        o_persons = Persons.objects.filter(pf_persons_rel__film=obj).\
+            exclude(Q(pf_persons_rel__p_type=APP_PERSON_DIRECTOR) | Q(pf_persons_rel__p_type=APP_PERSON_SCRIPTWRITER)).\
+            extra(select={'p_type': "persons_films.p_type", 'film': "persons_films.film_id"}).\
+            order_by('id')
+
+        return vbPerson(o_persons, many=True).data
 
 
     def calc_ratings(self, obj):
@@ -121,7 +124,7 @@ class vbFilm(serializers.ModelSerializer):
     def calc_has_free(self, obj):
         result = self.location_rebuild.get(obj.pk, [])
         for loc in result:
-            if loc.price_type==APP_CONTENTS_PRICE_TYPE_FREE:
+            if loc.price_type == APP_CONTENTS_PRICE_TYPE_FREE:
                 return True
 
         return False
