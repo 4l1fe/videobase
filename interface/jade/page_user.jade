@@ -11,6 +11,7 @@ html(lang="ru")
                     .button-place
                         button.friendship-btn#friendship_btn Добавить в друзья
                 .col-md-9
+                        
                     h1 #{user.firstname} #{user.lastname}
                     table
                         tr
@@ -60,5 +61,9 @@ html(lang="ru")
                     span Показать всех
                 .shadow
         include footer
+        - t = JSON.stringify(user)
+        div#data
+            = t
         script.
-            $(document).ready(function () {window.InitApp({page_conf: !{JSON.stringify(film)}}, "Film")})
+            $('#data').hide()
+            $(document).ready(function () {window.InitApp({page_conf: JSON.parse($('div#data').text())}, "User")})
