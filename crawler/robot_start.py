@@ -285,57 +285,18 @@ def robot_exceptions(func):
     
 
 @robot_exceptions    
-def process_film_on_site(film,site):
+def process_film_on_site(site,film_id):
 
+    try:
+        film = [Films.objects.get(id=film_id),]
+    except Films.DoesNotExist:
+        print "There is no film in db with such id"
+        return
     robot = Robot(films=film, **sites_crawler[site])
     for data in robot.get_data(sane_dict):
         print u"Trying to put data from %s for %s to db" % (site, unicode(data['film']))
         save_location(**data)
-    
 
-    
-def launch_next_robot_try(site, film_id = None):
-    '''
-    This will launch next robot iteration according to its setting stored in db
-
-    As of now it just processes one next film
-
-    '''
-
-    try:
-        robot = Robots.objects.get(name=site)
-    except Robots.DoesNotExist:
-        print u'There is no such site in db'
-        return
-
-    params = json.loads(robot.state)
-    start = params['start'] if 'start' in params else 1
-
-    if film_id is None:
-        film_number = start + 1
-    else:
-        film_number = film_id
-    film = Films.objects.filter(pk=film_number)
-
-    if not film:
-        film_number = 1
-        film = Films.objects.filter(pk=film_number)
-        if not film:
-            print "Empty films db"
-            return
-        print u"Starting again"
-
-
-    robot.last_start = timezone.now()
-    robot.state = json.dumps({'start': film_number})
-    robot.save()
-    if RobotsTries.objects.filter(film=film, domain=site, outcome=APP_ROBOTS_TRY_NO_SUCH_PAGE):
-        try:
-            print u"Skipping this film {} on that site {} as previous attempt was unsuccessful".format(film,site)
-        except Exception,e:
-            print "Exception raised when tryint to print message"
-
-    process_film_on_site(film,site)
 
 def launch_next_robot_try_for_kinopoisk(robot):
     robot.last_start = timezone.now()
