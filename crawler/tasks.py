@@ -83,17 +83,6 @@ def robot_task(robot_name):
     return decor
 
 
-@robot_task('kinopoisk_poster')
-def get_person_poster(person_id):
-    try:
-        p = Persons.objects.get(id=person_id)
-        if p.photo == '' and p.kinopoisk_id != 0:
-            p.photo.save('profile.jpg', File(get_photo(p.kinopoisk_id)))
-    except Robots.DoesNotExist as e:
-        print e
-
-
-
 @robot_task('kinopoisk_persons')
 def parse_kinopoisk_persons(id):
         try:
@@ -118,6 +107,8 @@ def parse_kinopoisk_persons(id):
             p.birthdate = birthdate
             p.bio = bio
             p.kinopoisk_id = id
+            if p.photo == '' and p.kinopoisk_id != 0:
+                p.photo.save('profile.jpg', File(get_photo(p.kinopoisk_id)))
             p.save()
         except Exception, e:
             print e
@@ -205,4 +196,5 @@ def trailer_commands():
     for film in Films.objects.all():
         find_trailer.apply_async((film.id,))
         
-        
+
+
