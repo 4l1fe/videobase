@@ -257,7 +257,7 @@ if not DEBUG:
 CELERYBEAT_SCHEDULE = {
     'robot-launch': {
         'task': 'robot_launch',
-        'schedule': timedelta(minutes=1),
+        'schedule': timedelta(seconds=10),
     },
     'kinopoisk-get_id': {
         'task': 'kinopoisk_get_id',
