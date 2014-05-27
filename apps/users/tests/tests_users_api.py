@@ -74,7 +74,7 @@ class APIUsersFriendShipActionTestCase(APISimpleTestCase):
         response = self.client.delete(reverse(self.url_name, kwargs=kw),
                                    HTTP_X_MI_SESSION=self.headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertFalse(Feed.objects.all().exists())
+        self.assertFalse(Feed.objects.filter(user=self.user).exists())
 
     def test_api_user_friendship_200_without_rel_delete(self):
         user = UserFactory.create()
