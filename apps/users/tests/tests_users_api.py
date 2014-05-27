@@ -458,7 +458,7 @@ class APIUsersPersonsTestCase(APITestCase):
         response = self.client.get(reverse(self.url_name, kwargs=self.kwargs),
                                    data={'type': 'a'})
         ftype = persons_type['a']
-        persons = Persons.objects.filter(up_persons_rel__user=self.user, person_film_rel__p_type__in=ftype)
+        persons = Persons.objects.filter(up_persons_rel__user=self.user, pf_persons_rel__p_type__in=ftype)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         for i in range(len(persons)):
             sub = UsersPersons.objects.get(person=persons[i], user=self.user).subscribed

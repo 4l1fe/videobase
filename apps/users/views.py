@@ -148,44 +148,27 @@ class UserView(View):
             films = Films.objects.filter(uf_films_rel__user=user,
                                          type__in=(APP_FILM_SERIAL, APP_FILM_FULL_FILM),
                                          uf_films_rel__status=APP_USERFILM_STATUS_SUBS)
-            page_films = Paginator(films, APP_USERS_API_DEFAULT_PER_PAGE).page(APP_USERS_API_DEFAULT_PAGE)
-            vbf = vbFilm(page_films.object_list, many=True)
+            films = Paginator(films, APP_USERS_API_DEFAULT_PER_PAGE).page(APP_USERS_API_DEFAULT_PAGE)
+            vbf = vbFilm(films.object_list, many=True)
 
-            actors = Persons.objects.filter(up_persons_rel__user=user,
-                                            pf_persons_rel__p_type=APP_PERSON_ACTOR)
-            page_actors = Paginator(actors, APP_USERS_API_DEFAULT_PER_PAGE).\
-                page(APP_USERS_API_DEFAULT_PAGE)
-            vba = vbPerson(page_actors.object_list, many=True)
+            actors = Persons.objects.filter(up_persons_rel__user=user, pf_persons_rel__p_type=APP_PERSON_ACTOR)
+            actors = Paginator(actors, APP_USERS_API_DEFAULT_PER_PAGE).page(APP_USERS_API_DEFAULT_PAGE)
+            vba = vbPerson(actors.object_list, many=True)
 
-            directors = Persons.objects.filter(up_persons_rel__user=user,
-                                               pf_persons_rel__p_type=APP_PERSON_DIRECTOR)
-            page_directors = Paginator(directors, APP_USERS_API_DEFAULT_PER_PAGE).\
-                page(APP_USERS_API_DEFAULT_PAGE)
-            vbd = vbPerson(page_directors.object_list, many=True)
-
-            user_id = user.id
-
-            # Список подписок на фильм
-            uf = UsersFilms.get_subscribed_films_by_user(user_id, flat=True)
-
-            # Список подписок на персону
-            up = UsersPersons.get_subscribed_persons_by_user(user_id, flat=True)
-
-            # Выборка фидов
-            o_feed = Feed.get_feeds_by_user(user_id, uf=uf, up=up)
+            directors = Persons.objects.filter(up_persons_rel__user=user, pf_persons_rel__p_type=APP_PERSON_DIRECTOR)
+            directors = Paginator(directors, APP_USERS_API_DEFAULT_PER_PAGE).page(APP_USERS_API_DEFAULT_PAGE)
+            vbd = vbPerson(directors.object_list, many=True)
 
             # Сериализуем
-            try:
-                o_feed = vbFeedElement(o_feed, many=True).data
-            except Exception, e:
-                raise Http404
+            o_feed = vbFeedElement(calc_feed(user.id), many=True).data
 
-            default = {'user': default_user,
-                       'films_subscribed': vbf.data,
-                       'actors_fav': vba.data,
-                       'feed': o_feed,
-                       'directors_fav': vbd.data,
-                       }
+            default = {
+                'user': default_user,
+                'films_subscribed': vbf.data,
+                'actors_fav': vba.data,
+                'feed': o_feed,
+                'directors_fav': vbd.data,
+            }
 
             return HttpResponse(render_page('user', default))
 
@@ -251,22 +234,24 @@ class RestorePasswordView(View):
 #         return HttpResponseRedirect('/users/profile/')
 
 
+def calc_feed(user_id):
+    # Список подписок на фильм
+    uf = UsersFilms.get_subscribed_films_by_user(user_id, flat=True)
+
+    # Список подписок на персону
+    up = UsersPersons.get_subscribed_persons_by_user(user_id, flat=True)
+
+    # Выборка фидов
+    o_feed = Feed.get_feeds_by_user(user_id, uf=uf, up=up)
+
+    return o_feed
+
+
 def feed_view(request):
     if request.user.is_authenticated():
-        user_id = request.user.id
-
-        # Список подписок на фильм
-        uf = UsersFilms.get_subscribed_films_by_user(user_id, flat=True)
-
-        # Список подписок на персону
-        up = UsersPersons.get_subscribed_persons_by_user(user_id, flat=True)
-
-        # Выборка фидов
-        o_feed = Feed.get_feeds_by_user(user_id, uf=uf, up=up)
-
         # Сериализуем
         try:
-            o_feed = vbFeedElement(o_feed, many=True).data
+            o_feed = vbFeedElement(calc_feed(request.user.id), many=True).data
         except Exception, e:
             raise Http404
 
