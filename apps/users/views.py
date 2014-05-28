@@ -10,7 +10,7 @@ from django.http import HttpResponseRedirect, HttpResponse,\
 from django.middleware.csrf import CSRF_KEY_LENGTH
 from django.utils.crypto import get_random_string
 from django.utils import timezone
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AnonymousUser
 from django.views.generic import View
 from django.views.decorators.cache import never_cache
 from django.shortcuts import render_to_response, redirect, RequestContext
@@ -21,15 +21,14 @@ from rest_framework.authtoken.models import Token
 
 from apps.users.models import Feed
 from apps.users.api.serializers import vbUser, vbFeedElement
-from apps.users.forms import CustomRegisterForm
+from apps.users.forms import CustomRegisterForm, UsersProfileForm
 from apps.users.api.utils import create_new_session
 from apps.users.constants import APP_USERS_API_DEFAULT_PAGE, APP_USERS_API_DEFAULT_PER_PAGE,\
     APP_SUBJECT_TO_CONFIRM_REGISTER, APP_SUBJECT_TO_RESTORE_PASSWORD
 
 from apps.films.models import Films, Persons, UsersFilms, UsersPersons
 from apps.films.constants import APP_PERSON_DIRECTOR, APP_PERSON_ACTOR, \
-    APP_FILM_FULL_FILM, APP_FILM_SERIAL, APP_USERFILM_STATUS_SUBS, \
-    APP_PERSONFILM_SUBS_TRUE, APP_USERFILM_SUBS_TRUE
+    APP_FILM_FULL_FILM, APP_FILM_SERIAL, APP_USERFILM_STATUS_SUBS
 from apps.films.api.serializers import vbFilm, vbPerson
 
 from utils.common import url_with_querystring
@@ -81,6 +80,8 @@ class LoginUserView(View):
         resp_dict = {'csrf_token': csrf_token}
         response = HttpResponse(render_page('login', resp_dict))
         response.set_cookie("csrftoken", csrf_token)
+        response.delete_cookie("x-session")
+        response.delete_cookie("x-token")
         return response
 
     def post(self, *args, **kwargs):
@@ -172,7 +173,7 @@ class UserView(View):
             return HttpResponse(render_page('user', default))
 
         except Exception as e:
-            return HttpResponseServerError()
+            return HttpResponseServerError(e)
 
 
 class RestorePasswordView(View):
@@ -205,32 +206,27 @@ class RestorePasswordView(View):
 
         return redirect('login_view')
 
-# TODO: DONT DELETE THIS COMMENTS!
-# class ProfileEdit(TemplateView):
-#     template_name = 'profile.html'
-#
-#     def dispatch(self, request, *args, **kwargs):
-#         self.user = request.user
-#         return super(ProfileEdit, self).dispatch(request, *args, **kwargs)
-#
-#     def get_context_data(self, **kwargs):
-#         user = self.request.user
-#         uprofile_form = UsersProfileForm(user=user)
-#         resp_dict = {
-#         'uprofile_form': uprofile_form
-#         }
-#         resp_dict.update(csrf(self.request))
-#         return resp_dict
-#
-#     def post(self, request, **kwargs):
-#         uprofile_form = UsersProfileForm(data=request.POST, files=request.FILES,
-#                                          user=self.user)
-#         if uprofile_form.is_valid():
-#             try:
-#                 uprofile_form.save()
-#             except Exception as e:
-#                 print e
-#         return HttpResponseRedirect('/users/profile/')
+
+class UserProfileView(View):
+
+    def get(self, request, **kwargs):
+        if isinstance(request.user, AnonymousUser):
+            return redirect("login_view")
+        csrf_token = get_random_string(CSRF_KEY_LENGTH)
+        resp_dict = {'csrf_token': csrf_token,
+                     'form': UsersProfileForm(instance=request.user)}
+        response = render_to_response('profile.html', resp_dict)
+        response.set_cookie("csrftoken", csrf_token)
+        return response
+
+    def post(self, request, **kwargs):
+        uprofile_form = UsersProfileForm(data=request.POST, instance=request.user)
+        if uprofile_form.is_valid():
+            try:
+                uprofile_form.save()
+            except Exception as e:
+                return HttpResponseBadRequest(e)
+        return redirect('profile_view')
 
 
 def calc_feed(user_id):
