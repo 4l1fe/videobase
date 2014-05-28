@@ -11,7 +11,7 @@ class UsersProfileForm(forms.ModelForm):
         self.user = kwargs.pop('instance')
         kwargs['instance'] = self.user.profile
         super(UsersProfileForm, self).__init__(*args, **kwargs)
-        self.fields['email'].initial = self.user.username or self.user.email
+        self.fields['email'].initial = self.user.email
 
     def save(self, commit=True):
         super(UsersProfileForm, self).save(commit)
