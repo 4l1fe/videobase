@@ -181,6 +181,7 @@ REST_FRAMEWORK = {
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 
 # LOGIN_REDIRECT_URL = '/oauth-redirect/'
+LOGIN_URL = '/login'
 SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/tokenize'
 LOGIN_ERROR_URL = '/'
 
