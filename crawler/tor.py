@@ -5,7 +5,11 @@ import time
 import pycurl
 import socket
 import cStringIO as StringIO
-
+DEFAULT_HEADERS = [ 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'Accept-Language: ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4',
+        'Accept-Charset: UTF-8',
+    ]
+from crawler.constants import TOR_RECONNECTS
 
 ########################################################################
 def renew_connection(passAuth="mypassword"):
@@ -40,7 +44,7 @@ def renew_connection(passAuth="mypassword"):
 
 
 ########################################################################
-def get_page(url, user_agent, headers):
+def get_page(url, user_agent, headers = DEFAULT_HEADERS):
     # Init Data
     flag = False
 
@@ -90,6 +94,17 @@ def check_result(header):
 
     return True
 
+def get_page_or_renew(url,user_agent):
+    
+    while counter < TOR_RECONNECTS:
+        body, header = get_page(url, user_agent)
+
+        if not check_result(header):
+            renew_connection()
+            counter += 1
+        else:
+            return body
+            break
 
 ########################################################################
 def main():
@@ -98,12 +113,7 @@ def main():
 
     url = 'http://www.kinopoisk.ru/film/751952'
 
-    headers = [
-        'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-        'Accept-Language: ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4',
-        'Accept-Charset: UTF-8',
-    ]
-
+    headers = DEFAULT_HEADERS
     user_agent = "Mozilla/5.0 (Windows; U; Windows NT 5.1; ru; rv:1.9.0.4) Gecko/2008102920 AdCentriaIM/1.7 Firefox/3.0.4"
 
     while counter < 10:
