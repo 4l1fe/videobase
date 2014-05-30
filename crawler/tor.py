@@ -1,6 +1,7 @@
 # coding: utf-8
 
 import re
+import time
 import pycurl
 import socket
 import cStringIO as StringIO
@@ -33,44 +34,48 @@ def renew_connection(passAuth="mypassword"):
     finally:
         s.close()
 
+    time.sleep(2)
+
     return False
 
 
 ########################################################################
-def get_page(url, useragent, headers):
+def get_page(url, user_agent, headers):
+    # Init Data
     flag = False
-    curl = pycurl.Curl()
+
+    # Init IO
     retrieved_body = StringIO.StringIO()
     retrieved_headers = StringIO.StringIO()
 
-    try:
-        curl.setopt(pycurl.URL, url)
-        curl.setopt(pycurl.HTTPHEADER, headers)
-        curl.setopt(pycurl.HEADER, False)
-        curl.setopt(pycurl.ENCODING, 'gzip,deflate')
-        curl.setopt(pycurl.SSL_VERIFYPEER, False)
-        curl.setopt(pycurl.FOLLOWLOCATION, True)
-        curl.setopt(pycurl.USERAGENT, useragent)
-        curl.setopt(pycurl.MAXREDIRS, 2)
-        curl.setopt(pycurl.TIMEOUT, 80)
-        curl.setopt(pycurl.VERBOSE, 2)
-        curl.setopt(pycurl.FAILONERROR, 1)
-        curl.setopt(pycurl.PROXYTYPE, pycurl.PROXYTYPE_SOCKS5)
-        curl.setopt(pycurl.PROXY, '127.0.0.1:9050')
-        curl.setopt(pycurl.WRITEFUNCTION, retrieved_body.write)
-        curl.setopt(pycurl.HEADERFUNCTION, retrieved_headers.write)
-        curl.perform()
+    # Init curl
+    curl = pycurl.Curl()
+    curl.setopt(pycurl.URL, url)
+    curl.setopt(pycurl.HTTPHEADER, headers)
+    curl.setopt(pycurl.HEADER, False)
+    curl.setopt(pycurl.ENCODING, 'gzip,deflate')
+    curl.setopt(pycurl.SSL_VERIFYPEER, False)
+    curl.setopt(pycurl.FOLLOWLOCATION, True)
+    curl.setopt(pycurl.USERAGENT, user_agent)
+    curl.setopt(pycurl.MAXREDIRS, 2)
+    curl.setopt(pycurl.TIMEOUT, 80)
+    curl.setopt(pycurl.VERBOSE, 2)
+    curl.setopt(pycurl.FAILONERROR, 1)
+    curl.setopt(pycurl.PROXYTYPE, pycurl.PROXYTYPE_SOCKS5)
+    curl.setopt(pycurl.PROXY, '127.0.0.1:9050')
+    curl.setopt(pycurl.WRITEFUNCTION, retrieved_body.write)
+    curl.setopt(pycurl.HEADERFUNCTION, retrieved_headers.write)
 
+    try:
         flag = True
+        curl.perform()
     except Exception, e:
         return e
-
     finally:
-        curl.close()
-
         if flag:
             body, header = retrieved_body.getvalue(), retrieved_headers.getvalue()
 
+        curl.close()
         retrieved_body.close()
         retrieved_headers.close()
 
@@ -92,7 +97,6 @@ def main():
     counter = 0
 
     url = 'http://www.kinopoisk.ru/film/751952'
-    # url = 'http://www.kinopoisk.ru/handler_trailer_popup.php?ids=301'
 
     headers = [
         'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -100,10 +104,10 @@ def main():
         'Accept-Charset: UTF-8',
     ]
 
-    useragent = "Mozilla/5.0 (Windows; U; Windows NT 5.1; ru; rv:1.9.0.4) Gecko/2008102920 AdCentriaIM/1.7 Firefox/3.0.4"
+    user_agent = "Mozilla/5.0 (Windows; U; Windows NT 5.1; ru; rv:1.9.0.4) Gecko/2008102920 AdCentriaIM/1.7 Firefox/3.0.4"
 
     while counter < 10:
-        body, header = get_page(url, useragent, headers)
+        body, header = get_page(url, user_agent, headers)
 
         if not check_result(header):
             renew_connection()
