@@ -87,9 +87,6 @@ def process_all():
             film.rating_imdb_cnt=0 if rdict['votes'] is None else rdict['votes']
             logger.debug(("Rating after {} Count after {}".format(film.rating_imdb,film.rating_imdb_cnt)).encode("utf-8"))
             film.save()
-
-        
-        
     
     print "Films ratings found {}".format(changed_ratings)
     print "Films overall {}".format(i+1)
