@@ -6,8 +6,8 @@ import pycurl
 import socket
 import cStringIO as StringIO
 from crawler.constants import TOR_PROXY
-D
-EFAULT_HEADERS = [ 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+
+DEFAULT_HEADERS = [ 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
         'Accept-Language: ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4',
         'Accept-Charset: UTF-8',
     ]
