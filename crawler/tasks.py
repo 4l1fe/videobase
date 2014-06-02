@@ -2,6 +2,7 @@
 from __future__ import absolute_import
 from apps.films.models import Persons
 from bs4 import BeautifulSoup
+from crawler.core import simple_get
 from crawler.parse_page import crawler_get, get_photo
 from django.core.files import File
 from django.db import transaction
@@ -29,7 +30,7 @@ import datetime
 import  json
 from functools import partial
 
-
+KINOPOISK_LIST_FILMS_URL = "http://www.kinopoisk.ru/top/navigator/m_act%5Begenre%5D/999/m_act%5Bnum_vote%5D/10/m_act%5Brating%5D/1:/m_act%5Bis_film%5D/on/m_act%5Bis_mult%5D/on/order/year/page/{}/#results"
 information_robots = ['kinopoik_robot', 'imdb_robot']
 
 
@@ -77,7 +78,7 @@ def robot_launch_wrapper(robot_name,func):
         item_id =update_robot_state_film_id(robot)
         print "Starting robot {} for id = {}".format(robot_name,item_id)
         func(item_id)
-    
+
 def robot_task(robot_name):
     def decor(func):
         @app.task(name=robot_name)
@@ -85,6 +86,36 @@ def robot_task(robot_name):
             robot_launch_wrapper(robot_name,func)
         return wrapper
     return decor
+
+@app.task(name='kinopoisk_films')
+def kinopoisk_films(page):
+    count = page
+    try:
+        if page == 11:
+            data = BeautifulSoup(simple_get(KINOPOISK_LIST_FILMS_URL.format(1)).content)
+            pages = data.find('div', attrs={'class': 'pagesFromTo'})
+            count = int(pages.text.split(' ')[2])
+
+        for i in range(1, count+1):
+            print count
+            data = BeautifulSoup(simple_get(KINOPOISK_LIST_FILMS_URL.format(i)).content)
+            list_films = data.findAll('div', attrs={'class': 'name'})
+            print("!!!!!!!!"+str(i))
+            for film in list_films:
+                name = film.a.text
+                kinopoisk_id = int(film.a.get('href').split('/')[4])
+                if u'(сериал)' in name:
+                    name = name.replace(u'(сериал)', '')
+                try:
+                    Films.objects.get(kinopoisk_id=kinopoisk_id)
+                except Films.DoesNotExist:
+                    film = Films()
+                    film.name = name
+                    film.kinopoisk_id = kinopoisk_id
+                    film.type = ''
+                    film.save()
+    except Exception, e:
+        print e
 
 
 @robot_task('kinopoisk_persons')
@@ -119,7 +150,7 @@ def parse_kinopoisk_persons(id):
 
 @app.task(name='individual_site_film')
 def launch_individual_film_site_task(site):
-    
+
     robot_launch_wrapper(site,
                          partial(process_film_on_site,site))
 
@@ -201,7 +232,7 @@ def find_trailer(film_id):
 
     film = Films.objects.get(id =film_id)
     process_film(film)
-        
+
 @app.task(name = 'youtube_trailers_all')
 def trailer_commands():
     for film in Films.objects.all():

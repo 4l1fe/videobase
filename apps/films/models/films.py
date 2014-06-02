@@ -20,7 +20,7 @@ class FilmManager(models.Manager):
 class Films(models.Model):
     name             = models.CharField(max_length=255, blank=False, verbose_name=u'Название фильма')
     type             = models.CharField(max_length=255, choices=APP_FILM_FILM_TYPES, verbose_name=u'Тип фильма')
-    release_date     = models.DateField(verbose_name=u'Дата выхода')
+    release_date     = models.DateField(null=True, blank=True, verbose_name=u'Дата выхода')
     duration         = models.IntegerField(null=True, blank=True, verbose_name=u'Продолжительность фильма')
     budget           = models.IntegerField(null=True, blank=True, verbose_name=u'Бюджет фильма')
     description      = models.TextField(default='', blank=True, verbose_name=u'Описание фильма')
