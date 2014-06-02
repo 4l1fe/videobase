@@ -293,6 +293,10 @@ CELERYBEAT_SCHEDULE = {
     'youtube_trailers':{
         'task': 'youtube_trailers_all',
         'schedule': timedelta(days=1),
+    },
+    'kinopoisk_refresh':{
+        'task': 'kinopoisk_refresher',
+        'schedule': timedelta(seconds=10),
     }
 }
 

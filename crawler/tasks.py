@@ -180,10 +180,39 @@ def viaplay_robot_start():
 def kinopoisk_parse_one_film(kinopoisk_id,name):
     '''
     Task for parsing particual kinopoisk id
-    
     '''
-
     parse_from_kinopoisk(kinopoisk_id=kinopoisk_id, name = name)
+
+def compare_time(film,years):
+    '''
+    Returns true if @film less than @years old
+    '''
+    return timezone.now().date() - film.release_date < timezone.timedelta(days = 365*years)
+
+def kinopoisk_compare_time(film,days):
+    '''
+    Returns true if @film last checked on kinopoisk more than  @days ago
+    '''
+    if film.kinopoisk_lastupdate:
+        return timezone.now() - film.kinopoisk_lastupdate > timezone.timedelta(days = days)
+    else:
+        return True
+ 
+
+@app.task(name = 'kinopoisk_refresher')
+def create_due_refresh_tasks():
+
+    for film in Films.objects.all():
+
+        if compare_time(film, years=2):
+            if kinopoisk_compare_time(film, days=7):
+                kinopoisk_parse_one_film.apply_async((film.kinopoisk_id, film.name))
+        elif compare_time(film, years=4):
+            if kinopoisk_compare_time(film, days=30):
+                kinopoisk_parse_one_film.apply_async((film.kinopoisk_id, film.name))
+        else:
+            if kinopoisk_compare_time(film, days=180):
+                kinopoisk_parse_one_film.apply_async((film.kinopoisk_id, film.name))
 
 
 @app.task(name= 'kinopoisk_news')
