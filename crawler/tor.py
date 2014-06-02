@@ -5,7 +5,9 @@ import time
 import pycurl
 import socket
 import cStringIO as StringIO
-DEFAULT_HEADERS = [ 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+from crawler.constants import TOR_PROXY
+D
+EFAULT_HEADERS = [ 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
         'Accept-Language: ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4',
         'Accept-Charset: UTF-8',
     ]
@@ -66,7 +68,7 @@ def get_page(url, user_agent, headers = DEFAULT_HEADERS):
     curl.setopt(pycurl.VERBOSE, 2)
     curl.setopt(pycurl.FAILONERROR, 1)
     curl.setopt(pycurl.PROXYTYPE, pycurl.PROXYTYPE_SOCKS5)
-    curl.setopt(pycurl.PROXY, '127.0.0.1:9050')
+    curl.setopt(pycurl.PROXY, TOR_PROXY)
     curl.setopt(pycurl.WRITEFUNCTION, retrieved_body.write)
     curl.setopt(pycurl.HEADERFUNCTION, retrieved_headers.write)
 
@@ -95,6 +97,8 @@ def check_result(header):
     return True
 
 def get_page_or_renew(url,user_agent):
+
+    counter = 0
     
     while counter < TOR_RECONNECTS:
         body, header = get_page(url, user_agent)
