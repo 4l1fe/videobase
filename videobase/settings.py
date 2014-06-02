@@ -311,7 +311,7 @@ CELERYBEAT_SCHEDULE = {
     },
     'kinopoisk_refresh':{
         'task': 'kinopoisk_refresher',
-        'schedule': timedelta(seconds=10),
+        'schedule': timedelta(days=1),
     }
 }
 
