@@ -11,10 +11,11 @@ import os
 from collections import namedtuple
 import base64
 import logging
+from crawler.constants import browser_strings, browser_freq
+import random
 
 FakeResponse = namedtuple('FakeResponse', ['ok', 'content', 'url'])
 
-HEADERS = {'User-Agent': 'Mozilla/5.0'}
 
 CACHE_DIR = './cache'
 
@@ -102,6 +103,22 @@ def nopage_handler(func):
             raise RetrievePageException(url=url, status_code=r.status_code)
     return wrapper
 
+
+def get_random_weighted_browser_string():
+
+    num = random.randint(1,100)
+    summarum = 0
+    
+    for key,val in browser_freq.items():
+        summarum += val
+        if num < summarum :
+            break
+
+    brfiltered = [ brs for brs in browser_strings if key in brs]
+    if brfiltered:
+        return random.choice(brfiltered)
+    else:
+        return random.choice(browser_strings)
     
 @nopage_handler
 @cache
@@ -109,4 +126,12 @@ def simple_get(url, **kwargs):
     '''
     Simple wrapper around requests.get function with preset headers
     '''
-    return requests.get(url, headers=HEADERS, params=kwargs.get('params', {}))
+    return requests.get(url, headers={'User-Agent': get_random_weighted_browser_string()}, params=kwargs.get('params', {}))
+
+
+            
+            
+
+        
+        
+    

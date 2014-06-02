@@ -170,7 +170,6 @@ class UserView(View):
                 'feed': o_feed,
                 'directors_fav': vbd.data,
             }
-
             return HttpResponse(render_page('user', default))
 
         except Exception as e:

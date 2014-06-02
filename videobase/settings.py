@@ -308,6 +308,10 @@ CELERYBEAT_SCHEDULE = {
         'task': 'kinopoisk_films',
         'schedule': timedelta(days=31),
         'args': (11,),
+    },
+    'kinopoisk_refresh':{
+        'task': 'kinopoisk_refresher',
+        'schedule': timedelta(seconds=10),
     }
 }
 
