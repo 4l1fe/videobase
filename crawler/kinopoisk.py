@@ -89,9 +89,11 @@ flatland = get_country(u'Флатландию')
 
 
 def process_film(film, pdata):
+    '''
+    
+    '''
     a = []
-    
-    
+
     for d in pdata['Films']:
         a.extend(d.items())
     for key, value in dict(a).items():
@@ -99,9 +101,8 @@ def process_film(film, pdata):
     film.kinopoisk_lastupdate = now()
     film.save()
     print u"Updated data for {}".format(film)
-    
+
     for p in pdata['Persons']:
-        print p
         try:
             print u"Found person {}".format(p['name'])
             po = get_person(p['name'])
@@ -131,7 +132,7 @@ def process_film(film, pdata):
         if not(co in film.countries.all()):
             print u"Adding {} country to {} film".format(co,film)
             film.countries.add(co)
-        
+
 
     set_kinopoisk_poster(film)
 
@@ -148,8 +149,7 @@ def parse_from_kinopoisk(kinopoisk_id,name=None,film = None):
                          type = APP_FILM_FULL_FILM,
                          release_date =now()
                      )
-            film.save()
-            
+            film.save()            
     page_dump = u'Failed to acquire page_dump'
     try:
         page_dump = acquire_page(film.kinopoisk_id)
@@ -157,5 +157,6 @@ def parse_from_kinopoisk(kinopoisk_id,name=None,film = None):
         process_film(film, pdata)
     except Exception, e:
         logging.debug(u"Caught exception : %s", str(e))
-    
+
+
 

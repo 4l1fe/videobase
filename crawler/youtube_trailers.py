@@ -35,6 +35,11 @@ delays = (
     (timezone.timedelta(days=365*3 +1), timezone.timedelta(days =1)),
 )
 
+SEARCH_STRINGS_RU = ('официальный русский трейлер фильма hd','русский трейлер фильма hd','русский трейлер HD','трейлер на русском','официальный трейлер','русский трейлер','тв-ролик','финальный трейлер','промо ролик')
+SEARCH_STRINGS_EN =  ('international trailer hd', 'official trailer hd','trailer hd', 'international trailer', 'official teaser', 'trailer')
+FAIL_STRINGS = ('interview','интервью','premiere','премьера','review','обзор','conference','behind the scenes','gameplay','parody','videogame')
+
+
 def query_search(film_name,trailer_word):
     client = gdata.youtube.service.YouTubeService()
     query = gdata.youtube.service.YouTubeVideoQuery()
@@ -48,21 +53,23 @@ def query_search(film_name,trailer_word):
     for f in feed.entry:
         
         title = f.title.text.lower().decode('utf-8')
-        if (film_name.lower() in title) and (trailer_word.lower() in title):
+        if (film_name.lower() in title) and (trailer_word.lower() in title and sum(s in title for s in FAIL_STRINGS)==0):
             yield f.title.text, f.link[0].href
 
 
 
 def get_film_trailer(film):
 
-    trailer_name,link = next(chain(
-
-        query_search(film.name,u' Трейлер'),
-        query_search(film.name_orig,u' Трейлер'),
-        query_search(film.name_orig,u' trailer'),
-    ), None)
+    trailer_name,link = next(
+        chain(
+            chain(
+                *(query_search(film.name,w) for w in SEARCH_STRINGS_RU)),
+            
+        chain(
+            *(query_search(film.name_orig,w) for w in SEARCH_STRINGS_EN))
+        ),
+        None)
     
-    print trailer_name,link
     return trailer_name,link
         
 def process_film(film):

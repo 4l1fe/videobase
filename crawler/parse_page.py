@@ -9,7 +9,7 @@ from bs4 import BeautifulSoup
 import datetime
 from collections import defaultdict
 from apps.films.constants import APP_PERSON_ACTOR, APP_PERSON_DIRECTOR, APP_PERSON_PRODUCER
-from crawler.constants import PAGE_ARCHIVE, USE_SOCKS5_PROXY,SOCKS5_PROXY_ADDRESS
+from crawler.constants import PAGE_ARCHIVE, USE_SOCKS5_PROXY, SOCKS5_PROXY_ADDRESS, USE_TOR
 if USE_SOCKS5_PROXY:
     import requesocks as requests
 else:
@@ -19,22 +19,26 @@ from PIL import Image
 from functools import partial
 import logging
 import os
+import time
+from crawler.tor import get_page_or_renew
+
+from crawler.core.browser import get_random_weighted_browser_string
 
 YANDEX_KP_ACTORS_TEMPLATE = "http://st.kp.yandex.net/images/actor_iphone/iphone360_{}.jpg"
 YANDEX_KP_FILMS_TEMPLATE = "http://st.kp.yandex.net/images/film_big/{}.jpg"
-
-headers = {'User-Agent': 'Mozilla/5.0'}
 
 class ProbablyBanned(Exception):
     pass
 
 def crawler_get(url):
-    if USE_SOCKS5_PROXY:
+    if USE_TOR:
+        return get_page_or_renew(url,get_random_weighted_browser_string())
+    elif USE_SOCKS5_PROXY:
         session = requests.session()
         session.proxies = {'http': SOCKS5_PROXY_ADDRESS}
-        return session.get(url, headers=headers)
+        return session.get(url, headers={'User-Agent': get_random_weighted_browser_string()})
     else:
-        return requests.get(url, headers=headers)
+        return requests.get(url, headers={'User-Agent': get_random_weighted_browser_string()})
 
 
 def commatlst(tag):
@@ -151,6 +155,7 @@ def acquire_page(page_id):
         with open(dump_path) as fd:
             page_dump = fd.read().decode('utf-8')
     else:
+        time.sleep(1)
         url =u"http://www.kinopoisk.ru/film/%d/" % page_id
         res = crawler_get(url)
         page_dump = res.content.decode('cp1251')
