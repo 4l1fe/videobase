@@ -24,6 +24,7 @@ from crawler.kinopoisk import parse_from_kinopoisk
 from crawler.kinopoisk_premiere import kinopoisk_news
 from crawler.youtube_trailers import process_film
 from apps.films.models import Films
+from crawler.playfamily_xml import process
 
 
 import datetime
@@ -245,6 +246,9 @@ def create_due_refresh_tasks():
             if kinopoisk_compare_time(film, days=180):
                 kinopoisk_parse_one_film.apply_async((film.kinopoisk_id, film.name))
 
+@app.task(name = 'playfamily_xml')
+def pltask():
+    process()
 
 @app.task(name= 'kinopoisk_news')
 def parse_kinopoisk_news():
