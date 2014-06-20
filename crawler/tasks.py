@@ -20,11 +20,11 @@ from crawler.kinopoisk_poster import  poster_robot_wrapper
 from crawler.imdbratings import process_all
 from crawler.amediateka_ru.loader import Amediateka_robot
 from crawler.viaplay_ru.robot import ViaplayRobot
-from crawler.kinopoisk import parse_from_kinopoisk
 from crawler.kinopoisk_premiere import kinopoisk_news
 from crawler.youtube_trailers import process_film
 from apps.films.models import Films
 from crawler.playfamily_xml import process
+from crawler.task_modules.kinopoisk_one_page import kinopoisk_parse_one_film
 
 
 import datetime
@@ -208,12 +208,6 @@ def viaplay_robot_start():
     ViaplayRobot().get_data()
 
 
-@app.task(name = 'kinopoisk_parse_film_by_id')
-def kinopoisk_parse_one_film(kinopoisk_id,name):
-    '''
-    Task for parsing particual kinopoisk id
-    '''
-    parse_from_kinopoisk(kinopoisk_id=kinopoisk_id, name = name)
 
 def compare_time(film,years):
     '''
