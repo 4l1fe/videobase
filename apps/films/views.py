@@ -308,7 +308,7 @@ def search_view(request, *args, **kwargs):
 
     if request.REQUEST.get('text'):
         try:
-            resp_dict['films'] = SearchFilmsView().as_view(request).data
+            resp_dict['films'] = SearchFilmsView.as_view()(request).data
         except Exception, e:
             pass
 
