@@ -1,18 +1,22 @@
 # coding: utf-8
-""" Module containing general functionality for crawler robots
+
+"""
+Module containing general functionality for crawler robots
 and run function for robots written as loader parser combo
 """
 
+import re
+import json
+from requests.exceptions import ConnectionError
+
 from django.utils import timezone
 from django.db.models import Q
-from apps.films.models import Films
 from django.core.exceptions import ValidationError
-from crawler.locations_utils import save_location,sane_dict
 
+from apps.films.models import Films
 
-
-
-
+from crawler import Robot
+from crawler.locations_utils import save_location, sane_dict
 from crawler.kinopoisk import get_id_by_film
 from crawler.ivi_ru.loader import IVI_Loader
 from crawler.ivi_ru.parsers import ParseFilmPage
@@ -38,42 +42,56 @@ from crawler.tvzavr_ru.parsers import ParseTvzavrFilmPage
 from crawler.zoomby_ru.loader import ZOOMBY_Loader
 from crawler.zoomby_ru.parsers import ParseFilm
 
-
-
-from requests.exceptions import ConnectionError
 from apps.robots.constants import APP_ROBOTS_TRY_SITE_UNAVAILABLE, APP_ROBOTS_TRY_NO_SUCH_PAGE, \
     APP_ROBOTS_TRY_PARSE_ERROR
 from apps.robots.models import RobotsTries, Robots
 
-import re
-from crawler import Robot
-import json
 
 
 # Словарь сайтов:
 # loader: загрузчик страници
 # parser: парсер страници фильма
 sites_crawler = {
-    'ivi_ru': {'loader': IVI_Loader,
-               'parser': ParseFilmPage},
-    'zoomby_ru': {'loader': ZOOMBY_Loader,
-                  'parser': ParseFilm()},
-    'megogo_net': {'loader': MEGOGO_Loader,
-                   'parser': ParseMegogoFilm},
-    'now_ru': {'loader': NOW_Loader,
-               'parser': ParseNowFilmPage},
-    'tvigle_ru': {'loader': TVIGLE_Loader,
-                  'parser': ParseTvigleFilm()},
-    #'tvzavr_ru': {'loader': Tvzavr_Loader,
-    #            'parser': ParseTvzavrFilmPage()},
-    'stream_ru': {'loader': STREAM_RU_Loader,
-                  'parser': ParseStreamFilm},
-    'play_google_com': {'loader': PLAY_GOOGLE_Loader,
-                        'parser': ParsePlayGoogleFilm},
-    'oll_tv': {'loader': Oll_Loader,
-               'parser': ParseOllFilm()},
-    'zabava_ru': {'loader': ZABAVAR_RU_Loader,
-                  'parser': ParseZabavaFilm}
+    'ivi_ru': {
+        'loader': IVI_Loader,
+        'parser': ParseFilmPage
+    },
+    'zoomby_ru': {
+        'loader': ZOOMBY_Loader,
+        'parser': ParseFilm()
+    },
+    'megogo_net': {
+        'loader': MEGOGO_Loader,
+        'parser': ParseMegogoFilm
+    },
+    'now_ru': {
+        'loader': NOW_Loader,
+        'parser': ParseNowFilmPage
+    },
+    'tvigle_ru': {
+        'loader': TVIGLE_Loader,
+        'parser': ParseTvigleFilm()
+    },
+    #'tvzavr_ru': {
+    #     'loader': Tvzavr_Loader,
+    #     'parser': ParseTvzavrFilmPage()
+    # },
+    'stream_ru': {
+        'loader': STREAM_RU_Loader,
+        'parser': ParseStreamFilm
+    },
+    'play_google_com': {
+        'loader': PLAY_GOOGLE_Loader,
+        'parser': ParsePlayGoogleFilm
+    },
+    'oll_tv': {
+        'loader': Oll_Loader,
+        'parser': ParseOllFilm()
+    },
+    'zabava_ru': {
+        'loader': ZABAVAR_RU_Loader,
+        'parser': ParseZabavaFilm
+    }
 }
 sites = sites_crawler.keys()
 
@@ -85,8 +103,8 @@ def robot_exceptions(func):
             site = kwargs['site']
         else:
             site = args[1]
-        try:
 
+        try:
             func(*args,**kwargs)
         except ConnectionError, ce:
             # Couldn't conect to server
@@ -148,9 +166,8 @@ def robot_exceptions(func):
     return wrapper
     
 
-@robot_exceptions    
+@robot_exceptions
 def process_film_on_site(site,film_id):
-
     try:
         film = [Films.objects.get(id=film_id),]
     except Films.DoesNotExist:
@@ -193,4 +210,3 @@ def launch_next_robot_try_for_kinopoisk(robot):
             robot_try = RobotsTries(domain='kinopoisk_ru', film=film,
                                     outcome=APP_ROBOTS_TRY_PARSE_ERROR)
             robot_try.save()
-
