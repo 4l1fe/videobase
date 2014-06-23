@@ -1,19 +1,19 @@
 # coding: utf-8
 
 import os
-
 import djcelery
-
 from datetime import timedelta
 from ConfigParser import RawConfigParser
 
-
+###########################################################
 # Celery settings
 os.environ["CELERY_LOADER"] = "django"
 djcelery.setup_loader()
+
 AMQP_HOST = 'localhost'
 BROKER_HOST = 'localhost'
 BROKER_PORT = 5672
+###########################################################
 
 BASE_PATH = os.path.dirname(__file__)
 BASE_DIR = os.path.dirname(BASE_PATH)
@@ -45,6 +45,7 @@ HTTP_USER_TOKEN_TYPE = b'X-MI-TOKEN'
 STANDART_HTTP_SESSION_TOKEN_HEADER = b'HTTP_{}'.format(HTTP_SESSION_TOKEN_TYPE.replace('-', '_'))
 STANDART_HTTP_USER_TOKEN_HEADER = b'HTTP_{}'.format(HTTP_USER_TOKEN_TYPE.replace('-', '_'))
 
+###########################################################
 emailconf = RawConfigParser()
 emailconf.read(CONFIGS_PATH + '/email.ini')
 EMAIL_HOST = emailconf.get('email', 'EMAIL_HOST')
@@ -55,6 +56,7 @@ EMAIL_USE_TLS = emailconf.getboolean('email', 'EMAIL_USE_TLS')
 EMAIL_BACKEND = emailconf.get('email', 'EMAIL_BACKEND')
 DEFAULT_FROM_EMAIL = emailconf.get('email', 'DEFAULT_FROM_EMAIL')
 
+###########################################################
 # Application definition
 INSTALLED_APPS = (
     'admin_tools',
@@ -142,9 +144,21 @@ CACHES = {
     }
 }
 
+# Backends for social auth
+AUTHENTICATION_BACKENDS = (
+    # OAuth
+    'social_auth.backends.twitter.TwitterBackend',
+    'social_auth.backends.facebook.FacebookBackend',
+    'social_auth.backends.contrib.vk.VKOAuth2Backend',
+    'social_auth.backends.google.GoogleOAuth2Backend',
+
+    # Django
+    'django.contrib.auth.backends.ModelBackend',
+)
+
+###########################################################
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
-
 LANGUAGE_CODE = 'ru-RU'
 
 TIME_ZONE = 'UTC'
@@ -158,7 +172,6 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
-
 MEDIA_ROOT = os.path.abspath(BASE_PATH + '/../static')
 MEDIA_URL = '/static/'
 
@@ -180,11 +193,11 @@ REST_FRAMEWORK = {
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 
-# LOGIN_REDIRECT_URL = '/oauth-redirect/'
 LOGIN_URL = '/login'
 SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/tokenize'
 LOGIN_ERROR_URL = '/'
 
+###########################################################
 # Ключи для OAuth2 авторизации
 # Vkontakte
 VK_APP_ID            = '4296663'
@@ -212,17 +225,6 @@ MAILRU_OAUTH2_CLIENT_SECRET = '8cc7bb50e5b93663774e6584a1251d79'
 
 SOCIAL_AUTH_CREATE_USERS = True
 SOCIAL_AUTH_USERNAME_IS_FULL_EMAIL = True
-
-# Backends for social auth
-AUTHENTICATION_BACKENDS = (
-    # OAuth
-    'social_auth.backends.twitter.TwitterBackend',
-    'social_auth.backends.facebook.FacebookBackend',
-    'social_auth.backends.contrib.vk.VKOAuth2Backend',
-    'social_auth.backends.google.GoogleOAuth2Backend',
-    # Django
-    'django.contrib.auth.backends.ModelBackend',
-)
 
 # Перечислим pipeline, которые последовательно буду обрабатывать респонс
 SOCIAL_AUTH_PIPELINE = (
@@ -255,6 +257,7 @@ if not DEBUG:
         'dsn': 'http://8684bf8b497047d9ac170fd16aefc873:41e89f4666b24f998125370f3d1a1789@sentry.aaysm.com/2'
     }
 
+###########################################################
 CELERYBEAT_SCHEDULE = {
     'robot-launch': {
         'task': 'robot_launch',
@@ -284,36 +287,34 @@ CELERYBEAT_SCHEDULE = {
         'task': 'kinopoisk_persons',
         'schedule': timedelta(seconds=10),
     },
-
     'kinopoisk_news': {
         'task': 'kinopoisk_news',
         'schedule': timedelta(days=3),
     },
-
-    'youtube_trailers':{
+    'youtube_trailers': {
         'task': 'youtube_trailers_all',
         'schedule': timedelta(days=1),
     },
-    'kinopoisk_films':{
+    'kinopoisk_films': {
         'task': 'kinopoisk_films',
         'schedule': timedelta(days=1),
         'args': (3,),
     },
-    'kinopoisk_films':{
+    'kinopoisk_films': {
         'task': 'kinopoisk_films',
         'schedule': timedelta(days=7),
         'args': (10,),
     },
-    'kinopoisk_films':{
+    'kinopoisk_films': {
         'task': 'kinopoisk_films',
         'schedule': timedelta(days=31),
         'args': (11,),
     },
-    'kinopoisk_refresh':{
+    'kinopoisk_refresh': {
         'task': 'kinopoisk_refresher',
         'schedule': timedelta(days=1),
     },
-    'playfamily_xml':{
+    'playfamily_xml': {
         'task': 'playfamily_xml',
         'schedule': timedelta(days=7),
     }
