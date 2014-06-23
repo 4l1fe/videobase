@@ -299,3 +299,17 @@ def kinopoisk_view(request, film_id, *args, **kwargs):
         pass
 
     return redirect('index_view')
+
+
+def search_view(request, *args, **kwargs):
+    resp_dict = {
+        'films': [],
+    }
+
+    if request.REQUEST.get('text'):
+        try:
+            resp_dict['films'] = SearchFilmsView().as_view(request).data
+        except Exception, e:
+            pass
+
+    return HttpResponse(render_page('search', resp_dict))
