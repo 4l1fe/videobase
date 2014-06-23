@@ -30,9 +30,9 @@ body
                                         ul.dropdown-menu
                                             li
                                                 a(href='#' + i, title='',data-mi-id=0) все жанры
-                                            each item, i in filter_genres
+                                            each item in filter_genres.sort(function (a,b){return a.order - b.order})                                              
                                                 li
-                                                    a(href='?genre=' + i, title='',data-mi-id=i)=item
+                                                    a(href='?genre=' + item.id, title='',data-mi-id=item.id)=item.name
                                     li#filter_rating
                                         a.sprite.sprite-i-toggle-bottom(href='#', data-toggle='dropdown', title='')
                                             span=filter_rating[0]
