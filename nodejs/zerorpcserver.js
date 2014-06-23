@@ -17,13 +17,22 @@ var renderers = {
 
 var server = new zerorpc.Server({
     render: function(json, reply) {
+
         var data = JSON.parse(json);
+        try {
+        repl = renderers[data.template](data.context)
+        }
+        catch(e){
+            console.log(e)
+        }
+
+console.log("OK")
         reply(null, renderers[data.template](data.context));
     }
 });
 
 server.on("error", function(error) {
-   console.error(error);
+   console.log(error);
 });
 
 server.bind("tcp://*:4242");
