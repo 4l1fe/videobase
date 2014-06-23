@@ -3,14 +3,14 @@
   var conf;
 
   conf = {
-    static_url: "static/"
+    static_url: "/static/"
   };
 
-  conf.images_url = conf.static_url + 'img/';
+  conf.images_url = conf.static_url + '/img/';
 
-  conf.tpl_url = conf.static_url + 'tpl/';
+  conf.tpl_url = conf.static_url + '/tpl/';
 
-  conf.api_url = "api/";
+  conf.api_url = "/api/v1/";
 
   conf.noposter_url = conf.images_url + "noposter.png";
 
