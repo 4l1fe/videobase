@@ -34,6 +34,7 @@ urlpatterns = patterns('',
     url(r'^playlist/(?P<film_id>\d+)/$', 'apps.films.views.playlist_view', name='playlist_film_view'),
     url(r'^playlist/$', 'apps.films.views.playlist_view', name='playlist_view'),
     url(r'^kinopoisk/(?P<film_id>\d+)/$', 'apps.films.views.kinopoisk_view', name='kinopoisk_view'),
+    url(r'^search/$', 'apps.films.views.search_view', name='search_view'),
 
     # Auth
     url(r'', include('social_auth.urls')),
