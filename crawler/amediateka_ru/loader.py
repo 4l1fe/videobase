@@ -2,7 +2,7 @@
 import json
 import requests
 from apps.films.constants import APP_FILM_SERIAL
-from crawler.robot_start import save_location, sane_dict
+from crawler.locations_utils import save_location, sane_dict
 from apps.films.models import Films
 
 
