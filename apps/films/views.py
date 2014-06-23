@@ -302,6 +302,8 @@ def kinopoisk_view(request, film_id, *args, **kwargs):
 
 
 def search_view(request, *args, **kwargs):
+    # Устанавливаем ответ по умолчанию и вызываем сериализатор поиска
+
     resp_dict = {
         'films': [],
     }
