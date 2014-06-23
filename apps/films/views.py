@@ -143,8 +143,8 @@ def index_view(request):
 
     # Init response
     data = {
-         'new_films': resp_dict_data,
-         'genres': genres_data,
+        'films_new': resp_dict_data,
+        'filter_genres': genres_data,
     }
 
     return HttpResponse(render_page('index', data), status.HTTP_200_OK)
