@@ -287,3 +287,15 @@ def film_to_view(film_id):
     resp_dict['comments'] = calc_comments(o_film)
 
     return resp_dict, o_film
+
+
+def kinopoisk_view(request, film_id, *args, **kwargs):
+    # Проверяем, есть ли иакой film_id в нашей базе данных
+    # и что эта запись уникальна
+    try:
+        o_film = film_model.Films.objects.get(kinopoisk_id=film_id)
+        return redirect('film_view', film_id=o_film.id)
+    except Exception, e:
+        pass
+
+    return redirect('index_view')
