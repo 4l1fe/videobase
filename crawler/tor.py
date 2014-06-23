@@ -5,13 +5,13 @@ import time
 import pycurl
 import socket
 import cStringIO as StringIO
-from crawler.constants import TOR_PROXY
+from crawler.constants import TOR_PROXY, TOR_RECONNECTS
+
 
 DEFAULT_HEADERS = [ 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
         'Accept-Language: ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4',
         'Accept-Charset: UTF-8',
     ]
-from crawler.constants import TOR_RECONNECTS
 
 ########################################################################
 def renew_connection(passAuth="mypassword"):
@@ -46,7 +46,7 @@ def renew_connection(passAuth="mypassword"):
 
 
 ########################################################################
-def get_page(url, user_agent, headers = DEFAULT_HEADERS):
+def get_page(url, user_agent, headers=DEFAULT_HEADERS):
     # Init Data
     flag = False
 
@@ -96,8 +96,8 @@ def check_result(header):
 
     return True
 
-def get_page_or_renew(url,user_agent):
 
+def get_page_or_renew(url,user_agent):
     counter = 0
     
     while counter < TOR_RECONNECTS:
@@ -109,6 +109,7 @@ def get_page_or_renew(url,user_agent):
         else:
             return body
             break
+
 
 ########################################################################
 def main():
