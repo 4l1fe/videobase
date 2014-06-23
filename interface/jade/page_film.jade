@@ -73,7 +73,7 @@ body
                                     span Страна
                                     - delim = false
                                     each c in film.countries
-                                        =(delim?", ":"") + c
+                                        =(delim?", ":"") + c.name
                                         - delim = true
                             if film.directors
                                 li
