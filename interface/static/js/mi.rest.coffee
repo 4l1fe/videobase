@@ -162,6 +162,7 @@ class Resource
           complete: (xhr) =>
             if xhr.status == 200 && xhr.responseJSON && xhr.responseJSON.session_token
               @session_token = xhr.responseJSON.session_token
+              $.cookie("x-session", @session_token, {secure: true, path: "/"})
               for cb in @_session_callback_queue
                 cb(true)
             else

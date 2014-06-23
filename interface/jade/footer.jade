@@ -1,36 +1,132 @@
-footer
+footer(role='contentinfo')
     .container
-        .col-md-4.logo
-            .md-padding.md-vmiddle
-                span.md-vmiddle-helper
-                img(src="static/img/logo-footer.png",alt="Всё видео")
-        .col-md-4.links
-            ul.list-inline
-                li
-                    a(href="#") Правовая информация
-                li
-                    a(href="#") О сервисе
-        .col-md-4.social
-            ul.list-inline
-                li
-                    a(href="/login/facebook")
-                        img(src="static/img/social-fb.png",alt="Всё видео на Фейсбуке")
-                li
-                    a(href="/login/twitter/")
-                        img(src="static/img/social-twitter.png",alt="Всё видео на Твиттере")
-                li
-                    a(href="/login/google-oauth2/")
-                        img(src="static/img/social-rss.png",alt="Всё видео RSS")
-                li
-                    a(href="/login/vk-oauth/")
-                        img(src="static/img/social-vk.png",alt="Всё видео во ВКонтакте")
-    .container
-        .copyright.md-col-12
-            &copy; Всё видео, 2014. Все права защищены
-script(src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js")
-script(src="static/js/config.js")
-script(src="static/3d/rateit/jquery.rateit.js")
-script(src="static/js/mi.helper.js")
-script(src="static/js/mi.rest.js")
-script(src="static/js/app1.js")
-script(src="static/js/dirtyhack.js")
+        .top-footer
+            .row
+                .col-md-3.block-footer
+                    a(href='/', title='')
+                        img(src='static/img/logo-footer.png', alt='')
+                .col-md-6.block-footer
+                    ul.menu-footer
+                        li
+                            a(href='/legal', title='Правовая информация') Правовая информация
+                        li
+                            a(href='/about', title='О сервисе') О сервисе
+                .col-md-3.block-footer
+                    ul.menu-soc
+                        li
+                            a(href='#', title='')
+                                img(src='static/img/i-fb.png', alt='')
+                        li
+                            a(href='#', title='')
+                                img(src='static/img/i-tw.png', alt='')
+                        li
+                            a(href='#', title='')
+                                img(src='static/img/i-rss.png', alt='')
+                        li
+                            a(href='#', title='')
+                                img(src='static/img/i-vk.png', alt='')
+        //
+           .top-footer
+        .bottom-footer
+            p © ВсеВидео, 2014. Все права защищены
+        //
+           .bottom-footer
+        //
+           .wrap-page
+#reg-enter.modal.fade(tabindex='-1', role='dialog', area-hidden='true')
+    .modal-dialog
+        .modal-content
+            button.close.modal-close(type='button', data-dismiss='modal', aria-hidden='true') ×
+            .wrap-popup-content
+                ul.nav.nav-tabs.popup-tabs-a
+                    li.active
+                        a(href='#reg', data-toggle='tab')
+                            span Регистрация
+                    li
+                        a(href='#enter', data-toggle='tab')
+                            span Вход на сайт
+                .tab-content.popup-content
+                    #reg.tab-pane.active
+                        .wrap-popup-content
+                            h3 C помощью почты
+                            form.form-horizontal.form-popup(role='form',method="post",action="/login")
+                                .form-group
+                                    label.col-sm-3.control-label(for='inputEmail') E-mail
+                                    .col-sm-9
+                                        input#inputEmail.form-control(type='email')
+                                .form-group
+                                    label.col-sm-3.control-label(for='inputPassword') Пароль
+                                    .col-sm-9
+                                        input#inputPassword.form-control(type='password')
+                                        //p Количество символов должно быть не менее 8-ми.
+                                .form-group
+                                    label.col-sm-3.control-label(for='inputPasswordRe') Повторите пароль
+                                    .col-sm-9
+                                        input#inputPasswordRe.form-control(type='password')
+                                .form-group
+                                    .col-sm-offset-3.col-sm-10
+                                        button.btn.btn-yellow1(type='submit') Зарегистрироваться
+                            h3 C помощью социальных сетей
+                            ul.soc-hor
+                                li
+                                    a(href='/login/vk-oauth', title='')
+                                        img(src='static/img/i-vk-b.png', alt='')
+                                li
+                                    a(href='/login/facebook', title='')
+                                        img(src='static/img/i-fb-b.png', alt='')
+                                li
+                                    a(href='/login/twitter', title='')
+                                        img(src='static/img/i-tw-b.png', alt='')
+                                li
+                                    a(href='/login/google-oauth2', title='')
+                                        img(src='static/img/i-go-b.png', alt='')
+                        //
+                           .wrap-popup-content
+                    #enter.tab-pane
+                        .wrap-popup-content
+                            h3 C помощью почты
+                            form.form-horizontal.form-popup(role='form',method="post",action="/register")
+                                .form-group
+                                    label.col-sm-3.control-label(for='inputEmail1') E-mail
+                                    .col-sm-9
+                                        input#inputEmail1.form-control(type='email')
+                                .form-group
+                                    label.col-sm-3.control-label(for='inputPassword1') Пароль
+                                    .col-sm-9
+                                        input#inputPassword1.form-control(type='password')
+                                .form-group
+                                    .col-sm-offset-3.col-sm-10
+                                        button.btn.btn-yellow1(type='submit') Войти
+                            h3 C помощью социальных сетей
+                            ul.soc-hor
+                                li
+                                    a(href='/login/vk-oauth', title='')
+                                        img(src='static/img/i-vk-b.png', alt='')
+                                li
+                                    a(href='/login/facebook', title='')
+                                        img(src='static/img/i-fb-b.png', alt='')
+                                li
+                                    a(href='/login/twitter', title='')
+                                        img(src='static/img/i-tw-b.png', alt='')
+                                li
+                                    a(href='/login/google-oauth2', title='')
+                                        img(src='static/img/i-go-b.png', alt='')
+                        //
+                           .wrap-popup-content
+            //
+               .wrap-popup-content
+script(src='https://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js')
+script(src='static/js/bootstrap.min.js')
+script(src='static/js/jquery.rateit.min.js')
+script(src='static/js/imagesloaded.js')
+script(src='static/js/config.js')
+script(src='static/js/mi.helper.js')
+script(src='static/js/mi.rest.js')
+script(src='static/js/app1.js')
+//
+                    script(src='static/js/jquery.carouFredSel-6.2.1-packed.js')
+                    script(src='static/js/helper-caroufredsel/jquery.ba-throttle-debounce.min.js')
+                    script(src='static/js/helper-caroufredsel/jquery.mousewheel.min.js')
+                    script(src='static/js/helper-caroufredsel/jquery.touchSwipe.min.js')
+                    script(src='static/js/helper-caroufredsel/jquery.transit.min.js')
+                    script(src='/static/js/custom.js')
