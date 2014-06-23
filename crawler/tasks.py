@@ -1,4 +1,5 @@
 # coding: utf-8
+
 from __future__ import absolute_import
 from apps.films.models import Persons
 from bs4 import BeautifulSoup
@@ -16,7 +17,7 @@ import requests
 from videobase.celery import app
 from crawler.robot_start import sites_crawler, launch_next_robot_try_for_kinopoisk, process_film_on_site
 from apps.robots.models import Robots
-from crawler.kinopoisk_poster import  poster_robot_wrapper
+from crawler.kinopoisk_poster import poster_robot_wrapper
 from crawler.imdbratings import process_all
 from crawler.amediateka_ru.loader import Amediateka_robot
 from crawler.viaplay_ru.robot import ViaplayRobot
