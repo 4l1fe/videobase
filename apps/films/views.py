@@ -146,7 +146,7 @@ def index_view(request):
     data = {
         'films_new': resp_dict_data,
         'filter_genres': genres_data,
-        'films': [],
+        'films': vbFilm(film_model.Films.objects.order_by('rating_sort')[:12], many=True).data
     }
 
     return HttpResponse(render_page('index', data), status.HTTP_200_OK)
@@ -299,17 +299,3 @@ def kinopoisk_view(request, film_id, *args, **kwargs):
         pass
 
     return redirect('index_view')
-
-
-def search_view(request, *args, **kwargs):
-    resp_dict = {
-        'films': [],
-    }
-
-    if request.REQUEST.get('text'):
-        try:
-            resp_dict['films'] = SearchFilmsView.as_view()(request).data
-        except Exception, e:
-            pass
-
-    return HttpResponse(render_page('search', resp_dict))
