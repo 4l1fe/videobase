@@ -29,10 +29,11 @@ urlpatterns = patterns('',
     url(r'^user/profile/$', views.UserProfileView.as_view(), name='profile_view'),
     url(r'^user/(?P<user_id>\d+)/$', views.UserView.as_view()),
     url(r'^feed/$', 'apps.users.views.feed_view', name='user_feed_view'),
-    url(r'^persons/(?P<resource_id>\d+)/$', 'apps.films.views.person_view'),
-    url(r'^films/(?P<film_id>\d+)/$', 'apps.films.views.film_view'),
+    url(r'^persons/(?P<resource_id>\d+)/$', 'apps.films.views.person_view', name='person_view'),
+    url(r'^films/(?P<film_id>\d+)/$', 'apps.films.views.film_view', name='film_view'),
     url(r'^playlist/(?P<film_id>\d+)/$', 'apps.films.views.playlist_view', name='playlist_film_view'),
     url(r'^playlist/$', 'apps.films.views.playlist_view', name='playlist_view'),
+    url(r'^kinopoisk/(?P<film_id>\d+)/$', 'apps.films.views.kinopoisk_view', name='kinopoisk_view'),
 
     # Auth
     url(r'', include('social_auth.urls')),
