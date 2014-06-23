@@ -1,384 +1,200 @@
-<!DOCTYPE html5>
-<html lang="ru">
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Всё видео</title>
-  <link href="static/css/bootstrap.css" rel="stylesheet"/>
-  <link href="static/css/style.css" rel="stylesheet"/>
-  <link href="static/3d/rateit/rateit.css" rel="stylesheet"/>
-  <body class="page-film">
-    <header>
-      <div class="header-top">
+<!DOCTYPE html>
+<html lang="ru"></html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ВсеВидео</title>
+  <link href="static/css/bootstrap.min.css" rel="stylesheet">
+  <link href="static/css/bootstrap-theme.css" rel="stylesheet">
+  <link href="static/css/custom.css" rel="stylesheet">
+  <link href="static/css/rateit.css" rel="stylesheet">
+  <!--if lt IE 9
+  script(src='https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js')
+  script(src='https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js')
+  -->
+</head>
+<body>
+  <div id="log"></div>
+  <div class="wrap-page">
+    <header role="banner">
+      <div class="top-header">
         <div class="container">
-          <div class="col-md-3 col-sm-5 user-place">
-            <div class="avatar"><img src="static/img/tmp/user.gif" class="img-circle img-responsive"/></div>
-            <ul class="user-menu">
-              <li><a href="#">Профиль</a></li>
-              <li><a href="#">Выход</a></li>
-            </ul>
+          <div class="row">
+            <div class="col-md-3 user-block">
+              <ul>
+                <li><a href="#" data-toggle="modal" data-target="#reg-enter" title="" class="sprite sprite-i-enter"><span>Вход</span></a></li>
+                <li><a href="#" data-toggle="modal" data-target="#reg-enter" title="" class="sprite sprite-i-reg"><span>Регистрация</span></a></li>
+              </ul>
+            </div>
+            <div class="col-md-3 logo-block"><a href="/" title="Все Видео"><img src="static/img/logo-header.png" alt="" class="logo"></a></div>
+            <div class="col-md-6 search-block">
+              <div class="input-group">
+                <input type="text" placeholder="Поиск по сайту" class="form-control"><span class="input-group-btn">
+                  <button type="submit" class="btn btn-primary">Найти</button></span>
+              </div>
+            </div>
           </div>
-          <div class="col-md-3 col-sm-7 logo">
-            <div class="md-padding md-vmiddle"><span class="md-vmiddle-helper"></span><a href="#"><img src="static/img/logo.png" alt="Всё видео"/></a></div>
-          </div>
-          <form id="frm_search" class="col-md-6 col-sm-12 search">
-            <input type="search" name="text" placeholder="Поиск по сайту" id="inp_search" class="inp-search"/>
-            <input type="submit" value="Найти" id="inp_search" class="btn-submit"/>
-          </form>
         </div>
       </div>
-      <div class="header-menu">
+      <div class="bottom-header">
         <div class="container">
-          <div class="col-md-8 main-menu">
-            <ul class="list-inline">
-              <li class="active">
-                <div class="films">
-                  <p><a href="#">Фильмы</a></p>
-                </div>
-              </li>
-              <li>
-                <div class="serials">
-                  <p><a href="#">Сериалы</a></p>
-                </div>
-              </li>
-              <li>
-                <div class="tv">
-                  <p><a href="#">ТВ-программы</a></p>
-                </div>
-              </li>
-              <li>
-                <div class="stream">
-                  <p><a href="#">Онлайн-трансляции</a></p>
-                </div>
-              </li>
-            </ul>
-          </div>
-          <div class="col-md-4 sub-menu">
-            <ul class="list-inline">
-              <li>
-                <div class="playlist">
-                  <p><a href="#">Плейлист</a></p>
-                </div>
-              </li>
-              <li>
-                <div class="feed">
-                  <p><a href="#">Лента</a></p>
-                </div>
-              </li>
-            </ul>
+          <div class="row">
+            <div class="col-md-8 col-sm-8">
+              <ul class="menu-header">
+                <li><a href="/" title=""><i class="sprite sprite-i-film"></i><br>Фильмы</a></li>
+                <li><a href="#" title=""><i class="sprite sprite-i-ser"></i><br>Сериалы</a></li>
+                <li><a href="#" title=""><i class="sprite sprite-i-tv"></i><br>ТВ-программа</a></li>
+                <li><a href="#" title=""><i class="sprite sprite-i-online"></i><br>Онлайн</a></li>
+              </ul>
+            </div>
+            <div class="col-md-4 col-sm-4">
+              <ul class="menu-header">
+                <li><a href="/playlist" title=""><i class="sprite sprite-i-play"></i><br>Плейлист</a></li>
+                <li><a href="/feed" title=""><i class="sprite sprite-i-tape"></i><br>Лента</a></li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
     </header>
-    <div class="films-wrapper">
-      <div class="container">
-        <h1>Волк с Уолл-стрит <em>The wolf of Wall Street</em></h1>
-        <div id="player"></div>
-      </div>
-    </div>
-    <div class="container film-info">
-      <div class="col-md-3 poster-place">
-        <div class="poster"></div>
-      </div>
-      <div class="col-md-6 info-place">
-        <table>
-          <tr>
-            <th>Страна</th>
-            <td>США</td>
-          </tr>
-          <tr>
-            <th>Режиссёр</th>
-            <td><a href="#">Мартин Скорсезе</a></td>
-          </tr>
-          <tr>
-            <th>Сценарист</th>
-            <td><a href="#">Теренс Уинтер</a>,<a href="#">Джордан Белфорт</a></td>
-          </tr>
-          <tr>
-            <th>Дата выхода</th>
-            <td>1 января</td>
-          </tr>
-          <tr>
-            <th>Время</th>
-            <td>3 часа 10 минут</td>
-          </tr>
-        </table>
-      </div>
-      <div class="col-md-3 rating-place">
-        <div class="rating-header">Сводный рейтинг</div>
-        <div class="rating-cons">8.5</div>
-        <div class="rating-cons-cnt">8565 голосов</div>
-        <div class="rating-all">
-          <p><strong>8.9</strong> Рейтинг в <em>КП</em></p>
-          <p><strong>7.5</strong> Рейтинг в <em>IMDB</em></p>
-        </div>
-      </div>
-    </div>
+  </div>
+  <footer role="contentinfo">
     <div class="container">
-      <div class="col-md-9">
-        <div class="description-place">
-          <h2>Описание</h2>
-          <div class="description">
-            Метод HEAD.<br/>Метод HEAD аналогичен методу GET, за исключением того, что сервер ничего не посылает     в информационной части ответа. Метод HEAD запрашивает только информацию заголовка о
-            файле и ресурсе. Инфоримация заголовка запроса HEAD должна быть такой же, как в запросе
-            GET.
-            Этот метод используется, когда клиент хочет найти информацию о документе, не получая
-            его. Для метода HEAD существует множество приложений. Например, клиент может
-            затребовать следующую информацию:
-            * время изменения документа ( эти данные полезны для запросов, связанных с кэш-памятью);
-            * размер документа (необходим для компоновки страницы, оценки времени передачи,
-            определения необходимости запроса более компактной версии документа);
-            * тип документа (позволяет клиенту изучать документы только определенного типа);
-            * тип сервера;
-            Следует отметить, что большая часть информации заголовка, которую посылает сервер, не
-            является обязательной и может предоставляться не всеми срверами.
-            Ниже приведен пример HTTP-транакции с использованием запроса HEAD. Клиент посылает
+      <div class="top-footer">
+        <div class="row">
+          <div class="col-md-3 block-footer"><a href="#" title=""><img src="static/img/logo-footer.png" alt=""></a></div>
+          <div class="col-md-6 block-footer">
+            <ul class="menu-footer">
+              <li><a href="/legal" title="Правовая информация">Правовая информация</a></li>
+              <li><a href="/about" title="О сервисе">О сервисе</a></li>
+            </ul>
+          </div>
+          <div class="col-md-3 block-footer">
+            <ul class="menu-soc">
+              <li><a href="#" title=""><img src="static/img/i-fb.png" alt=""></a></li>
+              <li><a href="#" title=""><img src="static/img/i-tw.png" alt=""></a></li>
+              <li><a href="#" title=""><img src="static/img/i-rss.png" alt=""></a></li>
+              <li><a href="#" title=""><img src="static/img/i-vk.png" alt=""></a></li>
+            </ul>
           </div>
         </div>
-        <div class="trailer-place"></div>
-        <div class="comments-place"></div>
-        <!-- comments mixins-->
-        <div class="comments-more">
-          <button><span>Показать ещё</span></button>
-        </div>
       </div>
-      <div id="actors" class="col-md-3 actors-place">
-        <h2>Актёры</h2>
-        <!-- actors mixins-->
+      <!--.top-footer
+      -->
+      <div class="bottom-footer">
+        <p>© ВсеВидео, 2014. Все права защищены</p>
+      </div>
+      <!--.bottom-footer
+      -->
+      <!--.wrap-page
+      -->
+    </div>
+  </footer>
+  <div id="reg-enter" tabindex="-1" role="dialog" area-hidden="true" class="modal fade">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <button type="button" data-dismiss="modal" aria-hidden="true" class="close modal-close">×</button>
+        <div class="wrap-popup-content">
+          <ul class="nav nav-tabs popup-tabs-a">
+            <li class="active"><a href="#reg" data-toggle="tab"><span>Регистрация</span></a></li>
+            <li><a href="#enter" data-toggle="tab"><span>Вход на сайт</span></a></li>
+          </ul>
+          <div class="tab-content popup-content">
+            <div id="reg" class="tab-pane active">
+              <div class="wrap-popup-content">
+                <h3>C помощью почты</h3>
+                <form role="form" class="form-horizontal form-popup">
+                  <div class="form-group">
+                    <label for="inputEmail" class="col-sm-3 control-label">E-mail</label>
+                    <div class="col-sm-9">
+                      <input id="inputEmail" type="email" class="form-control">
+                    </div>
+                  </div>
+                  <div class="form-group has-error">
+                    <label for="inputPassword" class="col-sm-3 control-label">Пароль</label>
+                    <div class="col-sm-9">
+                      <input id="inputPassword" type="password" class="form-control">
+                      <p>Количество символов должно быть не менее 8-ми.</p>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="inputPasswordRe" class="col-sm-3 control-label">Повторите пароль</label>
+                    <div class="col-sm-9">
+                      <input id="inputPasswordRe" type="password" class="form-control">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="col-sm-offset-3 col-sm-10">
+                      <button type="submit" class="btn btn-yellow1">Зарегистрироваться</button>
+                    </div>
+                  </div>
+                </form>
+                <h3>C помощью социальных сетей</h3>
+                <ul class="soc-hor">
+                  <li><a href="#" title=""><img src="static/img/i-vk-b.png" alt=""></a></li>
+                  <li><a href="#" title=""><img src="static/img/i-fb-b.png" alt=""></a></li>
+                  <li><a href="#" title=""><img src="static/img/i-tw-b.png" alt=""></a></li>
+                  <li><a href="#" title=""><img src="static/img/i-go-b.png" alt=""></a></li>
+                </ul>
+              </div>
+              <!--.wrap-popup-content
+              -->
+            </div>
+            <div id="enter" class="tab-pane">
+              <div class="wrap-popup-content">
+                <h3>C помощью почты</h3>
+                <form role="form" class="form-horizontal form-popup">
+                  <div class="form-group">
+                    <label for="inputEmail1" class="col-sm-3 control-label">E-mail</label>
+                    <div class="col-sm-9">
+                      <input id="inputEmail1" type="email" class="form-control">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="inputPassword1" class="col-sm-3 control-label">Пароль</label>
+                    <div class="col-sm-9">
+                      <input id="inputPassword1" type="password" class="form-control">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="col-sm-offset-3 col-sm-10">
+                      <button type="submit" class="btn btn-yellow1">Войти</button>
+                    </div>
+                  </div>
+                </form>
+                <h3>C помощью социальных сетей</h3>
+                <ul class="soc-hor">
+                  <li><a href="#" title=""><img src="static/img/i-vk-b.png" alt=""></a></li>
+                  <li><a href="#" title=""><img src="static/img/i-fb-b.png" alt=""></a></li>
+                  <li><a href="#" title=""><img src="static/img/i-tw-b.png" alt=""></a></li>
+                  <li><a href="#" title=""><img src="static/img/i-go-b.png" alt=""></a></li>
+                </ul>
+              </div>
+              <!--.wrap-popup-content
+              -->
+            </div>
+          </div>
+        </div>
+        <!--.wrap-popup-content
+        -->
       </div>
     </div>
-    <div class="clearfix"></div>
-    <div id="films" class="container films">
-      <div id="film-thumb-1" class="film-thumb col-md-3">
-        <div class="poster-wrapper">
-          <div style="background-image: url(&quot;static/img/tmp/poster1.jpg&quot;)" class="poster-place"></div>
-        </div>
-        <div class="rating-place">
-          <p class="rating">5.6
-          </p>
-        </div>
-        <div class="name-place"><a href="#" class="name">Самый лучший фильм лучший фильм</a><span class="year"> (2014)</span></div>
-        <div class="rel-place">
-          <div data-rateit-max='10' data-rateit-resetable='0' data-rateit-value='5' class="rateit rate"></div>
-          <button class="notwatch-btn">N</button>
-        </div>
-        <div class="button-place button-priced">
-          <div class="instock">
-            <button class="watch-btn">Смотреть<br/><span>от 300 р. без рекламы</span></button>
-            <button class="playlist-btn">+</button>
-            <div class="watchprice invisible">или<br/><a href="#">от <span class="price">100</span> р. без рекламы</a></div>
-          </div>
-          <div class="notinstock display-none">
-            <button class="subscribe-btn">Подписаться</button>
-            <div class="watchprice">&nbsp;<br/>&nbsp;</div>
-          </div>
-        </div>
-      </div>
-      <div id="film-thumb-2" class="film-thumb col-md-3">
-        <div class="poster-wrapper">
-          <div style="background-image: url(&quot;static/img/tmp/poster1.jpg&quot;)" class="poster-place"></div>
-        </div>
-        <div class="rating-place">
-          <p class="rating">8.6
-          </p>
-        </div>
-        <div class="name-place"><a href="#" class="name">Самый лучший фильм</a><span class="year"> (2011)</span></div>
-        <div class="rel-place">
-          <div data-rateit-max='10' data-rateit-resetable='0' data-rateit-value='5' class="rateit rate"></div>
-          <button class="notwatch-btn">N</button>
-        </div>
-        <div class="button-place">
-          <div class="instock">
-            <button class="watch-btn">Смотреть<br/>Бесплатно</button>
-            <button class="playlist-btn">+</button>
-            <div class="watchprice invisible">или<br/><a href="#">от <span class="price"></span> р. без рекламы</a></div>
-          </div>
-          <div class="notinstock display-none">
-            <button class="subscribe-btn">Подписаться</button>
-            <div class="watchprice">&nbsp;<br/>&nbsp;</div>
-          </div>
-        </div>
-      </div>
-      <div id="film-thumb-3" class="film-thumb col-md-3">
-        <div class="poster-wrapper">
-          <div style="background-image: url(&quot;static/img/tmp/poster1.jpg&quot;)" class="poster-place"></div>
-        </div>
-        <div class="rating-place">
-          <p class="rating">7
-          </p>
-        </div>
-        <div class="name-place"><a href="#" class="name">Самый лучший фильм</a><span class="year"> (2001)</span></div>
-        <div class="rel-place">
-          <div data-rateit-max='10' data-rateit-resetable='0' data-rateit-value='8' class="rateit rate"></div>
-          <button class="notwatch-btn">N</button>
-        </div>
-        <div class="button-place">
-          <div class="instock display-none">
-            <button class="watch-btn">Смотреть<br/>Бесплатно</button>
-            <button class="playlist-btn">+</button>
-            <div class="watchprice invisible">или<br/><a href="#">от <span class="price"></span> р. без рекламы</a></div>
-          </div>
-          <div class="notinstock">
-            <button class="subscribe-btn">Подписаться</button>
-            <div class="watchprice">&nbsp;<br/>&nbsp;</div>
-          </div>
-        </div>
-      </div>
-      <div id="film-thumb-4" class="film-thumb col-md-3">
-        <div class="poster-wrapper">
-          <div style="background-image: url(&quot;static/img/tmp/poster1.jpg&quot;)" class="poster-place"></div>
-        </div>
-        <div class="rating-place">
-          <p class="rating">9.1
-          </p>
-        </div>
-        <div class="name-place"><a href="#" class="name">Самый лучший фильм</a><span class="year"> (1970)</span></div>
-        <div class="rel-place">
-          <div data-rateit-max='10' data-rateit-resetable='0' data-rateit-value='3' class="rateit rate"></div>
-          <button class="notwatch-btn">N</button>
-        </div>
-        <div class="button-place">
-          <div class="instock">
-            <button class="watch-btn">Смотреть<br/>Бесплатно</button>
-            <button class="playlist-btn">+</button>
-            <div class="watchprice">или<br/><a href="#">от <span class="price">100</span> р. без рекламы</a></div>
-          </div>
-          <div class="notinstock display-none">
-            <button class="subscribe-btn">Подписаться</button>
-            <div class="watchprice">&nbsp;<br/>&nbsp;</div>
-          </div>
-        </div>
-      </div>
-      <div id="film-thumb-1" class="film-thumb col-md-3">
-        <div class="poster-wrapper">
-          <div style="background-image: url(&quot;static/img/tmp/poster1.jpg&quot;)" class="poster-place"></div>
-        </div>
-        <div class="rating-place">
-          <p class="rating">5.6
-          </p>
-        </div>
-        <div class="name-place"><a href="#" class="name">Самый лучший фильм лучший фильм</a><span class="year"> (2014)</span></div>
-        <div class="rel-place">
-          <div data-rateit-max='10' data-rateit-resetable='0' data-rateit-value='0' class="rateit rate"></div>
-          <button class="notwatch-btn">N</button>
-        </div>
-        <div class="button-place button-priced">
-          <div class="instock">
-            <button class="watch-btn">Смотреть<br/><span>от 300 р. без рекламы</span></button>
-            <button class="playlist-btn">+</button>
-            <div class="watchprice invisible">или<br/><a href="#">от <span class="price">100</span> р. без рекламы</a></div>
-          </div>
-          <div class="notinstock display-none">
-            <button class="subscribe-btn">Подписаться</button>
-            <div class="watchprice">&nbsp;<br/>&nbsp;</div>
-          </div>
-        </div>
-      </div>
-      <div id="film-thumb-2" class="film-thumb col-md-3">
-        <div class="poster-wrapper">
-          <div style="background-image: url(&quot;static/img/tmp/poster1.jpg&quot;)" class="poster-place"></div>
-        </div>
-        <div class="rating-place">
-          <p class="rating">8.6
-          </p>
-        </div>
-        <div class="name-place"><a href="#" class="name">Самый лучший фильм</a><span class="year"> (2011)</span></div>
-        <div class="rel-place">
-          <div data-rateit-max='10' data-rateit-resetable='0' data-rateit-value='5' class="rateit rate"></div>
-          <button class="notwatch-btn">N</button>
-        </div>
-        <div class="button-place">
-          <div class="instock">
-            <button class="watch-btn">Смотреть<br/>Бесплатно</button>
-            <button class="playlist-btn">+</button>
-            <div class="watchprice invisible">или<br/><a href="#">от <span class="price"></span> р. без рекламы</a></div>
-          </div>
-          <div class="notinstock display-none">
-            <button class="subscribe-btn">Подписаться</button>
-            <div class="watchprice">&nbsp;<br/>&nbsp;</div>
-          </div>
-        </div>
-      </div>
-      <div id="film-thumb-3" class="film-thumb col-md-3">
-        <div class="poster-wrapper">
-          <div style="background-image: url(&quot;static/img/tmp/poster1.jpg&quot;)" class="poster-place"></div>
-        </div>
-        <div class="rating-place">
-          <p class="rating">7
-          </p>
-        </div>
-        <div class="name-place"><a href="#" class="name">Самый лучший фильм</a><span class="year"> (2001)</span></div>
-        <div class="rel-place">
-          <div data-rateit-max='10' data-rateit-resetable='0' data-rateit-value='8' class="rateit rate"></div>
-          <button class="notwatch-btn">N</button>
-        </div>
-        <div class="button-place">
-          <div class="instock display-none">
-            <button class="watch-btn">Смотреть<br/>Бесплатно</button>
-            <button class="playlist-btn">+</button>
-            <div class="watchprice invisible">или<br/><a href="#">от <span class="price"></span> р. без рекламы</a></div>
-          </div>
-          <div class="notinstock">
-            <button class="subscribe-btn">Подписаться</button>
-            <div class="watchprice">&nbsp;<br/>&nbsp;</div>
-          </div>
-        </div>
-      </div>
-      <div id="film-thumb-4" class="film-thumb col-md-3">
-        <div class="poster-wrapper">
-          <div style="background-image: url(&quot;static/img/tmp/poster1.jpg&quot;)" class="poster-place"></div>
-        </div>
-        <div class="rating-place">
-          <p class="rating">9.1
-          </p>
-        </div>
-        <div class="name-place"><a href="#" class="name">Самый лучший фильм</a><span class="year"> (1970)</span></div>
-        <div class="rel-place">
-          <div data-rateit-max='10' data-rateit-resetable='0' data-rateit-value='3' class="rateit rate"></div>
-          <button class="notwatch-btn">N</button>
-        </div>
-        <div class="button-place">
-          <div class="instock">
-            <button class="watch-btn">Смотреть<br/>Бесплатно</button>
-            <button class="playlist-btn">+</button>
-            <div class="watchprice">или<br/><a href="#">от <span class="price">100</span> р. без рекламы</a></div>
-          </div>
-          <div class="notinstock display-none">
-            <button class="subscribe-btn">Подписаться</button>
-            <div class="watchprice">&nbsp;<br/>&nbsp;</div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <footer>
-      <div class="container">
-        <div class="col-md-4 logo">
-          <div class="md-padding md-vmiddle"><span class="md-vmiddle-helper"></span><img src="static/img/logo-footer.png" alt="Всё видео"/></div>
-        </div>
-        <div class="col-md-4 links">
-          <ul class="list-inline">
-            <li><a href="#">Правовая информация</a></li>
-            <li><a href="#">О сервисе</a></li>
-          </ul>
-        </div>
-        <div class="col-md-4 social">
-          <ul class="list-inline">
-            <li><a href="#"><img src="static/img/social-fb.png" alt="Всё видео на Фейсбуке"/></a></li>
-            <li><a href="#"><img src="static/img/social-twitter.png" alt="Всё видео на Твиттере"/></a></li>
-            <li><a href="#"><img src="static/img/social-rss.png" alt="Всё видео RSS"/></a></li>
-            <li><a href="#"><img src="static/img/social-vk.png" alt="Всё видео во ВКонтакте"/></a></li>
-          </ul>
-        </div>
-      </div>
-      <div class="container">
-        <div class="copyright md-col-12">&copy; Всё видео, 2014. Все права защищены</div>
-      </div>
-    </footer>
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
-    <script src="static/js/config.js"></script>
-    <script src="static/3d/rateit/jquery.rateit.js"></script>
-    <script src="static/js/mi.helper.js"></script>
-    <script src="static/js/mi.rest.js"></script>
-    <script src="static/js/app.js"></script>
-    <script>$(document).ready(function () {window.InitApp({}, "Registration")})</script>
-  </body>
-</html>
+  </div>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+  <script src="static/js/bootstrap.min.js"></script>
+  <script src="static/js/jquery.rateit.min.js"></script>
+  <script src="static/js/config.js"></script>
+  <script src="static/js/mi.helper.js"></script>
+  <script src="static/js/mi.rest.js"></script>
+  <script src="static/js/app1.js"></script>
+  <script>$(document).ready(function () {window.InitApp({}, "Main")})</script>
+  <!--
+  script(src='static/js/jquery.carouFredSel-6.2.1-packed.js')
+  script(src='static/js/helper-caroufredsel/jquery.ba-throttle-debounce.min.js')
+  script(src='static/js/helper-caroufredsel/jquery.mousewheel.min.js')
+  script(src='static/js/helper-caroufredsel/jquery.touchSwipe.min.js')
+  script(src='static/js/helper-caroufredsel/jquery.transit.min.js')
+  script(src='/static/js/custom.js')
+  -->
+</body>

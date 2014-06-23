@@ -10,11 +10,11 @@
 
   conf.tpl_url = conf.static_url + 'tpl/';
 
-  conf.api_url = "/api/v1/";
+  conf.api_url = "api/";
 
-  conf.noposter_url = conf.images_url + "noposter.jpg";
+  conf.noposter_url = conf.images_url + "noposter.png";
 
-  conf.noavatar_url = conf.images_url + "nophoto.jpg";
+  conf.noavatar_url = conf.images_url + "noavatar.png";
 
   conf.noperson_url = conf.images_url + "noperson.jpg";
 

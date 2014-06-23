@@ -1,127 +1,195 @@
-doctype html5
+- film = playlist.film
+- film_year = film.releasedate.substr(0,4)
+- page_title = "Плейлист (" + playlist.id + "/" + playlist.total_cnt + ") &mdash; " + film.name + " (" + film_year + ")"
 include mixins
-html(lang="ru")
-    include head
-    body.page-film
-        include header
-        if(playlist.total_cnt > 0)
-            .nav-wrapper
+include head
+body
+    include header
+    .content(role='main')
+        section.broun-block-playlist
+            .title-playlist.rel.zmin
                 .container
-                    .col-md-3
-                        a(href="/playlist/" + playlist.previous.id)=playlist.previous.name
-                    .col-md-6.text-center
-                        strong Плейлист (#{playlist.id}/#{playlist.total_cnt})
-                    .col-md-3
-                        a(href="/playlist/" + playlist.next.id)=playlist.next.name
-            .film-wrapper
+                    .row
+                        if playlist.previous
+                            .col-md-3.col-sm-4.text-right.pull-right
+                                a.action-film.next-film.active.sprite(href='/playlist/' + playlist.previous.id, title='')=playlist.previous.name
+                        if playlist.next
+                            .col-md-3.col-sm-4.text-left
+                                a.action-film.prev-film.sprite(href='/playlist/ + playlist.next.id', title='')=playlist.next.name
+                        .col-md-6.col-sm-4.text-center
+                            p ПЛЕЙЛИСТ (#{playlist.id}/#{playlist.total_cnt})
+            //
+               .title-playlist
+            .title-film
                 .container
-                    h1.col-md-6 #{film.name} <span>#{film.year}</span><em>#{film.name_orig}</em>
-                    .actions.col-md-6
-                        button.notwatch-btn#notwatch_btn N
-                        .rateit.rate#rateit(data-rateit-max=10,data-rateit-resetable=0,data-rateit-value=(film.relation && film.relation.rating)?film.relation.rating:0)
-                        button.playlist-btn#playlist_btn +
-                    .clearfix
-                    .player-place
-                        .player#player
+                    .row
+                        .col-md-8.col-sm-7
+                            .name-playlist
+                                h2=film.name + " (" + film_year + ")"
+                                if film.name_orig
+                                    span=film.name_orig + " (" + film_year + ")"
+                        .col-md-4.col-sm-5
+                            .range-block-playlist.cf
+                                a.sprite.sprite-stop-view.block.fright(href='#', title='')#playlist_btn
+                                .range-style2.fright
+                                    .rateit(data-rateit-max=10,data-rateit-resetable=1,data-rateit-value=(film.relation && film.relation.rating)?film.relation.rating:0)#rateit
+                                //
+                                   .range-style2
+                            //
+                               .range-block-tape
+                //
+                   .title-film
+            .film-area
                 .container
-                    .locations#locations
-                        if (film.locations && film.locations.length)
-                            each item in film.locations
-                                mixin location_thumb(item)
-            .playlist-list
-                .container#playlist_list
-                    - items_cnt = playlist.items.length
-                    - for (var i = 0; i < items_cnt; i++)
-                        .col-md-2
-                            - item = playlist.items[i]
-                            a(href="/playlist/" + (i+1))
-                                img.img-responsive(src=item.poster || "static/img/noposter.jpg")
-                                =item.name + "1"
-            .container.film-info
-                .col-md-3.poster-place
-                    .poster
-                        img.img-responsive(src=film.poster || "static/img/noposter.jpg")
-                .col-md-6.info-place
-                    table
-                        if (film.countries && film.countries.length)
-                            tr
-                                th Страна
-                                td
-                                    -countries = []
-                                    each country in film.countries
-                                        - countries.push(country.name)
-                                    - items_str = countries.join(", ")
-                                    =items_str
-                        if (film.directors && film.directors.length)
-                            tr
-                                th Режиссёр
-                                td
-                                    - i = 0
-                                    each item in film.directors
-                                        a(href="/persons/" + item.id)=item.name
-                                        - i++
-                                        if (i < film.directors.length)
-                                            |,
-                        if (film.scripwriters && film.scripwriters.length)
-                            tr
-                                th Сценарист
-                                td
-                                    - i = 0
-                                    each item in film.scripwriters
-                                        a(href="/persons/" + item.id)=item.name
-                                        - i++
-                                        if (i < film.scripwriters.length)
-                                            |,&nbsp;
-                        tr
-                            th Дата выхода
-                            td 1 января
-                        tr
-                            th Время
-                            td 3 часа 10 минут
-                .col-md-3.rating-place
-                    .rating-header Сводный рейтинг
-                    .rating-cons-cnt
-                        p #{film.ratings.cons[1]}
-                    .rating-cons-place
-                        .rating-cons #{film.ratings.cons[0]}
-                    .rating-all
-                        p <strong>#{film.ratings.kp[0]}</strong> Рейтинг в <em>КП</em>
-                        p <strong>#{film.ratings.imdb[0]}</strong> Рейтинг в <em>IMDB</em>
+                    .frame-player-wrapper
+                        .frame-player-aspect
+                            .frame-player#frame_player
+                    ul.just-list.list-btns-film#locations
+                        each el in film.locations
+                            mixin loc_thumb(el)
+            .playlist.rel.zmin
+                //
+                   none-playlist добавляем к tp что бы изначально скрыть плейлист и убираем класс active c toggle-playlist
+                .tp
+                    .container
+                        .playlist-wrap
+                            .playlist-slider-wrap.cf.rel.zmin
+                                ul#slider-playlist.cf
+                                    li
+                                        .row
+                                            each el in playlist.items
+                                                .col-md-2.col-sm-3.col-xs-4
+                                                    a(href='/playlist/' + el.id, title='')
+                                                        img(src=el.poster || "static/img/noposter.png", alt='')
+                                                    p
+                                                        | #{el.name}
+                                                        br
+                                                        span=el.year
+                //
+                             .playlist-slider
+                //
+                   .playlist-wrap
+                //
+                   .toggle-playlist
+                a.block.ab.toggle-playlist.active(href='#', title='')
+                    span Скрыть плейлист
+                //
+                   .playlist
+                //
+                   .broun-block
+        section.section-about
             .container
-                .col-md-9
-                    .description-place
-                        h2 Описание
-                        .description.
-                            Метод HEAD.<br/>Метод HEAD аналогичен методу GET, за исключением того, что сервер ничего не посылает     в информационной части ответа. Метод HEAD запрашивает только информацию заголовка о
-                            файле и ресурсе. Инфоримация заголовка запроса HEAD должна быть такой же, как в запросе
-                            GET.
-                            Этот метод используется, когда клиент хочет найти информацию о документе, не получая
-                            его. Для метода HEAD существует множество приложений. Например, клиент может
-                            затребовать следующую информацию:
-                            * время изменения документа ( эти данные полезны для запросов, связанных с кэш-памятью);
-                            * размер документа (необходим для компоновки страницы, оценки времени передачи,
-                            определения необходимости запроса более компактной версии документа);
-                            * тип документа (позволяет клиенту изучать документы только определенного типа);
-                            * тип сервера;
-                            Следует отметить, что большая часть информации заголовка, которую посылает сервер, не
-                            является обязательной и может предоставляться не всеми срверами.
-                            Ниже приведен пример HTTP-транакции с использованием запроса HEAD. Клиент посылает
-                    .trailer-place
-                    .comments-place
-                        h2 Комментарии
-                        #comments
-                            mixin comment_thumb({id: 1, text: "lorem ipsum ipsum lorem", time_text: "5 минут назад", created: "2014-05-01 19:01:02", user: {id: 1, name: "Василий Пастеров"}})
-                            mixin comment_thumb({id: 2, text: "lorem ipsum ipsum lorem", time_text: "5 минут назад", created: "2014-05-07 15:51:00", user: {id: 2, name: "Галя Кокорева", avatar: "static/img/tmp/user.gif"}})
-                .col-md-3.actors-place
-                    h2 Актёры
-                    #actors
-                        mixin person_thumb({id: 100, name: "Роберт Дениро"})
-                        mixin person_thumb({id: 99, name: "Арнольд Шварценегер"})
-                    .actors-more-place#actors_more
-                        button
-                            span Показать всех
-         else
-             h2 Пока вы не подписаны ни на один фильм!
+                .row
+                    .col-md-3.col-sm-4.col-xs-12
+                        .img-person-playlist
+                            img(src=film.poster || "static/img/noposter.png", alt='')
+                            br
+                            img(src="static/img/shd-small.png", alt='')
+                        //
+                           .img-person
+                    .col-md-6.col-sm-8.col-xs-12
+                        ul.person-data-playlist
+                            if film.countries
+                                li
+                                    span Страна
+                                    - delim = false
+                                    each c in film.countries
+                                        =(delim?", ":"") + c
+                                        - delim = true
+                            if film.directors
+                                li
+                                    span Режиссер
+                                    - delim = false
+                                    each c in film.directors
+                                        =(delim?", ":"") + c.name
+                                        - delim = true
+                            if film.scriptwriters
+                                li
+                                    span Сценарист
+                                    - delim = false
+                                    each c in film.scriptwriters
+                                        =(delim?", ":"") + c.name
+                                        - delim = true
+                            li
+                                span Дата выхода
+                                |#{date_text_str(film.releasedate)}
+                            if film.duration
+                                li
+                                    span Время
+                                    |#{duration_text(film.duration)}
+                        //
+                            .share-block
+                            img(src='images/content/img42.png', alt='')
+                        //
+                           .share-block
+                    .col-md-3.col-sm-12.col-xs-12
+                        .block-rate.rel.zmin
+                            .title-rate.text-center
+                                h5 Сводный рейтинг
+                            //
+                               .title-rate
+                            .rel.zmin.blue-num.num
+                                i=film.ratings && film.ratings.cons?film.ratings.cons[0]:"-"
+                            p.text-center=(film.ratings && film.ratings.cons?film.ratings.cons[1]:0) + " голосов"
+                            ul
+                                li
+                                    | Рейтинг в
+                                    strong=" Kinopoisk"
+                                    span=" " + (film.ratings && film.ratings.kp?film.ratings.kp[0]:"-")
+                                li
+                                    | Рейтинг в
+                                    strong=" IMDB"
+                                    span=" " + (film.ratings && film.ratings.imdb?film.ratings.imdb[0]:"-")
+                        //
+                           .block-rate
+                        .brd-bottom-rate
+                        - if (!film.locations || !film.locations.length)
+                            a.btn-green.btn-def.block.margin0a.btn-clear(href='#', title='')#subscribe_btn подписаться
+        section.brd-top
+            .container
+                .actors-full#actors_full.hide
+                    h2.blackh1 Актеры
+                .row
+                    #toggle_col.col-md-9
+                        if film.description
+                            .playlist-content
+                                h2.blackh1 Описание
+                                p!=film.description
+                        //
+                           .playlist-content
+                        if film.comments && film.comments.length
+                            h2.blackh1 Комментарии
+                            .tape-list#comments
+                                each el in film.comments
+                                    mixin comment_thumb(el)
+                        //
+                           .tape-list
+                            if film.comments.length >=5
+                                .add-filter
+                                    .add-content.style-panel-action.rel.zmin
+                                        a(href='#', title='') показать еще
+                                    //
+                                       .filter-content
+                                    img.img-responsive(src='static/img/shd-big.png', alt='')
+                                //
+                                   .filter-block
+                    .col-md-3.hide-actors#actors_left
+                        .playlist-content
+                            h2.blackh1 Актеры
+                            ul.actor-list.cf#actors
+                                each el in film.actors
+                                    mixin person_thumb(el)
+                        if film.actors.length >= 5
+                            .add-filter#actors_more
+                                .add-content.style-panel-action.rel.zmin
+                                    a(href='#show-actors', title='') показать всех
+                                //
+                                   .filter-content
+                                img.img-responsive(src='static/img/shd-big.png', alt='')
+                            //
+                               .filter-block
+                            //
         include footer
+        - delete film.description; delete playlist.items
         script.
-            $(document).ready(function () {window.InitApp({page_conf: !{JSON.stringify(playlist)}}, "Playlist")})
+            $(document).ready(function () {window.InitApp({page_conf: !{JSON.stringify(film)}}, "Playlist")})

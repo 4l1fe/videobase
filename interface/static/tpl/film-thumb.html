@@ -1,25 +1,11 @@
-<div data-mi-id="id" data-mi-val="NA" class="film-thumb col-md-3">
-  <div class="poster-wrapper">
-    <div data-mi-id="poster" data-mi-atbg="poster" data-mi-default="static/img/noposter.jpg" style="background-image: url(&quot;static/img/noposter.jpg&quot;)" class="poster-place"></div>
-  </div>
-  <div class="rating-place">
-    <p data-mi-name="ratings.cons.0" class="rating">
-    </p>
-  </div>
-  <div class="name-place"><a href="/films/NA" data-mi-athref="id" data-mi-name="name" data-mi-id="name" class="name"></a><span data-mi-id="year" data-mi-name="releasedate" class="year"> ()</span></div>
-  <div class="rel-place">
-    <div data-mi-id="relation.rating" data-mi-val='0' data-rateit-max='10' data-rateit-resetable='0' data-rateit-value='0' class="rateit rate"></div>
-    <button data-mi-onclick="toggle_notwatch" data-mi-id="relation.notwatch" data-mi-val='0' class="notwatch-btn">N</button>
-  </div>
-  <div data-mi-id="button-place" class="button-place">
-    <div data-mi-id="instock" class="instock display-none">
-      <button data-mi-id="watch_btn" data-mi-onclick="watchfilm" class="watch-btn">Смотреть<br/>Бесплатно</button>
-      <button data-mi-id="relation.playlist" data-mi-onclick="toggle_playlist" data-mi-val='0' class="playlist-btn">+</button>
-      <div data-mi-id="watch_price" class="watchprice invisible">или<br/><a href="/films/NA" data-im-athref="id">от <span class="price" data-mi-name="price"></span> р. без рекламы</a></div>
+<div data-mi-id="id" data-mi-val="NA" class="col-md-3 col-sm-4 col-xs-6 film-thumb"><a href="/film/NA" title="" data-mi-athref="id" class="poster-place"><img src="static/img/noposter.png" data-mi-atsrc="poster" data-mi-default="static/img/noposter.png" alt="" data-mi-id="poster" class="img-poster"/></a><img src="static/img/shd-small.png" alt=""/>
+  <div class="rel zmin num"><i data-mi-name="ratings.cons.0"></i></div>
+  <div class="caption-def">
+    <div class="name-film"><a href="/film/NA" title="" data-mi-athref="id"><span data-mi-name="name"></span> (<i data-mi-name="releasedate" data-mi-id="releasedate" data-mi-val=""></i>)</a></div>
+    <div class="range-style range-block">
+      <div data-mi-id="relation.rating" data-mi-val='0' data-rateit-max='10' data-rateit-resetable='1' data-rateit-value='0' class="rateit"></div>
     </div>
-    <div data-mi-id="notinstock" class="notinstock">
-      <button data-mi-id="relation.subscribed" data-mi-onclick="toggle_subscribe" data-mi-val='0' class="subscribe-btn">Подписаться</button>
-      <div class="watchprice">&nbsp;<br/>&nbsp;</div>
-    </div>
+    <div data-mi-id="btn" class="btn-def block margin0a btn-subscribe"><a href="/film/NA" title="" data-mi-id="btn_text" data-mi-athref="id">Подписаться</a><a href="#" title="Добавить в плейлист" data-mi-id="relation.playlist" data-mi-onclick="toggle_playlist" data-mi-val='0' class="btn-add ab"></a></div>
+    <p data-mi-id="btn_price" class="display-none">или<br/><a href="/film/NA" title="" data-mi-athref="id"><span data-mi-id="price">от false р. без рекламы</span></a></p>
   </div>
 </div>
