@@ -19,12 +19,13 @@ def render_page(page_type, context):
     result = get_current_request()
     if result.user.is_authenticated() and isinstance(data, dict):
         user = result.user
-        data['auth_user'] = {
+        data['context']['auth_user'] = {
             'id': user.id,
             'name': '',
             'avatar': ''
         }
 
+    
     html = client.render(json.dumps(data, cls=DjangoJSONEncoder), async=False)
     client.close()
 
