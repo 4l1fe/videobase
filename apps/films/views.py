@@ -19,6 +19,8 @@ from django.template import Context
 from django.http import HttpResponse, Http404
 from django.shortcuts import render_to_response, redirect
 from django.utils import timezone
+from django.middleware.csrf import CSRF_KEY_LENGTH
+from django.utils.crypto import get_random_string
 
 from rest_framework import status
 
@@ -142,15 +144,20 @@ def index_view(request):
         except:
             genres_data = []
 
-    films_data = vbFilm(film_model.Films.objects.order_by('rating_sort')[:12],many = True).data
+    films_data = vbFilm(film_model.Films.objects.order_by('rating_sort')[:12], many=True).data
+
+    csrf_token = get_random_string(CSRF_KEY_LENGTH)
     # Init response
     data = {
         'films_new': resp_dict_data,
         'filter_genres': genres_data,
-        'films': films_data
+        'films': films_data,
+        'csrf_token': csrf_token,
     }
 
-    return HttpResponse(render_page('index', data), status.HTTP_200_OK)
+    response = HttpResponse(render_page('index', data), status.HTTP_200_OK)
+    response.set_cookie("csrftoken", csrf_token)
+    return response
 
 
 def person_view(request, resource_id):
@@ -265,8 +272,9 @@ def playlist_view(request, film_id=None, *args, **kwargs):
         playlist['items'] = vbFilm(playlist_data, many=True).data
         playlist['total_cnt'] = len(playlist_data)
         playlist['id'] = film_id
+        playlist['film'] = film_data
 
-        return HttpResponse(render_page('playlist', {'playlist': playlist, 'film': film_data}))
+        return HttpResponse(render_page('playlist', {'playlist': playlist}))
     return redirect('login_view')
 
 
