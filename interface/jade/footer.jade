@@ -49,20 +49,21 @@ footer(role='contentinfo')
                     #reg.tab-pane.active
                         .wrap-popup-content
                             h3 C помощью почты
-                            form.form-horizontal.form-popup(role='form',method="post",action="/login")
+                            form.form-horizontal.form-popup(role='form',method="post",action="/register/")
+                                input(type="hidden",name="csrfmiddlewaretoken",value=csrf_token)
                                 .form-group
                                     label.col-sm-3.control-label(for='inputEmail') E-mail
                                     .col-sm-9
-                                        input#inputEmail.form-control(type='email')
+                                        input#inputEmail.form-control(type='email',name='email')
                                 .form-group
                                     label.col-sm-3.control-label(for='inputPassword') Пароль
                                     .col-sm-9
-                                        input#inputPassword.form-control(type='password')
+                                        input#inputPassword.form-control(type='password',name='password')
                                         //p Количество символов должно быть не менее 8-ми.
                                 .form-group
                                     label.col-sm-3.control-label(for='inputPasswordRe') Повторите пароль
                                     .col-sm-9
-                                        input#inputPasswordRe.form-control(type='password')
+                                        input#inputPasswordRe.form-control(type='password',name='password2')
                                 .form-group
                                     .col-sm-offset-3.col-sm-10
                                         button.btn.btn-yellow1(type='submit') Зарегистрироваться
@@ -85,15 +86,16 @@ footer(role='contentinfo')
                     #enter.tab-pane
                         .wrap-popup-content
                             h3 C помощью почты
-                            form.form-horizontal.form-popup(role='form',method="post",action="/register")
+                            form.form-horizontal.form-popup(role='form',method="post",action="/login/")
+                                input(type="hidden",name="csrfmiddlewaretoken",value=csrf_token)
                                 .form-group
                                     label.col-sm-3.control-label(for='inputEmail1') E-mail
                                     .col-sm-9
-                                        input#inputEmail1.form-control(type='email')
+                                        input#inputEmail1.form-control(type='email',name='username')
                                 .form-group
                                     label.col-sm-3.control-label(for='inputPassword1') Пароль
                                     .col-sm-9
-                                        input#inputPassword1.form-control(type='password')
+                                        input#inputPassword1.form-control(type='password',name='password')
                                 .form-group
                                     .col-sm-offset-3.col-sm-10
                                         button.btn.btn-yellow1(type='submit') Войти

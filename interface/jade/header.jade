@@ -11,19 +11,19 @@
                                     img.img-circle.fleft(src=auth_user.avatar || "static/img/noavatar.png", alt='')
                                 ul.list-link-user
                                     li
-                                        a(href='/profile', title='') Профиль
+                                        a(href='/profile/', title='') Профиль
                                     li
-                                        a(href='/logout', title='') Выход
+                                        a(href='/logout/', title='') Выход
                             //
                                .profile-user
                     else
                         .col-md-3.user-block
                             ul
                                 li
-                                    a.sprite.sprite-i-enter#login_btn(href='/login', title='')
+                                    a.sprite.sprite-i-enter#login_btn(href='/login/', title='')
                                         span Вход
                                 li
-                                    a.sprite.sprite-i-reg#reg_btn(href='/register', title='')
+                                    a.sprite.sprite-i-reg#reg_btn(href='/register/', title='')
                                         span Регистрация
                     .col-md-3.logo-block
                         a(href='/', title='Все Видео')
