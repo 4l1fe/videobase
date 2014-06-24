@@ -3,7 +3,7 @@
 var zerorpc = require("zerorpc");
 var jade = require('jade');
 
-var tmpl_path = "../interface/jade/";
+var tmpl_path = __dirname + "/../interface/jade/";
 var renderers = {
     index: function(context) {return jade.renderFile(tmpl_path + 'page_index.jade', context)},
     film: function(context) {return jade.renderFile(tmpl_path + 'page_film.jade', context)},
