@@ -52,7 +52,7 @@ class ActSubscribeFilmView(APIView):
             'user': request.user,
             'film': o_film,
         }
-        obj_val = {'id': o_film.id, 'name': o_film.name}
+        obj_val = {'id': o_film.id, 'name': o_film.name , 'description': o_film.description}
 
         # Устанавливаем подписку
         try:
@@ -85,7 +85,7 @@ class ActSubscribeFilmView(APIView):
         subscribed = APP_USERFILM_SUBS_FALSE
         filter_ = {'user': request.user.pk,
                    'film': o_film.pk}
-        obj_val = {'id': o_film.id, 'name': o_film.name}
+        obj_val = {'id': o_film.id, 'name': o_film.name, 'description': o_film.description}
 
         # Удалим подписку
         UsersFilms.objects.filter(**filter_).update(subscribed=subscribed)

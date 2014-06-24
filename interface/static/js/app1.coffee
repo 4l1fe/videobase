@@ -1207,6 +1207,42 @@ class Page_Feed extends Page
       (data) =>
     )
 
+class Page_Account extends Page
+  self: undefined
+  constructor: () ->
+    super
+    $('.checkbox-default').uniform()
+    $('.radio-default').uniform({radioClass: 'radio-class'})
+
+    @_e.pvt_selector = $("#pvt_selector")
+    self = @
+
+    $("input:radio", @_e.pvt_selector).click ->
+      $this = $(this)
+      if self._e.pvt_selector.active
+        val = $this.val()
+        console.log val
+        self._e.pvt_selector.obj.text($(".value" + val, self._e.pvt_selector).text())
+        $("input").filter("[name=" + self._e.pvt_selector.active + "]").val(val)
+
+    $("a", $("#pvt_list")).click (e) ->
+      e.preventDefault()
+      self.pvt_select_toggle($(this))
+
+  pvt_select_toggle: ($this) ->
+    name = $("input", $this.parent()).attr("name")
+    if @_e.pvt_selector.active == name
+      @_e.pvt_selector.hide()
+      @_e.pvt_selector.active = undefined
+    else
+      @_e.pvt_selector.insertAfter($this).show()
+      @_e.pvt_selector.active = name
+      @_e.pvt_selector.obj = $this
+      val = $("input", $this.parent()).val()
+      $("input:radio", @_e.pvt_selector).each ->
+        $this = $(this)
+        $.uniform.update($this.prop('checked', $this.val() == val))
+
 class Page_User extends Page
   films_deck = undefined
   feed_deck = undefined
