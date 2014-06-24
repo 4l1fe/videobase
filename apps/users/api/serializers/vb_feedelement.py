@@ -7,7 +7,11 @@ from .vb_user import vbUser
 
 class vbFeedElement(serializers.ModelSerializer):
     user = serializers.SerializerMethodField('get_vbUser')
+    object = serializers.SerializerMethodField('get_Object')
 
+    def get_Object(self,obj):
+        return obj.object
+    
     def get_vbUser(self, obj):
         return vbUser(obj.user).data
 
