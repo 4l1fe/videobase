@@ -153,6 +153,13 @@ mixin person_thumb(item)
                 img.img-circle(src=item.photo || "static/img/nophoto.png", alt='', data-mi-atsrc="photo", data-mi-default="static/img/nophoto.png")
                 span(data-mi-name="name")=item.name
 
+mixin user_thumb(item)
+    li(data-mi-id="id",data-mi-val=item.id)
+        .actor
+            a(href="/users/" + item.id, title='', data-mi-athref="id")
+                img.img-circle(src=item.avatar || "static/img/noavatar.png", alt='', data-mi-atsrc="avatar", data-mi-default="static/img/noavatar.png")
+                span(data-mi-name="name")=item.name
+
 mixin comment_thumb(item)
     .tape-item.cf(data-mi-id="id", data-mi-val=item.id)
         - if (item.user) {

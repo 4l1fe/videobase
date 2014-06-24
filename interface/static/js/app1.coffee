@@ -271,6 +271,7 @@ class FilmThumb extends Item
     else
       btn_cls = "btn-subscribe"
       btn_text = "Подписаться"
+      @elements["btn"].self.click => @toggle_subscribe()
     if vals.relation && vals.relation.rating
       @elements["relation.rating"].self.rateit("value", vals.relation.rating)
 
@@ -581,7 +582,6 @@ class App
     if name != undefined
       @show_page(name, conf.page_conf)
 
-
     @auth_modal = $("#reg-enter").click ->
       index = $(this).parent().index();
       if index == 1
@@ -590,6 +590,33 @@ class App
       else
         $('.popup-tabs-a >li, .popup-content > div').removeClass('active');
         $('.popup-tabs-a >li:eq(1), .popup-content > div:eq(1)').addClass('active');
+
+    $("#login_btn").click (e)=>
+      e.preventDefault()
+      e.stopPropagation()
+      @auth_modal.modal("show")
+
+    $("#reg_btn").click (e) =>
+      e.preventDefault()
+      e.stopPropagation()
+      @auth_modal.modal("show")
+
+  user_action: (id, action, opts = {}) ->
+    if @user_is_auth()
+      rel = opts.rel || {}
+      action_str = action
+      if action_str == "friendship"
+        new_state = state_toggle(opts.status, rel[action_str])
+        if new_state
+          doit = "update"
+        else
+          doit = "destroy"
+        @rest.users.action[action][doit](id)
+        .done(
+          ->
+            rel[action_str] = new_state if opts.rel
+            opts.callback(new_state) if opts.callback
+        )
 
   film_action: (id, action, opts = {}) ->
     if @user_is_auth()
@@ -1155,14 +1182,70 @@ class Page_Feed extends Page
   feed_deck = undefined
   constructor: (@conf) ->
     super
-    feed_deck = new FeedDeck($("#feed"), {load_func: (deck) =>@load_more_films(deck) })
+    feed_deck = new FeedDeck($("#feed"), {load_func: (deck) =>@load_more_feed(deck) })
     feed_deck.load_more_bind($("#feed_more"))
     feed_deck.page = 1
+
+  load_more_feed: (deck) ->
+    current_counter = deck.load_counter
+    deck.load_more_hide()
+    @_app.rest.users.feed.read(@conf.user_id, {page: deck.page + 1})
+    .done(
+      (data) =>
+        return if current_counter != deck.load_counter
+        if data.items
+          deck.add_items(data.items)
+          if data.items.length >= 12
+            deck.load_more_show()
+            deck.page = data.page
+    )
+    .fail(
+      (data) =>
+    )
+
+class Page_User extends Page
+  films_deck = undefined
+  feed_deck = undefined
+  constructor: (@conf) ->
+    super
+    films_deck = new FilmsDeck($("#films"), {load_func: (deck) =>@load_more_films(deck) })
+    films_deck.load_more_bind($("#films_more"))
+    films_deck.page = 1
+    @_e.friendship_btn = $("#friendship").click(=> @action_friendship())
+    feed_deck = new FeedDeck($("#feed"), {load_func: (deck) =>@load_more_feed(deck) })
+    feed_deck.load_more_bind($("#feed_more"))
+    feed_deck.page = 1
+
+  action_friendship: (status) ->
+    @_app.user_action(@conf.id, "friendship", {
+      rel: @conf.relation
+      status: status
+      callback: =>
+        # alert("done")
+    })
+    false
 
   load_more_films: (deck) ->
     current_counter = deck.load_counter
     deck.load_more_hide()
-    @_app.rest.users.feed.read(@conf.user_id, {page: deck.page + 1})
+    @_app.rest.users.films.read(@conf.id, {page: deck.page + 1})
+    .done(
+      (data) =>
+        return if current_counter != deck.load_counter
+        if data.items
+          deck.add_items(data.items)
+          if data.items.length >= 12
+            deck.load_more_show()
+            deck.page = data.page
+    )
+    .fail(
+      (data) =>
+    )
+
+  load_more_feed: (deck) ->
+    current_counter = deck.load_counter
+    deck.load_more_hide()
+    @_app.rest.users.feed.read(@conf.id, {page: deck.page + 1})
     .done(
       (data) =>
         return if current_counter != deck.load_counter
