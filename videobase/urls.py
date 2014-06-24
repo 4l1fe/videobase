@@ -30,6 +30,9 @@ urlpatterns = patterns('',
     # Admin
     url(r'^admin_tools/', include('admin_tools.urls')),
     url(r'^admin/', include(admin.site.urls)),
+
+    url(r'^legal/$', 'apps.contents.views.legal'),
+    url(r'^about/$', 'apps.contents.views.about')
 )
 
 if settings.DEBUG:
