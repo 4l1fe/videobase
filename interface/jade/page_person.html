@@ -1,228 +1,199 @@
-<!DOCTYPE html5>
-<html lang="ru">
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Всё видео</title>
-  <link href="static/css/bootstrap.css" rel="stylesheet"/>
-  <link href="static/css/style.css" rel="stylesheet"/>
-  <link href="static/3d/rateit/rateit.css" rel="stylesheet"/>
-  <body class="page-person">
-    <header>
-      <div class="header-top">
+<!DOCTYPE html>
+<html lang="ru"></html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ВсеВидео</title>
+  <link href="static/css/bootstrap.min.css" rel="stylesheet">
+  <link href="static/css/bootstrap-theme.css" rel="stylesheet">
+  <link href="static/css/custom.css" rel="stylesheet">
+  <link href="static/css/rateit.css" rel="stylesheet">
+  <!--if lt IE 9
+  script(src='https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js')
+  script(src='https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js')
+  -->
+</head>
+<body>
+  <div id="log"></div>
+  <div class="wrap-page">
+    <header role="banner">
+      <div class="top-header">
         <div class="container">
-          <div class="col-md-3 col-sm-5 user-place">
-            <div class="avatar"><img src="static/img/tmp/user.gif" class="img-circle img-responsive"/></div>
-            <ul class="user-menu">
-              <li><a href="#">Профиль</a></li>
-              <li><a href="#">Выход</a></li>
-            </ul>
+          <div class="row">
+            <div class="col-md-3 user-block">
+              <ul>
+                <li><a href="#" data-toggle="modal" data-target="#reg-enter" title="" class="sprite sprite-i-enter"><span>Вход</span></a></li>
+                <li><a href="#" data-toggle="modal" data-target="#reg-enter" title="" class="sprite sprite-i-reg"><span>Регистрация</span></a></li>
+              </ul>
+            </div>
+            <div class="col-md-3 logo-block"><a href="/" title="Все Видео"><img src="static/img/logo-header.png" alt="" class="logo"></a></div>
+            <div class="col-md-6 search-block">
+              <div class="input-group">
+                <input type="text" placeholder="Поиск по сайту" class="form-control"><span class="input-group-btn">
+                  <button type="submit" class="btn btn-primary">Найти</button></span>
+              </div>
+            </div>
           </div>
-          <div class="col-md-3 col-sm-7 logo">
-            <div class="md-padding md-vmiddle"><span class="md-vmiddle-helper"></span><a href="#"><img src="static/img/logo.png" alt="Всё видео"/></a></div>
-          </div>
-          <form id="frm_search" class="col-md-6 col-sm-12 search">
-            <input type="search" name="text" placeholder="Поиск по сайту" id="inp_search" class="inp-search"/>
-            <input type="submit" value="Найти" id="inp_search" class="btn-submit"/>
-          </form>
         </div>
       </div>
-      <div class="header-menu">
+      <div class="bottom-header">
         <div class="container">
-          <div class="col-md-8 main-menu">
-            <ul class="list-inline">
-              <li class="active">
-                <div class="films">
-                  <p><a href="#">Фильмы</a></p>
-                </div>
-              </li>
-              <li>
-                <div class="serials">
-                  <p><a href="#">Сериалы</a></p>
-                </div>
-              </li>
-              <li>
-                <div class="tv">
-                  <p><a href="#">ТВ-программы</a></p>
-                </div>
-              </li>
-              <li>
-                <div class="stream">
-                  <p><a href="#">Онлайн-трансляции</a></p>
-                </div>
-              </li>
-            </ul>
-          </div>
-          <div class="col-md-4 sub-menu">
-            <ul class="list-inline">
-              <li>
-                <div class="playlist">
-                  <p><a href="#">Плейлист</a></p>
-                </div>
-              </li>
-              <li>
-                <div class="feed">
-                  <p><a href="#">Лента</a></p>
-                </div>
-              </li>
-            </ul>
+          <div class="row">
+            <div class="col-md-8 col-sm-8">
+              <ul class="menu-header">
+                <li><a href="/" title=""><i class="sprite sprite-i-film"></i><br>Фильмы</a></li>
+                <li><a href="#" title=""><i class="sprite sprite-i-ser"></i><br>Сериалы</a></li>
+                <li><a href="#" title=""><i class="sprite sprite-i-tv"></i><br>ТВ-программа</a></li>
+                <li><a href="#" title=""><i class="sprite sprite-i-online"></i><br>Онлайн</a></li>
+              </ul>
+            </div>
+            <div class="col-md-4 col-sm-4">
+              <ul class="menu-header">
+                <li><a href="/playlist" title=""><i class="sprite sprite-i-play"></i><br>Плейлист</a></li>
+                <li><a href="/feed" title=""><i class="sprite sprite-i-tape"></i><br>Лента</a></li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
     </header>
-    <div class="info-wrapper">
-      <div class="col-md-3">
-        <div class="photo"><img src="static/img/nophoto.jpg" class="img-responsive"/></div>
-        <button id="subscribe_btn" class="subscribe-btn">Подписаться</button>
+  </div>
+  <footer role="contentinfo">
+    <div class="container">
+      <div class="top-footer">
+        <div class="row">
+          <div class="col-md-3 block-footer"><a href="#" title=""><img src="static/img/logo-footer.png" alt=""></a></div>
+          <div class="col-md-6 block-footer">
+            <ul class="menu-footer">
+              <li><a href="/legal" title="Правовая информация">Правовая информация</a></li>
+              <li><a href="/about" title="О сервисе">О сервисе</a></li>
+            </ul>
+          </div>
+          <div class="col-md-3 block-footer">
+            <ul class="menu-soc">
+              <li><a href="#" title=""><img src="static/img/i-fb.png" alt=""></a></li>
+              <li><a href="#" title=""><img src="static/img/i-tw.png" alt=""></a></li>
+              <li><a href="#" title=""><img src="static/img/i-rss.png" alt=""></a></li>
+              <li><a href="#" title=""><img src="static/img/i-vk.png" alt=""></a></li>
+            </ul>
+          </div>
+        </div>
       </div>
-      <div class="col-md-9">
-        <h1>Мартин Скорцезе <em>Martin Scorsese</em></h1>
-        <h2>Биография</h2>
-        <div class="bio"></div>
+      <!--.top-footer
+      -->
+      <div class="bottom-footer">
+        <p>© ВсеВидео, 2014. Все права защищены</p>
+      </div>
+      <!--.bottom-footer
+      -->
+      <!--.wrap-page
+      -->
+    </div>
+  </footer>
+  <div id="reg-enter" tabindex="-1" role="dialog" area-hidden="true" class="modal fade">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <button type="button" data-dismiss="modal" aria-hidden="true" class="close modal-close">×</button>
+        <div class="wrap-popup-content">
+          <ul class="nav nav-tabs popup-tabs-a">
+            <li class="active"><a href="#reg" data-toggle="tab"><span>Регистрация</span></a></li>
+            <li><a href="#enter" data-toggle="tab"><span>Вход на сайт</span></a></li>
+          </ul>
+          <div class="tab-content popup-content">
+            <div id="reg" class="tab-pane active">
+              <div class="wrap-popup-content">
+                <h3>C помощью почты</h3>
+                <form role="form" class="form-horizontal form-popup">
+                  <div class="form-group">
+                    <label for="inputEmail" class="col-sm-3 control-label">E-mail</label>
+                    <div class="col-sm-9">
+                      <input id="inputEmail" type="email" class="form-control">
+                    </div>
+                  </div>
+                  <div class="form-group has-error">
+                    <label for="inputPassword" class="col-sm-3 control-label">Пароль</label>
+                    <div class="col-sm-9">
+                      <input id="inputPassword" type="password" class="form-control">
+                      <p>Количество символов должно быть не менее 8-ми.</p>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="inputPasswordRe" class="col-sm-3 control-label">Повторите пароль</label>
+                    <div class="col-sm-9">
+                      <input id="inputPasswordRe" type="password" class="form-control">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="col-sm-offset-3 col-sm-10">
+                      <button type="submit" class="btn btn-yellow1">Зарегистрироваться</button>
+                    </div>
+                  </div>
+                </form>
+                <h3>C помощью социальных сетей</h3>
+                <ul class="soc-hor">
+                  <li><a href="#" title=""><img src="static/img/i-vk-b.png" alt=""></a></li>
+                  <li><a href="#" title=""><img src="static/img/i-fb-b.png" alt=""></a></li>
+                  <li><a href="#" title=""><img src="static/img/i-tw-b.png" alt=""></a></li>
+                  <li><a href="#" title=""><img src="static/img/i-go-b.png" alt=""></a></li>
+                </ul>
+              </div>
+              <!--.wrap-popup-content
+              -->
+            </div>
+            <div id="enter" class="tab-pane">
+              <div class="wrap-popup-content">
+                <h3>C помощью почты</h3>
+                <form role="form" class="form-horizontal form-popup">
+                  <div class="form-group">
+                    <label for="inputEmail1" class="col-sm-3 control-label">E-mail</label>
+                    <div class="col-sm-9">
+                      <input id="inputEmail1" type="email" class="form-control">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="inputPassword1" class="col-sm-3 control-label">Пароль</label>
+                    <div class="col-sm-9">
+                      <input id="inputPassword1" type="password" class="form-control">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="col-sm-offset-3 col-sm-10">
+                      <button type="submit" class="btn btn-yellow1">Войти</button>
+                    </div>
+                  </div>
+                </form>
+                <h3>C помощью социальных сетей</h3>
+                <ul class="soc-hor">
+                  <li><a href="#" title=""><img src="static/img/i-vk-b.png" alt=""></a></li>
+                  <li><a href="#" title=""><img src="static/img/i-fb-b.png" alt=""></a></li>
+                  <li><a href="#" title=""><img src="static/img/i-tw-b.png" alt=""></a></li>
+                  <li><a href="#" title=""><img src="static/img/i-go-b.png" alt=""></a></li>
+                </ul>
+              </div>
+              <!--.wrap-popup-content
+              -->
+            </div>
+          </div>
+        </div>
+        <!--.wrap-popup-content
+        -->
       </div>
     </div>
-    <div class="films-wrapper">
-      <div class="container">
-        <h2>Фильмография</h2>
-      </div>
-      <div id="films" class="container">
-        <div data-mi-id="id" data-mi-val='1' class="film-thumb col-md-3">
-          <div class="poster-wrapper">
-            <div data-mi-id="poster" data-mi-atbg="poster" data-mi-default="static/img/noposter.jpg" style="background-image: url(&quot;static/img/tmp/poster1.jpg&quot;)" class="poster-place"></div>
-          </div>
-          <div class="rating-place">
-            <p data-mi-name="ratings.cons.0" class="rating">5.6
-            </p>
-          </div>
-          <div class="name-place"><a href="/films/1" data-mi-athref="id" data-mi-name="name" data-mi-id="name" class="name">Самый лучший фильм лучший фильм</a><span data-mi-id="year" data-mi-name="releasedate" class="year"> (2014)</span></div>
-          <div class="rel-place">
-            <div data-mi-id="relation.rating" data-mi-val='5' data-rateit-max='10' data-rateit-resetable='0' data-rateit-value='5' class="rateit rate"></div>
-            <button data-mi-onclick="toggle_notwatch" data-mi-id="relation.notwatch" data-mi-val='0' class="notwatch-btn">N</button>
-          </div>
-          <div data-mi-id="button-place" class="button-place button-priced">
-            <div data-mi-id="instock" class="instock">
-              <button data-mi-id="watch_btn" data-mi-onclick="watchfilm" class="watch-btn">Смотреть<br/><span>от <span class="price" data-mi-name="price">300</span> р. без рекламы</span></button>
-              <button data-mi-id="relation.playlist" data-mi-onclick="toggle_playlist" data-mi-val='0' class="playlist-btn">+</button>
-              <div data-mi-id="watch_price" class="watchprice invisible">или<br/><a href="/films/1" data-im-athref="id">от <span class="price" data-mi-name="price">100</span> р. без рекламы</a></div>
-            </div>
-            <div data-mi-id="notinstock" class="notinstock display-none">
-              <button data-mi-id="relation.subscribed" data-mi-onclick="toggle_subscribe" data-mi-val='0' class="subscribe-btn">Подписаться</button>
-              <div class="watchprice">&nbsp;<br/>&nbsp;</div>
-            </div>
-          </div>
-        </div>
-        <div data-mi-id="id" data-mi-val='2' class="film-thumb col-md-3">
-          <div class="poster-wrapper">
-            <div data-mi-id="poster" data-mi-atbg="poster" data-mi-default="static/img/noposter.jpg" style="background-image: url(&quot;static/img/tmp/poster1.jpg&quot;)" class="poster-place"></div>
-          </div>
-          <div class="rating-place">
-            <p data-mi-name="ratings.cons.0" class="rating">8.6
-            </p>
-          </div>
-          <div class="name-place"><a href="/films/2" data-mi-athref="id" data-mi-name="name" data-mi-id="name" class="name">Самый лучший фильм</a><span data-mi-id="year" data-mi-name="releasedate" class="year"> (2011)</span></div>
-          <div class="rel-place">
-            <div data-mi-id="relation.rating" data-mi-val='5' data-rateit-max='10' data-rateit-resetable='0' data-rateit-value='5' class="rateit rate"></div>
-            <button data-mi-onclick="toggle_notwatch" data-mi-id="relation.notwatch" data-mi-val='0' class="notwatch-btn">N</button>
-          </div>
-          <div data-mi-id="button-place" class="button-place">
-            <div data-mi-id="instock" class="instock">
-              <button data-mi-id="watch_btn" data-mi-onclick="watchfilm" class="watch-btn">Смотреть<br/>Бесплатно</button>
-              <button data-mi-id="relation.playlist" data-mi-onclick="toggle_playlist" data-mi-val='0' class="playlist-btn">+</button>
-              <div data-mi-id="watch_price" class="watchprice invisible">или<br/><a href="/films/2" data-im-athref="id">от <span class="price" data-mi-name="price"></span> р. без рекламы</a></div>
-            </div>
-            <div data-mi-id="notinstock" class="notinstock display-none">
-              <button data-mi-id="relation.subscribed" data-mi-onclick="toggle_subscribe" data-mi-val='0' class="subscribe-btn">Подписаться</button>
-              <div class="watchprice">&nbsp;<br/>&nbsp;</div>
-            </div>
-          </div>
-        </div>
-        <div data-mi-id="id" data-mi-val='3' class="film-thumb col-md-3">
-          <div class="poster-wrapper">
-            <div data-mi-id="poster" data-mi-atbg="poster" data-mi-default="static/img/noposter.jpg" style="background-image: url(&quot;static/img/tmp/poster1.jpg&quot;)" class="poster-place"></div>
-          </div>
-          <div class="rating-place">
-            <p data-mi-name="ratings.cons.0" class="rating">7
-            </p>
-          </div>
-          <div class="name-place"><a href="/films/3" data-mi-athref="id" data-mi-name="name" data-mi-id="name" class="name">Самый лучший фильм</a><span data-mi-id="year" data-mi-name="releasedate" class="year"> (2001)</span></div>
-          <div class="rel-place">
-            <div data-mi-id="relation.rating" data-mi-val='8' data-rateit-max='10' data-rateit-resetable='0' data-rateit-value='8' class="rateit rate"></div>
-            <button data-mi-onclick="toggle_notwatch" data-mi-id="relation.notwatch" data-mi-val='0' class="notwatch-btn">N</button>
-          </div>
-          <div data-mi-id="button-place" class="button-place">
-            <div data-mi-id="instock" class="instock display-none">
-              <button data-mi-id="watch_btn" data-mi-onclick="watchfilm" class="watch-btn">Смотреть<br/>Бесплатно</button>
-              <button data-mi-id="relation.playlist" data-mi-onclick="toggle_playlist" data-mi-val='0' class="playlist-btn">+</button>
-              <div data-mi-id="watch_price" class="watchprice invisible">или<br/><a href="/films/3" data-im-athref="id">от <span class="price" data-mi-name="price"></span> р. без рекламы</a></div>
-            </div>
-            <div data-mi-id="notinstock" class="notinstock">
-              <button data-mi-id="relation.subscribed" data-mi-onclick="toggle_subscribe" data-mi-val='0' class="subscribe-btn">Подписаться</button>
-              <div class="watchprice">&nbsp;<br/>&nbsp;</div>
-            </div>
-          </div>
-        </div>
-        <div data-mi-id="id" data-mi-val='4' class="film-thumb col-md-3">
-          <div class="poster-wrapper">
-            <div data-mi-id="poster" data-mi-atbg="poster" data-mi-default="static/img/noposter.jpg" style="background-image: url(&quot;static/img/tmp/poster1.jpg&quot;)" class="poster-place"></div>
-          </div>
-          <div class="rating-place">
-            <p data-mi-name="ratings.cons.0" class="rating">9.1
-            </p>
-          </div>
-          <div class="name-place"><a href="/films/4" data-mi-athref="id" data-mi-name="name" data-mi-id="name" class="name">Самый лучший фильм</a><span data-mi-id="year" data-mi-name="releasedate" class="year"> (1970)</span></div>
-          <div class="rel-place">
-            <div data-mi-id="relation.rating" data-mi-val='3' data-rateit-max='10' data-rateit-resetable='0' data-rateit-value='3' class="rateit rate"></div>
-            <button data-mi-onclick="toggle_notwatch" data-mi-id="relation.notwatch" data-mi-val='0' class="notwatch-btn">N</button>
-          </div>
-          <div data-mi-id="button-place" class="button-place">
-            <div data-mi-id="instock" class="instock">
-              <button data-mi-id="watch_btn" data-mi-onclick="watchfilm" class="watch-btn">Смотреть<br/>Бесплатно</button>
-              <button data-mi-id="relation.playlist" data-mi-onclick="toggle_playlist" data-mi-val='0' class="playlist-btn">+</button>
-              <div data-mi-id="watch_price" class="watchprice">или<br/><a href="/films/4" data-im-athref="id">от <span class="price" data-mi-name="price">100</span> р. без рекламы</a></div>
-            </div>
-            <div data-mi-id="notinstock" class="notinstock display-none">
-              <button data-mi-id="relation.subscribed" data-mi-onclick="toggle_subscribe" data-mi-val='0' class="subscribe-btn">Подписаться</button>
-              <div class="watchprice">&nbsp;<br/>&nbsp;</div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="container">
-        <div id="films_more" class="films-more">
-          <button><span>Мало, хочу ещё фильмов</span></button>
-          <div class="shadow"></div>
-        </div>
-      </div>
-    </div>
-    <footer>
-      <div class="container">
-        <div class="col-md-4 logo">
-          <div class="md-padding md-vmiddle"><span class="md-vmiddle-helper"></span><img src="static/img/logo-footer.png" alt="Всё видео"/></div>
-        </div>
-        <div class="col-md-4 links">
-          <ul class="list-inline">
-            <li><a href="#">Правовая информация</a></li>
-            <li><a href="#">О сервисе</a></li>
-          </ul>
-        </div>
-        <div class="col-md-4 social">
-          <ul class="list-inline">
-            <li><a href="#"><img src="static/img/social-fb.png" alt="Всё видео на Фейсбуке"/></a></li>
-            <li><a href="#"><img src="static/img/social-twitter.png" alt="Всё видео на Твиттере"/></a></li>
-            <li><a href="#"><img src="static/img/social-rss.png" alt="Всё видео RSS"/></a></li>
-            <li><a href="#"><img src="static/img/social-vk.png" alt="Всё видео во ВКонтакте"/></a></li>
-          </ul>
-        </div>
-      </div>
-      <div class="container">
-        <div class="copyright md-col-12">&copy; Всё видео, 2014. Все права защищены</div>
-      </div>
-    </footer>
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
-    <script src="static/js/config.js"></script>
-    <script src="static/3d/rateit/jquery.rateit.js"></script>
-    <script src="static/js/mi.helper.js"></script>
-    <script src="static/js/mi.rest.js"></script>
-    <script src="static/js/app1.js"></script>
-    <script>$(document).ready(function () {window.InitApp({page_conf: {"id":1,"name":"Мартин Скорцезе","name_orig":"Martin Scorsese","birthdate":"17 ноября, 1942","years_old":"71","types":["Режиссёр","Актёр"],"birthplace":["Москва","Россия"]}}, "Person")})</script>
-  </body>
-</html>
+  </div>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+  <script src="static/js/bootstrap.min.js"></script>
+  <script src="static/js/jquery.rateit.min.js"></script>
+  <script src="static/js/config.js"></script>
+  <script src="static/js/mi.helper.js"></script>
+  <script src="static/js/mi.rest.js"></script>
+  <script src="static/js/app1.js"></script>
+  <!--
+  script(src='static/js/jquery.carouFredSel-6.2.1-packed.js')
+  script(src='static/js/helper-caroufredsel/jquery.ba-throttle-debounce.min.js')
+  script(src='static/js/helper-caroufredsel/jquery.mousewheel.min.js')
+  script(src='static/js/helper-caroufredsel/jquery.touchSwipe.min.js')
+  script(src='static/js/helper-caroufredsel/jquery.transit.min.js')
+  script(src='/static/js/custom.js')
+  -->
+</body>

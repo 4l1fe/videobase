@@ -1,34 +1,193 @@
-<!DOCTYPE html5>
-<html lang="ru">
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Всё видео</title>
-  <link href="static/css/bootstrap.css" rel="stylesheet"/>
-  <link href="static/css/style.css" rel="stylesheet"/>
-  <body>
-    <header>
-      <div class="header-top">
-        <div class="container">
-          <div class="col-md-3 col-sm-5 user-place">
-            <div class="md-padding md-vmiddle">
-              <div class="user-avatar"></div>
-              <ul class="user-menu list-inline">
-                <li><a href="#">Профиль</a></li>
-                <li><a href="#">Выход</a></li>
-              </ul>
+<!DOCTYPE html>
+<html lang="ru"></html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ВсеВидео</title>
+  <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/static/css/bootstrap-theme.css" rel="stylesheet">
+  <link href="/static/css/custom.css" rel="stylesheet">
+  <link href="/static/css/rateit.css" rel="stylesheet">
+  <!--if lt IE 9
+  script(src='https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js')
+  script(src='https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js')
+  -->
+</head>
+<body>
+  <div id="log"></div>
+  <div id="reg-enter" tabindex="-1" role="dialog" aria-hidden="true" class="modal fade">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <button type="button" data-dismiss="modal" aria-hidden="true" class="close modal-close">×</button>
+        <div class="wrap-popup-content">
+          <ul class="nav nav-tabs popup-tabs-a">
+            <li class="active"><a href="#reg" data-toggle="tab"><span>Регистрация</span></a></li>
+            <li><a href="#enter" data-toggle="tab"><span>Вход на сайт</span></a></li>
+          </ul>
+          <div class="tab-content popup-content">
+            <div id="reg" class="tab-pane active">
+              <div class="wrap-popup-content">
+                <h3>C помощью почты</h3>
+                <form role="form" class="form-horizontal form-popup">
+                  <div class="form-group">
+                    <label for="inputEmail" class="col-sm-3 control-label">E-mail</label>
+                    <div class="col-sm-9">
+                      <input id="inputEmail" type="email" class="form-control">
+                    </div>
+                  </div>
+                  <div class="form-group has-error">
+                    <label for="inputPassword" class="col-sm-3 control-label">Пароль</label>
+                    <div class="col-sm-9">
+                      <input id="inputPassword" type="password" class="form-control">
+                      <p>Количество символов должно быть не менее 8-ми.</p>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="inputPasswordRe" class="col-sm-3 control-label">Повторите пароль</label>
+                    <div class="col-sm-9">
+                      <input id="inputPasswordRe" type="password" class="form-control">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="col-sm-offset-3 col-sm-10">
+                      <button type="submit" class="btn btn-yellow1">Зарегистрироваться</button>
+                    </div>
+                  </div>
+                </form>
+                <h3>C помощью социальных сетей</h3>
+                <ul class="soc-hor">
+                  <li><a href="#" title=""><img src="images/i-vk-b.png" alt=""></a></li>
+                  <li><a href="#" title=""><img src="images/i-fb-b.png" alt=""></a></li>
+                  <li><a href="#" title=""><img src="images/i-tw-b.png" alt=""></a></li>
+                  <li><a href="#" title=""><img src="images/i-go-b.png" alt=""></a></li>
+                </ul>
+              </div>
+              <!--.wrap-popup-content
+              -->
+            </div>
+            <div id="enter" class="tab-pane">
+              <div class="wrap-popup-content">
+                <h3>C помощью почты</h3>
+                <form role="form" class="form-horizontal form-popup">
+                  <div class="form-group">
+                    <label for="inputEmail1" class="col-sm-3 control-label">E-mail</label>
+                    <div class="col-sm-9">
+                      <input id="inputEmail1" type="email" class="form-control">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="inputPassword1" class="col-sm-3 control-label">Пароль</label>
+                    <div class="col-sm-9">
+                      <input id="inputPassword1" type="password" class="form-control">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="col-sm-offset-3 col-sm-10">
+                      <button type="submit" class="btn btn-yellow1">Войти</button>
+                    </div>
+                  </div>
+                </form>
+                <h3>C помощью социальных сетей</h3>
+                <ul class="soc-hor">
+                  <li><a href="#" title=""><img src="images/i-vk-b.png" alt=""></a></li>
+                  <li><a href="#" title=""><img src="images/i-fb-b.png" alt=""></a></li>
+                  <li><a href="#" title=""><img src="images/i-tw-b.png" alt=""></a></li>
+                  <li><a href="#" title=""><img src="images/i-go-b.png" alt=""></a></li>
+                </ul>
+              </div>
+              <!--.wrap-popup-content
+              -->
             </div>
           </div>
-          <div class="col-md-3 col-sm-7 logo">
-            <div class="md-padding md-vmiddle"><span class="md-vmiddle-helper"></span><a href="#"><img src="static/img/logo.png" alt="Всё видео"/></a></div>
-          </div>
-          <form id="frm_search" class="col-md-6 col-sm-12 search">
-            <div class="md-padding md-vmiddle">
-              <input type="search" name="text" placeholder="Поиск по сайту" id="inp_search" class="inp-search"/>
-              <input type="submit" value="Найти" id="inp_search" class="btn-submit"/>
+        </div>
+        <!--.wrap-popup-content
+        -->
+      </div>
+    </div>
+    <div class="wrap-page">
+      <header role="banner">
+        <div class="top-header">
+          <div class="container">
+            <div class="row">
+              <div class="col-md-3 user-block">
+                <ul>
+                  <li><a href="#" data-toggle="modal" data-target="#reg-enter" title="" class="sprite sprite-i-enter"><span>Вход</span></a></li>
+                  <li><a href="#" data-toggle="modal" data-target="#reg-enter" title="" class="sprite sprite-i-reg"><span>Регистрация</span></a></li>
+                </ul>
+              </div>
+              <div class="col-md-3 logo-block"><a href="/" title="Все Видео"><img src="images/logo-header.png" alt="" class="logo"></a></div>
+              <div class="col-md-6 search-block">
+                <div class="input-group">
+                  <input type="text" placeholder="Поиск по сайту" class="form-control"><span class="input-group-btn">
+                    <button type="submit" class="btn btn-primary">Найти</button></span>
+                </div>
+              </div>
             </div>
-          </form>
+          </div>
+        </div>
+        <div class="bottom-header">
+          <div class="container">
+            <div class="row">
+              <div class="col-md-8 col-sm-8">
+                <ul class="menu-header">
+                  <li><a href="/" title=""><i class="sprite sprite-i-film"></i><br>Фильмы</a></li>
+                  <li><a href="#" title=""><i class="sprite sprite-i-ser"></i><br>Сериалы</a></li>
+                  <li><a href="#" title=""><i class="sprite sprite-i-tv"></i><br>ТВ-программа</a></li>
+                  <li><a href="#" title=""><i class="sprite sprite-i-online"></i><br>Онлайн</a></li>
+                </ul>
+              </div>
+              <div class="col-md-4 col-sm-4">
+                <ul class="menu-header">
+                  <li><a href="/playlist" title=""><i class="sprite sprite-i-play"></i><br>Плейлист</a></li>
+                  <li><a href="/feed" title=""><i class="sprite sprite-i-tape"></i><br>Лента</a></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+    </div>
+  </div>
+  <footer role="contentinfo">
+    <div class="container">
+      <div class="top-footer">
+        <div class="row">
+          <div class="col-md-3 block-footer"><a href="#" title=""><img src="images/logo-footer.png" alt=""></a></div>
+          <div class="col-md-6 block-footer">
+            <ul class="menu-footer">
+              <li><a href="#" title="Правовая информация">Правовая информация</a></li>
+              <li><a href="#" title="О сервисе">О сервисе</a></li>
+            </ul>
+          </div>
+          <div class="col-md-3 block-footer">
+            <ul class="menu-soc">
+              <li><a href="#" title=""><img src="images/i-fb.png" alt=""></a></li>
+              <li><a href="#" title=""><img src="images/i-tw.png" alt=""></a></li>
+              <li><a href="#" title=""><img src="images/i-rss.png" alt=""></a></li>
+              <li><a href="#" title=""><img src="images/i-vk.png" alt=""></a></li>
+            </ul>
+          </div>
         </div>
       </div>
-    </header>
-  </body>
-</html>
+      <!--.top-footer
+      -->
+      <div class="bottom-footer">
+        <p>© ВсеВидео, 2014. Все права защищены</p>
+      </div>
+      <!--.bottom-footer
+      -->
+      <!--.wrap-page
+      -->
+    </div>
+  </footer>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+  <script src="/static/js/bootstrap.min.js"></script>
+  <script src="/static/js/jquery.rateit.min.js"></script>
+  <script src="/static/js/jquery.carouFredSel-6.2.1-packed.js"></script>
+  <script src="/static/js/helper-caroufredsel/jquery.ba-throttle-debounce.min.js"></script>
+  <script src="/static/js/helper-caroufredsel/jquery.mousewheel.min.js"></script>
+  <script src="/static/js/helper-caroufredsel/jquery.touchSwipe.min.js"></script>
+  <script src="/static/js/helper-caroufredsel/jquery.transit.min.js"></script>
+  <script src="/static/js/custom.js"></script>
+</body>

@@ -28,28 +28,6 @@ state_toggle = (new_state, cur_state, deflt)->
   else
     new_state?1:0
 
-locations_type_text =
-  ivi: "IVI.ru"
-  nowru: "NOW.ru"
-  zoomby: "Zoomby.ru"
-  megogo: "Megogo.net"
-  tvigle: "Tvigle.ru"
-  playfamily: "PlayFamily.ru"
-  amediateka: "Amediateka"
-  molodejj: "Molodejj.tv"
-  stream: "Stream.ru"
-  tvzavr: "TVzavr.ru"
-  viaplay: "Viaplay.ru"
-  zabava: "Zabava.ru"
-  playgoogle: "Play Google"
-  itunes: "Apple Itunes"
-  ayyo: "Ayyo.ru"
-  mosfilm: "Cinema.mosfilm.ru"
-  olltv: "oll.tv"
-
-location_type_to_text = (type) ->
-  locations_type_text[type.toLowerCase()] || type
-
 class Player
   constructor: (@place, opts = {}) ->
     @current = undefined
@@ -57,40 +35,11 @@ class Player
   load: (loc) ->
     if @current != undefined
       @clear()
-    html = undefined
-    type = loc.type
-    value = loc.value
-    ratio = 1
-    width = @place.width()
-    if type == "ivi"
-      value = loc.url_view.substr(24)
-      value = value.substr(0, value.indexOf("#"))
-      ratio = 640 / 360
-      height = parseInt(width / ratio)
-      html = '<object id="DigitalaccessVideoPlayer" classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" width="100%" height="100%" type="application/x-shockwave-flash" data="http://www.ivi.ru/video/player?siteId=s138&amp;_isB2C=1&amp;autoStart=1&amp;videoId=' + value + '&amp;allowSeriesPlaylist=1&amp;disableiviredirect=0&amp;share_embed=0"><param name="movie" value="http://www.ivi.ru/video/player?siteId=s138&amp;_isB2C=1&amp;autoStart=1&amp;videoId=' + value + '&amp;allowSeriesPlaylist=1&amp;disableiviredirect=0&amp;share_embed=0"><param name="allowScriptAccess" value="always"><param name="allowFullScreen" value="true"><param name="bgcolor" value="#000000"><param name="wmode" value="opaque"><embed quality="high" allowscriptaccess="always" allowfullscreen="true" wmode="opaque" width="100%" height="100%" type="application/x-shockwave-flash" src="http://www.ivi.ru/video/player?siteId=s138&amp;_isB2C=1&amp;autoStart=1&amp;videoId=' + value + '&amp;allowSeriesPlaylist=1&amp;disableiviredirect=0&amp;share_embed=0"></object>'
-    else if type == "nowru"
-      arr = loc.url_view.split("/")
-      value = arr[arr.length - 1]
-      html = '<iframe name="now1023318" src="http://www.now.ru/embed/frame/' + value + '" scrolling="no" frameborder="no" height="100%" width="100%"></iframe>'
-      ratio = 860 / 480
-    else if type == "tvigle"
-      arr = loc.url_view.split("=")
-      value = arr[arr.length - 1]
-      # f_value = "http://photo.tvigle.ru/resource/rf/swf/" + value.substr(0,2) + "/" + value.substr(2,2) + "/" + value.substr(4,2) + "/" + value.substr(6) + ".swf"
-      ratio = 720 / 539
-      height = Math.round(width / ratio)
-      html = '<object type="application/x-shockwave-flash" data="http://tvigle.ru/swf/tvigle_v12.swf?ver=3.597999999999975" width="1080" height="608" id="plr" style="visibility: visible; width: 1080px; height: 607.5px;"><param name="allowScriptAccess" value="always"><param name="bgcolor" value="#000000"><param name="quality" value="high"><param name="scale" value="noscale"><param name="allowFullScreen" value="true"><param name="wmode" value="opaque"><param name="flashvars" value="ref=1&amp;obj=' + value + '&amp;cnl=692685&amp;sid_name=&amp;user_sid=&amp;own=0&amp;w=1080&amp;h=608&amp;ap=1&amp;afbr=1&amp;region=RU&amp;skin=&amp;d=tvigle.ru"></object>'
-      # html = '<object id="v' + value + '" classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=9,0,0,0" width="100%" height="100%" align="middle"><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><param name="movie" value="' + f_value + '"></param><embed src="' + f_value + '" width="100%" height="100%"  allowfullscreen="true" allowscriptaccess="always" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" /></object>'
-    else if type == "streamru"
-      html = ""
-    else if type == "zoomby"
-      value = 184209
-      html = '<iframe src="http://www.zoomby.ru/v/' + value + '" width="100%" height="100%"></iframe>'
-      ratio = 640 / 360
-
-    if html != undefined
-      @current = loc
-      @place.height(@place.width() / ratio).html(html)
+    if loc.value
+      value = "&value=" + loc.value
+    else
+      value = "&view=" + encodeURI(loc.url_view)
+    @place.empty().html("<iframe src=\"player.html?type=" + loc.type + value + "\"></iframe>")
 
   clear: ->
     @place.addClass("player-empty")
@@ -275,7 +224,15 @@ class FilmThumb extends Item
           if !@user_is_auth()
             event.preventDefault()
         )
-        .bind "reset rated", (event) => @action_rate(ri.rateit("value"))
+        .bind "rated", (event) => @action_rate(ri.rateit("value"))
+        .bind "reset", (event) => @toggle_notwatch()
+      ###
+        @elements["poster"].self.css({"margin-left": -300}).load(->
+          $this = $(this)
+          $this.animate({"margin-left": 0}, 3000)
+        )
+      ###
+      # @place().imagesLoaded()
 
   transform_attr: (attr, name, val) ->
     if attr == "href" && name == "id"
@@ -285,14 +242,13 @@ class FilmThumb extends Item
 
   transform_val: (name, val) ->
     if name == "releasedate"
-      return " (" + val.substr(0, 4) + ")"
+      return val.substr(0, 4)
     else
       super
 
   set_vals: (vals, do_not_set) ->
+    @elements["btn_price"].self.hide()
     if vals.locations && vals.locations.length
-      @elements["notinstock"].self.hide()
-      @elements["instock"].self.show()
       vals.hasFree = false
       vals.price = 0
       for loc in vals.locations
@@ -301,18 +257,26 @@ class FilmThumb extends Item
           vals.hasFree = true
         else if loc.price && (vals.price == 0 || loc.price < vals.price)
           vals.price = loc.price
-      if vals.hasFree
-        @elements["watch_btn"].self.html("Смотреть<br/>Бесплатно").parent().removeClass("button-priced")
-        if vals.price
-          @elements["watch_price"].self.visible()
-        else
-          @elements["watch_price"].self.invisible()
-      else
-        @elements["watch_price"].self.invisible()
-        @elements["watch_btn"].self.html('Смотреть<br/><span>от <span class="price">' + loc.price + '</span> р. без рекламы</span>').parent().addClass("button-priced")
+      btn_cls = false
+      btn_text = ""
+      if !vals.hasFree && vals.price
+        btn_cls = "btn-price"
+        btn_text = "Смотреть<br><i>от " + vals.price + " р. без рекламы</i>"
+      else if vals.price
+        @elements["btn_price"].self.show()
+        @elements["price"].self.text("от " + vals.price + " р. без рекламы")
+      if !vals.price || vals.hasFree
+        btn_cls = "btn-free"
+        btn_text = "Смотреть<br/>бесплатно"
     else
-      @elements["notinstock"].self.show()
-      @elements["instock"].self.hide()
+      btn_cls = "btn-subscribe"
+      btn_text = "Подписаться"
+      @elements["btn"].self.click => @toggle_subscribe()
+    if vals.relation && vals.relation.rating
+      @elements["relation.rating"].self.rateit("value", vals.relation.rating)
+
+    @elements["btn"].self.removeClass("btn-subscribe").removeClass("btn-price").removeClass("btn-free").addClass(btn_cls)
+    @elements["btn_text"].self.html(btn_text).show()
     super
 
   action_rate: (val) ->
@@ -320,7 +284,7 @@ class FilmThumb extends Item
       rel: @vals.relation
       value: val
       callback: (new_state) =>
-        alert("done")
+        # alert("done")
     }
 
   toggle_playlist: (status) ->
@@ -328,15 +292,16 @@ class FilmThumb extends Item
       rel: @vals.relation
       state: status
       callback: (new_state) =>
-        alert("done")
+        # alert("done")
     }
+    false
 
   toggle_notwatch: (status) ->
     @_app.film_action @vals.id, "notwatch", {
       rel: @vals.relation
       state: status
       callback: (new_state) =>
-        alert("done")
+        # alert("done")
     }
 
   toggle_subscribe: (status) ->
@@ -344,8 +309,9 @@ class FilmThumb extends Item
       rel: @vals.relation
       state: status
       callback: (new_state) =>
-        alert("done")
+        # alert("done")
     }
+    false
 
   watchfilm: ->
     location.href = "/films/" + @vals.id
@@ -382,6 +348,42 @@ class PersonThumb extends Item
     else
       super
 
+class FeedThumb extends Item
+  constructor: (opts = {}, callback) ->
+    @_name = "feed-thumb"
+    if opts.vals
+      @_type = opts.vals.type
+      @vals_orig = opts.vals
+    super opts, =>
+      if !opts.place
+        $(".tape-" + @_type, @_place).removeClass("tape-thumb")
+        $(".tape-thumb", @_place).remove()
+        $(".time-tape", @_place).data("miVal", @vals_orig.created)
+        @_place.removeClass("display-none")
+        if @_type == "film-r"
+          @elements["object.rating"].self.rateit().rateit("value", opts.vals.object.rating)
+
+  transform_attr: (attr, name, val) ->
+    type = @_type
+    if type.substr(0,4) == "film"
+      if name == "object.id" && attr="href"
+        return "/films/" + val
+      if name == "object.name"
+        return val + " (" + @vals_orig.object.releasedate.substr(0,4) + ")"
+    if type.substr(0,4) == "pers" && attr="href"
+      if name == "object.id"
+        return "/persons/" + val
+    if type.substr(0,4) == "user" && attr="href"
+      if name == "object.id"
+        return "/users/" + val
+    if name == "user.id" && attr="href"
+      return "/users/" + val
+    if name == "created"
+      try
+        return time_text(new Date(val))
+      catch
+        return val
+
 class Deck
   constructor: (@_place, opts = {}) ->
     @load_counter = 0
@@ -399,23 +401,29 @@ class Deck
     if opts.more_place
       @load_more_bind(opts.more_place)
 
+  onchange: ->
+
   add_item_DOM: (obj) ->
     @items.push(new @item_class({place: obj, do_not_set: true}))
+    @onchange()
 
-  add_item: (item) ->
+  add_item: (item, onchange_call = true) ->
     @items.push(new @item_class({parent: @_place, vals: item}))
+    if onchange_call
+      @onchange()
 
   add_items: (items) ->
     for item in items
-      @add_item(item)
+      @add_item(item, false)
+    @onchange()
 
   get_items: ->
     @items
 
   load_more_bind: (place) ->
     @more.place = place
-    @more.btn = $("button", place)
-    @more.btn.click(=> @load_more())
+    @more.btn = $("a", place)
+    @more.btn.click(=> @load_more(); return false)
 
   load_more: (opts) ->
     if @load_func != undefined
@@ -435,6 +443,7 @@ class Deck
     @items = []
     @_place.empty()
     @page = 0
+    @onchange(true)
 
 class CommentsDeck extends Deck
   constructor: (place, opts = {}) ->
@@ -453,11 +462,61 @@ class CommentsDeck extends Deck
       if item.elements.time_text.val
         item.elements.time_text.self.text(time_text(new Date(item.elements.time_text.val)))
 
+class FeedDeck extends Deck
+  constructor: (place, opts = {}) ->
+    @element_name = "feed-thumb"
+    @item_class = FeedThumb
+    super
+    setInterval(
+      =>
+        @time_update()
+    , 1000
+    )
+    @time_update()
+
+  time_update: ->
+    $(".time-tape", @_place).each ->
+      $this = $(this)
+      if $this._failed
+        return
+      if !$this._datetime
+        try
+          $this._datetime = new Date($this.data("miVal"))
+        catch
+          $this._failed = true
+          return
+      $this.text(time_text($this._datetime))
+
+    return
+    #for item in @items
+    #  if item.elements.time_text.val
+    #    item.elements.time_text.self.text(time_text(new Date(item.elements.time_text.val)))
+
+
 class FilmsDeck extends Deck
   constructor: (place, opts = {}) ->
     @element_name = "film-thumb"
     @item_class = FilmThumb
     super
+    $(window).resize(=> @onchange())
+
+  onchange: (global = false) ->
+    items_inrow = Math.floor($("body").width() / 250)
+    if items_inrow > 4
+      items_inrow = 4
+    if items_inrow < 2
+      items_inrow = 2
+    if @current_items_inrow != items_inrow
+      global = true
+    @current_items_inrow = items_inrow
+    if global == true
+      $("hr", @_place).remove();
+
+    for i in [0...@items.length-1]
+      if ((i + 1) % items_inrow == 0)
+        el = @items[i].place()
+        if !el.next().is("hr")
+          $("<hr />").insertAfter(el)
 
 class PersonsDeck extends Deck
   constructor: (place, opts) ->
@@ -512,8 +571,52 @@ class App
     @rest.persons.add("action", {isSingle: true})
     @rest.persons.action.add("subscribe")
 
+    @_e =
+      search:
+        frm: $("#frm_search")
+    @_e.search.input = $(".inp-search", @_e.search.frm)
+    @_e.search.btn = $(".btn-search", @_e.search.frm)
+    q = @query_params("q")
+    @_e.search.input.val(q) if q
+
     if name != undefined
       @show_page(name, conf.page_conf)
+
+    @auth_modal = $("#reg-enter").click ->
+      index = $(this).parent().index();
+      if index == 1
+        $('.popup-tabs-a >li, .popup-content > div').removeClass('active');
+        $('.popup-tabs-a >li:eq(0), .popup-content > div:eq(0)').addClass('active');
+      else
+        $('.popup-tabs-a >li, .popup-content > div').removeClass('active');
+        $('.popup-tabs-a >li:eq(1), .popup-content > div:eq(1)').addClass('active');
+
+    $("#login_btn").click (e)=>
+      e.preventDefault()
+      e.stopPropagation()
+      @auth_modal.modal("show")
+
+    $("#reg_btn").click (e) =>
+      e.preventDefault()
+      e.stopPropagation()
+      @auth_modal.modal("show")
+
+  user_action: (id, action, opts = {}) ->
+    if @user_is_auth()
+      rel = opts.rel || {}
+      action_str = action
+      if action_str == "friendship"
+        new_state = state_toggle(opts.status, rel[action_str])
+        if new_state
+          doit = "update"
+        else
+          doit = "destroy"
+        @rest.users.action[action][doit](id)
+        .done(
+          ->
+            rel[action_str] = new_state if opts.rel
+            opts.callback(new_state) if opts.callback
+        )
 
   film_action: (id, action, opts = {}) ->
     if @user_is_auth()
@@ -574,7 +677,7 @@ class App
   user_is_auth: (ask_sign_in = true) ->
     if !@rest.has_auth()
       if ask_sign_in
-        alert("sign in first")
+        @auth_modal.modal("show")
       false
     else
       true
@@ -617,7 +720,7 @@ class App
       else
         error "Page " + name + " is not active"
     else
-      error "No page " + name + "found"
+      error "No page " + name + " found"
 
   show_page: (name, conf) ->
     p = @page(name, conf)
@@ -642,6 +745,35 @@ class App
     #  error "Unable to init page " + name, "crit"
     #  return undefined
 
+class Page_Search extends Page
+  films = undefined
+  self = undefined
+  constructor: (@conf)->
+    super
+    self = @
+    @_app.get_tpl("film-thumb")
+    films_deck = new FilmsDeck($("#films"), {load_func: @load_more_films})
+    films_deck.load_more_bind($("#films_more"))
+
+  load_more_films: (deck, opts = {}) ->
+    deck.load_more_hide()
+    params = {text: self.conf.search_text || ""}
+    current_counter = deck.load_counter
+    self._app.rest.films.read("search", params)
+    .done(
+      (data) =>
+        return if current_counter != deck.load_counter
+        if data.items
+          deck.add_items(data.items)
+          if data.items.length >= 12
+            deck.load_more_show()
+          deck.page = data.page
+        opts.callback() if opts.callback
+    )
+    .fail(
+      (data) =>
+    )
+
 class Page_Main extends Page
   films_deck = undefined
   self = undefined
@@ -661,35 +793,44 @@ class Page_Main extends Page
     )
 
     @_e.filter =
-      parent: $("#frm_filter")
-      genre: $("#sel_genre")
-      year_old: $("#sel_year_old")
-      rating: $("#sel_rating")
-      price: $("#sel_price")
-
-    for key, el of @_e.filter
-      el.change (=> @filter_changed_event())
+        genre: $("#filter_genres")
+        year_old: $("#filter_year_old")
+        rating: $("#filter_rating")
+        price: $("#filter_price")
+        sort: $("#filter_sort")
 
     params = @_app.query_params()
+    $.each(@_e.filter, (index) ->
+      el = this
+      el._title = $(".sprite > span", el)
+      el._selected = undefined
+      el._options = []
+      $(".dropdown-menu a", el).each( ->
+        $this = $(this)
+        $this._val = $this.data("miId")
+        $this._text = $this.text()
+        el._options.push($this)
+        $this.click( ->
+          if el._selected != $this
+            el._selected = $this
+            el._title.text($this._text)
+            self.filter_changed()
+          el.removeClass("open")
+          return false
+        )
+        if params[index] && params[index].toString() == $this._val.toString()
+          el._selected = $this
+          el._title.text($this._text)
+      )
+      if el._selected == undefined
+        el._selected = el._options[0]
+        el._title.text(el._options[0]._text)
+    )
+    if (films_deck.get_items().length >= 12)
+      @load_more_films(films_deck, {page: 2})
 
-    if params
-      if params.q
-        _filter_params.text = params.q
-
-      for param_name, param_value of params
-        for filter_name, filter_obj of @_e.filter
-          if filter_name == param_name
-            $("option", filter_obj).each(
-              ->
-                e = $(this)
-                e.prop "selected", e.val() == param_value
-            )
-
-    @update_filter_params()
-    films_deck.load_more()
-
-  filter_changed_event: ->
-    @filter_changed()
+    else
+      films_deck.load_more_hide()
 
   filter_changed: (text) ->
     _filter_counter++
@@ -709,10 +850,7 @@ class Page_Main extends Page
     )
 
   update_filter_params: (update_href = true) ->
-    if _filter_params.text
-      query_string = "text=" + encodeURI(_filter_params.text)
-    else
-      query_string=""
+    query_string=""
 
     if films_deck.page
       _filter_params.page = films_deck.page
@@ -720,7 +858,7 @@ class Page_Main extends Page
       query_string+= "page=" + films_deck.page
 
     for key, el of @_e.filter
-      val = el.val()
+      val = el._selected._val
       if val && val != "0"
         _filter_params[key] = val
         query_string+= "&" if query_string
@@ -734,19 +872,22 @@ class Page_Main extends Page
         history.pushState null, null, query_string
 
   load_more_films: (deck, opts = {}) ->
+    deck.load_more_hide()
+    params = $.extend(_filter_params, opts.params || {})
     if opts.clear_output
       deck.clear()
+      params.page = 1
+    else
+      params.page = opts.page || (deck.page + 1)
     current_counter = deck.load_counter
-    deck.load_more_hide()
-    opts.params = {} if !opts.params
-    self._app.rest.films.read("search", opts.params)
+    self._app.rest.films.read("search", params)
     .done(
       (data) =>
         return if current_counter != deck.load_counter
         if data.items
           deck.add_items(data.items)
-        if Math.ceil(data.total_cnt / data.per_page) > data.page
-          deck.load_more_show()
+          if data.items.length >= 12
+            deck.load_more_show()
           deck.page = data.page
         opts.callback() if opts.callback
     )
@@ -757,7 +898,7 @@ class Page_Main extends Page
 # implementing Login and Register Page class
 class Page_Login extends Page
 
-class Page_Registration extends Page
+class Page_Register extends Page
   @constructor: ->
     super
     $("#frm_reg").submit( ->
@@ -787,10 +928,12 @@ class Page_Film extends Page
       if !@user_is_auth()
         event.preventDefault()
     )
-    .bind "reset rated", (event) => @action_rate(@_e.rateit.rateit("value"))
+    .bind "rated", (event) => @action_rate(@_e.rateit.rateit("value"))
+    .bind "reset", (event) => @action_notwatch_toggle()
 
-    @_e.notwatch_btn = $("#notwatch_btn")
-    @_e.notwatch_btn.bind("click", => @action_notwatch_toggle()) if @_e.notwatch_btn.length
+    if @conf.relation && @conf.relation.rating
+      @_e.rateit.rateit "value", @conf.relation.rating
+
     @_e.playlist_btn = $("#playlist_btn")
     @_e.playlist_btn.bind("click", => @action_playlist_toggle()) if @_e.playlist_btn.length
     @_e.subscribe_btn = $("#subscribe_btn")
@@ -808,16 +951,18 @@ class Page_Film extends Page
         loc = self.conf.locations[i] if i < self.conf.locations.length
         if loc
           $this.click(-> self.play_location(id))
-          $(".type", $this).text(location_type_to_text(loc.type))
-          if loc.price_type == 0 || loc.price == 0
-            $(".price", $this).text("смотреть бесплатно")
-          else
-            $(".price", $this).text(loc.price + " р.")
-          loc._el = $this
+          ###
+            $(".type", $this).text(location_type_to_text(loc.type))
+            if loc.price_type == 0 || loc.price == 0
+              $(".price", $this).text("смотреть бесплатно")
+            else
+              $(".price", $this).text(loc.price + " р.")
+            loc._el = $this
+          ###
           locations[id] = loc
       )
 
-      @player = new Player($("#player"))
+      @player = new Player($("#frame_player"))
       @player.clear()
 
       loc_id = @_app.query_params("loc")
@@ -829,6 +974,7 @@ class Page_Film extends Page
 
   play_location: (id) ->
     @player.load(locations[id]) if locations[id]
+    return false
 
   load_all_actors: () ->
     actors_deck.load_more_hide();
@@ -838,6 +984,9 @@ class Page_Film extends Page
         if data && data.length
           actors_deck.add_items(data)
     )
+    actors_deck._place.appendTo($("#actors_full").removeClass("hide"))
+    $("#actors_left").hide();
+    $("#toggle_col").removeClass("col-md-9")
 
   action_rate: (val) ->
     @_app.film_action @conf.id, "rate", {
@@ -861,6 +1010,7 @@ class Page_Film extends Page
       rel: @conf.relation
       callback: =>
     })
+    false
 
   action_playlist_toggle: (status) ->
     @_app.film_action(@conf.id, "playlist", {
@@ -868,6 +1018,7 @@ class Page_Film extends Page
       rel: @conf.relation
       callback: =>
     })
+    false
 
 class Page_Person extends Page
   films_deck = undefined
@@ -875,41 +1026,46 @@ class Page_Person extends Page
     super
     films_deck = new FilmsDeck($("#films"), {load_func: (deck) =>@load_more_films(deck) })
     films_deck.load_more_bind($("#films_more"))
-    @_e.subscribe_btn = $("#subscribe_btn").click(=> @action_subscribe())
+    films_deck.page = 1
+    @_e.subscribe_btn = $("#subscribe").click(=> @action_subscribe())
 
   action_subscribe: (status) ->
     @_app.person_action(@conf.id, "subscribe", {
       rel: @conf.relation
       status: status
       callback: =>
-        alert("done")
+        # alert("done")
     })
+    false
 
   load_more_films: (deck) ->
     current_counter = deck.load_counter
     deck.load_more_hide()
-    @_app.rest.persons.filmography.read(@conf.id, {})
+    @_app.rest.persons.filmography.read(@conf.id, {page: deck.page + 1})
     .done(
       (data) =>
         return if current_counter != deck.load_counter
         if data.items
           deck.add_items(data.items)
-        if Math.ceil(data.total_cnt / data.per_page) > data.page
-          deck.load_more_show()
-          deck.page = data.page
+          if data.items.length >= 12
+            deck.load_more_show()
+            deck.page = data.page
     )
     .fail(
       (data) =>
     )
 
 class Page_Playlist extends Page
-  film = undefined
+  film_id = undefined
+  films_deck = undefined
   comments_deck = undefined
   actors_deck = undefined
   locations = {}
+  params = undefined
 
   constructor: (@conf) ->
     super
+    films_deck = new FilmsDeck($("#films"))
     comments_deck = new CommentsDeck($("#comments"))
     actors_deck = new PersonsDeck($("#actors"), {load_func: => @load_all_actors()})
     actors_deck.load_more_bind($("#actors_more"))
@@ -922,38 +1078,49 @@ class Page_Playlist extends Page
       if !@user_is_auth()
         event.preventDefault()
     )
-    .bind "reset rated", (event) => @action_rate(@_e.rateit.rateit("value"))
+    .bind "rated", (event) => @action_rate(@_e.rateit.rateit("value"))
+    .bind "reset", (event) => @action_notwatch_toggle()
 
-    @_e.notwatch_btn = $("#notwatch_btn")
-    @_e.notwatch_btn.bind("click", => @action_notwatch_toggle()) if @_e.notwatch_btn.length
+    if @conf.relation && @conf.relation.rating
+      @_e.rateit.rateit "value", @conf.relation.rating
+
     @_e.playlist_btn = $("#playlist_btn")
-    @_e.playlist_btn.bind("click", => @action_playlist_toggle()) if @_e.playlist_btn.length
-    @_e.subscribe_btn = $("#subscribe_btn")
-    @_e.subscribe_btn.bind("click", => @action_subscribe_toggle()) if @_e.subscribe_btn.length
+    @_e.playlist_btn.bind("click", => @action_playlist_toggle(false)) if @_e.playlist_btn.length
+
+
+    $('.toggle-playlist').click (e)->
+      e.preventDefault();
+      $(this).toggleClass('active')
+      $('.tp').slideToggle 'slow', ->
+        if $(this).is(':visible')
+          $('.toggle-playlist span').text('Скрыть плейлист')
+        else
+          $('.toggle-playlist span').text('Показать плейлист');
 
     self = @
-    film = @conf.film
-    if film.locations && film.locations.length
+    if @conf.locations && @conf.locations.length
       $(".location-thumb", $("#locations")).each( ->
         $this = $(this)
         id = $this.data("miVal")
         i = 0
         loc = undefined
-        while i < film.locations.length && film.locations[i].id != id
+        while i < self.conf.locations.length && self.conf.locations[i].id != id
           i++
-        loc = film.locations[i] if i < film.locations.length
+        loc = self.conf.locations[i] if i < self.conf.locations.length
         if loc
           $this.click(-> self.play_location(id))
-          $(".type", $this).text(location_type_to_text(loc.type))
-          if loc.price_type == 0 || loc.price == 0
-            $(".price", $this).text("смотреть бесплатно")
-          else
-            $(".price", $this).text(loc.price + " р.")
-          loc._el = $this
+          ###
+            $(".type", $this).text(location_type_to_text(loc.type))
+            if loc.price_type == 0 || loc.price == 0
+              $(".price", $this).text("смотреть бесплатно")
+            else
+              $(".price", $this).text(loc.price + " р.")
+            loc._el = $this
+          ###
           locations[id] = loc
       )
 
-      @player = new Player($("#player"))
+      @player = new Player($("#frame_player"))
       @player.clear()
 
       loc_id = @_app.query_params("loc")
@@ -965,18 +1132,22 @@ class Page_Playlist extends Page
 
   play_location: (id) ->
     @player.load(locations[id]) if locations[id]
+    return false
 
   load_all_actors: () ->
     actors_deck.load_more_hide();
-    @_app.rest.films.persons.read(film.id, {type: "a", top: actors_deck.get_items().length})
+    @_app.rest.films.persons.read(@conf.id, {type: "a", top: actors_deck.get_items().length})
     .done(
       (data)=>
         if data && data.length
           actors_deck.add_items(data)
     )
+    actors_deck._place.appendTo($("#actors_full").removeClass("hide"))
+    $("#actors_left").hide();
+    $("#toggle_col").removeClass("col-md-9")
 
   action_rate: (val) ->
-    @_app.film_action film.id, "rate", {
+    @_app.film_action @conf.id, "rate", {
       rel: @conf.relation
       value: val
       callback: (new_value) =>
@@ -984,7 +1155,7 @@ class Page_Playlist extends Page
     }
 
   action_notwatch_toggle: (status) ->
-    @_app.film_action(film.id, "notwatch", {
+    @_app.film_action(@conf.id, "notwatch", {
       state: status
       rel: @conf.relation
       callback: =>
@@ -992,18 +1163,101 @@ class Page_Playlist extends Page
     })
 
   action_subscribe_toggle: (status) ->
-    @_app.film_action(film.id, "subscribe", {
+    @_app.film_action(@conf.id, "subscribe", {
       state: status
       rel: @conf.relation
       callback: =>
     })
+    false
 
   action_playlist_toggle: (status) ->
-    @_app.film_action(film.id, "playlist", {
+    @_app.film_action(@conf.id, "playlist", {
       state: status
       rel: @conf.relation
       callback: =>
     })
+    false
+
+class Page_Feed extends Page
+  feed_deck = undefined
+  constructor: (@conf) ->
+    super
+    feed_deck = new FeedDeck($("#feed"), {load_func: (deck) =>@load_more_feed(deck) })
+    feed_deck.load_more_bind($("#feed_more"))
+    feed_deck.page = 1
+
+  load_more_feed: (deck) ->
+    current_counter = deck.load_counter
+    deck.load_more_hide()
+    @_app.rest.users.feed.read(@conf.user_id, {page: deck.page + 1})
+    .done(
+      (data) =>
+        return if current_counter != deck.load_counter
+        if data.items
+          deck.add_items(data.items)
+          if data.items.length >= 12
+            deck.load_more_show()
+            deck.page = data.page
+    )
+    .fail(
+      (data) =>
+    )
+
+class Page_User extends Page
+  films_deck = undefined
+  feed_deck = undefined
+  constructor: (@conf) ->
+    super
+    films_deck = new FilmsDeck($("#films"), {load_func: (deck) =>@load_more_films(deck) })
+    films_deck.load_more_bind($("#films_more"))
+    films_deck.page = 1
+    @_e.friendship_btn = $("#friendship").click(=> @action_friendship())
+    feed_deck = new FeedDeck($("#feed"), {load_func: (deck) =>@load_more_feed(deck) })
+    feed_deck.load_more_bind($("#feed_more"))
+    feed_deck.page = 1
+
+  action_friendship: (status) ->
+    @_app.user_action(@conf.id, "friendship", {
+      rel: @conf.relation
+      status: status
+      callback: =>
+        # alert("done")
+    })
+    false
+
+  load_more_films: (deck) ->
+    current_counter = deck.load_counter
+    deck.load_more_hide()
+    @_app.rest.users.films.read(@conf.id, {page: deck.page + 1})
+    .done(
+      (data) =>
+        return if current_counter != deck.load_counter
+        if data.items
+          deck.add_items(data.items)
+          if data.items.length >= 12
+            deck.load_more_show()
+            deck.page = data.page
+    )
+    .fail(
+      (data) =>
+    )
+
+  load_more_feed: (deck) ->
+    current_counter = deck.load_counter
+    deck.load_more_hide()
+    @_app.rest.users.feed.read(@conf.id, {page: deck.page + 1})
+    .done(
+      (data) =>
+        return if current_counter != deck.load_counter
+        if data.items
+          deck.add_items(data.items)
+          if data.items.length >= 12
+            deck.load_more_show()
+            deck.page = data.page
+    )
+    .fail(
+      (data) =>
+    )
 
 window.InitApp =  (opts = {}, page_name) ->
   new App(opts, page_name)
