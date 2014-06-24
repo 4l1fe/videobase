@@ -1096,6 +1096,7 @@ a.toggle-playlist.active {
 .dropdown-menu li a {padding: 5px; margin: 0}
 
 .list-film .row hr {border: 0; margin: 0; padding: 0; width: 100%; height: 1px; clear: both; background: url("../img/films-delim.png") repeat-x}
+.broun-block .list-film .row hr {border: 0; margin: 0; padding: 0; width: 100%; height: 1px; clear: both; background: url("../img/films-delim-white.png") repeat-x}
 
 .frame-player-wrapper {text-align: center; width: 100%}
 .frame-player-wrapper .frame-player-aspect {width: 100%; padding-top: 59%; position: relative}
@@ -1104,3 +1105,10 @@ a.toggle-playlist.active {
 
 .person-block-wrap .btn-green {padding: 0; color: #fff}
 .btn-clear {padding: 0}
+
+.page-profile .tape-item .row {margin-left: 0}
+.page-profile .title-item-tape {margin-left: 15px; padding-left: 0}
+
+.playlist-empty {margin-bottom: 40px}
+.playlist-empty h2 {font-size: 28px; font-weight: bold;}
+.playlist-empty span {color: #a08c8c; font-size: 14px;}

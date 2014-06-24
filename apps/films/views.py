@@ -142,11 +142,12 @@ def index_view(request):
         except:
             genres_data = []
 
+    films_data = vbFilm(film_model.Films.objects.order_by('rating_sort')[:12],many = True).data
     # Init response
     data = {
         'films_new': resp_dict_data,
         'filter_genres': genres_data,
-        'films': vbFilm(film_model.Films.objects.order_by('rating_sort')[:12], many=True).data
+        'films': films_data
     }
 
     return HttpResponse(render_page('index', data), status.HTTP_200_OK)
@@ -300,7 +301,6 @@ def kinopoisk_view(request, film_id, *args, **kwargs):
 
     return redirect('index_view')
 
-
 def search_view(request, *args, **kwargs):
     # Устанавливаем ответ по умолчанию и вызываем сериализатор поиска
 
@@ -315,3 +315,4 @@ def search_view(request, *args, **kwargs):
             pass
 
     return HttpResponse(render_page('search', resp_dict))
+
