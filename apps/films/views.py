@@ -272,8 +272,9 @@ def playlist_view(request, film_id=None, *args, **kwargs):
         playlist['items'] = vbFilm(playlist_data, many=True).data
         playlist['total_cnt'] = len(playlist_data)
         playlist['id'] = film_id
+        playlist['film'] = film_data
 
-        return HttpResponse(render_page('playlist', {'playlist': playlist, 'film': film_data}))
+        return HttpResponse(render_page('playlist', {'playlist': playlist}))
     return redirect('login_view')
 
 
