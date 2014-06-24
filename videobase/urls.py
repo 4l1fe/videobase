@@ -2,12 +2,11 @@
 
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
+
 import admin_tools
 
-from django.contrib import admin
-
 from videobase import settings
-from apps.users import views
+
 from apps.films.views import test_view
 
 admin.autodiscover()
@@ -22,23 +21,11 @@ urlpatterns = patterns('',
     url(r'^api/test', test_view),
 
     # Interface
-    url(r'^$', 'apps.films.views.index_view', name='index_view'),
-    url(r'^register/$', views.RegisterUserView.as_view()),
-    url(r'^restore-password/$', views.RestorePasswordView.as_view()),
-    url(r'^login/$', views.LoginUserView.as_view(), name='login_view'),
-    url(r'^user/profile/$', views.UserProfileView.as_view(), name='profile_view'),
-    url(r'^user/(?P<user_id>\d+)/$', views.UserView.as_view()),
-    url(r'^feed/$', 'apps.users.views.feed_view', name='user_feed_view'),
-    url(r'^persons/(?P<resource_id>\d+)/$', 'apps.films.views.person_view', name='person_view'),
-    url(r'^films?/(?P<film_id>\d+)/$', 'apps.films.views.film_view', name='film_view'),
-    url(r'^playlist/(?P<film_id>\d+)/$', 'apps.films.views.playlist_view', name='playlist_film_view'),
-    url(r'^playlist/$', 'apps.films.views.playlist_view', name='playlist_view'),
-    url(r'^kinopoisk/(?P<film_id>\d+)/$', 'apps.films.views.kinopoisk_view', name='kinopoisk_view'),
-    url(r'^search/$', 'apps.films.views.search_view', name='search_view'),
+    url('', include('apps.films.view_url')),
+    url('', include('apps.users.view_url')),
 
     # Auth
     url(r'', include('social_auth.urls')),
-    url('^tokenize/?$', views.TokenizeView.as_view(), name="tokenize"),
 
     # Admin
     url(r'^admin_tools/', include('admin_tools.urls')),
