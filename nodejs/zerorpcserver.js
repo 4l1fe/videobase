@@ -18,7 +18,6 @@ var renderers = {
 
 var server = new zerorpc.Server({
     render: function(json, reply) {
-
         var data = JSON.parse(json);
         try {
             repl = renderers[data.template](data.context)
@@ -26,7 +25,7 @@ var server = new zerorpc.Server({
             console.log(e)
         }
 
-        console.log("OK")
+        console.log("OK");
         reply(null, renderers[data.template](data.context));
     }
 });
