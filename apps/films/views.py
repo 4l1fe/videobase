@@ -19,8 +19,6 @@ from django.template import Context
 from django.http import HttpResponse, Http404
 from django.shortcuts import render_to_response, redirect
 from django.utils import timezone
-from django.middleware.csrf import CSRF_KEY_LENGTH
-from django.utils.crypto import get_random_string
 
 from rest_framework import status
 
@@ -144,20 +142,15 @@ def index_view(request):
         except:
             genres_data = []
 
-    films_data = vbFilm(film_model.Films.objects.order_by('rating_sort')[:12], many=True).data
-
-    csrf_token = get_random_string(CSRF_KEY_LENGTH)
+    films_data = vbFilm(film_model.Films.objects.order_by('rating_sort')[:12],many = True).data
     # Init response
     data = {
         'films_new': resp_dict_data,
         'filter_genres': genres_data,
-        'films': films_data,
-        'csrf_token': csrf_token,
+        'films': films_data
     }
 
-    response = HttpResponse(render_page('index', data), status.HTTP_200_OK)
-    response.set_cookie("csrftoken", csrf_token)
-    return response
+    return HttpResponse(render_page('index', data), status.HTTP_200_OK)
 
 
 def person_view(request, resource_id):
@@ -244,10 +237,10 @@ def film_view(request, film_id, *args, **kwargs):
 def playlist_view(request, film_id=None, *args, **kwargs):
     if not film_id:
         film_id = 1
-
+    print request.user
     film_id = int(film_id)
     if request.user.is_authenticated():
-        playlist = {'items': [], 'next': [], 'previous': [], 'total_cnt': 0, 'id': 0}
+        playlist = {'id': 0}
         playlist_data = film_model.Films.objects.\
             filter(uf_films_rel__user=request.user.id, uf_films_rel__subscribed=APP_USERFILM_SUBS_TRUE).\
             order_by('uf_films_rel__created')
@@ -274,7 +267,7 @@ def playlist_view(request, film_id=None, *args, **kwargs):
         playlist['id'] = film_id
         playlist['film'] = film_data
 
-        return HttpResponse(render_page('playlist', {'playlist': playlist}))
+        return HttpResponse(render_page('playlist', {'playlist': playlist, 'film': film_data}))
     return redirect('login_view')
 
 
