@@ -1,3 +1,6 @@
+
+
+
 - if (playlist.film) {
 -   film = playlist.film
 -   film_year = film.releasedate.substr(0,4)
@@ -29,13 +32,13 @@ body
                     .container
                         .row
                             if playlist.previous
-                                .col-md-3.col-sm-4.text-right.pull-right
-                                    a.action-film.next-film.active.sprite(href='/playlist/' + playlist.previous.id, title='')=playlist.previous.name
-                            if playlist.next
-                                .col-md-3.col-sm-4.text-left
-                                    a.action-film.prev-film.sprite(href='/playlist/ + playlist.next.id', title='')=playlist.next.name
+                                .col-md-3.col-sm-4.text-right.pull-left
+                                    a.action-film.prev-film.active.sprite(href='/playlist/' + playlist.previous.id, title='')=playlist.previous.name
                             .col-md-6.col-sm-4.text-center
                                 p ПЛЕЙЛИСТ (#{playlist.id}/#{playlist.total_cnt})
+                            if playlist.next
+                                .col-md-3.col-sm-4.text-right
+                                    a.action-film.next-film.sprite(href='/playlist/' + playlist.next.id, title='')=playlist.next.name
                 //
                    .title-playlist
                 .title-film
@@ -75,9 +78,11 @@ body
                                     ul#slider-playlist.cf
                                         li
                                             .row
-                                                each el in playlist.items
+                                                - items_cnt = playlist.items.length
+                                                - for (var i = 0; i < items_cnt; i++)
+                                                    - el = playlist.items[i]
                                                     .col-md-2.col-sm-3.col-xs-4
-                                                        a(href='/playlist/' + el.id, title='')
+                                                        a(href='/playlist/' + (i+1), title='')
                                                             img(src=el.poster || "static/img/noposter.png", alt='')
                                                         p
                                                             | #{el.name}
@@ -112,7 +117,7 @@ body
                                         span Страна
                                         - delim = false
                                         each c in film.countries
-                                            =(delim?", ":"") + c
+                                            =(delim?", ":"") + c.name
                                             - delim = true
                                 if film.directors
                                     li
@@ -208,6 +213,6 @@ body
                                    .filter-block
                                 //
     include footer
-    - delete film.description; delete playlist.items;
+    //- delete film.description; delete playlist.items;
     script.
         $(document).ready(function () {window.InitApp({page_conf: !{JSON.stringify(film)}}, "Playlist")})
