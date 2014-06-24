@@ -16,18 +16,16 @@ def render_page(page_type, context):
     client = zerorpc.Client()
     client.connect("tcp://127.0.0.1:4242", False)
 
-    data = json.dumps(data, cls=DjangoJSONEncoder)
-
     result = get_current_request()
-    if result.user.is_authenticated():
+    if result.user.is_authenticated() and isinstance(data, dict):
         user = result.user
         data['auth_user'] = {
             'id': user.id,
             'name': '',
-            'avatar': '',
+            'avatar': ''
         }
 
-    html = client.render(data, async=False)
+    html = client.render(json.dumps(data, cls=DjangoJSONEncoder), async=False)
     client.close()
 
     return html
