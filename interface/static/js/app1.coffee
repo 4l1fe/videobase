@@ -39,7 +39,7 @@ class Player
       value = "&value=" + loc.value
     else
       value = "&view=" + encodeURI(loc.url_view)
-    @place.empty().html("<iframe src=\"player.html?type=" + loc.type + value + "\"></iframe>")
+    @place.empty().html("<iframe src=\"/static/player.html?type=" + loc.type + value + "\"></iframe>")
 
   clear: ->
     @place.addClass("player-empty")
@@ -582,24 +582,28 @@ class App
     if name != undefined
       @show_page(name, conf.page_conf)
 
-    @auth_modal = $("#reg-enter").click ->
-      index = $(this).parent().index();
-      if index == 1
-        $('.popup-tabs-a >li, .popup-content > div').removeClass('active');
-        $('.popup-tabs-a >li:eq(0), .popup-content > div:eq(0)').addClass('active');
-      else
-        $('.popup-tabs-a >li, .popup-content > div').removeClass('active');
-        $('.popup-tabs-a >li:eq(1), .popup-content > div:eq(1)').addClass('active');
+    @auth_modal = $("#reg-enter")
 
     $("#login_btn").click (e)=>
       e.preventDefault()
       e.stopPropagation()
       @auth_modal.modal("show")
+      @show_modal("login")
 
     $("#reg_btn").click (e) =>
       e.preventDefault()
       e.stopPropagation()
-      @auth_modal.modal("show")
+      @show_modal("reg")
+
+  show_modal: (index) ->
+    index = "reg" if index == undefined
+    if index == "reg"
+      $('.popup-tabs-a >li, .popup-content > div', @auth_modal).removeClass('active');
+      $('.popup-tabs-a >li:eq(0), .popup-content > div:eq(0)', @auth_modal).addClass('active');
+    else
+      $('.popup-tabs-a >li, .popup-content > div').removeClass('active');
+      $('.popup-tabs-a >li:eq(1), .popup-content > div:eq(1)', @auth_modal).addClass('active');
+    @auth_modal.modal("show")
 
   user_action: (id, action, opts = {}) ->
     if @user_is_auth()

@@ -65,7 +65,7 @@
       } else {
         value = "&view=" + encodeURI(loc.url_view);
       }
-      return this.place.empty().html("<iframe src=\"player.html?type=" + loc.type + value + "\"></iframe>");
+      return this.place.empty().html("<iframe src=\"/static/player.html?type=" + loc.type + value + "\"></iframe>");
     };
 
     Player.prototype.clear = function() {
@@ -935,32 +935,37 @@
       if (name !== void 0) {
         this.show_page(name, conf.page_conf);
       }
-      this.auth_modal = $("#reg-enter").click(function() {
-        var index;
-        index = $(this).parent().index();
-        if (index === 1) {
-          $('.popup-tabs-a >li, .popup-content > div').removeClass('active');
-          return $('.popup-tabs-a >li:eq(0), .popup-content > div:eq(0)').addClass('active');
-        } else {
-          $('.popup-tabs-a >li, .popup-content > div').removeClass('active');
-          return $('.popup-tabs-a >li:eq(1), .popup-content > div:eq(1)').addClass('active');
-        }
-      });
+      this.auth_modal = $("#reg-enter");
       $("#login_btn").click((function(_this) {
         return function(e) {
           e.preventDefault();
           e.stopPropagation();
-          return _this.auth_modal.modal("show");
+          _this.auth_modal.modal("show");
+          return _this.show_modal("login");
         };
       })(this));
       $("#reg_btn").click((function(_this) {
         return function(e) {
           e.preventDefault();
           e.stopPropagation();
-          return _this.auth_modal.modal("show");
+          return _this.show_modal("reg");
         };
       })(this));
     }
+
+    App.prototype.show_modal = function(index) {
+      if (index === void 0) {
+        index = "reg";
+      }
+      if (index === "reg") {
+        $('.popup-tabs-a >li, .popup-content > div', this.auth_modal).removeClass('active');
+        $('.popup-tabs-a >li:eq(0), .popup-content > div:eq(0)', this.auth_modal).addClass('active');
+      } else {
+        $('.popup-tabs-a >li, .popup-content > div').removeClass('active');
+        $('.popup-tabs-a >li:eq(1), .popup-content > div:eq(1)', this.auth_modal).addClass('active');
+      }
+      return this.auth_modal.modal("show");
+    };
 
     App.prototype.user_action = function(id, action, opts) {
       var action_str, doit, new_state, rel;
