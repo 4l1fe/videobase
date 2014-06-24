@@ -65,7 +65,7 @@
       } else {
         value = "&view=" + encodeURI(loc.url_view);
       }
-      return this.place.empty().html("<iframe src=\"player.html?type=" + loc.type + value + "\"></iframe>");
+      return this.place.empty().html("<iframe src=\"/static/player.html?type=" + loc.type + value + "\"></iframe>");
     };
 
     Player.prototype.clear = function() {

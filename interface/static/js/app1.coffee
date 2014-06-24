@@ -39,7 +39,7 @@ class Player
       value = "&value=" + loc.value
     else
       value = "&view=" + encodeURI(loc.url_view)
-    @place.empty().html("<iframe src=\"player.html?type=" + loc.type + value + "\"></iframe>")
+    @place.empty().html("<iframe src=\"/static/player.html?type=" + loc.type + value + "\"></iframe>")
 
   clear: ->
     @place.addClass("player-empty")
