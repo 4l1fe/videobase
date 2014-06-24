@@ -49,7 +49,7 @@ footer(role='contentinfo')
                     #reg.tab-pane.active
                         .wrap-popup-content
                             h3 C помощью почты
-                            form.form-horizontal.form-popup(role='form',method="post",action="/register")
+                            form.form-horizontal.form-popup(role='form',method="post",action="/register/")
                                 input(type="hidden",name="csrfmiddlewaretoken",value=csrf_token)
                                 .form-group
                                     label.col-sm-3.control-label(for='inputEmail') E-mail
@@ -86,7 +86,7 @@ footer(role='contentinfo')
                     #enter.tab-pane
                         .wrap-popup-content
                             h3 C помощью почты
-                            form.form-horizontal.form-popup(role='form',method="post",action="/login")
+                            form.form-horizontal.form-popup(role='form',method="post",action="/login/")
                                 input(type="hidden",name="csrfmiddlewaretoken",value=csrf_token)
                                 .form-group
                                     label.col-sm-3.control-label(for='inputEmail1') E-mail
