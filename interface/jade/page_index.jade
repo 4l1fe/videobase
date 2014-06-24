@@ -1,120 +1,114 @@
-doctype html5
+- is_main = true
+- filter_year_old = {0: "все фильмы", 1: "этого года", 3: "самые свежие", 8: "свежие", 15: "новые", 20: "не старые"}
+- filter_price = {0: "бесплатно", 50: "до 50 рублей", 100: "до 100 рублей", 200: "до 200 рублей", 9999: "любая стоимость"}
+- filter_rating = {0: "любой рейтинг", 5: "включая плохие", 6: "неплохие", 6.5: "хорошие", 7: "отличные", 8: "самые лучшие"}
+- filter_sort = {"rating": "по рейтингу", "subscribes": "по подписчикам"}
+- page_title = "агрегатор всех онлайн-кинотеатров"
 include mixins
-html(lang="ru")
-    include head
-    body.page-index
-        include header
-        .content-blue-wrapper
+include head
+body
+    include header
+    .content(role='main')
+        section.blue-block.films-new
             .container
-                h2 Новинки
-                #films_new
-                    each item in new_films
-                        mixin film_thumb(item)
-        .films-wrapper
+                h1.dots1.whiteh1.centerh1 новинки
+                .list-film
+                    .row#films_new
+                        each item in films_new
+                            mixin film_thumb(item)
+        section
             .container
-                h2 Рекомендуемое
-                .filter-place
-                    form.filter#frm_filter
-                        .filter-sort
-                            | сортировать по
-                            .select-wrapper
-                                select#sel_sort(name="sort")
-                                    option(value="rating") рейтингу
-                                    option(value="subscribes") подпискам
-                        .filter-main
-                            .select-wrapper
-                                select#sel_genre(name="genre")
-                                    option(value="0") любого жанра
-                                    each item in genres.sort(function (a,b){return a.order - b.order})
-                                         option(value=item.id)
-                                             = item.name
-                            .select-wrapper
-                                select#sel_rating(name="rating")
-                                    option(value="0") любого рейтинга
-                                    option(value="5") включая плохие
-                                    option(value="6") неплохие
-                                    option(value="7") хорошие
-                                    option(value="7.5") отличные
-                                    option(value="8") самые лучшие
-                            .select-wrapper
-                                select#sel_price(name="price")
-                                    option(value="999") любой стоимости
-                                    option(value="0") только бесплатные
-                                    option(value="50") не дороже 50 руб.
-                                    option(value="100") не дороже 100 руб.
-                                    option(value="150") не дороже 150 руб.
-                            .select-wrapper
-                                select#sel_year_old(name="year_old")
-                                    option(value="999") любого года
-                                    option(value="1") этого года
-                                    option(value="3") самые свежие
-                                    option(value="5") свежие
-                                    option(value="10") новые
-                                    option(value="15") не старые
-
-                    .shadow
-            .container.films#films
-               //
-                                mixin film_thumb({id: 4, name: "Самый лучший фильм", year: 1970, relation: {rating: 3}, rating: {cons: 9.1}, poster: "static/img/tmp/poster1.jpg", instock: true, hasFree: true, price: 100})
-            .container
-                .films-more#films_more
-                    button
-                       span Мало, хочу ещё фильмов
-                    .shadow
-        .comments-wrapper
-            .container
-                h2 Рецензии
-                .comments-place
-                    .col-md-4.comment-place
-                        .comment-wrapper
-                            .comment
-                                a(href="#")
-                                    h4 Первый мститель: Другая война
-                                .rating
-                                    strong Оценка:
-                                    | Отлично
-                                .text
-                                    | Очень жду выхода второй части этого фильма. Думаю, что очень понравится. Я даже не сомневаюсь в этом. Как только выйдет сразу в кино побегу=)
-                        .user
-                            .avatar
-                                img(src="static/img/tmp/user.gif").img-circle
-                            .name
-                                a(href="#") Анна Иванова
-                            .city Москва
-                .comments-place
-                    .col-md-4.comment-place
-                        .comment-wrapper
-                            .comment
-                                a(href="#")
-                                    h4 Робокоп
-                                .rating
-                                    strong Оценка:
-                                    | Хорошо
-                                .text
-                                    | Марти Макфлай, ты ли это? Я уже ничему не удивляюсь, вон - народ уже Хоббита вовсю оценивает. А на самом деле оценивайте то, что вы смотрели, а именно короткий 20-ти минутный мультфильм &quot;Как приручить дракона: дар ночной фурии&quot;. Ибо так ваши оценки и отзывы к мультфильму, который еще не вышел и трейлер которого (трейлер аж на 20 минут - вот так новость! ) вы якобы видели, не соизволив как следует разобраться, а трейлер ли это был, выглядят как минимум смешно.
-                        .user
-                            .avatar
-                                img(src="static/img/tmp/user.gif").img-circle
-                            .name
-                                a(href="#") Вася Капуста
-                            .city Брянск
-                .comments-place
-                    .col-md-4.comment-place
-                        .comment-wrapper
-                            .comment
-                                a(href="#")
-                                    h4 Звёздные войны IV
-                                .rating
-                                    strong Оценка:
-                                    | Отлично
-                                .text
-                                    | Очень понравилась первая часть, но я считаю, что в ней была полная и оконченная история, снимать дальше уже не надо. Что там можно продолжать? Почему бы не придумать другую историю?
-                        .user
-                            .avatar
-                                img(src="static/img/tmp/user.gif").img-circle
-                            .name
-                                a(href="#") Максим Перцев
-                            .city Москва
-        include footer
-        script.
-            $(document).ready(function () {window.InitApp({}, "Main")})
+                h1.dots2.blackh1.centerh1 Рекомендуемое
+                .filter-block
+                    .filter-content.style-panel-action.rel.zmin
+                        .row
+                            .col-md-9
+                                ul.sort-list.center-sort
+                                    li#filter_genres
+                                        a.sprite.sprite-i-toggle-bottom(href='#', data-toggle='dropdown', title='')
+                                            span все жанры
+                                        ul.dropdown-menu
+                                            li
+                                                a(href='#' + i, title='',data-mi-id=0) все жанры
+                                            each item in filter_genres.sort(function (a,b){return a.order - b.order})                                              
+                                                li
+                                                    a(href='?genre=' + item.id, title='',data-mi-id=item.id)=item.name
+                                    li#filter_rating
+                                        a.sprite.sprite-i-toggle-bottom(href='#', data-toggle='dropdown', title='')
+                                            span=filter_rating[0]
+                                        ul.dropdown-menu
+                                            each item, i in filter_rating
+                                                li
+                                                    a(href='?rating=' + i, title='',data-mi-id=i)=item
+                                    li#filter_price
+                                        a.sprite.sprite-i-toggle-bottom(href='#', data-toggle='dropdown', title='')
+                                            span=filter_price[0]
+                                        ul.dropdown-menu
+                                            each item, i in filter_price
+                                                li
+                                                    a(href='?price=' + i, title='',data-mi-id=i)=item
+                                    li#filter_year_old
+                                        a.sprite.sprite-i-toggle-bottom(href='#', data-toggle='dropdown', title='')
+                                            span=filter_year_old[0]
+                                        ul.dropdown-menu
+                                            each item, i in filter_year_old
+                                                li
+                                                    a(href='?year=' + i, title='',data-mi-id=i)=item
+                            .col-md-3
+                                ul.sort-list.center-sort.nobg
+                                    //li
+                                        strong cортировать:
+                                    li#filter_sort
+                                        a.sprite.sprite-i-toggle-bottom(href='#', data-toggle='dropdown', title='')
+                                            span по подписчикам
+                                        ul.dropdown-menu
+                                            each item, i in filter_sort
+                                                li
+                                                    a(href='?sort=' + i, title='',data-mi-id=i)=item
+                    //
+                       .filter-content
+                    img.img-responsive(src='static/img/shd-big.png', alt='')
+                //
+                   .filter-block
+                .list-film
+                    .row#films
+                        each item in films
+                            mixin film_thumb(item)
+                //
+                   .list-film
+                .add-filter#films_more
+                    .add-content.style-panel-action.rel.zmin
+                        a(href='#') мало, хочу еще фильмы
+                    //
+                       .filter-content
+                    img.img-responsive(src='static/img/shd-big.png', alt='')
+                //
+                   .filter-block
+        if comments && comments.length
+            section.broun-block
+                .container-brown.margin0a
+                    h1.dots3.whiteh1.centerh1 рецензии
+                    .slider-comments
+                        ul#slider-comments.slide-comments
+                            li
+                                .row
+                                    each item,i in comments
+                                        .col-md-4.col-sm-6
+                                            .block-text.rel.zmin
+                                                a(href=item.film.id, title='')=item.film.name
+                                                .mark
+                                                    strong Оценка:
+                                                    |#{item.film.rating}
+                                                p=item.text
+                                                ins.ab.zmin.sprite.sprite-i-triangle.block
+                                            //
+                                               .block-text
+                                            .person-text.rel
+                                                img(src=item.user.avatar || "static/img/noavatar.png", alt='')
+                                                a(href='#', title='')=item.user.name
+                                                i=item.user.city || ""
+                                            //
+                                               .person-text
+    include footer
+    script.
+        $(document).ready(function () {window.InitApp({}, "Main")})

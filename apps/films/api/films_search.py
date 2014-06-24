@@ -44,7 +44,7 @@ class SearchFilmsView(APIView):
         return data.cleaned_data, location_group
 
 
-    def search_by_films(self, filter):
+    def search_by_films(self, filter, personalize):
         o_search = Films.objects.extra(
                 where=['EXTRACT(year FROM "films"."release_date") <= %s'],
                 params=[date.today().year],
@@ -70,7 +70,7 @@ class SearchFilmsView(APIView):
             o_search = o_search.filter(genres=filter['genre'])
 
         # Персоноализация выборки
-        if self.request.user.is_authenticated():
+        if personalize and self.request.user.is_authenticated():
              o_search = o_search.extra(
                  where=['NOT "films"."id" IN (SELECT "users_films"."film_id" FROM "users_films" WHERE "users_films"."user_id" = %s AND "users_films"."status" = %s)'],
                  params=[self.request.user.pk, APP_USERFILM_STATUS_NOT_WATCH],
@@ -133,7 +133,7 @@ class SearchFilmsView(APIView):
         return filter
 
 
-    def get(self, request, format=None, *args, **kwargs):
+    def get(self, request, format=None, personalize=True, *args, **kwargs):
         # Copy post request
         self.get_copy = request.GET.copy()
 
@@ -152,7 +152,7 @@ class SearchFilmsView(APIView):
 
             result = cache.get(cache_key) if use_cache else None
             if result is None:
-                o_search = self.search_by_films(filter)
+                o_search = self.search_by_films(filter, personalize)
 
                 list_films_by_content = []
                 if location_group > 0:
