@@ -33,7 +33,7 @@ body
                                     a.action-film.next-film.active.sprite(href='/playlist/' + playlist.previous.id, title='')=playlist.previous.name
                             if playlist.next
                                 .col-md-3.col-sm-4.text-left
-                                    a.action-film.prev-film.sprite(href='/playlist/ + playlist.next.id', title='')=playlist.next.name
+                                    a.action-film.prev-film.sprite(href='/playlist/' + playlist.next.id, title='')=playlist.next.name
                             .col-md-6.col-sm-4.text-center
                                 p ПЛЕЙЛИСТ (#{playlist.id}/#{playlist.total_cnt})
                 //
@@ -208,6 +208,6 @@ body
                                    .filter-block
                                 //
     include footer
-    - delete film.description; delete playlist.items;
+    //- delete film.description; delete playlist.items;
     script.
         $(document).ready(function () {window.InitApp({page_conf: !{JSON.stringify(film)}}, "Playlist")})
