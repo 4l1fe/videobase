@@ -9,11 +9,11 @@ body
             h1.dots1.whiteh1.centerh1 Поиск
             .list-film
                 .row#films
-                    each item in films
+                    each item in films.items
                         mixin film_thumb(item)
             //
                .list-film
-            if films.length >= 12
+            if films.total_cnt >= 12
                 .add-filter#films_more
                     .add-content.style-panel-action.rel.zmin
                         a(href='#') мало, хочу еще фильмы
