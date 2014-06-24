@@ -2,7 +2,11 @@
 
 var zerorpc = require("zerorpc");
 var jade = require('jade');
-var tmpl_path = "../interface/jade/";
+
+var path = require('path');
+var current_path = path.dirname(require.main.filename);
+var tmpl_path = path.join(current_path, "../interface/jade/");
+
 
 var renderers = {
     index: function(context) {return jade.renderFile(tmpl_path + 'page_index.jade', context)},
