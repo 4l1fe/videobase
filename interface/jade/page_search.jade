@@ -1,0 +1,26 @@
+- page_title = "Результаты поиска"
+include mixins
+include head
+body
+    include header
+    .content(role='main')
+    section.blue-block
+        .container
+            h1.dots1.whiteh1.centerh1 Поиск
+            .list-film
+                .row#films
+                    each item in films.items
+                        mixin film_thumb(item)
+            //
+               .list-film
+            if films.total_cnt >= 12
+                .add-filter#films_more
+                    .add-content.style-panel-action.rel.zmin
+                        a(href='#') мало, хочу еще фильмы
+                    //
+                       .filter-content
+                    img.img-responsive(src='static/img/shd-big.png', alt='')
+                //
+    include footer
+    script.
+        $(document).ready(function () {window.InitApp({page_conf: !{JSON.stringify({search_text: search_text})}}, "Search")})
