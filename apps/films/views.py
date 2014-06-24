@@ -27,6 +27,7 @@ import apps.contents.models as content_model
 
 from apps.films.api.serializers import vbFilm, vbComment, vbPerson
 from apps.films.constants import APP_USERFILM_SUBS_TRUE
+from apps.films.api import SearchFilmsView
 
 from utils.noderender import render_page
 from utils.common import reindex_by
@@ -299,3 +300,19 @@ def kinopoisk_view(request, film_id, *args, **kwargs):
         pass
 
     return redirect('index_view')
+
+def search_view(request, *args, **kwargs):
+    # Устанавливаем ответ по умолчанию и вызываем сериализатор поиска
+
+    resp_dict = {
+        'films': [],
+    }
+
+    if request.REQUEST.get('text'):
+        try:
+            resp_dict['films'] = SearchFilmsView.as_view()(request).data
+        except Exception, e:
+            pass
+
+    return HttpResponse(render_page('search', resp_dict))
+
