@@ -1112,3 +1112,5 @@ a.toggle-playlist.active {
 .playlist-empty {margin-bottom: 40px}
 .playlist-empty h2 {font-size: 28px; font-weight: bold;}
 .playlist-empty span {color: #a08c8c; font-size: 14px;}
+
+.list-profile input.value {display: none}
