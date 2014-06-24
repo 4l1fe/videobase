@@ -26,7 +26,7 @@ var server = new zerorpc.Server({
             console.log(e)
         }
 
-console.log("OK")
+console.log("OK");
         reply(null, renderers[data.template](data.context));
     }
 });
