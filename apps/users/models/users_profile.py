@@ -8,7 +8,6 @@ from ..constants import *
 
 class UsersProfile(models.Model):
     user         = models.OneToOneField(User, verbose_name=u'Пользователь', related_name='profile')
-    nickname     = models.CharField(max_length=128, verbose_name=u'Имя пользователя', null=True, blank=True)
     last_visited = models.DateTimeField(verbose_name=u'Песледний визит', auto_now_add=True, blank=True)
     userpic_type = models.CharField(max_length=255, verbose_name=u'Тип', choices=APP_USER_PIC_TYPES, null=True, blank=True)
     userpic_id   = models.IntegerField(verbose_name=u'Id аватарки', null=True, blank=True)
@@ -30,7 +29,7 @@ class UsersProfile(models.Model):
         return u'[%s] %s' % (self.id, self.user.username, )
 
     def get_name(self):
-        return self.nickname or self.user.username
+        return self.user.first_name
 
     def as_comment_vbUser(self):
 

@@ -12,14 +12,16 @@ body
                             p C помощью E-mail
                             form.form-horizontal(role='form', method='post')
                                 input(type="hidden",name="csrfmiddlewaretoken",value=csrf_token)
-                                .form-group
+                                .form-group(class=error?"has-error":"")
                                     label.col-sm-2.control-label(for='inputEmail3') Email
                                     .col-sm-10
                                         input#inputEmail3.form-control(type='email', name='username')
-                                .form-group
+                                .form-group(class=error?"has-error":"")
                                     label.col-sm-2.control-label(for='inputPassword3') Пароль
                                     .col-sm-10
                                         input#inputPassword3.form-control(type='password', name='password')
+                                        if error
+                                            p=error
                                 .form-group
                                     .col-sm-offset-2.col-sm-10
                                         button.btn.btn-yellow1(type='submit') Войти
@@ -30,19 +32,19 @@ body
                             p C помощью соц.сетей
                             ul
                                 li
-                                    a(href='/login/vk-oauth', title='')
+                                    a(href='/login/vk-oauth', title='Вконтакте')
                                         img(src='static/img/i-vk-b.png', alt='')
                                         | ВКонтакте
                                 li
-                                    a(href='/login/facebook', title='')
+                                    a(href='/login/facebook', title='Facebook')
                                         img(src='static/img/i-fb-b.png', alt='')
                                         | Facebook
                                 li
-                                    a(href='/login/twitter', title='')
+                                    a(href='/login/twitter', title='Twitter')
                                         img(src='static/img/i-tw-b.png', alt='')
                                         | Twitter
                                 li
-                                    a(href='/login/google-oauth2', title='')
+                                    a(href='/login/google-oauth2', title='Google+')
                                         img(src='static/img/i-go-b.png', alt='')
                                         | Google +
                         //
