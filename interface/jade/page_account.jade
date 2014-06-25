@@ -21,27 +21,27 @@ body
                                 .form-group
                                     label.col-sm-3.control-label(for='inputEmail3') Имя
                                     .col-sm-9
-                                        input#inputEmail3.form-control(type='text',required,value=user.name)
+                                        input#inputEmail3.form-control(type='text',required,value=user.name,name='username')
                                 .form-group
                                     label.col-sm-3.control-label(for='inputPassword3') Email
                                     .col-sm-9
-                                        input#inputPassword3.form-control(type='email',required,value=user.email)
+                                        input#inputPassword3.form-control(type='email',required,value=user.email,name='email')
                                 h2 Настройки уведомлений
                                 ul.list-profile
                                     li
-                                        input.checkbox-default(type='checkbox',value=1,checked=user.ntf_vid_new)
+                                        input.checkbox-default(type='checkbox',value=1,checked=user.ntf_vid_new,name='ntf_vid_new')
                                         | Появление нового видео в списке подписок
                                     li
-                                        input.checkbox-default(type='checkbox',value=1,checked=user.ntf_vid_director)
+                                        input.checkbox-default(type='checkbox',value=1,checked=user.ntf_vid_director,name='ntf_vid_director')
                                         | Появление кино определённого режисёра / с определённым актёром
                                     li
-                                        input.checkbox-default(type='checkbox',value=1,checked=user.ntf_frnd_rate)
+                                        input.checkbox-default(type='checkbox',value=1,checked=user.ntf_frnd_rate,name='ntf_frnd_rate')
                                         | Новые оценки ваших друзей
                                     li
-                                        input.checkbox-default(type='checkbox',value=1,checked=user.ntf_frnd_comment)
+                                        input.checkbox-default(type='checkbox',value=1,checked=user.ntf_frnd_comment,name='ntf_frnd_comment')
                                         | Новые комментарии ваших друзей
                                     li
-                                        input.checkbox-default(type='checkbox',value=1,checked=user.ntf_frnd_subscribe)
+                                        input.checkbox-default(type='checkbox',value=1,checked=user.ntf_frnd_subscribe,name='ntf_frnd_subscribe')
                                         | Новые подписки ваших друзей
                                     li
                                         - freq = user.ntf_frequency
