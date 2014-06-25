@@ -108,17 +108,17 @@ body
                             //
                                .title-rate
                             .rel.zmin.blue-num.num
-                                i=film.ratings && film.ratings.cons?film.ratings.cons[0]:"-"
-                            p.text-center=(film.ratings && film.ratings.cons?film.ratings.cons[1]:0) + " голосов"
+                                i=film.ratings && film.ratings.cons[0]?film.ratings.cons[0]:"-"
+                            p.text-center=(film.ratings && film.ratings.cons[1]?film.ratings.cons[1]:0) + " голосов"
                             ul
                                 li
                                     | Рейтинг в
                                     strong=" Kinopoisk"
-                                    span=" " + (film.ratings && film.ratings.kp?film.ratings.kp[0]:"-")
+                                    span=" " + (film.ratings && film.ratings.kp[0]?film.ratings.kp[0]:"-")
                                 li
                                     | Рейтинг в
                                     strong=" IMDB"
-                                    span=" " + (film.ratings && film.ratings.imdb?film.ratings.imdb[0]:"-")
+                                    span=" " + (film.ratings && film.ratings.imdb[0]?film.ratings.imdb[0]:"-")
                         //
                            .block-rate
                         .brd-bottom-rate
@@ -140,7 +140,7 @@ body
                             .playlist-content
                                 h2.blackh1 Трейлер
                                 .trailer-area
-                                    - res = /v=([a-z0-9]+)/ig.exec(film.trailer)
+                                    - res = /v=([a-z0-9_\-]+)/ig.exec(film.trailer)
                                     iframe(width='100%', height='393', src="\/\/youtube.com\/embed\/" + res[1], frameborder='0', allowfullscreen='allowfullscreen')
                                 //
                                    .trailer-area
