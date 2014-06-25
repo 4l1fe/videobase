@@ -29,14 +29,14 @@ body
                     .title-playlist.rel.zmin
                         .container
                             .row
-                                if playlist.previous
+                                if playlist.next
                                     .col-md-3.col-sm-4.text-right.pull-left
-                                        a.action-film.prev-film.active.sprite(href='/playlist/' + playlist.previous.id, title='')=playlist.previous.name
+                                        a.action-film.prev-film.active.sprite(href='/playlist/' + playlist.next.id, title='')=playlist.next.name
+                                if playlist.previous
+                                    .col-md-3.col-sm-4.text-right
+                                        a.action-film.next-film.sprite(href='/playlist/' + playlist.previous.id, title='')=playlist.previous.name
                                 .col-md-6.col-sm-4.text-center
                                     p ПЛЕЙЛИСТ (#{playlist.id}/#{playlist.total_cnt})
-                                if playlist.next
-                                    .col-md-3.col-sm-4.text-right
-                                        a.action-film.next-film.sprite(href='/playlist/' + playlist.next.id, title='')=playlist.next.name
                     //
                        .title-playlist
                     .title-film
