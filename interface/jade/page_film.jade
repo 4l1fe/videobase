@@ -140,7 +140,7 @@ body
                             .playlist-content
                                 h2.blackh1 Трейлер
                                 .trailer-area
-                                    - res = /v=([a-z0-9]+)/ig.exec(film.trailer)
+                                    - res = /v=([a-z0-9\-]+)/ig.exec(film.trailer)
                                     iframe(width='100%', height='393', src="\/\/youtube.com\/embed\/" + res[1], frameborder='0', allowfullscreen='allowfullscreen')
                                 //
                                    .trailer-area

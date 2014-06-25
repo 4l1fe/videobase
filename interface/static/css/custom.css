@@ -642,6 +642,7 @@ a.btn-more-friends, .btn-more-friends {
     padding-bottom: 20px;
     line-height: 0px;font-size: 0px;padding-top: 3px;
 }
+.img-person-playlist img {max-width: 100%}
 .img-person img {width: 211px;}
 .person-info {padding-left: 50px;}
 .person-name span, .person-data {
