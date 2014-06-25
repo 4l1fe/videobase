@@ -4,8 +4,9 @@ import json
 import zerorpc
 
 from django.core.serializers.json import DjangoJSONEncoder
+
+from apps.users.models import UsersPics
 from utils.middlewares.local_thread import get_current_request
-from apps.users.api.serializers import vbUser
 
 
 def render_page(page_type, context):
@@ -19,7 +20,13 @@ def render_page(page_type, context):
 
     request = get_current_request()
     if request.user.is_authenticated():
-        data['context']['auth_user'] = vbUser(request.user).data
+        user = request.user
+        profile = user.profile
+        data['context']['auth_user'] = {
+            'id': user.id,
+            'name': profile.get_name(),
+            'avatar': UsersPics.get_picture(profile),
+        }
 
     html = client.render(json.dumps(data, cls=DjangoJSONEncoder), async=False)
     client.close()
