@@ -74,7 +74,7 @@ class FilmExtras(PhotoClass):
         if not isinstance(ids, list):
             ids = [ids]
 
-        result = cls.objects.filter(film__in=ids, type=APP_FILM_TYPE_ADDITIONAL_MATERIAL_TRAILER)
+        result = cls.objects.filter(film__in=ids, type=APP_FILM_TYPE_ADDITIONAL_MATERIAL_TRAILER).order_by('id')
         if first:
             result = result.first()
 
