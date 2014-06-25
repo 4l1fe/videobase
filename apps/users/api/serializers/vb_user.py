@@ -69,13 +69,7 @@ class vbUser(serializers.ModelSerializer):
             return {}
 
     def path_to_avatar(self, obj):
-        userpic = obj.profile.userpic_id
-        try:
-            image = UsersPics.objects.get(id=userpic).image
-            path = image.storage.url(image.name)
-        except:
-            path = ''
-        return path
+        return UsersPics.get_picture(obj.profile)
 
     def get_regdate(self, obj):
         return obj.date_joined
