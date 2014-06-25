@@ -49,3 +49,8 @@ class CustomRegisterForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ('email', 'password', 'username', 'is_active')
+
+
+class UserUpdateForm(forms.Form):
+    name = forms.CharField(max_length=30, required=False)
+    email = forms.EmailField(required=False)
