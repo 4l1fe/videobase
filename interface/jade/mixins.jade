@@ -227,7 +227,8 @@ mixin feed_thumb(item, for_tpl)
                            .title-item-tape
                         .content-item-tape
                             .short-text-tape
-                                h4(data-mi-name="object.name")=item.object.name + " (" + item.object.releasedate.substr(0,4) + ")"
+                                h4(data-mi-name="object.name")=item.object.name
+                                 // + " (" + item.object.releasedate.substr(0,4) + ")"
                                 p(data-mi-name="object.text")=item.object.text
                             //
                                .short-text-tape
