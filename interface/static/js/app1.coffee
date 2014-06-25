@@ -214,25 +214,23 @@ class FilmThumb extends Item
   constructor: (opts = {}, callback) ->
     @_name = "film-thumb"
     super opts, =>
-      ri = @elements["relation.rating"].self
-      if !opts.place
-        ri.rateit()
+      ri = @elements["relation.rating"].self.rateit()
       ri
-        .rateit "min", 0
-        .rateit "max", 10
-        .bind("beforerated beforereset", (event) =>
-          if !@user_is_auth()
-            event.preventDefault()
-        )
-        .bind "rated", (event) => @action_rate(ri.rateit("value"))
-        .bind "reset", (event) => @toggle_notwatch()
-      ###
-        @elements["poster"].self.css({"margin-left": -300}).load(->
-          $this = $(this)
-          $this.animate({"margin-left": 0}, 3000)
-        )
-      ###
-      # @place().imagesLoaded()
+      .rateit "min", 0
+      .rateit "max", 10
+      .bind("beforerated beforereset", (event) =>
+        if !@user_is_auth()
+          event.preventDefault()
+      )
+      .bind "rated", (event) => @action_rate(ri.rateit("value"))
+      .bind "reset", (event) => @toggle_notwatch()
+  ###
+    @elements["poster"].self.css({"margin-left": -300}).load(->
+      $this = $(this)
+      $this.animate({"margin-left": 0}, 3000)
+    )
+  ###
+  # @place().imagesLoaded()
 
   transform_attr: (attr, name, val) ->
     if attr == "href" && name == "id"
@@ -273,7 +271,7 @@ class FilmThumb extends Item
       btn_text = "Подписаться"
       @elements["btn"].self.click => @toggle_subscribe()
     if vals.relation && vals.relation.rating
-      @elements["relation.rating"].self.rateit("value", vals.relation.rating)
+      @elements["relation.rating"].self.rateit().rateit("value", vals.relation.rating)
 
     @elements["btn"].self.removeClass("btn-subscribe").removeClass("btn-price").removeClass("btn-free").addClass(btn_cls)
     @elements["btn_text"].self.html(btn_text).show()
@@ -761,7 +759,7 @@ class Page_Search extends Page
 
   load_more_films: (deck, opts = {}) ->
     deck.load_more_hide()
-    params = {text: self.conf.search_text || ""}
+    params = {text: self.conf.search_text || "", page: deck.page + 1}
     current_counter = deck.load_counter
     self._app.rest.films.read("search", params)
     .done(
