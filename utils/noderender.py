@@ -17,15 +17,14 @@ def render_page(page_type, context):
     client.connect("tcp://127.0.0.1:4242", False)
 
     result = get_current_request()
-    if result.user.is_authenticated() and isinstance(data, dict):
+    if result.user.is_authenticated():
         user = result.user
         data['context']['auth_user'] = {
             'id': user.id,
-            'name': '',
-            'avatar': ''
+            'name': user.get_full_name(),
+            'avatar': '',
         }
 
-    
     html = client.render(json.dumps(data, cls=DjangoJSONEncoder), async=False)
     client.close()
 

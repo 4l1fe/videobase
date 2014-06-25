@@ -237,7 +237,7 @@ def film_view(request, film_id, *args, **kwargs):
 def playlist_view(request, film_id=None, *args, **kwargs):
     if not film_id:
         film_id = 1
-    print request.user
+
     film_id = int(film_id)
     if request.user.is_authenticated():
         playlist = {'id': 0}
@@ -302,6 +302,7 @@ def kinopoisk_view(request, film_id, *args, **kwargs):
 
     return redirect('index_view')
 
+
 def search_view(request, *args, **kwargs):
     # Устанавливаем ответ по умолчанию и вызываем сериализатор поиска
 
@@ -316,4 +317,3 @@ def search_view(request, *args, **kwargs):
             pass
 
     return HttpResponse(render_page('search', resp_dict))
-
