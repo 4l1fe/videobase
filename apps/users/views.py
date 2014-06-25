@@ -20,7 +20,7 @@ from tasks import send_template_mail
 from rest_framework.authtoken.models import Token
 
 from apps.users.models import Feed
-from apps.users.api.serializers import vbUser, vbFeedElement
+from apps.users.api.serializers import vbUser, vbFeedElement, vbUserProfile
 from apps.users.forms import CustomRegisterForm, UsersProfileForm
 from apps.users.api.utils import create_new_session
 from apps.users.constants import APP_USERS_API_DEFAULT_PAGE, APP_USERS_API_DEFAULT_PER_PAGE,\
@@ -63,7 +63,7 @@ class RegisterUserView(View):
                 send_template_mail.apply_async(kwargs=kw)
             except Exception as e:
                 transaction.rollback()
-                return HttpResponseBadRequest
+                return HttpResponseBadRequest()
 
             transaction.commit()
             return redirect('index_view')
@@ -214,7 +214,7 @@ class UserProfileView(View):
             return redirect("login_view")
         csrf_token = get_random_string(CSRF_KEY_LENGTH)
         resp_dict = {'csrf_token': csrf_token,
-                     'user': vbUser(request.user).data,
+                     'user': vbUserProfile(request.user.profile).data,
                      }
         response = HttpResponse(render_page('profile', resp_dict))
         response.set_cookie("csrftoken", csrf_token)

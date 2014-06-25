@@ -6,6 +6,7 @@ from .models import User, UsersProfile
 
 class UsersProfileForm(forms.ModelForm):
     email = forms.EmailField(required=False)
+    username = forms.CharField(required=True, max_length=30)
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('instance')
@@ -16,6 +17,7 @@ class UsersProfileForm(forms.ModelForm):
     def save(self, commit=True):
         super(UsersProfileForm, self).save(commit)
         self.user.username = self.user.email = self.cleaned_data['email']
+        self.user.first_name = self.cleaned_data['username']
         self.user.save()
 
     class Meta:
