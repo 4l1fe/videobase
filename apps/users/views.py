@@ -63,7 +63,7 @@ class RegisterUserView(View):
                 send_template_mail.apply_async(kwargs=kw)
             except Exception as e:
                 transaction.rollback()
-                return HttpResponseBadRequest
+                return HttpResponseBadRequest()
 
             transaction.commit()
             return redirect('index_view')
