@@ -15,16 +15,32 @@ class UsersPics(models.Model):
     user  = models.ForeignKey(User, verbose_name=u'Пользователь', related_name='pics')
     image = models.ImageField(upload_to=get_image_path, verbose_name=u'Аватарка')
 
+
     @property
     def get_upload_to(self):
         return APP_USER_PIC_DIR
+
 
     @property
     def filename(self):
         return os.path.basename(self.image.file.name)
 
+
+    @classmethod
+    def get_picture(cls, profile):
+        path = u''
+        try:
+            image = cls.objects.get(id=profile.userpic_id).image
+            path = image.storage.url(image.name)
+        except Exception, e:
+            pass
+
+        return path
+
+
     def __unicode__(self):
         return u'[%s] %s : %s' % (self.pk, self.user, self.filename, )
+
 
     class Meta:
         # Имя таблицы в БД
