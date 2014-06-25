@@ -7,108 +7,109 @@
 include mixins
 include head
 body
-    include header
-    .content(role='main')
-        section.blue-block.films-new
-            .container
-                h1.dots1.whiteh1.centerh1 новинки
-                .list-film
-                    .row#films_new
-                        each item in films_new
-                            mixin film_thumb(item)
-        section
-            .container
-                h1.dots2.blackh1.centerh1 Рекомендуемое
-                .filter-block
-                    .filter-content.style-panel-action.rel.zmin
-                        .row
-                            .col-md-9
-                                ul.sort-list.center-sort
-                                    li#filter_genres
-                                        a.sprite.sprite-i-toggle-bottom(href='#', data-toggle='dropdown', title='')
-                                            span все жанры
-                                        ul.dropdown-menu
-                                            li
-                                                a(href='#' + i, title='',data-mi-id=0) все жанры
-                                            each item in filter_genres.sort(function (a,b){return a.order - b.order})                                              
+    .wrap-page
+        include header
+        .content(role='main')
+            section.blue-block.films-new
+                .container
+                    h1.dots1.whiteh1.centerh1 новинки
+                    .list-film
+                        .row#films_new
+                            each item in films_new
+                                mixin film_thumb(item)
+            section
+                .container
+                    h1.dots2.blackh1.centerh1 Рекомендуемое
+                    .filter-block
+                        .filter-content.style-panel-action.rel.zmin
+                            .row
+                                .col-md-9
+                                    ul.sort-list.center-sort
+                                        li#filter_genres
+                                            a.sprite.sprite-i-toggle-bottom(href='#', data-toggle='dropdown', title='')
+                                                span все жанры
+                                            ul.dropdown-menu
                                                 li
-                                                    a(href='?genre=' + item.id, title='',data-mi-id=item.id)=item.name
-                                    li#filter_rating
-                                        a.sprite.sprite-i-toggle-bottom(href='#', data-toggle='dropdown', title='')
-                                            span=filter_rating[0]
-                                        ul.dropdown-menu
-                                            each item, i in filter_rating
-                                                li
-                                                    a(href='?rating=' + i, title='',data-mi-id=i)=item
-                                    li#filter_price
-                                        a.sprite.sprite-i-toggle-bottom(href='#', data-toggle='dropdown', title='')
-                                            span=filter_price[0]
-                                        ul.dropdown-menu
-                                            each item, i in filter_price
-                                                li
-                                                    a(href='?price=' + i, title='',data-mi-id=i)=item
-                                    li#filter_year_old
-                                        a.sprite.sprite-i-toggle-bottom(href='#', data-toggle='dropdown', title='')
-                                            span=filter_year_old[0]
-                                        ul.dropdown-menu
-                                            each item, i in filter_year_old
-                                                li
-                                                    a(href='?year=' + i, title='',data-mi-id=i)=item
-                            .col-md-3
-                                ul.sort-list.center-sort.nobg
-                                    //li
-                                        strong cортировать:
-                                    li#filter_sort
-                                        a.sprite.sprite-i-toggle-bottom(href='#', data-toggle='dropdown', title='')
-                                            span по подписчикам
-                                        ul.dropdown-menu
-                                            each item, i in filter_sort
-                                                li
-                                                    a(href='?sort=' + i, title='',data-mi-id=i)=item
+                                                    a(href='#' + i, title='',data-mi-id=0) все жанры
+                                                each item in filter_genres.sort(function (a,b){return a.order - b.order})
+                                                    li
+                                                        a(href='?genre=' + item.id, title='',data-mi-id=item.id)=item.name
+                                        li#filter_rating
+                                            a.sprite.sprite-i-toggle-bottom(href='#', data-toggle='dropdown', title='')
+                                                span=filter_rating[0]
+                                            ul.dropdown-menu
+                                                each item, i in filter_rating
+                                                    li
+                                                        a(href='?rating=' + i, title='',data-mi-id=i)=item
+                                        li#filter_price
+                                            a.sprite.sprite-i-toggle-bottom(href='#', data-toggle='dropdown', title='')
+                                                span=filter_price[0]
+                                            ul.dropdown-menu
+                                                each item, i in filter_price
+                                                    li
+                                                        a(href='?price=' + i, title='',data-mi-id=i)=item
+                                        li#filter_year_old
+                                            a.sprite.sprite-i-toggle-bottom(href='#', data-toggle='dropdown', title='')
+                                                span=filter_year_old[0]
+                                            ul.dropdown-menu
+                                                each item, i in filter_year_old
+                                                    li
+                                                        a(href='?year=' + i, title='',data-mi-id=i)=item
+                                .col-md-3
+                                    ul.sort-list.center-sort.nobg
+                                        //li
+                                            strong cортировать:
+                                        li#filter_sort
+                                            a.sprite.sprite-i-toggle-bottom(href='#', data-toggle='dropdown', title='')
+                                                span по подписчикам
+                                            ul.dropdown-menu
+                                                each item, i in filter_sort
+                                                    li
+                                                        a(href='?sort=' + i, title='',data-mi-id=i)=item
+                        //
+                           .filter-content
+                        img.img-responsive(src='static/img/shd-big.png', alt='')
                     //
-                       .filter-content
-                    img.img-responsive(src='static/img/shd-big.png', alt='')
-                //
-                   .filter-block
-                .list-film
-                    .row#films
-                        each item in films
-                            mixin film_thumb(item)
-                //
-                   .list-film
-                .add-filter#films_more
-                    .add-content.style-panel-action.rel.zmin
-                        a(href='#') мало, хочу еще фильмы
+                       .filter-block
+                    .list-film
+                        .row#films
+                            each item in films
+                                mixin film_thumb(item)
                     //
-                       .filter-content
-                    img.img-responsive(src='static/img/shd-big.png', alt='')
-                //
-                   .filter-block
-        if comments && comments.length
-            section.broun-block
-                .container-brown.margin0a
-                    h1.dots3.whiteh1.centerh1 рецензии
-                    .slider-comments
-                        ul#slider-comments.slide-comments
-                            li
-                                .row
-                                    each item,i in comments
-                                        .col-md-4.col-sm-6
-                                            .block-text.rel.zmin
-                                                a(href=item.film.id, title='')=item.film.name
-                                                .mark
-                                                    strong Оценка:
-                                                    |#{item.film.rating}
-                                                p=item.text
-                                                ins.ab.zmin.sprite.sprite-i-triangle.block
-                                            //
-                                               .block-text
-                                            .person-text.rel
-                                                img(src=item.user.avatar || "static/img/noavatar.png", alt='')
-                                                a(href='#', title='')=item.user.name
-                                                i=item.user.city || ""
-                                            //
-                                               .person-text
-    include footer
+                       .list-film
+                    .add-filter#films_more
+                        .add-content.style-panel-action.rel.zmin
+                            a(href='#') мало, хочу еще фильмы
+                        //
+                           .filter-content
+                        img.img-responsive(src='static/img/shd-big.png', alt='')
+                    //
+                       .filter-block
+            if comments && comments.length
+                section.broun-block
+                    .container-brown.margin0a
+                        h1.dots3.whiteh1.centerh1 рецензии
+                        .slider-comments
+                            ul#slider-comments.slide-comments
+                                li
+                                    .row
+                                        each item,i in comments
+                                            .col-md-4.col-sm-6
+                                                .block-text.rel.zmin
+                                                    a(href=item.film.id, title='')=item.film.name
+                                                    .mark
+                                                        strong Оценка:
+                                                        |#{item.film.rating}
+                                                    p=item.text
+                                                    ins.ab.zmin.sprite.sprite-i-triangle.block
+                                                //
+                                                   .block-text
+                                                .person-text.rel
+                                                    img(src=item.user.avatar || "static/img/noavatar.png", alt='')
+                                                    a(href='#', title='')=item.user.name
+                                                    i=item.user.city || ""
+                                                //
+                                                   .person-text
+        include footer
     script.
         $(document).ready(function () {window.InitApp({}, "Main")})
