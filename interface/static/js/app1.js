@@ -352,10 +352,7 @@
       FilmThumb.__super__.constructor.call(this, opts, (function(_this) {
         return function() {
           var ri;
-          ri = _this.elements["relation.rating"].self;
-          if (!opts.place) {
-            ri.rateit();
-          }
+          ri = _this.elements["relation.rating"].self.rateit();
           return ri.rateit("min", 0).rateit("max", 10).bind("beforerated beforereset", function(event) {
             if (!_this.user_is_auth()) {
               return event.preventDefault();
@@ -365,16 +362,17 @@
           }).bind("reset", function(event) {
             return _this.toggle_notwatch();
           });
-
-          /*
-            @elements["poster"].self.css({"margin-left": -300}).load(->
-              $this = $(this)
-              $this.animate({"margin-left": 0}, 3000)
-            )
-           */
         };
       })(this));
     }
+
+
+    /*
+      @elements["poster"].self.css({"margin-left": -300}).load(->
+        $this = $(this)
+        $this.animate({"margin-left": 0}, 3000)
+      )
+     */
 
     FilmThumb.prototype.transform_attr = function(attr, name, val) {
       if (attr === "href" && name === "id") {
@@ -431,7 +429,7 @@
         })(this));
       }
       if (vals.relation && vals.relation.rating) {
-        this.elements["relation.rating"].self.rateit("value", vals.relation.rating);
+        this.elements["relation.rating"].self.rateit().rateit("value", vals.relation.rating);
       }
       this.elements["btn"].self.removeClass("btn-subscribe").removeClass("btn-price").removeClass("btn-free").addClass(btn_cls);
       this.elements["btn_text"].self.html(btn_text).show();
@@ -1211,7 +1209,8 @@
       }
       deck.load_more_hide();
       params = {
-        text: self.conf.search_text || ""
+        text: self.conf.search_text || "",
+        page: deck.page + 1
       };
       current_counter = deck.load_counter;
       return self._app.rest.films.read("search", params).done((function(_this) {
