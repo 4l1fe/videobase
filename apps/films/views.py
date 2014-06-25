@@ -272,13 +272,14 @@ def playlist_view(request, film_id=None, *args, **kwargs):
 
             film = playlist_data[film_id-1]
             film_data, o_film = film_to_view(film.id)
-
+        recommended_films = vbFilm(film_model.Films.objects.order_by('rating_sort')[:12],many = True).data
         # Update playlist
         playlist.update({
             'id': film_id,
             'film': film_data,
             'total_cnt': len(playlist_data),
             'items': vbFilm(playlist_data, many=True).data,
+            'films': recommended_films,
         })
 
         return HttpResponse(render_page('playlist', {'playlist': playlist, 'film': film_data}))
