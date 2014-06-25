@@ -4,7 +4,10 @@ html(lang="ru")
         title Плеер ВсеВидео
         meta(charset="utf-8")
         style.
-            #player {width: 100%; height: 100%}
+            #player {
+                width: 100%;
+                height: 100%
+            }
     body
         #player
         script.
@@ -31,13 +34,13 @@ html(lang="ru")
                         value = view.substr(24)
                         value = value.substr(0, value.indexOf("#"))
                     }
-                    html = '<object id="DigitalaccessVideoPlayer" classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" width="100%" height="100%" type="application/x-shockwave-flash" data="http://www.ivi.ru/video/player?siteId=s138&amp;_isB2C=1&amp;autoStart=1&amp;videoId=' + value + '&amp;allowSeriesPlaylist=1&amp;disableiviredirect=0&amp;share_embed=0"><param name="movie" value="http://www.ivi.ru/video/player?siteId=s138&amp;_isB2C=1&amp;autoStart=1&amp;videoId=' + value + '&amp;allowSeriesPlaylist=1&amp;disableiviredirect=0&amp;share_embed=0"><param name="allowScriptAccess" value="always"><param name="allowFullScreen" value="true"><param name="bgcolor" value="#000000"><param name="wmode" value="opaque"><embed allowscriptaccess="always" allowfullscreen="true" wmode="opaque" width="100%" height="100%" type="application/x-shockwave-flash" src="http://www.ivi.ru/video/player?siteId=s138&amp;_isB2C=1&amp;autoStart=1&amp;videoId=' + value + '&amp;allowSeriesPlaylist=1&amp;disableiviredirect=0&amp;share_embed=0"></object>'
+                    html = '<iframe src="http://www.ivi.ru/player/?videoid=' + value + '&amp;subsite=138&amp;enableseries=0&amp;autostart=0" width="100%" height="100%" frameborder="0" allowfullscreen=""></iframe>'
                 } else if (type == "nowru") {
                     if (value == false) {
                         arr = view.split("/")
                         value = arr[arr.length - 1]
                     }
-                    html = '<iframe name="now1023318" src="http://www.now.ru/embed/frame/' + value + '" scrolling="no" frameborder="no" height="100%" width="100%"></iframe>'
+                    html = '<iframe name="now1023318" src="http://www.now.ru/embed/frame/' + value + '" scrolling="no" frameborder="no" height="100%" width="100%" allowfullscreen></iframe>'
                 } else if (type == "tvigle") {
                         if (value == false) {
                             arr = view.split("=")
@@ -54,6 +57,8 @@ html(lang="ru")
                     html = '<iframe width="100%" height="100%" src="http://www.tvzavr.ru/js/v5/tvzavrplayer2.swf?playlist=' + value + '&autoplay=1"></iframe>';
                 } else if (type == "mosfilm") {
                     html = '<iframe width="100%" height="100%" src="//www.youtube.com/embed/' + value + '" frameborder="0" allowfullscreen></iframe>'
+                } else if (type == "playfamily") {
+                    html = '<iframe width="100%" height="100%" id="playlite-frame" class="playlite-object" frameborder="0" scrolling="no" src=' + value + '></iframe>'
                 }
             }
             if (!html)
