@@ -19,8 +19,6 @@ from django.template import Context
 from django.http import HttpResponse, Http404
 from django.shortcuts import render_to_response, redirect
 from django.utils import timezone
-from django.middleware.csrf import CSRF_KEY_LENGTH
-from django.utils.crypto import get_random_string
 
 from rest_framework import status
 
@@ -144,20 +142,16 @@ def index_view(request):
         except:
             genres_data = []
 
-    films_data = vbFilm(film_model.Films.objects.order_by('rating_sort')[:12], many=True).data
+    films_data = vbFilm(film_model.Films.objects.order_by('rating_sort')[:12],many = True).data
 
-    csrf_token = get_random_string(CSRF_KEY_LENGTH)
     # Init response
     data = {
         'films_new': resp_dict_data,
         'filter_genres': genres_data,
-        'films': films_data,
-        'csrf_token': csrf_token,
+        'films': films_data
     }
 
-    response = HttpResponse(render_page('index', data), status.HTTP_200_OK)
-    response.set_cookie("csrftoken", csrf_token)
-    return response
+    return HttpResponse(render_page('index', data), status.HTTP_200_OK)
 
 
 def person_view(request, resource_id):
@@ -201,20 +195,22 @@ def calc_actors(o_film):
         'limit': 5,
     }
 
+    result = []
     try:
         result = list(film_model.Persons.get_sorted_persons_by_name(**filter).values('id', 'name'))
     except Exception, e:
-        result = []
+        pass
 
     return result
 
 
 def calc_similar(o_film):
+    result = []
     try:
         result = film_model.Films.similar_api(o_film)
         result = vbFilm(result).data
     except Exception, e:
-        result = []
+        pass
 
     return result
 
@@ -238,6 +234,11 @@ def film_view(request, film_id, *args, **kwargs):
     resp_dict, o_film = film_to_view(film_id)
     resp_dict['similar'] = calc_similar(o_film)
 
+    # Trailer
+    trailer = film_model.FilmExtras.get_trailer_by_film(film_id, first=True)
+    if not trailer is None:
+        resp_dict['trailer'] = trailer.url
+
     return HttpResponse(render_page('film', {'film': resp_dict}))
 
 
@@ -245,14 +246,17 @@ def playlist_view(request, film_id=None, *args, **kwargs):
     if not film_id:
         film_id = 1
 
-    film_id = int(film_id)
     if request.user.is_authenticated():
-        playlist = {'items': [], 'next': [], 'previous': [], 'total_cnt': 0, 'id': 0}
+        # Init data
+        film_data = {}
+        playlist = {'id': 0}
+        film_id = int(film_id)
+
+        # Выборка плейлиста
         playlist_data = film_model.Films.objects.\
             filter(uf_films_rel__user=request.user.id, uf_films_rel__subscribed=APP_USERFILM_SUBS_TRUE).\
             order_by('uf_films_rel__created')
 
-        film_data = {}
         if len(playlist_data) > 0:
             if film_id > len(playlist_data) or film_id < 1:
                 return redirect('playlist_film_view', film_id=1)
@@ -269,11 +273,16 @@ def playlist_view(request, film_id=None, *args, **kwargs):
             film = playlist_data[film_id-1]
             film_data, o_film = film_to_view(film.id)
 
-        playlist['items'] = vbFilm(playlist_data, many=True).data
-        playlist['total_cnt'] = len(playlist_data)
-        playlist['id'] = film_id
+        # Update playlist
+        playlist.update({
+            'id': film_id,
+            'film': film_data,
+            'total_cnt': len(playlist_data),
+            'items': vbFilm(playlist_data, many=True).data,
+        })
 
         return HttpResponse(render_page('playlist', {'playlist': playlist, 'film': film_data}))
+
     return redirect('login_view')
 
 
@@ -308,9 +317,9 @@ def kinopoisk_view(request, film_id, *args, **kwargs):
 
     return redirect('index_view')
 
+
 def search_view(request, *args, **kwargs):
     # Устанавливаем ответ по умолчанию и вызываем сериализатор поиска
-
     resp_dict = {
         'films': [],
     }
@@ -322,4 +331,3 @@ def search_view(request, *args, **kwargs):
             pass
 
     return HttpResponse(render_page('search', resp_dict))
-

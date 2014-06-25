@@ -253,7 +253,8 @@ mixin feed_thumb(item, for_tpl)
                         //
                            .title-item-tape
                         .content-item-tape
-                            h4(data-mi-name="object.name")=item.object.name + " (" + item.object.releasedate.substr(0,4) + ")"
+                            h4(data-mi-name="object.name")=item.object.name 
+                            // + " (" + item.object.releasedate.substr(0,4) + ")"
                             br
                             .range-block-tape.cf
                                 .range-style2.fleft
@@ -324,7 +325,8 @@ mixin feed_thumb(item, for_tpl)
                                 a(href='/films/' + item.object.id, title='', data-mi-athref="object.id")
                                     img(src=item.object.poster || "static/img/noposter.png", alt='', data-mi-atsrc="object.poster", data-mi-default="static/img/noposter.png")
                                 h4
-                                    a(href='/films/' + item.object.id, title='', data-mi-athref="object.id", data-mi-name="object.name")=item.object.name + " (" + item.object.releasedate.substr(0,4) + ")"
+                                    a(href='/films/' + item.object.id, title='', data-mi-athref="object.id", data-mi-name="object.name")=item.object.name 
+                                    // + " (" + item.object.releasedate.substr(0,4) + ")"
                                 p(data-mi-name="object.description")=item.object.description
                             //
                                .short-text-tape
@@ -403,7 +405,8 @@ mixin feed_thumb(item, for_tpl)
                                 a(href='/films/' + item.object.id, title='', data-mi-athref="object.id")
                                     img(src=item.object.poster || "static/img/noposter.png", alt='', data-mi-atsrc="object.poster", data-mi-default="static/img/noposter.png")
                                 h4
-                                    a(href='/films/' + item.object.id, title='', data-mi-athref="object.id", data-mi-name="object.name")=item.object.name + " (" + item.object.releasedate.substr(0,4) + ")"
+                                    a(href='/films/' + item.object.id, title='', data-mi-athref="object.id", data-mi-name="object.name")=item.object.name 
+                                    //+ " (" + item.object.releasedate.substr(0,4) + ")"
                                 p(data-mi-name="object.description")=item.object.description
                             //
                                .short-text-tape

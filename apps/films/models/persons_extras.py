@@ -32,4 +32,3 @@ class PersonsExtras(models.Model):
         app_label = 'films'
         verbose_name = u'Расширения персоны'
         verbose_name_plural = u'Расширения персон'
-        
