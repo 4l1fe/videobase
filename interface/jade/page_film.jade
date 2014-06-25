@@ -3,39 +3,40 @@
 include mixins
 include head
 body
-    include header
-    .content(role='main')
-        - if (film.locations && film.locations.length) {
-            section.broun-block-playlist
-                .title-film
-                    .container
-                        .row
-                            .col-md-8.col-sm-7
-                                .name-playlist
-                                    h2=film.name + " (" + film_year + ")"
-                                    if film.name_orig
-                                        span=film.name_orig + " (" + film_year + ")"
-                            .col-md-4.col-sm-5
-                                .range-block-playlist.cf
-                                    a.sprite.sprite-go-view.block.fright(href='#', title='')#playlist_btn
-                                    .range-style2.fright
-                                        .rateit(data-rateit-max=10,data-rateit-resetable=1,data-rateit-value=(film.relation && film.relation.rating)?film.relation.rating:0)#rateit
+    .wrap-page
+        include header
+        .content(role='main')
+            - if (film.locations && film.locations.length) {
+                section.broun-block-playlist
+                    .title-film
+                        .container
+                            .row
+                                .col-md-8.col-sm-7
+                                    .name-playlist
+                                        h2=film.name + " (" + film_year + ")"
+                                        if film.name_orig
+                                            span=film.name_orig + " (" + film_year + ")"
+                                .col-md-4.col-sm-5
+                                    .range-block-playlist.cf
+                                        a.sprite.sprite-go-view.block.fright(href='#', title='')#playlist_btn
+                                        .range-style2.fright
+                                            .rateit(data-rateit-max=10,data-rateit-resetable=1,data-rateit-value=(film.relation && film.relation.rating)?film.relation.rating:0)#rateit
+                                        //
+                                           .range-style2
                                     //
-                                       .range-style2
-                                //
-                                   .range-block-tape
-                //
-                   .title-film
-                .film-area
-                    .container
-                        .frame-player-wrapper
-                            .frame-player-aspect
-                                .frame-player#frame_player
-                        ul.just-list.list-btns-film#locations
-                            each el in film.locations
-                                mixin loc_thumb(el)
-        //
-           .film-area
+                                       .range-block-tape
+                    //
+                       .title-film
+                    .film-area
+                        .container
+                            .frame-player-wrapper
+                                .frame-player-aspect
+                                    .frame-player#frame_player
+                            ul.just-list.list-btns-film#locations
+                                each el in film.locations
+                                    mixin loc_thumb(el)
+            //
+               .film-area
         //
            .broun-block
          - } else {
