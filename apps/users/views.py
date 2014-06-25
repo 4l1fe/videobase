@@ -63,7 +63,7 @@ class RegisterUserView(View):
                 send_template_mail.apply_async(kwargs=kw)
             except Exception as e:
                 transaction.rollback()
-                return HttpResponseBadRequest
+                return HttpResponseBadRequest()
 
             transaction.commit()
             return redirect('index_view')
@@ -214,8 +214,9 @@ class UserProfileView(View):
             return redirect("login_view")
         csrf_token = get_random_string(CSRF_KEY_LENGTH)
         resp_dict = {'csrf_token': csrf_token,
-                     'form': UsersProfileForm(instance=request.user)}
-        response = render_to_response('profile.html', resp_dict)
+                     'user': vbUser(request.user).data,
+                     }
+        response = HttpResponse(render_page('profile', resp_dict))
         response.set_cookie("csrftoken", csrf_token)
         return response
 
@@ -227,6 +228,17 @@ class UserProfileView(View):
             except Exception as e:
                 return HttpResponseBadRequest(e)
         return redirect('profile_view')
+
+
+class UserLogoutView(View):
+
+    def get(self, request, **kwargs):
+        csrf_token = get_random_string(CSRF_KEY_LENGTH)
+        response = HttpResponseRedirect(reverse('index_view'))
+        response.set_cookie("csrftoken", csrf_token)
+        response.delete_cookie("x-session")
+        response.delete_cookie("x-token")
+        return response
 
 
 def calc_feed(user_id):

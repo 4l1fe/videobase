@@ -29,6 +29,7 @@ class vbUser(serializers.ModelSerializer):
     # Признак friends
     friends = serializers.SerializerMethodField('friends_list')
 
+
     def __init__(self, *args, **kwargs):
         self.cer_user = kwargs.pop('cer_user', None)
         del_fields = []
@@ -52,8 +53,10 @@ class vbUser(serializers.ModelSerializer):
             for field_name in del_fields:
                 self.fields.pop(field_name, None)
 
+
     def get_name(self, obj):
         return obj.profile.get_name()
+
 
     def get_genre_fav(self, obj):
         try:
@@ -63,55 +66,63 @@ class vbUser(serializers.ModelSerializer):
                 key=lambda g: g['count'])
         except:
             return {}
+
         if 'id' in genre and 'name' in genre:
             return {'id': genre['id'], 'name': genre['name']}
-        else:
-            return {}
+
+        return {}
+
 
     def path_to_avatar(self, obj):
-        userpic = obj.profile.userpic_id
-        try:
-            image = UsersPics.objects.get(id=userpic).image
-            path = image.storage.url(image.name)
-        except:
-            path = ''
-        return path
+        return UsersPics.get_picture(obj.profile)
+
 
     def get_regdate(self, obj):
         return obj.date_joined
 
+
     def get_friends_cnt(self, obj):
         return UsersRels.objects.filter(user=obj, rel_type=APP_USER_REL_TYPE_FRIENDS).count()
+
 
     def get_films_watched_cnt(self, obj):
         return UsersFilms.objects.filter(user=obj).exclude(status=APP_USERFILM_STATUS_NOT_WATCH).count()
 
+
     def get_comments_cnt(self, obj):
         return obj.comments.all().count()
 
+
     def get_relation(self, obj):
+        rel = APP_USER_REL_TYPE_NONE
         try:
             rel = UsersRels.objects.get(user=obj, user_rel=self.cer_user).rel_type
-        except:
-            rel = APP_USER_REL_TYPE_NONE
+        except Exception, e:
+            pass
+
         return rel
+
 
     def genres_list(self, obj):
         genres = Genres.objects.filter(genres__uf_films_rel__user=obj).\
             exclude(genres__uf_films_rel__status=APP_USERFILM_STATUS_NOT_WATCH).\
             distinct()
-        serializer = vbUserGenre(genres, user=obj, many=True)
-        return serializer.data
+
+        return vbUserGenre(genres, user=obj, many=True).data
+
 
     def friends_list(self, obj):
         friends = User.objects.extra(
             where=['id IN (SELECT "user_rel_id" FROM "auth_user" INNER JOIN "users_rels" ON ( "auth_user"."id" = "users_rels"."user_id" ) WHERE ("users_rels"."rel_type" =%s  AND "users_rels"."user_id" = %s ))'],
             params=[APP_USER_REL_TYPE_FRIENDS, obj.pk]).all()
-        serializer = vbUser(friends, cer_user=self.cer_user, many=True)
-        return serializer.data
+
+        return vbUser(friends, cer_user=self.cer_user, many=True).data
+
 
     class Meta:
         model = User
-        fields = ('id', 'name', 'avatar', 'regdate',
-                  'friends_cnt', 'films_watched', 'comments_cnt',
-                  'relation', 'genres', 'friends', 'genre_fav')
+        fields = (
+            'id', 'name', 'avatar', 'regdate',
+            'friends_cnt', 'films_watched', 'comments_cnt',
+            'relation', 'genres', 'friends', 'genre_fav'
+        )

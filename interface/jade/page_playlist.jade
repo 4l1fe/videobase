@@ -1,7 +1,4 @@
-
-
-
-- if (playlist.film) {
+- if (playlist.total_cnt) {
 -   film = playlist.film
 -   film_year = film.releasedate.substr(0,4)
 -   page_title = "Плейлист (" + playlist.id + "/" + playlist.total_cnt + ") &mdash; " + film.name + " (" + film_year + ")"
@@ -13,7 +10,7 @@ include mixins
 include head
 body
     include header
-    if playlist.film == undefined
+    if playlist.total_cnt==0
         .content(role='main')
             section.broun-block
                 .container.playlist-empty
@@ -23,8 +20,8 @@ body
                     h1.dots2.whiteh1.centerh1 Рекомендуемое
                     .list-film
                         .row#films
-                            each item in playlist.films
-                                mixin film_thumb(item)
+                            //each item in playlist.films
+                            //    mixin film_thumb(item)
     else
         .content(role='main')
             section.broun-block-playlist
@@ -213,6 +210,6 @@ body
                                    .filter-block
                                 //
     include footer
-    //- delete film.description; delete playlist.items;
+    - delete film.description; delete playlist.items;
     script.
         $(document).ready(function () {window.InitApp({page_conf: !{JSON.stringify(film)}}, "Playlist")})
