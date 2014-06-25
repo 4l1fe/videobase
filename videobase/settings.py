@@ -295,17 +295,17 @@ CELERYBEAT_SCHEDULE = {
         'task': 'youtube_trailers_all',
         'schedule': timedelta(days=1),
     },
-    'kinopoisk_films': {
+    'kinopoisk_films_daily': {
         'task': 'kinopoisk_films',
         'schedule': timedelta(days=1),
         'args': (3,),
     },
-    'kinopoisk_films': {
+    'kinopoisk_films_weekly': {
         'task': 'kinopoisk_films',
         'schedule': timedelta(days=7),
         'args': (10,),
     },
-    'kinopoisk_films': {
+    'kinopoisk_films_monthly': {
         'task': 'kinopoisk_films',
         'schedule': timedelta(days=31),
         'args': (11,),

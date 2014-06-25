@@ -7,7 +7,8 @@ from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
 
 from apps.films.constants import *
 from apps.films.models.photoclass import PhotoClass
-from apps.films.constants import APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER
+from apps.films.constants import APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER, APP_FILM_TYPE_ADDITIONAL_MATERIAL_TRAILER
+
 
 from utils.common import get_image_path
 
@@ -38,15 +39,18 @@ class FilmExtras(PhotoClass):
         super(FilmExtras, self).__init__(*args, **kwargs)
         self._original_type = self.type
 
+
     @property
     def get_upload_to(self):
         return APP_FILM_POSTER_DIR
+
 
     def clean(self, *args, **kwargs):
         if not self.pk is None:
             if self._original_type != self.type:
                 msg = {'type': (u"Это поле не изменяемо",)}
                 raise ValidationError(msg)
+
 
     def save(self, *args, **kwargs):
         if self.type == APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER:
@@ -56,15 +60,29 @@ class FilmExtras(PhotoClass):
 
         super(FilmExtras, self).save(*args, **kwargs)
 
+
     @classmethod
-    def get_additional_material_by_film(self, ids):
+    def get_additional_material_by_film(cls, ids):
         if not isinstance(ids, list):
             ids = [ids]
 
-        return self.objects.filter(film__in=ids, type=APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER)
+        return cls.objects.filter(film__in=ids, type=APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER)
+
 
     @classmethod
-    def get_poster_by_film(self, list_extras):
+    def get_trailer_by_film(cls, ids, first=False, *args, **kwargs):
+        if not isinstance(ids, list):
+            ids = [ids]
+
+        result = cls.objects.filter(film__in=ids, type=APP_FILM_TYPE_ADDITIONAL_MATERIAL_TRAILER).order_by('id')
+        if first:
+            result = result.first()
+
+        return result
+
+
+    @classmethod
+    def get_poster_by_film(cls, list_extras):
         poster = ''
         if not isinstance(list_extras, list):
             list_extras = [list_extras]
@@ -75,6 +93,7 @@ class FilmExtras(PhotoClass):
                 break
 
         return poster
+
 
     def get_photo_url(self, prefix=True):
         result = ''
@@ -87,8 +106,10 @@ class FilmExtras(PhotoClass):
 
         return result
 
+
     def __unicode__(self):
         return u'[{0}] {1}'.format(self.pk, self.name)
+
 
     class  Meta(object):
         # Имя таблицы в БД
