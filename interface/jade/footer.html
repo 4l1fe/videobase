@@ -1,42 +1,6 @@
-
-<footer role="contentinfo">
-  <div class="container">
-    <div class="top-footer">
-      <div class="row">
-        <div class="col-md-3 block-footer"><a href="#" title=""><img src="images/logo-footer.png" alt=""/></a></div>
-        <div class="col-md-6 block-footer">
-          <ul class="menu-footer">
-            <li><a href="#" title="Правовая информация">Правовая информация</a></li>
-            <li><a href="#" title="О сервисе">О сервисе</a></li>
-          </ul>
-        </div>
-        <div class="col-md-3 block-footer">
-          <ul class="menu-soc">
-            <li><a href="#" title=""><img src="images/i-fb.png" alt=""/></a></li>
-            <li><a href="#" title=""><img src="images/i-tw.png" alt=""/></a></li>
-            <li><a href="#" title=""><img src="images/i-rss.png" alt=""/></a></li>
-            <li><a href="#" title=""><img src="images/i-vk.png" alt=""/></a></li>
-          </ul>
-        </div>
-      </div>
-    </div>
-    <!--.top-footer
-    -->
-    <div class="bottom-footer">
-      <p>© ВсеВидео, 2014. Все права защищены</p>
-    </div>
-    <!--.bottom-footer
-    -->
-    <!--.wrap-page
-    -->
-  </div>
-</footer>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-<script src="/static/js/bootstrap.min.js"></script>
-<script src="/static/js/jquery.rateit.min.js"></script>
-<script src="/static/js/jquery.carouFredSel-6.2.1-packed.js"></script>
-<script src="/static/js/helper-caroufredsel/jquery.ba-throttle-debounce.min.js"></script>
-<script src="/static/js/helper-caroufredsel/jquery.mousewheel.min.js"></script>
-<script src="/static/js/helper-caroufredsel/jquery.touchSwipe.min.js"></script>
-<script src="/static/js/helper-caroufredsel/jquery.transit.min.js"></script>
-<script src="/static/js/custom.js"></script>
+<footer role="contentinfo"><div class="container"><div class="top-footer"><div class="row"><div class="col-md-3 block-footer"><a href="/" title=""><img src="static/img/logo-footer.png" alt=""/></a></div><div class="col-md-6 block-footer"><ul class="menu-footer"><li><a href="/legal" title="Правовая информация">Правовая информация</a></li><li><a href="/about" title="О сервисе">О сервисе</a></li></ul></div><div class="col-md-3 block-footer"><ul class="menu-soc"><li><a href="#" title=""><img src="static/img/i-fb.png" alt=""/></a></li><li><a href="#" title=""><img src="static/img/i-tw.png" alt=""/></a></li><li><a href="#" title=""><img src="static/img/i-rss.png" alt=""/></a></li><li><a href="#" title=""><img src="static/img/i-vk.png" alt=""/></a></li></ul></div></div></div><!--.top-footer--><div class="bottom-footer"><p>© ВсеВидео, 2014. Все права защищены</p></div><!--.bottom-footer--><!--.wrap-page--></div></footer><div id="reg-enter" tabindex="-1" role="dialog" area-hidden="true" class="modal fade"><div class="modal-dialog"><div class="modal-content"><button type="button" data-dismiss="modal" aria-hidden="true" class="close modal-close">×</button><div class="wrap-popup-content"><ul class="nav nav-tabs popup-tabs-a"><li class="active"><a href="#reg" data-toggle="tab"><span>Регистрация</span></a></li><li><a href="#enter" data-toggle="tab"><span>Вход на сайт</span></a></li></ul><div class="tab-content popup-content"><div id="reg" class="tab-pane active"><div class="wrap-popup-content"><h3>C помощью почты</h3><form role="form" method="post" action="/register/" class="form-horizontal form-popup"><input type="hidden" name="csrfmiddlewaretoken"/><div class="form-group"><label for="inputEmail" class="col-sm-3 control-label">E-mail</label><div class="col-sm-9"><input id="inputEmail" type="email" name="email" class="form-control"/></div></div><div class="form-group"><label for="inputPassword" class="col-sm-3 control-label">Пароль</label><div class="col-sm-9"><input id="inputPassword" type="password" name="password" class="form-control"/><!--p Количество символов должно быть не менее 8-ми.--></div></div><div class="form-group"><label for="inputPasswordRe" class="col-sm-3 control-label">Повторите пароль</label><div class="col-sm-9"><input id="inputPasswordRe" type="password" name="password2" class="form-control"/></div></div><div class="form-group"><div class="col-sm-offset-3 col-sm-10"><button type="submit" class="btn btn-yellow1">Зарегистрироваться</button></div></div></form><h3>C помощью социальных сетей</h3><ul class="soc-hor"><li><a href="/login/vk-oauth" title=""><img src="static/img/i-vk-b.png" alt=""/></a></li><li><a href="/login/facebook" title=""><img src="static/img/i-fb-b.png" alt=""/></a></li><li><a href="/login/twitter" title=""><img src="static/img/i-tw-b.png" alt=""/></a></li><li><a href="/login/google-oauth2" title=""><img src="static/img/i-go-b.png" alt=""/></a></li></ul></div><!--.wrap-popup-content--></div><div id="enter" class="tab-pane"><div class="wrap-popup-content"><h3>C помощью почты</h3><form role="form" method="post" action="/login/" class="form-horizontal form-popup"><input type="hidden" name="csrfmiddlewaretoken"/><div class="form-group"><label for="inputEmail1" class="col-sm-3 control-label">E-mail</label><div class="col-sm-9"><input id="inputEmail1" type="email" name="username" class="form-control"/></div></div><div class="form-group"><label for="inputPassword1" class="col-sm-3 control-label">Пароль</label><div class="col-sm-9"><input id="inputPassword1" type="password" name="password" class="form-control"/></div></div><div class="form-group"><div class="col-sm-offset-3 col-sm-10"><button type="submit" class="btn btn-yellow1">Войти</button></div></div></form><h3>C помощью социальных сетей</h3><ul class="soc-hor"><li><a href="/login/vk-oauth" title=""><img src="static/img/i-vk-b.png" alt=""/></a></li><li><a href="/login/facebook" title=""><img src="static/img/i-fb-b.png" alt=""/></a></li><li><a href="/login/twitter" title=""><img src="static/img/i-tw-b.png" alt=""/></a></li><li><a href="/login/google-oauth2" title=""><img src="static/img/i-go-b.png" alt=""/></a></li></ul></div><!--.wrap-popup-content--></div></div></div><!--.wrap-popup-content--></div></div></div><script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script><script src="static/js/bootstrap.min.js"></script><script src="static/js/jquery.rateit.min.js"></script><script src="static/js/imagesloaded.js"></script><script src="static/js/config.js"></script><script src="static/js/mi.helper.js"></script><script src="static/js/mi.rest.js"></script><script src="static/js/app1.js"></script><!--script(src='static/js/jquery.carouFredSel-6.2.1-packed.js')
+script(src='static/js/helper-caroufredsel/jquery.ba-throttle-debounce.min.js')
+script(src='static/js/helper-caroufredsel/jquery.mousewheel.min.js')
+script(src='static/js/helper-caroufredsel/jquery.touchSwipe.min.js')
+script(src='static/js/helper-caroufredsel/jquery.transit.min.js')
+script(src='/static/js/custom.js')-->
