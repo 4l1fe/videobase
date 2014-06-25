@@ -5,6 +5,7 @@ import zerorpc
 
 from django.core.serializers.json import DjangoJSONEncoder
 from utils.middlewares.local_thread import get_current_request
+from apps.users.api.serializers import vbUser
 
 
 def render_page(page_type, context):
@@ -16,14 +17,9 @@ def render_page(page_type, context):
     client = zerorpc.Client()
     client.connect("tcp://127.0.0.1:4242", False)
 
-    result = get_current_request()
-    if result.user.is_authenticated():
-        user = result.user
-        data['context']['auth_user'] = {
-            'id': user.id,
-            'name': user.get_full_name(),
-            'avatar': '',
-        }
+    request = get_current_request()
+    if request.user.is_authenticated():
+        data['context']['auth_user'] = vbUser(request.user).data
 
     html = client.render(json.dumps(data, cls=DjangoJSONEncoder), async=False)
     client.close()
