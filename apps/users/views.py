@@ -63,7 +63,7 @@ class RegisterUserView(View):
                 send_template_mail.apply_async(kwargs=kw)
             except Exception as e:
                 transaction.rollback()
-                return HttpResponseBadRequest
+                return HttpResponseBadRequest()
 
             transaction.commit()
             return redirect('index_view')
@@ -214,7 +214,7 @@ class UserProfileView(View):
             return redirect("login_view")
         csrf_token = get_random_string(CSRF_KEY_LENGTH)
         resp_dict = {'csrf_token': csrf_token,
-                     'user': vbUserProfile(instance=request.user.profile).data,
+                     'user': vbUserProfile(request.user.profile).data,
                      }
         response = HttpResponse(render_page('profile', resp_dict))
         response.set_cookie("csrftoken", csrf_token)
