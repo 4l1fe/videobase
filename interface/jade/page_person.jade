@@ -11,77 +11,78 @@
 include mixins
 include head
 body
-    include header
-    .content(role='main')
-        section.blue-block
-            .container
-                .row.person-block-wrap
-                    .col-md-3.col-sm-4.col-xs-12
-                        .person-img-full
-                            .img-person
-                                img(src=person.photo || "static/img/nophoto-big.png", alt='')
-                                br
-                                img(src='static/img/shd-small.png', alt='')
-                            a.btn-green.btn-def.block.margin0a(href='#', title='')#subscribe подписаться
-                        //
-                           .person-img-full
-                    .col-md-9.col-sm-8.col-xs-12
-                        .person-info
-                            .person-name
-                                h2=person.name
-                                if person.name_orig
-                                    span=person.name_orig
-                            //
-                               .person-name
-                            ul.person-data
-                                if person.roles && person.roles.length
-                                    li
-                                        span Карьера
-                                        - delim = false
-                                        each c in person.roles
-                                            =(delim?", ":"") + c
-                                            - delim = true
-                                if person.birhtplace
-                                    li
-                                        span Место рождения
-                                        - delim = false
-                                        each c in person.birthplace
-                                            =(delim?", ":"") + c
-                                            - delim = true
-                                li
-                                    span Дата рождения
-                                    |#{date_text_str(person.birthdate)} #{person.years_old} #{cardinal(person.years_old, "год", "года", "лет")}
-                            .person-text-short
-                                h3 Биография
-                                p!=person.bio
-                                ////
-                                    #hidden-text.none
-                                        p Скрытый текст
-                                    a.btn-show-more(href='#', data-href='hidden-text', title='')
-                                        span Показать еще
-                            //
-                               .person-text-short
-                        //
-                           .person-info
-        //
-           .blue-block
-        if person.filmography && person.filmography.length
-            section
+    .wrap-page
+        include header
+        .content(role='main')
+            section.blue-block
                 .container
-                    h1.dots2.blackh1.centerh1 Фильмография
-                    .list-film
-                        .row#films
-                            each item in person.filmography
-                                mixin film_thumb(item)
-                        if person.filmography.length >= 12
-                            .add-filter#films_more
-                                .add-content.style-panel-action.rel.zmin
-                                    a(href='') мало, Хочу еще фильмы
-                                //
-                                   .filter-content
-                                img.img-responsive(src='static/img/shd-big.png', alt='')
+                    .row.person-block-wrap
+                        .col-md-3.col-sm-4.col-xs-12
+                            .person-img-full
+                                .img-person
+                                    img(src=person.photo || "static/img/nophoto-big.png", alt='')
+                                    br
+                                    img(src='static/img/shd-small.png', alt='')
+                                a.btn-green.btn-def.block.margin0a(href='#', title='')#subscribe подписаться
                             //
-    include footer
-    - delete person.bio; delete person.filmography
+                               .person-img-full
+                        .col-md-9.col-sm-8.col-xs-12
+                            .person-info
+                                .person-name
+                                    h2=person.name
+                                    if person.name_orig
+                                        span=person.name_orig
+                                //
+                                   .person-name
+                                ul.person-data
+                                    if person.roles && person.roles.length
+                                        li
+                                            span Карьера
+                                            - delim = false
+                                            each c in person.roles
+                                                =(delim?", ":"") + c
+                                                - delim = true
+                                    if person.birhtplace
+                                        li
+                                            span Место рождения
+                                            - delim = false
+                                            each c in person.birthplace
+                                                =(delim?", ":"") + c
+                                                - delim = true
+                                    li
+                                        span Дата рождения
+                                        |#{date_text_str(person.birthdate)} #{person.years_old} #{cardinal(person.years_old, "год", "года", "лет")}
+                                .person-text-short
+                                    h3 Биография
+                                    p!=person.bio
+                                    ////
+                                        #hidden-text.none
+                                            p Скрытый текст
+                                        a.btn-show-more(href='#', data-href='hidden-text', title='')
+                                            span Показать еще
+                                //
+                                   .person-text-short
+                            //
+                               .person-info
+            //
+               .blue-block
+            if person.filmography && person.filmography.length
+                section
+                    .container
+                        h1.dots2.blackh1.centerh1 Фильмография
+                        .list-film
+                            .row#films
+                                each item in person.filmography
+                                    mixin film_thumb(item)
+                            if person.filmography.length >= 12
+                                .add-filter#films_more
+                                    .add-content.style-panel-action.rel.zmin
+                                        a(href='') мало, Хочу еще фильмы
+                                    //
+                                       .filter-content
+                                    img.img-responsive(src='static/img/shd-big.png', alt='')
+                                //
+        include footer
+        - delete person.bio; delete person.filmography
     script.
         $(document).ready(function () {window.InitApp({page_conf: !{JSON.stringify(person)}}, "Person")})
