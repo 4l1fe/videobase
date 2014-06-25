@@ -18,19 +18,21 @@ var renderers = {
     login: function(context) {return jade.renderFile(path.join(tmpl_path, 'page_login.jade'), context)},
     playlist: function(context) {return jade.renderFile(path.join(tmpl_path, 'page_playlist.jade'), context)},
     feed: function(context) {return jade.renderFile(path.join(tmpl_path, 'page_feed.jade'), context)},
-    search: function(context) {return jade.renderFile(path.join(tmpl_path, 'page_search.jade'), context)}
+    search: function(context) {return jade.renderFile(path.join(tmpl_path, 'page_search.jade'), context)},
+    profile: function(context) {return jade.renderFile(path.join(tmpl_path, ' page_account.jade'), context)}
 };
 
 var server = new zerorpc.Server({
     render: function(json, reply) {
         var data = JSON.parse(json);
+        var html = null;
         try {
-            repl = renderers[data.template](data.context);
+            html = renderers[data.template](data.context);
         } catch(e) {
-            console.log(e);
+            console.log(e)
         }
 
-        reply(null, renderers[data.template](data.context));
+        reply(null, html);
     }
 });
 

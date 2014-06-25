@@ -35,9 +35,9 @@ delays = (
     (timezone.timedelta(days=365*3 +1), timezone.timedelta(days =1)),
 )
 
-SEARCH_STRINGS_RU = ('официальный русский трейлер фильма hd','русский трейлер фильма hd','русский трейлер HD','трейлер на русском','официальный трейлер','русский трейлер','тв-ролик','финальный трейлер','промо ролик')
-SEARCH_STRINGS_EN =  ('international trailer hd', 'official trailer hd','trailer hd', 'international trailer', 'official teaser', 'trailer')
-FAIL_STRINGS = ('interview','интервью','premiere','премьера','review','обзор','conference','behind the scenes','gameplay','parody','videogame')
+SEARCH_STRINGS_RU = (u'официальный русский трейлер фильма hd',u'русский трейлер фильма hd',u'русский трейлер HD',u'трейлер на русском',u'официальный трейлер',u'русский трейлер',u'тв-ролик',u'финальный трейлер',u'промо ролик')
+SEARCH_STRINGS_EN =  (u'international trailer hd', u'official trailer hd',u'trailer hd', u'international trailer', u'official teaser', u'trailer')
+FAIL_STRINGS = (u'interview',u'интервью',u'premiere',u'премьера',u'review',u'обзор',u'conference',u'behind the scenes',u'gameplay',u'parody',u'videogame')
 
 
 def query_search(film_name,trailer_word):
@@ -88,7 +88,7 @@ def process_film(film):
 
 
     if ytchk.was_successfull:
-        print "Trailer already set"
+        print u"Trailer already set"
         return
     else:
         for delta,delay in delays:
@@ -97,7 +97,7 @@ def process_film(film):
 
                 if ytchk.last_check - timezone.now() < delay:
 
-                    print "Trying to get trailer for {} from youtube".format(film)
+                    print u"Trying to get trailer for {} from youtube".format(film)
                     trtuple = get_film_trailer(film)
                     if trtuple:
                         trailer_name, link = trtuple
@@ -111,9 +111,9 @@ def process_film(film):
 
                         fe.save()
                         ytchk.was_successfull = True
-                        print "Succesfully set trailer"
+                        print u"Succesfully set trailer"
                     else:
-                        print "Failed to find trailer"
+                        print u"Failed to find trailer"
                         ytchk.was_successfull = False
                         
                     ytchk.last_check = timezone.now()
