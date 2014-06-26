@@ -2,144 +2,145 @@
 include mixins
 include head
 body.page-profile
-    include header
-    .content(role='main')
-        section.blue-block
-            .container
-                .row.block-profile-me
-                    .col-md-3
-                        .person-img
-                            img.img-circle(src=user.avatar || "static/img/noavatar.png", alt='')
-                            br
-                            a.btn-yellow3.rel.zmin(href='#', title='')#friendship Добавить в друзья
-                        //
-                           .person-img
-                    .col-md-6
-                        .profile-column
-                            h2=user.name
-                            ul.list-profile
-                                li
-                                    i На сайте
-                                    span=how_long(new Date(user.regdate), 1)
-                                if user.friends_cnt
+    .wrap-page
+        include header
+        .content(role='main')
+            section.blue-block
+                .container
+                    .row.block-profile-me
+                        .col-md-3
+                            .person-img
+                                img.img-circle(src=user.avatar || "static/img/noavatar.png", alt='')
+                                br
+                                a.btn-yellow3.rel.zmin(href='#', title='')#friendship Добавить в друзья
+                            //
+                               .person-img
+                        .col-md-6
+                            .profile-column
+                                h2=user.name
+                                ul.list-profile
                                     li
-                                        i Друзей
-                                        span=user.friends_cnt
-                                if user.films_watched
-                                    li
-                                        i Просмотрел фильмов
-                                        span=user.films_watched
-                                if user.comments_cnt
-                                    li
-                                        i Оставил комментариев
-                                        span=user.comments_cnt
-                                if user.genre_fav
-                                    li
-                                        i Любимый жанр
-                                        span=user.genre_fav.name
-                        //
-                           .profile-column
-                //
-                   .enter-block
-        //
-           .blue-block
-        section
-            .container
-                #show-actors.none
-                    h2.blackh1 Друзья
-                    ul.actor-list.cf
-                    .vote
-                        h3 Любимые жанры
-                        ul.vote-list.cf
-                .row
-                    .col-md-3.hide-actors
-                        if user.friends && user.friends.length
-                            h3 Друзья
-                            ul.actor-list.cf#friends
-                                each item in user.friends
-                                    mixin user_thumb(item)
-                        if false && user.friends.length > 10
-                            .add-filter#friends_more
+                                        i На сайте
+                                        span=how_long(new Date(user.regdate), 1)
+                                    if user.friends_cnt
+                                        li
+                                            i Друзей
+                                            span=user.friends_cnt
+                                    if user.films_watched
+                                        li
+                                            i Просмотрел фильмов
+                                            span=user.films_watched
+                                    if user.comments_cnt
+                                        li
+                                            i Оставил комментариев
+                                            span=user.comments_cnt
+                                    if user.genre_fav
+                                        li
+                                            i Любимый жанр
+                                            span=user.genre_fav.name
+                            //
+                               .profile-column
+                    //
+                       .enter-block
+            //
+               .blue-block
+            section
+                .container
+                    #show-actors.none
+                        h2.blackh1 Друзья
+                        ul.actor-list.cf
+                        .vote
+                            h3 Любимые жанры
+                            ul.vote-list.cf
+                    .row
+                        .col-md-3.hide-actors
+                            if user.friends && user.friends.length
+                                h3 Друзья
+                                ul.actor-list.cf#friends
+                                    each item in user.friends
+                                        mixin user_thumb(item)
+                            if false && user.friends.length > 10
+                                .add-filter#friends_more
+                                    .add-content.style-panel-action.rel.zmin
+                                        a(href='#show-actors', title='') показать всех
+                                    //
+                                       .filter-content
+                                    img.img-responsive(src='images/shd-big.png', alt='')
+                                //
+                                   .filter-block
+                            if user.genres && user.genres.length
+                                .vote
+                                    h3 Любимые жанры
+                                    ul.vote-list#genres
+                                        each item in user.genres
+                                            li
+                                                .row
+                                                    .col-md-8.col-sm-10.col-xs-10
+                                                        p=item.name
+                                                    .col-md-4.col-sm-2.col-xs-2.text-right
+                                                        span=item.percent
+                                                .progress
+                                                    .progress-bar(role='progressbar', aria-valuenow=item.percent, aria-valuemin='0', aria-valuemax='100', style='width: ' + item.percent + '%;')
+                                                        span.sr-only #{item.percent}%
+                        #toggle-col.col-md-9
+                            h3 Лента активности
+                            .tape-list#feed
+                                if user.feed
+                                    each item in user.feed
+                                        mixin feed_thumb(item)
+                            .add-filter#feed_more
                                 .add-content.style-panel-action.rel.zmin
-                                    a(href='#show-actors', title='') показать всех
+                                    a(href='#', title='') загрузить еще
                                 //
                                    .filter-content
-                                img.img-responsive(src='images/shd-big.png', alt='')
+                                img.img-responsive(src='static/img/shd-big.png', alt='')
                             //
                                .filter-block
-                        if user.genres && user.genres.length
-                            .vote
-                                h3 Любимые жанры
-                                ul.vote-list#genres
-                                    each item in user.genres
-                                        li
-                                            .row
-                                                .col-md-8.col-sm-10.col-xs-10
-                                                    p=item.name
-                                                .col-md-4.col-sm-2.col-xs-2.text-right
-                                                    span=item.percent
-                                            .progress
-                                                .progress-bar(role='progressbar', aria-valuenow=item.percent, aria-valuemin='0', aria-valuemax='100', style='width: ' + item.percent + '%;')
-                                                    span.sr-only #{item.percent}%
-                    #toggle-col.col-md-9
-                        h3 Лента активности
-                        .tape-list#feed
-                            if user.feed
-                                each item in user.feed
-                                    mixin feed_thumb(item)
-                        .add-filter#feed_more
-                            .add-content.style-panel-action.rel.zmin
-                                a(href='#', title='') загрузить еще
-                            //
-                               .filter-content
-                            img.img-responsive(src='static/img/shd-big.png', alt='')
-                        //
-                           .filter-block
-        if user.films
-            section.brd-top
-                .container
-                    h3 Подписан на фильмы
-                    .list-film
-                        .row#films
-                            each item in user.films
-                                mixin film_thumb(item)
-                    if user.films.length >=12
-                        //
-                           .list-film
-                        .add-filter#films_more
-                            .add-content.style-panel-action.rel.zmin
-                                a(href='') показать еще
-                            //
-                               .filter-content
-                            img.img-responsive(src='static/img/shd-big.png', alt='')
-                        //
-                           .filter-block
-        if user.actors || user.directors
-            if user.actors
-                section.people-block
+            if user.films
+                section.brd-top
                     .container
-                        .sector-person
-                            h3 Любимые актеры
-                            .row.actor-list-hor
-                                each item in user.actors
-                                    .col-md-4.col-sm-4.col-xs-6
-                                        .actor
-                                            a(href='/persons/' + item.id, title='')
-                                                img.img-circle(src=item.photo || "static/img/nophoto.png", alt='')
-                                                | #{item.name}
-            if user.actors
-                section.people-block
-                    .container
-                        .sector-person
-                            h3 Любимые режиссёры
-                            .row.actor-list-hor
-                                each item in user.directors
-                                    .col-md-4.col-sm-4.col-xs-6
-                                        .actor
-                                            a(href='/persons/' + item.id, title='')
-                                                img.img-circle(src=item.photo || "static/img/nophoto.png", alt='')
-                                                | #{item.name}
-    include footer
-    - delete user.films; delete user.actors; delete user.directors; delete user.feed; delete user.genres; delete user.friends
+                        h3 Подписан на фильмы
+                        .list-film
+                            .row#films
+                                each item in user.films
+                                    mixin film_thumb(item)
+                        if user.films.length >=12
+                            //
+                               .list-film
+                            .add-filter#films_more
+                                .add-content.style-panel-action.rel.zmin
+                                    a(href='') показать еще
+                                //
+                                   .filter-content
+                                img.img-responsive(src='static/img/shd-big.png', alt='')
+                            //
+                               .filter-block
+            if user.actors || user.directors
+                if user.actors
+                    section.people-block
+                        .container
+                            .sector-person
+                                h3 Любимые актеры
+                                .row.actor-list-hor
+                                    each item in user.actors
+                                        .col-md-4.col-sm-4.col-xs-6
+                                            .actor
+                                                a(href='/persons/' + item.id, title='')
+                                                    img.img-circle(src=item.photo || "static/img/nophoto.png", alt='')
+                                                    | #{item.name}
+                if user.directors
+                    section.people-block
+                        .container
+                            .sector-person
+                                h3 Любимые режиссёры
+                                .row.actor-list-hor
+                                    each item in user.directors
+                                        .col-md-4.col-sm-4.col-xs-6
+                                            .actor
+                                                a(href='/persons/' + item.id, title='')
+                                                    img.img-circle(src=item.photo || "static/img/nophoto.png", alt='')
+                                                    | #{item.name}
+        include footer
+        - delete user.films; delete user.actors; delete user.directors; delete user.feed; delete user.genres; delete user.friends
     script.
         $(document).ready(function () {window.InitApp({page_conf: !{JSON.stringify(user)}}, "User")})

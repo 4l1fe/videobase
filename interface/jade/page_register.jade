@@ -1,63 +1,68 @@
 - page_title = "Регистрация"
 include head
 body
-    include header
-    .content(role='main')
-        section.blue-block
-            .container
-                h1.whiteh1 Регистрация
-                .enter-block.row
-                    .col-md-6
-                        .form-enter
-                            p C помощью почты
-                            form.form-horizontal(role='form',method='post')
-                                input(type="hidden",name="csrfmiddlewaretoken",value=csrf_token)
-                                .form-group
-                                    label.col-sm-4.control-label(for='inputEmail3') Email
-                                    .col-sm-8
-                                        input#inputEmail3.form-control(type='email',name='email')
-                                .form-group
-                                    label.col-sm-4.control-label(for='inputPassword3') Пароль
-                                    .col-sm-8
-                                        input#inputPassword3.form-control(type='password',name='password')
-                                        // p Количество символов должно быть не менее 8-ми.
-                                .form-group
-                                    label.col-sm-4.control-label(for='inputPassword4') Повторите пароль
-                                    .col-sm-8
-                                        input#inputPassword4.form-control(type='password',name='password2')
-                                .form-group
-                                    .col-sm-offset-4.col-sm-10
-                                        button.btn.btn-yellow1(type='submit') Зарегистрироваться
-                        //
-                           .form-enter
-                    .col-md-6
-                        .more-enter.margin0a
-                            p C помощью соц.сетей
-                            ul
-                                li
-                                    a(href='/login/vk-oauth', title='')
-                                        img(src='static/img/i-vk-b.png', alt='')
-                                        | ВКонтакте
-                                li
-                                    a(href='/login/facebook', title='')
-                                        img(src='static/img/i-fb-b.png', alt='')
-                                        | Facebook
-                                li
-                                    a(href='/login/twitter', title='')
-                                        img(src='static/img/i-tw-b.png', alt='')
-                                        | Twitter
-                                li
-                                    a(href='/login/google-oauth2', title='')
-                                        img(src='static/img/i-go-b.png', alt='')
-                                        | Google +
-                        //
-                           .more-enter
-                //
-                   .enter-block
+    .wrap-page
+        include header
+        .content(role='main')
+            section.blue-block
+                .container
+                    h1.whiteh1 Регистрация
+                    .enter-block.row
+                        .col-md-6
+                            .form-enter
+                                p C помощью почты
+                                form.form-horizontal(role='form',method='post')
+                                    .form-group(class=error && error.email?"has-error":"")
+                                        label.col-sm-4.control-label(for='inputEmail3') Email
+                                        .col-sm-8
+                                            input#inputEmail3.form-control(type='email',name='email',required)
+                                            if error && error.email
+                                                p=error.email
+                                    .form-group(class=error && error.password?"has-error":"")
+                                        label.col-sm-4.control-label(for='inputPassword3') Пароль
+                                        .col-sm-8
+                                            input#inputPassword3.form-control(type='password',name='password1',required)
+                                            if error && error.password
+                                                p=error.password
+                                    .form-group(class=error && error.password2?"has-error":"")
+                                        label.col-sm-4.control-label(for='inputPassword4') Повторите пароль
+                                        .col-sm-8
+                                            input#inputPassword4.form-control(type='password',name='password2',required)
+                                            if error && error.password2
+                                                p=error.password2
+                                    .form-group
+                                        .col-sm-offset-4.col-sm-10
+                                            button.btn.btn-yellow1(type='submit') Зарегистрироваться
+                            //
+                               .form-enter
+                        .col-md-6
+                            .more-enter.margin0a
+                                p C помощью соц.сетей
+                                ul
+                                    li
+                                        a(href='/login/vk-oauth', title='')
+                                            img(src='static/img/i-vk-b.png', alt='')
+                                            | ВКонтакте
+                                    li
+                                        a(href='/login/facebook', title='')
+                                            img(src='static/img/i-fb-b.png', alt='')
+                                            | Facebook
+                                    li
+                                        a(href='/login/twitter', title='')
+                                            img(src='static/img/i-tw-b.png', alt='')
+                                            | Twitter
+                                    li
+                                        a(href='/login/google-oauth2', title='')
+                                            img(src='static/img/i-go-b.png', alt='')
+                                            | Google +
+                            //
+                               .more-enter
+                    //
+                       .enter-block
+            //
+               .blue-block
         //
-           .blue-block
-    //
-       .content
-    include footer
+           .content
+        include footer
     script.
         $(document).ready(function () {window.InitApp({}, "Register")})
