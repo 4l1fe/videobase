@@ -90,12 +90,12 @@ body
                                     ul.soc-acc
                                         li
                                             if user.social.facebook
-                                                a(href='/', title='')
+                                                a(href='#', title='')
                                                     img(src='static/img/i-fb.png', alt='')
                                                     | facebook.com/vasiliev
-                                                a.block.i-close.sprite.sprite-i-close.fright(href='#')
+                                                a.block.i-close.sprite.sprite-i-close.fright(href='/logout/facebook/')
                                             else
-                                                a(href='/login/facebook', title='')
+                                                a(href='/login/facebook/', title='')
                                                     img(src='static/img/i-fb.png', alt='')
                                                     span Привязать
                                         li
@@ -103,9 +103,9 @@ body
                                                 a(href='#', title='')
                                                     img(src='static/img/i-tw.png', alt='')
                                                     | twitter.com/vasiliev
-                                                a.block.i-close.sprite.sprite-i-close.fright(href='#')
+                                                a.block.i-close.sprite.sprite-i-close.fright(href='/logout/twitter/')
                                             else
-                                                a(href='/login/twitter', title='')
+                                                a(href='/login/twitter/', title='')
                                                     img(src='static/img/i-tw.png', alt='')
                                                     span Привязать
                                         li
@@ -113,7 +113,7 @@ body
                                                 a(href='#', title='')
                                                     img(src='static/img/i-vk.png', alt='')
                                                     | vk.com/vasiliev
-                                                a.block.i-close.sprite.sprite-i-close.fright(href='#')
+                                                a.block.i-close.sprite.sprite-i-close.fright(href='/logout/vk-oauth/')
                                             else
                                                 a(href='/login/vk-oauth', title='')
                                                     img(src='static/img/i-vk.png', alt='')
@@ -123,7 +123,7 @@ body
                                                 a(href='#', title='')
                                                     img(src='static/img/i-go.png', alt='')
                                                     | plus.google.com/vasiliev
-                                                a.block.i-close.sprite.sprite-i-close.fright(href='#')
+                                                a.block.i-close.sprite.sprite-i-close.fright(href='/logout/google-oauth2/')
                                             else
                                                 a(href='/login/google-oauth2', title='')
                                                     img(src='static/img/i-go.png', alt='')
