@@ -83,7 +83,7 @@ def process(soup = None):
             print "Succesfully created {}. Trying to schedule update".format(film)
             kinopoisk_parse_one_film.apply_async(
                 (info['title'],
-                 info['kinopoiskId'])
+                 info['kinopoiskId'] if type(infpo['kinopoiskId']) is int else int(info['kinopoiskId']))
             )
             print "Update scheduled"
 
