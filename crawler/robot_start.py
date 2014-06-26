@@ -167,7 +167,7 @@ def robot_exceptions(func):
     
 
 @robot_exceptions
-def process_film_on_site(site,film_id):
+def process_film_on_site(site, film_id):
     try:
         film = [Films.objects.get(id=film_id),]
     except Films.DoesNotExist:
