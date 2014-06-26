@@ -89,7 +89,7 @@ class UserLogoutView(View):
         response = HttpResponseRedirect(reverse('index_view'))
         response.delete_cookie("x-session")
         response.delete_cookie("x-token")
-        response.delete_cookie("session")
+        response.delete_cookie("sessionid")
         return response
 
 
@@ -109,6 +109,7 @@ class TokenizeView(View):
         response = HttpResponseRedirect(back_url)
         response.set_cookie('x-token', token)
         response.set_cookie('x-session', session.token.key)
+        response.delete_cookie('sessionid')
 
         return response
 
@@ -136,8 +137,6 @@ class UserView(View):
             films = Films.objects.filter(uf_films_rel__user=user,
 #                                         type__in=(APP_FILM_SERIAL, APP_FILM_FULL_FILM),
                                          uf_films_rel__subscribed=APP_USERFILM_SUBS_TRUE)
-            print "Fail"
-            print films
             films = Paginator(films, APP_USERS_API_DEFAULT_PER_PAGE).page(APP_USERS_API_DEFAULT_PAGE)
             vbf = vbFilm(films.object_list, many=True)
 
