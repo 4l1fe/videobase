@@ -204,7 +204,6 @@ VK_APP_ID            = '4296663'
 VKONTAKTE_APP_ID     = VK_APP_ID
 VK_API_SECRET        = 'JAEQddzkBCm554iGXe6S'
 VKONTAKTE_APP_SECRET = VK_API_SECRET
-VK_EXTRA_SCOPE = ['notify', 'friends', 'status', 'groups', 'notifications']
 
 # Facebook
 FACEBOOK_APP_ID     = '212532105624824'

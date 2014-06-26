@@ -2,25 +2,26 @@
 include mixins
 include head
 body
-    include header
-    .content.brd-top(role='main')
-        section
-            .container
-                h3 Лента активности
-                .tape-list#feed
-                    each item in feed
-                        mixin feed_thumb(item)
-                if feed.length >= 10
-                    .add-filter#feed_more
-                        .add-content.style-panel-action.rel.zmin
-                            a(href='#', title='') загрузить еще
-                        //
-                           .filter-content
-                        img.img-responsive(src='static/img/shd-big.png', alt='')
-                        //
-                           .filter-block
-                //
-                   .content
-    include footer
+    .wrap-page
+        include header
+        .content.brd-top(role='main')
+            section
+                .container
+                    h3 Лента активности
+                    .tape-list#feed
+                        each item in feed
+                            mixin feed_thumb(item)
+                    if feed.length >= 10
+                        .add-filter#feed_more
+                            .add-content.style-panel-action.rel.zmin
+                                a(href='#', title='') загрузить еще
+                            //
+                               .filter-content
+                            img.img-responsive(src='static/img/shd-big.png', alt='')
+                            //
+                               .filter-block
+                    //
+                       .content
+        include footer
     script.
         $(document).ready(function () {window.InitApp({page_conf: {user_id:!{auth_user.id}}}, "Feed")})
