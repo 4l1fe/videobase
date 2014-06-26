@@ -7,28 +7,26 @@ from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponse,\
     HttpResponseBadRequest, HttpResponseServerError, Http404
-from django.middleware.csrf import CSRF_KEY_LENGTH
-from django.utils.crypto import get_random_string
 from django.utils import timezone
 from django.contrib.auth.models import User, AnonymousUser
 from django.views.generic import View
 from django.views.decorators.cache import never_cache
-from django.shortcuts import render_to_response, redirect, RequestContext
+from django.shortcuts import redirect
 from django.contrib.auth.forms import AuthenticationForm
 from tasks import send_template_mail
+from social_auth.models import UserSocialAuth
 
 from rest_framework.authtoken.models import Token
 
 from apps.users.models import Feed
-from apps.users.api.serializers import vbUser, vbFeedElement
+from apps.users.api.serializers import vbUser, vbFeedElement, vbUserProfile
 from apps.users.forms import CustomRegisterForm, UsersProfileForm
 from apps.users.api.utils import create_new_session
 from apps.users.constants import APP_USERS_API_DEFAULT_PAGE, APP_USERS_API_DEFAULT_PER_PAGE,\
-    APP_SUBJECT_TO_CONFIRM_REGISTER, APP_SUBJECT_TO_RESTORE_PASSWORD
+    APP_SUBJECT_TO_RESTORE_PASSWORD
 
 from apps.films.models import Films, Persons, UsersFilms, UsersPersons
-from apps.films.constants import APP_PERSON_DIRECTOR, APP_PERSON_ACTOR, \
-    APP_FILM_FULL_FILM, APP_FILM_SERIAL, APP_USERFILM_STATUS_SUBS
+from apps.films.constants import APP_PERSON_DIRECTOR, APP_PERSON_ACTOR, APP_USERFILM_SUBS_TRUE
 from apps.films.api.serializers import vbFilm, vbPerson
 
 from utils.common import url_with_querystring
@@ -38,11 +36,7 @@ from utils.noderender import render_page
 class RegisterUserView(View):
 
     def get(self, *args, **kwargs):
-        csrf_token = get_random_string(CSRF_KEY_LENGTH)
-        resp_dict = {'csrf_token': csrf_token}
-        response = HttpResponse(render_page('register', resp_dict))
-        response.set_cookie("csrftoken", csrf_token)
-        return response
+        return HttpResponse(render_page('register', {}))
 
     @transaction.commit_manually
     def post(self, *args, **kwargs):
@@ -51,35 +45,28 @@ class RegisterUserView(View):
             user = register_form.save()
             kw = {'token': user.auth_token.key,
                   '_': timezone.now().date().strftime("%H%M%S")}
-            url = url_with_querystring(reverse('tokenize'), **kw)
-            url = "http://{host}{url}".format(host=self.request.get_host(), url=url)
-            context = {'user': user, 'redirect_url': url}
-
-            try:
-                kw = dict(subject=APP_SUBJECT_TO_CONFIRM_REGISTER,
-                          tpl_name='confirmation_register.html',
-                          context=context,
-                          to=[user.email])
-                send_template_mail.apply_async(kwargs=kw)
-            except Exception as e:
-                transaction.rollback()
-                return HttpResponseBadRequest()
+            url_redirect = url_with_querystring(reverse('tokenize'), **kw)
+            # url = "http://{host}{url}".format(host=self.request.get_host(), url=url_redirect)
+            # context = {'user': user, 'redirect_url': url}
+            #
+            # kw = dict(subject=APP_SUBJECT_TO_CONFIRM_REGISTER,
+            #           tpl_name='confirmation_register.html',
+            #           context=context,
+            #           to=[user.email])
+            # send_template_mail.apply_async(kwargs=kw)
 
             transaction.commit()
-            return redirect('index_view')
+            return redirect(url_redirect)
 
         else:
             transaction.rollback()
-            return HttpResponseBadRequest()
+            return HttpResponse(render_page('register', dict(((i[0], i[1][0]) for i in register_form.errors.items()))))
 
 
 class LoginUserView(View):
 
     def get(self, *args, **kwargs):
-        csrf_token = get_random_string(CSRF_KEY_LENGTH)
-        resp_dict = {'csrf_token': csrf_token}
-        response = HttpResponse(render_page('login', resp_dict))
-        response.set_cookie("csrftoken", csrf_token)
+        response = HttpResponse(render_page('login', {}))
         response.delete_cookie("x-session")
         response.delete_cookie("x-token")
         return response
@@ -88,42 +75,43 @@ class LoginUserView(View):
         login_form = AuthenticationForm(data=self.request.POST)
         if login_form.is_valid():
             user = login_form.get_user()
-            if not user.is_active:
-                return HttpResponse(render_page('login', {'error': {'password': 'True'}}))
             kw = {'token': user.auth_token.key,
                   '_': timezone.now().date().strftime("%H%M%S")}
             url = url_with_querystring(reverse('tokenize'), **kw)
             return HttpResponseRedirect(url)
         else:
-            return HttpResponse(render_page('login', {'error': {'password': 'True'}}))
+            return HttpResponse(render_page('login', {'error': u'Введите коректный логин и пароль'}))
+
+
+class UserLogoutView(View):
+
+    def get(self, request, **kwargs):
+        response = HttpResponseRedirect(reverse('index_view'))
+        response.delete_cookie("x-session")
+        response.delete_cookie("x-token")
+        response.delete_cookie("sessionid")
+        return response
 
 
 class TokenizeView(View):
 
     @never_cache
     def get(self, *args, **kwargs):
-        context = RequestContext(self.request)
-        response_dict = {
-            'back_url': self.request.GET['back_url'] if 'back_url' in self.request.GET else '',
-            'token': ''
-        }
-
-        if 'token' in self.request.GET:
-            response_dict['token'] = self.request.GET['token']
-        else:
-            response_dict['token'] = self.request.user.auth_token.key
-
+        back_url = self.request.GET['back_url'] if 'back_url' in self.request.GET else reverse('index_view')
+        token = self.request.GET['token'] if 'token' in self.request.GET else self.request.user.auth_token.key
         try:
-            user = Token.objects.get(key=response_dict['token']).user
-            user.is_active = True
-            user.save()
-        except:
-            return HttpResponseBadRequest()
+            user = Token.objects.get(key=token).user
+        except Token.DoesNotExist:
+            return HttpResponse(render_page('login', {'error': u'Неверный токен пользователя'}))
 
         session = create_new_session(user)
-        response_dict['session_key'] = session.token.key
 
-        return render_to_response('tokenize.html', response_dict, context_instance=context)
+        response = HttpResponseRedirect(back_url)
+        response.set_cookie('x-token', token)
+        response.set_cookie('x-session', session.token.key)
+        response.delete_cookie('sessionid')
+
+        return response
 
 
 class UserView(View):
@@ -147,8 +135,8 @@ class UserView(View):
             default_user.update(uvb.data)
 
             films = Films.objects.filter(uf_films_rel__user=user,
-                                         type__in=(APP_FILM_SERIAL, APP_FILM_FULL_FILM),
-                                         uf_films_rel__status=APP_USERFILM_STATUS_SUBS)
+#                                         type__in=(APP_FILM_SERIAL, APP_FILM_FULL_FILM),
+                                         uf_films_rel__subscribed=APP_USERFILM_SUBS_TRUE)
             films = Paginator(films, APP_USERS_API_DEFAULT_PER_PAGE).page(APP_USERS_API_DEFAULT_PAGE)
             vbf = vbFilm(films.object_list, many=True)
 
@@ -164,13 +152,14 @@ class UserView(View):
             o_feed = vbFeedElement(calc_feed(user.id), many=True).data
 
             default = {
-                'user': default_user,
-                'films_subscribed': vbf.data,
-                'actors_fav': vba.data,
+                
+                'films': vbf.data,
+                'actors': vba.data,
                 'feed': o_feed,
-                'directors_fav': vbd.data,
+                'directors': vbd.data,
             }
-            return HttpResponse(render_page('user', default))
+            default_user.update(default)
+            return HttpResponse(render_page('user', {'user':default_user}))
 
         except Exception as e:
             return HttpResponseServerError(e)
@@ -179,11 +168,7 @@ class UserView(View):
 class RestorePasswordView(View):
 
     def get(self, *args, **kwargs):
-        csrf_token = get_random_string(CSRF_KEY_LENGTH)
-        resp_dict = {'csrf_token': csrf_token}
-        response = HttpResponse(render_page('restore_password', resp_dict))
-        response.set_cookie("csrftoken", csrf_token)
-        return response
+        return HttpResponse(render_page('restore_password', {}))
 
     def post(self, *args, **kwargs):
         if 'to' in self.request.POST:
@@ -212,13 +197,8 @@ class UserProfileView(View):
     def get(self, request, **kwargs):
         if isinstance(request.user, AnonymousUser):
             return redirect("login_view")
-        csrf_token = get_random_string(CSRF_KEY_LENGTH)
-        resp_dict = {'csrf_token': csrf_token,
-                     'user': vbUser(request.user).data,
-                     }
-        response = HttpResponse(render_page('profile', resp_dict))
-        response.set_cookie("csrftoken", csrf_token)
-        return response
+        resp_dict = {'user': vbUserProfile(request.user.profile).data}
+        return HttpResponse(render_page('profile', resp_dict))
 
     def post(self, request, **kwargs):
         uprofile_form = UsersProfileForm(data=request.POST, instance=request.user)
@@ -226,19 +206,18 @@ class UserProfileView(View):
             try:
                 uprofile_form.save()
             except Exception as e:
-                return HttpResponseBadRequest(e)
+                return HttpResponse(render_page('profile', {'error': ''}))
         return redirect('profile_view')
 
 
-class UserLogoutView(View):
-
-    def get(self, request, **kwargs):
-        csrf_token = get_random_string(CSRF_KEY_LENGTH)
-        response = HttpResponseRedirect(reverse('index_view'))
-        response.set_cookie("csrftoken", csrf_token)
-        response.delete_cookie("x-session")
-        response.delete_cookie("x-token")
-        return response
+def delete_social_provider(request, provider):
+    if isinstance(request.user, AnonymousUser):
+        return redirect("login_view")
+    try:
+        UserSocialAuth.objects.get(user=request.user, provider=provider).delete()
+    except:
+        pass
+    return redirect('profile_view')
 
 
 def calc_feed(user_id):
