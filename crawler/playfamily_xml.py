@@ -52,12 +52,12 @@ def process(soup = None):
     if soup is None:
         soup = get_soup()
 
-    info_iier = extract_info(soup)
+    info_iier = [e for e in extract_info(soup)]
 
     for info in info_iier:
 
         try:
-            film = Films.objects.get( kinopoisk_id= info['kinopoiskId'])
+            film = Films.objects.get(kinopoisk_id=info['kinopoiskId'])
             print "Found {} in our database".format(film)
 
             if not film.name.strip():
@@ -81,10 +81,14 @@ def process(soup = None):
             )
             film.save()
             print "Succesfully created {}. Trying to schedule update".format(film)
-            kinopoisk_parse_one_film.apply_async(
-                (info['title'],
-                 info['kinopoiskId'] if type(infpo['kinopoiskId']) is int else int(info['kinopoiskId']))
-            )
+            kinopoisk_id = info['kinopoiskId'] if type(info['kinopoiskId']) is int else int(info['kinopoiskId'])
+            '''kinopoisk_parse_one_film.apply_async(
+                
+                (
+                 kinopoisk_id,
+                info['title']
+                 )
+            )'''
             print "Update scheduled"
 
             
@@ -92,9 +96,9 @@ def process(soup = None):
     d = sane_dict(film)
 
     d['price_type'] = APP_CONTENTS_PRICE_TYPE_PAY
-    d['price']= int(info['price'])
+    d['price']= int(float(info['price']))
 
-    d['url_view'] = extract_url(d['frame'])
+    d['url_view'] = extract_url(info['frame'])
     save_location(**d)
     
 
