@@ -14,6 +14,7 @@ from django.views.decorators.cache import never_cache
 from django.shortcuts import redirect
 from django.contrib.auth.forms import AuthenticationForm
 from tasks import send_template_mail
+from social_auth.models import UserSocialAuth
 
 from rest_framework.authtoken.models import Token
 
@@ -25,8 +26,7 @@ from apps.users.constants import APP_USERS_API_DEFAULT_PAGE, APP_USERS_API_DEFAU
     APP_SUBJECT_TO_RESTORE_PASSWORD
 
 from apps.films.models import Films, Persons, UsersFilms, UsersPersons
-from apps.films.constants import APP_PERSON_DIRECTOR, APP_PERSON_ACTOR, \
-    APP_FILM_FULL_FILM, APP_FILM_SERIAL, APP_USERFILM_STATUS_SUBS, APP_USERFILM_SUBS_TRUE
+from apps.films.constants import APP_PERSON_DIRECTOR, APP_PERSON_ACTOR, APP_USERFILM_SUBS_TRUE
 from apps.films.api.serializers import vbFilm, vbPerson
 
 from utils.common import url_with_querystring
@@ -208,6 +208,16 @@ class UserProfileView(View):
             except Exception as e:
                 return HttpResponse(render_page('profile', {'error': ''}))
         return redirect('profile_view')
+
+
+def delete_social_provider(request, provider):
+    if isinstance(request.user, AnonymousUser):
+        return redirect("login_view")
+    try:
+        UserSocialAuth.objects.get(user=request.user, provider=provider).delete()
+    except:
+        pass
+    return redirect('profile_view')
 
 
 def calc_feed(user_id):
