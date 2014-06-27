@@ -26,7 +26,7 @@ import apps.films.models as film_model
 import apps.contents.models as content_model
 
 from apps.films.api.serializers import vbFilm, vbComment, vbPerson
-from apps.films.constants import APP_USERFILM_SUBS_TRUE
+from apps.films.constants import APP_USERFILM_STATUS_PLAYLIST
 from apps.films.api import SearchFilmsView
 
 from utils.noderender import render_page
@@ -254,7 +254,7 @@ def playlist_view(request, film_id=None, *args, **kwargs):
 
         # Выборка плейлиста
         playlist_data = film_model.Films.objects.\
-            filter(uf_films_rel__user=request.user.id, uf_films_rel__subscribed=APP_USERFILM_SUBS_TRUE).\
+            filter(uf_films_rel__user=request.user.id, uf_films_rel__status=APP_USERFILM_STATUS_PLAYLIST).\
             order_by('uf_films_rel__created')
 
         if len(playlist_data) > 0:

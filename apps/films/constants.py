@@ -65,12 +65,12 @@ APP_FILM_ADMIN_CSS = ('http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery
 #############################################################################################################
 APP_USERFILM_STATUS_UNDEF = 0
 APP_USERFILM_STATUS_NOT_WATCH = 1
-APP_USERFILM_STATUS_SUBS = 2
+APP_USERFILM_STATUS_PLAYLIST = 2
 
 APP_USERFILM_STATUS = (
     (APP_USERFILM_STATUS_UNDEF, u'Не определено'),
     (APP_USERFILM_STATUS_NOT_WATCH, u'Не буду смотреть'),
-    (APP_USERFILM_STATUS_SUBS, u'Подписан'),
+    (APP_USERFILM_STATUS_PLAYLIST, u'В плейлисте'),
 )
 
 #############################################################################################################
