@@ -90,9 +90,10 @@ body
                                     ul.soc-acc
                                         li
                                             if user.social.facebook
-                                                a(href='#', title='')
+                                                - var url = 'http://www.facebook.com/profile.php?id=' + user.social.facebook
+                                                a(href='url', title='')
                                                     img(src='static/img/i-fb.png', alt='')
-                                                    | facebook.com/vasiliev
+                                                    =url
                                                 a.block.i-close.sprite.sprite-i-close.fright(href='/logout/facebook/')
                                             else
                                                 a(href='/login/facebook/', title='')
@@ -100,9 +101,10 @@ body
                                                     span Привязать
                                         li
                                             if user.social.twitter
-                                                a(href='#', title='')
+                                                -url = 'http://twitter.com/#' + user.social.twitter
+                                                a(href=url, title='',target='_blank')
                                                     img(src='static/img/i-tw.png', alt='')
-                                                    | twitter.com/vasiliev
+                                                    =url
                                                 a.block.i-close.sprite.sprite-i-close.fright(href='/logout/twitter/')
                                             else
                                                 a(href='/login/twitter/', title='')
@@ -121,9 +123,10 @@ body
                                                     span Привязать
                                         li
                                             if user.social.gplus
-                                                a(href='#', title='')
+                                                - var url = 'https://plus.google.com/' + user.social.gplus + '/posts'
+                                                a(href=url, title='')
                                                     img(src='static/img/i-go.png', alt='')
-                                                    | plus.google.com/vasiliev
+                                                    =url
                                                 a.block.i-close.sprite.sprite-i-close.fright(href='/logout/google-oauth2/')
                                             else
                                                 a(href='/login/google-oauth2', title='')
