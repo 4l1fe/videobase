@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
-from apps.films.models import Films, UsersFilms
+from apps.films.models import Films, UsersFilms, FilmExtras
 from apps.contents.models import Locations
 from apps.films.constants import APP_USERFILM_SUBS_TRUE, APP_USERFILM_SUBS_FALSE, APP_FILM_SERIAL
 from apps.users.models import Feed
@@ -52,7 +52,8 @@ class ActSubscribeFilmView(APIView):
             'user': request.user,
             'film': o_film,
         }
-        obj_val = {'id': o_film.id, 'name': o_film.name , 'description': o_film.description}
+        poster = FilmExtras.get_poster_by_film(o_film.fe_film_rel.all())
+        obj_val = {'id': o_film.id, 'name': o_film.name , 'description': o_film.description, 'poster': poster}
 
         # Устанавливаем подписку
         try:
@@ -85,7 +86,8 @@ class ActSubscribeFilmView(APIView):
         subscribed = APP_USERFILM_SUBS_FALSE
         filter_ = {'user': request.user.pk,
                    'film': o_film.pk}
-        obj_val = {'id': o_film.id, 'name': o_film.name, 'description': o_film.description}
+        poster = FilmExtras.get_poster_by_film(o_film.fe_film_rel.all())
+        obj_val = {'id': o_film.id, 'name': o_film.name , 'description': o_film.description, 'poster': poster}
 
         # Удалим подписку
         UsersFilms.objects.filter(**filter_).update(subscribed=subscribed)
