@@ -11,7 +11,7 @@ from apps.films.tests.factories import (UserFactory, GenreFactory, CountriesFact
                                         FilmFactory, ContentFactory,LocationFactory, CommentsFactory,
                                         FilmsExtrasFactory, UsersFilmsFactory, PersonsFilmFactory, FeedFactory)
 from apps.films.constants import (APP_FILM_SERIAL, APP_PERSON_DIRECTOR, APP_PERSON_ACTOR, APP_PERSON_SCRIPTWRITER,
-                                  APP_USERFILM_STATUS_UNDEF, APP_USERFILM_STATUS_NOT_WATCH, APP_USERFILM_STATUS_SUBS,
+                                  APP_USERFILM_STATUS_UNDEF, APP_USERFILM_STATUS_NOT_WATCH, APP_USERFILM_STATUS_PLAYLIST,
                                   APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER, APP_FILM_TYPE_ADDITIONAL_MATERIAL_TRAILER,
                                   APP_USERFILM_SUBS_TRUE, APP_USERFILM_SUBS_FALSE, APP_USERFILM_STATUS)
 from apps.users.models.api_session import SessionToken, UsersApiSessions
@@ -168,7 +168,7 @@ class FilmsTestCase(APISimpleTestCase):
                 extras = ext
                 break
         if auth:
-            UsersFilmsFactory.create(user=self.user, film=film, status=APP_USERFILM_STATUS_SUBS)
+            UsersFilmsFactory.create(user=self.user, film=film, status=APP_USERFILM_STATUS_PLAYLIST)
             response = self.client.post(reverse('film_details_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_X_MI_SESSION=self.headers)
         else:
             response = self.client.post(reverse('film_details_view', kwargs={'film_id': film.id, 'format': 'json'}))
@@ -208,7 +208,7 @@ class FilmsTestCase(APISimpleTestCase):
             if film.id == persf.film_id and persf.p_type not in [APP_PERSON_DIRECTOR, APP_PERSON_SCRIPTWRITER] and not persf.person in persons:
                 persons.append(persf.person)
         if auth:
-            UsersFilmsFactory.create(user=self.user, film=film, status=APP_USERFILM_STATUS_SUBS)
+            UsersFilmsFactory.create(user=self.user, film=film, status=APP_USERFILM_STATUS_PLAYLIST)
             response = self.client.post(reverse('film_details_view', kwargs={'film_id': film.id, 'format': 'json'}), data={'extend': True, 'persons': True}, HTTP_X_MI_SESSION=self.headers)
         else:
             response = self.client.post(reverse('film_details_view', kwargs={'film_id': film.id, 'format': 'json'}), data={'extend': True, 'persons': True})
@@ -254,7 +254,7 @@ class FilmsTestCase(APISimpleTestCase):
                 extras = ext
                 break
         if auth:
-            UsersFilmsFactory.create(user=self.user, film=film, status=APP_USERFILM_STATUS_SUBS)
+            UsersFilmsFactory.create(user=self.user, film=film, status=APP_USERFILM_STATUS_PLAYLIST)
             response = self.client.post(reverse('film_details_view', kwargs={'film_id': film.id, 'format': 'json'}), data={'extend': True, 'persons': False}, HTTP_X_MI_SESSION=self.headers)
         else:
             response = self.client.post(reverse('film_details_view', kwargs={'film_id': film.id, 'format': 'json'}),data={'extend': True, 'persons': False})
@@ -298,7 +298,7 @@ class FilmsTestCase(APISimpleTestCase):
             if film.id == persf.film_id and persf.p_type not in [APP_PERSON_DIRECTOR, APP_PERSON_SCRIPTWRITER] and not persf.person in persons:
                 persons.append(persf.person)
         if auth:
-            UsersFilmsFactory.create(user=self.user, film=film, status=APP_USERFILM_STATUS_SUBS)
+            UsersFilmsFactory.create(user=self.user, film=film, status=APP_USERFILM_STATUS_PLAYLIST)
             response = self.client.post(reverse('film_details_view', kwargs={'film_id': film.id, 'format': 'json'}), data={'extend': False, 'persons': True}, HTTP_X_MI_SESSION=self.headers)
         else:
             response = self.client.post(reverse('film_details_view', kwargs={'film_id': film.id, 'format': 'json'}),data={'extend': False, 'persons': True})
@@ -327,7 +327,7 @@ class FilmsTestCase(APISimpleTestCase):
                 extras = ext
                 break
         if auth:
-            UsersFilmsFactory.create(user=self.user, film=film, status=APP_USERFILM_STATUS_SUBS)
+            UsersFilmsFactory.create(user=self.user, film=film, status=APP_USERFILM_STATUS_PLAYLIST)
             response = self.client.post(reverse('film_details_view', kwargs={'film_id': film.id, 'format': 'json'}), data={}, HTTP_X_MI_SESSION=self.headers)
         else:
             response = self.client.post(reverse('film_details_view', kwargs={'film_id': film.id, 'format': 'json'}), data={})
@@ -448,12 +448,12 @@ class FilmsTestCase(APISimpleTestCase):
         users_films = UsersFilms.objects.all().last()
         self.assertEqual(users_films.film, film)
         self.assertEqual(users_films.user, self.user)
-        self.assertEqual(users_films.status, APP_USERFILM_STATUS_SUBS)
+        self.assertEqual(users_films.status, APP_USERFILM_STATUS_PLAYLIST)
         self.assertEqual(users_films.subscribed, APP_USERFILM_SUBS_TRUE)
 
     def test_api_action_playlist_already_exist(self):
         film = self.films[0]
-        UsersFilmsFactory.create(user=self.user, film=film, status=APP_USERFILM_STATUS_SUBS, subscribed=APP_USERFILM_SUBS_TRUE)
+        UsersFilmsFactory.create(user=self.user, film=film, status=APP_USERFILM_STATUS_PLAYLIST, subscribed=APP_USERFILM_SUBS_TRUE)
         response = self.client.get(reverse('act_film_playlist_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_X_MI_SESSION=self.headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -472,7 +472,7 @@ class FilmsTestCase(APISimpleTestCase):
 
     def test_api_action_playlist_delete(self):
         film = self.films[0]
-        UsersFilmsFactory.create(user=self.user, film=film, status=APP_USERFILM_STATUS_SUBS, subscribed=APP_USERFILM_SUBS_TRUE)
+        UsersFilmsFactory.create(user=self.user, film=film, status=APP_USERFILM_STATUS_PLAYLIST, subscribed=APP_USERFILM_SUBS_TRUE)
         response = self.client.delete(reverse('act_film_playlist_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_X_MI_SESSION=self.headers)
         self.assertFalse(UsersFilms.objects.filter(user=self.user, film=film).exists())
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -484,7 +484,7 @@ class FilmsTestCase(APISimpleTestCase):
         users_films = UsersFilms.objects.all().last()
         self.assertEqual(users_films.film, film)
         self.assertEqual(users_films.user, self.user)
-        self.assertEqual(users_films.status, APP_USERFILM_STATUS_SUBS)
+        self.assertEqual(users_films.status, APP_USERFILM_STATUS_PLAYLIST)
         self.assertEqual(users_films.subscribed, APP_USERFILM_SUBS_FALSE)
 
     def test_api_action_rate_add(self):
@@ -645,7 +645,7 @@ class FilmsTestCase(APISimpleTestCase):
                 extras = ext
                 break
         if auth:
-            UsersFilmsFactory.create(user=self.user, film=sim_film, status=APP_USERFILM_STATUS_SUBS)
+            UsersFilmsFactory.create(user=self.user, film=sim_film, status=APP_USERFILM_STATUS_PLAYLIST)
             response = self.client.get(reverse('film_similar_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_X_MI_SESSION=self.headers)
         else:
             response = self.client.get(reverse('film_similar_view', kwargs={'film_id': film.id, 'format': 'json'}))
@@ -816,7 +816,7 @@ class FilmsTestCase(APISimpleTestCase):
 
         data = {'text': film.name}
         if auth:
-            UsersFilmsFactory.create(user=self.user, film=film, status=APP_USERFILM_STATUS_SUBS)
+            UsersFilmsFactory.create(user=self.user, film=film, status=APP_USERFILM_STATUS_PLAYLIST)
             response = self.client.get(reverse('film_search_view', kwargs={'format': 'json'}), data=data, HTTP_X_MI_SESSION=self.headers)
         else:
             response = self.client.get(reverse('film_search_view', kwargs={'format': 'json'}), data=data)
@@ -857,7 +857,7 @@ class FilmsTestCase(APISimpleTestCase):
         data = {'genre': self.genres[4].id, 'year_old': 0, 'price': 100, 'instock': True, 'per_page': 2}
         if auth:
             UsersFilmsFactory.create(user=self.user, film=film1, status=APP_USERFILM_STATUS_NOT_WATCH)
-            UsersFilmsFactory.create(user=self.user, film=film2, status=APP_USERFILM_STATUS_SUBS)
+            UsersFilmsFactory.create(user=self.user, film=film2, status=APP_USERFILM_STATUS_PLAYLIST)
             response = self.client.get(reverse('film_search_view', kwargs={'format': 'json'}), data=data, HTTP_X_MI_SESSION=self.headers)
         else:
             response = self.client.get(reverse('film_search_view', kwargs={'format': 'json'}), data=data)
