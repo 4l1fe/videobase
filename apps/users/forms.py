@@ -29,7 +29,6 @@ class UsersProfileForm(forms.ModelForm):
 class CustomRegisterForm(forms.ModelForm):
     password2 = forms.CharField(widget=forms.PasswordInput, required=True)
     password1 = forms.CharField(widget=forms.PasswordInput, required=True)
-    email     = forms.EmailField(required=True)
 
     error_messages = {
         'passwords_not_equal': u'Пароли не совпадают',
@@ -38,6 +37,7 @@ class CustomRegisterForm(forms.ModelForm):
     def __init__(self, **kwargs):
         super(CustomRegisterForm, self).__init__(**kwargs)
         self.fields['username'].required = False
+        self.fields['email'].required = True
 
     def clean(self):
         self.cleaned_data['username'] = self.cleaned_data['email']
