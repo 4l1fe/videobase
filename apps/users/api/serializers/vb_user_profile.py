@@ -22,6 +22,8 @@ class vbUserProfile(serializers.ModelSerializer):
                 resp_dict['vk'] = social.uid
             elif social.provider == 'google-oauth2':
                 resp_dict['gplus'] = social.uid
+            else:
+                resp_dict[social.provider] = social.uid
         return resp_dict
 
     def get_email(self, obj):
