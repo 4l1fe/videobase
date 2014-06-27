@@ -13,15 +13,15 @@ class vbUserProfile(serializers.ModelSerializer):
         return obj.get_name()
 
     def get_social(self, obj):
-        resp_dict = {'facebook': False,
-                     'twitter': False,
-                     'vk': False,
-                     'gplus': False}
+        resp_dict = {'facebook': '',
+                     'twitter': '',
+                     'vk': '',
+                     'gplus': ''}
         for social in obj.user.social_auth.all():
             if social.provider == 'vk-oauth':
-                resp_dict['vk'] = True
+                resp_dict['vk'] = social.uid
             elif social.provider == 'google-oauth2':
-                resp_dict['gplus'] = True
+                resp_dict['gplus'] = social.uid
         return resp_dict
 
     def get_email(self, obj):
