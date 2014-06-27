@@ -110,9 +110,10 @@ body
                                                     span Привязать
                                         li
                                             if user.social.vk
-                                                a(href='#', title='')
+                                                - var url = 'http://vk.com/id' + user.social.vk
+                                                a(href=url, title='', target='_blank')
                                                     img(src='static/img/i-vk.png', alt='')
-                                                    | vk.com/vasiliev
+                                                    =url
                                                 a.block.i-close.sprite.sprite-i-close.fright(href='/logout/vk-oauth/')
                                             else
                                                 a(href='/login/vk-oauth', title='')
