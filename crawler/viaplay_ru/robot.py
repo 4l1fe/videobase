@@ -1,7 +1,7 @@
 
 from apps.films.models import Films
 from bs4 import BeautifulSoup
-from crawler.locations_utils import save_location, sane_dict
+from crawler.utils.locations_utils import save_location, sane_dict
 from apps.contents.constants import *
 import requests
 

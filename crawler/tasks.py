@@ -4,7 +4,7 @@ from __future__ import absolute_import
 from apps.films.models import Persons
 from bs4 import BeautifulSoup
 from crawler.core import simple_get
-from crawler.parse_page import crawler_get, get_photo
+from crawler.kinopoisk_ru.parse_page import crawler_get, get_photo
 from django.core.files import File
 from django.db import transaction
 
@@ -15,16 +15,16 @@ from celery.utils.log import get_task_logger
 import requests
 
 from videobase.celery import app
-from crawler.robot_start import sites_crawler, launch_next_robot_try_for_kinopoisk, process_film_on_site
+from crawler.utils.robot_start import sites_crawler, launch_next_robot_try_for_kinopoisk, process_film_on_site
 from apps.robots.models import Robots
-from crawler.kinopoisk_poster import poster_robot_wrapper
+from crawler.kinopoisk_ru.kinopoisk_poster import poster_robot_wrapper
 from crawler.imdbratings import process_all
 from crawler.amediateka_ru.loader import Amediateka_robot
 from crawler.viaplay_ru.robot import ViaplayRobot
-from crawler.kinopoisk_premiere import kinopoisk_news
-from crawler.youtube_trailers import process_film
+from crawler.kinopoisk_ru.kinopoisk_premiere import kinopoisk_news
+from crawler.youtube_com.youtube_trailers import process_film
 from apps.films.models import Films
-from crawler.playfamily_xml import process
+from crawler.playfamily_dot_ru.playfamily_xml import process
 from crawler.task_modules.kinopoisk_one_page import kinopoisk_parse_one_film
 
 
