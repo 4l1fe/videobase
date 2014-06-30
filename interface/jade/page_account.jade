@@ -91,7 +91,7 @@ body
                                         li
                                             if user.social.facebook
                                                 - var url = 'http://www.facebook.com/profile.php?id=' + user.social.facebook
-                                                a(href='url', title='')
+                                                a(href=url, title='',target='_blank')
                                                     img(src='static/img/i-fb.png', alt='')
                                                     =url
                                                 a.block.i-close.sprite.sprite-i-close.fright(href='/logout/facebook/')
@@ -101,7 +101,7 @@ body
                                                     span Привязать
                                         li
                                             if user.social.twitter
-                                                -url = 'http://twitter.com/#' + user.social.twitter
+                                                -var url = 'http://twitter.com/#' + user.social.twitter
                                                 a(href=url, title='',target='_blank')
                                                     img(src='static/img/i-tw.png', alt='')
                                                     =url
@@ -123,8 +123,8 @@ body
                                                     span Привязать
                                         li
                                             if user.social.gplus
-                                                - var url = 'https://plus.google.com/' + user.social.gplus + '/posts'
-                                                a(href=url, title='')
+                                                - var url = 'https://plus.google.com/me'
+                                                a(href=url, title='', target='_blank')
                                                     img(src='static/img/i-go.png', alt='')
                                                     =url
                                                 a.block.i-close.sprite.sprite-i-close.fright(href='/logout/google-oauth2/')
