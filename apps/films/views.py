@@ -177,8 +177,9 @@ def person_view(request, resource_id):
 
     pfs = film_model.PersonsFilms.objects.filter(person=person)[:12]  # почему-то 12 первых фильмов. Был пагинатор
     vbf = vbFilm([pf.film for pf in pfs], many=True)
+    crutch['filmography'] = vbf.data
 
-    return HttpResponse(render_page('person', {'person': crutch, 'filmography': vbf.data}))
+    return HttpResponse(render_page('person', {'person': crutch}))
 
 
 def test_view(request):
