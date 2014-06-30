@@ -60,7 +60,8 @@ class RegisterUserView(View):
 
         else:
             transaction.rollback()
-            return HttpResponse(render_page('register', dict(((i[0], i[1][0]) for i in register_form.errors.items()))))
+            resp_dict = {'error': dict(((i[0], i[1][0]) for i in register_form.errors.items()))}
+            return HttpResponse(render_page('register', resp_dict))
 
 
 class LoginUserView(View):
