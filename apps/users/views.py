@@ -197,7 +197,8 @@ class UserProfileView(View):
     def get(self, request, **kwargs):
         if isinstance(request.user, AnonymousUser):
             return redirect("login_view")
-        resp_dict = {'user': vbUserProfile(request.user.profile).data}
+        resp_dict = {'user': vbUserProfile(request.user.profile).data,
+                     'error': request.GET.get('e', None)}
         return HttpResponse(render_page('profile', resp_dict))
 
     def post(self, request, **kwargs):
@@ -206,7 +207,7 @@ class UserProfileView(View):
             try:
                 uprofile_form.save()
             except Exception as e:
-                return HttpResponse(render_page('profile', {'error': ''}))
+                return HttpResponse(render_page('profile', {'error': e}))
         return redirect('profile_view')
 
 
@@ -214,7 +215,13 @@ def delete_social_provider(request, provider):
     if isinstance(request.user, AnonymousUser):
         return redirect("login_view")
     try:
-        UserSocialAuth.objects.get(user=request.user, provider=provider).delete()
+        users_social = UserSocialAuth.objects.filter(user=request.user)
+        if request.user.has_usable_password() or users_social.count() > 1:
+            users_social.get(provider=provider).delete()
+        else:
+            kw = {'e': u'Невозможно удалить аккаунт социальной сети'.encode('utf-8')}
+            url = url_with_querystring(reverse('profile_view'), **kw)
+            return redirect(url)
     except:
         pass
     return redirect('profile_view')
