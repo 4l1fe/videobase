@@ -1,7 +1,7 @@
 # coding: utf-8
 from apps.films.constants import APP_FILM_FULL_FILM, APP_FILM_SERIAL
 from bs4 import BeautifulSoup
-import requests
+from crawler.utils.tor import simple_tor_get_page
 
 HOST = 'http://www.zoomby.ru'
 
@@ -23,11 +23,11 @@ class ParseFilm(object):
 
     def parse(self, response, dict_gen, film, url):
         d = dict_gen(film)
-        response = requests.get(url)
+        content = simple_tor_get_page(url)
         value = ''
         isFilm = False
         try:
-            soup = BeautifulSoup(response.content)
+            soup = BeautifulSoup(content)
             tag = soup.find('meta', attrs={'property': 'og:type'})
             if (not tag is None and film.type == APP_FILM_FULL_FILM)\
                     or (film.type == APP_FILM_SERIAL and tag is None):

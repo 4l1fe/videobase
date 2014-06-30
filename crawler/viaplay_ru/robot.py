@@ -3,8 +3,7 @@ from apps.films.models import Films
 from bs4 import BeautifulSoup
 from crawler.utils.locations_utils import save_location, sane_dict
 from apps.contents.constants import *
-import requests
-
+from crawler.utils.tor import simple_tor_get_page
 
 class ViaplayRobot(object):
     def __init__(self):
@@ -13,8 +12,7 @@ class ViaplayRobot(object):
 
     def get_data(self):
         all_film_url = 'http://viaplay.ru/filmy/vse/5/alphabetical'
-        response = requests.get(all_film_url)
-        content = response.content
+        content = simple_tor_get_page(all_film_url)
         soup_films = BeautifulSoup(content).find('ul', {'class': 'atoz-list'}).li.ul.find_all('li')
         films = Films.objects.values('name', 'id')
         for li_film in soup_films:

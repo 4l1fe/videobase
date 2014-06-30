@@ -1,7 +1,6 @@
 # coding: utf-8
 from apps.films.constants import APP_FILM_SERIAL
 from crawler.core.exceptions import NoSuchFilm
-import requests
 import parsers
 from ..core import BaseLoader
 import urllib
