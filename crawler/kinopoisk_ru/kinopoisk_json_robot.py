@@ -1,18 +1,17 @@
-import requests
-from apps.films import Films
+from apps.films.models import Films
 JSON_API = "http://www.kinopoisk.ru/handler_trailer_popup.php"
-from crawler.core.browser import get_random_weighted_browser_string
 import json
 from django.utils import timezone
+from crawler.utils.tor import simple_tor_get_page
 
 
 def form_candidates():
     pass
 
 def get_data_dict(kinopoisk_id):
-    r = requests.get('http://www.kinopoisk.ru/handler_trailer_popup.php',params = {'ids':kinopoisk_id}, headers ={'User-Agent': get_random_weighted_browser_string()})
-
-    return json.loads(r.content)
+    
+    content = simple_tor_get_page('http://www.kinopoisk.ru/handler_trailer_popup.php?ids={}'.format(kinnopoisk_id))
+    return json.loads(content)
 
 
     
@@ -22,7 +21,7 @@ def update_film_information(film,item):
 
     film.description = item['desc']
 
-    film.kinopoisk_last_try = 
+    
     
     
     

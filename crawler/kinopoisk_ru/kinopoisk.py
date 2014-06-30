@@ -1,5 +1,4 @@
 # coding: utf-8
-import requests
 import time
 import random
 import re
@@ -7,7 +6,6 @@ import logging
 
 from bs4 import BeautifulSoup
 
-from crawler.core.browser import simple_get
 from apps.films.models import Films, PersonsFilms, Persons, Genres, FilmExtras, Countries
 from apps.films.constants import APP_PERSON_PHOTO_DIR,APP_FILM_CRAWLER_LIMIT,APP_FILM_CRAWLER_DELAY,APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER, APP_FILM_FULL_FILM
 from apps.robots.models import KinopoiskTries

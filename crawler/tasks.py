@@ -3,8 +3,7 @@
 from __future__ import absolute_import
 from apps.films.models import Persons
 from bs4 import BeautifulSoup
-from crawler.core import simple_get
-from crawler.kinopoisk_ru.parse_page import crawler_get, get_photo
+from crawler.kinopoisk_ru.parse_page import get_photo
 from django.core.files import File
 from django.db import transaction
 
@@ -12,7 +11,6 @@ from django.utils import timezone
 
 from celery import shared_task
 from celery.utils.log import get_task_logger
-import requests
 
 from videobase.celery import app
 from crawler.utils.robot_start import sites_crawler, launch_next_robot_try_for_kinopoisk, process_film_on_site
@@ -26,6 +24,7 @@ from crawler.youtube_com.youtube_trailers import process_film
 from apps.films.models import Films
 from crawler.playfamily_dot_ru.playfamily_xml import process
 from crawler.task_modules.kinopoisk_one_page import kinopoisk_parse_one_film
+from crawler.utils.tor import simple_tor_get_page
 
 
 import datetime
@@ -94,13 +93,13 @@ def kinopoisk_films(page):
     count = page
     try:
         if page == 11:
-            data = BeautifulSoup(simple_get(KINOPOISK_LIST_FILMS_URL.format(1)).content)
+            data = BeautifulSoup(simple_tor_get_page(KINOPOISK_LIST_FILMS_URL.format(1)))
             pages = data.find('div', attrs={'class': 'pagesFromTo'})
             count = int(pages.text.split(' ')[2])
 
         for i in range(1, count+1):
             print count
-            data = BeautifulSoup(simple_get(KINOPOISK_LIST_FILMS_URL.format(i)).content)
+            data = BeautifulSoup(simple_tor_get_page(KINOPOISK_LIST_FILMS_URL.format(i)))
             list_films = data.findAll('div', attrs={'class': 'name'})
             print("!!!!!!!!"+str(i))
             for film in list_films:
@@ -123,8 +122,8 @@ def kinopoisk_films(page):
 @robot_task('kinopoisk_persons')
 def parse_kinopoisk_persons(id):
         try:
-            response = crawler_get('http://www.kinopoisk.ru/name/{}/view_info/ok/#trivia'.format(id))
-            soup = BeautifulSoup(response.content)
+            response = simple_tor_get_page('http://www.kinopoisk.ru/name/{}/view_info/ok/#trivia'.format(id))
+            soup = BeautifulSoup(response)
             tag = soup.find('span', attrs={'itemprop': 'alternativeHeadline'})
             person_name = tag.text.strip()
             p = Persons.objects.get(name=person_name)
@@ -265,6 +264,6 @@ def find_trailer(film_id):
 def trailer_commands():
     for film in Films.objects.all():
         find_trailer.apply_async((film.id,))
-        
+
 
 
