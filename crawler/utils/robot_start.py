@@ -16,8 +16,8 @@ from django.core.exceptions import ValidationError
 from apps.films.models import Films
 
 from crawler import Robot
-from crawler.locations_utils import save_location, sane_dict
-from crawler.kinopoisk import get_id_by_film
+from crawler.utils.locations_utils import save_location, sane_dict
+from crawler.kinopoisk_ru.kinopoisk import get_id_by_film
 from crawler.ivi_ru.loader import IVI_Loader
 from crawler.ivi_ru.parsers import ParseFilmPage
 from crawler.now_ru.loader import NOW_Loader
