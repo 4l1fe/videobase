@@ -20,7 +20,7 @@ from functools import partial
 import logging
 import os
 import time
-from crawler.tor import get_page_or_renew
+from crawler.utils.tor import get_page_or_renew
 
 from crawler.core.browser import get_random_weighted_browser_string
 
@@ -122,8 +122,8 @@ def get_image(template, actor_id):
         conv_file.seek(0)
         return conv_file
     except requests.ConnectionError:
-        raise Proba
-        
+        raise ProbablyBanned
+
 
 
 get_poster = partial(get_image, YANDEX_KP_FILMS_TEMPLATE)
@@ -165,7 +165,7 @@ def acquire_page(page_id):
     return page_dump
 
 
-def parse_one_page(page_dump):
+def extract_facts_from_dump(page_dump):
 
     '''
     Parsing one page from the multiline string @page_dump
@@ -176,34 +176,34 @@ def parse_one_page(page_dump):
 
     '''
 
-    parsed_data = []
+    facts = []
     soup = BeautifulSoup(page_dump)
     info_table = soup.select("div#infoTable")[0]
     tds = info_table.select("td.type")
-    data_dict = dict([(f.text.strip(),s) for f,s in [ td.parent.select("td") for td in tds]])
+    data_dict = dict([(f.text.strip(), s) for f, s in [td.parent.select("td") for td in tds]])
 
     actor_list = soup.select("div#actorList")[0]
-    actors_n_l = [ (a.text,a.attrs['href']) for a in actor_list.find_all('a') if  not 'film' in a.attrs['href']]
+    actors_n_l = [(a.text, a.attrs['href']) for a in actor_list.find_all('a') if  not 'film' in a.attrs['href']]
 
     brand_words = ('Films', {'description': soup.select("div.brand_words")[0].text})
 
     moviename, orig_movie_name = extract_names(soup)
-    vote = ('Films',{'rating_kinopoisk': get_vote(soup)})
+    vote = ('Films', {'rating_kinopoisk': get_vote(soup)})
 
-    parsed_data.extend(transform_data_dict(data_dict))
-    parsed_data.extend(actors_wrap(actors_n_l))
-    parsed_data.extend([brand_words, moviename, orig_movie_name, vote])
+    facts.extend(transform_data_dict(data_dict))
+    facts.extend(actors_wrap(actors_n_l))
+    facts.extend([brand_words, moviename, orig_movie_name, vote])
 
     ddict = defaultdict(list)
 
-    for pd in parsed_data:
-        element,value = pd
+    for pd in facts:
+        element, value = pd
         ddict[element].append(value)
     return ddict
 
 
 if __name__ == "__main__":
-    d = parse_one_page(acquire_page(301))
+    d = extract_facts_from_dump(acquire_page(301))
     for di in d['Films']:
 
         for k in di :
