@@ -1,6 +1,6 @@
 # coding: utf-8
 import json
-import requests
+from crawler.utils.tor import simple_tor_get_page
 from apps.films.constants import APP_FILM_SERIAL
 from crawler.utils.locations_utils import save_location, sane_dict
 from apps.films.models import Films
@@ -17,9 +17,9 @@ class Amediateka_robot(object):
     def get_film_data(self):
         search_film_url = '/hbo/api/v1/films.json?'
         filter_film_search = 'limit=1000&offset=0&expand=genres&client_id=amediateka&platform=desktop'
-        url = "http://%s%s%s" % ('www.amediateka.ru', search_film_url, filter_film_search)
-        response = requests.get(url)
-        data_site = json.loads(response.content)['films']
+        url = "http://{}{}{}".format('www.amediateka.ru', search_film_url, filter_film_search)
+        response = simple_tor_get_page(url)
+        data_site = json.loads(response)['films']
         film = Films.objects.values_list('id', 'name')
         data = film.values('name', 'id')
         for f in data_site:
@@ -34,9 +34,9 @@ class Amediateka_robot(object):
     def get_serials_data(self):
         search_serials_url = '/hbo/api/v1/serials.json?'
         filter_serials_search = 'limit=1000&offset=0&expand=seasons,genres&client_id=amediateka&platform=desktop'
-        url = "http://%s%s%s" % ('www.amediateka.ru', search_serials_url, filter_serials_search)
-        response = requests.get(url)
-        data_site = json.loads(response.content)['serials']
+        url = "http://{}{}{}".format('www.amediateka.ru', search_serials_url, filter_serials_search)
+        response = simple_tor_get_page(url)
+        data_site = json.loads(response)['serials']
         data = Films.objects.values_list('id', 'name').values('name', 'id')
         for s in data_site:
             for serials in data:
