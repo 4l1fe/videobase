@@ -140,7 +140,7 @@ class UserView(View):
             films = Paginator(films, APP_USERS_API_DEFAULT_PER_PAGE).page(APP_USERS_API_DEFAULT_PAGE)
             vbf = vbFilm(films.object_list, many=True)
 
-            actors = Persons.objects.filter(up_persons_rel__user=user, pf_persons_rel__p_type=APP_PERSON_ACTOR)
+            actors = Persons.objects.filter(up_persons_rel__user=user, pf_persons_rel__p_type=APP_PERSON_ACTOR).distinct('id')
             actors = Paginator(actors, APP_USERS_API_DEFAULT_PER_PAGE).page(APP_USERS_API_DEFAULT_PAGE)
             vba = vbPerson(actors.object_list, many=True)
 
