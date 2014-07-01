@@ -142,7 +142,7 @@ def index_view(request):
         except:
             genres_data = []
 
-    films_data = vbFilm(film_model.Films.objects.order_by('rating_sort')[:12],many = True).data
+    films_data = vbFilm(film_model.Films.similar_default(), many=True).data
 
     # Init response
     data = {
