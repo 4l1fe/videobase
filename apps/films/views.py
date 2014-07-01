@@ -268,11 +268,13 @@ def playlist_view(request, film_id=None, *args, **kwargs):
                 playlist['next'] = arrow_data(playlist_data[film_id], film_id+1)
 
             if film_id > 1:
-                playlist['previous'] = arrow_data(playlist_data[film_id - 2], film_id - 1)
+                playlist['previous'] = arrow_data(playlist_data[film_id-2], film_id-1)
 
             film = playlist_data[film_id-1]
             film_data, o_film = film_to_view(film.id)
-        recommended_films = vbFilm(film_model.Films.objects.order_by('rating_sort')[:12],many = True).data
+
+        recommended_films = vbFilm(film_model.Films.similar_default(), many=True).data
+
         # Update playlist
         playlist.update({
             'id': film_id,
