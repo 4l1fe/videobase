@@ -32,6 +32,7 @@ class CustomRegisterForm(forms.ModelForm):
 
     error_messages = {
         'passwords_not_equal': u'Пароли не совпадают',
+        'email': u'Email-обязательное поле!',
     }
 
     def __init__(self, **kwargs):
@@ -40,7 +41,11 @@ class CustomRegisterForm(forms.ModelForm):
         self.fields['email'].required = True
 
     def clean(self):
-        self.cleaned_data['username'] = self.cleaned_data['email']
+        if 'email' in self.cleaned_data:
+            self.cleaned_data['username'] = self.cleaned_data.get['email']
+        else:
+            raise forms.ValidationError(self.error_messages['email'],
+                                        code='email')
         if 'password1' in self.cleaned_data and 'password2' in self.cleaned_data:
             if self.cleaned_data['password1'] != self.cleaned_data['password2']:
                 raise forms.ValidationError(self.error_messages['passwords_not_equal'],
