@@ -8,6 +8,9 @@ from apps.films.models import Countries
 from data.checker import FactChecker
 from data.constants import FLATLAND_NAME
 
+import gdata.youtube
+import gdata.youtube.service
+
 film_checker = FactChecker(Films)
 
 
@@ -23,8 +26,8 @@ def trailer_name_check(film):
 
     ft = film_trailers[0]
 
-
-    return film.name in
+    yid = re.match('.+watch[?]v[=](?P<id>.+)(([&].+)?)', ft.url)
+    #return film.name in
 
     
 
