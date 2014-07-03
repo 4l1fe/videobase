@@ -1559,28 +1559,32 @@
       }
       self = this;
       if (this.conf.locations && this.conf.locations.length) {
-        $(".location-thumb", $("#locations")).each(function() {
-          var $this, i, id, loc;
-          $this = $(this);
-          id = $this.data("miVal");
-          i = 0;
-          loc = void 0;
-          while (i < self.conf.locations.length && self.conf.locations[i].id !== id) {
-            i++;
-          }
-          if (i < self.conf.locations.length) {
-            loc = self.conf.locations[i];
-          }
-          if (loc) {
-            if (loc.price) {
-              loc.price = Math.ceil(loc.price);
+        if (this.conf.locations.length > 1) {
+          $(".location-thumb", $("#locations")).each(function() {
+            var $this, i, id, loc;
+            $this = $(this);
+            id = $this.data("miVal");
+            i = 0;
+            loc = void 0;
+            while (i < self.conf.locations.length && self.conf.locations[i].id !== id) {
+              i++;
             }
-            $this.click(function() {
-              return self.play_location(id);
-            });
-            return locations[id] = loc;
-          }
-        });
+            if (i < self.conf.locations.length) {
+              loc = self.conf.locations[i];
+            }
+            if (loc) {
+              if (loc.price) {
+                loc.price = Math.ceil(loc.price);
+              }
+              $this.click(function() {
+                return self.play_location(id);
+              });
+              return locations[id] = loc;
+            }
+          });
+        } else {
+          locations[this.conf.locations[0].id] = this.conf.locations[0];
+        }
         this.player = new Player($("#frame_player"));
         this.player.clear();
         loc_id = this._app.query_params("loc");
@@ -1604,6 +1608,7 @@
             }
           }
         }
+        console.log(loc_id, loc_price_id);
         if (!loc_id) {
           loc_id = loc_price_id;
         }
