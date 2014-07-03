@@ -93,13 +93,13 @@ def process(soup = None):
 
             
                         
-    d = sane_dict(film)
+        d = sane_dict(film)
 
-    d['price_type'] = APP_CONTENTS_PRICE_TYPE_PAY
-    d['price']= int(float(info['price']))
+        d['price_type'] = APP_CONTENTS_PRICE_TYPE_PAY
+        d['price']= int(float(info['price']))
 
-    d['url_view'] = extract_url(info['frame'])
-    save_location(**d)
+        d['url_view'] = extract_url(info['frame'])
+        save_location(**d)
     
 
 
