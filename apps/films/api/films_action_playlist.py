@@ -6,7 +6,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
 from apps.films.models import Films, UsersFilms
-from apps.films.constants import APP_USERFILM_STATUS_SUBS, APP_USERFILM_SUBS_TRUE, APP_FILM_SERIAL
+from apps.films.constants import APP_FILM_SERIAL, APP_USERFILM_STATUS_PLAYLIST
 
 
 #############################################################################################################
@@ -40,13 +40,11 @@ class ActPlaylistFilmView(APIView):
             return o_film
 
         # Init data
-        add_params = {
-            'status': APP_USERFILM_STATUS_SUBS,
-        }
+        add_params = {}
 
         # Если не сериал
         if o_film.type != APP_FILM_SERIAL:
-            add_params.update({'subscribed': APP_USERFILM_SUBS_TRUE})
+            add_params.update({'status': APP_USERFILM_STATUS_PLAYLIST})
 
         filter = {
             'user': request.user,
@@ -56,6 +54,9 @@ class ActPlaylistFilmView(APIView):
         # Устанавливаем в плейлист
         try:
             o_subs = UsersFilms.objects.get(**filter)
+            if o_subs.status != APP_USERFILM_STATUS_PLAYLIST and o_film.type != APP_FILM_SERIAL:
+                o_subs.status = APP_USERFILM_STATUS_PLAYLIST
+                o_subs.save()
             # Исправлена логика ответа на ошибочное действие
             return Response(status=status.HTTP_200_OK)
         except Exception as e:

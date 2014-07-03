@@ -3,7 +3,7 @@ Module for emulating browser
 '''
 from crawler.core.exceptions import RetrievePageException
 
-import requests
+
 from urlparse import urlparse
 from os.path import exists
 from os.path import join
@@ -119,19 +119,4 @@ def get_random_weighted_browser_string():
         return random.choice(brfiltered)
     else:
         return random.choice(browser_strings)
-    
-@nopage_handler
-@cache
-def simple_get(url, **kwargs):
-    '''
-    Simple wrapper around requests.get function with preset headers
-    '''
-    return requests.get(url, headers={'User-Agent': get_random_weighted_browser_string()}, params=kwargs.get('params', {}))
 
-
-            
-            
-
-        
-        
-    

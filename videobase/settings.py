@@ -204,7 +204,6 @@ VK_APP_ID            = '4296663'
 VKONTAKTE_APP_ID     = VK_APP_ID
 VK_API_SECRET        = 'JAEQddzkBCm554iGXe6S'
 VKONTAKTE_APP_SECRET = VK_API_SECRET
-VK_EXTRA_SCOPE = ['notify', 'friends', 'status', 'groups', 'notifications']
 
 # Facebook
 FACEBOOK_APP_ID     = '212532105624824'
@@ -241,9 +240,8 @@ SOCIAL_AUTH_PIPELINE = (
     'social_auth.backends.pipeline.social.associate_user',
     # Получает и обновляет social_user.extra_data
     'social_auth.backends.pipeline.social.load_extra_data',
-    # Обновляет инстанс user дополнительными данными с бекенда
-    'social_auth.backends.pipeline.user.update_user_details'
 )
+
 
 # In minutes
 API_SESSION_EXPIRATION_TIME = 15
