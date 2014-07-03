@@ -26,6 +26,7 @@ var server = new zerorpc.Server({
     render: function(json, reply) {
         var data = JSON.parse(json);
         var html = null;
+
         try {
             html = renderers[data.template](data.context);
         } catch(e) {
