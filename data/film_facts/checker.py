@@ -46,8 +46,18 @@ def omdb_year_check(film):
     pass
 
 
-    
+@film_checker.add("There is no such trailer")
+def trailer_check(film):
+    pass
 
+@film_checker.add("Youtube trailer duration not within limits")
+def trailer_duration_check(film):
+    pass
+
+
+
+    
+    
 
 
 
