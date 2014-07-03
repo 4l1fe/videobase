@@ -962,20 +962,23 @@ class Page_Film extends Page
 
     self = @
     if @conf.locations && @conf.locations.length
-      $(".location-thumb", $("#locations")).each( ->
-        $this = $(this)
-        id = $this.data("miVal")
-        i = 0
-        loc = undefined
-        while i < self.conf.locations.length && self.conf.locations[i].id != id
-          i++
-        loc = self.conf.locations[i] if i < self.conf.locations.length
-        if loc
-          if (loc.price)
-            loc.price = Math.ceil(loc.price)
-          $this.click(-> self.play_location(id))
-          locations[id] = loc
-      )
+      if @conf.locations.length > 1
+        $(".location-thumb", $("#locations")).each( ->
+          $this = $(this)
+          id = $this.data("miVal")
+          i = 0
+          loc = undefined
+          while i < self.conf.locations.length && self.conf.locations[i].id != id
+            i++
+          loc = self.conf.locations[i] if i < self.conf.locations.length
+          if loc
+            if (loc.price)
+              loc.price = Math.ceil(loc.price)
+            $this.click(-> self.play_location(id))
+            locations[id] = loc
+        )
+      else
+        locations[@conf.locations[0].id] = @conf.locations[0]
 
       @player = new Player($("#frame_player"))
       @player.clear()
@@ -993,6 +996,7 @@ class Page_Film extends Page
               loc_price = item.price
               if item.type == "playfamily"
                 loc_price = 1
+      console.log loc_id, loc_price_id
       if !loc_id
         loc_id = loc_price_id
       @play_location(loc_id) if loc_id
