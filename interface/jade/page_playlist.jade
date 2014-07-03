@@ -1,7 +1,8 @@
+include config
 - if (playlist.total_cnt) {
 -   film = playlist.film
 -   film_year = film.releasedate.substr(0,4)
--   page_title = "Плейлист (" + playlist.id + "/" + playlist.total_cnt + ") &mdash; " + film.name + " (" + film_year + ")"
+-   page_title = film.name + " &mdash; Плейлист (" + playlist.id + "/" + playlist.total_cnt + ")"
 - } else {
 -   page_title = "Плейлист"
 -   film = {}
@@ -29,12 +30,14 @@ body
                     .title-playlist.rel.zmin
                         .container
                             .row
-                                if playlist.next
-                                    .col-md-3.col-sm-4.text-right.pull-left
-                                        a.action-film.prev-film.active.sprite(href='/playlist/' + playlist.next.id, title='')=playlist.next.name
-                                if playlist.previous
-                                    .col-md-3.col-sm-4.text-right
-                                        a.action-film.next-film.sprite(href='/playlist/' + playlist.previous.id, title='')=playlist.previous.name
+                                .col-md-3.col-sm-4.text-right.pull-right
+                                    if playlist.next
+                                        - url_tmp = '/playlist/' + playlist.next.id
+                                        a.action-film.next-film.active.sprite(href=url_tmp, title='')=playlist.next.name
+                                .col-md-3.col-sm-4.text-left
+                                    if playlist.previous
+                                        - url_tmp = '/playlist/' + playlist.previous.id
+                                        a.action-film.prev-film.sprite(href=url_tmp, title='')=playlist.previous.name
                                 .col-md-6.col-sm-4.text-center
                                     p ПЛЕЙЛИСТ (#{playlist.id}/#{playlist.total_cnt})
                     //
@@ -44,28 +47,32 @@ body
                             .row
                                 .col-md-8.col-sm-7
                                     .name-playlist
-                                        h2=film.name + " (" + film_year + ")"
-                                        if film.name_orig
-                                            span=film.name_orig + " (" + film_year + ")"
+                                        h2=film.name
+                                        if film.name_orig && film.name_orig != film.name
+                                            span=film.name_orig
                                 .col-md-4.col-sm-5
                                     .range-block-playlist.cf
-                                        a.sprite.sprite-stop-view.block.fright(href='#', title='')#playlist_btn
+                                        a.sprite.sprite-go-view.block.fright(href='#', title='')#playlist_btn
                                         .range-style2.fright
-                                            .rateit(data-rateit-max=10,data-rateit-resetable=1,data-rateit-value=(film.relation && film.relation.rating)?film.relation.rating:0)#rateit
+                                            .rateit(data-rateit-max=10,data-rateit-step=1,data-rateit-resetable=1,data-rateit-value=(film.relation && film.relation.rating)?film.relation.rating:0)#rateit
                                         //
                                            .range-style2
                                     //
                                        .range-block-tape
-                        //
-                           .title-film
+                    //
+                       .title-film
                     .film-area
                         .container
+                            a(name="player")
                             .frame-player-wrapper
                                 .frame-player-aspect
                                     .frame-player#frame_player
-                            ul.just-list.list-btns-film#locations
-                                each el in film.locations
-                                    mixin loc_thumb(el)
+                            if film.locations.length > 1
+                                ul.just-list.list-btns-film#locations
+                                    each el in film.locations
+                                        mixin loc_thumb(el)
+                        //
+                           .title-film
                     .playlist.rel.zmin
                         //
                            none-playlist добавляем к tp что бы изначально скрыть плейлист и убираем класс active c toggle-playlist
@@ -80,8 +87,10 @@ body
                                                     - for (var i = 0; i < items_cnt; i++)
                                                         - el = playlist.items[i]
                                                         .col-md-2.col-sm-3.col-xs-4
-                                                            a(href='/playlist/' + (i+1), title='')
-                                                                img(src=el.poster || "static/img/noposter.png", alt='')
+                                                            - url_tmp = '/playlist/' + (i+1)
+                                                            a(href=url_tmp, title='')
+                                                                - poster_url = el.poster || noposter_url
+                                                                img(src=poster_url, alt='')
                                                             p
                                                                 | #{el.name}
                                                                 br
@@ -103,9 +112,9 @@ body
                         .row
                             .col-md-3.col-sm-4.col-xs-12
                                 .img-person-playlist
-                                    img(src=film.poster || "static/img/noposter.png", alt='')
+                                    img(src=film.poster || noposter_url, alt='')
                                     br
-                                    img(src="static/img/shd-small.png", alt='')
+                                    img(src=img_url + 'shd-small.png', alt='')
                                 //
                                    .img-person
                             .col-md-6.col-sm-8.col-xs-12
@@ -117,55 +126,69 @@ body
                                             each c in film.countries
                                                 =(delim?", ":"") + c.name
                                                 - delim = true
-                                    if film.directors
+                                    if film.directors && film.directors.length
                                         li
                                             span Режиссер
                                             - delim = false
                                             each c in film.directors
                                                 =(delim?", ":"") + c.name
                                                 - delim = true
-                                    if film.scriptwriters
+                                    if film.scriptwriters && film.scriptwriters.length
                                         li
                                             span Сценарист
                                             - delim = false
                                             each c in film.scriptwriters
                                                 =(delim?", ":"") + c.name
                                                 - delim = true
+                                    if film.genres && film.genres.length
+                                        li
+                                            span Жанр
+                                            - delim = false
+                                            each c in film.genres
+                                                =(delim?", ":"") + c.name
+                                                - delim = true
                                     li
                                         span Дата выхода
-                                        |#{date_text_str(film.releasedate)}
+                                        | #{date_text_str(film.releasedate)}
                                     if film.duration
                                         li
                                             span Время
-                                            |#{duration_text(film.duration)}
+                                            | #{duration_text(film.duration)}
                                 //
                                     .share-block
                                     img(src='images/content/img42.png', alt='')
                                 //
                                    .share-block
                             .col-md-3.col-sm-12.col-xs-12
-                                .block-rate.rel.zmin
-                                    .title-rate.text-center
-                                        h5 Сводный рейтинг
+                                if film.ratings && (film.ratings.cons || film.ratings.kp || film.ratings.imdb)
+                                    .block-rate.rel.zmin
+                                        .title-rate.text-center
+                                            h5 Сводный рейтинг
+                                        //
+                                           .title-rate
+                                        .rel.zmin.blue-num.num
+                                            i=film.ratings && film.ratings.cons[0]?film.ratings.cons[0]:"-"
+                                        p.text-center!=(film.ratings && film.ratings.cons[1]?film.ratings.cons[1]:0).toString().replace(/(\d)(?=(\d\d\d)+([^\d]|$))/g, '$1&thinsp;') + " голосов"
+                                        if (film.ratings.kp && film.ratings.kp[0]) || (film.ratings.imdb && film.ratings.imdb[0]) || (film.ratings.vsevi && film.ratings.vsevi[0])
+                                            ul
+                                                if film.ratings.vsevi && film.ratings.vsevi[0]
+                                                    li
+                                                        | Рейтинг
+                                                        strong=" ВсеВи"
+                                                        span=" " + film.ratings.vsevi[0]
+                                                if film.ratings.kp && film.ratings.kp[0]
+                                                    li
+                                                        | Рейтинг
+                                                        strong=" КП"
+                                                        span=" " + film.ratings.kp[0]
+                                                if film.ratings.imdb && film.ratings.imdb[0]
+                                                    li
+                                                        | Рейтинг
+                                                        strong=" IMDB"
+                                                        span=" " + film.ratings.imdb[0]
                                     //
-                                       .title-rate
-                                    .rel.zmin.blue-num.num
-                                        i=film.ratings && film.ratings.cons[0]?film.ratings.cons[0]:"-"
-                                    p.text-center=(film.ratings && film.ratings.cons[1]?film.ratings.cons[1]:0) + " голосов"
-                                    ul
-                                        li
-                                            | Рейтинг в
-                                            strong=" Kinopoisk"
-                                            span=" " + (film.ratings && film.ratings.kp[0]?film.ratings.kp[0]:"-")
-                                        li
-                                            | Рейтинг в
-                                            strong=" IMDB"
-                                            span=" " + (film.ratings && film.ratings.imdb[0]?film.ratings.imdb[0]:"-")
-                                //
-                                   .block-rate
-                                .brd-bottom-rate
-                                - if (!film.locations || !film.locations.length)
-                                    a.btn-green.btn-def.block.margin0a.btn-clear(href='#', title='')#subscribe_btn подписаться
+                                       .block-rate
+                                    .brd-bottom-rate
                 section.brd-top
                     .container
                         .actors-full#actors_full.hide
@@ -206,7 +229,7 @@ body
                                             a(href='#show-actors', title='') показать всех
                                         //
                                            .filter-content
-                                        img.img-responsive(src='static/img/shd-big.png', alt='')
+                                        img.img-responsive(src=img_url + 'shd-big.png', alt='')
                                     //
                                        .filter-block
                                     //

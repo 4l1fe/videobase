@@ -1,56 +1,71 @@
-<!DOCTYPE html5><html lang="ru"><head><title>Плеер ВсеВидео</title><meta charset="utf-8"/><style>#player {
-    width: 100%;
-    height: 100%
-}</style></head><body><div id="player"></div><script>var
-    query_arr = (window.location + "").split("?"),
-    params, type = 0, value = false, html = false, view;
-if (query_arr.length > 1) {
-    params = query_arr[1].split("&");
-    for (var i = 0; i < params.length; i++) {
-        param_arr = params[i].split("=")
-        if (param_arr[0] == "type")
-            type = decodeURI(param_arr[1]);
-        else if (param_arr[0] == "value")
-            value = decodeURI(param_arr[1]);
-        else if (param_arr[0] == "view")
-            view = decodeURI(param_arr[1]);
-    }
-}
-if (type && (value || view)) {
-    var
-        html = false;
-    if (type == "ivi") {
-        if (value == false) {
-            value = view.substr(24)
-            value = value.substr(0, value.indexOf("#"))
-        }
-        html = '<iframe src="http://www.ivi.ru/player/?videoid=' + value + '&amp;subsite=138&amp;enableseries=0&amp;autostart=0" width="100%" height="100%" frameborder="0" allowfullscreen=""></iframe>'
-    } else if (type == "nowru") {
-        if (value == false) {
-            arr = view.split("/")
-            value = arr[arr.length - 1]
-        }
-        html = '<iframe name="now1023318" src="http://www.now.ru/embed/frame/' + value + '" scrolling="no" frameborder="no" height="100%" width="100%" allowfullscreen></iframe>'
-    } else if (type == "tvigle") {
-            if (value == false) {
-                arr = view.split("=")
-                value = arr[arr.length - 1]
-            }
-    html = '<object type="application/x-shockwave-flash" data="http://tvigle.ru/swf/tvigle_v12.swf?ver=3.597999999999975" width="100%" height="100%" id="plr" style="visibility: visible; width: 100%; height: 100%;"><param name="allowScriptAccess" value="always"><param name="bgcolor" value="#000000"><param name="quality" value="high"><param name="scale" value="noscale"><param name="allowFullScreen" value="true"><param name="wmode" value="opaque"><param name="flashvars" value="ref=1&amp;obj=' + value + '&amp;cnl=692685&amp;sid_name=&amp;user_sid=&amp;own=0&amp;w=1080&amp;h=608&amp;ap=1&amp;afbr=1&amp;region=RU&amp;skin=&amp;d=tvigle.ru"></object>'
-    } else if (type == "zoomby") {
-        html = '<iframe src="http://www.zoomby.ru/v/' + value + '" width="100%" height="100%"></iframe>'
-    } else if (type == "meogogo") {
-        html = '<iframe width="100%" height="100%" src="http://megogo.net/e/' + value + '" frameborder="0" allowfullscreen></iframe>'
-    } else if (type == "molodejj") {
-        html = '<iframe width="100%" height="100%" src="http://player.molodejj.tv/player_mjj.swf?pl=544&amp;vid=' + value + '&amp;site=vkontakte_embed&amp;type=video&amp;channel=3"></iframe>'
-    } else if (type == "tvzavr") {
-        html = '<iframe width="100%" height="100%" src="http://www.tvzavr.ru/js/v5/tvzavrplayer2.swf?playlist=' + value + '&autoplay=1"></iframe>';
-    } else if (type == "mosfilm") {
-        html = '<iframe width="100%" height="100%" src="//www.youtube.com/embed/' + value + '" frameborder="0" allowfullscreen></iframe>'
-    } else if (type == "playfamily") {
-        html = '<iframe width="100%" height="100%" id="playlite-frame" class="playlite-object" frameborder="0" scrolling="no" src=' + value + '></iframe>'
-    }
-}
-if (!html)
-    html = '<div style="width: 100%; height: 100%">Unable to load</div>';
-document.getElementById("player").innerHTML = html</script></body></html>
+<!DOCTYPE html5>
+<html lang="ru">
+  <head>
+    <title>Плеер ВсеВидео</title>
+    <meta charset="utf-8"/>
+    <style>
+      #player {
+          width: 100%;
+          height: 100%
+      }
+    </style>
+  </head>
+  <body>
+    <div id="player"></div>
+    <script>
+      var
+          query_arr = (window.location + "").split("?"),
+          params, type = 0, value = false, html = false, view;
+      if (query_arr.length > 1) {
+          params = query_arr[1].split("&");
+          for (var i = 0; i < params.length; i++) {
+              param_arr = params[i].split("=")
+              if (param_arr[0] == "type")
+                  type = decodeURI(param_arr[1]);
+              else if (param_arr[0] == "value")
+                  value = decodeURI(param_arr[1]);
+              else if (param_arr[0] == "view")
+                  view = decodeURI(param_arr[1]);
+          }
+      }
+      if (type && (value || view)) {
+          var
+              html = false;
+          if (type == "ivi") {
+              if (value == false) {
+                  value = view.substr(24)
+                  value = value.substr(0, value.indexOf("#"))
+              }
+              html = '<iframe src="http://www.ivi.ru/player/?videoid=' + value + '&amp;subsite=138&amp;enableseries=0&amp;autostart=0" width="100%" height="100%" frameborder="0" allowfullscreen=""></iframe>'
+          } else if (type == "nowru") {
+              if (value == false) {
+                  arr = view.split("/")
+                  value = arr[arr.length - 1]
+              }
+              html = '<iframe name="now1023318" src="http://www.now.ru/embed/frame/' + value + '" scrolling="no" frameborder="no" height="100%" width="100%" allowfullscreen></iframe>'
+          } else if (type == "tvigle") {
+                  if (value == false) {
+                      arr = view.split("=")
+                      value = arr[arr.length - 1]
+                  }
+          html = '<object type="application/x-shockwave-flash" data="http://tvigle.ru/swf/tvigle_v12.swf?ver=3.597999999999975" width="100%" height="100%" id="plr" style="visibility: visible; width: 100%; height: 100%;"><param name="allowScriptAccess" value="always"><param name="bgcolor" value="#000000"><param name="quality" value="high"><param name="scale" value="noscale"><param name="allowFullScreen" value="true"><param name="wmode" value="opaque"><param name="flashvars" value="ref=1&amp;obj=' + value + '&amp;cnl=692685&amp;sid_name=&amp;user_sid=&amp;own=0&amp;w=1080&amp;h=608&amp;ap=1&amp;afbr=1&amp;region=RU&amp;skin=&amp;d=tvigle.ru"></object>'
+          } else if (type == "zoomby") {
+              html = '<iframe src="http://www.zoomby.ru/v/' + value + '" width="100%" height="100%"></iframe>'
+          } else if (type == "meogogo") {
+              html = '<iframe width="100%" height="100%" src="http://megogo.net/e/' + value + '" frameborder="0" allowfullscreen></iframe>'
+          } else if (type == "molodejj") {
+              html = '<iframe width="100%" height="100%" src="http://player.molodejj.tv/player_mjj.swf?pl=544&amp;vid=' + value + '&amp;site=vkontakte_embed&amp;type=video&amp;channel=3"></iframe>'
+          } else if (type == "tvzavr") {
+              html = '<iframe width="100%" height="100%" src="http://www.tvzavr.ru/js/v5/tvzavrplayer2.swf?playlist=' + value + '&autoplay=1"></iframe>';
+          } else if (type == "mosfilm") {
+              html = '<iframe width="100%" height="100%" src="//www.youtube.com/embed/' + value + '" frameborder="0" allowfullscreen></iframe>'
+          } else if (type == "playfamily") {
+              html = '<iframe width="100%" height="100%" id="playlite-frame" class="playlite-object" frameborder="0" scrolling="no" src=' + value + '></iframe>'
+          }
+      }
+      if (!html)
+          html = '<div style="width: 100%; height: 100%">Unable to load</div>';
+      document.getElementById("player").innerHTML = html
+    </script>
+  </body>
+</html>

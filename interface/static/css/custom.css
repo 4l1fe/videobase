@@ -1,5 +1,5 @@
 html, body, div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, abbr, address, cite, code, del, dfn, em, img, ins, kbd, q, samp, small, strong, sub, sup, var, b, i, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, figcaption, figure, footer, header, menu, nav, section, summary, time, mark, audio, video {margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent;}
-body {line-height:1;background: url(../img/bg.jpg) center top;}
+body {line-height:1;background: url(../img/bg.jpg) center top #e6e7e9;}
 ul,menu,ol {list-style:none;}
 article,aside,details,figcaption,figure,footer,header,menu,nav,section {display:block;}
 blockquote, q {quotes: none;}
@@ -131,6 +131,8 @@ h5 {color: #fff;font-size: 14px;font-weight: bold;text-transform: uppercase;}
 .menu-header a {
     text-transform: uppercase;color: #4f4747;font-size: 14px;font-weight: bold;text-decoration: underline;
 }
+.menu-header .inactive a {cursor: default; text-decoration: none;}
+
 .menu-header a:hover {text-decoration: none;}
 .menu-header li:first-child {background: none;padding-left: 0px;}
 .menu-header li:last-child {padding-right: 0px;}
@@ -140,8 +142,8 @@ h5 {color: #fff;font-size: 14px;font-weight: bold;text-transform: uppercase;}
 }
 
 
-.blue-block {background: url(../img/bg-blue.jpg) center top;}
-.broun-block {background: url(../img/bg-broun.jpg) center top;padding-bottom: 34px;}
+.blue-block {background: url(../img/bg-blue.jpg) center top #0469a1;}
+.broun-block {background: url(../img/bg-broun.jpg) center top #453535;padding-bottom: 34px;}
 .broun-block-playlist {background: url(../img/bg-broun.jpg) center top;padding: 0;}
 .blue-block .list-film .col-md-3 {padding-top: 20px;}
 section {padding:37px 0 6px 0;}
@@ -239,7 +241,7 @@ section {padding:37px 0 6px 0;}
     behavior: url(PIE.htc);
 }
 
-.filter-block {padding-top: 15px;margin-bottom: -20px;}
+.filter-block {padding-top: 15px;margin-bottom: -20px; z-index: 999; position: relative}
 .filter-content {padding: 18px 0 0 0;}
 
 
@@ -268,11 +270,9 @@ section {padding:37px 0 6px 0;}
     background: url(../img/brd1-right.png) left center no-repeat;
 }
 .sort-list > li:first-child {background: none;}
-.sort-list > li:first-child a {padding-left: 0px;}
 .sort-list a {
     color: #3168d1;font-size: 14px;text-decoration: none;
     padding: 0 13px 0 18px;
-
 }
 .sort-list a span {
     border-bottom: 1px dotted #3168d1;
@@ -281,7 +281,7 @@ section {padding:37px 0 6px 0;}
 .sort-list strong {
     font-size: 14px;color: #626262;
 }
-
+.dropdown-menu>li>a {padding-bottom: 5px}
 .slide-comments > li {float: left;padding-bottom:35px;padding-right: 15px;padding-left: 15px;}
 .container-brown {max-width: 960px;}
 
@@ -546,7 +546,7 @@ footer[role=contentinfo] {padding: 18px 0 0 0;}
 
 .actor {padding-top: 10px;padding-left: 3px;}
 .actor img {
-    width: 61px;height: 61px;vertical-align: middle;margin-right: 10px;
+    min-width: 61px; max-height: 61px;vertical-align: middle;margin-right: 10px;
 }
 .actor a {
     color: #3168d1;font-size: 18px;
@@ -718,8 +718,8 @@ a.btn-more-friends, .btn-more-friends {
 .name-playlist {line-height: 30px;}
 .name-playlist span {color: #a08c8c; font-size: 14px;}
 .name-film1 span {color: #a08c8c; font-size: 14px;}
-.name-film1 {padding-bottom: 30px;line-height: 27px;}
-.title-film {padding: 25px 0;}
+.name-film1 {padding-bottom: 0px;line-height: 27px;}
+.title-film {padding: 25px 0 5px 0;}
 .range-block-playlist {padding: 14px 0 0 0;}
 
 
@@ -819,7 +819,7 @@ a.toggle-playlist.active {
 .section-about {padding-bottom: 0}
 
 .block-rate {
-    height: 217px;margin-top: 3px;
+    min-height: 130px;margin-top: 3px;
     background-color: #f9c200;
 }
 .block-rate i {text-shadow: none;}
@@ -830,7 +830,7 @@ a.toggle-playlist.active {
 .block-rate p {color: #000;font-size: 14px;padding-top: 17px;}
 .block-rate ul {
     color: #000;font-size: 14px;
-    padding: 0px 10px 0 20px;margin-top: 15px;
+    padding: 0px 10px 20px 20px;margin-top: 15px;
     border-top: 1px solid #a38717;
 }
 .block-rate span {font-size:22px;font-weight: bold;}
@@ -844,6 +844,8 @@ a.toggle-playlist.active {
 .playlist-content {
     padding-top: 15px;padding-bottom: 40px;
 }
+.hide-actors .playlist-content {padding-bottom: 0}
+
 .playlist-content p {
     color: #484c4d;font-size: 14px;line-height: 20px;
     padding-top: 10px;
@@ -1066,7 +1068,7 @@ a.toggle-playlist.active {
 }
 
 .blue-block .film-thumb .btn-def {background: url(../img/btn-broun.png) left top no-repeat;}
-.blue-block .film-thumb .btn-def a { color: #fff;text-shadow: 0px 2px 1px #271e1e;}
+.blue-block .film-thumb .btn-def a { color: #fff;text-shadow: 0px 2px 1px #271e1e; display: block}
 .blue-block .film-thumb .btn-def i {color: #c2b5b5;}
 
 .film-thumb .btn-free {background: url(../img/btn-yellow.png) left top no-repeat;}
@@ -1094,24 +1096,37 @@ a.toggle-playlist.active {
 
 .display-none {display: none}
 
-.dropdown-menu li a {padding: 5px; margin: 0}
+.dropdown-menu li {padding: 5px; margin: 0}
 
 .list-film .row hr {border: 0; margin: 0; padding: 0; width: 100%; height: 1px; clear: both; background: url("../img/films-delim.png") repeat-x}
 .broun-block .list-film .row hr {border: 0; margin: 0; padding: 0; width: 100%; height: 1px; clear: both; background: url("../img/films-delim-white.png") repeat-x}
+
+.container {padding-left: 0; padding-right: 0}
 
 .frame-player-wrapper {text-align: center; width: 100%}
 .frame-player-wrapper .frame-player-aspect {width: 100%; padding-top: 59%; position: relative}
 .frame-player-wrapper .frame-player {position: absolute; top: 0; bottom: 0; left: 0; right: 0}
 .frame-player iframe {width: 100%; height: 100%}
 
+.trailer-area-wrapper {text-align: center; width: 100%}
+.trailer-area-wrapper .trailer-area-aspect {width: 100%; padding-top: 59%; position: relative}
+.trailer-area-wrapper .trailer-area {position: absolute; top: 0; bottom: 0; left: 0; right: 0}
+.trailer-area iframe {width: 100%; height: 100%}
+
+
 .person-block-wrap .btn-green {padding: 0; color: #fff}
 .btn-clear {padding: 0}
 
 .page-profile .tape-item .row {margin-left: 0}
 .page-profile .title-item-tape {margin-left: 15px; padding-left: 0}
+.page-profile .content-item-tape {margin-left: 15px; padding-left: 0}
 
 .playlist-empty {margin-bottom: 40px}
 .playlist-empty h2 {font-size: 28px; font-weight: bold;}
 .playlist-empty span {color: #a08c8c; font-size: 14px;}
 
 .list-profile input.value {display: none}
+.list-profile label {cursor: pointer}
+
+.big-text {font-size: 150px; color: #fff; text-align: center; padding: 60px 0 40px 0}
+.sad-text {font-size: 30px; color: #fff; text-align: center; padding: 40px 0 60px 0}
