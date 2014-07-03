@@ -18,11 +18,11 @@ body
                                     .form-group(class=error_cls)
                                         label.col-sm-2.control-label(for='inputEmail3') Email
                                         .col-sm-10
-                                            input#inputEmail3.form-control(type='email', name='username')
+                                            input#inputEmail3.form-control(type='email', name='username',required)
                                     .form-group(class=error_cls)
                                         label.col-sm-2.control-label(for='inputPassword3') Пароль
                                         .col-sm-10
-                                            input#inputPassword3.form-control(type='password', name='password')
+                                            input#inputPassword3.form-control(type='password', name='password',required)
                                             if error
                                                 p=error
                                     .form-group

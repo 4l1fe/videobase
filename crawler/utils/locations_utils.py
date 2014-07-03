@@ -1,5 +1,6 @@
 from apps.contents.models import Contents, Locations
 from apps.films.models import  Seasons
+from apps.robots.constants import APP_ROBOT_VALUE
 from django.core.validators import URLValidator
 from apps.contents.constants import APP_CONTENTS_PRICE_TYPE_FREE
 def sane_dict(film=None):
@@ -115,7 +116,9 @@ def save_location(film, **kwargs):
 
     
     '''
-    
+    if kwargs['type'] in APP_ROBOT_VALUE and kwargs['value'] == '':
+        return
+
     content = get_content(film, kwargs)
     val = URLValidator()
 

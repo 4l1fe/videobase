@@ -1,26 +1,24 @@
 # coding: utf-8
-
 import os
-
 from django.db import models
 from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
-
+from django.db.models.query import QuerySet
 from apps.films.constants import *
 from apps.films.models.photoclass import PhotoClass
 from apps.films.constants import APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER, APP_FILM_TYPE_ADDITIONAL_MATERIAL_TRAILER
-
-
 from utils.common import get_image_path
-
 import videobase.settings as settings
 
-#############################################################################################################
-#
+
+class EmptyQuerySet(Exception):
+    pass
+
+
 class PosterFilmManager(models.Manager):
     def get_query_set(self):
         return super(PosterFilmManager, self).get_query_set().filter(type=APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER)
 
-#############################################################################################################
+
 # Модель Расширения фильмов/сериалов
 class FilmExtras(PhotoClass):
     film        = models.ForeignKey('Films', verbose_name=u'Фильм', related_name="fe_film_rel")
@@ -82,14 +80,20 @@ class FilmExtras(PhotoClass):
 
 
     @classmethod
-    def get_poster_by_film(cls, list_extras):
-        poster = ''
-        if not isinstance(list_extras, list):
-            list_extras = [list_extras]
+    def get_poster_by_film(cls, film_extras):
+        """Договорились брать изображение из первого FilmExtras.
+        Пример использования FilmExtras.get_poster_by_film(film_ins.fe_film_rel.all())
+        """
 
-        for item in list_extras:
-            if not item.photo is None and item.photo:
-                poster = item.get_photo_url()
+        if not isinstance(film_extras, QuerySet):
+            raise TypeError('film_extras is not a QuerySet')
+        elif not film_extras.exists():
+            raise EmptyQuerySet('films_extras has not items')
+
+        poster = ''
+        for fe in film_extras:  # в каком-то есть изображение
+            if fe.photo is not None and fe.photo:
+                poster = fe.get_photo_url()
                 break
 
         return poster

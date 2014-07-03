@@ -1,6 +1,5 @@
 # coding: utf-8
 from crawler.core.exceptions import NoSuchFilm
-import requests
 import parsers
 import urllib
 from ..core import BaseLoader

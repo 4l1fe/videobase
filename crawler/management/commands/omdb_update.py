@@ -5,7 +5,7 @@ import requests
 from apps.films.models import Films,Countries
 import time
 import datetime
-from crawler.shelved import PersistentDict
+from crawler.utils.shelved import PersistentDict
 
 class NoResponse(Exception):
     pass

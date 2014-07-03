@@ -1,6 +1,6 @@
 # coding: utf-8
 
-from ..core.browser import simple_get
+from crawler.utils.tor import simple_tor_get_page as simple_get
 from crawler.core.exceptions import RetrievePageException
 
 # Базовый класс загрузчика страници
