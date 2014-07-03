@@ -319,5 +319,5 @@ CELERYBEAT_SCHEDULE = {
 }
 
 CELERY_TIMEZONE = 'UTC'
-
+CELERY_ACCEPT_CONTENT = ['pickle','json', 'msgpack', 'yaml']
 POSTER_URL_PREFIX = '_260x360'
