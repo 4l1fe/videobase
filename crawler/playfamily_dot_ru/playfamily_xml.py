@@ -2,8 +2,8 @@
 from apps.films.models import Films
 from bs4 import BeautifulSoup
 
-from crawler.utils.tor import get_page_or_renew
-from crawler.core.browser import get_random_weighted_browser_string
+from crawler.tor import get_page_or_renew
+from crawler.tor import simple_tor_get_page
 from crawler.utils.locations_utils import sane_dict,save_location
 from crawler.kinopoisk_ru.kinopoisk import get_genre, get_country
 from crawler.task_modules.kinopoisk_one_page import kinopoisk_parse_one_film
@@ -14,7 +14,7 @@ PLAYFAMILY_XML= 'http://playlite.ru/widgets/partner/catalog/p661.xml'
 
 
 def get_soup():
-    xmldata = get_page_or_renew(PLAYFAMILY_XML, user_agent =get_random_weighted_browser_string())
+    xmldata = simple_tor_get_page(PLAYFAMILY_XML)
 
     soup = BeautifulSoup(xmldata,'xml')
 

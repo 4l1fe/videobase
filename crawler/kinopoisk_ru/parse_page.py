@@ -16,7 +16,7 @@ from functools import partial
 import logging
 import os
 import time
-from crawler.utils.tor import get_page_or_renew
+from crawler.tor import get_page_or_renew
 
 
 YANDEX_KP_ACTORS_TEMPLATE = "http://st.kp.yandex.net/images/actor_iphone/iphone360_{}.jpg"
