@@ -2,7 +2,7 @@ from crawler.playfamily_dot_ru.parse_search_page import  form_search_url
 from crawler.playfamily_dot_ru.parse_page import form_url_from_name
 from crawler.playfamily_dot_ru.utils import HTML_with_type
 
-from crawler.utils.tor import simple_tor_get_page
+from crawler.tor import simple_tor_get_page
 from crawler.playfamily_dot_ru.utils import HTML_with_type
 
 

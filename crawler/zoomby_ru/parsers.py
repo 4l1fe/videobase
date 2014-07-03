@@ -1,7 +1,7 @@
 # coding: utf-8
 from apps.films.constants import APP_FILM_FULL_FILM, APP_FILM_SERIAL
 from bs4 import BeautifulSoup
-from crawler.utils.tor import simple_tor_get_page
+from crawler.tor import simple_tor_get_page
 
 HOST = 'http://www.zoomby.ru'
 
