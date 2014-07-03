@@ -1,7 +1,9 @@
 # coding: utf-8
 
-from crawler.utils.tor import simple_tor_get_page as simple_get
+from crawler.tor import simple_tor_get_page as simple_get
 from crawler.core.exceptions import RetrievePageException
+
+
 
 # Базовый класс загрузчика страници
 class BaseLoader(object):
@@ -20,7 +22,7 @@ class BaseLoader(object):
         raise NotImplementedError()
 
     # сама функция загрузки
-    def load(self, load_function=simple_get):
+    def load(self,load_function):
         try:
             url = self.get_url(load_function)
             return {'html': load_function(url), 'url': url}

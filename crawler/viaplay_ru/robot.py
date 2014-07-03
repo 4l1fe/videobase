@@ -3,7 +3,7 @@ from apps.films.models import Films
 from bs4 import BeautifulSoup
 from crawler.utils.locations_utils import save_location, sane_dict
 from apps.contents.constants import *
-from crawler.utils.tor import simple_tor_get_page
+from crawler.tor import simple_tor_get_page
 
 class ViaplayRobot(object):
     def __init__(self):
