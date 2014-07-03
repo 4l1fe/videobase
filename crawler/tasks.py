@@ -14,7 +14,7 @@ from celery.utils.log import get_task_logger
 
 from videobase.celery import app
 from crawler.utils.robot_start import sites_crawler, launch_next_robot_try_for_kinopoisk, process_film_on_site
-#from apps.robots.models import Robots
+from apps.robots.models import Robots
 from crawler.kinopoisk_ru.kinopoisk_poster import poster_robot_wrapper
 from crawler.imdbratings import process_all
 from crawler.amediateka_ru.loader import Amediateka_robot
