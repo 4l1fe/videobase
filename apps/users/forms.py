@@ -1,5 +1,6 @@
 # coding: utf-8
 from django import forms
+from django.contrib.auth.forms import UserCreationForm
 
 from .models import User, UsersProfile
 
@@ -27,28 +28,43 @@ class UsersProfileForm(forms.ModelForm):
 
 class CustomRegisterForm(forms.ModelForm):
     password2 = forms.CharField(widget=forms.PasswordInput, required=True)
-    is_active = forms.BooleanField(widget=forms.HiddenInput, initial=False, required=False)
+    password1 = forms.CharField(widget=forms.PasswordInput, required=True)
+
+    error_messages = {
+        'passwords_not_equal': u'Пароли не совпадают',
+        'email': u'Email-обязательное поле!',
+    }
 
     def __init__(self, **kwargs):
         super(CustomRegisterForm, self).__init__(**kwargs)
         self.fields['username'].required = False
+        self.fields['email'].required = True
 
     def clean(self):
-        self.cleaned_data['username'] = self.cleaned_data['email']
-        if self.cleaned_data['password'] != self.cleaned_data['password2']:
-            raise ValueError("Passwords not coincidence")
+        if 'email' in self.cleaned_data:
+            self.cleaned_data['username'] = self.cleaned_data.get['email']
         else:
-            return super(CustomRegisterForm, self).clean()
+            raise forms.ValidationError(self.error_messages['email'],
+                                        code='email')
+        if 'password1' in self.cleaned_data and 'password2' in self.cleaned_data:
+            if self.cleaned_data['password1'] != self.cleaned_data['password2']:
+                raise forms.ValidationError(self.error_messages['passwords_not_equal'],
+                                            code='password_not_equal')
+            else:
+                return super(CustomRegisterForm, self).clean()
+        else:
+            raise forms.ValidationError('Password is required field')
 
     def save(self, commit=True):
         instance = super(CustomRegisterForm, self).save(commit)
-        instance.set_password(self.cleaned_data['password'])
+        instance.first_name = self.cleaned_data['email'].split('@')[0]
+        instance.set_password(self.cleaned_data['password1'])
         instance.save()
         return instance
 
     class Meta:
         model = User
-        fields = ('email', 'password', 'username', 'is_active')
+        fields = ('email', 'username')
 
 
 class UserUpdateForm(forms.Form):

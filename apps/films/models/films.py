@@ -94,17 +94,17 @@ class Films(models.Model):
     @property
     def get_rating_imdb(self):
         rating_imdb = self.rating_imdb
-        return round(rating_imdb, 1) if not rating_imdb is None else rating_imdb
+        return round(rating_imdb) if not rating_imdb is None else rating_imdb
 
     @property
     def get_rating_kinopoisk(self):
         rating_kinopoisk = self.rating_kinopoisk
-        return round(rating_kinopoisk, 1) if not rating_kinopoisk is None else rating_kinopoisk
+        return round(rating_kinopoisk) if not rating_kinopoisk is None else rating_kinopoisk
 
     @property
     def get_rating_cons(self):
         rating_cons = self.rating_cons
-        return round(rating_cons, 1) if not rating_cons is None else rating_cons
+        return round(rating_cons) if not rating_cons is None else rating_cons
 
     @property
     def get_rating_local_cnt(self):

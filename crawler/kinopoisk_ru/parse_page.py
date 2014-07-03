@@ -10,36 +10,20 @@ import datetime
 from collections import defaultdict
 from apps.films.constants import APP_PERSON_ACTOR, APP_PERSON_DIRECTOR, APP_PERSON_PRODUCER
 from crawler.constants import PAGE_ARCHIVE, USE_SOCKS5_PROXY, SOCKS5_PROXY_ADDRESS, USE_TOR
-if USE_SOCKS5_PROXY:
-    import requesocks as requests
-else:
-    import requests
 import StringIO
 from PIL import Image
 from functools import partial
 import logging
 import os
 import time
-from crawler.tor import get_page_or_renew
+from crawler.utils.tor import get_page_or_renew
 
-from crawler.core.browser import get_random_weighted_browser_string
 
 YANDEX_KP_ACTORS_TEMPLATE = "http://st.kp.yandex.net/images/actor_iphone/iphone360_{}.jpg"
 YANDEX_KP_FILMS_TEMPLATE = "http://st.kp.yandex.net/images/film_big/{}.jpg"
 
 class ProbablyBanned(Exception):
     pass
-
-def crawler_get(url):
-    if USE_TOR:
-        return get_page_or_renew(url,get_random_weighted_browser_string())
-    elif USE_SOCKS5_PROXY:
-        session = requests.session()
-        session.proxies = {'http': SOCKS5_PROXY_ADDRESS}
-        return session.get(url, headers={'User-Agent': get_random_weighted_browser_string()})
-    else:
-        return requests.get(url, headers={'User-Agent': get_random_weighted_browser_string()})
-
 
 def commatlst(tag):
     return tag.text.strip().split(u',')
@@ -121,9 +105,9 @@ def get_image(template, actor_id):
         img.save(conv_file, 'JPEG')
         conv_file.seek(0)
         return conv_file
-    except requests.ConnectionError:
-        raise Proba
-        
+    except Exception:
+        raise ProbablyBanned
+
 
 
 get_poster = partial(get_image, YANDEX_KP_FILMS_TEMPLATE)
@@ -165,7 +149,7 @@ def acquire_page(page_id):
     return page_dump
 
 
-def parse_one_page(page_dump):
+def extract_facts_from_dump(page_dump):
 
     '''
     Parsing one page from the multiline string @page_dump
@@ -176,34 +160,34 @@ def parse_one_page(page_dump):
 
     '''
 
-    parsed_data = []
+    facts = []
     soup = BeautifulSoup(page_dump)
     info_table = soup.select("div#infoTable")[0]
     tds = info_table.select("td.type")
-    data_dict = dict([(f.text.strip(),s) for f,s in [ td.parent.select("td") for td in tds]])
+    data_dict = dict([(f.text.strip(), s) for f, s in [td.parent.select("td") for td in tds]])
 
     actor_list = soup.select("div#actorList")[0]
-    actors_n_l = [ (a.text,a.attrs['href']) for a in actor_list.find_all('a') if  not 'film' in a.attrs['href']]
+    actors_n_l = [(a.text, a.attrs['href']) for a in actor_list.find_all('a') if  not 'film' in a.attrs['href']]
 
     brand_words = ('Films', {'description': soup.select("div.brand_words")[0].text})
 
     moviename, orig_movie_name = extract_names(soup)
-    vote = ('Films',{'rating_kinopoisk': get_vote(soup)})
+    vote = ('Films', {'rating_kinopoisk': get_vote(soup)})
 
-    parsed_data.extend(transform_data_dict(data_dict))
-    parsed_data.extend(actors_wrap(actors_n_l))
-    parsed_data.extend([brand_words, moviename, orig_movie_name, vote])
+    facts.extend(transform_data_dict(data_dict))
+    facts.extend(actors_wrap(actors_n_l))
+    facts.extend([brand_words, moviename, orig_movie_name, vote])
 
     ddict = defaultdict(list)
 
-    for pd in parsed_data:
-        element,value = pd
+    for pd in facts:
+        element, value = pd
         ddict[element].append(value)
     return ddict
 
 
 if __name__ == "__main__":
-    d = parse_one_page(acquire_page(301))
+    d = extract_facts_from_dump(acquire_page(301))
     for di in d['Films']:
 
         for k in di :

@@ -5,7 +5,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase, APISimpleTestCase
 from rest_framework.reverse import reverse
 
-from apps.films.constants import APP_FILM_FULL_FILM, APP_FILM_SERIAL, APP_USERFILM_STATUS_SUBS, \
+from apps.films.constants import APP_FILM_FULL_FILM, APP_FILM_SERIAL, APP_USERFILM_STATUS_PLAYLIST, \
     APP_PERSON_DIRECTOR, APP_PERSON_ACTOR, APP_PERSON_SCRIPTWRITER, APP_PERSON_PRODUCER
 from apps.users import Feed
 from apps.users.constants import APP_USER_REL_TYPE_FRIENDS, APP_USER_REL_TYPE_NONE,\
@@ -490,7 +490,7 @@ class APIUsersFilmsTestCase(APITestCase):
             LocationsFactory.create(content=content)
 
         for i in range(10):
-            UserFilmsFactory.create(user=self.user, status=APP_USERFILM_STATUS_SUBS, film=films[i])
+            UserFilmsFactory.create(user=self.user, status=APP_USERFILM_STATUS_PLAYLIST, film=films[i])
 
     def test_api_users_films_400_get(self):
         pk = User.objects.latest('id').pk
@@ -504,7 +504,7 @@ class APIUsersFilmsTestCase(APITestCase):
                                    data={'type': 's'})
         ftype = [APP_FILM_SERIAL]
         films = Films.objects.filter(uf_films_rel__user=self.user, type__in=ftype,
-                                     uf_films_rel__status=APP_USERFILM_STATUS_SUBS)
+                                     uf_films_rel__status=APP_USERFILM_STATUS_PLAYLIST)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         for i in range(len(films)):
             loc = Locations.objects.get(content__film=films[i])
@@ -530,7 +530,7 @@ class APIUsersFilmsTestCase(APITestCase):
         response = self.client.get(reverse(self.url_name, kwargs=self.kwargs))
         ftype = [APP_FILM_SERIAL, APP_FILM_FULL_FILM]
         films = Films.objects.filter(uf_films_rel__user=self.user, type__in=ftype,
-                                     uf_films_rel__status=APP_USERFILM_STATUS_SUBS)
+                                     uf_films_rel__status=APP_USERFILM_STATUS_PLAYLIST)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         for i in range(len(films)):
             loc = Locations.objects.get(content__film=films[i])
@@ -556,7 +556,7 @@ class APIUsersFilmsTestCase(APITestCase):
         response = self.client.get(reverse(self.url_name, kwargs=self.kwargs), data={'type': 'f'})
         films = Films.objects.filter(uf_films_rel__user=self.user,
                                      type__in=[APP_FILM_FULL_FILM],
-                                     uf_films_rel__status=APP_USERFILM_STATUS_SUBS)
+                                     uf_films_rel__status=APP_USERFILM_STATUS_PLAYLIST)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         for i in range(len(films)):
