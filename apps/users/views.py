@@ -28,7 +28,7 @@ from apps.users.constants import APP_USERS_API_DEFAULT_PAGE, APP_USERS_API_DEFAU
 
 from apps.films.models import Films, Persons, UsersFilms, UsersPersons
 from apps.films.constants import APP_PERSON_DIRECTOR, APP_PERSON_ACTOR, \
-    APP_FILM_FULL_FILM, APP_FILM_SERIAL, APP_USERFILM_STATUS_SUBS
+    APP_FILM_FULL_FILM, APP_FILM_SERIAL, APP_USERFILM_STATUS_SUBS, APP_USERFILM_SUBS_TRUE
 from apps.films.api.serializers import vbFilm, vbPerson
 
 from utils.common import url_with_querystring
@@ -147,8 +147,10 @@ class UserView(View):
             default_user.update(uvb.data)
 
             films = Films.objects.filter(uf_films_rel__user=user,
-                                         type__in=(APP_FILM_SERIAL, APP_FILM_FULL_FILM),
-                                         uf_films_rel__status=APP_USERFILM_STATUS_SUBS)
+#                                         type__in=(APP_FILM_SERIAL, APP_FILM_FULL_FILM),
+                                         uf_films_rel__subscribed=APP_USERFILM_SUBS_TRUE)
+            print "Fail"
+            print films
             films = Paginator(films, APP_USERS_API_DEFAULT_PER_PAGE).page(APP_USERS_API_DEFAULT_PAGE)
             vbf = vbFilm(films.object_list, many=True)
 
@@ -164,13 +166,14 @@ class UserView(View):
             o_feed = vbFeedElement(calc_feed(user.id), many=True).data
 
             default = {
-                'user': default_user,
-                'films_subscribed': vbf.data,
-                'actors_fav': vba.data,
+                
+                'films': vbf.data,
+                'actors': vba.data,
                 'feed': o_feed,
-                'directors_fav': vbd.data,
+                'directors': vbd.data,
             }
-            return HttpResponse(render_page('user', default))
+            default_user.update(default)
+            return HttpResponse(render_page('user', {'user':default_user}))
 
         except Exception as e:
             return HttpResponseServerError(e)
