@@ -1,6 +1,6 @@
 # coding: utf-8
 import json
-from crawler.utils.tor import simple_tor_get_page
+from crawler.tor import simple_tor_get_page
 from apps.films.constants import APP_FILM_SERIAL
 from crawler.utils.locations_utils import save_location, sane_dict
 from apps.films.models import Films
