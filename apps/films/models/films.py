@@ -68,11 +68,17 @@ class Films(models.Model):
 
 
     @classmethod
-    def similar_api(self, o_film):
+    def similar_api(cls, o_film):
         list_genres = [i.pk for i in o_film.genres.all()]
 
-        o_similar = Films.objects.distinct().filter(genres__in=list_genres).\
-                        exclude(pk=o_film.pk).order_by('-rating_sort')[:APP_FILMS_API_DEFAULT_PER_PAGE]
+        o_similar = Films.similar_default().filter(genres__in=list_genres).exclude(pk=o_film.pk)
+
+        return o_similar
+
+
+    @classmethod
+    def similar_default(cls):
+        o_similar = Films.objects.order_by('-rating_sort')[:APP_FILMS_API_DEFAULT_PER_PAGE]
 
         return o_similar
 
