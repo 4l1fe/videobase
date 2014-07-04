@@ -48,7 +48,15 @@ def omdb_year_check(film):
 
 @film_checker.add("There is no such trailer")
 def trailer_check(film):
-    pass
+    yt_service = gdata.youtube.service.YouTubeService()
+    ft = FilmExtras.objects.filter(film=film).first()
+    yid = re.match('.+watch[?]v[=](?P<id>.+)(([&].+)?)', ft.url).groupdict()['id']
+    try:
+        entry = yt_service.GetYouTubeVideoEntry(video_id=yid)
+        return 0
+    except:
+        return 1
+
 
 @film_checker.add("Youtube trailer duration not within limits")
 def trailer_duration_check(film):
@@ -75,4 +83,3 @@ def film_release_date_check(film):
     date_string = '2014'
     date = datetime.strptime(date_string, '%Y')
     return film.release_date.year == date.year
-
