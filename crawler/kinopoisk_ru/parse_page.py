@@ -9,14 +9,13 @@ from bs4 import BeautifulSoup
 import datetime
 from collections import defaultdict
 from apps.films.constants import APP_PERSON_ACTOR, APP_PERSON_DIRECTOR, APP_PERSON_PRODUCER
-from crawler.constants import PAGE_ARCHIVE, USE_SOCKS5_PROXY, SOCKS5_PROXY_ADDRESS, USE_TOR
+from crawler.tor import simple_tor_get_page
 import StringIO
 from PIL import Image
 from functools import partial
 import logging
 import os
 import time
-from crawler.tor import get_page_or_renew
 
 
 YANDEX_KP_ACTORS_TEMPLATE = "http://st.kp.yandex.net/images/actor_iphone/iphone360_{}.jpg"
@@ -41,7 +40,7 @@ def get_vote(soup):
     csslink =[ lnk.attrs['href'] for lnk in soup.find_all('link') if 'votes' in lnk.attrs['href']][0]
     # TODO implement caching
 
-    r = crawler_get(csslink)
+    r = simple_tor_get_page(csslink)
 
     css = r.content
     m = re.search('[.]starbar[ ]{width[:][ ](?P<width>[0-9]+)px', css)
@@ -96,16 +95,17 @@ def transform_data_dict(ddict):
 
 def get_image(template, actor_id):
     try:
-        r = crawler_get(template.format(actor_id))
+        r = simple_tor_get_page(template.format(actor_id))
         fileobj = StringIO.StringIO()
-        fileobj.write(r.content)
+        fileobj.write(r)
         fileobj.seek(0)
         img = Image.open(fileobj).convert('RGB')
         conv_file = StringIO.StringIO()
         img.save(conv_file, 'JPEG')
         conv_file.seek(0)
         return conv_file
-    except Exception:
+    except Exception as e:
+        print e
         raise ProbablyBanned
 
 
@@ -141,8 +141,8 @@ def acquire_page(page_id):
     else:
         time.sleep(1)
         url =u"http://www.kinopoisk.ru/film/%d/" % page_id
-        res = crawler_get(url)
-        page_dump = res.content.decode('cp1251')
+        res = simple_tor_get_page(url)
+        page_dump = res.decode('cp1251')
         with open(dump_path,'w') as fdw:
             fdw.write(page_dump.encode('utf-8'))
 

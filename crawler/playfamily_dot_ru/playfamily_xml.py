@@ -52,12 +52,14 @@ def process(soup = None):
     if soup is None:
         soup = get_soup()
 
-    info_iier = [e for e in extract_info(soup)]
+    info_iter = [e for e in extract_info(soup)][-1:]
 
-    for info in info_iier:
+    for info in info_iter:
 
+        kinopoisk_id = info['kinopoiskId'] if type(info['kinopoiskId']) is int else int(info['kinopoiskId'])
+        
         try:
-            film = Films.objects.get(kinopoisk_id=info['kinopoiskId'])
+            film = Films.objects.get(kinopoisk_id=kinopoisk_id)
             print "Found {} in our database".format(film)
 
             if not film.name.strip():
@@ -72,11 +74,13 @@ def process(soup = None):
                 
             
         except Films.DoesNotExist:
-            print u"Couldn't found film {} in our database trying to create one".format(info['title']) 
+            print u"Couldn't found film {} in our database trying to create one".format(info['title'])
+            
             film= Films(name = info['title'],
                         name_orig = info['originalFilename'],
                         description =0, duration = int(info['duration']),
-                        release_date = timezone.datetime.strptime(info['releaseYear'],"%Y")
+                        release_date = timezone.datetime.strptime(info['releaseYear'],"%Y"),
+                        kinopoisk_id = kinopoisk_id
                                                    
             )
             film.save()
