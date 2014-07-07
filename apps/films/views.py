@@ -108,7 +108,7 @@ def index_view(request):
     resp_dict_serialized = cache.get(NEW_FILMS_CACHE_KEY)
 
     if resp_dict_serialized is None:
-        o_film = film_model.Films.get_newest_films(timezone.now().date())
+        o_film = film_model.Films.get_newest_films()
 
         resp_dict_data = vbFilm(o_film, require_relation=False, extend=True, many=True).data
         resp_dict_serialized = json.dumps(resp_dict_data, cls=DjangoJSONEncoder)

@@ -193,7 +193,7 @@ class Films(models.Model):
         return sort_cnt
 
     @classmethod
-    def get_newest_films(cls, date):
+    def get_newest_films(cls):
         from django.db import connection
         cursor = connection.cursor()
 
@@ -203,22 +203,20 @@ class Films(models.Model):
             INNER JOIN "content" ON ("t"."content_id" = "content"."id")
             INNER JOIN "films" ON ("content"."film_id" = "films"."id")
 
-        WHERE ("films"."release_date" < %s AND "films"."rating_cons" >= %s  AND "films"."rating_cons_cnt" > %s)
+        WHERE ("films"."rating_cons" >= %s  AND "films"."rating_cons_cnt" > %s)
         ORDER BY "t"."id" DESC LIMIT %s;
         """
 
         try:
-            cursor.execute(query, [date, 5.5, 5000, 4])
-            result = cursor.fetchall()
-
-            return cls.objects.filter(id__in=[i[0] for i in result])
+            cursor.execute(query, [5.5, 5000, 4])
+            return cls.objects.filter(id__in=[i[0] for i in cursor.fetchall()])
 
         except Exception, e:
             return e
         finally:
             cursor.close()
 
-        return  False
+        return False
 
 
     class Meta(object):
