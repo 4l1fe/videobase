@@ -6,8 +6,9 @@ header(role='banner')
                 if auth_user
                     .col-md-3.profile-block
                         .profile-user.cf
-                            a(href="/users/" + auth_user.id, title='')
-                                img.img-circle.fleft(src=auth_user.avatar || "static/img/noavatar.png", alt='')
+                            - auth_user_url = '/users/' + auth_user.id
+                            a(href=auth_user_url, title='')
+                                img.img-circle.fleft(src=auth_user.avatar || noavatar_url, alt='')
                             ul.list-link-user
                                 li
                                     a(href='/profile/', title='') Профиль
@@ -26,10 +27,11 @@ header(role='banner')
                                     span Регистрация
                 .col-md-3.logo-block
                     a(href='/', title='Все Видео')
-                        img.logo(src='static/img/logo-header.png', alt='')
+                        img.logo(src=img_url + 'logo-header.png', alt='')
                 .col-md-6.search-block
                     form.input-group(action="/search",method="get")
-                        input.form-control(type='text', placeholder='Поиск по сайту',name="text",value=search_text || "")
+                        - search_text = search_text || ""
+                        input.form-control(type='text', placeholder='Поиск по сайту',name="text",value=search_text)
                         span.input-group-btn
                             button.btn.btn-primary(type='submit') Найти
     .bottom-header
@@ -42,17 +44,17 @@ header(role='banner')
                                 i.sprite.sprite-i-film
                                 br
                                 | Фильмы
-                        li
+                        li.inactive
                             a(href='#', title='')
                                 i.sprite.sprite-i-ser
                                 br
                                 | Сериалы
-                        li
+                        li.inactive
                             a(href='#', title='')
                                 i.sprite.sprite-i-tv
                                 br
                                 | ТВ-программа
-                        li
+                        li.inactive
                             a(href='#', title='')
                                 i.sprite.sprite-i-online
                                 br
@@ -60,12 +62,13 @@ header(role='banner')
                 .col-md-4.col-sm-4
                     ul.menu-header
                         li
-                            a(href='/playlist', title='', data-toggle=auth_user?"":'modal', data-target='#reg-enter', data-remote="false")
+                            - auth_modal = auth_user?"":'modal'
+                            a(href='/playlist', title='', data-toggle=auth_modal, data-target='#reg-enter', data-remote="false")
                                 i.sprite.sprite-i-play
                                 br
                                 | Плейлист
                         li
-                            a(href='/feed', title='',data-toggle=auth_user?"":'modal', data-target='#reg-enter', data-remote="false")
+                            a(href='/feed', title='',data-toggle=auth_modal, data-target='#reg-enter', data-remote="false")
                                 i.sprite.sprite-i-tape
                                 br
                                 | Лента

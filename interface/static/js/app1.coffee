@@ -28,18 +28,28 @@ state_toggle = (new_state, cur_state, deflt)->
   else
     new_state?1:0
 
+scroll_to_obj = (obj, duration = 1000) ->
+  $('html, body').stop().animate({scrollTop: obj.offset().top}, duration)
+
+stars_tootltips = ["не смотреть", "очень плохо", "плохо", "ниже среднего", "средне", "неплохо", "хорошо", "отлично", "великолепно", "лучше не бывает"]
+
 class Player
   constructor: (@place, opts = {}) ->
     @current = undefined
 
-  load: (loc) ->
+  load: (loc, scroll = true) ->
     if @current != undefined
       @clear()
-    if loc.value
-      value = "&value=" + loc.value
+    if (loc.price_type != 0 && loc.type != "playfamily")
+      value = "&price=" + loc.price + "&view=" + encodeURI(loc.url_view)
     else
-      value = "&view=" + encodeURI(loc.url_view)
-    @place.empty().html("<iframe src=\"/static/player.html?type=" + loc.type + value + "\"></iframe>")
+      if loc.value
+        value = "&value=" + loc.value
+      else
+        value = "&view=" + encodeURI(loc.url_view)
+    @place.empty().html('<iframe src="' + window.mi_conf.player_url + '?type=' + loc.type + value + '"></iframe>')
+    if (scroll)
+      scroll_to_obj @place
 
   clear: ->
     @place.addClass("player-empty")
@@ -224,6 +234,7 @@ class FilmThumb extends Item
       )
       .bind "rated", (event) => @action_rate(ri.rateit("value"))
       .bind "reset", (event) => @toggle_notwatch()
+      .bind "over", (event, value) -> $(this).attr('title', stars_tootltips[value]);
   ###
     @elements["poster"].self.css({"margin-left": -300}).load(->
       $this = $(this)
@@ -234,7 +245,7 @@ class FilmThumb extends Item
 
   transform_attr: (attr, name, val) ->
     if attr == "href" && name == "id"
-      return "/films/" + val
+      return "/films/" + val + "/"
     else
       return val
 
@@ -255,13 +266,14 @@ class FilmThumb extends Item
           vals.hasFree = true
         else if loc.price && (vals.price == 0 || loc.price < vals.price)
           vals.price = loc.price
+          vals.price_loc = loc.id
       btn_cls = false
       btn_text = ""
       if !vals.hasFree && vals.price
         btn_cls = "btn-price"
         btn_text = "Смотреть<br><i>от " + vals.price + " р. без рекламы</i>"
       else if vals.price
-        @elements["btn_price"].self.show()
+        @elements["btn_price"].self.css("display", "block")
         @elements["price"].self.text("от " + vals.price + " р. без рекламы")
       if !vals.price || vals.hasFree
         btn_cls = "btn-free"
@@ -274,7 +286,7 @@ class FilmThumb extends Item
       @elements["relation.rating"].self.rateit().rateit("value", vals.relation.rating)
 
     @elements["btn"].self.removeClass("btn-subscribe").removeClass("btn-price").removeClass("btn-free").addClass(btn_cls)
-    @elements["btn_text"].self.html(btn_text).show()
+    @elements["btn_text"].self.html(btn_text).css("display", "block")
     super
 
   action_rate: (val) ->
@@ -312,7 +324,7 @@ class FilmThumb extends Item
     false
 
   watchfilm: ->
-    location.href = "/films/" + @vals.id
+    location.href = "/films/" + @vals.id + "/"
 
 class CommentThumb extends Item
   constructor: ->
@@ -321,7 +333,7 @@ class CommentThumb extends Item
 
   transform_attr: (attr, name, val) ->
     if attr == "href" && name == "user.id"
-      return "/users/" + val
+      return "/users/" + val + "/"
     else
       super
 
@@ -342,7 +354,7 @@ class PersonThumb extends Item
 
   transform_attr: (attr, name, val) ->
     if attr == "href" && name == "id"
-      return "/persons/" + val
+      return "/persons/" + val + "/"
     else
       super
 
@@ -365,17 +377,17 @@ class FeedThumb extends Item
     type = @_type
     if type.substr(0,4) == "film"
       if name == "object.id" && attr="href"
-        return "/films/" + val
+        return "/films/" + val + "/"
       if name == "object.name"
         return val + " (" + @vals_orig.object.releasedate.substr(0,4) + ")"
     if type.substr(0,4) == "pers" && attr="href"
       if name == "object.id"
-        return "/persons/" + val
+        return "/persons/" + val + "/"
     if type.substr(0,4) == "user" && attr="href"
       if name == "object.id"
-        return "/users/" + val
+        return "/users/" + val + "/"
     if name == "user.id" && attr="href"
-      return "/users/" + val
+      return "/users/" + val + "/"
     if name == "created"
       try
         return time_text(new Date(val))
@@ -534,7 +546,7 @@ class App
   active_page = undefined
   query_params = undefined
 
-  constructor: (opts = {}, name) ->
+  constructor: (opts = {}, name = "Simple") ->
     # App is Singleton
     if window.mi_app
       error "App is already running", "crit"
@@ -740,12 +752,15 @@ class App
       name = active_page
     if pages[name]
       return pages[name]
-    #try
-    page_obj = new (eval("Page_" + name))(conf)
-    return pages[name] = page_obj
-    #catch
-    #  error "Unable to init page " + name, "crit"
-    #  return undefined
+    try
+      page_obj = new (eval("Page_" + name))(conf)
+      return pages[name] = page_obj
+    catch
+      error "Unable to init page " + name, "crit"
+      return undefined
+
+class Page_Simple extends Page
+
 
 class Page_Search extends Page
   films = undefined
@@ -755,6 +770,7 @@ class Page_Search extends Page
     self = @
     @_app.get_tpl("film-thumb")
     films_deck = new FilmsDeck($("#films"), {load_func: @load_more_films})
+    films_deck.page = 1
     films_deck.load_more_bind($("#films_more"))
 
   load_more_films: (deck, opts = {}) ->
@@ -820,7 +836,7 @@ class Page_Main extends Page
           el.removeClass("open")
           return false
         )
-        if params[index] && params[index].toString() == $this._val.toString()
+        if params[index] && ($this._val == undefined || (params[index].toString() == $this._val.toString()))
           el._selected = $this
           el._title.text($this._text)
       )
@@ -891,6 +907,8 @@ class Page_Main extends Page
           if data.items.length >= 12
             deck.load_more_show()
           deck.page = data.page
+          if opts.clear_output
+            scroll_to_obj deck._place
         opts.callback() if opts.callback
     )
     .fail(
@@ -932,6 +950,7 @@ class Page_Film extends Page
     )
     .bind "rated", (event) => @action_rate(@_e.rateit.rateit("value"))
     .bind "reset", (event) => @action_notwatch_toggle()
+    .bind "over", (event, value) -> $(this).attr('title', stars_tootltips[value]);
 
     if @conf.relation && @conf.relation.rating
       @_e.rateit.rateit "value", @conf.relation.rating
@@ -943,35 +962,43 @@ class Page_Film extends Page
 
     self = @
     if @conf.locations && @conf.locations.length
-      $(".location-thumb", $("#locations")).each( ->
-        $this = $(this)
-        id = $this.data("miVal")
-        i = 0
-        loc = undefined
-        while i < self.conf.locations.length && self.conf.locations[i].id != id
-          i++
-        loc = self.conf.locations[i] if i < self.conf.locations.length
-        if loc
-          $this.click(-> self.play_location(id))
-          ###
-            $(".type", $this).text(location_type_to_text(loc.type))
-            if loc.price_type == 0 || loc.price == 0
-              $(".price", $this).text("смотреть бесплатно")
-            else
-              $(".price", $this).text(loc.price + " р.")
-            loc._el = $this
-          ###
-          locations[id] = loc
-      )
+      if @conf.locations.length > 1
+        $(".location-thumb", $("#locations")).each( ->
+          $this = $(this)
+          id = $this.data("miVal")
+          i = 0
+          loc = undefined
+          while i < self.conf.locations.length && self.conf.locations[i].id != id
+            i++
+          loc = self.conf.locations[i] if i < self.conf.locations.length
+          if loc
+            if (loc.price)
+              loc.price = Math.ceil(loc.price)
+            $this.click(-> self.play_location(id))
+            locations[id] = loc
+        )
+      else
+        locations[@conf.locations[0].id] = @conf.locations[0]
 
       @player = new Player($("#frame_player"))
       @player.clear()
 
       loc_id = @_app.query_params("loc")
       if !loc_id
+        loc_price = false
+        loc_price_id = false
         for key,item of locations
           if item.price_type == 0
-            loc_id = key
+            loc_id = key if !loc_id
+          else
+            if item.type == "playfamily" || loc_price_id == false || loc_price == false || loc_price > item.price
+              loc_price_id = item.id
+              loc_price = item.price
+              if item.type == "playfamily"
+                loc_price = 1
+      console.log loc_id, loc_price_id
+      if !loc_id
+        loc_id = loc_price_id
       @play_location(loc_id) if loc_id
 
   play_location: (id) ->
@@ -1058,38 +1085,9 @@ class Page_Person extends Page
     )
 
 class Page_Playlist extends Page
-  film_id = undefined
-  films_deck = undefined
-  comments_deck = undefined
-  actors_deck = undefined
-  locations = {}
-  params = undefined
-
   constructor: (@conf) ->
     super
-    films_deck = new FilmsDeck($("#films"))
-    comments_deck = new CommentsDeck($("#comments"))
-    actors_deck = new PersonsDeck($("#actors"), {load_func: => @load_all_actors()})
-    actors_deck.load_more_bind($("#actors_more"))
-
-    @_e.rateit = $("#rateit")
-    @_e.rateit
-    .rateit "min", 0
-    .rateit "max", 10
-    .bind("beforerated beforereset", (event) =>
-      if !@user_is_auth()
-        event.preventDefault()
-    )
-    .bind "rated", (event) => @action_rate(@_e.rateit.rateit("value"))
-    .bind "reset", (event) => @action_notwatch_toggle()
-
-    if @conf.relation && @conf.relation.rating
-      @_e.rateit.rateit "value", @conf.relation.rating
-
-    @_e.playlist_btn = $("#playlist_btn")
-    @_e.playlist_btn.bind("click", => @action_playlist_toggle(false)) if @_e.playlist_btn.length
-
-
+    film_page = new Page_Film(@conf)
     $('.toggle-playlist').click (e)->
       e.preventDefault();
       $(this).toggleClass('active')
@@ -1098,87 +1096,6 @@ class Page_Playlist extends Page
           $('.toggle-playlist span').text('Скрыть плейлист')
         else
           $('.toggle-playlist span').text('Показать плейлист');
-
-    self = @
-    if @conf.locations && @conf.locations.length
-      $(".location-thumb", $("#locations")).each( ->
-        $this = $(this)
-        id = $this.data("miVal")
-        i = 0
-        loc = undefined
-        while i < self.conf.locations.length && self.conf.locations[i].id != id
-          i++
-        loc = self.conf.locations[i] if i < self.conf.locations.length
-        if loc
-          $this.click(-> self.play_location(id))
-          ###
-            $(".type", $this).text(location_type_to_text(loc.type))
-            if loc.price_type == 0 || loc.price == 0
-              $(".price", $this).text("смотреть бесплатно")
-            else
-              $(".price", $this).text(loc.price + " р.")
-            loc._el = $this
-          ###
-          locations[id] = loc
-      )
-
-      @player = new Player($("#frame_player"))
-      @player.clear()
-
-      loc_id = @_app.query_params("loc")
-      if !loc_id
-        for key,item of locations
-          if item.price_type == 0
-            loc_id = key
-      @play_location(loc_id) if loc_id
-
-  play_location: (id) ->
-    @player.load(locations[id]) if locations[id]
-    return false
-
-  load_all_actors: () ->
-    actors_deck.load_more_hide();
-    @_app.rest.films.persons.read(@conf.id, {type: "a", top: actors_deck.get_items().length})
-    .done(
-      (data)=>
-        if data && data.length
-          actors_deck.add_items(data)
-    )
-    actors_deck._place.appendTo($("#actors_full").removeClass("hide"))
-    $("#actors_left").hide();
-    $("#toggle_col").removeClass("col-md-9")
-
-  action_rate: (val) ->
-    @_app.film_action @conf.id, "rate", {
-      rel: @conf.relation
-      value: val
-      callback: (new_value) =>
-        alert("done")
-    }
-
-  action_notwatch_toggle: (status) ->
-    @_app.film_action(@conf.id, "notwatch", {
-      state: status
-      rel: @conf.relation
-      callback: =>
-
-    })
-
-  action_subscribe_toggle: (status) ->
-    @_app.film_action(@conf.id, "subscribe", {
-      state: status
-      rel: @conf.relation
-      callback: =>
-    })
-    false
-
-  action_playlist_toggle: (status) ->
-    @_app.film_action(@conf.id, "playlist", {
-      state: status
-      rel: @conf.relation
-      callback: =>
-    })
-    false
 
 class Page_Feed extends Page
   feed_deck = undefined
@@ -1219,7 +1136,6 @@ class Page_Account extends Page
       $this = $(this)
       if self._e.pvt_selector.active
         val = $this.val()
-        console.log val
         self._e.pvt_selector.obj.text($(".value" + val, self._e.pvt_selector).text())
         $("input").filter("[name=" + self._e.pvt_selector.active + "]").val(val)
 
