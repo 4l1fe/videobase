@@ -1,27 +1,31 @@
 - page_title = "Результаты поиска"
+include config
 include mixins
 include head
 body
     .wrap-page
         include header
         .content(role='main')
-        section.blue-block
-            .container
-                h1.dots1.whiteh1.centerh1 Поиск
-                .list-film
-                    .row#films
-                        each item in films.items
-                            mixin film_thumb(item)
-                //
-                   .list-film
-                if films.total_cnt >= 12
-                    .add-filter#films_more
-                        .add-content.style-panel-action.rel.zmin
-                            a(href='#') мало, хочу еще фильмы
-                        //
-                           .filter-content
-                        img.img-responsive(src='static/img/shd-big.png', alt='')
-                    //
+            section.blue-block
+                .container
+                    if films && films.items && films.items.length
+                            h1.dots1.whiteh1.centerh1 Поиск
+                            .list-film
+                                .row#films
+                                    each item in films.items
+                                        mixin film_thumb(item)
+                            //
+                               .list-film
+                            if films.total_cnt >= 12
+                                .add-filter#films_more
+                                    .add-content.style-panel-action.rel.zmin
+                                        a(href='#') мало, хочу еще фильмов
+                                    //
+                                       .filter-content
+                                    img.img-responsive(src=img_url + 'shd-big.png', alt='')
+                                //
+                    else
+                        .sad-text К сожалению, мы ничего не нашли по вашему запросу.
         include footer
     script.
         $(document).ready(function () {window.InitApp({page_conf: !{JSON.stringify({search_text: search_text})}}, "Search")})
