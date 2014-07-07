@@ -76,7 +76,7 @@ def kinopoisk_films(page):
         print e
 
 
-@robot_task('kinopoisk_persons')
+@robot_task(name='kinopoisk_persons')
 def parse_kinopoisk_persons(pid):
     try:
         response = simple_tor_get_page('http://www.kinopoisk.ru/name/{}/view_info/ok/#trivia'.format(pid))
@@ -161,13 +161,13 @@ def imdb_robot_start(*args,**kwargs):
 def viaplay_robot_start():
     ViaplayRobot().get_data()
 
-def compare_time(film,years):
+def film_at_least_years_old(film,years):
     '''
     Returns true if @film less than @years old
     '''
     return timezone.now().date() - film.release_date < timezone.timedelta(days = 365*years)
 
-def kinopoisk_compare_time(film,days):
+def film_checked_on_kp_at_least_days_ago(film,days):
     '''
     Returns true if @film last checked on kinopoisk more than  @days ago
     '''
@@ -181,14 +181,14 @@ def create_due_refresh_tasks():
 
     for film in Films.objects.all():
 
-        if compare_time(film, years=2):
-            if kinopoisk_compare_time(film, days=7):
+        if film_at_least_years_old(film, years=2):
+            if film_checked_on_kp_at_least_days_ago(film, days=7):
                 kinopoisk_parse_one_film.apply_async((film.kinopoisk_id, film.name))
-        elif compare_time(film, years=4):
-            if kinopoisk_compare_time(film, days=30):
+        elif film_at_least_years_old(film, years=4):
+            if film_checked_on_kp_at_least_days_ago(film, days=30):
                 kinopoisk_parse_one_film.apply_async((film.kinopoisk_id, film.name))
         else:
-            if kinopoisk_compare_time(film, days=180):
+            if film_checked_on_kp_at_least_days_ago(film, days=180):
                 kinopoisk_parse_one_film.apply_async((film.kinopoisk_id, film.name))
 
 @app.task(name='playfamily_xml')
