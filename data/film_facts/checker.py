@@ -90,7 +90,7 @@ def trailer_duration_check(film):
         else:
             return 0
     else:
-        print('Trailer duration check was broken')
+        return 0
 
 
 @film_checker.add("Film release year is not 2014")
