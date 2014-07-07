@@ -36,8 +36,7 @@ from crawler.tvzavr_ru.parsers import ParseTvzavrFilmPage
 from crawler.zoomby_ru.loader import ZOOMBY_Loader
 from crawler.zoomby_ru.parsers import ParseFilm
 
-from apps.robots.constants import APP_ROBOTS_TRY_SITE_UNAVAILABLE, APP_ROBOTS_TRY_NO_SUCH_PAGE, \
-    APP_ROBOTS_TRY_PARSE_ERROR
+from apps.robots.constants import APP_ROBOTS_TRY_NO_SUCH_PAGE
 
 
 
