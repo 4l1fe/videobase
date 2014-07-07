@@ -24,7 +24,7 @@ class PhotoClass(models.Model):
     image_file.allow_tags = True
 
     def save(self, *args, **kwargs):
-        is_new = self.pk == None
+        is_new = self.pk is None
         super(PhotoClass, self).save(*args, **kwargs)
 
         if is_new:
