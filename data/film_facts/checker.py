@@ -99,3 +99,11 @@ def film_release_date_check(film):
     date = datetime.strptime(date_string, '%Y')
     return film.release_date.year == date.year
 
+
+@film_checker.add("Film kinopoisk id is not set")
+def film_kinopoisk_id_check(film):
+    film_kinopoisk_id = film.kinopoisk_id
+    if film_kinopoisk_id > 0:
+        return 1
+    else:
+        return 0
