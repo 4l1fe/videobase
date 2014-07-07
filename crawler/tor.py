@@ -6,7 +6,7 @@ import pycurl
 import socket
 import cStringIO as StringIO
 from crawler.constants import TOR_PROXY, TOR_RECONNECTS
-from crawler.core.browser import get_random_weighted_browser_string
+from crawler.utils.headers import get_random_weighted_browser_string
 
 DEFAULT_HEADERS = [ 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
         'Accept-Language: ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4',

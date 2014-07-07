@@ -1,4 +1,4 @@
 # coding: utf-8
-from loader import BaseLoader
-from parse import BaseParse
-from browser import simple_get
+from crawler.core.loader import BaseLoader
+from crawler.core.parse import BaseParse
+
