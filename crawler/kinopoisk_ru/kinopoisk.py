@@ -17,6 +17,7 @@ from crawler.kinopoisk_ru.kinopoisk_poster import set_kinopoisk_poster
 from time import sleep
 from django.utils.timezone import now, datetime
 import logging
+from crawler.tor import simple_tor_get_page as simple_get
 
 
 KINOPOISK = 'www.kinopoisk.ru'
