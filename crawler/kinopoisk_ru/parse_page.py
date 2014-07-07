@@ -156,6 +156,7 @@ def extract_facts_from_dump(page_dump):
 
     Returns
 
+    
     Dictionary with keys 'Films', 'Persons', 'Genres'
 
     '''
