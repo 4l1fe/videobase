@@ -12,8 +12,8 @@ from apps.films.models.photoclass import PhotoClass
 # Модель Персон
 class Persons(PhotoClass):
     city      = models.ForeignKey('Cities', null=True, blank=True, verbose_name=u'Город', related_name='persons')
-    name      = models.CharField(max_length=255, verbose_name=u'Имя')
-    name_orig = models.CharField(max_length=255, verbose_name=u'Оригинальное имя')
+    name      = models.CharField(max_length=255, db_index=True, verbose_name=u'Имя')
+    name_orig = models.CharField(max_length=255, db_index=True, verbose_name=u'Оригинальное имя')
     bio       = models.TextField(verbose_name=u'Биография')
     photo     = models.ImageField(upload_to=get_image_path, blank=True, null=True, verbose_name=u'Фото')
     birthdate = models.DateField(verbose_name=u'Дата дня рождения', null=True, blank=True)
