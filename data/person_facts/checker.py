@@ -1,6 +1,6 @@
 # coding: utf-8
 from apps.films.models import Films
-from apps.films.models import FilmsExtras
+from apps.films.models import FilmExtras
 from apps.films.constants import APP_FILM_TYPE_ADDITIONAL_MATERIAL_TRAILER
 
 from apps.films.models import Countries
@@ -12,6 +12,7 @@ import gdata.youtube
 import gdata.youtube.service
 
 film_checker = FactChecker(Films)
+
 
 
 @film_checker.add('Flatland in countries')
@@ -29,7 +30,6 @@ def trailer_name_check(film):
     yid = re.match('.+watch[?]v[=](?P<id>.+)(([&].+)?)', ft.url)
     #return film.name in
 
-    
 
 
 
