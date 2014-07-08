@@ -35,7 +35,7 @@ class SearchFilmsView(APIView):
         instock - Фильм в наличии в кинотеатрах
     """
 
-    def search_by_films(self, filter, personalize):
+    def search_by_films(self, filter):
         o_search = Films.objects.extra(
                 where=['EXTRACT(year FROM "films"."release_date") <= %s'],
                 params=[date.today().year],
@@ -61,18 +61,15 @@ class SearchFilmsView(APIView):
             o_search = o_search.filter(genres=filter['genre'])
 
         # Персоноализация выборки
-        if personalize and self.request.user.is_authenticated():
+        if self.request.user.is_authenticated() and filter.get('recommend'):
             sql = """
             NOT "films"."id" IN (
                 SELECT "users_films"."film_id" FROM "users_films"
                 WHERE "users_films"."user_id" = %s AND
-                      "users_films"."status" = %s
+                      "users_films"."status" = %s AND
+                      "users_films"."rating" != ''
+            )
             """
-
-            if filter.get('recommend'):
-                sql += 'AND "users_films"."rating" != \'\''
-
-            sql += ')'
 
             o_search = o_search.extra(
                 where=[sql],
@@ -125,9 +122,12 @@ class SearchFilmsView(APIView):
         return filter
 
 
-    def get(self, request, format=None, personalize=True, *args, **kwargs):
+    def get(self, request, format=None, recommend=False, *args, **kwargs):
         # Копируем запрос, т.к. в форме его изменяем
         self.get_copy = request.GET.copy()
+
+        if recommend:
+           self.get_copy['recommend'] = True
 
         # Валидируем форму
         form = SearchForm(data=self.get_copy)
@@ -149,7 +149,7 @@ class SearchFilmsView(APIView):
 
             if result is None:
                 # Наложение условий фильтрации на фильмы
-                o_search = self.search_by_films(filter, personalize)
+                o_search = self.search_by_films(filter)
 
                 if location_group > 0:
                     # Список фильмов удовлетворяющий условиям локации

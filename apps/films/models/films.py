@@ -65,31 +65,16 @@ class Films(models.Model):
               FROM "films" INNER JOIN "films_genres" ON ("films"."id" = "films_genres"."films_id")
               WHERE "films_genres"."genres_id" IN ({0})
             ) as films
-            WHERE NOT ("films"."id" = {1})
-            ORDER BY "films"."rating_sort"
-            DESC LIMIT {2};
+            WHERE "films"."id" != {1}
+            ORDER BY "films"."rating_sort" DESC LIMIT {2};
         """.format(*params)
 
         return cls.objects.raw(sql)
 
 
     @classmethod
-    def similar_default(cls, user=False, limit=True):
+    def similar_default(cls, limit=True):
         o_similar = cls.objects.order_by('-rating_sort')
-
-        if user and user.is_authenticated():
-            sql = """
-            NOT "films"."id" IN (
-                SELECT "users_films"."film_id" FROM "users_films"
-                WHERE "users_films"."user_id" = %s AND
-                      "users_films"."status" = %s AND
-                      "users_films"."rating" != ''
-            )
-            """
-            o_similar = o_similar.extra(
-                where=[sql],
-                params=[user.pk, APP_USERFILM_STATUS_NOT_WATCH],
-            )
 
         if limit:
             o_similar = o_similar[:APP_FILMS_API_DEFAULT_PER_PAGE]
