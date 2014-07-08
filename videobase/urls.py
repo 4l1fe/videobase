@@ -34,7 +34,10 @@ urlpatterns = patterns('',
     url(r'^legal/$', 'apps.contents.views.legal'),
     url(r'^about/$', 'apps.contents.views.about'),
 
-    url(r'^/rss/feed_tw/$', '')
+    url(r'^rss/feed_tw/$', 'apps.feed.views.get_feed_tw'),
+    url(r'^rss/feed_vk/$', 'apps.feed.views.get_feed_vk'),
+    url(r'^rss/feed/$', 'apps.feed.views.get_feed'),
+    url(r'^rss/feed_fb/$', 'apps.feed.views.get_feed_fb')
 )
 
 if settings.DEBUG:
