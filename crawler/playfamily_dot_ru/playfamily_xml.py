@@ -65,11 +65,11 @@ def process(soup = None):
     Can accept non mandatory parameter @soup. If there is no soup supplied function downloads
     new one from url set in PLAYFAMILY_XML constant
     '''
-
+    
     if soup is None:
         soup = get_soup()
 
-    info_iter = [e for e in extract_info(soup)][-1:]
+    info_iter = [e for e in extract_info(soup)]
     for info in info_iter:
         kinopoisk_id = info['kinopoiskId'] if type(info['kinopoiskId']) is int else int(info['kinopoiskId'])
         try:
