@@ -95,7 +95,7 @@ mixin film_thumb(item)
             - min_price = false
             - price_loc = ""
             - btn_cls = ""
-            - if (item.locations) {
+            - if (item.locations && item.locations.length>0) {
             -   for (i = 0; i < item.locations.length; i++) {
             -       obj = item.locations[i];
             -       if (obj.price_type == 0) {
