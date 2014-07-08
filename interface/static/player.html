@@ -3,10 +3,7 @@
     overflow: hidden
 }
 
-#player {
-    width: 100%;
-    height: 100%
-}
+#player {width: 100%; height: 100%}
 
 .inner {
     position: absolute;
@@ -14,7 +11,7 @@
     height: 6em;
     margin-top: -3em;
     text-align: center;
-    width: 90%;
+    width: 100%;
     color: white;
     font-size: 24px
 }
@@ -34,7 +31,7 @@ if (query_arr.length > 1) {
 }
 location_names = {"ivi": "IVI.ru", "nowru": "Now.ru", "megogo": "Megogo", "tvigle": "TVigle", "zoomby": "Zoomby.ru", playfamily: "PlayFamily.ru", "olltv": "Oll.tv", amediateka: "Amediateka", molodejj: "Molodejj.tv", streamru: "Stream.ru", tvzavr: "TVzavr.ru", viaplay: "Viaplay.ru", zabava: "Zabava.ru", playgoogle: "Play Google", itunes: "Apple Itunes", ayyo: "Ayyo.ru", mosfilm: "Cinema.mosfilm.ru", "default": "Онлайн-кинотеатре"}
 if (vals.price && vals.view) {
-    html = '<div class="inner">Чтобы посмотреть фильм за ' + vals.price + ' руб. на ' + (location_names[vals.type] || location_names["default"]) + '<br>вам необходимо перейти по <a href="' + vals.view + '" target="_blank" ref="nofollow">ссылке</a></div>'
+    html = '<div class="inner">Чтобы посмотреть фильм за ' + Math.floor(vals.price) + ' руб. на ' + (location_names[vals.type] || location_names["default"]) + '<br>вам необходимо перейти по <a href="' + vals.view + '" target="_blank" ref="nofollow">ссылке</a></div>'
 } else if (vals.type && (vals.value || vals.view)) {
     html = false;
     value = vals.value || false
@@ -67,7 +64,7 @@ if (vals.price && vals.view) {
     } else if (vals.type == "mosfilm") {
         html = '<iframe width="100%" height="100%" src="//www.youtube.com/embed/' + value + '" frameborder="0" allowfullscreen></iframe>'
     } else if (vals.type == "playfamily") {
-        html = '<iframe width="100%" height="100%" id="playlite-frame" class="playlite-object" frameborder="0" scrolling="no" src=' + value + '></iframe>'
+        html = '<iframe width="100%" height="100%" id="playlite-frame" class="playlite-object" frameborder="0" scrolling="no" src="http://playlite.ru/widgets/widget/' + value + '/PARTNER661"></iframe>'
     }
 }
 if (!html)
