@@ -35,7 +35,7 @@ class SearchFilmsView(APIView):
         instock - Фильм в наличии в кинотеатрах
     """
 
-    def search_by_films(self, filter):
+    def search_by_films(self, filter, personalize):
         o_search = Films.objects.extra(
                 where=['EXTRACT(year FROM "films"."release_date") <= %s'],
                 params=[date.today().year],
@@ -61,7 +61,7 @@ class SearchFilmsView(APIView):
             o_search = o_search.filter(genres=filter['genre'])
 
         # Персоноализация выборки
-        if self.request.user.is_authenticated():
+        if personalize and self.request.user.is_authenticated():
             sql = """
             NOT "films"."id" IN (
                 SELECT "users_films"."film_id" FROM "users_films"
@@ -149,7 +149,7 @@ class SearchFilmsView(APIView):
 
             if result is None:
                 # Наложение условий фильтрации на фильмы
-                o_search = self.search_by_films(filter)
+                o_search = self.search_by_films(filter, personalize)
 
                 if location_group > 0:
                     # Список фильмов удовлетворяющий условиям локации
