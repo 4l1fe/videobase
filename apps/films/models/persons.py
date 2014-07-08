@@ -30,6 +30,7 @@ class Persons(PhotoClass):
         full_name = u"{0} ({1})".format(self.name, self.name_orig)
         return full_name.strip()
 
+
     @property
     def get_path_to_photo(self):
         path_to_photo = ''
@@ -48,15 +49,6 @@ class Persons(PhotoClass):
 
         return obj
 
-    def as_vBPerson(self, extend=False):
-
-        p_dict = {'id': self.pk,
-                  'name': self.name,
-                  'photo': self.photo if self.photo else '',
-                  }
-        if extend:
-            p_dict['bio'] = self.bio
-        return p_dict
         
     class Meta:
         # Имя таблицы в БД

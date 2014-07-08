@@ -29,8 +29,8 @@ class SimilarFilmView(APIView):
 
     def logic_calcultate(self, o_film, data_flag=False):
         o_similar = Films.similar_api(o_film)
-        serializer = vbFilm(o_similar, request=self.request, many=True)
-        serializer = serializer.data
+        serializer = vbFilm(o_similar, request=self.request, many=True).data
+
         return Response(serializer, status=status.HTTP_200_OK) if not data_flag else serializer
 
 
