@@ -86,6 +86,7 @@ sites_crawler = {
         'parser': ParseZabavaFilm
     }
 }
+
 sites = sites_crawler.keys()
 
 
@@ -95,8 +96,10 @@ def process_film_on_site(site, film_id):
     except Films.DoesNotExist:
         print "There is no film in db with such id"
         return
-    robot = Robot(films=film, **sites_crawler[site])
-    for data in robot.get_data(sane_dict):
+
+    loaded_data = sites_crawler[site].loader(film).load()
+
+    for data in sites_crawler[site]['parser'].parse(loaded_data['html'], sane_dict, film, url=loaded_data['url']):
         print u"Trying to put data from %s for %s to db" % (site, unicode(data['film']))
         save_location(**data)
 
