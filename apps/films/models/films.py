@@ -54,32 +54,45 @@ class Films(models.Model):
             name = self.name
         return u'[{0}] {1}'.format(self.pk, name)
 
-    def as_vbFilm(self, extend=False, persons=False, authorized=False):
-        f_dict = {
-            'id':self.pk,
-            'name': self.name,
-            'name_orig': self.name_orig,
-            'releasedate': self.release_date,
-            'poster': [],
-            'ratings': self.get_rating_for_vb_film,
-            'duration': self.duration,
-        }
-
-        return f_dict
-
 
     @classmethod
     def similar_api(cls, o_film):
-        list_genres = [i.pk for i in o_film.genres.all()]
+        params = [','.join([str(i.pk) for i in o_film.genres.all()]), o_film.id, APP_FILMS_API_DEFAULT_PER_PAGE]
 
-        o_similar = Films.similar_default().filter(genres__in=list_genres).exclude(pk=o_film.pk)
+        sql = """
+            SELECT "films".* FROM (
+              SELECT DISTINCT ON ("films"."id") films.id AS d, "films".*
+              FROM "films" INNER JOIN "films_genres" ON ("films"."id" = "films_genres"."films_id")
+              WHERE "films_genres"."genres_id" IN ({0})
+            ) as films
+            WHERE NOT ("films"."id" = {1})
+            ORDER BY "films"."rating_sort"
+            DESC LIMIT {2};
+        """.format(*params)
 
-        return o_similar
+        return cls.objects.raw(sql)
 
 
     @classmethod
-    def similar_default(cls):
-        o_similar = Films.objects.order_by('-rating_sort')[:APP_FILMS_API_DEFAULT_PER_PAGE]
+    def similar_default(cls, user=False, limit=True):
+        o_similar = cls.objects.order_by('-rating_sort')
+
+        if user and user.is_authenticated():
+            sql = """
+            NOT "films"."id" IN (
+                SELECT "users_films"."film_id" FROM "users_films"
+                WHERE "users_films"."user_id" = %s AND
+                      "users_films"."status" = %s AND
+                      "users_films"."rating" != ''
+            )
+            """
+            o_similar = o_similar.extra(
+                where=[sql],
+                params=[user.pk, APP_USERFILM_STATUS_NOT_WATCH],
+            )
+
+        if limit:
+            o_similar = o_similar[:APP_FILMS_API_DEFAULT_PER_PAGE]
 
         return o_similar
 
