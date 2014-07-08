@@ -32,7 +32,9 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
 
     url(r'^legal/$', 'apps.contents.views.legal'),
-    url(r'^about/$', 'apps.contents.views.about')
+    url(r'^about/$', 'apps.contents.views.about'),
+
+    url(r'^/rss/feed_tw/$', '')
 )
 
 if settings.DEBUG:
