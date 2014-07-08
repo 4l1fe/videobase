@@ -1,4 +1,25 @@
 {% extends "base_feed.html" %}
         {% block feeditems %}
-
+            {% for film in films %}
+                  <title>{{film.name}}</title>
+                  <link>http://vsevi.ru/films/{{film.id}} </link>
+                  <description>Новинка в кинотеатре "Все видео": Фильм "{{ film.name }}"({{ film.name_orig }}, {{name.release_date}})
+                      Оценка: {{ film.rating_cons}}/10
+                      Смотреть: http://vsevi.ru/films/{{film.id}}
+                      В ролях:
+                      {% for person in film.persons.all %}
+                          {{ person.name }},
+                      {% endfor %}
+                      Жанр:
+                      {% for ganre in film.genres.all %}
+                          #{{ganre.name}}
+                      {% endfor %}
+                          звезды: {{film.rating_cons}}/10, {{film.release_date}} http://vsevi.ru/films/{{film.id}}</description>
+                  <pubDate>
+{#                      {% with total=film.id %}#}
+{#                          {{ newdate.total }}#}
+{#                      {% endwith %}#}
+                  </pubDate>
+                  <guid>http://vsevi.ru/films/{{film.id}}</guid>
+            {% endfor %}
         {% endblock %}
