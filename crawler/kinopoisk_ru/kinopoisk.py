@@ -15,7 +15,7 @@ from django.core.files import File
 from optparse import make_option
 from crawler.kinopoisk_ru.kinopoisk_poster import set_kinopoisk_poster
 from time import sleep
-from django.utils.timezone import now
+from django.utils.timezone import now, datetime
 import logging
 from crawler.tor import simple_tor_get_page as simple_get
 
@@ -165,7 +165,7 @@ def parse_from_kinopoisk(kinopoisk_id, name=None, film=None):
             film = Films(kinopoisk_id=kinopoisk_id,
                          name=name if name else u' ',
                          type=APP_FILM_FULL_FILM,
-                         release_date=now()
+                         release_date=datetime.utcfromtimestamp(0)
                      )
             film.save()
     page_dump = u'Failed to acquire page_dump'

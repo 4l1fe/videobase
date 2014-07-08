@@ -6,12 +6,9 @@ and run function for robots written as loader parser combo
 """
 
 import re
-import json
-from requests.exceptions import ConnectionError
 
 from django.utils import timezone
 from django.db.models import Q
-from django.core.exceptions import ValidationError
 
 from apps.films.models import Films
 
@@ -26,11 +23,8 @@ from crawler.megogo_net.loader import MEGOGO_Loader
 from crawler.megogo_net.parsers import ParseMegogoFilm
 from crawler.stream_ru.loader import STREAM_RU_Loader
 from crawler.stream_ru.parsers import ParseStreamFilm
-from crawler.core.exceptions import NoSuchFilm, RetrievePageException
 from crawler.play_google_com.loader import PLAY_GOOGLE_Loader
 from crawler.play_google_com.parsers import ParsePlayGoogleFilm
-from crawler.playfamily_dot_ru.loader import playfamily_loader
-from crawler.playfamily_dot_ru.parser import PlayfamilyParser
 from crawler.tvigle_ru.loader import TVIGLE_Loader
 from crawler.tvigle_ru.parsers import ParseTvigleFilm
 from crawler.zabava_ru.loader import ZABAVAR_RU_Loader
@@ -42,9 +36,8 @@ from crawler.tvzavr_ru.parsers import ParseTvzavrFilmPage
 from crawler.zoomby_ru.loader import ZOOMBY_Loader
 from crawler.zoomby_ru.parsers import ParseFilm
 
-from apps.robots.constants import APP_ROBOTS_TRY_SITE_UNAVAILABLE, APP_ROBOTS_TRY_NO_SUCH_PAGE, \
-    APP_ROBOTS_TRY_PARSE_ERROR
-from apps.robots.models import RobotsTries, Robots
+from apps.robots.constants import APP_ROBOTS_TRY_NO_SUCH_PAGE
+
 
 
 
@@ -93,88 +86,20 @@ sites_crawler = {
         'parser': ParseZabavaFilm
     }
 }
+
 sites = sites_crawler.keys()
 
 
-def robot_exceptions(func):
-    def wrapper(*args,**kwargs):
-
-        if 'site' in kwargs:
-            site = kwargs['site']
-        else:
-            site = args[1]
-
-        try:
-            func(*args,**kwargs)
-        except ConnectionError, ce:
-            # Couldn't conect to server
-            print u"Connection error"
-            m = re.match(".+host[=][']([^']+)['].+", ce.message.message)
-
-            host = m.groups()[0]
-            url = ce.message.url
-            if host is None:
-                host = 'unknown'
-
-            robot_try = RobotsTries(domain=host,
-                                url='http://' + host + url,
-                                film=args[0][0],
-                                outcome=APP_ROBOTS_TRY_SITE_UNAVAILABLE
-                                )
-
-            robot_try.save()
-
-        except RetrievePageException, rexp:
-            # Server responded but not 200
-            print u"RetrievePageException"
-            if site is None:
-                site = 'unknown'
-
-                robot_try = RobotsTries(domain=site,
-                                url=rexp.url,
-                                film=args[0][0],
-                                outcome=APP_ROBOTS_TRY_NO_SUCH_PAGE
-                                )
-
-                robot_try.save()
-
-        except UnicodeDecodeError:
-            print "Unicode error"
-            if site is None:
-                site = 'unknown'
-
-                robot_try = RobotsTries(domain=site,
-                                film=args[0][0],
-                                outcome=APP_ROBOTS_TRY_PARSE_ERROR
-                                )
-
-            robot_try.save()
-
-        except ValidationError as ve:
-
-            print "Tried to save location with invalid URL"
-
-        except NoSuchFilm as e:
-            robot_try = RobotsTries(domain=site,
-                                    film=e.film,
-                                    outcome=APP_ROBOTS_TRY_NO_SUCH_PAGE)
-            
-            robot_try.save()
-        except Exception,e:
-            print "Unknown exception {}".format(e)
-            
-    return wrapper
-    
-
-@robot_exceptions
 def process_film_on_site(site, film_id):
     try:
         film = [Films.objects.get(id=film_id),]
     except Films.DoesNotExist:
         print "There is no film in db with such id"
         return
-    robot = Robot(films=film, **sites_crawler[site])
-    for data in robot.get_data(sane_dict):
+
+    loaded_data = sites_crawler[site].loader(film).load()
+
+    for data in sites_crawler[site]['parser'].parse(loaded_data['html'], sane_dict, film, url=loaded_data['url']):
         print u"Trying to put data from %s for %s to db" % (site, unicode(data['film']))
         save_location(**data)
 
@@ -186,27 +111,6 @@ def launch_next_robot_try_for_kinopoisk(robot):
     films = Films.objects.filter(~Q(robots_tries__outcome=APP_ROBOTS_TRY_NO_SUCH_PAGE),
                                  kinopoisk_id__isnull=True)[:10]
     for film in films:
-        try:
-            id = get_id_by_film(film)
-            film.kinopoisk_id = id
-            film.save()
-        except RetrievePageException as rexp:
-            # Server responded but not 200
-            print u"RetrievePageException"
-            robot_try = RobotsTries(domain='kinopoisk_ru',
-                                    url=rexp.url,
-                                    film=film[0],
-                                    outcome=APP_ROBOTS_TRY_NO_SUCH_PAGE)
-
-            robot_try.save()
-        except UnicodeDecodeError:
-            print "Unicode error"
-            robot_try = RobotsTries(domain='kinopoisk_ru',
-                                    film=film, outcome=APP_ROBOTS_TRY_PARSE_ERROR)
-
-            robot_try.save()
-        except Exception as e:
-            print "Unknown exception %s", str(e)
-            robot_try = RobotsTries(domain='kinopoisk_ru', film=film,
-                                    outcome=APP_ROBOTS_TRY_PARSE_ERROR)
-            robot_try.save()
+        id = get_id_by_film(film)
+        film.kinopoisk_id = id
+        film.save()
