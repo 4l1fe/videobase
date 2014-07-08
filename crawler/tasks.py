@@ -76,7 +76,7 @@ def kinopoisk_films(page):
         print e
 
 
-@robot_task(name='kinopoisk_persons')
+@robot_task('kinopoisk_persons')
 def parse_kinopoisk_persons(pid):
     try:
         response = simple_tor_get_page('http://www.kinopoisk.ru/name/{}/view_info/ok/#trivia'.format(pid))
