@@ -6,7 +6,7 @@ from django.db import models
 #############################################################################################################
 # Модель жанров фильмов/сериалов
 class Genres(models.Model):
-    name        = models.CharField(max_length=255, verbose_name=u'Название жанра')
+    name        = models.CharField(max_length=255, db_index=True, verbose_name=u'Название жанра')
     description = models.TextField(verbose_name=u'Описание жанра')
 
     def __unicode__(self):

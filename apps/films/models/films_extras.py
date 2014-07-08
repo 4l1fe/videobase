@@ -22,7 +22,7 @@ class PosterFilmManager(models.Manager):
 # Модель Расширения фильмов/сериалов
 class FilmExtras(PhotoClass):
     film        = models.ForeignKey('Films', verbose_name=u'Фильм', related_name="fe_film_rel")
-    type        = models.CharField(max_length=255, choices=APP_FILM_TYPE_ADDITIONAL_MATERIAL, verbose_name=u'Тип дополнительного материала')
+    type        = models.CharField(max_length=255, db_index=True, choices=APP_FILM_TYPE_ADDITIONAL_MATERIAL, verbose_name=u'Тип дополнительного материала')
     name        = models.CharField(max_length=255, verbose_name=u'Название')
     name_orig   = models.CharField(max_length=255, verbose_name=u'Оригинальное название')
     description = models.TextField(verbose_name=u'Описание')
