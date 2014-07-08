@@ -18,30 +18,31 @@ class FilmManager(models.Manager):
 #############################################################################################################
 # Модель фильмов/сериалов
 class Films(models.Model):
-    name             = models.CharField(max_length=255, blank=False, verbose_name=u'Название фильма')
-    type             = models.CharField(max_length=255, choices=APP_FILM_FILM_TYPES, verbose_name=u'Тип фильма')
-    release_date     = models.DateField(null=True, blank=True, verbose_name=u'Дата выхода')
+    name             = models.CharField(max_length=255, db_index=True, blank=False, verbose_name=u'Название фильма')
+    type             = models.CharField(max_length=255, db_index=True, choices=APP_FILM_FILM_TYPES, verbose_name=u'Тип фильма')
+    release_date     = models.DateField(null=True, blank=True, db_index=True, verbose_name=u'Дата выхода')
     duration         = models.IntegerField(null=True, blank=True, verbose_name=u'Продолжительность фильма')
     budget           = models.IntegerField(null=True, blank=True, verbose_name=u'Бюджет фильма')
     description      = models.TextField(default='', blank=True, verbose_name=u'Описание фильма')
-    rating_local     = models.FloatField(null=True, blank=True, default=0, verbose_name=u'Рейтинг фильма по мнению пользователей нашего сайта')
-    rating_local_cnt = models.PositiveSmallIntegerField(null=True, blank=True, default=0, verbose_name=u'Количество пользователей нашего сайта оценивших фильм')
+    rating_local     = models.FloatField(null=True, blank=True, db_index=True, default=0, verbose_name=u'Рейтинг фильма по мнению пользователей нашего сайта')
+    rating_local_cnt = models.IntegerField(null=True, blank=True, db_index=True, default=0, verbose_name=u'Количество пользователей нашего сайта оценивших фильм')
     imdb_id          = models.IntegerField(null=True, blank=True, verbose_name=u'Порядковый номер на IMDB')
     rating_imdb      = models.FloatField(null=True, blank=True, default=0, verbose_name=u'Рейтинг фильма на сайте imdb.com')
     rating_imdb_cnt  = models.IntegerField(null=True, blank=True, default=0, verbose_name=u'Количество пользователей imdb.com оценивших этот фильм')
     rating_cons      = models.FloatField(null=True, blank=True, default=0, verbose_name=u'Консолидированный рейтинг')
-    rating_cons_cnt  = models.IntegerField(null=True, blank=True, default=0, verbose_name=u'Количество голосов консолидированного рейтинга')
-    rating_sort      = models.IntegerField(null=True, blank=True, default=0, verbose_name=u'Условный рейтинг для сортировки')
-    kinopoisk_id     = models.IntegerField(null=True, blank=True, verbose_name=u'Порядковый номер на кинопоиске')
-    age_limit        = models.PositiveSmallIntegerField(null=True, blank=True, verbose_name=u'Ограничение по возрасту')
+    rating_cons_cnt  = models.IntegerField(null=True, blank=True, db_index=True, default=0, verbose_name=u'Количество голосов консолидированного рейтинга')
+    rating_sort      = models.IntegerField(null=True, blank=True, db_index=True, default=0, verbose_name=u'Условный рейтинг для сортировки')
+    kinopoisk_id     = models.IntegerField(null=True, blank=True, db_index=True, verbose_name=u'Порядковый номер на кинопоиске')
+    age_limit        = models.PositiveSmallIntegerField(null=True, blank=True, db_index=True, verbose_name=u'Ограничение по возрасту')
     kinopoisk_lastupdate = models.DateTimeField(null=True, blank=True, verbose_name=u'Дата последнего обновления на кинопоиске')
     rating_kinopoisk     = models.FloatField(null=True, blank=True, verbose_name=u'Рейтинг фильма на сайте kinopoisk.ru')
     rating_kinopoisk_cnt = models.PositiveSmallIntegerField(null=True, blank=True, verbose_name=u'Количество пользователей kinopoisk.ru оценивших этот фильм')
     seasons_cnt = models.PositiveSmallIntegerField(null=True, blank=True, verbose_name=u'Количество сезонов')
-    name_orig   = models.CharField(max_length=255, default='', blank=True, verbose_name=u'Оригинальное название фильма')
+    name_orig   = models.CharField(max_length=255, default='', blank=True, db_index=True, verbose_name=u'Оригинальное название фильма')
     countries   = models.ManyToManyField('Countries', verbose_name=u'Страны производители', related_name='countries')
     genres      = models.ManyToManyField('Genres', verbose_name=u'Жанры', related_name='genres')
     persons     = models.ManyToManyField('Persons', through='PersonsFilms', verbose_name=u'Персоны', related_name='persons')
+
 
     get_film_type = FilmManager()
     objects = models.Manager()
@@ -190,6 +191,32 @@ class Films(models.Model):
             sort_cnt = rating_cons_cnt
 
         return sort_cnt
+
+    @classmethod
+    def get_newest_films(cls):
+        from django.db import connection
+        cursor = connection.cursor()
+
+        query = """
+        SELECT "content"."film_id"
+        FROM (SELECT DISTINCT ON ("locations"."content_id") "locations"."content_id", "locations"."id" FROM "locations" ) AS t
+            INNER JOIN "content" ON ("t"."content_id" = "content"."id")
+            INNER JOIN "films" ON ("content"."film_id" = "films"."id")
+
+        WHERE ("films"."rating_cons" >= %s  AND "films"."rating_cons_cnt" > %s)
+        ORDER BY "t"."id" DESC LIMIT %s;
+        """
+
+        try:
+            cursor.execute(query, [5.5, 5000, 4])
+            return cls.objects.filter(id__in=[i[0] for i in cursor.fetchall()])
+
+        except Exception, e:
+            return e
+        finally:
+            cursor.close()
+
+        return False
 
 
     class Meta(object):

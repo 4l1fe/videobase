@@ -10,12 +10,12 @@ from apps.contents.constants import APP_CONTENTS_LOC_TYPE, APP_CONTENTS_PRICE_TY
 # Модель Месторасположения контента
 class Locations(models.Model):
     content    = models.ForeignKey('Contents', verbose_name=u'Контент', related_name='location')
-    type       = models.CharField(choices=APP_CONTENTS_LOC_TYPE, verbose_name=u'Тип', max_length=40)
+    type       = models.CharField(choices=APP_CONTENTS_LOC_TYPE, db_index=True, verbose_name=u'Тип', max_length=40)
     lang       = models.CharField(max_length=40, verbose_name=u'Язык')
     quality    = models.CharField(max_length=40, verbose_name=u'Качество')
     subtitles  = models.CharField(max_length=40, verbose_name=u'Субтитры')
-    price      = CurrencyField(verbose_name=u'Цена')
-    price_type = models.SmallIntegerField(choices=APP_CONTENTS_PRICE_TYPE, verbose_name=u'Тип цены')
+    price      = CurrencyField(db_index=True, verbose_name=u'Цена')
+    price_type = models.SmallIntegerField(choices=APP_CONTENTS_PRICE_TYPE, db_index=True, verbose_name=u'Тип цены')
     url_view   = models.URLField(max_length=255, verbose_name=u'Ссылка для просмотра')
     value      = models.TextField(verbose_name=u"Код встраивания", blank=True, null=True)
 
