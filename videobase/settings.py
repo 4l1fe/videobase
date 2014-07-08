@@ -79,6 +79,7 @@ INSTALLED_APPS = (
     'apps.films',
     'apps.contents',
     'apps.robots',
+    'apps.feed',
     'crawler',
     'social_auth',
     'djcelery',
@@ -182,7 +183,6 @@ SITE_ID = 1
 
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': (
-        'rest_framework.renderers.XMLRenderer',
         'rest_framework.renderers.JSONRenderer',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -257,10 +257,29 @@ if not DEBUG:
 
 ###########################################################
 CELERYBEAT_SCHEDULE = {
+
+    # Launching robots that are described in Robots table.
     'robot-launch': {
         'task': 'robot_launch',
         'schedule': timedelta(seconds=10),
     },
+
+    # Updating ratings from IMDB DB via archive
+    'imdb_rating_update_command': {
+        'task': 'imdb_rating_update',
+        'schedule': timedelta(days=7),
+    },
+    # Amediateka weekly run
+    'amediateka_ru_update': {
+        'task': 'amediateka_ru_robot_start',
+        'schedule': timedelta(days=7),
+    },
+    # Viaplay robot weekly run
+    'viaplay_ru_robot_start': {
+        'task': 'viaplay_ru_robot_start',
+        'schedule': timedelta(days=7),
+    },
+    # Searching for kinopoisk_id for films that doesn't have one in our db
     'kinopoisk-get_id': {
         'task': 'kinopoisk_get_id',
         'schedule': timedelta(minutes=1),
@@ -269,30 +288,22 @@ CELERYBEAT_SCHEDULE = {
         'task': 'kinopoisk_set_poster',
         'schedule': timedelta(seconds=10),
     },
-    'imdb_rating_update_command': {
-        'task': 'imdb_rating_update',
-        'schedule': timedelta(days=7),
-    },
-    'amediateka_ru_update': {
-        'task': 'amediateka_ru_robot_start',
-        'schedule': timedelta(days=7),
-    },
-    'viaplay_ru_robot_start': {
-        'task': 'viaplay_ru_robot_start',
-        'schedule': timedelta(days=7),
-    },
+    # Updating information about persons using kinopoisk
     'kinopoisk_persons': {
         'task': 'kinopoisk_persons',
         'schedule': timedelta(seconds=10),
     },
+    # Checking kinopoisk premiere page
     'kinopoisk_news': {
         'task': 'kinopoisk_news',
         'schedule': timedelta(days=3),
     },
+    # Youtube trailers
     'youtube_trailers': {
         'task': 'youtube_trailers_all',
         'schedule': timedelta(days=1),
     },
+    # Three tasks that parse information from kinopoisk navigator page
     'kinopoisk_films_daily': {
         'task': 'kinopoisk_films',
         'schedule': timedelta(days=1),
@@ -308,10 +319,12 @@ CELERYBEAT_SCHEDULE = {
         'schedule': timedelta(days=31),
         'args': (11,),
     },
+    # Task that periodically requests information from kinopoisk depending on film age
     'kinopoisk_refresh': {
         'task': 'kinopoisk_refresher',
         'schedule': timedelta(days=1),
     },
+    # Playfamily XML parser.
     'playfamily_xml': {
         'task': 'playfamily_xml',
         'schedule': timedelta(days=7),
@@ -319,5 +332,5 @@ CELERYBEAT_SCHEDULE = {
 }
 
 CELERY_TIMEZONE = 'UTC'
-
+CELERY_ACCEPT_CONTENT = ['pickle', 'json', 'msgpack', 'yaml']
 POSTER_URL_PREFIX = '_260x360'

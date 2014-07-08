@@ -134,3 +134,4 @@ def save_location(film, **kwargs):
                          price=kwargs['price'],
                          price_type=kwargs['price_type'])
     location.save()
+    print u"Saved location for film {}".format(film)
