@@ -110,6 +110,8 @@ def process(soup = None):
         data_dict['price_type'] = APP_CONTENTS_PRICE_TYPE_PAY
         data_dict['price'] = int(float(info['price']))
         data_dict['type'] = 'playfamily'
+        data_dict['value'] = info['uid']
+        
         data_dict['url_view'] = extract_url(info['frame'])
         save_location(**data_dict)
 
