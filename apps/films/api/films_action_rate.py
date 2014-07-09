@@ -41,10 +41,21 @@ class ActRateFilmView(APIView):
 
             # Init data
             rating = form.cleaned_data['rating']
-            filter_ = {'user': request.user,
-                      'film': o_film}
-            obj_val = {'id': o_film.id, 'name': o_film.name}
-            obj_valr = {'id': o_film.id, 'name': o_film.name, 'rating': rating}
+            filter_ = {
+                'user': request.user,
+                'film': o_film,
+            }
+
+            obj_val = {
+                'id': o_film.id,
+                'name': o_film.name
+            }
+
+            obj_valr = {
+                'id': o_film.id,
+                'name': o_film.name,
+                'rating': rating
+            }
 
             # Устанавливаем оценку
             try:
