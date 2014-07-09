@@ -4,7 +4,8 @@
                 <item>
                   <title>{{film.name}}</title>
                   <link>http://vsevi.ru/film/{{film.id}} </link>
-                  <description><img src="{{poster}}}">Новинка в кинотеатре "Все видео": Фильм "{{ film.name }}"({{ film.name_orig }}, {{name.release_date.year}})
+                  <enclosure url="{{ poster }}" type="image/jpeg"/>
+                  <description>Новинка в кинотеатре "Все видео": Фильм "{{ film.name }}"({{ film.name_orig }}, {{name.release_date.year}})
                       Сводный рейтинг: {{ film.rating_cons}}/10
                       Смотреть: http://vsevi.ru/film/{{film.id}}
                       Стоимость:{{ cost }}
