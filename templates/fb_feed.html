@@ -1,29 +1,22 @@
 {% extends "base_feed.html" %}
         {% block feeditems %}
-            {% for film, actors, directors, poster, trailer in films %}
+            {% for film, actors, directors, poster, trailer, cost in films %}
+                <item>
                   <title>{{film.name}}</title>
                   <link>http://vsevi.ru/film/{{film.id}} </link>
-                  <description><img src="{{poster}}}">Новинка в кинотеатре "Все видео": Фильм "{{ film.name }}"({{ film.name_orig }}, {{name.release_date}})
-                      Оценка: {{ film.rating_cons}}/10
+                  <description><img src="{{poster}}}">Новинка в кинотеатре "Все видео": Фильм "{{ film.name }}"({{ film.name_orig }}, {{name.release_date.year}})
+                      Сводный рейтинг: {{ film.rating_cons}}/10
                       Смотреть: http://vsevi.ru/film/{{film.id}}
-                      В ролях:
-                      {% for actor in actors%}
-                          {{ actor }},
-                      {% endfor %}
-                      Режиссер:
-                      {% for director in directors%}
-                      {{ director }},
-                      {% endfor %}
-                      Жанр:
-                      {% for ganre in film.genres.all %}
-                          #{{ganre.name}}
-                      {% endfor %}
-                          звезды: {{film.rating_cons}}/10, {{film.release_date}} http://vsevi.ru/film/{{film.id}}</description>
+                      Стоимость:{{ cost }}
+                      В ролях: {% for actor in actors%} {{ actor }},{% endfor %}
+                      Жанр: {% for ganre in film.genres.all %} #{{ganre.name}} {% endfor %}
+                      Режиссер: {% for director in directors%} {{ director }}, {% endfor %}
+                     {{film.description}} http://vsevi.ru/film/{{film.id}}
+                  </description>
                   <pubDate>
-{#                      {% with total=film.id %}#}
-{#                          {{ newdate.total }}#}
-{#                      {% endwith %}#}
+                    {{date }}
                   </pubDate>
                   <guid>http://vsevi.ru/film/{{film.id}}</guid>
+                </item>
             {% endfor %}
         {% endblock %}
