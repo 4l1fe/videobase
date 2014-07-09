@@ -12,7 +12,7 @@ from email import utils
 
 
 def get_format_time():
-    nowdt = datetime.datetime.now()
+    nowdt = datetime.now()
     nowtuple = nowdt.timetuple()
     nowtimestamp = time.mktime(nowtuple)
     return utils.formatdate(nowtimestamp)
