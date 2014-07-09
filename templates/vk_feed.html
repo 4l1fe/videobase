@@ -5,7 +5,7 @@
                   <link>{{ trailer }} </link>
                   <description><img src="{{poster}}}">Новинка в кинотеатре "Все видео": Фильм "{{ film.name }}"({{ film.name_orig }}, {{name.release_date}})
                       Оценка: {{ film.rating_cons}}/10
-                      Смотреть: http://vsevi.ru/films/{{film.id}}
+                      Смотреть: http://vsevi.ru/film/{{film.id}}
                       В ролях:
                       {% for actor in actors%}
                           {{ actor }},
@@ -18,12 +18,12 @@
                       {% for ganre in film.genres.all %}
                           #{{ganre.name}}
                       {% endfor %}
-                          звезды: {{film.rating_cons}}/10, {{film.release_date}} http://vsevi.ru/films/{{film.id}}</description>
+                          звезды: {{film.rating_cons}}/10, {{film.release_date}} http://vsevi.ru/film/{{film.id}}</description>
                   <pubDate>
 {#                      {% with total=film.id %}#}
 {#                          {{ newdate.total }}#}
 {#                      {% endwith %}#}
                   </pubDate>
-                  <guid>http://vsevi.ru/films/{{film.id}}</guid>
+                  <guid>http://vsevi.ru/film/{{film.id}}</guid>
             {% endfor %}
         {% endblock %}

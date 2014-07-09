@@ -2,7 +2,7 @@
         {% block feeditems %}
             {% for film in films %}
                   <title>{{film.name}}</title>
-                  <link>http://vsevi.ru/films/{{film.id}} </link>
+                  <link>http://vsevi.ru/film/{{film.id}} </link>
                   <description>{{ film.description }} </description>
                   <pubDate>
 {#                      {% with total=film.id %}#}

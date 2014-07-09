@@ -47,7 +47,7 @@ def get_film_descriprion(is_vk):
         cnt_actor = 0
         persons = PersonsFilms.objects.filter(film_id=film.id).all()
         film_extras = FilmExtras.objects.filter(film_id=film.id).all()
-        trailer = 'http://vsevi.ru/films/' + str(film.id)
+        trailer = 'http://vsevi.ru/film/' + str(film.id)
         for extras in film_extras:
 
             if extras.type == APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER:
