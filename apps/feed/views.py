@@ -7,7 +7,7 @@ import copy
 
 
 def get_feed_tw(request):
-    films = Films.get_newest_films().all()
+    films = Films.get_newest_films()
     result = {'films': films, 'date': datetime.utcnow(), 'newdate': ''}
     return render(request, 'tw_feed.html',
                   result)
@@ -20,7 +20,7 @@ def get_feed_vk(request):
 
 
 def get_feed(request):
-    films = Films.get_newest_films().all()
+    films = Films.get_newest_films()
     result = {'films': films, 'newdate': '', 'date': datetime.utcnow()}
     return render(request, 'feed.html',
                   result)
@@ -37,7 +37,7 @@ def get_film_descriprion(is_vk):
     list_director = []
     list_poster = []
     list_trailer = []
-    films = Films.get_newest_films().all()
+    films = Films.get_newest_films()
 
     for film in films:
         list_actor_by_film = []
