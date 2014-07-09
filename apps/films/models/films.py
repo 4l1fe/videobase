@@ -63,7 +63,9 @@ class Films(models.Model):
 
         params = [','.join([str(i.pk) for i in film.genres.all()]), film.id, APP_FILMS_API_DEFAULT_PER_PAGE]
 
-        sql = """
+        # Выполняем запрос, если у фильма есть жанры
+        if params[0]:
+            sql = """
             SELECT "films".* FROM (
               SELECT DISTINCT ON ("films"."id") films.id AS d, "films".*
               FROM "films" INNER JOIN "films_genres" ON ("films"."id" = "films_genres"."films_id")
@@ -71,9 +73,11 @@ class Films(models.Model):
             ) as films
             WHERE "films"."id" != {1}
             ORDER BY "films"."rating_sort" DESC LIMIT {2};
-        """.format(*params)
+            """.format(*params)
 
-        return cls.objects.raw(sql)
+            return cls.objects.raw(sql)
+
+        return []
 
 
     @classmethod
@@ -203,7 +207,7 @@ class Films(models.Model):
 
         sql = """
         SELECT "films".*
-        FROM (SELECT DISTINCT ON ("locations"."content_id") "locations"."content_id", "locations"."id" FROM "locations" ) AS loc
+        FROM (SELECT DISTINCT ON ("locations"."content_id") "locations"."content_id", "locations"."id" FROM "locations") AS loc
             INNER JOIN "content" ON ("loc"."content_id" = "content"."id")
             INNER JOIN "films" ON ("content"."film_id" = "films"."id")
         WHERE ("films"."rating_cons" >= %s AND "films"."rating_cons_cnt" > %s)
