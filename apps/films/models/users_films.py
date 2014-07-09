@@ -13,8 +13,8 @@ from apps.films.constants import APP_USERFILM_STATUS, APP_USERFILM_STATUS_UNDEF,
 class UsersFilms(models.Model):
     user       = models.ForeignKey(User, verbose_name=u'Идентификатор пользоваля', related_name='uf_users_rel')
     film       = models.ForeignKey('Films', verbose_name=u'Фильм', related_name='uf_films_rel')
-    status     = models.PositiveSmallIntegerField(null=True, blank=True, default=APP_USERFILM_STATUS_UNDEF, choices=APP_USERFILM_STATUS, verbose_name=u'Статус фильма с т.з. пользователя')
-    rating     = models.PositiveSmallIntegerField(null=True, blank=True, verbose_name=u'Рейтинг фильма поставленный пользователем')
+    status     = models.PositiveSmallIntegerField(null=True, blank=True, db_index=True, default=APP_USERFILM_STATUS_UNDEF, choices=APP_USERFILM_STATUS, verbose_name=u'Статус фильма с т.з. пользователя')
+    rating     = models.PositiveSmallIntegerField(null=True, blank=True, db_index=True, verbose_name=u'Рейтинг фильма поставленный пользователем')
     subscribed = models.PositiveSmallIntegerField(null=True, blank=True, default=APP_USERFILM_SUBS_FALSE, choices=APP_USERFILM_SUBS, verbose_name=u'Статус подписки')
     created    = models.DateTimeField(auto_now_add=True, verbose_name=u'Дата создания')
 

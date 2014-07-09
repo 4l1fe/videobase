@@ -1,14 +1,15 @@
 # coding: utf-8
 from datetime import datetime
-from apps.films.models import Films, FilmExtras
+import re
 
-from apps.films.models import Countries
-
-from data.checker import FactChecker
-from data.constants import FLATLAND_NAME
 import gdata.youtube
 import gdata.youtube.service
-import re
+
+from apps.films.models import Films, FilmExtras
+from apps.films.models import Countries
+from data.checker import FactChecker
+from data.constants import FLATLAND_NAME
+import requests
 
 
 film_checker = FactChecker(Films)
@@ -43,7 +44,21 @@ def youtube_name_check(film):
 
 @film_checker.add(u"Release date differs from omdb one by more than a year")
 def omdb_year_check(film):
-    pass
+    omdb_id = film.imdb_id
+    film_release_date_in_db = film.release_date.year
+
+    try:
+        r = requests.get('http://www.omdbapi.com/?i=tt'+str(omdb_id))
+        omdb_year_str = r.json()['Released'].split(' ')[2]
+        omdb_release_year_date = int(omdb_year_str)
+    except:
+        print "Attempt to get film info by imdb id from OMDB server was failed "
+        return 1
+
+    if abs(film_release_date_in_db - omdb_release_year_date) > 1:
+        return 0
+    else:
+        return 1
 
 
 @film_checker.add("There is no such trailer")
@@ -53,9 +68,9 @@ def trailer_check(film):
     yid = re.match('.+watch[?]v[=](?P<id>.+)(([&].+)?)', ft.url).groupdict()['id']
     try:
         entry = yt_service.GetYouTubeVideoEntry(video_id=yid)
-        return 0
-    except:
         return 1
+    except:
+        return 0
 
 
 @film_checker.add("Youtube trailer duration not within limits")
@@ -83,3 +98,12 @@ def film_release_date_check(film):
     date_string = '2014'
     date = datetime.strptime(date_string, '%Y')
     return film.release_date.year == date.year
+
+
+@film_checker.add("Film kinopoisk id is not set")
+def film_kinopoisk_id_check(film):
+    film_kinopoisk_id = film.kinopoisk_id
+    if film_kinopoisk_id > 0:
+        return 1
+    else:
+        return 0
