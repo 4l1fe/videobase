@@ -13,12 +13,12 @@ class Genres(models.Model):
         return u'[{0}] {1}'.format(self.pk, self.name)
 
     @classmethod
-    def get_cache_key(self):
-        return u'{0}-{1}-{2}'.format(self._meta.app_label, self._meta.db_table, 'all')
+    def get_cache_key(cls):
+        return u'{0}-{1}-{2}'.format(cls._meta.app_label, cls._meta.db_table, 'all')
 
     @classmethod
-    def get_all_genres(self, order=False):
-        genres_data = self.objects.all().values('id', 'name')
+    def get_all_genres(cls, order=False):
+        genres_data = cls.objects.all().values('id', 'name')
 
         if order:
             genres_data = [

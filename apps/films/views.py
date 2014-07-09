@@ -107,11 +107,15 @@ def index_view(request):
     NEW_FILMS_CACHE_KEY = 'new_films'
     resp_dict_serialized = cache.get(NEW_FILMS_CACHE_KEY)
 
+    # Расчитываем новинки, если их нет в кеше
     if resp_dict_serialized is None:
         o_film = film_model.Films.get_newest_films()
 
+        # Сериализуем новинки и конвертируем результат в строку
         resp_dict_data = vbFilm(o_film, require_relation=False, extend=True, many=True).data
         resp_dict_serialized = json.dumps(resp_dict_data, cls=DjangoJSONEncoder)
+
+        # Положим результат в кеш
         cache.set(NEW_FILMS_CACHE_KEY, resp_dict_serialized, 9000)
 
     else:
@@ -128,7 +132,7 @@ def index_view(request):
             if item['id'] in o_user:
                 resp_dict_data[index]['relation'] = o_user[item['id']].relation_for_vb_film
 
-    # Выборка жанров
+    # Выборка списка жанров из кеша, если есть
     genres_cache_key = film_model.Genres.get_cache_key()
     genres_data = cache.get(genres_cache_key)
 
@@ -139,13 +143,14 @@ def index_view(request):
         except:
             genres_data = []
 
-    films_data = vbFilm(film_model.Films.similar_default(), many=True).data
+    # Список рекомендуемых фильмов
+    o_recommend = SearchFilmsView.as_view()(request, recommend=True).data
 
-    # Init response
+    # Формируем ответ
     data = {
         'films_new': resp_dict_data,
         'filter_genres': genres_data,
-        'films': films_data
+        'films': o_recommend['items'],
     }
 
     return HttpResponse(render_page('index', data), status.HTTP_200_OK)
@@ -327,7 +332,7 @@ def search_view(request, *args, **kwargs):
 
     if request.REQUEST.get('text'):
         try:
-            resp_dict['films'] = SearchFilmsView.as_view()(request, personalize=False).data
+            resp_dict['films'] = SearchFilmsView.as_view()(request).data
             resp_dict['search_text'] = request.REQUEST.get('text')
         except Exception, e:
             pass
