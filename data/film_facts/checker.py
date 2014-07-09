@@ -9,18 +9,25 @@ from apps.films.models import Films, FilmExtras
 from apps.films.models import Countries
 from data.checker import FactChecker
 from data.constants import FLATLAND_NAME
+from bs4 import BeautifulSoup
 import requests
 
 
 film_checker = FactChecker(Films)
 
+
 def youtube_trailer_corrector(film):
-    print "Corrector deleted bad trailer successfully"
     ft = FilmExtras.objects.filter(film=film).first()
-    if not ft:
-        return False
     ft.delete()
-    return True
+    print u"Corrector deleted bad trailer successfully"
+
+
+def film_description_corrector(film):
+    film_html_description = BeautifulSoup(film.description)
+    film.description = film_html_description.getText(separator=u' ')
+    film.save()
+    print u"Corrector removed html tags in film description"
+
 
 @film_checker.add(u'Flatland in countries')
 def flatland_check(film):
@@ -62,7 +69,7 @@ def omdb_year_check(film):
         omdb_year_str = r.json()['Released'].split(' ')[2]
         omdb_release_year_date = int(omdb_year_str)
     except :
-        print "Attempt to get film info by imdb id from OMDB server was failed "
+        print u"Attempt to get film info by imdb id from OMDB server was failed "
         return True
 
     if omdb_release_year_date and abs(film_release_date_in_db - omdb_release_year_date) > 1:
@@ -71,7 +78,7 @@ def omdb_year_check(film):
         return True
 
 
-@film_checker.add("There is no such trailer", corrector=youtube_trailer_corrector)
+@film_checker.add(u"There is no such trailer", corrector=youtube_trailer_corrector)
 def trailer_check(film):
     yt_service = gdata.youtube.service.YouTubeService()
     ft = FilmExtras.objects.filter(film=film).first()
@@ -83,7 +90,7 @@ def trailer_check(film):
         return False
 
 
-@film_checker.add("Youtube trailer duration not within limits", corrector=youtube_trailer_corrector)
+@film_checker.add(u"Youtube trailer duration not within limits", corrector=youtube_trailer_corrector)
 def trailer_duration_check(film):
     max_trailer_time_in_seconds = 270
     min_trailer_time_in_secons = 60
@@ -94,7 +101,7 @@ def trailer_duration_check(film):
         entry = yt_service.GetYouTubeVideoEntry(video_id=yid)
         trailer_duration = entry.media.duration.seconds
     except:
-        return False
+        return True
     if trailer_duration:
         trailer_duration = int(trailer_duration)
         if (trailer_duration >= min_trailer_time_in_secons) and (trailer_duration <= max_trailer_time_in_seconds):
@@ -105,14 +112,14 @@ def trailer_duration_check(film):
         return False
 
 
-@film_checker.add("Film release year is not 2014")
+@film_checker.add(u"Film release year is not 2014")
 def film_release_date_check(film):
     date_string = '2014'
     date = datetime.strptime(date_string, '%Y')
     return film.release_date.year == date.year
 
 
-@film_checker.add("Film kinopoisk id is not set")
+@film_checker.add(u"Film kinopoisk id is not set")
 def film_kinopoisk_id_check(film):
     film_kinopoisk_id = film.kinopoisk_id
     if film_kinopoisk_id > 0:
@@ -121,3 +128,12 @@ def film_kinopoisk_id_check(film):
         return False
 
 
+@film_checker.add(u"Film description contains html tags", corrector=film_description_corrector)
+def film_description_contains_html_tags_check(film):
+    bs = BeautifulSoup(film.description)
+    p_tag = bs.find('body').find('p')
+    if p_tag:
+        tags_count = len(p_tag.findChildren())
+        if tags_count == 0:
+            return True
+    return False
