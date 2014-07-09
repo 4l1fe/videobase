@@ -4,7 +4,8 @@
                 <item>
                   <title>{{film.name}}</title>
                   <link>{{ trailer }} </link>
-                  <description><img src="{{poster}}}">Новинка в кинотеатре "Все видео": Фильм "{{ film.name }}"({{ film.name_orig }}, {{name.release_date}})
+                  <enclosure url="{{ poster }}" type="image/jpeg"/>
+                  <description>Новинка в кинотеатре "Все видео": Фильм "{{ film.name }}"({{ film.name_orig }}, {{name.release_date}})
                       Оценка: {{ film.rating_cons}}/10
                       Смотреть: http://vsevi.ru/film/{{film.id}}
                       В ролях:
