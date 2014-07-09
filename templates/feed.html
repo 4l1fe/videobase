@@ -1,14 +1,21 @@
 {% extends "base_feed.html" %}
         {% block feeditems %}
-            {% for film in films %}
+            {% for film, actors, directors, poster, trailer, scriptwriters, cost in films %}
+                <item>
                   <title>{{film.name}}</title>
                   <link>http://vsevi.ru/film/{{film.id}} </link>
-                  <description>{{ film.description }} </description>
+                  <description><img src="{{poster}}}" align="right">
+                    Сводный рейтинг: {{ film.rating_cons}}/10
+                    В ролях: {% for actor in actors%}{{ actor }}, {% endfor %}
+                    Режиссер: {% for director in directors%}{{ director }}, {% endfor %}. Сценарист: {% for scriptwriter in scriptwriters%}{{ scriptwriter}}{% endfor %}
+                    Жанр: {% for ganre in film.genres.all %} {{ganre.name}}, {% endfor %}
+                    Стоимость: {{ cost }}
+                    {{ film.description }}
+                </description>
                   <pubDate>
-{#                      {% with total=film.id %}#}
-{#                          {{ newdate.total }}#}
-{#                      {% endwith %}#}
+                    {{ date }}
                   </pubDate>
-                  <guid>http://vsevi.ru/films/{{film.id}}</guid>
+                  <guid>http://vsevi.ru/film/{{film.id}}</guid>
+                </item>
             {% endfor %}
         {% endblock %}
