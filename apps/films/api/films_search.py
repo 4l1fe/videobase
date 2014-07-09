@@ -20,6 +20,8 @@ from apps.contents.models import Contents, Locations
 
 import videobase.settings as settings
 
+from utils.middlewares.local_thread import get_current_request
+
 
 #############################################################################################################
 class SearchFilmsView(APIView):
@@ -122,12 +124,15 @@ class SearchFilmsView(APIView):
         return filter
 
 
-    def get(self, request, format=None, recommend=False, *args, **kwargs):
+    def get(self, request, format=None, recommend=False, use_thread=False,  *args, **kwargs):
         # Копируем запрос, т.к. в форме его изменяем
         self.get_copy = request.GET.copy()
 
         if recommend:
            self.get_copy['recommend'] = True
+
+        if use_thread:
+            request = get_current_request()
 
         # Валидируем форму
         form = SearchForm(data=self.get_copy)
@@ -169,7 +174,7 @@ class SearchFilmsView(APIView):
                     'total_cnt': page.paginator.count,
                     'per_page': page.paginator.per_page,
                     'page': page.number,
-                    'items': vbFilm(page.object_list, request=self.request, many=True).data,
+                    'items': vbFilm(page.object_list, request=request, many=True).data,
                 }
 
                 if use_cache:
