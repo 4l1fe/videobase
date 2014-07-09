@@ -210,7 +210,7 @@ def calc_actors(o_film):
 def calc_similar(o_film):
     result = []
     try:
-        result = film_model.Films.similar_api(o_film)
+        result = [i for i in film_model.Films.similar_api(o_film)]
         result = vbFilm(result).data
     except Exception, e:
         pass
