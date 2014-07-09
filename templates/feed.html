@@ -4,7 +4,8 @@
                 <item>
                   <title>{{film.name}}</title>
                   <link>http://vsevi.ru/film/{{film.id}} </link>
-                  <description><img src="{{poster}}}" align="right">
+                  <enclosure url="{{ poster }}" type="image/jpeg"/>
+                  <description>
                     Сводный рейтинг: {{ film.rating_cons}}/10
                     В ролях: {% for actor in actors%}{{ actor }}, {% endfor %}
                     Режиссер: {% for director in directors%}{{ director }}, {% endfor %}. Сценарист: {% for scriptwriter in scriptwriters%}{{ scriptwriter}}{% endfor %}
