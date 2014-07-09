@@ -14,20 +14,30 @@ import requests
 
 film_checker = FactChecker(Films)
 
+def youtube_trailer_corrector(film):
+    print "Corrector deleted bad trailer successfully"
+    ft = FilmExtras.objects.filter(film=film).first()
+    if not ft:
+        return False
+    ft.delete()
+    return True
+
 @film_checker.add(u'Flatland in countries')
 def flatland_check(film):
     flatland = Countries.objects.get(name = FLATLAND_NAME)
     return not ( flatland in film.countries.all() )
 
 
-@film_checker.add(u"Youtube name doesn't contain film name")
+@film_checker.add(u"Youtube name doesn't contain film name", corrector=youtube_trailer_corrector)
 def youtube_name_check(film):
 
     yt_service = gdata.youtube.service.YouTubeService()
-    ft = FilmExtras.objects.filter(film = film)[0]
-    yid = re.match('.+watch[?]v[=](?P<id>.+)(([&].+)?)', ft.url).groupdict()['id']
-
-    entry = yt_service.GetYouTubeVideoEntry(video_id=yid)
+    try:
+        ft = FilmExtras.objects.filter(film = film).first()
+        yid = re.match('.+watch[?]v[=](?P<id>.+)(([&].+)?)', ft.url).groupdict()['id']
+        entry = yt_service.GetYouTubeVideoEntry(video_id=yid)
+    except:
+        return True
 
     #print film.name, entry.title.text
     #print 'name = "{}"'.format(film.name_orig)
@@ -51,46 +61,48 @@ def omdb_year_check(film):
         r = requests.get('http://www.omdbapi.com/?i=tt'+str(omdb_id))
         omdb_year_str = r.json()['Released'].split(' ')[2]
         omdb_release_year_date = int(omdb_year_str)
-    except:
+    except :
         print "Attempt to get film info by imdb id from OMDB server was failed "
-        return 1
+        return True
 
-    if abs(film_release_date_in_db - omdb_release_year_date) > 1:
-        return 0
+    if omdb_release_year_date and abs(film_release_date_in_db - omdb_release_year_date) > 1:
+        return False
     else:
-        return 1
+        return True
 
 
-@film_checker.add("There is no such trailer")
+@film_checker.add("There is no such trailer", corrector=youtube_trailer_corrector)
 def trailer_check(film):
     yt_service = gdata.youtube.service.YouTubeService()
     ft = FilmExtras.objects.filter(film=film).first()
-    yid = re.match('.+watch[?]v[=](?P<id>.+)(([&].+)?)', ft.url).groupdict()['id']
     try:
+        yid = re.match('.+watch[?]v[=](?P<id>.+)(([&].+)?)', ft.url).groupdict()['id']
         entry = yt_service.GetYouTubeVideoEntry(video_id=yid)
-        return 1
+        return True
     except:
-        return 0
+        return False
 
 
-@film_checker.add("Youtube trailer duration not within limits")
+@film_checker.add("Youtube trailer duration not within limits", corrector=youtube_trailer_corrector)
 def trailer_duration_check(film):
     max_trailer_time_in_seconds = 270
     min_trailer_time_in_secons = 60
     yt_service = gdata.youtube.service.YouTubeService()
-    ft = FilmExtras.objects.filter(film=film).first()
-    yid = re.match('.+watch[?]v[=](?P<id>.+)(([&].+)?)', ft.url).groupdict()['id']
-
-    entry = yt_service.GetYouTubeVideoEntry(video_id=yid)
-    trailer_duration = entry.media.duration.seconds
+    try:
+        ft = FilmExtras.objects.filter(film=film).first()
+        yid = re.match('.+watch[?]v[=](?P<id>.+)(([&].+)?)', ft.url).groupdict()['id']
+        entry = yt_service.GetYouTubeVideoEntry(video_id=yid)
+        trailer_duration = entry.media.duration.seconds
+    except:
+        return False
     if trailer_duration:
         trailer_duration = int(trailer_duration)
         if (trailer_duration >= min_trailer_time_in_secons) and (trailer_duration <= max_trailer_time_in_seconds):
-            return 1
+            return True
         else:
-            return 0
+            return False
     else:
-        return 0
+        return False
 
 
 @film_checker.add("Film release year is not 2014")
@@ -104,6 +116,8 @@ def film_release_date_check(film):
 def film_kinopoisk_id_check(film):
     film_kinopoisk_id = film.kinopoisk_id
     if film_kinopoisk_id > 0:
-        return 1
+        return True
     else:
-        return 0
+        return False
+
+
