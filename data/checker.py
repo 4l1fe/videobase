@@ -1,5 +1,4 @@
 
-
 class FactChecker(object):
 
     checkers = {}
@@ -25,10 +24,13 @@ class FactChecker(object):
             return failures
 
     def check_and_correct(self, target):
-        failures = self.check(target)
-        for failure in failures:
-            if failure in self.correctors:
-                self.correctors[failure](target)
+        is_target_changed = True
+        while is_target_changed:
+            is_target_changed = False
+            failures = self.check(target)
+            for failure in failures:
+                if failure in self.correctors:
+                    self.correctors[failure](target)
         return self.check(target)
 
 
