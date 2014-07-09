@@ -1,6 +1,7 @@
 {% extends "base_feed.html" %}
         {% block feeditems %}
             {% for film, actors, directors, poster, trailer in films %}
+                <item>
                   <title>{{film.name}}</title>
                   <link>{{ trailer }} </link>
                   <description><img src="{{poster}}}">Новинка в кинотеатре "Все видео": Фильм "{{ film.name }}"({{ film.name_orig }}, {{name.release_date}})
@@ -20,10 +21,9 @@
                       {% endfor %}
                           звезды: {{film.rating_cons}}/10, {{film.release_date}} http://vsevi.ru/film/{{film.id}}</description>
                   <pubDate>
-{#                      {% with total=film.id %}#}
-{#                          {{ newdate.total }}#}
-{#                      {% endwith %}#}
+                       {{ date }}
                   </pubDate>
                   <guid>http://vsevi.ru/film/{{film.id}}</guid>
+                </item>
             {% endfor %}
         {% endblock %}
