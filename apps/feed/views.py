@@ -7,30 +7,37 @@ from apps.films.constants import APP_PERSON_ACTOR, APP_PERSON_DIRECTOR, APP_FILM
     APP_FILMS_EXTRAS_POSTER_HOST, APP_FILM_TYPE_ADDITIONAL_MATERIAL_TRAILER
 from apps.films.models import Films, PersonsFilms, FilmExtras
 import copy
+import time
+from email import utils
 
 
+def get_format_time():
+    nowdt = datetime.datetime.now()
+    nowtuple = nowdt.timetuple()
+    nowtimestamp = time.mktime(nowtuple)
+    return utils.formatdate(nowtimestamp)
 
 def get_feed_tw(request):
     films = Films.get_newest_films()
-    result = {'films': films, 'date': datetime.now().strftime('%a, %d %b %Y'), 'newdate': ''}
+    result = {'films': films, 'date': get_format_time(), 'newdate': ''}
     return HttpResponse(render(request, 'tw_feed.html',
                   result), content_type="application/rss+xml")
 
 
 def get_feed_vk(request):
-    result = {'films': get_film_description(True), 'newdate': '', 'date': datetime.now().strftime('%a, %d %b %Y')}
+    result = {'films': get_film_description(True), 'newdate': '', 'date': get_format_time()}
     return HttpResponse(render(request, 'vk_feed.html',
                   result), content_type="application/rss+xml" )
 
 
 def get_feed(request):
-    result = {'films': get_film_description(False), 'newdate': '', 'date': datetime.now().strftime('%a, %d %b %Y')}
+    result = {'films': get_film_description(False), 'newdate': '', 'date': get_format_time()}
     return HttpResponse(render(request, 'feed.html',
                   result), content_type="application/rss+xml")
 
 
 def get_feed_fb(request):
-    result = {'films': get_film_description(False), 'newdate': '', 'date': datetime.now().strftime('%a, %d %b %Y') }
+    result = {'films': get_film_description(False), 'newdate': '', 'date': get_format_time()}
     return HttpResponse(render(request, 'fb_feed.html',
                   result), content_type="application/rss+xml")
 
