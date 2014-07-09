@@ -9,9 +9,9 @@
                       Сводный рейтинг: {{ film.rating_cons}}/10
                       Смотреть: http://vsevi.ru/film/{{film.id}}
                       Стоимость:{{ cost }}
-                      В ролях: {% for actor in actors%} {{ actor }},{% endfor %}
+                      В ролях: {{ actors }}
                       Жанр: {% for ganre in film.genres.all %} #{{ganre.name}} {% endfor %}
-                      Режиссер: {% for director in directors%} {{ director }}, {% endfor %}
+                      Режиссер: {{ directors }}
                      {{film.description}} http://vsevi.ru/film/{{film.id}}
                   </description>
                   <pubDate>

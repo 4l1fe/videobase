@@ -119,4 +119,4 @@ def get_person(film):
         else:
             list_scriptwriter_by_film.append(person.person.name)
 
-    return list_actor_by_film, list_director_by_film, list_scriptwriter_by_film
+    return ','.join(list_actor_by_film), ','.join(list_director_by_film), ','.join(list_scriptwriter_by_film)
