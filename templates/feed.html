@@ -1,0 +1,14 @@
+{% extends "base_feed.html" %}
+        {% block feeditems %}
+            {% for film in films %}
+                  <title>{{film.name}}</title>
+                  <link>http://vsevi.ru/film/{{film.id}} </link>
+                  <description>{{ film.description }} </description>
+                  <pubDate>
+{#                      {% with total=film.id %}#}
+{#                          {{ newdate.total }}#}
+{#                      {% endwith %}#}
+                  </pubDate>
+                  <guid>http://vsevi.ru/films/{{film.id}}</guid>
+            {% endfor %}
+        {% endblock %}
