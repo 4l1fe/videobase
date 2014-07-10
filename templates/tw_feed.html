@@ -4,7 +4,7 @@
                 <item>
                   <title>{{film.name}}</title>
                   <link>http://vsevi.ru/films/{{film.id}} </link>
-                  <description>Новый #фильм {{ film.name }} {% for ganre in film.genres.all %}#{{ganre.name}}{% endfor %} {{film.rating_cons}}/10, {{film.release_date.year}} http://vsevi.ru/films/{{film.id}}
+                  <description><![CDATA[Новый #фильм {{ film.name }} {% for ganre in film.genres.all %}#{{ganre.name}}{% endfor %} {{film.rating_cons}}/10, {{film.release_date.year}} http://vsevi.ru/films/{{film.id}}]]>
                   </description>
                   <pubDate>
                     {{ date }}
