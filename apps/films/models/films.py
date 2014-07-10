@@ -98,20 +98,33 @@ class Films(models.Model):
             'cons': [self.get_rating_cons, self.rating_cons_cnt],
         }
 
+
     @property
     def get_rating_imdb(self):
-        rating_imdb = self.rating_imdb
-        return round(rating_imdb) if not rating_imdb is None else rating_imdb
+        rating = self.rating_imdb
+        if not rating is None:
+            return int(rating) if rating.is_integer() else rating
+
+        return rating
+
 
     @property
     def get_rating_kinopoisk(self):
-        rating_kinopoisk = self.rating_kinopoisk
-        return round(rating_kinopoisk) if not rating_kinopoisk is None else rating_kinopoisk
+        rating = self.rating_kinopoisk
+        if not rating is None:
+            return int(rating) if rating.is_integer() else rating
+
+        return rating
+
 
     @property
     def get_rating_cons(self):
-        rating_cons = self.rating_cons
-        return round(rating_cons) if not rating_cons is None else rating_cons
+        rating = self.rating_cons
+        if not rating is None:
+            return int(rating) if rating.is_integer() else rating
+
+        return rating
+
 
     @property
     def get_rating_local_cnt(self):
@@ -176,7 +189,7 @@ class Films(models.Model):
         divisor = float(sum(t[0] for t in values if t[1]))
         result = sum([t[0] / divisor * t[1] for t in values if t[1]])
 
-        return result
+        return round(result, 1)
 
 
     def get_sort_cnt(self, rating_cons_cnt):
