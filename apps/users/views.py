@@ -132,7 +132,7 @@ class UserView(View):
         try:
             user = User.objects.get(pk=user_id)
         except User.DoesNotExist:
-            return HttpResponseBadRequest()
+            raise Http404
 
         try:
             uvb = vbUser(user, extend=True, genres=True, friends=True)
