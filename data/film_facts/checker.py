@@ -11,6 +11,9 @@ from data.checker import FactChecker
 from data.constants import FLATLAND_NAME
 from bs4 import BeautifulSoup
 import requests
+import re
+
+
 
 
 film_checker = FactChecker(Films)
@@ -22,11 +25,26 @@ def youtube_trailer_corrector(film):
     print u"Corrector deleted bad trailer successfully"
 
 
-def film_description_corrector(film):
+def film_description_html_corrector(film):
     film_html_description = BeautifulSoup(film.description)
     film.description = film_html_description.getText(separator=u' ')
     film.save()
     print u"Corrector removed html tags in film description"
+
+
+def film_description_digits_corrector(film):
+    film_description = film.description.encode("utf-8")
+
+    def find_first_uppercase_letter_position(s):
+        pattern = re.compile("[А-Я]")
+        mo = re.search(pattern, s)
+        return mo.start()
+
+    i = find_first_uppercase_letter_position(film_description)
+    film.description = film_description[i-1:].decode("utf-8")
+    film.save()
+    print u"Corrector removed digits in film description"
+
 
 
 @film_checker.add(u'Flatland in countries')
@@ -128,7 +146,7 @@ def film_kinopoisk_id_check(film):
         return False
 
 
-@film_checker.add(u"Film description contains html tags", corrector=film_description_corrector)
+@film_checker.add(u"Film description contains html tags", corrector=film_description_html_corrector)
 def film_description_contains_html_tags_check(film):
     bs = BeautifulSoup(film.description)
     p_tag = bs.find('body').find('p')
@@ -137,3 +155,13 @@ def film_description_contains_html_tags_check(film):
         if tags_count == 0:
             return True
     return False
+
+
+@film_checker.add(u"Film description contains digits", corrector=film_description_digits_corrector)
+def film_description_contains_digits_check(film):
+    film_description = film.description
+    a = re.compile("^[А-Я]")
+    if a.match(film_description.encode("utf-8")):
+        return True
+    else:
+        return False

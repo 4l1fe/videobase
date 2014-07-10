@@ -8,7 +8,6 @@ import data.film_facts.checker
 class Command(NoArgsCommand):
     def handle_noargs(self, **options):
         f = Films.objects.get(pk=91)
-        print(f.release_date)
         ft = FilmExtras.objects.filter(film=f)
         print f.description
         print data.film_facts.checker.film_checker.check_and_correct(f)
