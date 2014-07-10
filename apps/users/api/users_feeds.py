@@ -51,10 +51,9 @@ class UsersFeedsView(APIView):
             o_feed, count = Feed.get_feeds_by_user_all(user_id, uf=uf, up=up, ur=ur,
                                                         count=True, offset=offset, limit=per_page)
 
+        # Сериализуем данные
         try:
-            # Сериализуем данные
             serializer = vbFeedElement(o_feed, many=True).data
-
         except Exception as e:
             return Response({'e': e.message}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -76,9 +75,11 @@ class UsersFeedsView(APIView):
 
         return uf, up
 
+
     def get_rels_info(self, user_id):
         # Список друзей пользователя
         return UsersRels.get_all_friends_user(user_id, flat=True)
+
 
     def validation(self, page, per_page):
         try:
