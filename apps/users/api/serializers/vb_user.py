@@ -10,6 +10,8 @@ from apps.films.constants import APP_USERFILM_STATUS_NOT_WATCH
 from apps.users.models import User, UsersPics, UsersRels
 from apps.users.constants import APP_USER_REL_TYPE_NONE, APP_USER_REL_TYPE_FRIENDS
 
+#:TODO Нужно отрефакторить vbUser. Волосы дыбом стоия когда его читаешь.
+#:TODO Необходимо сделать замеры количества запросов, есть подозрение что можно сэкономить
 
 class vbUser(serializers.ModelSerializer):
     name = serializers.SerializerMethodField('get_name')
@@ -60,11 +62,13 @@ class vbUser(serializers.ModelSerializer):
 
     def get_genre_fav(self, obj):
         try:
-            genre = max(Genres.objects.filter(genres__uf_films_rel__user=obj).\
-                exclude(genres__uf_films_rel__status=APP_USERFILM_STATUS_NOT_WATCH).\
-                distinct().values("id", "name").annotate(count=Count("genres__id")),
-                key=lambda g: g['count'])
-        except:
+            genre = Genres.objects.filter(genres__uf_films_rel__user=obj).\
+                exclude(genres__uf_films_rel__status=APP_USERFILM_STATUS_NOT_WATCH).distinct().values("id", "name").\
+                annotate(count=Count("genres__id"))
+            genre = max(genre, key=lambda g: g['count'])
+
+
+        except Exception, e:
             return {}
 
         if 'id' in genre and 'name' in genre:
@@ -108,7 +112,7 @@ class vbUser(serializers.ModelSerializer):
             exclude(genres__uf_films_rel__status=APP_USERFILM_STATUS_NOT_WATCH).\
             distinct()
 
-        return vbUserGenre(genres, user=obj, many=True).data
+        return sorted(vbUserGenre(genres, user=obj, many=True).data, key=lambda g: g['percent'], reverse=True)
 
 
     def friends_list(self, obj):
