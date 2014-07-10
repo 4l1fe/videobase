@@ -202,7 +202,7 @@ def calc_actors(o_film):
     try:
         result = list(film_model.Persons.get_sorted_persons_by_name(**filter).values('id', 'name'))
     except Exception, e:
-        pass
+        print "Caught exception {} in calc_actors".format(e)
 
     return result
 
@@ -212,7 +212,7 @@ def calc_similar(o_film):
     try:
         result = vbFilm(film_model.Films.similar_api(o_film), many=True).data
     except Exception, e:
-        pass
+        print "Caught exception {} in calc_similar".format(e)
 
     return result
 
