@@ -637,7 +637,7 @@ class App
       rel = opts.rel || {}
       action_str = action
       action_str+= "d" if action == "subscribe"
-      new_state = state_toggle(opts.status, rel[action_str])
+      new_state = state_toggle(rel.status, rel[action_str])
       if action == "rate"
         if !opts.value
           @rest.films.action.rate.destroy(id)
