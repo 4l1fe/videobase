@@ -96,7 +96,17 @@ class Films(models.Model):
             'imdb': [self.get_rating_imdb, self.rating_imdb_cnt],
             'kp': [self.get_rating_kinopoisk, self.rating_kinopoisk_cnt],
             'cons': [self.get_rating_cons, self.rating_cons_cnt],
+            'vsevi': [self.get_rating_local, self.rating_local_cnt],
         }
+
+
+    @property
+    def get_rating_local(self):
+        rating = self.rating_local
+        if not rating is None:
+            return int(rating) if rating.is_integer() else round(rating, 1)
+
+        return rating
 
 
     @property
