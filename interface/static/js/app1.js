@@ -1030,7 +1030,7 @@
         if (action === "subscribe") {
           action_str += "d";
         }
-        new_state = state_toggle(opts.status, rel[action_str]);
+        new_state = state_toggle(rel.status, rel[action_str]);
         if (action === "rate") {
           if (!opts.value) {
             return this.rest.films.action.rate.destroy(id).done(function() {
@@ -1989,3 +1989,5 @@
   };
 
 }).call(this);
+
+//# sourceMappingURL=app1.map
