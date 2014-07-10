@@ -14,9 +14,16 @@ import requests
 import re
 
 
-
-
 film_checker = FactChecker(Films)
+
+
+def find_first_pattern_position(str, pat):
+        pattern = re.compile(pat)
+        mo = re.search(pattern, str)
+        if mo:
+            return mo.start()
+        else:
+            return -1
 
 
 def youtube_trailer_corrector(film):
@@ -35,15 +42,21 @@ def film_description_html_corrector(film):
 def film_description_digits_corrector(film):
     film_description = film.description.encode("utf-8")
 
-    def find_first_uppercase_letter_position(s):
-        pattern = re.compile("[А-Я]")
-        mo = re.search(pattern, s)
-        return mo.start()
+    i = find_first_pattern_position(film_description, "[А-Я]")
+    if i!=-1:
+        film.description = film_description[i:].decode("utf-8")
+        film.save()
+        print u"Corrector removed digits in film description"
 
-    i = find_first_uppercase_letter_position(film_description)
-    film.description = film_description[i-1:].decode("utf-8")
-    film.save()
-    print u"Corrector removed digits in film description"
+
+def film_description_useless_links_corrector(film):
+    film_description = film.description.encode("utf-8")
+
+    i = find_first_pattern_position(film_description, "(NOW.RU)|(ZOOMBY.RU)")
+    if i!=-1:
+        film.description = film_description[0:i].decode("utf-8")
+        film.save()
+        print u"Corrector removed useless links in film description"
 
 
 
@@ -165,3 +178,15 @@ def film_description_contains_digits_check(film):
         return True
     else:
         return False
+
+
+@film_checker.add(u"Film description contains useless site names at the end",
+                  corrector=film_description_useless_links_corrector)
+def film_description_contains_useless_site_names_check(film):
+    film_description = film.description.encode("utf-8")
+    i = find_first_pattern_position(film_description, "(NOW.RU)|(ZOOMBY.RU)")
+    print "INDEX", i, len(film_description)
+    if i!=-1:
+        return False
+    else:
+        return True
