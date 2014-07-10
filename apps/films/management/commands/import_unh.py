@@ -21,12 +21,12 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        filename =  args[0]
+        filename = args[0]
         if os.path.exists(filename):
-            self.stdout.write(u'Start: Import from UNH CSV from %s' % filename)
-            self.import_file( filename)
+            self.stdout.write(u'Start: Import from UNH CSV from {0}'.format(filename))
+            self.import_file(filename)
         else:
-            raise Exception(u'File %s not found' % filename)
+            raise Exception(u'File {0} not found'.format(filename))
 
     @property
     def html_parser(self):
@@ -39,7 +39,7 @@ class Command(BaseCommand):
         return _value
 
     def import_file(self, filename):
-        self.stdout.write('Run import -  %s' % filename)
+        self.stdout.write(u'Run import - {0}'.format(filename))
         data = self.__csvfile(filename)
         headers = data[0]
         counter = 0
