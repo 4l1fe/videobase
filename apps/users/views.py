@@ -138,13 +138,14 @@ class UserView(View):
             uvb = vbUser(user, extend=True, genres=True, friends=True)
             days = (timezone.now() - uvb.data['regdate']).days
             how_long = numeral.get_plural(days, (u'день', u'дня', u'дней'))
-            default_user = {'regdate': uvb.data['regdate'].strftime("%Y-%m-%d"),
-                            'how_long': how_long}
-            default_user.update(uvb.data)
 
-            films = Films.objects.filter(uf_films_rel__user=user,
-#                                         type__in=(APP_FILM_SERIAL, APP_FILM_FULL_FILM),
-                                         uf_films_rel__subscribed=APP_USERFILM_SUBS_TRUE)
+            default_user = uvb.data
+            default_user.update({
+                'regdate': uvb.data['regdate'].strftime("%Y-%m-%d"),
+                'how_long': how_long
+            })
+
+            films = Films.objects.filter(uf_films_rel__user=user, uf_films_rel__subscribed=APP_USERFILM_SUBS_TRUE)
             films = Paginator(films, APP_USERS_API_DEFAULT_PER_PAGE).page(APP_USERS_API_DEFAULT_PAGE)
             vbf = vbFilm(films.object_list, many=True)
 
@@ -159,15 +160,14 @@ class UserView(View):
             # Сериализуем
             o_feed = vbFeedElement(calc_feed(user.id), many=True).data
 
-            default = {
-                
+            default_user.update({
                 'films': vbf.data,
                 'actors': vba.data,
                 'feed': o_feed,
                 'directors': vbd.data,
-            }
-            default_user.update(default)
-            return HttpResponse(render_page('user', {'user':default_user}))
+            })
+
+            return HttpResponse(render_page('user', {'user': default_user}))
 
         except Exception as e:
             return HttpResponseServerError(e)
