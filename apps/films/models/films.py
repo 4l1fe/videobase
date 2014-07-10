@@ -103,7 +103,7 @@ class Films(models.Model):
     def get_rating_imdb(self):
         rating = self.rating_imdb
         if not rating is None:
-            return int(rating) if rating.is_integer() else rating
+            return int(rating) if rating.is_integer() else round(rating, 1)
 
         return rating
 
@@ -112,7 +112,7 @@ class Films(models.Model):
     def get_rating_kinopoisk(self):
         rating = self.rating_kinopoisk
         if not rating is None:
-            return int(rating) if rating.is_integer() else rating
+            return int(rating) if rating.is_integer() else round(rating, 1)
 
         return rating
 
@@ -121,7 +121,7 @@ class Films(models.Model):
     def get_rating_cons(self):
         rating = self.rating_cons
         if not rating is None:
-            return int(rating) if rating.is_integer() else rating
+            return int(rating) if rating.is_integer() else round(rating, 1)
 
         return rating
 
