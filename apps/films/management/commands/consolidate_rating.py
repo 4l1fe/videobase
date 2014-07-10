@@ -58,7 +58,7 @@ class Command(BaseCommand):
 
     def calculate_local_rating(self):
         """
-            Вычисление локального рейтинга
+        Вычисление локального рейтинга
         """
 
         cursor = connection.cursor()
@@ -101,7 +101,7 @@ class Command(BaseCommand):
 
     def calc_rating_sort(self, instance):
         """
-            Вычисление условного рейтинга для сортировки
+        Вычисление условного рейтинга для сортировки
         """
 
         rating_sort = instance.get_sort_cnt(instance.rating_cons_cnt) * \
