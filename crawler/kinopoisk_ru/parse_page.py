@@ -16,6 +16,7 @@ from functools import partial
 import logging
 import os
 import time
+from crawler.constants import PAGE_ARCHIVE
 
 
 YANDEX_KP_ACTORS_TEMPLATE = "http://st.kp.yandex.net/images/actor_iphone/iphone360_{}.jpg"
@@ -42,7 +43,7 @@ def get_vote(soup):
 
     r = simple_tor_get_page(csslink)
 
-    css = r.content
+    css = r
     m = re.search('[.]starbar[ ]{width[:][ ](?P<width>[0-9]+)px', css)
     parent_width = float(m.groupdict()['width'])
 
