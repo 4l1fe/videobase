@@ -5,6 +5,7 @@ import sys
 import csv
 import json
 import codecs
+from optparse import make_option
 
 from django.test.client import Client
 from django.core.urlresolvers import reverse
@@ -17,27 +18,54 @@ from apps.users.models import SessionToken, UsersApiSessions, User
 
 
 class Command(BaseCommand):
+    option_list = BaseCommand.option_list + (
+        make_option('-f', '--filename',
+            action  = 'store',
+            dest    = 'filename',
+            default = False,
+            help    = 'Full path for file',
+        ),
+        make_option('-u', '--user',
+            action  = 'store',
+            dest    = 'user',
+            default = False,
+            help    = 'ID for user',
+        ),
+    )
 
     help = u"Импортирование оценок фильма из файла"
     requires_model_validation = True
 
 
     def handle(self, *args, **options):
-        filename = args[0]
+        filename = options.get('filename', False)
+        user_id = options.get('user', False)
+
+        # Проверка имени файла
+        if not filename:
+            self.stdout.write(u'Введите имя файла')
+            sys.exit(1)
+
+        # Проверка пользователя
+        if not user_id:
+            self.stdout.write(u'Введите ID пользователя')
+            sys.exit(1)
+
+        # Проверка существования файла
         if os.path.exists(filename):
             self.stdout.write(u'Start: Import ratings from {0}'.format(filename))
-            self.import_file(filename)
+            self.import_file(filename, user_id)
         else:
             raise Exception(u'File {0} not found'.format(filename))
 
 
-    def import_file(self, filename):
+    def import_file(self, filename, user_id):
         self.stdout.write(u'Run import - {0}'.format(filename))
 
         # Init data
         counter = 0
         not_linked_films = []
-        o_user = User.objects.get(id=36)
+        o_user = User.objects.get(id=user_id)
 
         # Create Session
         token = Token.objects.get(user=o_user.id)
