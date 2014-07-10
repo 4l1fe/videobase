@@ -21,25 +21,25 @@ def get_feed_tw(request):
     films = Films.get_newest_films()
     result = {'films': films, 'date': get_format_time(), 'newdate': ''}
     return HttpResponse(render(request, 'tw_feed.html',
-                  result), content_type="application/rss+xml")
+                  result), content_type="application/rss+xml ; charset=utf-8")
 
 
 def get_feed_vk(request):
     result = {'films': get_film_description(True), 'newdate': '', 'date': get_format_time()}
     return HttpResponse(render(request, 'vk_feed.html',
-                  result), content_type="application/rss+xml" )
+                  result), content_type="application/rss+xml ; charset=utf-8")
 
 
 def get_feed(request):
     result = {'films': get_film_description(False), 'newdate': '', 'date': get_format_time()}
     return HttpResponse(render(request, 'feed.html',
-                  result), content_type="application/rss+xml")
+                  result), content_type="application/rss+xml ; charset=utf-8")
 
 
 def get_feed_fb(request):
     result = {'films': get_film_description(False), 'newdate': '', 'date': get_format_time()}
     return HttpResponse(render(request, 'fb_feed.html',
-                  result), content_type="application/rss+xml")
+                  result), content_type="application/rss+xml ; charset=utf-8")
 
 
 def get_film_description(is_vk):
@@ -57,6 +57,7 @@ def get_film_description(is_vk):
         list_actor_by_film, list_director_by_film, list_scriptwriter_by_film = get_person(film)
         cost = get_price(film)
         list_cost.append(copy.deepcopy(cost))
+        list_cost.append(cost)
         list_director.append(copy.deepcopy(list_director_by_film))
         list_actor.append(copy.deepcopy(list_actor_by_film))
         list_poster.append(copy.deepcopy(poster))
@@ -78,12 +79,14 @@ def get_price(film):
             min_price = location.price
 
     if min_price != 0:
-        cost = u'от ' + str(min_price) + u'рублей без рекламы'
+        cost = u'от ' + str(int(min_price)) + u' рублей без рекламы'
 
     if min_price == 0 and price != -1:
-        cost = u'бесплатно или от ' + str(price) + u' рублей без рекламы'
+        cost = u'бесплатно или от ' + str(int(price)) + u' рублей без рекламы'
 
     return cost
+
+
 def get_extras(film, is_vk):
     film_extras = FilmExtras.objects.filter(film_id=film.id).all()
     poster = ''
@@ -120,3 +123,4 @@ def get_person(film):
             list_scriptwriter_by_film.append(person.person.name)
 
     return ','.join(list_actor_by_film), ','.join(list_director_by_film), ','.join(list_scriptwriter_by_film)
+
