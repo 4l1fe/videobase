@@ -1,8 +1,10 @@
 from apps.contents.models import Contents, Locations
-from apps.films.models import  Seasons
+from apps.films.models import Seasons
 from apps.robots.constants import APP_ROBOT_VALUE
 from django.core.validators import URLValidator
 from apps.contents.constants import APP_CONTENTS_PRICE_TYPE_FREE
+
+
 def sane_dict(film=None):
     '''
     Template for dict returned by parsers with sane defaults

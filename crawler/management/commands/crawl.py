@@ -1,18 +1,13 @@
 # coding: utf-8
 
-from django.core.management.base import BaseCommand, CommandError
-from apps.films.models import Films, PersonsFilms, Persons, Genres, FilmExtras, Countries
-from apps.films.constants import APP_PERSON_PHOTO_DIR,APP_FILM_CRAWLER_LIMIT,APP_FILM_CRAWLER_DELAY,APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER, APP_FILM_FULL_FILM
+from django.core.management.base import BaseCommand
+from apps.films.models import Films
+from apps.films.constants import APP_FILM_CRAWLER_LIMIT, APP_FILM_CRAWLER_DELAY
 from apps.robots.models import KinopoiskTries
-from apps.robots.constants import APP_ROBOT_FAIL, APP_ROBOT_SUCCESS
-from crawler.parse_page import acquire_page, parse_one_page
-from django.core.files import File
+from apps.robots.constants import APP_ROBOT_FAIL
 from optparse import make_option
-from crawler.kinopoisk_poster import set_kinopoisk_poster
 from time import sleep
-from django.utils.timezone import now
-import logging
-from crawler.kinopoisk import parse_from_kinopoisk
+from crawler.kinopoisk_ru.kinopoisk import parse_from_kinopoisk
     
     
 class Command(BaseCommand):
@@ -32,18 +27,14 @@ class Command(BaseCommand):
     )
 
     def handle(self, *args, **options):
-        page_dump = u"Couldn't get page"
-
-        logger.info("Starting crawler")
-
         if args:
             films = [Films.objects.get(pk=arg) for arg in args]
         else:
-            films = Films.objects.filter(kinopoisk_lastupdate=None, kinopoisk_id__isnull=False)[:LIMIT]
+            films = Films.objects.filter(kinopoisk_lastupdate=None, kinopoisk_id__isnull=False)
 
         for film in films:
-            previous_tries = KinopoiskTries.objects.filter(result=APP_ROBOT_FAIL, film=film)
+            previous_tries = KinopoiskTries.objects.filter(result=APP_ROBOT_FAIL,film=film)
             if film.kinopoisk_id and ((not previous_tries) or options['debug']):
                 sleep(APP_FILM_CRAWLER_DELAY)
-                parse_from_kinopoisk(film,film.kinopoisk_id)
+                parse_from_kinopoisk(film, film.kinopoisk_id)
 

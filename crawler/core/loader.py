@@ -4,7 +4,6 @@ from crawler.tor import simple_tor_get_page as simple_get
 from crawler.core.exceptions import RetrievePageException
 
 
-
 # Базовый класс загрузчика страници
 class BaseLoader(object):
     """ Base class to load html from site"""
@@ -22,7 +21,7 @@ class BaseLoader(object):
         raise NotImplementedError()
 
     # сама функция загрузки
-    def load(self,load_function):
+    def load(self, load_function=simple_get):
         try:
             url = self.get_url(load_function)
             return {'html': load_function(url), 'url': url}
