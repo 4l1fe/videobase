@@ -3,49 +3,50 @@ include config
 include mixins
 include head
 body.page-profile
-    .wrap-page
+    .wrap-page.bg-noise
         include header
         .content(role='main')
             section.blue-block
-                .container
-                    .row.block-profile-me
-                        .col-md-3
-                            .person-img
-                                - url_tmp = user.avatar || noavatar_url
-                                img.img-circle(src=url_tmp, alt='')
-                                br
-                                a.btn-yellow3.rel.zmin(href='#', title='')#friendship Добавить в друзья
-                            //
-                               .person-img
-                        .col-md-6
-                            .profile-column
-                                h2=user.name
-                                ul.list-profile
-                                    li
-                                        i На сайте
-                                        span=how_long_str(new Date(user.regdate), 1)
-                                    if user.friends_cnt
+                .bg-noise
+                    .container
+                        .row.block-profile-me
+                            .col-md-3
+                                .person-img
+                                    - url_tmp = user.avatar || noavatar_url
+                                    img.img-circle(src=url_tmp, alt='')
+                                    br
+                                    a.btn-yellow3.rel.zmin(href='#', title='')#friendship Добавить в друзья
+                                //-
+                                   .person-img
+                            .col-md-6
+                                .profile-column
+                                    h2=user.name
+                                    ul.list-profile
                                         li
-                                            i Друзей
-                                            span=user.friends_cnt
-                                    if user.films_watched
-                                        li
-                                            i Просмотрел фильмов
-                                            span=user.films_watched
-                                    if user.comments_cnt
-                                        li
-                                            i Оставил комментариев
-                                            span=user.comments_cnt
-                                    if user.genre_fav && user.genre_fav.name
-                                        li
-                                            i Любимый жанр
-                                            span=user.genre_fav.name
-                            //
-                               .profile-column
-                    //
-                       .enter-block
-            //
-               .blue-block
+                                            i На сайте
+                                            span=how_long_str(user.regdate, 1)
+                                        if user.friends_cnt
+                                            li
+                                                i Друзей
+                                                span=user.friends_cnt
+                                        if user.films_watched
+                                            li
+                                                i Просмотрел фильмов
+                                                span=user.films_watched
+                                        if user.comments_cnt
+                                            li
+                                                i Оставил комментариев
+                                                span=user.comments_cnt
+                                        if user.genre_fav && user.genre_fav.name
+                                            li
+                                                i Любимый жанр
+                                                span=user.genre_fav.name
+                                //-
+                                   .profile-column
+                        //-
+                           .enter-block
+                //-
+                   .blue-block
             section
                 .container
                     #show-actors.none
@@ -65,10 +66,10 @@ body.page-profile
                                     .add-filter#friends_more
                                         .add-content.style-panel-action.rel.zmin
                                             a(href='#show-actors', title='') показать всех
-                                        //
+                                        //-
                                            .filter-content
                                         img.img-responsive(src=img_url + 'shd-big.png', alt='')
-                                    //
+                                    //-
                                        .filter-block
                             if user.genres && user.genres.length
                                 .vote
@@ -95,10 +96,10 @@ body.page-profile
                                 .add-filter#feed_more
                                     .add-content.style-panel-action.rel.zmin
                                         a(href='#', title='') загрузить еще
-                                    //
+                                    //-
                                        .filter-content
                                     img.img-responsive(src=img_url + 'shd-big.png', alt='')
-                                //
+                                //-
                                    .filter-block
             if user.films && user.films.length
                 section.brd-top
@@ -109,15 +110,15 @@ body.page-profile
                                 each item in user.films
                                     mixin film_thumb(item)
                         if user.films.length >=12
-                            //
+                            //-
                                .list-film
                             .add-filter#films_more
                                 .add-content.style-panel-action.rel.zmin
                                     a(href='') показать еще
-                                //
+                                //-
                                    .filter-content
                                 img.img-responsive(src=img_url + 'shd-big.png', alt='')
-                            //
+                            //-
                                .filter-block
             if user.actors || user.directors
                 if user.actors && user.actors.length
