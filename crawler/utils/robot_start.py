@@ -5,8 +5,6 @@ Module containing general functionality for crawler robots
 and run function for robots written as loader parser combo
 """
 
-import re
-
 from django.utils import timezone
 from django.db.models import Q
 
@@ -14,26 +12,26 @@ from apps.films.models import Films
 
 from crawler.utils.locations_utils import save_location, sane_dict
 from crawler.kinopoisk_ru.kinopoisk import get_id_by_film
-from crawler.ivi_ru.loader import IVI_Loader
-from crawler.ivi_ru.parsers import ParseFilmPage
-from crawler.now_ru.loader import NOW_Loader
-from crawler.now_ru.parsers import ParseNowFilmPage
-from crawler.megogo_net.loader import MEGOGO_Loader
-from crawler.megogo_net.parsers import ParseMegogoFilm
-from crawler.stream_ru.loader import STREAM_RU_Loader
-from crawler.stream_ru.parsers import ParseStreamFilm
-from crawler.play_google_com.loader import PLAY_GOOGLE_Loader
-from crawler.play_google_com.parsers import ParsePlayGoogleFilm
-from crawler.tvigle_ru.loader import TVIGLE_Loader
-from crawler.tvigle_ru.parsers import ParseTvigleFilm
-from crawler.zabava_ru.loader import ZABAVAR_RU_Loader
-from crawler.zabava_ru.parsers import ParseZabavaFilm
-from crawler.oll_tv.loader import Oll_Loader
-from crawler.oll_tv.parser import ParseOllFilm
-from crawler.tvzavr_ru.loader import Tvzavr_Loader
-from crawler.tvzavr_ru.parsers import ParseTvzavrFilmPage
-from crawler.zoomby_ru.loader import ZOOMBY_Loader
-from crawler.zoomby_ru.parsers import ParseFilm
+from crawler.locrobots.ivi_ru.loader import IVI_Loader
+from crawler.locrobots.ivi_ru.parsers import ParseFilmPage
+from crawler.locrobots.now_ru.loader import NOW_Loader
+from crawler.locrobots.now_ru.parsers import ParseNowFilmPage
+from crawler.locrobots.megogo_net.loader import MEGOGO_Loader
+from crawler.locrobots.megogo_net.parsers import ParseMegogoFilm
+from crawler.locrobots.stream_ru.loader import STREAM_RU_Loader
+from crawler.locrobots.stream_ru.parsers import ParseStreamFilm
+from crawler.locrobots.play_google_com.loader import PLAY_GOOGLE_Loader
+from crawler.locrobots.play_google_com.parsers import ParsePlayGoogleFilm
+from crawler.locrobots.tvigle_ru.loader import TVIGLE_Loader
+from crawler.locrobots.tvigle_ru.parsers import ParseTvigleFilm
+from crawler.locrobots.zabava_ru.loader import ZABAVAR_RU_Loader
+from crawler.locrobots.zabava_ru.parsers import ParseZabavaFilm
+from crawler.locrobots.oll_tv.loader import Oll_Loader
+from crawler.locrobots.oll_tv.parser import ParseOllFilm
+from crawler.locrobots.tvzavr_ru.loader import Tvzavr_Loader
+from crawler.locrobots.tvzavr_ru.parsers import ParseTvzavrFilmPage
+from crawler.locrobots.zoomby_ru.loader import ZOOMBY_Loader
+from crawler.locrobots.zoomby_ru.parsers import ParseFilm
 
 from apps.robots.constants import APP_ROBOTS_TRY_NO_SUCH_PAGE
 
