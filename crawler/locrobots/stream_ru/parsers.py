@@ -6,11 +6,13 @@ from apps.films.constants import APP_FILM_FULL_FILM, APP_FILM_SERIAL
 import re
 
 
-def search_film(ul, film_name):
+def search_film(ul, film_name, year):
     if not (ul is None):
         for li in ul.select('li.item'):
             div = li.find(class_='description')
-            if div.a.text == film_name:
+            tag_year = div.find('p', {'class':'genre-year'}).text
+            film_year = int(re.search(ur'\d+', tag_year).group())
+            if div.a.text == film_name and film_year == year:
                 film_link = 'http://www.stream.ru' + div.a.get('href')
                 break
         return film_link
@@ -18,16 +20,15 @@ def search_film(ul, film_name):
         return None
 
 
-def parse_search(response, film_name, film_type):
+def parse_search(response, film_name, film_type, year):
     film_link = None
     try:
-        content = response.content
-        soup = BeautifulSoup(content)
+        soup = BeautifulSoup(response)
         if not (soup.find(attrs={'class': 'found-nothing'}) is None):
             return None
-        if film_type == APP_FILM_FULL_FILM:
+        if film_type == APP_FILM_FULL_FILM or film_type == u'':
             ul = soup.find('ul', {'class': 'item-list'})
-            film_link = search_film(ul, film_name)
+            film_link = search_film(ul, film_name, year)
         elif film_type == APP_FILM_SERIAL:
             ul = soup.find('ul', {'class': 'item-list2'})
             film_link = search_film(ul, film_name)
@@ -77,3 +78,6 @@ class ParseStreamFilm(BaseParse):
 
     def get_type(self, **kwargs):
         return 'streamru'
+
+    def get_value(self, **kwargs):
+        pass

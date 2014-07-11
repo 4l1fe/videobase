@@ -1,4 +1,6 @@
 # coding: utf-8
+from utils.common import url_with_querystring
+
 HOST = 'www.stream.ru'
 URL_SEARCH = 'search'
 URL_LOAD = ''
@@ -15,8 +17,9 @@ class STREAM_RU_Loader(BaseLoader):
 
     def get_url(self, load_function):
         url = "http://%s/%s" % (self.host, self.search_url, )
-        response = load_function(url, params=self.params, cache=False)
-        film_url = parsers.parse_search(response, self.film.name, self.film.type)
+        url = url_with_querystring(url, **self.params)
+        response = load_function(url)
+        film_url = parsers.parse_search(response, self.film.name, self.film.type, self.film.release_date.year)
         if film_url is None:
             raise NoSuchFilm(self.film)
         self.url_load = film_url
