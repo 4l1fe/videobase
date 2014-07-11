@@ -107,7 +107,7 @@ def get_image(template, actor_id):
         return conv_file
     except Exception as e:
         print e
-        raise ProbablyBanned
+        return None
 
 
 
