@@ -2,23 +2,16 @@
 import time
 import random
 import re
-import logging
-
 from bs4 import BeautifulSoup
 
-from apps.films.models import Films, PersonsFilms, Persons, Genres, FilmExtras, Countries
-from apps.films.constants import APP_PERSON_PHOTO_DIR,APP_FILM_CRAWLER_LIMIT,APP_FILM_CRAWLER_DELAY,APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER, APP_FILM_FULL_FILM
-from apps.robots.models import KinopoiskTries
-from apps.robots.constants import APP_ROBOT_FAIL, APP_ROBOT_SUCCESS
-from crawler.datarobots.kinopoisk_ru.parse_page import acquire_page, extract_facts_from_dump
 from django.core.files import File
-from optparse import make_option
-from crawler.datarobots.kinopoisk_ru.kinopoisk_poster import set_kinopoisk_poster
-from time import sleep
 from django.utils.timezone import now, datetime
-import logging
-from crawler.tor import simple_tor_get_page as simple_get
 
+from apps.films.models import Films, PersonsFilms, Persons, Genres, Countries
+from apps.films.constants import APP_FILM_FULL_FILM
+from crawler.datarobots.kinopoisk_ru.parse_page import acquire_page, extract_facts_from_dump
+from crawler.datarobots.kinopoisk_ru.kinopoisk_poster import set_kinopoisk_poster
+from crawler.tor import simple_tor_get_page as simple_get
 
 KINOPOISK = 'www.kinopoisk.ru'
 
@@ -42,11 +35,9 @@ LIMIT = 10
 
 
 def get_person(name):
-
     try:
         person = Persons.objects.get(name=name)
-        return person 
-
+        return person
     except Persons.DoesNotExist:
         person = Persons(name=name, photo='')
         person.save()
@@ -56,7 +47,6 @@ def get_person(name):
 
 
 def get_genre(name):
-
     try:
         genre = Genres.objects.get(name=name)
         return genre
@@ -98,6 +88,7 @@ def process_person_dict(film, person_dict):
     except Exception, e:
         print e
 
+
 def process_genre_dict(film, genre_dict):
     genre_object = get_genre(genre_dict['name'])
     if not genre_object in film.genres.all():
@@ -112,6 +103,7 @@ def process_country_dict(film, country_dict):
     if not country_object in film.countries.all():
         print u"Adding {} country to {} film".format(country_object, film)
         film.countries.add(country_object)
+
 
 def process_film_facts(film, facts):
     '''
@@ -143,6 +135,7 @@ def process_film_facts(film, facts):
     print u"Saving {} film object".format(film)
     film.save()
 
+
 def parse_from_kinopoisk(kinopoisk_id, name=None, film=None):
     '''
     Parse page of film with kinopoisk_id from kinopoisk.ru site
@@ -155,10 +148,8 @@ def parse_from_kinopoisk(kinopoisk_id, name=None, film=None):
             film = Films(kinopoisk_id=kinopoisk_id,
                          name=name if name else u' ',
                          type=APP_FILM_FULL_FILM,
-                         release_date=datetime.utcfromtimestamp(0)
-                     )
+                         release_date=datetime.utcfromtimestamp(0))
             film.save()
-    page_dump = u'Failed to acquire page_dump'
     try:
         page_dump = acquire_page(film.kinopoisk_id)
         facts = extract_facts_from_dump(page_dump)
