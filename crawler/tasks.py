@@ -14,13 +14,13 @@ from apps.films.models import Films
 
 from videobase.celery import app
 from crawler.locrobots import sites_crawler, process_film_on_site
-from crawler.kinopoisk_ru.parse_page import get_photo
-from crawler.kinopoisk_ru.kinopoisk_poster import poster_robot_wrapper
-from crawler.imdbratings import process_all
+from crawler.datarobots.kinopoisk_ru.parse_page import get_photo
+from crawler.datarobots.kinopoisk_ru.kinopoisk_poster import poster_robot_wrapper
+from crawler.datarobots.imdbratings import process_all
 from crawler.locrobots.amediateka_ru.loader import Amediateka_robot
 from crawler.locrobots.viaplay_ru.robot import ViaplayRobot
-from crawler.kinopoisk_ru.kinopoisk_premiere import kinopoisk_news
-from crawler.youtube_com.youtube_trailers import process_film
+from crawler.datarobots.kinopoisk_ru.kinopoisk_premiere import kinopoisk_news
+from crawler.datarobots.youtube_com.youtube_trailers import process_film
 from crawler.locrobots.playfamily_dot_ru.playfamily_xml import process
 from crawler.task_modules.kinopoisk_one_page import kinopoisk_parse_one_film
 from crawler.tor import simple_tor_get_page
