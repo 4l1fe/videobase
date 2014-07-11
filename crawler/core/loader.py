@@ -1,5 +1,4 @@
 # coding: utf-8
-
 from crawler.tor import simple_tor_get_page as simple_get
 from crawler.core.exceptions import RetrievePageException
 

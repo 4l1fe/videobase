@@ -21,7 +21,7 @@ class IVI_Loader(BaseLoader):
         self.params = {'q': self.film.name + ' ', 'json': 1, 'limit': 10}
 
     # Поиск фильма
-    def get_url(self, load_function=simple_tor_get_page):
+    def get_url(self, load_function):
         url = "http://%s/%s" % (self.host, self.search_url, )
         url = url_with_querystring(url, **self.params)
         response = load_function(url)
