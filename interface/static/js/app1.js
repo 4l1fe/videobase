@@ -55,7 +55,7 @@
     }, duration);
   };
 
-  stars_tootltips = ["не смотреть", "очень плохо", "плохо", "ниже среднего", "средне", "неплохо", "хорошо", "отлично", "великолепно", "лучше не бывает"];
+  stars_tootltips = ["не смотреть", "хуже не бывает", "очень плохо", "плохо", "ниже среднего", "средне", "неплохо", "хорошо", "отлично", "великолепно", "лучше не бывает"];
 
   Player = (function() {
     function Player(place, opts) {
@@ -374,7 +374,7 @@
         return function() {
           var ri;
           ri = _this.elements["relation.rating"].self.rateit();
-          return ri.rateit("min", 0).rateit("max", 10).bind("beforerated beforereset", function(event) {
+          return ri.bind("beforerated beforereset", function(event) {
             if (!_this.user_is_auth()) {
               return event.preventDefault();
             }
@@ -457,7 +457,12 @@
       }
       this.elements["btn"].self.removeClass("btn-subscribe").removeClass("btn-price").removeClass("btn-free").addClass(btn_cls);
       this.elements["btn_text"].self.html(btn_text).css("display", "block");
-      return FilmThumb.__super__.set_vals.apply(this, arguments);
+      FilmThumb.__super__.set_vals.apply(this, arguments);
+      if (!vals.hasFree && vals.price) {
+        return this.elements["btn_text"].self.attr("href", this.elements["btn_text"].self.attr("href") + "#" + vals.price_loc);
+      } else if (vals.price) {
+        return this.elements["price"].self.parent().attr("href", this.elements["price"].self.parent().attr("href") + "#" + vals.price_loc);
+      }
     };
 
     FilmThumb.prototype.action_rate = function(val) {
@@ -643,6 +648,7 @@
       this.load_func = void 0;
       this.items = [];
       this.more = {};
+      this.save_footer = false;
       self = this;
       $("." + this.element_name, this._place).each(function() {
         return self.add_item_DOM($(this));
@@ -684,6 +690,10 @@
         item = items[_i];
         this.add_item(item, false);
       }
+      if (this.save_footer) {
+        this.save_footer = false;
+        this._place.removeClass("loading").css("min-height", 0);
+      }
       return this.onchange();
     };
 
@@ -709,21 +719,41 @@
       }
     };
 
-    Deck.prototype.load_more_hide = function() {
-      if (this.more.place) {
-        return this.more.place.hide();
+    Deck.prototype.load_more_hide = function(loading) {
+      if (loading == null) {
+        loading = true;
+      }
+      if (loading) {
+        return this.more.place.addClass("add-filter-loading");
+      } else {
+        if (this.more.place) {
+          return this.more.place.hide();
+        }
       }
     };
 
     Deck.prototype.load_more_show = function() {
       if (this.more.place) {
-        return this.more.place.show();
+        return this.more.place.removeClass("add-filter-loading").show();
       }
     };
 
-    Deck.prototype.clear = function() {
-      var item, _i, _len, _ref;
+    Deck.prototype.clear = function(loading_more) {
+      var item, pH, pTop, wH, wScrollTop, _i, _len, _ref;
+      if (loading_more == null) {
+        loading_more = true;
+      }
       this.load_counter++;
+      if (loading_more) {
+        pTop = this._place.offset().top;
+        wScrollTop = $(window).scrollTop();
+        wH = $(window).height();
+        pH = this._place.height();
+        if ((pTop - wScrollTop + pH) >= wH) {
+          this.save_footer = true;
+          this._place.css("min-height", wH - pTop + wScrollTop).addClass("loading");
+        }
+      }
       _ref = this.items;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         item = _ref[_i];
@@ -1032,6 +1062,7 @@
         }
         new_state = state_toggle(opts.status, rel[action_str]);
         if (action === "rate") {
+          console.log(opts.value);
           if (!opts.value) {
             return this.rest.films.action.rate.destroy(id).done(function() {
               if (opts.rel) {
@@ -1444,7 +1475,7 @@
             }
             deck.page = data.page;
             if (opts.clear_output) {
-              scroll_to_obj(deck._place);
+              scroll_to_obj($("#filter_content"));
             }
           }
           if (opts.callback) {
@@ -1521,14 +1552,15 @@
       });
       actors_deck.load_more_bind($("#actors_more"));
       this._e.rateit = $("#rateit");
-      this._e.rateit.rateit("min", 0).rateit("max", 10).bind("beforerated beforereset", (function(_this) {
+      this._e.rateit.bind("beforerated beforereset", (function(_this) {
         return function(event) {
-          if (!_this.user_is_auth()) {
+          if (!_this.user_is_auth() && false) {
             return event.preventDefault();
           }
         };
       })(this)).bind("rated", (function(_this) {
         return function(event) {
+          console.log(_this._e.rateit.rateit("value"));
           return _this.action_rate(_this._e.rateit.rateit("value"));
         };
       })(this)).bind("reset", (function(_this) {
@@ -1587,8 +1619,9 @@
         }
         this.player = new Player($("#frame_player"));
         this.player.clear();
-        loc_id = this._app.query_params("loc");
-        if (!loc_id) {
+        loc_id = window.location.hash.substr(1);
+        if (locations[loc_id] === void 0) {
+          loc_id = void 0;
           loc_price = false;
           loc_price_id = false;
           for (key in locations) {
@@ -1608,7 +1641,6 @@
             }
           }
         }
-        console.log(loc_id, loc_price_id);
         if (!loc_id) {
           loc_id = loc_price_id;
         }
