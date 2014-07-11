@@ -1,9 +1,10 @@
 # coding: utf-8
 from crawler.core.exceptions import NoSuchFilm
+from crawler.tor import simple_tor_get_page
+from crawler.core.loader import BaseLoader
+from utils.common import url_with_querystring
 
 import parsers
-from ..core import BaseLoader
-
 
 HOST = 'www.ivi.ru'
 URL_SEARCH = 'search/ajax/new/autocomplete'
@@ -17,13 +18,14 @@ class IVI_Loader(BaseLoader):
         # url для поиска фильмов
         self.search_url = URL_SEARCH
         # параметры для поиска
-        self.params = {'q': self.film.name + ' ', 'json': 1, 'limit': 1}
+        self.params = {'q': self.film.name + ' ', 'json': 1, 'limit': 10}
 
     # Поиск фильма
-    def get_url(self, load_function):
+    def get_url(self, load_function=simple_tor_get_page):
         url = "http://%s/%s" % (self.host, self.search_url, )
-        response = load_function(url, params=self.params, cache=False)
-        film = parsers.parse_search(response)
+        url = url_with_querystring(url, **self.params)
+        response = load_function(url)
+        film = parsers.parse_search(response, self.film)
         if film is None:
             raise NoSuchFilm(self.film)
         self.url_load = film['link']

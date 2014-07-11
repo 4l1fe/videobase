@@ -1,5 +1,5 @@
 # coding: utf-8
-from ..core import BaseParse
+from crawler.core.parse import BaseParse
 from apps.contents.constants import *
 
 from bs4 import BeautifulSoup
@@ -8,11 +8,15 @@ import json
 
 
 # Парсер для поисковика фильма
-def parse_search(response):
+def parse_search(response, film):
+    search_film = None
     try:
-        films = json.loads(response.content)['content']
-        search_film = films[0]
-    except IndexError:
+        js_films = json.loads(response)['content']
+        for js_film in js_films:
+            if js_film['year'] == film.release_date.year and\
+               js_film['title'] == film.name:
+                search_film = js_film
+    except Exception as e:
         search_film = None
     return search_film
 
