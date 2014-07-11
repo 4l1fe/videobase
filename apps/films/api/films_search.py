@@ -20,6 +20,8 @@ from apps.contents.models import Contents, Locations
 
 import videobase.settings as settings
 
+from utils.middlewares.local_thread import get_current_request
+
 
 #############################################################################################################
 class SearchFilmsView(APIView):
@@ -35,20 +37,11 @@ class SearchFilmsView(APIView):
         instock - Фильм в наличии в кинотеатрах
     """
 
-    def parse_post(self, data):
-        location_group = 0
-
-        if 'price' in data.data:
-            location_group += 1
-
-        return data.cleaned_data, location_group
-
-
-    def search_by_films(self, filter, personalize):
+    def search_by_films(self, filter):
         o_search = Films.objects.extra(
                 where=['EXTRACT(year FROM "films"."release_date") <= %s'],
                 params=[date.today().year],
-            )
+            ).order_by('-rating_sort')
 
         # Поиск по имени
         if filter.get('text'):
@@ -70,36 +63,34 @@ class SearchFilmsView(APIView):
             o_search = o_search.filter(genres=filter['genre'])
 
         # Персоноализация выборки
-        if personalize and self.request.user.is_authenticated():
-             o_search = o_search.extra(
-                 where=['NOT "films"."id" IN (SELECT "users_films"."film_id" FROM "users_films" WHERE "users_films"."user_id" = %s AND "users_films"."status" = %s)'],
-                 params=[self.request.user.pk, APP_USERFILM_STATUS_NOT_WATCH],
-             )
+        if self.request.user.is_authenticated() and filter.get('recommend'):
+            sql = """
+            NOT "films"."id" IN (
+                SELECT "users_films"."film_id" FROM "users_films"
+                WHERE "users_films"."user_id" = %s AND
+                      "users_films"."status" = %s AND
+                      "users_films"."rating" != ''
+            )
+            """
+
+            o_search = o_search.extra(
+                where=[sql],
+                params=[self.request.user.pk, APP_USERFILM_STATUS_NOT_WATCH],
+            )
 
         return o_search
 
 
     def search_by_location(self, filter, o_search=None):
-        o_loc = Locations.objects.all()
+        o_loc = Locations.objects.values_list('content__film', flat=True)
 
         if filter.get('price'):
             o_loc = o_loc.filter(price__lte=filter['price'])
 
-        if not o_search is None:
-            list_film_pk = set(o_search.values_list('id', flat=True))
-            conts_dict = dict(Contents.objects.filter(film__in=list_film_pk).values_list('id', 'film'))
-            o_loc = o_loc.filter(content__in=conts_dict.keys())
+        if filter.get('instock'):
+            o_loc = o_loc.distinct('content')
 
-        o_loc = o_loc.distinct('content').values_list('content', flat=True)
-
-        # Пересечение
-        if o_search is None:
-            list_films_by_content = Contents.objects.filter(pk__in=o_loc).\
-                values_list('film', flat=True).distinct('film')
-        else:
-            list_films_by_content = list_film_pk & set([conts_dict[i] for i in o_loc if i in conts_dict])
-
-        return list_films_by_content
+        return o_loc
 
 
     def use_cache(self):
@@ -133,15 +124,23 @@ class SearchFilmsView(APIView):
         return filter
 
 
-    def get(self, request, format=None, personalize=True, *args, **kwargs):
-        # Copy post request
+    def get(self, request, format=None, recommend=False, use_thread=False,  *args, **kwargs):
+        # Копируем запрос, т.к. в форме его изменяем
         self.get_copy = request.GET.copy()
 
+        if recommend:
+           self.get_copy['recommend'] = True
+
+        if use_thread:
+            request = get_current_request()
+
+        # Валидируем форму
         form = SearchForm(data=self.get_copy)
+
         if form.is_valid():
             # Init data
-            filter, location_group = self.parse_post(form)
-            filter = self.validation_pagination(self.get_copy.get('page'), self.get_copy.get('per_page'), filter)
+            location_group = 1 if 'price' in form.data or 'instock' in form.data else 0
+            filter = self.validation_pagination(self.get_copy.get('page'), self.get_copy.get('per_page'), form.cleaned_data)
 
             # Init cache params
             use_cache = self.use_cache()
@@ -150,40 +149,32 @@ class SearchFilmsView(APIView):
                 ':'.join([i if isinstance(i, basestring) else str(i) for i in filter.values()])
             )
 
+            # Проверим, есть ли результат в кеше
             result = cache.get(cache_key) if use_cache else None
+
             if result is None:
-                o_search = self.search_by_films(filter, personalize)
+                # Наложение условий фильтрации на фильмы
+                o_search = self.search_by_films(filter)
 
-                list_films_by_content = []
                 if location_group > 0:
+                    # Список фильмов удовлетворяющий условиям локации
                     list_films_by_content = self.search_by_location(filter, o_search)
-                else:
-                    if filter.get('instock'):
-                        list_films_by_content = self.search_by_location(filter, o_search)
 
-                # Пересечение не пусто
-                if len(list_films_by_content):
-                    o_search = Films.objects.filter(pk__in=list_films_by_content)
-                else:
-                    if filter.get('instock'):
-                        list_films_by_content = self.search_by_location(filter, o_search)
-
-                        if len(list_films_by_content):
-                            o_search = Films.objects.filter(pk__in=list_films_by_content)
+                    # Наложение списка локации на выборку фильмов
+                    o_search = o_search.filter(id__in=list_films_by_content)
 
                 try:
-                    page = Paginator(o_search.order_by('-rating_sort'), per_page=filter['per_page']).\
+                    page = Paginator(o_search, per_page=filter['per_page']).\
                         page(filter['page'])
                 except Exception, e:
                     return Response({'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
 
-                serializer = vbFilm(page.object_list, request=self.request, many=True)
-
+                # Формируем ответ
                 result = {
                     'total_cnt': page.paginator.count,
                     'per_page': page.paginator.per_page,
                     'page': page.number,
-                    'items': serializer.data,
+                    'items': vbFilm(page.object_list, request=request, many=True).data,
                 }
 
                 if use_cache:

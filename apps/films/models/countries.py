@@ -6,7 +6,7 @@ from django.db import models
 #############################################################################################################
 # Модель Стран
 class Countries(models.Model):
-    name        = models.CharField(max_length=255, verbose_name=u'Русское название страны')
+    name        = models.CharField(max_length=255, db_index=True, verbose_name=u'Русское название страны')
     name_orig   = models.CharField(max_length=255, verbose_name=u'Название страны на ее языке')
     description = models.TextField(verbose_name=u'Описание')
 

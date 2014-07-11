@@ -4,7 +4,7 @@ from django.db import models
 
 class Cities(models.Model):
     country    = models.ForeignKey('Countries', verbose_name=u'Название страны', related_name='cities')
-    name       = models.CharField(max_length=255, verbose_name=u'Название города')
+    name       = models.CharField(max_length=255, db_index=True, verbose_name=u'Название города')
     name_orig  = models.CharField(max_length=255, verbose_name=u'Оригинальное название города')
 
     def  __unicode__(self):
