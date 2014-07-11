@@ -1,27 +1,26 @@
 # coding: utf-8
 
 from __future__ import absolute_import
-from apps.films.models import Persons
+
 from bs4 import BeautifulSoup
-from crawler.kinopoisk_ru.parse_page import get_photo
+
 from django.core.files import File
-from django.db import transaction
-
 from django.utils import timezone
-
-from celery import shared_task
 from celery.utils.log import get_task_logger
 
-from videobase.celery import app
-from crawler.utils.robot_start import sites_crawler, launch_next_robot_try_for_kinopoisk, process_film_on_site
 from apps.robots.models import Robots
+from apps.films.models import Persons
+from apps.films.models import Films
+
+from videobase.celery import app
+from crawler.locrobots import sites_crawler, process_film_on_site
+from crawler.kinopoisk_ru.parse_page import get_photo
 from crawler.kinopoisk_ru.kinopoisk_poster import poster_robot_wrapper
 from crawler.imdbratings import process_all
 from crawler.locrobots.amediateka_ru.loader import Amediateka_robot
 from crawler.locrobots.viaplay_ru.robot import ViaplayRobot
 from crawler.kinopoisk_ru.kinopoisk_premiere import kinopoisk_news
 from crawler.youtube_com.youtube_trailers import process_film
-from apps.films.models import Films
 from crawler.locrobots.playfamily_dot_ru.playfamily_xml import process
 from crawler.task_modules.kinopoisk_one_page import kinopoisk_parse_one_film
 from crawler.tor import simple_tor_get_page
@@ -44,6 +43,7 @@ def amediateka_robot_start(*args, **kwargs):
     Amediateka_robot
     '''
     Amediateka_robot().get_film_data()
+
 
 @app.task(name='kinopoisk_films')
 def kinopoisk_films(page):
@@ -106,11 +106,10 @@ def parse_kinopoisk_persons(pid):
     except Exception, e:
         print e
 
+
 @app.task(name='individual_site_film')
 def launch_individual_film_site_task(site):
-
-    robot_launch_wrapper(site,
-                         partial(process_film_on_site,site))
+    robot_launch_wrapper(site, partial(process_film_on_site, site))
 
 
 @app.task(name='robot_launch')
@@ -129,7 +128,7 @@ def robot_launcher(*args, **kwargs):
 
 
 @app.task(name='kinopoisk_set_poster')
-def kinopoisk_set_paster(*args,**kwargs):
+def kinopoisk_set_paster(*args, **kwargs):
     print "Start robot for setting posters"
     robot = Robots.objects.get(name='kinopoisk_set_poster')
 
@@ -140,30 +139,33 @@ def kinopoisk_set_paster(*args,**kwargs):
     else:
         print u'Skipping robot %s' % robot.name
 
+
 @app.task(name='imdb_rating_update')
 def imdb_robot_start(*args,**kwargs):
     process_all()
-
 
 
 @app.task(name='viaplay_ru_robot_start')
 def viaplay_robot_start():
     ViaplayRobot().get_data()
 
-def film_at_least_years_old(film,years):
+
+def film_at_least_years_old(film, years):
     '''
     Returns true if @film less than @years old
     '''
-    return timezone.now().date() - film.release_date < timezone.timedelta(days = 365*years)
+    return timezone.now().date() - film.release_date < timezone.timedelta(days=365*years)
+
 
 def film_checked_on_kp_at_least_days_ago(film,days):
     '''
     Returns true if @film last checked on kinopoisk more than  @days ago
     '''
     if film.kinopoisk_lastupdate:
-        return timezone.now() - film.kinopoisk_lastupdate > timezone.timedelta(days = days)
+        return timezone.now() - film.kinopoisk_lastupdate > timezone.timedelta(days=days)
     else:
         return True
+
 
 @app.task(name='kinopoisk_refresher')
 def create_due_refresh_tasks():
@@ -180,9 +182,11 @@ def create_due_refresh_tasks():
             if film_checked_on_kp_at_least_days_ago(film, days=180):
                 kinopoisk_parse_one_film.apply_async((film.kinopoisk_id, film.name))
 
+
 @app.task(name='playfamily_xml')
 def pltask():
     process()
+
 
 @app.task(name='kinopoisk_news')
 def parse_kinopoisk_news():
@@ -194,11 +198,13 @@ def parse_kinopoisk_news():
     for name, kinopoisk_id in kinopoisk_news():
         kinopoisk_parse_one_film.apply_async((kinopoisk_id, name))
 
+
 @app.task(name="find_trailer_for_film")
 def find_trailer(film_id):
 
     film = Films.objects.get(id=film_id)
     process_film(film)
+
 
 @app.task(name='youtube_trailers_all')
 def trailer_commands():
