@@ -79,6 +79,7 @@ INSTALLED_APPS = (
     'apps.films',
     'apps.contents',
     'apps.robots',
+    'apps.feed',
     'crawler',
     'social_auth',
     'djcelery',
@@ -183,7 +184,6 @@ SITE_ID = 1
 
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': (
-        'rest_framework.renderers.XMLRenderer',
         'rest_framework.renderers.JSONRenderer',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
