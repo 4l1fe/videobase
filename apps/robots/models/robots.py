@@ -11,7 +11,6 @@ class Robots(models.Model):
     description = models.TextField(verbose_name=u'Описание робота')
     last_start  = models.DateTimeField(verbose_name=u'Дата последнего старта')
     delay       = models.IntegerField(verbose_name=u'Время между стартами в минутах')
-    rstatus     = models.IntegerField(verbose_name=u'Статус')
     state       = models.TextField(verbose_name=u'Состояние между запусками')
 
     def __unicode__(self):

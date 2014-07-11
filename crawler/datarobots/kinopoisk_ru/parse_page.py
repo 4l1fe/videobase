@@ -2,28 +2,29 @@
 '''
 Kinopoisk robot
 '''
-
 import re
-#import requests
-from bs4 import BeautifulSoup
-import datetime
-from collections import defaultdict
-from apps.films.constants import APP_PERSON_ACTOR, APP_PERSON_DIRECTOR, APP_PERSON_PRODUCER
-from crawler.tor import simple_tor_get_page
-import StringIO
-from PIL import Image
-from functools import partial
-import logging
 import os
 import time
+import datetime
+import StringIO
+
+from bs4 import BeautifulSoup
+from PIL import Image
+from collections import defaultdict
+from functools import partial
+
+from apps.films.constants import APP_PERSON_ACTOR, APP_PERSON_DIRECTOR, APP_PERSON_PRODUCER
 from crawler.constants import PAGE_ARCHIVE
+from crawler.tor import simple_tor_get_page
 
 
 YANDEX_KP_ACTORS_TEMPLATE = "http://st.kp.yandex.net/images/actor_iphone/iphone360_{}.jpg"
 YANDEX_KP_FILMS_TEMPLATE = "http://st.kp.yandex.net/images/film_big/{}.jpg"
 
+
 class ProbablyBanned(Exception):
     pass
+
 
 def commatlst(tag):
     return tag.text.strip().split(u',')
@@ -38,7 +39,7 @@ def date_extract(tag):
 
 
 def get_vote(soup):
-    csslink =[ lnk.attrs['href'] for lnk in soup.find_all('link') if 'votes' in lnk.attrs['href']][0]
+    csslink = [lnk.attrs['href'] for lnk in soup.find_all('link') if 'votes' in lnk.attrs['href']][0]
     # TODO implement caching
 
     r = simple_tor_get_page(csslink)
@@ -50,48 +51,46 @@ def get_vote(soup):
     starbar_div = soup.select('div.starbar_w')
     child_width = float(dict([i.split(':') for i in starbar_div[0].attrs['style'].split(';')])['width'].replace('px',''))
 
-    return round(child_width/parent_width *10,2)
+    return round(child_width/parent_width*10, 2)
 
 
 def budget(bstring):
     if u'руб.' in bstring:
         #ms = bstring.replace(u'руб.','')
         #There is no way to store rub in database
-        logging.debug("Encountered budget in RUB. Storing nothing")
+        print "Encountered budget in RUB. Storing nothing"
         return None
     elif '$' in bstring:
         ms = bstring.replace(u'$', '')
         return int(u''.join(ms.split()))
     else:
-        logging.debug("Encountered budget in unknown currency.Storing nothing")
+        print "Encountered budget in unknown currency.Storing nothing"
         return None
 
 
 def transform_data_dict(ddict):
     transforms = {
         #u'roд': lambda d: ('Films',{'freleasedate': datetime.datetime.strptime(d.text.strip(),"%Y%m%d")}),
-        u'страна':lambda d:[('Countries', { 'name': c}) for c in extract_countries(d)],
-        u'жанр' : lambda d:[('Genres', { 'name':c }) for c in commatlst(d)],
-        u'режиссер' : lambda d:[('Persons', {'name':c, 'p_type': APP_PERSON_DIRECTOR}) for c in commatlst(d)],
-        u'продюсер' : lambda d:[('Persons', {'name':c, 'p_type': APP_PERSON_PRODUCER}) for c in commatlst(d)],
-        u'бюджет': lambda d: [('Films',{'fbudget':budget(d.text)})],
-        u'премьера (мир)': lambda d: [('Films',{'frelease_date': date_extract(d)})],
-        u'премьера (РФ)' : lambda d: [('Films',{'frelease_date': date_extract(d)})],
-        u'возраст': lambda d: [('Films',{'age_limit': int(
+        u'страна': lambda d: [('Countries', {'name': c}) for c in extract_countries(d)],
+        u'жанр': lambda d: [('Genres', {'name': c}) for c in commatlst(d)],
+        u'режиссер': lambda d: [('Persons', {'name':c, 'p_type': APP_PERSON_DIRECTOR}) for c in commatlst(d)],
+        u'продюсер': lambda d: [('Persons', {'name':c, 'p_type': APP_PERSON_PRODUCER}) for c in commatlst(d)],
+        u'бюджет': lambda d: [('Films', {'fbudget': budget(d.text)})],
+        u'премьера (мир)': lambda d: [('Films', {'frelease_date': date_extract(d)})],
+        u'премьера (РФ)': lambda d: [('Films', {'frelease_date': date_extract(d)})],
+        u'возраст': lambda d: [('Films', {'age_limit': int(
             [e for e in d.parent.select('div.ageLimit')[0].attrs['class']
-            if not  e.endswith(u'Limit')][0].split('age')[-1])
-        }
-                               )],
-        u'время' : lambda d :[('Films', {'fduration': int( d.parent.select('td.time')[0].text.split(u'мин.')[0]) })]
+             if not e.endswith(u'Limit')][0].split('age')[-1])
+        })],
+        u'время': lambda d :[('Films', {'fduration': int( d.parent.select('td.time')[0].text.split(u'мин.')[0])})]
     }
     tkeys = transforms.keys()
-    for key,val in ddict.items():
+    for key, val in ddict.items():
         if key in tkeys:
             for el in transforms[key](val):
                 yield el
         else:
-            pass
-            logging.debug(u"Can't find parser for %s",key)
+            print u"Can't find parser for {}".format(key)
 
 
 def get_image(template, actor_id):
@@ -109,29 +108,24 @@ def get_image(template, actor_id):
         print e
         return None
 
-
-
 get_poster = partial(get_image, YANDEX_KP_FILMS_TEMPLATE)
 get_photo = partial(get_image, YANDEX_KP_ACTORS_TEMPLATE)
 
 
 def extract_names(soup):
     nametag = soup.select('h1.moviename-big')[0]
-    moviename = ('Films', {'name':nametag.text})
-    orig_movie_name = ('Films', {'name_orig':nametag.select('span')[0].text if len(nametag.select('span')) else ''})
-
+    moviename = ('Films', {'name': nametag.text})
+    orig_movie_name = ('Films', {'name_orig': nametag.select('span')[0].text if len(nametag.select('span')) else ''})
     return moviename, orig_movie_name
 
 
 def actors_wrap(actors_names):
-   return [('Persons', {'name': an , 'p_type': APP_PERSON_ACTOR,
-                       'photo': get_photo(re.match('[/]name[/](?P<id>[0-9]+)[/]',ai).groupdict()['id'])
-
-                   }) for an, ai in actors_names]
+    return [('Persons', {'name': an, 'p_type': APP_PERSON_ACTOR,
+                         'photo': get_photo(re.match('[/]name[/](?P<id>[0-9]+)[/]', ai).
+                             groupdict()['id'])}) for an, ai in actors_names]
 
 
 def acquire_page(page_id):
-
     if not os.path.exists(PAGE_ARCHIVE):
         os.mkdir(PAGE_ARCHIVE)
 
@@ -144,21 +138,17 @@ def acquire_page(page_id):
         url =u"http://www.kinopoisk.ru/film/%d/" % page_id
         res = simple_tor_get_page(url)
         page_dump = res.decode('cp1251')
-        with open(dump_path,'w') as fdw:
+        with open(dump_path, 'w') as fdw:
             fdw.write(page_dump.encode('utf-8'))
 
     return page_dump
 
 
 def extract_facts_from_dump(page_dump):
-
     '''
     Parsing one page from the multiline string @page_dump
-
     Returns
-
     Dictionary with keys 'Films', 'Persons', 'Genres'
-
     '''
 
     facts = []
@@ -190,13 +180,12 @@ def extract_facts_from_dump(page_dump):
 if __name__ == "__main__":
     d = extract_facts_from_dump(acquire_page(301))
     for di in d['Films']:
-
-        for k in di :
+        for k in di:
             print(k)
             print(di[k])
-    for di in d['Countries']:
 
-        for k in di :
+    for di in d['Countries']:
+        for k in di:
             print(k)
             print(di[k])
 

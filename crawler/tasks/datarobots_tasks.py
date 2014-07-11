@@ -1,41 +1,26 @@
 # coding: utf-8
 from __future__ import absolute_import
-
-from bs4 import BeautifulSoup
-
 from django.core.files import File
 from django.utils import timezone
-from celery.utils.log import get_task_logger
 
 from apps.robots.models import Robots
 from apps.films.models import Persons
 from apps.films.models import Films
-
-from videobase.celery import app
-
 from crawler.datarobots.kinopoisk_ru.parse_page import get_photo
 from crawler.datarobots.kinopoisk_ru.kinopoisk_poster import poster_robot_wrapper
 from crawler.datarobots.imdbratings import process_all
-
-
 from crawler.datarobots.kinopoisk_ru.kinopoisk_premiere import kinopoisk_news
 from crawler.datarobots.youtube_com.youtube_trailers import process_film
-
 from crawler.tasks.kinopoisk_one_page import kinopoisk_parse_one_film
 from crawler.tor import simple_tor_get_page
-
-from crawler.tasks.utils import robot_task, robot_launch_wrapper, update_robot_state_film_id
-
-
+from crawler.tasks.utils import robot_task,  update_robot_state_film_id
+from videobase.celery import app
 
 import datetime
-from functools import partial
+from bs4 import BeautifulSoup
 
 KINOPOISK_LIST_FILMS_URL = "http://www.kinopoisk.ru/top/navigator/m_act%5Begenre%5D/999/m_act%5Bnum_vote%5D/10/m_act%5Brating%5D/1:/m_act%5Bis_film%5D/on/m_act%5Bis_mult%5D/on/order/year/page/{}/#results"
 information_robots = ['kinopoik_robot', 'imdb_robot']
-
-
-logger = get_task_logger(__name__)
 
 
 @app.task(name='kinopoisk_films')
@@ -100,10 +85,6 @@ def parse_kinopoisk_persons(pid):
         print e
 
 
-
-
-
-
 @app.task(name='kinopoisk_set_poster')
 def kinopoisk_set_paster(*args, **kwargs):
     print "Start robot for setting posters"
@@ -122,8 +103,6 @@ def imdb_robot_start(*args,**kwargs):
     process_all()
 
 
-
-
 def film_at_least_years_old(film, years):
     '''
     Returns true if @film less than @years old
@@ -131,7 +110,7 @@ def film_at_least_years_old(film, years):
     return timezone.now().date() - film.release_date < timezone.timedelta(days=365*years)
 
 
-def film_checked_on_kp_at_least_days_ago(film,days):
+def film_checked_on_kp_at_least_days_ago(film, days):
     '''
     Returns true if @film last checked on kinopoisk more than  @days ago
     '''
@@ -143,7 +122,6 @@ def film_checked_on_kp_at_least_days_ago(film,days):
 
 @app.task(name='kinopoisk_refresher')
 def create_due_refresh_tasks():
-
     for film in Films.objects.all():
 
         if film_at_least_years_old(film, years=2):
@@ -157,13 +135,10 @@ def create_due_refresh_tasks():
                 kinopoisk_parse_one_film.apply_async((film.kinopoisk_id, film.name))
 
 
-
-
 @app.task(name='kinopoisk_news')
 def parse_kinopoisk_news():
     '''
     Periodic task for parsing new films from kinopoisk
-
     For each film found on premiere page, parser called asynchronously
     '''
     for name, kinopoisk_id in kinopoisk_news():
@@ -172,7 +147,6 @@ def parse_kinopoisk_news():
 
 @app.task(name="find_trailer_for_film")
 def find_trailer(film_id):
-
     film = Films.objects.get(id=film_id)
     process_film(film)
 
