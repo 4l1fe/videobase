@@ -11,7 +11,7 @@ import json
 def parse_search(response, film):
     search_film = None
     try:
-        js_films = json.loads(response.content)['content']
+        js_films = json.loads(response)['content']
         for js_film in js_films:
             if js_film['year'] == film.release_date.year and\
                js_film['title'] == film.name:
