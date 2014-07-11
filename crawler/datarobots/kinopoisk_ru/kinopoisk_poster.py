@@ -1,7 +1,7 @@
 # coding: utf-8
 from django.core.files import File
 
-from crawler.kinopoisk_ru.parse_page import get_poster
+from crawler.datarobots.kinopoisk_ru.parse_page import get_poster
 from apps.films.models import FilmExtras,Films
 from apps.films.constants import APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER
 

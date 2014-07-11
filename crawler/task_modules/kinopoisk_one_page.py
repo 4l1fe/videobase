@@ -1,5 +1,5 @@
 from videobase.celery import app
-from crawler.kinopoisk_ru.kinopoisk import parse_from_kinopoisk
+from crawler.datarobots.kinopoisk_ru.kinopoisk import parse_from_kinopoisk
 
 
 @app.task(name='kinopoisk_parse_film_by_id')

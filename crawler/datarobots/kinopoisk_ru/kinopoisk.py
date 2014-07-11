@@ -10,10 +10,10 @@ from apps.films.models import Films, PersonsFilms, Persons, Genres, FilmExtras, 
 from apps.films.constants import APP_PERSON_PHOTO_DIR,APP_FILM_CRAWLER_LIMIT,APP_FILM_CRAWLER_DELAY,APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER, APP_FILM_FULL_FILM
 from apps.robots.models import KinopoiskTries
 from apps.robots.constants import APP_ROBOT_FAIL, APP_ROBOT_SUCCESS
-from crawler.kinopoisk_ru.parse_page import acquire_page, extract_facts_from_dump
+from crawler.datarobots.kinopoisk_ru.parse_page import acquire_page, extract_facts_from_dump
 from django.core.files import File
 from optparse import make_option
-from crawler.kinopoisk_ru.kinopoisk_poster import set_kinopoisk_poster
+from crawler.datarobots.kinopoisk_ru.kinopoisk_poster import set_kinopoisk_poster
 from time import sleep
 from django.utils.timezone import now, datetime
 import logging
