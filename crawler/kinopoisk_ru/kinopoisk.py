@@ -90,12 +90,11 @@ flatland = get_country(u'Флатландию')
 
 
 def process_person_dict(film, person_dict):
-
     try:
         print u"Found person {}".format(person_dict['name'])
         person_object = get_person(person_dict['name'])
         if 'photo' in person_dict:
-            print u"Found foto for {}".format(person_object)
+            print u"Found photo for {}".format(person_object)
             if not (person_object.photo != '' or (person_dict['photo'] is None)):
                 person_object.photo.save('profile.jpg', File(person_dict['photo']))
 
@@ -174,6 +173,7 @@ def parse_from_kinopoisk(kinopoisk_id, name=None, film=None):
         facts = extract_facts_from_dump(page_dump)
         process_film_facts(film, facts)
     except Exception, exception:
+        print exception
         logging.debug(u"Caught exception : %s", str(exception))
 
 
