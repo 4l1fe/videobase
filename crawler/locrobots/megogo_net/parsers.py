@@ -1,5 +1,5 @@
 # coding: utf-8
-from ..core import BaseParse
+from crawler.core import BaseParse
 from bs4 import BeautifulSoup
 from apps.contents.constants import *
 import re

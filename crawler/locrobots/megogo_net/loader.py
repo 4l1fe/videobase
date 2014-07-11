@@ -3,7 +3,7 @@ from crawler.core.exceptions import NoSuchFilm
 import string
 import parsers
 import re
-from ..core import BaseLoader
+from crawler.core import BaseLoader
 
 HOST = 'www.megogo.net/ru'
 URL_SEARCH = 'searchhint'
