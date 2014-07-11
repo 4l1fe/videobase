@@ -4,7 +4,7 @@ URL_SEARCH = 'search'
 URL_LOAD = ''
 from crawler.core.exceptions import NoSuchFilm
 import parsers
-from ..core import BaseLoader
+from crawler.core import BaseLoader
 
 
 class ZABAVAR_RU_Loader(BaseLoader):

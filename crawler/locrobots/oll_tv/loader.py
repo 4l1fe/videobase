@@ -3,7 +3,7 @@ import urllib
 from apps.films.constants import APP_FILM_SERIAL
 from crawler.core import BaseLoader
 from crawler.core.exceptions import NoSuchFilm
-from crawler.oll_tv.parser import ParseOllFilm
+from crawler.locrobots.oll_tv.parser import ParseOllFilm
 
 HOST = 'www.oll.tv'
 URL_LOAD = ''
