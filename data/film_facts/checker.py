@@ -9,10 +9,56 @@ from apps.films.models import Films, FilmExtras
 from apps.films.models import Countries
 from data.checker import FactChecker
 from data.constants import FLATLAND_NAME
+from bs4 import BeautifulSoup
 import requests
+import re
 
 
 film_checker = FactChecker(Films)
+
+
+def find_first_pattern_position(str, pat):
+        pattern = re.compile(pat)
+        mo = re.search(pattern, str)
+        if mo:
+            return mo.start()
+        else:
+            return -1
+
+
+def youtube_trailer_corrector(film):
+    ft = FilmExtras.objects.filter(film=film).first()
+    ft.delete()
+    print u"Corrector deleted bad trailer successfully"
+
+
+def film_description_html_corrector(film):
+    film_html_description = BeautifulSoup(film.description)
+    film.description = film_html_description.getText(separator=u' ')
+    film.save()
+    print u"Corrector removed html tags in film description"
+
+
+def film_description_digits_corrector(film):
+    film_description = film.description.encode("utf-8")
+
+    i = find_first_pattern_position(film_description, "[А-Я]")
+    if i!=-1:
+        film.description = film_description[i:].decode("utf-8")
+        film.save()
+        print u"Corrector removed digits in film description"
+
+
+def film_description_useless_links_corrector(film):
+    film_description = film.description.encode("utf-8")
+
+    i = find_first_pattern_position(film_description, "(NOW.RU)|(ZOOMBY.RU)")
+    if i!=-1:
+        film.description = film_description[0:i].decode("utf-8")
+        film.save()
+        print u"Corrector removed useless links in film description"
+
+
 
 @film_checker.add(u'Flatland in countries')
 def flatland_check(film):
@@ -20,14 +66,16 @@ def flatland_check(film):
     return not ( flatland in film.countries.all() )
 
 
-@film_checker.add(u"Youtube name doesn't contain film name")
+@film_checker.add(u"Youtube name doesn't contain film name", corrector=youtube_trailer_corrector)
 def youtube_name_check(film):
 
     yt_service = gdata.youtube.service.YouTubeService()
-    ft = FilmExtras.objects.filter(film = film)[0]
-    yid = re.match('.+watch[?]v[=](?P<id>.+)(([&].+)?)', ft.url).groupdict()['id']
-
-    entry = yt_service.GetYouTubeVideoEntry(video_id=yid)
+    try:
+        ft = FilmExtras.objects.filter(film = film).first()
+        yid = re.match('.+watch[?]v[=](?P<id>.+)(([&].+)?)', ft.url).groupdict()['id']
+        entry = yt_service.GetYouTubeVideoEntry(video_id=yid)
+    except:
+        return True
 
     #print film.name, entry.title.text
     #print 'name = "{}"'.format(film.name_orig)
@@ -51,59 +99,94 @@ def omdb_year_check(film):
         r = requests.get('http://www.omdbapi.com/?i=tt'+str(omdb_id))
         omdb_year_str = r.json()['Released'].split(' ')[2]
         omdb_release_year_date = int(omdb_year_str)
-    except:
-        print "Attempt to get film info by imdb id from OMDB server was failed "
-        return 1
+    except :
+        print u"Attempt to get film info by imdb id from OMDB server was failed "
+        return True
 
-    if abs(film_release_date_in_db - omdb_release_year_date) > 1:
-        return 0
+    if omdb_release_year_date and abs(film_release_date_in_db - omdb_release_year_date) > 1:
+        return False
     else:
-        return 1
+        return True
 
 
-@film_checker.add("There is no such trailer")
+@film_checker.add(u"There is no such trailer", corrector=youtube_trailer_corrector)
 def trailer_check(film):
     yt_service = gdata.youtube.service.YouTubeService()
     ft = FilmExtras.objects.filter(film=film).first()
-    yid = re.match('.+watch[?]v[=](?P<id>.+)(([&].+)?)', ft.url).groupdict()['id']
     try:
+        yid = re.match('.+watch[?]v[=](?P<id>.+)(([&].+)?)', ft.url).groupdict()['id']
         entry = yt_service.GetYouTubeVideoEntry(video_id=yid)
-        return 1
+        return True
     except:
-        return 0
+        return False
 
 
-@film_checker.add("Youtube trailer duration not within limits")
+@film_checker.add(u"Youtube trailer duration not within limits", corrector=youtube_trailer_corrector)
 def trailer_duration_check(film):
     max_trailer_time_in_seconds = 270
     min_trailer_time_in_secons = 60
     yt_service = gdata.youtube.service.YouTubeService()
-    ft = FilmExtras.objects.filter(film=film).first()
-    yid = re.match('.+watch[?]v[=](?P<id>.+)(([&].+)?)', ft.url).groupdict()['id']
-
-    entry = yt_service.GetYouTubeVideoEntry(video_id=yid)
-    trailer_duration = entry.media.duration.seconds
+    try:
+        ft = FilmExtras.objects.filter(film=film).first()
+        yid = re.match('.+watch[?]v[=](?P<id>.+)(([&].+)?)', ft.url).groupdict()['id']
+        entry = yt_service.GetYouTubeVideoEntry(video_id=yid)
+        trailer_duration = entry.media.duration.seconds
+    except:
+        return True
     if trailer_duration:
         trailer_duration = int(trailer_duration)
         if (trailer_duration >= min_trailer_time_in_secons) and (trailer_duration <= max_trailer_time_in_seconds):
-            return 1
+            return True
         else:
-            return 0
+            return False
     else:
-        print('Trailer duration check was broken')
+        return False
 
 
-@film_checker.add("Film release year is not 2014")
+@film_checker.add(u"Film release year is not 2014")
 def film_release_date_check(film):
     date_string = '2014'
     date = datetime.strptime(date_string, '%Y')
     return film.release_date.year == date.year
 
 
-@film_checker.add("Film kinopoisk id is not set")
+@film_checker.add(u"Film kinopoisk id is not set")
 def film_kinopoisk_id_check(film):
     film_kinopoisk_id = film.kinopoisk_id
     if film_kinopoisk_id > 0:
-        return 1
+        return True
     else:
-        return 0
+        return False
+
+
+@film_checker.add(u"Film description contains html tags", corrector=film_description_html_corrector)
+def film_description_contains_html_tags_check(film):
+    bs = BeautifulSoup(film.description)
+    p_tag = bs.find('body').find('p')
+    if p_tag:
+        tags_count = len(p_tag.findChildren())
+        if tags_count == 0:
+            return True
+    return False
+
+
+@film_checker.add(u"Film description contains digits", corrector=film_description_digits_corrector)
+def film_description_contains_digits_check(film):
+    film_description = film.description
+    a = re.compile("^[А-Я]")
+    if a.match(film_description.encode("utf-8")):
+        return True
+    else:
+        return False
+
+
+@film_checker.add(u"Film description contains useless site names at the end",
+                  corrector=film_description_useless_links_corrector)
+def film_description_contains_useless_site_names_check(film):
+    film_description = film.description.encode("utf-8")
+    i = find_first_pattern_position(film_description, "(NOW.RU)|(ZOOMBY.RU)")
+    print "INDEX", i, len(film_description)
+    if i!=-1:
+        return False
+    else:
+        return True
