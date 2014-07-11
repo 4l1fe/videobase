@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 
 
 # Парсер для поисковика фильма
-def parse_search(response, film):
+def parse_search(response, film, year):
     if not (type(film) is unicode):
         film = film.decode('utf-8')
 
@@ -24,8 +24,9 @@ def parse_search(response, film):
                 if exit_flag:
                     break
                 for h2 in tag.find_all('h2'):
+                    year_tag = h2.span.text
                     h2.span.extract()
-                    if h2.text.lower().strip() == film.lower().strip():
+                    if h2.text.lower().strip() == film.lower().strip() and str(year) in year_tag:
                         film_div = h2.parent.parent.parent
                         exit_flag = True
                         break
@@ -35,7 +36,11 @@ def parse_search(response, film):
             else:
                 return None
         else:
-            film_link = soup.find(attrs={'property':'og:url'}).get('content')
+            year_tag = soup.find('span', {'class': 'y'}).text
+            if str(year) in year_tag:
+                film_link = soup.find(attrs={'property':'og:url'}).get('content')
+            else:
+                return None
 
     except IndexError:
         film_link = None
