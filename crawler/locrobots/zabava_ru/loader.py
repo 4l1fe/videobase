@@ -1,10 +1,11 @@
 # coding: utf-8
-HOST = 'www.zabava.ru'
-URL_SEARCH = 'search'
-URL_LOAD = ''
 from crawler.core.exceptions import NoSuchFilm
 import parsers
 from crawler.core import BaseLoader
+
+HOST = 'www.zabava.ru'
+URL_SEARCH = 'search'
+URL_LOAD = ''
 
 
 class ZABAVAR_RU_Loader(BaseLoader):

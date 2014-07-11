@@ -11,7 +11,8 @@ from crawler.utils.headers import get_random_weighted_browser_string
 DEFAULT_HEADERS = [ 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
         'Accept-Language: ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4',
         'Accept-Charset: UTF-8',
-    ]
+        ]
+
 
 ########################################################################
 def renew_connection(passAuth="mypassword"):
@@ -114,6 +115,7 @@ def get_page_or_renew(url,user_agent):
 
 def simple_tor_get_page(url):
     return get_page_or_renew(url, get_random_weighted_browser_string())
+
 
 ########################################################################
 def main():
