@@ -47,6 +47,7 @@ def get_person(name):
 
 
 def get_genre(name):
+    name = name.lower().strip()
     try:
         genre = Genres.objects.get(name=name)
         return genre

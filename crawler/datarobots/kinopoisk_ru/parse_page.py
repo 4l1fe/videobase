@@ -42,7 +42,7 @@ def get_vote(soup):
     csslink = [lnk.attrs['href'] for lnk in soup.find_all('link') if 'votes' in lnk.attrs['href']][0]
     # TODO implement caching
 
-    r = simple_tor_get_page(csslink)
+    r = simple_tor_get_page(csslink, tor_flag=True)
 
     css = r
     m = re.search('[.]starbar[ ]{width[:][ ](?P<width>[0-9]+)px', css)
@@ -67,12 +67,21 @@ def budget(bstring):
         print "Encountered budget in unknown currency.Storing nothing"
         return None
 
+def russian_word(st):
+    return bool(re.match(u'[а-я]+',st.lower().strip()))
+        
+def cut_triple_dots(dl):
+    for el in dl:
+        if russian_word(el):
+            break
+        else:
+            yield el
 
 def transform_data_dict(ddict):
     transforms = {
         #u'roд': lambda d: ('Films',{'freleasedate': datetime.datetime.strptime(d.text.strip(),"%Y%m%d")}),
         u'страна': lambda d: [('Countries', {'name': c}) for c in extract_countries(d)],
-        u'жанр': lambda d: [('Genres', {'name': c}) for c in commatlst(d)],
+        u'жанр': lambda d: [('Genres', {'name': c}) for c in cut_triple_dots(commatlst(d))],
         u'режиссер': lambda d: [('Persons', {'name':c, 'p_type': APP_PERSON_DIRECTOR}) for c in commatlst(d)],
         u'продюсер': lambda d: [('Persons', {'name':c, 'p_type': APP_PERSON_PRODUCER}) for c in commatlst(d)],
         u'бюджет': lambda d: [('Films', {'fbudget': budget(d.text)})],
@@ -95,7 +104,7 @@ def transform_data_dict(ddict):
 
 def get_image(template, actor_id):
     try:
-        r = simple_tor_get_page(template.format(actor_id))
+        r = simple_tor_get_page(template.format(actor_id), tor_flag=True)
         fileobj = StringIO.StringIO()
         fileobj.write(r)
         fileobj.seek(0)
@@ -136,7 +145,7 @@ def acquire_page(page_id):
     else:
         time.sleep(1)
         url =u"http://www.kinopoisk.ru/film/%d/" % page_id
-        res = simple_tor_get_page(url)
+        res = simple_tor_get_page(url, tor_flag=True)
         page_dump = res.decode('cp1251')
         with open(dump_path, 'w') as fdw:
             fdw.write(page_dump.encode('utf-8'))
