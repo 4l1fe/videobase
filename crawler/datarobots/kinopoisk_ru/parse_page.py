@@ -42,7 +42,7 @@ def get_vote(soup):
     csslink = [lnk.attrs['href'] for lnk in soup.find_all('link') if 'votes' in lnk.attrs['href']][0]
     # TODO implement caching
 
-    r = simple_tor_get_page(csslink)
+    r = simple_tor_get_page(csslink, tor_flag=True)
 
     css = r
     m = re.search('[.]starbar[ ]{width[:][ ](?P<width>[0-9]+)px', css)
@@ -95,7 +95,7 @@ def transform_data_dict(ddict):
 
 def get_image(template, actor_id):
     try:
-        r = simple_tor_get_page(template.format(actor_id))
+        r = simple_tor_get_page(template.format(actor_id), tor_flag=True)
         fileobj = StringIO.StringIO()
         fileobj.write(r)
         fileobj.seek(0)
@@ -136,7 +136,7 @@ def acquire_page(page_id):
     else:
         time.sleep(1)
         url =u"http://www.kinopoisk.ru/film/%d/" % page_id
-        res = simple_tor_get_page(url)
+        res = simple_tor_get_page(url, tor_flag=True)
         page_dump = res.decode('cp1251')
         with open(dump_path, 'w') as fdw:
             fdw.write(page_dump.encode('utf-8'))
