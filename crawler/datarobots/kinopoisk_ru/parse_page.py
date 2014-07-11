@@ -67,12 +67,21 @@ def budget(bstring):
         print "Encountered budget in unknown currency.Storing nothing"
         return None
 
+def russian_word(st):
+    return bool(re.match(u'[а-я]+',st.lower().strip()))
+        
+def cut_triple_dots(dl):
+    for el in dl:
+        if russian_word(el):
+            break
+        else:
+            yield el
 
 def transform_data_dict(ddict):
     transforms = {
         #u'roд': lambda d: ('Films',{'freleasedate': datetime.datetime.strptime(d.text.strip(),"%Y%m%d")}),
         u'страна': lambda d: [('Countries', {'name': c}) for c in extract_countries(d)],
-        u'жанр': lambda d: [('Genres', {'name': c}) for c in commatlst(d)],
+        u'жанр': lambda d: [('Genres', {'name': c}) for c in cut_triple_dots(commatlst(d))],
         u'режиссер': lambda d: [('Persons', {'name':c, 'p_type': APP_PERSON_DIRECTOR}) for c in commatlst(d)],
         u'продюсер': lambda d: [('Persons', {'name':c, 'p_type': APP_PERSON_PRODUCER}) for c in commatlst(d)],
         u'бюджет': lambda d: [('Films', {'fbudget': budget(d.text)})],
