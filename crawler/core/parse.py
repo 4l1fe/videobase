@@ -26,7 +26,7 @@ class BaseParse(object):
 
     @classmethod
     def parse(cls, response, dict_gen, film, **kwargs):
-        obj = cls(response.content)
+        obj = cls(response)
         resp_list = []
         type_robot = obj.get_type()
         link = obj.get_link(**kwargs)

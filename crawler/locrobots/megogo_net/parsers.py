@@ -6,14 +6,14 @@ import re
 import json
 
 
-def parse_search(response, filmName):
+def parse_search(response, filmName, year):
     regFilmname = re.compile('(?P<name>.+)[ ][(](?P<year>[0-9]{4})[)]')
     search_film = None
     try:
-        films = json.loads(response.content)
+        films = json.loads(response)
         for film in films:
             search = regFilmname.search(film['title'])
-            if search.group('name').lower().strip() == filmName.lower().strip():
+            if search.group('name').lower().strip() == filmName.lower().strip() and str(year) in search.group('year'):
                 search_film = film
                 break
     except IndexError:
@@ -55,4 +55,7 @@ class ParseMegogoFilm(BaseParse):
 
     def get_type(self, **kwargs):
         return 'megogo'
+
+    def get_value(self, **kwargs):
+        pass
 

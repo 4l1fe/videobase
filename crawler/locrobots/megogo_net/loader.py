@@ -4,6 +4,7 @@ import string
 import parsers
 import re
 from crawler.core import BaseLoader
+from utils.common import url_with_querystring
 
 HOST = 'www.megogo.net/ru'
 URL_SEARCH = 'searchhint'
@@ -18,8 +19,9 @@ class MEGOGO_Loader(BaseLoader):
 
     def get_url(self, load_function):
         url = "http://%s/%s" % (self.host, self.search_url, )
-        response = load_function(url, params=self.params, cache=False)
-        film = parsers.parse_search(response, self.film.name)
+        url = url_with_querystring(url, **self.params)
+        response = load_function(url)
+        film = parsers.parse_search(response, self.film.name, self.film.release_date.year)
         if film is None:
             raise NoSuchFilm(self.film)
         self.url_load = film['view_link']

@@ -3,13 +3,13 @@ from apps.contents.constants import *
 from bs4 import BeautifulSoup
 from crawler.core import BaseParse
 import re
+from crawler.tor import simple_tor_get_page
 
 
-def parse_search(response, film_name):
+def parse_search(response, film_name, year):
     film_link = None
     try:
-        content = response.content
-        soup = BeautifulSoup(content)
+        soup = BeautifulSoup(response)
         if not (soup.find('div', {'class': 'empty-search'}) is None):
             return None
         search_div = soup.find('div', {'class': 'card-list'})
@@ -18,6 +18,13 @@ def parse_search(response, film_name):
             film_tag = film.find('a', {'class': 'title'})
             if film_name == film_tag.get('title'):
                 film_link = 'http://play.google.com' + film_tag.get('href')
+        if film_link:
+            page = simple_tor_get_page(film_link)
+            soup_page = BeautifulSoup(page)
+            film_year = soup_page.find('div', {'itemprop':'datePublished'}).text
+            film_year = re.search(ur'\d+', film_year)
+            if not str(year) in film_year.group():
+                return None
     except IndexError:
         film_link = None
     return film_link
@@ -49,3 +56,6 @@ class ParsePlayGoogleFilm(BaseParse):
 
     def get_type(self, **kwargs):
         return 'playgoogle'
+
+    def get_value(self, **kwargs):
+        pass
