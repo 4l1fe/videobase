@@ -96,13 +96,12 @@ def process(soup = None):
             )
             film.save()
             print "Succesfully created {}. Trying to schedule update".format(film)
-            kinopoisk_id = info['kinopoiskId'] if type(info['kinopoiskId']) is int else int(info['kinopoiskId'])
-            '''kinopoisk_parse_one_film.apply_async(
-            (
-                 kinopoisk_id,
-                info['title']
-                 )
-            )'''
+            kinopoisk_parse_one_film.apply_async(
+                (
+                    kinopoisk_id,
+                    info['title']
+                )
+            )
             print "Update scheduled"
 
         data_dict = sane_dict(film)
@@ -111,7 +110,6 @@ def process(soup = None):
         data_dict['price'] = int(float(info['price']))
         data_dict['type'] = 'playfamily'
         data_dict['value'] = info['uid']
-        
         data_dict['url_view'] = extract_url(info['frame'])
         save_location(**data_dict)
 

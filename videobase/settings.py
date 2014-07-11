@@ -84,6 +84,7 @@ INSTALLED_APPS = (
     'social_auth',
     'djcelery',
     'backup_system',
+    'data'
 )
 
 MIDDLEWARE_CLASSES = (

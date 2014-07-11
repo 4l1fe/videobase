@@ -58,7 +58,7 @@ class Command(BaseCommand):
 
     def calculate_local_rating(self):
         """
-            Вычисление локального рейтинга
+        Вычисление локального рейтинга
         """
 
         cursor = connection.cursor()
@@ -66,7 +66,7 @@ class Command(BaseCommand):
             query = """
                 SELECT "users_films"."film_id", COALESCE(SUM("users_films"."rating"), 0) AS sum_films,
                 COALESCE(COUNT("users_films"."film_id"), 0) AS count_films
-                FROM "users_films" GROUP BY "users_films"."film_id"
+                FROM "users_films" GROUP BY "users_films"."film_id" ORDER BY "users_films"."film_id"
             """
 
             cursor.execute(query)
@@ -91,8 +91,8 @@ class Command(BaseCommand):
             sum = 0
 
             # Check if not null
-            if item['sum_films']:
-                sum = item['count_films'] / item['sum_films']
+            if item['count_films']:
+                sum = round(item['sum_films'] / item['count_films'], 1)
 
             # Обновляем локальный рейтинг
             Films.objects.filter(id=item['film_id']).\
@@ -101,7 +101,7 @@ class Command(BaseCommand):
 
     def calc_rating_sort(self, instance):
         """
-            Вычисление условного рейтинга для сортировки
+        Вычисление условного рейтинга для сортировки
         """
 
         rating_sort = instance.get_sort_cnt(instance.rating_cons_cnt) * \
