@@ -92,7 +92,7 @@ class Command(BaseCommand):
 
             # Check if not null
             if item['count_films']:
-                sum = item['sum_films'] / item['count_films']
+                sum = round(item['sum_films'] / item['count_films'], 1)
 
             # Обновляем локальный рейтинг
             Films.objects.filter(id=item['film_id']).\
