@@ -97,10 +97,10 @@ def process(soup = None):
             film.save()
             print "Succesfully created {}. Trying to schedule update".format(film)
             kinopoisk_parse_one_film.apply_async(
-            (
-                 kinopoisk_id,
-                info['title']
-                 )
+                (
+                    kinopoisk_id,
+                    info['title']
+                )
             )
             print "Update scheduled"
 
