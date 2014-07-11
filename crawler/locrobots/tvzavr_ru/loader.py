@@ -3,7 +3,7 @@ import urllib
 import time
 from crawler.core import BaseLoader
 from crawler.core.exceptions import NoSuchFilm
-from crawler.tvzavr_ru.parsers import parse_source
+from crawler.locrobots.tvzavr_ru.parsers import parse_source
 from selenium import webdriver
 from pyvirtualdisplay import Display
 

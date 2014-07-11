@@ -2,7 +2,7 @@
 from crawler.core.exceptions import NoSuchFilm
 import parsers
 import urllib
-from ..core import BaseLoader
+from crawler.core import BaseLoader
 
 HOST = 'www.now.ru'
 URL_SEARCH = 'search?{}'

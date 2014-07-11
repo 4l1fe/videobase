@@ -2,7 +2,7 @@
 from crawler.core.exceptions import NoSuchFilm
 import requests
 import parsers
-from ..core import BaseLoader
+from crawler.core import BaseLoader
 import urllib
 
 HOST = 'www.zoomby.ru'
