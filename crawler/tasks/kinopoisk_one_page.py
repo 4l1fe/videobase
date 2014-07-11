@@ -1,3 +1,4 @@
+# coding: utf-8
 from videobase.celery import app
 from crawler.datarobots.kinopoisk_ru.kinopoisk import parse_from_kinopoisk
 
