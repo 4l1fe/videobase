@@ -31,6 +31,6 @@ class FactChecker(object):
             for failure in failures:
                 if failure in self.correctors:
                     self.correctors[failure](target)
-        return self.check(target)
+        return failures
 
 
