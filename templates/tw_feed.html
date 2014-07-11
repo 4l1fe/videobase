@@ -1,0 +1,15 @@
+{% extends "base_feed.html" %}
+        {% block feeditems %}
+            {% for film in films %}
+                <item>
+                  <title>{{film.name}}</title>
+                  <link>http://vsevi.ru/films/{{film.id}} </link>
+                  <description><![CDATA[Новый #фильм {{ film.name }} {% for ganre in film.genres.all %}#{{ganre.name}}{% endfor %} {{film.rating_cons}}/10, {{film.release_date.year}} http://vsevi.ru/films/{{film.id}}]]>
+                  </description>
+                  <pubDate>
+                    {{ date }}
+                  </pubDate>
+                  <guid>http://vsevi.ru/films/{{film.id}}</guid>
+                </item>
+            {% endfor %}
+        {% endblock %}

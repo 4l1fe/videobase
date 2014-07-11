@@ -1,4 +1,6 @@
-
+'''
+Class for fact cheking and information fixing
+'''
 class FactChecker(object):
 
     checkers = {}
@@ -9,6 +11,11 @@ class FactChecker(object):
         self.target_type = target_type
 
     def add(self, message, corrector = None):
+        '''
+        Instance method can be used as 
+
+        
+        '''
 
         def wrapper(func):
             self.checkers[message] = func
