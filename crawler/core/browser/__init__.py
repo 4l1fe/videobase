@@ -1,9 +1,10 @@
+# coding: utf-8
 '''
 Module for emulating browser
 '''
 from crawler.core.exceptions import RetrievePageException
 
-
+import requests
 from urlparse import urlparse
 from os.path import exists
 from os.path import join
@@ -12,10 +13,9 @@ from collections import namedtuple
 import base64
 import logging
 
-import random
-
 FakeResponse = namedtuple('FakeResponse', ['ok', 'content', 'url'])
 
+HEADERS = {'User-Agent': 'Mozilla/5.0'}
 
 CACHE_DIR = './cache'
 
@@ -59,15 +59,12 @@ def construct_path(urlstring, kwargs):
             return join(ljoin(repath), 'cache')
         else:
             return join(ljoin(repath), base64.urlsafe_b64encode(purl.query))
-  
 
 
 def cache(func):
     '''
     Caching wrapper for get functions
     '''
-
-
     def wrapper(url, **kwargs):
         '''
         Wrapper function
@@ -103,4 +100,11 @@ def nopage_handler(func):
             raise RetrievePageException(url=url, status_code=r.status_code)
     return wrapper
 
-
+    
+@nopage_handler
+@cache
+def simple_get(url, **kwargs):
+    '''
+    Simple wrapper around requests.get function with preset headers
+    '''
+    return requests.get(url, headers=HEADERS, params=kwargs.get('params', {}))
