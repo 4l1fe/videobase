@@ -1,5 +1,4 @@
 # coding: utf-8
-
 from __future__ import absolute_import
 
 from bs4 import BeautifulSoup
@@ -13,18 +12,20 @@ from apps.films.models import Persons
 from apps.films.models import Films
 
 from videobase.celery import app
-from crawler.locrobots import sites_crawler, process_film_on_site
+
 from crawler.datarobots.kinopoisk_ru.parse_page import get_photo
 from crawler.datarobots.kinopoisk_ru.kinopoisk_poster import poster_robot_wrapper
 from crawler.datarobots.imdbratings import process_all
-from crawler.locrobots.amediateka_ru.loader import Amediateka_robot
-from crawler.locrobots.viaplay_ru.robot import ViaplayRobot
+
+
 from crawler.datarobots.kinopoisk_ru.kinopoisk_premiere import kinopoisk_news
 from crawler.datarobots.youtube_com.youtube_trailers import process_film
-from crawler.locrobots.playfamily_dot_ru.playfamily_xml import process
-from crawler.task_modules.kinopoisk_one_page import kinopoisk_parse_one_film
+
+from crawler.tasks.kinopoisk_one_page import kinopoisk_parse_one_film
 from crawler.tor import simple_tor_get_page
-from crawler.task_modules.utils import robot_task, robot_launch_wrapper, update_robot_state_film_id
+
+from crawler.tasks.utils import robot_task, robot_launch_wrapper, update_robot_state_film_id
+
 
 
 import datetime
@@ -35,14 +36,6 @@ information_robots = ['kinopoik_robot', 'imdb_robot']
 
 
 logger = get_task_logger(__name__)
-
-
-@app.task(name='amediateka_ru_robot_start')
-def amediateka_robot_start(*args, **kwargs):
-    '''
-    Amediateka_robot
-    '''
-    Amediateka_robot().get_film_data()
 
 
 @app.task(name='kinopoisk_films')
@@ -107,24 +100,8 @@ def parse_kinopoisk_persons(pid):
         print e
 
 
-@app.task(name='individual_site_film')
-def launch_individual_film_site_task(site):
-    robot_launch_wrapper(site, partial(process_film_on_site, site))
 
 
-@app.task(name='robot_launch')
-def robot_launcher(*args, **kwargs):
-
-    print 'Start'
-
-    for robot in Robots.objects.all():
-        print u'Checking robot %s' % robot.name
-        if robot.last_start + datetime.timedelta(seconds=robot.delay) < timezone.now():
-
-            if robot.name in sites_crawler:
-                launch_individual_film_site_task.apply_async((robot.name,))
-        else:
-            print u'Skipping robot %s' % robot.name
 
 
 @app.task(name='kinopoisk_set_poster')
@@ -145,9 +122,6 @@ def imdb_robot_start(*args,**kwargs):
     process_all()
 
 
-@app.task(name='viaplay_ru_robot_start')
-def viaplay_robot_start():
-    ViaplayRobot().get_data()
 
 
 def film_at_least_years_old(film, years):
@@ -183,9 +157,6 @@ def create_due_refresh_tasks():
                 kinopoisk_parse_one_film.apply_async((film.kinopoisk_id, film.name))
 
 
-@app.task(name='playfamily_xml')
-def pltask():
-    process()
 
 
 @app.task(name='kinopoisk_news')
@@ -210,6 +181,3 @@ def find_trailer(film_id):
 def trailer_commands():
     for film in Films.objects.all():
         find_trailer.apply_async((film.id,))
-
-
-

@@ -1,4 +1,4 @@
-
+# coding: utf-8
 from apps.films.models import Films
 from bs4 import BeautifulSoup
 
@@ -6,7 +6,7 @@ from crawler.tor import get_page_or_renew
 from crawler.tor import simple_tor_get_page
 from crawler.utils.locations_utils import sane_dict,save_location
 from crawler.datarobots.kinopoisk_ru.kinopoisk import get_genre, get_country
-from crawler.task_modules.kinopoisk_one_page import kinopoisk_parse_one_film
+from crawler.tasks.kinopoisk_one_page import kinopoisk_parse_one_film
 from apps.contents.constants import APP_CONTENTS_PRICE_TYPE_PAY
 from django.utils import timezone
 
