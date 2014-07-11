@@ -1,17 +1,19 @@
 # coding: utf-8
 from datetime import datetime
-import re
 
 import gdata.youtube
 import gdata.youtube.service
 
 from apps.films.models import Films, FilmExtras
+from apps.films.models import PersonsFilms
 from apps.films.models import Countries
 from data.checker import FactChecker
 from data.constants import FLATLAND_NAME
+from crawler.task_modules.kinopoisk_one_page import kinopoisk_parse_one_film
 from bs4 import BeautifulSoup
 import requests
 import re
+from apps.films.constants import *
 
 
 film_checker = FactChecker(Films)
@@ -57,6 +59,17 @@ def film_description_useless_links_corrector(film):
         film.description = film_description[0:i].decode("utf-8")
         film.save()
         print u"Corrector removed useless links in film description"
+
+
+def film_scriptwriter_and_director_corrector(film):
+    if film.kinopoisk_id:
+        kinopoisk_parse_one_film.apply_async(
+                     (
+                     film.kinopoisk_id,
+                     film.name
+                     )
+                )
+        print u"Corrector updated scriptwriter and director info for film successfully"
 
 
 
@@ -198,3 +211,14 @@ def film_kinopoisk_rating_check(film):
         return True
     else:
         return False
+
+@film_checker.add(u"Film has no scriptwriter or director", corrector=film_scriptwriter_and_director_corrector)
+def film_scriptwriter_check(film):
+    persons_film = PersonsFilms.objects.filter(film=film)
+    film_script_writers = persons_film.filter(p_type=APP_PERSON_SCRIPTWRITER)
+    film_directors = persons_film.filter(p_type=APP_PERSON_DIRECTOR)
+    if not (film_script_writers or film_directors):
+        return False
+    else:
+        return True
+
