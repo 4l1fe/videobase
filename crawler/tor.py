@@ -65,7 +65,7 @@ def get_page(url, user_agent, headers=DEFAULT_HEADERS):
     curl.setopt(pycurl.USERAGENT, user_agent)
     curl.setopt(pycurl.MAXREDIRS, 2)
     curl.setopt(pycurl.TIMEOUT, 80)
-    curl.setopt(pycurl.VERBOSE, 2)
+    curl.setopt(pycurl.VERBOSE, 0)
     curl.setopt(pycurl.FAILONERROR, 1)
     curl.setopt(pycurl.PROXYTYPE, pycurl.PROXYTYPE_SOCKS5)
     curl.setopt(pycurl.PROXY, TOR_PROXY)
@@ -76,7 +76,8 @@ def get_page(url, user_agent, headers=DEFAULT_HEADERS):
         flag = True
         curl.perform()
     except Exception, e:
-        return e
+        #return e
+        pass
     finally:
         if flag:
             body, header = retrieved_body.getvalue(), retrieved_headers.getvalue()
@@ -104,11 +105,12 @@ def get_page_or_renew(url,user_agent):
         body, header = get_page(url, user_agent)
 
         if not check_result(header):
+            print check_result(header)
             renew_connection()
             counter += 1
         else:
             return body
-            break
+            
 
 def simple_tor_get_page(url):
     return get_page_or_renew(url,get_random_weighted_browser_string())
