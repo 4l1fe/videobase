@@ -12,7 +12,6 @@ from django.db.models import Q
 
 from apps.films.models import Films
 
-from crawler import Robot
 from crawler.utils.locations_utils import save_location, sane_dict
 from crawler.kinopoisk_ru.kinopoisk import get_id_by_film
 from crawler.ivi_ru.loader import IVI_Loader
@@ -92,12 +91,12 @@ sites = sites_crawler.keys()
 
 def process_film_on_site(site, film_id):
     try:
-        film = [Films.objects.get(id=film_id),]
+        film = Films.objects.get(id=film_id)
     except Films.DoesNotExist:
         print "There is no film in db with such id"
-        return
+        return None
 
-    loaded_data = sites_crawler[site].loader(film).load()
+    loaded_data = sites_crawler[site]['loader'](film).load()
 
     for data in sites_crawler[site]['parser'].parse(loaded_data['html'], sane_dict, film, url=loaded_data['url']):
         print u"Trying to put data from %s for %s to db" % (site, unicode(data['film']))

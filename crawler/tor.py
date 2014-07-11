@@ -113,7 +113,7 @@ def get_page_or_renew(url,user_agent):
             
 
 def simple_tor_get_page(url):
-    return get_page_or_renew(url,get_random_weighted_browser_string())
+    return get_page_or_renew(url, get_random_weighted_browser_string())
 
 ########################################################################
 def main():
