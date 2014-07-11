@@ -15,8 +15,7 @@ def parse_search(response, film, year):
     film_div = None
     exit_flag = False
     try:
-        content = response.content
-        soup = BeautifulSoup(content)
+        soup = BeautifulSoup(response)
         if not(soup.find(attrs={'id': 'noresults'}) is None):
             return None
         if search_text_title in soup.head.title.text:
@@ -87,3 +86,6 @@ class ParseNowFilmPage(BaseParse):
 
     def get_type(self, **kwargs):
         return 'nowru'
+
+    def get_value(self, **kwargs):
+        pass
