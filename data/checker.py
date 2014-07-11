@@ -1,5 +1,6 @@
-
-
+'''
+Class for fact cheking and information fixing
+'''
 class FactChecker(object):
 
     checkers = {}
@@ -10,6 +11,11 @@ class FactChecker(object):
         self.target_type = target_type
 
     def add(self, message, corrector = None):
+        '''
+        Instance method can be used as 
+
+        
+        '''
 
         def wrapper(func):
             self.checkers[message] = func
@@ -18,18 +24,20 @@ class FactChecker(object):
         return wrapper
 
     def check(self, target):
-
         if not (type(target) is self.target_type):
             raise NameError("Wrong type of data. Expected {}, got {}".format(self.target_type, type(target)))
         else:
-            failures = [ name for name in self.checkers if not self.checkers[name](target)]
+            failures = [name for name in self.checkers if not self.checkers[name](target)]
             return failures
 
-    def check_and_correct(self,target):
-        failures = self.check(target)
-        for failure in failures:
-            if failure in self.correctors:
-                self.correctors[failure](target)
+    def check_and_correct(self, target):
+        is_target_changed = True
+        while is_target_changed:
+            is_target_changed = False
+            failures = self.check(target)
+            for failure in failures:
+                if failure in self.correctors:
+                    self.correctors[failure](target)
         return self.check(target)
 
 
