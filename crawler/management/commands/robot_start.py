@@ -1,6 +1,6 @@
 # coding: utf-8
-from crawler.utils.robot_start import process_film_on_site
-from crawler.utils.robot_start import sites
+from crawler.locrobots import process_film_on_site
+from crawler.locrobots import sites
 
 from django.core.management import BaseCommand
 

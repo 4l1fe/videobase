@@ -9,7 +9,6 @@ HOST = 'www.zoomby.ru'
 URL_LOAD = ''
 
 
-
 class ZOOMBY_Loader(BaseLoader):
     def __init__(self, film, host=HOST, url_load=URL_LOAD):
         super(ZOOMBY_Loader, self).__init__(film, host, url_load)
