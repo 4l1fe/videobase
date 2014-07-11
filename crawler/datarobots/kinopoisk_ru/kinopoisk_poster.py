@@ -2,10 +2,9 @@
 from django.core.files import File
 
 from crawler.datarobots.kinopoisk_ru.parse_page import get_poster
-from apps.films.models import FilmExtras,Films
+from apps.films.models import FilmExtras, Films
 from apps.films.constants import APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER
 
-import logging
 
 def set_kinopoisk_poster(film):
     poster = get_poster(film.kinopoisk_id)

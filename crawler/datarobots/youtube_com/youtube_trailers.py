@@ -17,7 +17,6 @@
 
 '''
 
-
 import gdata.youtube
 import gdata.youtube.service
 from itertools import chain
@@ -35,80 +34,73 @@ delays = (
     (timezone.timedelta(days=365*3 +1), timezone.timedelta(days =1)),
 )
 
-SEARCH_STRINGS_RU = (u'официальный русский трейлер фильма hd',u'русский трейлер фильма hd',u'русский трейлер HD',u'трейлер на русском',u'официальный трейлер',u'русский трейлер',u'тв-ролик',u'финальный трейлер',u'промо ролик')
-SEARCH_STRINGS_EN =  (u'international trailer hd', u'official trailer hd',u'trailer hd', u'international trailer', u'official teaser', u'trailer')
-FAIL_STRINGS = (u'interview',u'интервью',u'premiere',u'премьера',u'review',u'обзор',u'conference',u'behind the scenes',u'gameplay',u'parody',u'videogame')
+SEARCH_STRINGS_RU = (u'официальный русский трейлер фильма hd',
+                     u'русский трейлер фильма hd', u'русский трейлер HD',
+                     u'трейлер на русском', u'официальный трейлер',
+                     u'русский трейлер', u'тв-ролик', u'финальный трейлер',
+                     u'промо ролик')
+SEARCH_STRINGS_EN = (u'international trailer hd', u'official trailer hd',
+                     u'trailer hd', u'international trailer',
+                     u'official teaser', u'trailer')
+FAIL_STRINGS = (u'interview', u'интервью', u'premiere', u'премьера', u'review',
+                u'обзор', u'conference', u'behind the scenes', u'gameplay',
+                u'parody', u'videogame')
 
 
-def query_search(film_name,trailer_word):
+def query_search(film_name, trailer_word):
     client = gdata.youtube.service.YouTubeService()
     query = gdata.youtube.service.YouTubeVideoQuery()
 
     query.vq = (film_name + trailer_word).encode('utf-8')
     query.max_results = 25
-    
 
     feed = client.YouTubeQuery(query)
 
     for f in feed.entry:
-        
         title = f.title.text.lower().decode('utf-8')
         if (film_name.lower() in title) and (trailer_word.lower() in title and sum(s in title for s in FAIL_STRINGS)==0):
             yield f.title.text, f.link[0].href
 
 
-
 def get_film_trailer(film):
 
-    trailer_name,link = next(
+    trailer_name, link = next(
         chain(
             chain(
-                *(query_search(film.name,w) for w in SEARCH_STRINGS_RU)),
-            
+                *(query_search(film.name, w) for w in SEARCH_STRINGS_RU)),
         chain(
-            *(query_search(film.name_orig,w) for w in SEARCH_STRINGS_EN))
+            *(query_search(film.name_orig, w) for w in SEARCH_STRINGS_EN))
         ),
         None)
     
-    return trailer_name,link
-        
+    return trailer_name, link
+
+
 def process_film(film):
 
     try:
-        ytchk= YoutubeTrailerCheck.objects.get(film = film)
-
+        ytchk = YoutubeTrailerCheck.objects.get(film=film)
     except YoutubeTrailerCheck.DoesNotExist:
-
-        ytchk = YoutubeTrailerCheck(film=film,
-                                    last_check=timezone.now() - timezone.timedelta(days = 1000),
-                                    was_successfull =False
-
-        )
+        ytchk = YoutubeTrailerCheck(film=film, was_successfull=False,
+                                    last_check=timezone.now()-timezone.timedelta(days=1000))
         ytchk.save()
-
 
     if ytchk.was_successfull:
         print u"Trailer already set"
-        return
+        return None
     else:
-        for delta,delay in delays:
-            
-            if  timezone.now().date() - film.release_date < delta:
-
+        for delta, delay in delays:
+            if timezone.now().date() - film.release_date < delta:
                 if ytchk.last_check - timezone.now() < delay:
-
                     print u"Trying to get trailer for {} from youtube".format(film)
                     trtuple = get_film_trailer(film)
                     if trtuple:
                         trailer_name, link = trtuple
-
-                        fe = FilmExtras(film= film,
-                                    type = APP_FILM_TYPE_ADDITIONAL_MATERIAL_TRAILER,
-                                    name = trailer_name,
-                                    name_orig = trailer_name,
-                                    description = trailer_name,
-                                    url = link )
-
+                        fe = FilmExtras(film=film,
+                                        type=APP_FILM_TYPE_ADDITIONAL_MATERIAL_TRAILER,
+                                        name=trailer_name,
+                                        name_orig=trailer_name,description=trailer_name,
+                                        url=link)
                         fe.save()
                         ytchk.was_successfull = True
                         print u"Succesfully set trailer"
@@ -118,26 +110,4 @@ def process_film(film):
                         
                     ytchk.last_check = timezone.now()
                     ytchk.save()
-                return
-                
-
-
-        
-
-
-    
-
-
-
-
-
-
-
-
-    
-
-
-
-    
-    
-    
+                return None
