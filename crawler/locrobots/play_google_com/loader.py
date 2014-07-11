@@ -1,4 +1,6 @@
 # coding: utf-8
+from utils.common import url_with_querystring
+
 HOST = 'play.google.com'
 URL_SEARCH = 'store/search'
 URL_LOAD = ''
@@ -15,8 +17,9 @@ class PLAY_GOOGLE_Loader(BaseLoader):
 
     def get_url(self, load_function):
         url = "http://%s/%s" % (self.host, self.search_url, )
-        response = load_function(url, params=self.params, cache=False)
-        film_url = parsers.parse_search(response, self.film.name)
+        url = url_with_querystring(url, **self.params)
+        response = load_function(url)
+        film_url = parsers.parse_search(response, self.film.name, self.film.release_date.year)
         if film_url is None:
             raise NoSuchFilm(self.film)
         self.url_load = film_url
