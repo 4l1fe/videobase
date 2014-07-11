@@ -38,15 +38,6 @@ def get_id_by_film(film, load_function=simple_get):
     id = int(re.findall(r'/film/(\d+)', href)[0])
     return id
 
-
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-ch = logging.StreamHandler()
-ch.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-ch.setFormatter(formatter)
-logger.addHandler(ch)
-
 LIMIT = 10
 
 
@@ -174,7 +165,6 @@ def parse_from_kinopoisk(kinopoisk_id, name=None, film=None):
         process_film_facts(film, facts)
     except Exception, exception:
         print exception
-        logging.debug(u"Caught exception : %s", str(exception))
 
 
 
