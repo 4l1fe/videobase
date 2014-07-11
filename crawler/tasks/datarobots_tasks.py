@@ -13,7 +13,7 @@ from crawler.datarobots.kinopoisk_ru.kinopoisk_premiere import kinopoisk_news
 from crawler.datarobots.youtube_com.youtube_trailers import process_film
 from crawler.tasks.kinopoisk_one_page import kinopoisk_parse_one_film
 from crawler.tor import simple_tor_get_page
-from crawler.tasks.utils import robot_task,  update_robot_state_film_id
+from crawler.tasks.utils import robot_task, update_robot_state_film_id
 from videobase.celery import app
 
 import datetime
