@@ -185,8 +185,16 @@ def film_description_contains_digits_check(film):
 def film_description_contains_useless_site_names_check(film):
     film_description = film.description.encode("utf-8")
     i = find_first_pattern_position(film_description, "(NOW.RU)|(ZOOMBY.RU)")
-    print "INDEX", i, len(film_description)
     if i!=-1:
         return False
     else:
         return True
+
+
+@film_checker.add(u"Film has no Kinopoisk rating")
+def film_kinopoisk_rating_check(film):
+    film_kinopoisk_rating = film.rating_kinopoisk
+    if film_kinopoisk_rating:
+        return True
+    else:
+        return False
