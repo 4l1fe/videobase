@@ -1,5 +1,6 @@
 html, body, div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, abbr, address, cite, code, del, dfn, em, img, ins, kbd, q, samp, small, strong, sub, sup, var, b, i, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, figcaption, figure, footer, header, menu, nav, section, summary, time, mark, audio, video {margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent;}
-body {line-height:1;background: url(../img/bg.jpg) center top #e6e7e9;}
+body {line-height:1;background: url(../img/background-white.png) center top repeat #e6e7e9;}
+
 ul,menu,ol {list-style:none;}
 article,aside,details,figcaption,figure,footer,header,menu,nav,section {display:block;}
 blockquote, q {quotes: none;}
@@ -36,7 +37,8 @@ table {border-collapse:collapse;border-spacing:0;}
 .h-footer {height:150px;}*/
 .clearfix {clear:both;overflow:hidden;height:0px;}
 
-.wrap-page {min-width: 470px;}
+.wrap-page {min-width: 470px; }
+.bg-noise {background: url('../img/noise.png') repeat;}
 
 h1 {font-size: 22px;text-transform: uppercase;font-weight: bold;}
 h2 {font-size: 28px;color: #fff;font-weight: bold;}
@@ -51,9 +53,10 @@ h5 {color: #fff;font-size: 14px;font-weight: bold;text-transform: uppercase;}
 .margin0a {margin: 0 auto;}
 
 .top-header {
-    min-height: 100px;padding: 16px 0;
-    background:url(../img/bg-header.jpg);
+    min-height: 100px;
+    background: url(../img/background.png) center top repeat #392F2E;
 }
+.top-header .bg-noise {padding: 16px 0; min-height: 100px;}
 .top-header .col-md-3 {text-align: center;}
 
 .top-header .input-group {padding-top: 17px;}
@@ -142,9 +145,9 @@ h5 {color: #fff;font-size: 14px;font-weight: bold;text-transform: uppercase;}
 }
 
 
-.blue-block {background: url(../img/bg-blue.jpg) center top #0469a1;}
-.broun-block {background: url(../img/bg-broun.jpg) center top #453535;padding-bottom: 34px;}
-.broun-block-playlist {background: url(../img/bg-broun.jpg) center top;padding: 0;}
+.blue-block {background: url(../img/background.png) center top repeat #0469a1;}
+.broun-block {background: url(../img/background.png) center top repeat #453535;padding-bottom: 34px;}
+.broun-block-playlist {background: url(../img/background.png) center top repeat #453535;padding: 0;}
 .blue-block .list-film .col-md-3 {padding-top: 20px;}
 section {padding:37px 0 6px 0;}
 .dots1 {background: url(../img/dots1.png) center center no-repeat;}
@@ -152,7 +155,7 @@ section {padding:37px 0 6px 0;}
 .dots3 {background: url(../img/dots3.png) center center no-repeat;}
 
 .list-film .col-md-3 {padding: 29px 10px 10px 10px;}
-.films-new .list-film > .row {max-height: 530px;overflow: hidden;}
+.films-new .list-film > .row {overflow: hidden;}
 .film-thumb {
     background: transparent;margin-bottom: 18px;
     border: none;
@@ -230,7 +233,7 @@ section {padding:37px 0 6px 0;}
     -webkit-border-radius: 5px;
     -moz-border-radius: 5px;
     border-radius: 5px;
-    background: #d6e3e9;
+    background-color: #d6e3e9;
     background: -webkit-gradient(linear, 0 0, 0 bottom, from(#d6e3e9), to(#ccdde4));
     background: -webkit-linear-gradient(#d6e3e9, #ccdde4);
     background: -moz-linear-gradient(#d6e3e9, #ccdde4);
@@ -246,6 +249,7 @@ section {padding:37px 0 6px 0;}
 
 
 .add-filter {padding-bottom: 16px;}
+.add-filter-loading .add-content a {visibility: hidden}
 .add-content {
     text-align: center;
     padding: 17px 0 16px 0;
@@ -254,12 +258,15 @@ section {padding:37px 0 6px 0;}
     color: #3168d1;text-transform: uppercase;font-size: 14px;font-weight: bold;text-decoration: none;
     border-bottom: 1px dotted #3168d1;
 }
+.loading {background: url("../img/loader.gif") no-repeat center center; background-size: 100px 100px}
+
 .add-content a:hover {border: none;}
+.add-filter-loading .style-panel-action {background: url("../img/loader.gif") no-repeat center center #d6e3e9; background-size: 30px 30px}
 
 /* .sort-list > li {min-width: 158px}*/
 .sort-list.center-sort {text-align: center;}
 .sort-list.right-sort {text-align: right;padding-right: 30px;}
-.sort-list.right-sort .dropdown-menu {text-align: center;}
+.sort-list.right-sort .dropdown-menu {text-align: right;}
 .sort-list.right-sort a {padding-left: 6px;}
 .sort-list.nobg li {background: none;}
 .sort-list {font-size: 0px;padding-left: 25px;}
@@ -281,7 +288,7 @@ section {padding:37px 0 6px 0;}
 .sort-list strong {
     font-size: 14px;color: #626262;
 }
-.dropdown-menu>li>a {padding-bottom: 5px}
+.dropdown-menu>li>a {padding-bottom: 2px}
 .slide-comments > li {float: left;padding-bottom:35px;padding-right: 15px;padding-left: 15px;}
 .container-brown {max-width: 960px;}
 
@@ -916,20 +923,10 @@ a.toggle-playlist.active {
     background-color: #f49600;
 }
 
-
-
-
-
 .people-block {
     padding-top: 15px;
 }
 .sector-person {padding-bottom: 45px;}
-
-
-
-
-
-
 
 .sprite {background: url(../img/sprite.png) no-repeat top left;}
 .sprite-i-bell{ background-position: 0 0; width: 18px; height: 20px; }
@@ -986,6 +983,7 @@ a.toggle-playlist.active {
         padding-left: 0px;text-align: center;float: none;
     }
     .choose-def .btn-film {float: none;margin: 0 auto;}
+    #films_new .film-thumb:nth-child(4) {display: none}
 }
 
 .list-btns-film {text-align: center;}
@@ -1018,6 +1016,7 @@ a.toggle-playlist.active {
     .title-playlist p {
         padding-top: 21px;
     }
+    #films_new .film-thumb:nth-child(3) {display: none}
 }
 
 
@@ -1096,7 +1095,8 @@ a.toggle-playlist.active {
 
 .display-none {display: none}
 
-.dropdown-menu li {padding: 5px; margin: 0}
+.dropdown-menu {min-width: 100px}
+.dropdown-menu li {padding: 1px 0 1px 0; margin: 0}
 
 .list-film .row hr {border: 0; margin: 0; padding: 0; width: 100%; height: 1px; clear: both; background: url("../img/films-delim.png") repeat-x}
 .broun-block .list-film .row hr {border: 0; margin: 0; padding: 0; width: 100%; height: 1px; clear: both; background: url("../img/films-delim-white.png") repeat-x}
