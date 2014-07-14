@@ -42,7 +42,7 @@ class CustomRegisterForm(forms.ModelForm):
 
     def clean(self):
         if 'email' in self.cleaned_data:
-            self.cleaned_data['username'] = self.cleaned_data.get['email']
+            self.cleaned_data['username'] = self.cleaned_data.get('email')
         else:
             raise forms.ValidationError(self.error_messages['email'],
                                         code='email')

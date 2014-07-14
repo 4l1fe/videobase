@@ -1,8 +1,10 @@
 from apps.contents.models import Contents, Locations
-from apps.films.models import  Seasons
+from apps.films.models import Seasons
 from apps.robots.constants import APP_ROBOT_VALUE
 from django.core.validators import URLValidator
 from apps.contents.constants import APP_CONTENTS_PRICE_TYPE_FREE
+
+
 def sane_dict(film=None):
     '''
     Template for dict returned by parsers with sane defaults
@@ -113,8 +115,6 @@ def save_location(film, **kwargs):
     Creating content if necessary and creating location
 
     for given dictionary based on one produced by sane_dict
-
-    
     '''
     if kwargs['type'] in APP_ROBOT_VALUE and kwargs['value'] == '':
         return
@@ -125,6 +125,20 @@ def save_location(film, **kwargs):
     # Validating that given url_view exists
     val(kwargs['url_view'])
 
+    try:
+        prev_location = Locations.objects.get(type=kwargs['type'], content = content)
+        print "Found location with such type and film."
+    except Locations.DoesNotExist:
+        print "There is no location with such type and film."
+        prev_location = None
+    except Locations.MultipleObjectsReturned:
+        print "There are multiple locations with such parameters. Deleting all"
+        locations = Locations.objects.filter(type=kwargs['type'], content = content)
+        locations.delete()
+        prev_location = None
+        
+
+
     location = Locations(content=content,
                          type=kwargs['type'],
                          value=kwargs['value'],
@@ -133,5 +147,10 @@ def save_location(film, **kwargs):
                          subtitles=kwargs['subtitles'],
                          price=kwargs['price'],
                          price_type=kwargs['price_type'])
+    print "Saving location"
     location.save()
+    if prev_location:
+        print "Deleting previous location"
+        prev_location.delete()
+
     print u"Saved location for film {}".format(film)
