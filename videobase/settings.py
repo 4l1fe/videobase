@@ -94,8 +94,9 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'utils.middlewares.auth_token_middleware.AuthTokenMiddleware',
-    'utils.middlewares.local_thread.ThreadLocals',
+    'utils.middlewares.AuthTokenMiddleware',
+    'utils.middlewares.ThreadLocals',
+    'utils.middlewares.ExceptionMiddleware'
 )
 
 TEMPLATE_LOADERS = (
