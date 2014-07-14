@@ -60,7 +60,7 @@ def get_content(film, kwargs):
     if len(contents) == 0:
         #If there is no such content just creating one with meaningful defaults
 
-        if  (season_num is None) or (season_num ==0):
+        if (season_num is None) or (season_num ==0):
 
             content = Contents(film=film, name=film.name, name_orig=film.name_orig,
                            description=description,
