@@ -1,14 +1,16 @@
-include config
-include head
-body
-    .wrap-page.bg-noise
-        include header
-        .content(role='main')
-            section.broun-block-playlist
-                .bg-noise
-                    .container
-                        .big-text=item.error
-                        .sad-text!=item.text
-        include footer
-        script.
-            $(document).ready(function () {window.InitApp()})
+doctype html
+html
+    include config
+    include head
+    body
+        .wrap-page.bg-noise
+            include header
+            .content(role='main')
+                section.broun-block-playlist
+                    .bg-noise
+                        .container
+                            .big-text=item.error
+                            .sad-text!=item.text
+            include footer
+            script.
+                $(document).ready(function () {window.InitApp()})

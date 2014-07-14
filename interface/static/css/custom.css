@@ -246,7 +246,9 @@ section {padding:37px 0 6px 0;}
 
 .filter-block {padding-top: 15px;margin-bottom: -20px; z-index: 999; position: relative}
 .filter-content {padding: 18px 0 0 0;}
+.filter-instock label {display: inline}
 
+.search-block input {color: #fff}
 
 .add-filter {padding-bottom: 16px;}
 .add-filter-loading .add-content a {visibility: hidden}

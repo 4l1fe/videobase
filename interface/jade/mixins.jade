@@ -196,16 +196,16 @@ mixin comment_thumb(item)
                                 a(href=href, title='', data-mi-athref="user.id", data-mi-name="user.name")=name
                             .col-md-3.col-sm-3.col-xs-3
                                 .time-tape(data-mi-id="created",data-mi-val=item.created,data-mi-name="created")=time_text_str(item.created)
-                    //
+                    //-
                        .title-item-tape
                     .content-item-tape
                         .short-text-tape
                             p(data-mi-name="text")=item.text
-                        //
+                        //-
                            .short-text-tape
-                    //
+                    //-
                        .content-item-tape
-    //
+    //-
        .tape-item
 
 mixin feed_thumb(item, for_tpl)
@@ -246,18 +246,18 @@ mixin feed_thumb(item, for_tpl)
                                     |&nbsp;оставил комментарий к фильму
                                 .col-md-2.col-sm-3.col-xs-3
                                     .time-tape(data-mi-id="created", data-mi-name="created", data-mi-val=item.created)=created
-                        //
+                        //-
                            .title-item-tape
                         .content-item-tape
                             .short-text-tape
                                 h4
                                     a(href=film_url, title='', data-mi-athref="object.id", data-mi-name="object.name")=item.object.name
                                 p(data-mi-name="object.text")=item.object.text
-                            //
+                            //-
                                .short-text-tape
-                        //
+                        //-
                            .content-item-tape
-            //
+            //-
                .tape-item
         if item.type == "film-r" || for_tpl
             .tape-item.cf.tape-thumb(class="tape-film-r")
@@ -274,7 +274,7 @@ mixin feed_thumb(item, for_tpl)
                                     |&nbsp;оценил фильм
                                 .col-md-2.col-sm-3.col-xs-3
                                     .time-tape(data-mi-id="created", data-mi-name="created", data-mi-val=item.created)=created
-                        //
+                        //-
                            .title-item-tape
                         .content-item-tape
                             h4
@@ -283,15 +283,15 @@ mixin feed_thumb(item, for_tpl)
                             .range-block-tape.cf
                                 .range-style2.fleft
                                     .rateit(data-mi-id="object.rating",data-mi-val=item.object.rating,data-rateit-max=10,data-rateit-resetable=0,data-rateit-value=item.object.rating, data-rateit-readonly="true")
-                                //
+                                //-
                                    .range-style2
                                 span(data-mi-name="object.rating")=item.object.rating
                                 |&nbsp;из 10
-                            //
+                            //-
                                .range-block-tape
-                        //
+                        //-
                            .content-item-tape
-            //
+            //-
                .tape-item
         if item.type == "pers-s" || for_tpl
             .tape-item.cf.tape-thumb(class="tape-pers-s")
@@ -308,24 +308,24 @@ mixin feed_thumb(item, for_tpl)
                                     |&nbsp;подписался на обновления актера
                                 .col-md-2.col-sm-3.col-xs-3
                                     .time-tape(data-mi-id="created", data-mi-name="created", data-mi-val=item.created)=created
-                        //
+                        //-
                            .title-item-tape
                         .content-item-tape
                             .actor
                                 a(href=person_url, title='',data-mi-athref="object.id")
                                     img.img-circle(src=item.object.photo || nophoto_url, alt='',data-mi-atsrc="object.photo")
                                     span(data-mi-name="object.name")=item.object.name
-                            //
+                            //-
                                .actor
-                        //
+                        //-
                            .content-item-tape
-            //
+            //-
                .tape-item
         if item.type == "sys-a" || for_tpl
             .tape-msg.tape-thumb(class="tape-sys-a")
                 i.type-msg1.block.sprite.sprite-i-danger.fleft
                 p(data-mi-name="text")=item.text
-            //
+            //-
                .tape-msg
         if item.type == "film-s" || for_tpl
             .tape-item.cf.tape-thumb(class="tape-film-s")
@@ -342,7 +342,7 @@ mixin feed_thumb(item, for_tpl)
                                     |&nbsp;подписался на фильм
                                 .col-md-2.col-sm-3.col-xs-3
                                     .time-tape(data-mi-id="created", data-mi-name="created", data-mi-val=item.created)=created
-                        //
+                        //-
                            .title-item-tape
                         .content-item-tape
                             .short-text-tape1.cf
@@ -350,7 +350,7 @@ mixin feed_thumb(item, for_tpl)
                                     img(src=item.object.poster || noposter_url, alt='', data-mi-atsrc="object.poster", data-mi-default=noposter_url)
                                 h4
                                     a(href=film_url, title='', data-mi-athref="object.id", data-mi-name="object.name")=item.object.name
-                                    // + " (" + item.object.releasedate.substr(0,4) + ")"
+                                    //- + " (" + item.object.releasedate.substr(0,4) + ")"
                                 p(data-mi-name="object.description")=item.object.description
         if item.type == "film-o" || for_tpl
             .tape-msg.tape-thumb(class="tape-film-o")
@@ -359,7 +359,7 @@ mixin feed_thumb(item, for_tpl)
                     |&nbsp;В кинотеатре появился новый фильм&nbsp;
 
                     a(href=film_url, title='', data-mi-name="object.name", data-mi-athref="object.id")=item.object.name
-                //
+                //-
                    .tape-msg
         if item.type == "user-f" || for_tpl
             .tape-item.cf.tape-thumb(class="tape-user-f")
@@ -376,18 +376,18 @@ mixin feed_thumb(item, for_tpl)
                                     |&nbsp;теперь дружит с
                                 .col-md-2.col-sm-3.col-xs-3
                                     .time-tape(data-mi-id="created", data-mi-name="created", data-mi-val=item.created)=created
-                        //
+                        //-
                            .title-item-tape
                         .content-item-tape
                             .actor
                                 a(href=user_url, title='')
                                     img.img-circle(src=item.object.avatar || noavatar_url, alt='',data-mi-atsrc="object.avatar",data-mi-default=noavatar_url)
                                     span(data-mi-name="object.name")=item.object.name
-                            //
+                            //-
                                .actor
-                        //
+                        //-
                            .content-item-tape
-            //
+            //-
                .tape-item
         if item.type == "pers-o" || for_tpl
             .tape-msg.tape-thumb(class="tape-pers-o")
@@ -395,7 +395,7 @@ mixin feed_thumb(item, for_tpl)
                 p
                     |&nbsp;В кинотеатре появился новый фильм с участием актёра&nbsp;
                     a(href=person_url, title='',data-mi-athref="object.id", data-mi-name="object.name")=item.object.name
-            //
+            //-
                .tape-msg
         if item.type == "film-nw" || for_tpl
             .tape-item.cf.tape-thumb(class="tape-film-nw")
@@ -412,7 +412,7 @@ mixin feed_thumb(item, for_tpl)
                                     |&nbsp;не будет смотреть фильм
                                 .col-md-2.col-sm-3.col-xs-3
                                     .time-tape(data-mi-id="created", data-mi-name="created", data-mi-val=item.created)=created
-                        //
+                        //-
                            .title-item-tape
                         .content-item-tape
                             .short-text-tape1.cf
@@ -422,16 +422,16 @@ mixin feed_thumb(item, for_tpl)
                                     a(href=film_url, title='', data-mi-athref="object.id", data-mi-name="object.name")=item.object.name
                                     //+ " (" + item.object.releasedate.substr(0,4) + ")"
                                 p(data-mi-name="object.description")=item.object.description
-                            //
+                            //-
                                .short-text-tape
-                            //ul.action-tape
+                            //-ul.action-tape
                                 li
                                     a(href='#', title='') Подписаться
                                 li
                                     a(href='#', title='') Посмотреть
-                        //
+                        //-
                            .content-item-tape
-            //
+            //-
                .tape-item
         if item.type == "user-a" || for_tpl
             .tape-item.cf.tape-thumb(class="tape-user-a")
@@ -448,13 +448,13 @@ mixin feed_thumb(item, for_tpl)
                                     |&nbsp;предлагает вам дружить
                                 .col-md-2.col-sm-3.col-xs-3
                                     .time-tape(data-mi-id="created", data-mi-name="created", data-mi-val=item.created)=created
-                        //
+                        //-
                            .title-item-tape
                         .content-item-tape
                             a.btn-yellow3.rel.zmin(href='#', title='') Добавить в друзья
-                        //
+                        //-
                            .content-item-tape
-            //
+            //-
                .tape-item
-            //
+            //-
                .tape-list
