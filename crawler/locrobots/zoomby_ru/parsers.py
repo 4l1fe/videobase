@@ -1,4 +1,5 @@
 # coding: utf-8
+import re
 from apps.films.constants import APP_FILM_FULL_FILM, APP_FILM_SERIAL
 from bs4 import BeautifulSoup
 from crawler.tor import simple_tor_get_page
@@ -6,10 +7,18 @@ from crawler.tor import simple_tor_get_page
 HOST = 'http://www.zoomby.ru'
 
 
-def parse_search(response, film_name):
+def parse_search(response, film_name, year):
     try:
-        soup = BeautifulSoup(response.content)
+        soup = BeautifulSoup(response)
         tag = soup.find(attrs={'class': 'element_row_3'}, text=film_name)
+        par_div = tag.parent
+        year_tag = par_div.find_all('div', {'class': 'element_row_5'})
+        for tag in year_tag:
+            if tag.span:
+                year_text = tag.span.text
+        film_year = re.search(ur'\d+', year_text).group()
+        if year != int(film_year):
+            return None
         tag_a = tag.a
         film_link = tag_a.get('href')
     except:
