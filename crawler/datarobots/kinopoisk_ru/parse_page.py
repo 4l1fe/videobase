@@ -89,9 +89,9 @@ def transform_data_dict(ddict):
         u'жанр': lambda d: [('Genres', {'name': c}) for c in cut_triple_dots(commatlst(d))],
         u'режиссер': lambda d: [('Persons', {'name':name,'kinopoisk_id':kid, 'p_type': APP_PERSON_DIRECTOR}) for kid,name in extract_names_and_ids(d)],
         u'продюсер': lambda d: [('Persons', {'name':name, 'kinopoisk_id': kid, 'p_type': APP_PERSON_PRODUCER}) for kid,name in extract_names_and_ids(d)],
-        u'бюджет': lambda d: [('Films', {'fbudget': budget(d.text)})],
-        u'премьера (мир)': lambda d: [('Films', {'frelease_date': date_extract(d)})],
-        u'премьера (РФ)': lambda d: [('Films', {'frelease_date': date_extract(d)})],
+        u'бюджет': lambda d: [('Films', {'budget': budget(d.text)})],
+        u'премьера (мир)': lambda d: [('Films', {'release_date': date_extract(d)})],
+        u'премьера (РФ)': lambda d: [('Films', {'release_date': date_extract(d)})],
         u'сценарий': lambda d: [('Persons', {'name':name, 'kinopoisk_id': kid, 'p_type': APP_PERSON_SCRIPTWRITER}) for kid,name in extract_names_and_ids(d)],
         u'возраст': lambda d: [('Films', {'age_limit': int(
             [e for e in d.parent.select('div.ageLimit')[0].attrs['class']
