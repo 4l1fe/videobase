@@ -132,7 +132,7 @@ def index_view(request):
             if item['id'] in o_user:
                 resp_dict_data[index]['relation'] = o_user[item['id']].relation_for_vb_film
 
-    # Выборка жанров из кеша, если есть
+    # Выборка списка жанров из кеша, если есть
     genres_cache_key = film_model.Genres.get_cache_key()
     genres_data = cache.get(genres_cache_key)
 
@@ -144,13 +144,13 @@ def index_view(request):
             genres_data = []
 
     # Список рекомендуемых фильмов
-    o_similar = film_model.Films.similar_default(user=request.user)
+    o_recommend = SearchFilmsView.as_view()(request, use_thread=True, recommend=True).data
 
     # Формируем ответ
     data = {
         'films_new': resp_dict_data,
         'filter_genres': genres_data,
-        'films': vbFilm(o_similar, many=True).data
+        'films': o_recommend['items'],
     }
 
     return HttpResponse(render_page('index', data), status.HTTP_200_OK)
@@ -202,7 +202,7 @@ def calc_actors(o_film):
     try:
         result = list(film_model.Persons.get_sorted_persons_by_name(**filter).values('id', 'name'))
     except Exception, e:
-        pass
+        print "Caught exception {} in calc_actors".format(e)
 
     return result
 
@@ -210,10 +210,9 @@ def calc_actors(o_film):
 def calc_similar(o_film):
     result = []
     try:
-        result = film_model.Films.similar_api(o_film)
-        result = vbFilm(result).data
+        result = vbFilm(film_model.Films.similar_api(o_film), many=True).data
     except Exception, e:
-        pass
+        print "Caught exception {} in calc_similar".format(e)
 
     return result
 
@@ -332,7 +331,7 @@ def search_view(request, *args, **kwargs):
 
     if request.REQUEST.get('text'):
         try:
-            resp_dict['films'] = SearchFilmsView.as_view()(request, personalize=False).data
+            resp_dict['films'] = SearchFilmsView.as_view()(request, use_thread=True).data
             resp_dict['search_text'] = request.REQUEST.get('text')
         except Exception, e:
             pass
