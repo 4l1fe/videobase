@@ -172,7 +172,10 @@ def extract_facts_from_dump(page_dump):
     actor_list = soup.select("div#actorList")[0]
     actors_n_l = [(a.text, a.attrs['href']) for a in actor_list.find_all('a') if  not 'film' in a.attrs['href']]
 
-    brand_words = ('Films', {'description': soup.select("div.brand_words")[0].text})
+    if len(soup.select("div.brand_words")):
+        brand_words = ('Films', {'description': soup.select("div.brand_words")[0].text})
+    else:
+        brand_words = ('Films', {'description': u''})
 
     moviename, orig_movie_name = extract_names(soup)
     vote = ('Films', {'rating_kinopoisk': get_vote(soup)})
