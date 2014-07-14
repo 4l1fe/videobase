@@ -31,7 +31,7 @@ header(role='banner')
                             img.logo(src=img_url + 'logo-header.png', alt='')
                     .col-md-6.search-block
                         form.input-group(action="/search",method="get")
-                            - search_text = search_text || ""
+                            - search_text = (search_text || "").replace(/[<>]/g, " ")
                             input.form-control(type='text', placeholder='Поиск по сайту',name="text",value=search_text)
                             span.input-group-btn
                                 button.btn.btn-primary(type='submit') Найти
