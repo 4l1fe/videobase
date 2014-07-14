@@ -77,7 +77,7 @@ def russian_word(st):
         
 def cut_triple_dots(datastringlist):
     for el in datastringlist:
-        if russian_word(el):
+        if not russian_word(el):
             break
         else:
             yield el.strip()
@@ -97,7 +97,7 @@ def transform_data_dict(ddict):
             [e for e in d.parent.select('div.ageLimit')[0].attrs['class']
              if not e.endswith(u'Limit')][0].split('age')[-1])
         })],
-        u'время': lambda d :[('Films', {'fduration': int( d.parent.select('td.time')[0].text.split(u'мин.')[0])})]
+        u'время': lambda d :[('Films', {'duration': int( d.parent.select('td.time')[0].text.split(u'мин.')[0])})]
     }
     tkeys = transforms.keys()
     for key, val in ddict.items():
