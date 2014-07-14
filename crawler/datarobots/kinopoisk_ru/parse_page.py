@@ -29,6 +29,11 @@ class ProbablyBanned(Exception):
 def commatlst(tag):
     return [s.strip() for s in tag.text.strip().split(u',')]
 
+def extract_names_and_ids(tag):
+
+    for atag in tag.find_all('a'):
+        if 'name' in atag.attrs['href']:
+            yield re.match('[/]name[/](?P<id>[0-9]+)[/]', atag.attrs['href']).groupdict()['id'], atag.text
 
 def extract_countries(tag):
     return [t.text.strip() for t in tag.select('a')]
@@ -82,12 +87,12 @@ def transform_data_dict(ddict):
         #u'roд': lambda d: ('Films',{'freleasedate': datetime.datetime.strptime(d.text.strip(),"%Y%m%d")}),
         u'страна': lambda d: [('Countries', {'name': c}) for c in extract_countries(d)],
         u'жанр': lambda d: [('Genres', {'name': c}) for c in cut_triple_dots(commatlst(d))],
-        u'режиссер': lambda d: [('Persons', {'name':c, 'p_type': APP_PERSON_DIRECTOR}) for c in commatlst(d)],
-        u'продюсер': lambda d: [('Persons', {'name':c, 'p_type': APP_PERSON_PRODUCER}) for c in commatlst(d)],
+        u'режиссер': lambda d: [('Persons', {'name':name,'kinopoisk_id':kid, 'p_type': APP_PERSON_DIRECTOR}) for kid,name in extract_names_and_ids(d)],
+        u'продюсер': lambda d: [('Persons', {'name':name, 'kinopoisk_id': kid, 'p_type': APP_PERSON_PRODUCER}) for kid,name in extract_names_and_ids(d)],
         u'бюджет': lambda d: [('Films', {'fbudget': budget(d.text)})],
         u'премьера (мир)': lambda d: [('Films', {'frelease_date': date_extract(d)})],
         u'премьера (РФ)': lambda d: [('Films', {'frelease_date': date_extract(d)})],
-        u'сценарий': lambda d: [('Persons', {'name':c, 'p_type': APP_PERSON_SCRIPTWRITER}) for c in commatlst(d)],
+        u'сценарий': lambda d: [('Persons', {'name':name, 'kinopoisk_id': kid, 'p_type': APP_PERSON_SCRIPTWRITER}) for kid,name in extract_names_and_ids(d)],
         u'возраст': lambda d: [('Films', {'age_limit': int(
             [e for e in d.parent.select('div.ageLimit')[0].attrs['class']
              if not e.endswith(u'Limit')][0].split('age')[-1])
@@ -186,6 +191,7 @@ def extract_facts_from_dump(page_dump):
 
 if __name__ == "__main__":
     d = extract_facts_from_dump(acquire_page(301))
+    print d
     for di in d['Films']:
         for k in di:
             print(k)
