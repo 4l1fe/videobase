@@ -125,7 +125,7 @@ body
                                                         span Привязать
                                             li
                                                 if user.social.gplus
-                                                    - var url = 'https://plus.google.com/me'
+                                                    - var url = 'https://plus.google.com/' + user.social.gplus
                                                     a(href=url, title='', target='_blank')
                                                         img(src=img_url + 'i-go.png', alt='')
                                                         =url
