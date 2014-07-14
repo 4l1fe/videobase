@@ -171,7 +171,9 @@ class Films(models.Model):
             - если release_date - текущая дата <= 1, то time_factor = 1.5
         """
 
-        days = (datetime.date.today() - self.release_date).days
+        days = 0
+        if not self.release_date is None:
+            days = (datetime.date.today() - self.release_date).days
 
         if days >= 700:
             time_factor = 1
