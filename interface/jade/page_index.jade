@@ -1,126 +1,138 @@
-- is_main = true
-- filter_year_old = {0: "все фильмы", 1: "этого года", 3: "самые свежие", 8: "свежие", 15: "новые", 20: "не старые"}
-- filter_price = [[9999, "любая стоимость"], [0, "бесплатно"], [50, "до 50 рублей"], [100, "до 100 рублей"], [200, "до 200 рублей"]]
-- filter_rating = [[0, "любой рейтинг"], [5, "включая плохие"], [6, "неплохие"], [6.5, "хорошие"], [7, "отличные"], [8, "самые лучшие"]]
-- filter_sort = {"rating": "по рейтингу", "subscribes": "по подписчикам"}
-- page_title = "агрегатор всех онлайн-кинотеатров"
-include config
-include mixins
-include head
-body
-    .wrap-page.bg-noise
-        include header
-        .content(role='main')
-            section.blue-block.films-new
-                .bg-noise
+doctype html
+html
+    - is_main = true
+    - filter_year_old = {0: "все фильмы", 1: "этого года", 3: "самые свежие", 8: "свежие", 15: "новые", 20: "не старые"}
+    - filter_price = [[0, "бесплатно"], [50, "до 50 рублей"], [100, "до 100 рублей"], [200, "до 200 рублей"], [9999, "любая стоимость"]]
+    - filter_rating = [[0, "любой рейтинг"], [5, "включая плохие"], [6, "неплохие"], [6.5, "хорошие"], [7, "отличные"], [8, "самые лучшие"]]
+    - filter_sort = {"rating": "по рейтингу", "subscribes": "по подписчикам"}
+    - filter_instock = [[0, "в наличии и нет"],[1, "только в наличии"]]
+    include config
+    include mixins
+    include head
+    body
+        .wrap-page.bg-noise
+            include header
+            .content(role='main')
+                section.blue-block.films-new
+                    .bg-noise
+                        .container
+                            h1.dots1.whiteh1.centerh1 новинки
+                            .list-film
+                                .row#films_new
+                                    each item in films_new
+                                        mixin film_thumb(item)
+                section
                     .container
-                        h1.dots1.whiteh1.centerh1 новинки
+                        h1.dots2.blackh1.centerh1 Рекомендуемое
+                        .filter-block
+                            .filter-content.style-panel-action.rel.zmin#filter_content
+                                .row
+                                    .col-md-9
+                                        ul.sort-list
+                                            li#filter_year_old
+                                                a.sprite.sprite-i-toggle-bottom(href='#', data-toggle='dropdown', title='')
+                                                    span=filter_year_old[0]
+                                                ul.dropdown-menu
+                                                    each item, i in filter_year_old
+                                                        li
+                                                            - url_tmp = "?year_old=" + i
+                                                            a(href=url_tmp, title='',data-mi-id=i)=item
+                                            li#filter_instock
+                                                a.sprite.sprite-i-toggle-bottom(href='#', data-toggle='dropdown', title='')
+                                                    span=filter_instock[0][1]
+                                                ul.dropdown-menu
+                                                    each item in filter_instock
+                                                        li
+                                                            - url_tmp = "?instock=" + item[0]
+                                                            a(href=url_tmp, title='',data-mi-id=i)=item[1]
+                                            li#filter_price
+                                                - url_tmp = '?price=' + filter_price[0][0]
+                                                a.sprite.sprite-i-toggle-bottom(href=url_tmp, data-toggle='dropdown', title='')
+                                                    span=filter_price[0][1]
+                                                ul.dropdown-menu
+                                                    each item in filter_price
+                                                        li
+                                                            - url_tmp = "?price=" + item[0]
+                                                            a(href=url_tmp, title='',data-mi-id=i)=item[1]
+                                            li#filter_genres
+                                                a.sprite.sprite-i-toggle-bottom(href='#', data-toggle='dropdown', title='')
+                                                    span все жанры
+                                                ul.dropdown-menu
+                                                    li
+                                                        a(href='?genres=0', title='',data-mi-id=0) все жанры
+                                                    each item in filter_genres.sort(function (a,b){return a.order - b.order})
+                                                        li
+                                                            - url_tmp = "?genres=" + i
+                                                            a(href=url_tmp, title='',data-mi-id=item.id)=item.name
+                                            li#filter_rating
+                                                a.sprite.sprite-i-toggle-bottom(href='#', data-toggle='dropdown', title='')
+                                                    span=filter_rating[0]
+                                                ul.dropdown-menu
+                                                    each item in filter_rating
+                                                        li
+                                                            - url_tmp = "?rating=" + item[0]
+                                                            a(href=url_tmp, title='',data-mi-id=i)=item[1]
+
+
+                                    .col-md-3
+                                        ul.sort-list.right-sort.nobg
+                                            //-li
+                                                strong cортировать:
+                                            li#filter_sort.right-sort
+                                                a.sprite.sprite-i-toggle-bottom(href='?sort=subscribes', data-toggle='dropdown', title='')
+                                                    span по подписчикам
+                                                ul.dropdown-menu.dropdown-menu-right
+                                                    each item, i in filter_sort
+                                                        li
+                                                            - url_tmp = "?sort=" + i
+                                                            a(href=url_tmp, title='',data-mi-id=i)=item
+                            //-
+                               .filter-content
+                            img.img-responsive(src=img_url + 'shd-big.png', alt='')
+                        //-
+                           .filter-block
                         .list-film
-                            .row#films_new
-                                each item in films_new
+                            .row#films
+                                each item in films
                                     mixin film_thumb(item)
-            section
-                .container
-                    h1.dots2.blackh1.centerh1 Рекомендуемое
-                    .filter-block
-                        .filter-content.style-panel-action.rel.zmin#filter_content
-                            .row
-                                .col-md-9
-                                    ul.sort-list
-                                        li#filter_genres
-                                            a.sprite.sprite-i-toggle-bottom(href='#', data-toggle='dropdown', title='')
-                                                span все жанры
-                                            ul.dropdown-menu
-                                                li
-                                                    a(href='?genres=0', title='',data-mi-id=0) все жанры
-                                                each item in filter_genres.sort(function (a,b){return a.order - b.order})
-                                                    li
-                                                        - url_tmp = "?genres=" + i
-                                                        a(href=url_tmp, title='',data-mi-id=item.id)=item.name
-                                        li#filter_rating
-                                            a.sprite.sprite-i-toggle-bottom(href='#', data-toggle='dropdown', title='')
-                                                span=filter_rating[0]
-                                            ul.dropdown-menu
-                                                each item in filter_rating
-                                                    li
-                                                        - url_tmp = "?rating=" + item[0]
-                                                        a(href=url_tmp, title='',data-mi-id=i)=item[1]
-                                        li#filter_price
-                                            - url_tmp = '?price=' + filter_price[0][0]
-                                            a.sprite.sprite-i-toggle-bottom(href=url_tmp, data-toggle='dropdown', title='')
-                                                span=filter_price[0][1]
-                                            ul.dropdown-menu
-                                                each item in filter_price
-                                                    li
-                                                        - url_tmp = "?price=" + item[0]
-                                                        a(href=url_tmp, title='',data-mi-id=i)=item[1]
-                                        li#filter_year_old
-                                            a.sprite.sprite-i-toggle-bottom(href='#', data-toggle='dropdown', title='')
-                                                span=filter_year_old[0]
-                                            ul.dropdown-menu
-                                                each item, i in filter_year_old
-                                                    li
-                                                        - url_tmp = "?year_old=" + i
-                                                        a(href=url_tmp, title='',data-mi-id=i)=item
-                                .col-md-3
-                                    ul.sort-list.right-sort.nobg
-                                        //li
-                                            strong cортировать:
-                                        li#filter_sort.right-sort
-                                            a.sprite.sprite-i-toggle-bottom(href='?sort=subscribes', data-toggle='dropdown', title='')
-                                                span по подписчикам
-                                            ul.dropdown-menu.dropdown-menu-right
-                                                each item, i in filter_sort
-                                                    li
-                                                        - url_tmp = "?sort=" + i
-                                                        a(href=url_tmp, title='',data-mi-id=i)=item
-                        //
-                           .filter-content
-                        img.img-responsive(src=img_url + 'shd-big.png', alt='')
-                    //
-                       .filter-block
-                    .list-film
-                        .row#films
-                            each item in films
-                                mixin film_thumb(item)
-                    //
-                       .list-film
-                    .add-filter#films_more
-                        .add-content.style-panel-action.rel.zmin
-                            a(href='#') мало, хочу еще фильмов
-                        //
-                           .filter-content
-                        img.img-responsive(src=img_url + 'shd-big.png', alt='')
-                    //
-                       .filter-block
-            if comments && comments.length
-                section.broun-block
-                    .container-brown.margin0a
-                        h1.dots3.whiteh1.centerh1 рецензии
-                        .slider-comments
-                            ul#slider-comments.slide-comments
-                                li
-                                    .row
-                                        each item,i in comments
-                                            .col-md-4.col-sm-6
-                                                .block-text.rel.zmin
-                                                    - url_tmp = '/films/' + item.film.id + '/'
-                                                    a(href=url_tmp, title='')=item.film.name
-                                                    .mark
-                                                        strong Оценка:
-                                                        |#{item.film.rating}
-                                                    p=item.text
-                                                    ins.ab.zmin.sprite.sprite-i-triangle.block
-                                                //
-                                                   .block-text
-                                                .person-text.rel
-                                                    - avatar = item.user.avatar || noavatar_url
-                                                    img(src=avatar, alt='')
-                                                    - url_tmp = '/users/' + item.user.id + '/'
-                                                    a(href=url_tmp, title='')=item.user.name
-                                                    i=item.user.city || ""
-                                                //
-                                                   .person-text
-        include footer
-    script.
-        $(document).ready(function () {window.InitApp({}, "Main")})
+                        //-
+                           .list-film
+                        .add-filter#films_more
+                            .add-content.style-panel-action.rel.zmin
+                                a(href='#') мало, хочу еще фильмов
+                            //-
+                               .filter-content
+                            img.img-responsive(src=img_url + 'shd-big.png', alt='')
+                        //-
+                           .filter-block
+                if comments && comments.length
+                    section.broun-block
+                        .container-brown.margin0a
+                            h1.dots3.whiteh1.centerh1 рецензии
+                            .slider-comments
+                                ul#slider-comments.slide-comments
+                                    li
+                                        .row
+                                            each item,i in comments
+                                                .col-md-4.col-sm-6
+                                                    .block-text.rel.zmin
+                                                        - url_tmp = '/films/' + item.film.id + '/'
+                                                        a(href=url_tmp, title='')=item.film.name
+                                                        .mark
+                                                            strong Оценка:
+                                                            |#{item.film.rating}
+                                                        p=item.text
+                                                        ins.ab.zmin.sprite.sprite-i-triangle.block
+                                                    //-
+                                                       .block-text
+                                                    .person-text.rel
+                                                        - avatar = item.user.avatar || noavatar_url
+                                                        img(src=avatar, alt='')
+                                                        - url_tmp = '/users/' + item.user.id + '/'
+                                                        a(href=url_tmp, title='')=item.user.name
+                                                        i=item.user.city || ""
+                                                    //-
+                                                       .person-text
+            include footer
+        script.
+            $(document).ready(function () {window.InitApp({}, "Main")})

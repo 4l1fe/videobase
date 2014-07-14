@@ -1,5 +1,5 @@
 doctype html5
-html(lang="ru")
+html
     head
         title Плеер ВсеВидео
         meta(charset="utf-8")
@@ -60,7 +60,7 @@ html(lang="ru")
                 } else if (vals.type == "mosfilm") {
                     html = '<iframe width="100%" height="100%" src="//www.youtube.com/embed/' + value + '" frameborder="0" allowfullscreen></iframe>'
                 } else if (vals.type == "playfamily") {
-                    html = '<iframe width="100%" height="100%" id="playlite-frame" class="playlite-object" frameborder="0" scrolling="no" src=' + value + '></iframe>'
+                    html = '<iframe width="100%" height="100%" id="playlite-frame" class="playlite-object" frameborder="0" scrolling="no" src="http://playlite.ru/widgets/widget/' + value + '/PARTNER661">'
                 }
             }
             if (!html)
