@@ -2,9 +2,9 @@
 - quality_texts = {"norm": "Отличное", "hd": "Хорошее", "fhd": "Full<strong>HD</strong>", "default": "Хорошее"}
 - months = ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"]
 - date_now = new Date()
-- function how_long_str(str) {
+- function how_long_str(str, level) {
 -   try {
--       return how_long(new Date(str));
+-       return how_long(new Date(str), level);
 -   } catch (e) {
 -       return "";
 -   }
@@ -107,7 +107,7 @@ mixin film_thumb(item)
             -   }
             -   if (min_price)
             -       min_price = Math.floor(min_price)
-            -   url_loc = price_loc?url+"?loc=" + price_loc:""
+            -   url_loc = price_loc?(url+"#" + price_loc):""
             -   if (min_price && !has_free) {
             -       btn_cls = "btn-price"
             -       btn_text = "Смотреть<br><i>от " + min_price + " р. без рекламы</i>"
@@ -136,7 +136,7 @@ mixin film_thumb(item)
                     .rateit(data-mi-id="relation.rating",data-mi-val=(item.relation && item.relation.rating)?item.relation.rating:0,data-rateit-step=1,data-rateit-max=10,data-rateit-resetable=1,data-rateit-value=(item.relation && item.relation.rating)?item.relation.rating:0)
                 .btn-def.block.margin0a(class=btn_cls,data-mi-id="btn")
                     a(href=url, title='',data-mi-id="btn_text",data-mi-athref="id")!=btn_text
-                    a.btn-add.ab(href="#", title='Добавить в плейлист',data-mi-id="relation.playlist",data-mi-onclick="toggle_playlist",data-mi-val=item.relation && item.relation.playlist?1:0)
+                    a.btn-add.ab(href=url, title='Добавить в плейлист',data-mi-id="relation.playlist",data-mi-onclick="toggle_playlist",data-mi-val=item.relation && item.relation.playlist?1:0)
                 p(class=min_price && has_free?'':'display-none',data-mi-id="btn_price")
                     | или
                     br

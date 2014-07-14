@@ -12,63 +12,64 @@ include config
 include mixins
 include head
 body
-    .wrap-page
+    .wrap-page.bg-noise
         include header
         .content(role='main')
             section.blue-block
-                .container
-                    .row.person-block-wrap
-                        .col-md-3.col-sm-4.col-xs-12
-                            .person-img-full
-                                .img-person
-                                    - url_tmp = person.photo || noperson_url
-                                    img(src=url_tmp, alt='')
-                                    br
-                                    img(src=img_url + 'shd-small.png', alt='')
-                                a.btn-green.btn-def.block.margin0a(href='#', title='')#subscribe подписаться
-                            //
-                               .person-img-full
-                        .col-md-9.col-sm-8.col-xs-12
-                            .person-info
-                                .person-name
-                                    h2=person.name
-                                    if person.name_orig && person.name_orig != person.name
-                                        span=person.name_orig
-                                //
-                                   .person-name
-                                ul.person-data
-                                    if person.roles && person.roles.length
+                .bg-noise
+                    .container
+                        .row.person-block-wrap
+                            .col-md-3.col-sm-4.col-xs-12
+                                .person-img-full
+                                    .img-person
+                                        - url_tmp = person.photo || noperson_url
+                                        img(src=url_tmp, alt='')
+                                        br
+                                        img(src=img_url + 'shd-small.png', alt='')
+                                    a.btn-green.btn-def.block.margin0a(href='#', title='')#subscribe подписаться
+                                //-
+                                   .person-img-full
+                            .col-md-9.col-sm-8.col-xs-12
+                                .person-info
+                                    .person-name
+                                        h2=person.name
+                                        if person.name_orig && person.name_orig != person.name
+                                            span=person.name_orig
+                                    //-
+                                       .person-name
+                                    ul.person-data
+                                        if person.roles && person.roles.length
+                                            li
+                                                span Карьера
+                                                - delim = false
+                                                each c in person.roles
+                                                    =(delim?", ":"") + c
+                                                    - delim = true
+                                        if person.birhtplace
+                                            li
+                                                span Место рождения
+                                                - delim = false
+                                                each c in person.birthplace
+                                                    =(delim?", ":"") + c
+                                                    - delim = true
                                         li
-                                            span Карьера
-                                            - delim = false
-                                            each c in person.roles
-                                                =(delim?", ":"") + c
-                                                - delim = true
-                                    if person.birhtplace
-                                        li
-                                            span Место рождения
-                                            - delim = false
-                                            each c in person.birthplace
-                                                =(delim?", ":"") + c
-                                                - delim = true
-                                    li
-                                        span Дата рождения
-                                        |#{date_text_str(person.birthdate)}, #{how_long_str(person.birthdate)}
-                                if person.bio
-                                    .person-text-short
-                                        h3 Биография
-                                        p!=person.bio
-                                    ////
-                                        #hidden-text.none
-                                            p Скрытый текст
-                                        a.btn-show-more(href='#', data-href='hidden-text', title='')
-                                            span Показать еще
-                                //
-                                   .person-text-short
-                            //
-                               .person-info
-            //
-               .blue-block
+                                            span Дата рождения
+                                            |#{date_text_str(person.birthdate)}, #{how_long_str(person.birthdate)}
+                                    if person.bio
+                                        .person-text-short
+                                            h3 Биография
+                                            p!=person.bio
+                                        ////-
+                                            #hidden-text.none
+                                                p Скрытый текст
+                                            a.btn-show-more(href='#', data-href='hidden-text', title='')
+                                                span Показать еще
+                                    //-
+                                       .person-text-short
+                                //-
+                                   .person-info
+                //-
+                   .blue-block
             if person.filmography && person.filmography.length
                 section
                     .container
@@ -81,10 +82,9 @@ body
                                 .add-filter#films_more
                                     .add-content.style-panel-action.rel.zmin
                                         a(href='') мало, Хочу еще фильмы
-                                    //
+                                    //-
                                        .filter-content
                                     img.img-responsive(src=img_url + 'shd-big.png', alt='')
-                                //
         include footer
         - delete person.bio; delete person.filmography
     script.
