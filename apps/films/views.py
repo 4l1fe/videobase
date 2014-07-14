@@ -144,13 +144,17 @@ def index_view(request):
             genres_data = []
 
     # Список рекомендуемых фильмов
-    o_recommend = SearchFilmsView.as_view()(request, use_thread=True, recommend=True).data
+    try:
+        o_recommend = SearchFilmsView.as_view()(request, use_thread=True, recommend=True).data
+        o_recommend = o_recommend['items']
+    except Exception, e:
+        o_recommend = []
 
     # Формируем ответ
     data = {
         'films_new': resp_dict_data,
         'filter_genres': genres_data,
-        'films': o_recommend['items'],
+        'films': o_recommend,
     }
 
     return HttpResponse(render_page('index', data), status.HTTP_200_OK)
@@ -337,3 +341,45 @@ def search_view(request, *args, **kwargs):
             pass
 
     return HttpResponse(render_page('search', resp_dict))
+
+#
+# bad_genres_list = film_model.Genres.filter(id__gte=37).order_by('id')
+# not_del_genres_list = []
+#
+#
+# for item in bad_genres_list:
+#     dublicate_list = []
+#
+#     # Find original genre
+#     try:
+#         orig_genre = film_model.Genres.get(name=item.name.strip().lower(), id__lt=37)
+#     except Exception, e:
+#         print "Not find ID: {0}".format(item.id)
+#         not_del_genres_list.append(item.id)
+#
+#         continue
+#
+#     sql = """
+#         SELECT * FROM films_genres WHERE genres_id IN ({0}) ORDER BY films_id, genres_id;
+#     """.format(','.join(str(i) for i in [orig_genre.id, item.id]))
+#
+#     # Detect dublicate
+#     prev = None
+#     for i in sql.fetchall():
+#         if not prev is None:
+#             if prev[1] == i[1]:
+#                 dublicate_list.append(i[0])
+#
+#         else:
+#             prev = i
+#
+#     # Update films genres
+#     sql = "UPDATE films_genres SET genres_id={0} WHERE genres_id={1}".format(orig_genre.id, item.id)
+#
+#     if len(dublicate_list):
+#         print "Find dublicate IDs: {0}".format(dublicate_list)
+#         sql += " AND id NOT IN ({0})".format(','.join(str(i) for i in dublicate_list))
+#
+#     print sql
+#     # Drop genre
+#     # film_model.Genres.filter(id=item.id).delete()
