@@ -17,7 +17,7 @@ class ZOOMBY_Loader(BaseLoader):
     def get_url(self, load_function):
         url = "http://%s/%s" % (self.host, self.search_url, )
         response = load_function(url)
-        filmLink = parsers.parse_search(response, self.film.name)
+        filmLink = parsers.parse_search(response, self.film.name, self.film.release_date.year)
         if filmLink is None:
             raise NoSuchFilm(self.film)
         self.url_load = filmLink
