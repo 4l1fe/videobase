@@ -13,7 +13,7 @@ from PIL import Image
 from collections import defaultdict
 from functools import partial
 
-from apps.films.constants import APP_PERSON_ACTOR, APP_PERSON_DIRECTOR, APP_PERSON_PRODUCER
+from apps.films.constants import APP_PERSON_ACTOR, APP_PERSON_DIRECTOR, APP_PERSON_PRODUCER, APP_PERSON_SCRIPTWRITER
 from crawler.constants import PAGE_ARCHIVE
 from crawler.tor import simple_tor_get_page
 
@@ -27,11 +27,11 @@ class ProbablyBanned(Exception):
 
 
 def commatlst(tag):
-    return tag.text.strip().split(u',')
+    return [s.strip() for s in tag.text.strip().split(u',')]
 
 
 def extract_countries(tag):
-    return [t.text for t in tag.select('a')]
+    return [t.text.strip() for t in tag.select('a')]
 
 
 def date_extract(tag):
@@ -68,14 +68,14 @@ def budget(bstring):
         return None
 
 def russian_word(st):
-    return bool(re.match(u'[а-я]+',st.lower().strip()))
+    return bool(re.match(u'[а-я ]+',st.lower().strip()))
         
-def cut_triple_dots(dl):
-    for el in dl:
+def cut_triple_dots(datastringlist):
+    for el in datastringlist:
         if russian_word(el):
             break
         else:
-            yield el
+            yield el.strip()
 
 def transform_data_dict(ddict):
     transforms = {
@@ -87,6 +87,7 @@ def transform_data_dict(ddict):
         u'бюджет': lambda d: [('Films', {'fbudget': budget(d.text)})],
         u'премьера (мир)': lambda d: [('Films', {'frelease_date': date_extract(d)})],
         u'премьера (РФ)': lambda d: [('Films', {'frelease_date': date_extract(d)})],
+        u'сценарий': lambda d: [('Persons', {'name':c, 'p_type': APP_PERSON_SCRIPTWRITER}) for c in commatlst(d)],
         u'возраст': lambda d: [('Films', {'age_limit': int(
             [e for e in d.parent.select('div.ageLimit')[0].attrs['class']
              if not e.endswith(u'Limit')][0].split('age')[-1])
@@ -125,13 +126,11 @@ def extract_names(soup):
     nametag = soup.select('h1.moviename-big')[0]
     moviename = ('Films', {'name': nametag.text})
     orig_movie_name = ('Films', {'name_orig': nametag.select('span')[0].text if len(nametag.select('span')) else ''})
-    return moviename, orig_movie_name
+    return moviename.strip(), orig_movie_name.strip()
 
 
 def actors_wrap(actors_names):
-    return [('Persons', {'name': an, 'p_type': APP_PERSON_ACTOR,
-                         'photo': get_photo(re.match('[/]name[/](?P<id>[0-9]+)[/]', ai).
-                             groupdict()['id'])}) for an, ai in actors_names if re.match(u'[а-я ]+',an.lower(),)]
+    return [('Persons', {'name': an, 'p_type': APP_PERSON_ACTOR, 'kinopoisk_id': re.match('[/]name[/](?P<id>[0-9]+)[/]', ai).groupdict()['id']}) for an, ai in actors_names if re.match(u'[а-я ]+',an.lower(),)]
 
 
 def acquire_page(page_id):
@@ -143,7 +142,6 @@ def acquire_page(page_id):
         with open(dump_path) as fd:
             page_dump = fd.read().decode('utf-8')
     else:
-        time.sleep(1)
         url =u"http://www.kinopoisk.ru/film/%d/" % page_id
         res = simple_tor_get_page(url, tor_flag=True)
         page_dump = res.decode('cp1251')
