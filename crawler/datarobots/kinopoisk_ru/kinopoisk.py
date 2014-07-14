@@ -66,9 +66,6 @@ def get_country(name):
         print u'Added Country {}'.format(name)
         return country
 
-flatland = get_country(u'Флатландию')
-
-
 def process_person_dict(film, person_dict):
     try:
         print u"Found person {}".format(person_dict['name'])
@@ -90,8 +87,6 @@ def process_genre_dict(film, genre_dict):
 
 
 def process_country_dict(film, country_dict):
-    if flatland in film.countries.all():
-        film.countries.remove(flatland)
     country_object = get_country(country_dict['name'])
     if not country_object in film.countries.all():
         print u"Adding {} country to {} film".format(country_object, film)
