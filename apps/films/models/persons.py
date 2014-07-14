@@ -17,7 +17,7 @@ class Persons(PhotoClass):
     bio       = models.TextField(verbose_name=u'Биография')
     photo     = models.ImageField(upload_to=get_image_path, blank=True, null=True, verbose_name=u'Фото')
     birthdate = models.DateField(verbose_name=u'Дата дня рождения', null=True, blank=True)
-    kinopoisk_id = models.IntegerField(blank=True, null=True)
+    kinopoisk_id = models.IntegerField(unique=True)
 
 
     @property
