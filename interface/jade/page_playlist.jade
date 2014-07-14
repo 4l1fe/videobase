@@ -10,103 +10,105 @@ include config
 include mixins
 include head
 body
-    .wrap-page
+    .wrap-page.bg-noise
         include header
         if playlist.total_cnt==0
             .content(role='main')
                 section.broun-block
-                    .container.playlist-empty
-                        h2 Пустой плейлист
-                        span Вы можете добавлять в плейлист фильмы (нажимая на плюсик рядом с кнопкой просмотра), а также в плейлист добавляются автоматически весь контент сайта, на который вы подписаны.
-                    .container
-                        h1.dots2.whiteh1.centerh1 Рекомендуемое
-                        .list-film
-                            .row#films
-                                each item in playlist.films
-                                    mixin film_thumb(item)
+                    .bg-noise
+                        .container.playlist-empty
+                            h2 Пустой плейлист
+                            span Вы можете добавлять в плейлист фильмы (нажимая на плюсик рядом с кнопкой просмотра), а также в плейлист добавляются автоматически весь контент сайта, на который вы подписаны.
+                        .container
+                            h1.dots2.whiteh1.centerh1 Рекомендуемое
+                            .list-film
+                                .row#films
+                                    each item in playlist.films
+                                        mixin film_thumb(item)
         else
             .content(role='main')
                 section.broun-block-playlist
-                    .title-playlist.rel.zmin
-                        .container
-                            .row
-                                .col-md-3.col-sm-4.text-right.pull-right
-                                    if playlist.next
-                                        - url_tmp = '/playlist/' + playlist.next.id
-                                        a.action-film.next-film.active.sprite(href=url_tmp, title='')=playlist.next.name
-                                .col-md-3.col-sm-4.text-left
-                                    if playlist.previous
-                                        - url_tmp = '/playlist/' + playlist.previous.id
-                                        a.action-film.prev-film.sprite(href=url_tmp, title='')=playlist.previous.name
-                                .col-md-6.col-sm-4.text-center
-                                    p ПЛЕЙЛИСТ (#{playlist.id}/#{playlist.total_cnt})
-                    //
-                       .title-playlist
-                    .title-film
-                        .container
-                            .row
-                                .col-md-8.col-sm-7
-                                    .name-playlist
-                                        h2=film.name
-                                        if film.name_orig && film.name_orig != film.name
-                                            span=film.name_orig
-                                .col-md-4.col-sm-5
-                                    .range-block-playlist.cf
-                                        a.sprite.sprite-stop-view.block.fright(href='#', title='')#playlist_btn
-                                        .range-style2.fright
-                                            .rateit(data-rateit-max=10,data-rateit-step=1,data-rateit-resetable=1,data-rateit-value=(film.relation && film.relation.rating)?film.relation.rating:0)#rateit
-                                        //
-                                           .range-style2
-                                    //
-                                       .range-block-tape
-                    //
-                       .title-film
-                    .film-area
-                        .container
-                            a(name="player")
-                            .frame-player-wrapper
-                                .frame-player-aspect
-                                    .frame-player#frame_player
-                            if film.locations.length > 1
-                                ul.just-list.list-btns-film#locations
-                                    each el in film.locations
-                                        mixin loc_thumb(el)
-                        //
-                           .title-film
-                    .playlist.rel.zmin
-                        //
-                           none-playlist добавляем к tp что бы изначально скрыть плейлист и убираем класс active c toggle-playlist
-                        .tp
+                    .bg-noise
+                        .title-playlist.rel.zmin
                             .container
-                                .playlist-wrap
-                                    .playlist-slider-wrap.cf.rel.zmin
-                                        ul#slider-playlist.cf
-                                            li
-                                                .row
-                                                    - items_cnt = playlist.items.length
-                                                    - for (var i = 0; i < items_cnt; i++)
-                                                        - el = playlist.items[i]
-                                                        .col-md-2.col-sm-3.col-xs-4
-                                                            - url_tmp = '/playlist/' + (i+1)
-                                                            a(href=url_tmp, title='')
-                                                                - poster_url = el.poster || noposter_url
-                                                                img(src=poster_url, alt='')
-                                                            p
-                                                                | #{el.name}
-                                                                br
-                                                                span=el.year
-                        //
-                                     .playlist-slider
-                        //
-                           .playlist-wrap
-                        //
-                           .toggle-playlist
-                        a.block.ab.toggle-playlist.active(href='#', title='')
-                            span Скрыть плейлист
-                        //
-                           .playlist
-                        //
-                           .broun-block
+                                .row
+                                    .col-md-3.col-sm-4.text-right.pull-right
+                                        if playlist.next
+                                            - url_tmp = '/playlist/' + playlist.next.id
+                                            a.action-film.next-film.active.sprite(href=url_tmp, title='')=playlist.next.name
+                                    .col-md-3.col-sm-4.text-left
+                                        if playlist.previous
+                                            - url_tmp = '/playlist/' + playlist.previous.id
+                                            a.action-film.prev-film.sprite(href=url_tmp, title='')=playlist.previous.name
+                                    .col-md-6.col-sm-4.text-center
+                                        p ПЛЕЙЛИСТ (#{playlist.id}/#{playlist.total_cnt})
+                        //-
+                           .title-playlist
+                        .title-film
+                            .container
+                                .row
+                                    .col-md-8.col-sm-7
+                                        .name-playlist
+                                            h2=film.name
+                                            if film.name_orig && film.name_orig != film.name
+                                                span=film.name_orig
+                                    .col-md-4.col-sm-5
+                                        .range-block-playlist.cf
+                                            a.sprite.sprite-go-view.block.fright(href='#', title='')#playlist_btn
+                                            .range-style2.fright
+                                                .rateit(data-rateit-max=10,data-rateit-step=1,data-rateit-resetable=1,data-rateit-value=(film.relation && film.relation.rating)?film.relation.rating:0)#rateit
+                                            //-
+                                               .range-style2
+                                        //-
+                                           .range-block-tape
+                        //-
+                           .title-film
+                        .film-area
+                            .container
+                                a(name="player")
+                                .frame-player-wrapper
+                                    .frame-player-aspect
+                                        .frame-player#frame_player
+                                if film.locations.length > 1
+                                    ul.just-list.list-btns-film#locations
+                                        each el in film.locations
+                                            mixin loc_thumb(el)
+                            //-
+                               .title-film
+                        .playlist.rel.zmin
+                            //-
+                               none-playlist добавляем к tp что бы изначально скрыть плейлист и убираем класс active c toggle-playlist
+                            .tp
+                                .container
+                                    .playlist-wrap
+                                        .playlist-slider-wrap.cf.rel.zmin
+                                            ul#slider-playlist.cf
+                                                li
+                                                    .row
+                                                        - items_cnt = playlist.items.length
+                                                        - for (var i = 0; i < items_cnt; i++)
+                                                            - el = playlist.items[i]
+                                                            .col-md-2.col-sm-3.col-xs-4
+                                                                - url_tmp = '/playlist/' + (i+1)
+                                                                a(href=url_tmp, title='')
+                                                                    - poster_url = el.poster || noposter_url
+                                                                    img(src=poster_url, alt='')
+                                                                p
+                                                                    | #{el.name}
+                                                                    br
+                                                                    span=el.year
+                            //-
+                                         .playlist-slider
+                            //-
+                               .playlist-wrap
+                            //-
+                               .toggle-playlist
+                            a.block.ab.toggle-playlist.active(href='#', title='')
+                                span Скрыть плейлист
+                            //-
+                               .playlist
+                            //-
+                               .broun-block
                 section.section-about
                     .container
                         .row
@@ -115,7 +117,7 @@ body
                                     img(src=film.poster || noposter_url, alt='')
                                     br
                                     img(src=img_url + 'shd-small.png', alt='')
-                                //
+                                //-
                                    .img-person
                             .col-md-6.col-sm-8.col-xs-12
                                 ul.person-data-playlist
@@ -154,17 +156,17 @@ body
                                         li
                                             span Время
                                             | #{duration_text(film.duration)}
-                                //
+                                //-
                                     .share-block
                                     img(src='images/content/img42.png', alt='')
-                                //
+                                //-
                                    .share-block
                             .col-md-3.col-sm-12.col-xs-12
                                 if film.ratings && (film.ratings.cons || film.ratings.kp || film.ratings.imdb)
                                     .block-rate.rel.zmin
                                         .title-rate.text-center
                                             h5 Сводный рейтинг
-                                        //
+                                        //-
                                            .title-rate
                                         .rel.zmin.blue-num.num
                                             i=film.ratings && film.ratings.cons[0]?film.ratings.cons[0]:"-"
@@ -186,7 +188,7 @@ body
                                                         | Рейтинг
                                                         strong=" IMDB"
                                                         span=" " + film.ratings.imdb[0]
-                                    //
+                                    //-
                                        .block-rate
                                     .brd-bottom-rate
                 section.brd-top
@@ -199,23 +201,23 @@ body
                                     .playlist-content
                                         h2.blackh1 Описание
                                         p!=film.description
-                                //
+                                //-
                                    .playlist-content
                                 if film.comments && film.comments.length
                                     h2.blackh1 Комментарии
                                     .tape-list#comments
                                         each el in film.comments
                                             mixin comment_thumb(el)
-                                //
+                                //-
                                    .tape-list
                                     if film.comments.length >=5
                                         .add-filter
                                             .add-content.style-panel-action.rel.zmin
                                                 a(href='#', title='') показать еще
-                                            //
+                                            //-
                                                .filter-content
                                             img.img-responsive(src='static/img/shd-big.png', alt='')
-                                        //
+                                        //-
                                            .filter-block
                             .col-md-3.hide-actors#actors_left
                                 .playlist-content
@@ -227,12 +229,12 @@ body
                                     .add-filter#actors_more
                                         .add-content.style-panel-action.rel.zmin
                                             a(href='#show-actors', title='') показать всех
-                                        //
+                                        //-
                                            .filter-content
                                         img.img-responsive(src=img_url + 'shd-big.png', alt='')
-                                    //
+                                    //-
                                        .filter-block
-                                    //
+                                    //-
         include footer
         - delete film.description; delete playlist.items;
     script.
