@@ -56,40 +56,33 @@ class Films(models.Model):
 
 
     @classmethod
-    def similar_api(cls, o_film):
-        params = [','.join([str(i.pk) for i in o_film.genres.all()]), o_film.id, APP_FILMS_API_DEFAULT_PER_PAGE]
+    def similar_api(cls, film):
+        """
+            Выборка похожих фильмов
+        """
 
-        sql = """
+        params = [','.join([str(i.pk) for i in film.genres.all()]), film.id, APP_FILMS_API_DEFAULT_PER_PAGE]
+
+        # Выполняем запрос, если у фильма есть жанры
+        if params[0]:
+            sql = """
             SELECT "films".* FROM (
               SELECT DISTINCT ON ("films"."id") films.id AS d, "films".*
               FROM "films" INNER JOIN "films_genres" ON ("films"."id" = "films_genres"."films_id")
               WHERE "films_genres"."genres_id" IN ({0})
             ) as films
-            WHERE NOT ("films"."id" = {1})
-            ORDER BY "films"."rating_sort"
-            DESC LIMIT {2};
-        """.format(*params)
+            WHERE "films"."id" != {1}
+            ORDER BY "films"."rating_sort" DESC LIMIT {2};
+            """.format(*params)
 
-        return cls.objects.raw(sql)
+            return cls.objects.raw(sql)
+
+        return []
 
 
     @classmethod
-    def similar_default(cls, user=False, limit=True):
+    def similar_default(cls, limit=True):
         o_similar = cls.objects.order_by('-rating_sort')
-
-        if user and user.is_authenticated():
-            sql = """
-            NOT "films"."id" IN (
-                SELECT "users_films"."film_id" FROM "users_films"
-                WHERE "users_films"."user_id" = %s AND
-                      "users_films"."status" = %s AND
-                      "users_films"."rating" != ''
-            )
-            """
-            o_similar = o_similar.extra(
-                where=[sql],
-                params=[user.pk, APP_USERFILM_STATUS_NOT_WATCH],
-            )
 
         if limit:
             o_similar = o_similar[:APP_FILMS_API_DEFAULT_PER_PAGE]
@@ -103,22 +96,45 @@ class Films(models.Model):
             'imdb': [self.get_rating_imdb, self.rating_imdb_cnt],
             'kp': [self.get_rating_kinopoisk, self.rating_kinopoisk_cnt],
             'cons': [self.get_rating_cons, self.rating_cons_cnt],
+            'vsevi': [self.get_rating_local, self.rating_local_cnt],
         }
+
+
+    @property
+    def get_rating_local(self):
+        rating = self.rating_local
+        if not rating is None:
+            return int(rating) if rating.is_integer() else round(rating, 1)
+
+        return rating
+
 
     @property
     def get_rating_imdb(self):
-        rating_imdb = self.rating_imdb
-        return round(rating_imdb) if not rating_imdb is None else rating_imdb
+        rating = self.rating_imdb
+        if not rating is None:
+            return int(rating) if rating.is_integer() else round(rating, 1)
+
+        return rating
+
 
     @property
     def get_rating_kinopoisk(self):
-        rating_kinopoisk = self.rating_kinopoisk
-        return round(rating_kinopoisk) if not rating_kinopoisk is None else rating_kinopoisk
+        rating = self.rating_kinopoisk
+        if not rating is None:
+            return int(rating) if rating.is_integer() else round(rating, 1)
+
+        return rating
+
 
     @property
     def get_rating_cons(self):
-        rating_cons = self.rating_cons
-        return round(rating_cons) if not rating_cons is None else rating_cons
+        rating = self.rating_cons
+        if not rating is None:
+            return int(rating) if rating.is_integer() else round(rating, 1)
+
+        return rating
+
 
     @property
     def get_rating_local_cnt(self):
@@ -183,7 +199,7 @@ class Films(models.Model):
         divisor = float(sum(t[0] for t in values if t[1]))
         result = sum([t[0] / divisor * t[1] for t in values if t[1]])
 
-        return result
+        return round(result, 1)
 
 
     def get_sort_cnt(self, rating_cons_cnt):
@@ -205,31 +221,23 @@ class Films(models.Model):
 
         return sort_cnt
 
+
     @classmethod
     def get_newest_films(cls):
-        from django.db import connection
-        cursor = connection.cursor()
-
-        query = """
-        SELECT "content"."film_id"
-        FROM (SELECT DISTINCT ON ("locations"."content_id") "locations"."content_id", "locations"."id" FROM "locations" ) AS t
-            INNER JOIN "content" ON ("t"."content_id" = "content"."id")
-            INNER JOIN "films" ON ("content"."film_id" = "films"."id")
-
-        WHERE ("films"."rating_cons" >= %s  AND "films"."rating_cons_cnt" > %s)
-        ORDER BY "t"."id" DESC LIMIT %s;
+        """
+            Выбираем четыре последних новинки из фильмов
         """
 
-        try:
-            cursor.execute(query, [5.5, 5000, 4])
-            return cls.objects.filter(id__in=[i[0] for i in cursor.fetchall()])
+        sql = """
+        SELECT "films".*
+        FROM (SELECT DISTINCT ON ("locations"."content_id") "locations"."content_id", "locations"."id" FROM "locations") AS loc
+            INNER JOIN "content" ON ("loc"."content_id" = "content"."id")
+            INNER JOIN "films" ON ("content"."film_id" = "films"."id")
+        WHERE ("films"."rating_cons" >= %s AND "films"."rating_cons_cnt" > %s)
+        ORDER BY "loc"."id" DESC LIMIT %s;
+        """
 
-        except Exception, e:
-            return e
-        finally:
-            cursor.close()
-
-        return False
+        return cls.objects.raw(sql, params=[5.5, 5000, 4])
 
 
     class Meta(object):

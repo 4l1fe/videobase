@@ -32,6 +32,7 @@ from apps.films.api.serializers import vbFilm, vbPerson
 from utils.common import url_with_querystring
 from utils.noderender import render_page
 
+HOST = 'vsevi.ru'
 
 class RegisterUserView(View):
 
@@ -43,8 +44,11 @@ class RegisterUserView(View):
         register_form = CustomRegisterForm(data=self.request.POST)
         if register_form.is_valid():
             user = register_form.save()
-            kw = {'token': user.auth_token.key,
-                  '_': timezone.now().date().strftime("%H%M%S")}
+            kw = {
+                'token': user.auth_token.key,
+                '_': timezone.now().date().strftime("%H%M%S"),
+            }
+
             url_redirect = url_with_querystring(reverse('tokenize'), **kw)
             # url = "http://{host}{url}".format(host=self.request.get_host(), url=url_redirect)
             # context = {'user': user, 'redirect_url': url}
@@ -76,12 +80,17 @@ class LoginUserView(View):
         login_form = AuthenticationForm(data=self.request.POST)
         if login_form.is_valid():
             user = login_form.get_user()
-            kw = {'token': user.auth_token.key,
-                  '_': timezone.now().date().strftime("%H%M%S")}
+            kw = {
+                'token': user.auth_token.key,
+                '_': timezone.now().date().strftime("%H%M%S")
+            }
+            if self.request.META['HTTP_HOST'] == HOST and not HOST+'/login' in self.request.META['HTTP_REFERER']:
+                kw.update(back_url=self.request.META['HTTP_REFERER'])
             url = url_with_querystring(reverse('tokenize'), **kw)
             return HttpResponseRedirect(url)
+
         else:
-            return HttpResponse(render_page('login', {'error': u'Введите коректный логин и пароль'}))
+            return HttpResponse(render_page('login', {'error': u'Введите корректный логин или пароль'}))
 
 
 class UserLogoutView(View):
@@ -125,19 +134,20 @@ class UserView(View):
         try:
             user = User.objects.get(pk=user_id)
         except User.DoesNotExist:
-            return HttpResponseBadRequest()
+            raise Http404
 
         try:
             uvb = vbUser(user, extend=True, genres=True, friends=True)
             days = (timezone.now() - uvb.data['regdate']).days
             how_long = numeral.get_plural(days, (u'день', u'дня', u'дней'))
-            default_user = {'regdate': uvb.data['regdate'].strftime("%Y-%m-%d"),
-                            'how_long': how_long}
-            default_user.update(uvb.data)
 
-            films = Films.objects.filter(uf_films_rel__user=user,
-#                                         type__in=(APP_FILM_SERIAL, APP_FILM_FULL_FILM),
-                                         uf_films_rel__subscribed=APP_USERFILM_SUBS_TRUE)
+            default_user = uvb.data
+            default_user.update({
+                'regdate': uvb.data['regdate'].strftime("%Y-%m-%d"),
+                'how_long': how_long
+            })
+
+            films = Films.objects.filter(uf_films_rel__user=user, uf_films_rel__subscribed=APP_USERFILM_SUBS_TRUE)
             films = Paginator(films, APP_USERS_API_DEFAULT_PER_PAGE).page(APP_USERS_API_DEFAULT_PAGE)
             vbf = vbFilm(films.object_list, many=True)
 
@@ -152,15 +162,14 @@ class UserView(View):
             # Сериализуем
             o_feed = vbFeedElement(calc_feed(user.id), many=True).data
 
-            default = {
-                
+            default_user.update({
                 'films': vbf.data,
                 'actors': vba.data,
                 'feed': o_feed,
                 'directors': vbd.data,
-            }
-            default_user.update(default)
-            return HttpResponse(render_page('user', {'user':default_user}))
+            })
+
+            return HttpResponse(render_page('user', {'user': default_user}))
 
         except Exception as e:
             return HttpResponseServerError(e)

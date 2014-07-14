@@ -1060,7 +1060,7 @@
         if (action === "subscribe") {
           action_str += "d";
         }
-        new_state = state_toggle(opts.status, rel[action_str]);
+        new_state = state_toggle(rel.status, rel[action_str]);
         if (action === "rate") {
           console.log(opts.value);
           if (!opts.value) {
@@ -2021,3 +2021,5 @@
   };
 
 }).call(this);
+
+//# sourceMappingURL=app1.map
