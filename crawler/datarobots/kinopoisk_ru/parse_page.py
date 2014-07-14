@@ -131,7 +131,7 @@ def extract_names(soup):
 def actors_wrap(actors_names):
     return [('Persons', {'name': an, 'p_type': APP_PERSON_ACTOR,
                          'photo': get_photo(re.match('[/]name[/](?P<id>[0-9]+)[/]', ai).
-                             groupdict()['id'])}) for an, ai in actors_names]
+                             groupdict()['id'])}) for an, ai in actors_names if re.match(u'[а-я ]+',an.lower(),)]
 
 
 def acquire_page(page_id):
