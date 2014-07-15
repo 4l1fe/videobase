@@ -72,6 +72,28 @@ def film_scriptwriter_and_director_corrector(film):
         print u"Corrector updated scriptwriter and director info for film successfully"
 
 
+def film_produced_country_name_corrector(film):
+    film_countries = film.countries
+    dictinary = {}
+    a = re.compile("^[a-zA-Z]")
+    with open(os.path.dirname(__file__) + "/../countries") as f:
+        for line in f:
+            spl_str = line.split('\t')
+            if len(spl_str) > 1:
+                key = unicode(spl_str[0], "utf-8").encode("utf-8")
+                val = unicode(spl_str[1], "utf-8").encode("utf-8")
+                dictinary[str(key)] = val
+
+    for fc in film_countries.iterator():
+        if a.match(fc.name.encode("utf-8")):
+            try:
+                fc.name = dictinary[fc.name]
+                fc.save()
+            except:
+                print u"Corrector can't translate English produced country name to Russian"
+
+    print u"Corrector translated produced country name to russian successfully"
+
 
 @film_checker.add(u'Flatland in countries')
 def flatland_check(film):
@@ -221,4 +243,13 @@ def film_scriptwriter_check(film):
         return False
     else:
         return True
+
+@film_checker.add(u"Film has produced country name in english", corrector=film_produced_country_name_corrector)
+def film_produced_country_name_check(film):
+    film_countries = film.countries
+    a = re.compile("^[a-zA-Z]")
+    for i in film_countries.all():
+        if a.match(i.name.encode("utf-8")):
+            return False
+    return True
 
