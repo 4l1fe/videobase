@@ -32,7 +32,7 @@ class Films(models.Model):
     rating_cons      = models.FloatField(null=True, blank=True, default=0, verbose_name=u'Консолидированный рейтинг')
     rating_cons_cnt  = models.IntegerField(null=True, blank=True, db_index=True, default=0, verbose_name=u'Количество голосов консолидированного рейтинга')
     rating_sort      = models.IntegerField(null=True, blank=True, db_index=True, default=0, verbose_name=u'Условный рейтинг для сортировки')
-    kinopoisk_id     = models.IntegerField(null=True, blank=True, db_index=True, verbose_name=u'Порядковый номер на кинопоиске')
+    kinopoisk_id     = models.IntegerField(unique=True, db_index=True, verbose_name=u'Порядковый номер на кинопоиске')
     age_limit        = models.PositiveSmallIntegerField(null=True, blank=True, db_index=True, verbose_name=u'Ограничение по возрасту')
     kinopoisk_lastupdate = models.DateTimeField(null=True, blank=True, verbose_name=u'Дата последнего обновления на кинопоиске')
     rating_kinopoisk     = models.FloatField(null=True, blank=True, verbose_name=u'Рейтинг фильма на сайте kinopoisk.ru')
@@ -171,7 +171,9 @@ class Films(models.Model):
             - если release_date - текущая дата <= 1, то time_factor = 1.5
         """
 
-        days = (datetime.date.today() - self.release_date).days
+        days = 0
+        if not self.release_date is None:
+            days = (datetime.date.today() - self.release_date).days
 
         if days >= 700:
             time_factor = 1

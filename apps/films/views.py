@@ -144,13 +144,17 @@ def index_view(request):
             genres_data = []
 
     # Список рекомендуемых фильмов
-    o_recommend = SearchFilmsView.as_view()(request, use_thread=True, recommend=True).data
+    try:
+        o_recommend = SearchFilmsView.as_view()(request, use_thread=True, recommend=True).data
+        o_recommend = o_recommend['items']
+    except Exception, e:
+        o_recommend = []
 
     # Формируем ответ
     data = {
         'films_new': resp_dict_data,
         'filter_genres': genres_data,
-        'films': o_recommend['items'],
+        'films': o_recommend,
     }
 
     return HttpResponse(render_page('index', data), status.HTTP_200_OK)
