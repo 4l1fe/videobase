@@ -12,7 +12,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from apps.films.api.serializers import vbFilm
-from apps.films.models import Films
+from apps.films.models import Films, Genres
 from apps.films.forms import SearchForm
 from apps.films.constants import APP_USERFILM_STATUS_NOT_WATCH, APP_FILMS_API_DEFAULT_PAGE, \
                                  APP_FILMS_API_DEFAULT_PER_PAGE
@@ -60,7 +60,7 @@ class SearchFilmsView(APIView):
 
         # Поиск по жанрам
         if filter.get('genre'):
-            o_search = o_search.filter(genres=filter['genre'])
+            o_search = o_search.filter(genres__in=Genres.get_children_list_id(filter['genre']))
 
         # Персоноализация выборки
         if self.request.user.is_authenticated() and filter.get('recommend'):

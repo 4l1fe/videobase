@@ -138,7 +138,7 @@ def index_view(request):
 
     if genres_data is None:
         try:
-            genres_data = film_model.Genres.get_all_genres(order=True)
+            genres_data = list(film_model.Genres.get_grouped_genres())
             cache.set(genres_cache_key, genres_data, 86400)
         except:
             genres_data = []
