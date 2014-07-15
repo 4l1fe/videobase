@@ -29,6 +29,11 @@ class ProbablyBanned(Exception):
 def commatlst(tag):
     return [s.strip() for s in tag.text.strip().split(u',')]
 
+def extract_names_and_ids(tag):
+
+    for atag in tag.find_all('a'):
+        if 'name' in atag.attrs['href']:
+            yield re.match('[/]name[/](?P<id>[0-9]+)[/]', atag.attrs['href']).groupdict()['id'], atag.text
 
 def extract_countries(tag):
     return [t.text.strip() for t in tag.select('a')]
@@ -72,7 +77,7 @@ def russian_word(st):
         
 def cut_triple_dots(datastringlist):
     for el in datastringlist:
-        if russian_word(el):
+        if not russian_word(el):
             break
         else:
             yield el.strip()
@@ -82,17 +87,17 @@ def transform_data_dict(ddict):
         #u'roд': lambda d: ('Films',{'freleasedate': datetime.datetime.strptime(d.text.strip(),"%Y%m%d")}),
         u'страна': lambda d: [('Countries', {'name': c}) for c in extract_countries(d)],
         u'жанр': lambda d: [('Genres', {'name': c}) for c in cut_triple_dots(commatlst(d))],
-        u'режиссер': lambda d: [('Persons', {'name':c, 'p_type': APP_PERSON_DIRECTOR}) for c in commatlst(d)],
-        u'продюсер': lambda d: [('Persons', {'name':c, 'p_type': APP_PERSON_PRODUCER}) for c in commatlst(d)],
-        u'бюджет': lambda d: [('Films', {'fbudget': budget(d.text)})],
-        u'премьера (мир)': lambda d: [('Films', {'frelease_date': date_extract(d)})],
-        u'премьера (РФ)': lambda d: [('Films', {'frelease_date': date_extract(d)})],
-        u'сценарий': lambda d: [('Persons', {'name':c, 'p_type': APP_PERSON_SCRIPTWRITER}) for c in commatlst(d)],
+        u'режиссер': lambda d: [('Persons', {'name':name,'kinopoisk_id':kid, 'p_type': APP_PERSON_DIRECTOR}) for kid,name in extract_names_and_ids(d)],
+        u'продюсер': lambda d: [('Persons', {'name':name, 'kinopoisk_id': kid, 'p_type': APP_PERSON_PRODUCER}) for kid,name in extract_names_and_ids(d)],
+        u'бюджет': lambda d: [('Films', {'budget': budget(d.text)})],
+        u'премьера (мир)': lambda d: [('Films', {'release_date': date_extract(d)})],
+        u'премьера (РФ)': lambda d: [('Films', {'release_date': date_extract(d)})],
+        u'сценарий': lambda d: [('Persons', {'name':name, 'kinopoisk_id': kid, 'p_type': APP_PERSON_SCRIPTWRITER}) for kid,name in extract_names_and_ids(d)],
         u'возраст': lambda d: [('Films', {'age_limit': int(
             [e for e in d.parent.select('div.ageLimit')[0].attrs['class']
              if not e.endswith(u'Limit')][0].split('age')[-1])
         })],
-        u'время': lambda d :[('Films', {'fduration': int( d.parent.select('td.time')[0].text.split(u'мин.')[0])})]
+        u'время': lambda d :[('Films', {'duration': int( d.parent.select('td.time')[0].text.split(u'мин.')[0])})]
     }
     tkeys = transforms.keys()
     for key, val in ddict.items():
@@ -124,9 +129,9 @@ get_photo = partial(get_image, YANDEX_KP_ACTORS_TEMPLATE)
 
 def extract_names(soup):
     nametag = soup.select('h1.moviename-big')[0]
-    moviename = ('Films', {'name': nametag.text})
-    orig_movie_name = ('Films', {'name_orig': nametag.select('span')[0].text if len(nametag.select('span')) else ''})
-    return moviename.strip(), orig_movie_name.strip()
+    moviename = ('Films', {'name': nametag.text.strip()})
+    orig_movie_name = ('Films', {'name_orig': nametag.select('span')[0].text.strip() if len(nametag.select('span')) else ''})
+    return moviename, orig_movie_name
 
 
 def actors_wrap(actors_names):
@@ -167,7 +172,10 @@ def extract_facts_from_dump(page_dump):
     actor_list = soup.select("div#actorList")[0]
     actors_n_l = [(a.text, a.attrs['href']) for a in actor_list.find_all('a') if  not 'film' in a.attrs['href']]
 
-    brand_words = ('Films', {'description': soup.select("div.brand_words")[0].text})
+    if len(soup.select("div.brand_words")):
+        brand_words = ('Films', {'description': soup.select("div.brand_words")[0].text})
+    else:
+        brand_words = ('Films', {'description': u''})
 
     moviename, orig_movie_name = extract_names(soup)
     vote = ('Films', {'rating_kinopoisk': get_vote(soup)})
@@ -186,6 +194,7 @@ def extract_facts_from_dump(page_dump):
 
 if __name__ == "__main__":
     d = extract_facts_from_dump(acquire_page(301))
+    print d
     for di in d['Films']:
         for k in di:
             print(k)
