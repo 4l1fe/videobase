@@ -100,7 +100,7 @@ html
                                                             =url
                                                         a.block.i-close.sprite.sprite-i-close.fright(href='/logout/facebook/')
                                                     else
-                                                        a(href='/login/facebook/', title='')
+                                                        a(href='/login/facebook/?next=/profile/', title='')
                                                             img(src=img_url + 'i-fb.png', alt='')
                                                             span Привязать
                                                 li
@@ -111,7 +111,7 @@ html
                                                             =url
                                                         a.block.i-close.sprite.sprite-i-close.fright(href='/logout/twitter/')
                                                     else
-                                                        a(href='/login/twitter/', title='')
+                                                        a(href='/login/twitter/?next=/profile/', title='')
                                                             img(src=img_url+'i-tw.png', alt='')
                                                             span Привязать
                                                 li
@@ -122,18 +122,18 @@ html
                                                             =url
                                                         a.block.i-close.sprite.sprite-i-close.fright(href='/logout/vk-oauth/')
                                                     else
-                                                        a(href='/login/vk-oauth', title='')
+                                                        a(href='/login/vk-oauth/?next=/profile/', title='')
                                                             img(src=img_url + 'i-vk.png', alt='')
                                                             span Привязать
                                                 li
                                                     if user.social.gplus
-                                                        - var url = 'https://plus.google.com/me'
+                                                        - var url = 'https://plus.google.com/' + user.social.gplus
                                                         a(href=url, title='', target='_blank')
                                                             img(src=img_url + 'i-go.png', alt='')
                                                             =url
                                                         a.block.i-close.sprite.sprite-i-close.fright(href='/logout/google-oauth2/')
                                                     else
-                                                        a(href='/login/google-oauth2', title='')
+                                                        a(href='/login/google-oauth2/?next=/profile/', title='')
                                                             img(src=img_url + 'i-go.png', alt='')
                                                             span Привязать
                                             .form-group
