@@ -79,19 +79,19 @@ def film_produced_country_name_corrector(film):
     with open(os.path.dirname(__file__) + "/../countries") as f:
         for line in f:
             spl_str = line.split('\t')
+            print(spl_str)
             if len(spl_str) > 1:
                 key = unicode(spl_str[0], "utf-8").encode("utf-8")
+                print (key)
                 val = unicode(spl_str[1], "utf-8").encode("utf-8")
                 dictinary[str(key)] = val
 
     for fc in film_countries.iterator():
         if a.match(fc.name.encode("utf-8")):
-            try:
-                fc.name = dictinary[fc.name]
-                fc.save()
-            except:
-                print u"Corrector can't translate English produced country name to Russian"
-
+            print("KEY", fc.name, "Vietnam" in dictinary)
+            fc.name = dictinary[fc.name]
+            #print dictinary[fc.name.encode("utf-8")]
+            fc.save()
     print u"Corrector translated produced country name to russian successfully"
 
 
