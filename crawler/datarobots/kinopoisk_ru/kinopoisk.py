@@ -51,7 +51,7 @@ def get_genre(name):
     try:
         genre = Genres.get_all_genres().get(name=name)
     except Genres.DoesNotExist:
-        genre = Genres(name=name, description='')
+        genre = Genres.add_root(name=name, description='')
         genre.save()
         print u'Added Genre {}'.format(name)
 
