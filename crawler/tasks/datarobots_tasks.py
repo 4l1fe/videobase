@@ -15,6 +15,7 @@ from crawler.tasks.kinopoisk_one_page import kinopoisk_parse_one_film
 from crawler.tor import simple_tor_get_page
 from crawler.tasks.utils import robot_task, update_robot_state_film_id
 from videobase.celery import app
+import data.film_facts.checker
 
 import datetime
 from bs4 import BeautifulSoup
@@ -155,3 +156,16 @@ def find_trailer(film_id):
 def trailer_commands():
     for film in Films.objects.all():
         find_trailer.apply_async((film.id,))
+
+
+@app.task(name='check_one_film_by_id')
+def check_and_correct_one_film(film_id):
+    film = Films.objects.get(id=film_id)
+    data.film_facts.checker.film_checker.check_and_correct(film)
+
+    
+@app.task(name='film_info_check_and_correct')
+def check_and_correct_tasks():
+    for film in Films.objects.all():
+        check_and_correct_one_film.apply_async(film.id)
+

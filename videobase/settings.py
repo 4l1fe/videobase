@@ -327,6 +327,11 @@ CELERYBEAT_SCHEDULE = {
     'playfamily_xml': {
         'task': 'playfamily_xml',
         'schedule': timedelta(days=7),
+    },
+    # Films check and correct
+    'film_info_check_and_correct': {
+        'task': 'film_info_check_and_correct',
+        'schedule': timedelta(days=7),
     }
 }
 
