@@ -8,21 +8,22 @@ include config
 include mixins
 include head
 body
-    .wrap-page
+    .wrap-page.bg-noise
         include header
         .content(role='main')
             section.blue-block.films-new
-                .container
-                    h1.dots1.whiteh1.centerh1 новинки
-                    .list-film
-                        .row#films_new
-                            each item in films_new
-                                mixin film_thumb(item)
+                .bg-noise
+                    .container
+                        h1.dots1.whiteh1.centerh1 новинки
+                        .list-film
+                            .row#films_new
+                                each item in films_new
+                                    mixin film_thumb(item)
             section
                 .container
                     h1.dots2.blackh1.centerh1 Рекомендуемое
                     .filter-block
-                        .filter-content.style-panel-action.rel.zmin
+                        .filter-content.style-panel-action.rel.zmin#filter_content
                             .row
                                 .col-md-9
                                     ul.sort-list
@@ -65,7 +66,7 @@ body
                                     ul.sort-list.right-sort.nobg
                                         //li
                                             strong cортировать:
-                                        li#filter_sort
+                                        li#filter_sort.right-sort
                                             a.sprite.sprite-i-toggle-bottom(href='?sort=subscribes', data-toggle='dropdown', title='')
                                                 span по подписчикам
                                             ul.dropdown-menu.dropdown-menu-right

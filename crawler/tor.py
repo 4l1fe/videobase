@@ -1,6 +1,7 @@
 # coding: utf-8
 
 import re
+import requests
 import time
 import pycurl
 import socket
@@ -11,7 +12,8 @@ from crawler.utils.headers import get_random_weighted_browser_string
 DEFAULT_HEADERS = [ 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
         'Accept-Language: ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4',
         'Accept-Charset: UTF-8',
-    ]
+        ]
+
 
 ########################################################################
 def renew_connection(passAuth="mypassword"):
@@ -98,22 +100,24 @@ def check_result(header):
     return True
 
 
-def get_page_or_renew(url,user_agent):
+def get_page_or_renew(url,user_agent, tor_flag):
     counter = 0
-    
-    while counter < TOR_RECONNECTS:
-        body, header = get_page(url, user_agent)
+    if tor_flag:
+        while counter < TOR_RECONNECTS:
+            body, header = get_page(url, user_agent)
 
-        if not check_result(header):
-            print check_result(header)
-            renew_connection()
-            counter += 1
-        else:
-            return body
-            
+            if not check_result(header):
+                print check_result(header)
+                renew_connection()
+                counter += 1
+            else:
+                return body
+    else:
+        return requests.get(url).content
 
-def simple_tor_get_page(url):
-    return get_page_or_renew(url,get_random_weighted_browser_string())
+def simple_tor_get_page(url, tor_flag=False):
+    return get_page_or_renew(url, get_random_weighted_browser_string(), tor_flag)
+
 
 ########################################################################
 def main():

@@ -94,8 +94,9 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'utils.middlewares.auth_token_middleware.AuthTokenMiddleware',
-    'utils.middlewares.local_thread.ThreadLocals',
+    'utils.middlewares.AuthTokenMiddleware',
+    'utils.middlewares.ThreadLocals',
+    'utils.middlewares.ExceptionMiddleware'
 )
 
 TEMPLATE_LOADERS = (
@@ -218,10 +219,7 @@ TWITTER_CONSUMER_SECRET = 'Ge0k2rKltyPq3ida76IjTbhesZVdIrvckcNPXzJaBU2ouzixut'
 GOOGLE_OAUTH2_CLIENT_ID     = '729866043170.apps.googleusercontent.com'
 GOOGLE_OAUTH2_CLIENT_SECRET = 'Ga91PMNEXi28egLsTUy5Wqhw'
 
-# Mail.ru
-MAILRU_OAUTH2_APP_KEY = '719516'
-MAILRU_OAUTH2_CLIENT_KEY = '4daa3ed8bef5be08ebd7e25ff5ae806a'
-MAILRU_OAUTH2_CLIENT_SECRET = '8cc7bb50e5b93663774e6584a1251d79'
+GOOGLE_OAUTH2_USE_UNIQUE_USER_ID = True
 
 SOCIAL_AUTH_CREATE_USERS = True
 SOCIAL_AUTH_USERNAME_IS_FULL_EMAIL = True

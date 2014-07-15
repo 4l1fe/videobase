@@ -31,7 +31,7 @@ state_toggle = (new_state, cur_state, deflt)->
 scroll_to_obj = (obj, duration = 1000) ->
   $('html, body').stop().animate({scrollTop: obj.offset().top}, duration)
 
-stars_tootltips = ["не смотреть", "очень плохо", "плохо", "ниже среднего", "средне", "неплохо", "хорошо", "отлично", "великолепно", "лучше не бывает"]
+stars_tootltips = ["не смотреть", "хуже не бывает", "очень плохо", "плохо", "ниже среднего", "средне", "неплохо", "хорошо", "отлично", "великолепно", "лучше не бывает"]
 
 class Player
   constructor: (@place, opts = {}) ->
@@ -226,8 +226,6 @@ class FilmThumb extends Item
     super opts, =>
       ri = @elements["relation.rating"].self.rateit()
       ri
-      .rateit "min", 0
-      .rateit "max", 10
       .bind("beforerated beforereset", (event) =>
         if !@user_is_auth()
           event.preventDefault()
@@ -284,10 +282,13 @@ class FilmThumb extends Item
       @elements["btn"].self.click => @toggle_subscribe()
     if vals.relation && vals.relation.rating
       @elements["relation.rating"].self.rateit().rateit("value", vals.relation.rating)
-
     @elements["btn"].self.removeClass("btn-subscribe").removeClass("btn-price").removeClass("btn-free").addClass(btn_cls)
     @elements["btn_text"].self.html(btn_text).css("display", "block")
     super
+    if !vals.hasFree && vals.price
+      @elements["btn_text"].self.attr("href", @elements["btn_text"].self.attr("href") + "#" + vals.price_loc)
+    else if vals.price
+      @elements["price"].self.parent().attr("href", @elements["price"].self.parent().attr("href") + "#" + vals.price_loc)
 
   action_rate: (val) ->
     @_app.film_action @vals.id, "rate", {
@@ -401,6 +402,7 @@ class Deck
     @load_func = undefined
     @items = []
     @more = {}
+    @save_footer = false
 
     self = @
     $("." + @element_name, @_place).each(
@@ -425,6 +427,9 @@ class Deck
   add_items: (items) ->
     for item in items
       @add_item(item, false)
+    if @save_footer
+      @save_footer = false
+      @_place.removeClass("loading").css("min-height", 0)
     @onchange()
 
   get_items: ->
@@ -440,14 +445,25 @@ class Deck
       @load_counter++
       @load_func(@, opts)
 
-  load_more_hide: ->
-    @more.place.hide() if @more.place
+  load_more_hide: (loading = true) ->
+    if loading
+      @more.place.addClass("add-filter-loading")
+    else
+      @more.place.hide() if @more.place
 
   load_more_show: ->
-    @more.place.show() if @more.place
+     @more.place.removeClass("add-filter-loading").show() if @more.place
 
-  clear: ->
+  clear: (loading_more = true) ->
     @load_counter++
+    if loading_more
+      pTop = @_place.offset().top
+      wScrollTop = $(window).scrollTop()
+      wH = $(window).height()
+      pH = @_place.height()
+      if (pTop - wScrollTop + pH) >= wH
+        @save_footer = true
+        @_place.css("min-height", wH - pTop + wScrollTop).addClass("loading")
     for item in @items
       item.remove()
     @items = []
@@ -639,6 +655,7 @@ class App
       action_str+= "d" if action == "subscribe"
       new_state = state_toggle(rel.status, rel[action_str])
       if action == "rate"
+        console.log opts.value
         if !opts.value
           @rest.films.action.rate.destroy(id)
           .done(
@@ -846,7 +863,6 @@ class Page_Main extends Page
     )
     if (films_deck.get_items().length >= 12)
       @load_more_films(films_deck, {page: 2})
-
     else
       films_deck.load_more_hide()
 
@@ -905,10 +921,10 @@ class Page_Main extends Page
         if data.items
           deck.add_items(data.items)
           if data.items.length >= 12
-            deck.load_more_show()
+           deck.load_more_show()
           deck.page = data.page
           if opts.clear_output
-            scroll_to_obj deck._place
+            scroll_to_obj $("#filter_content")
         opts.callback() if opts.callback
     )
     .fail(
@@ -942,13 +958,11 @@ class Page_Film extends Page
 
     @_e.rateit = $("#rateit")
     @_e.rateit
-    .rateit "min", 0
-    .rateit "max", 10
     .bind("beforerated beforereset", (event) =>
-      if !@user_is_auth()
+      if !@user_is_auth() && false
         event.preventDefault()
     )
-    .bind "rated", (event) => @action_rate(@_e.rateit.rateit("value"))
+    .bind "rated", (event) => console.log @_e.rateit.rateit("value"); @action_rate(@_e.rateit.rateit("value"))
     .bind "reset", (event) => @action_notwatch_toggle()
     .bind "over", (event, value) -> $(this).attr('title', stars_tootltips[value]);
 
@@ -983,8 +997,9 @@ class Page_Film extends Page
       @player = new Player($("#frame_player"))
       @player.clear()
 
-      loc_id = @_app.query_params("loc")
-      if !loc_id
+      loc_id = window.location.hash.substr(1);
+      if locations[loc_id] == undefined
+        loc_id = undefined
         loc_price = false
         loc_price_id = false
         for key,item of locations
@@ -996,7 +1011,6 @@ class Page_Film extends Page
               loc_price = item.price
               if item.type == "playfamily"
                 loc_price = 1
-      console.log loc_id, loc_price_id
       if !loc_id
         loc_id = loc_price_id
       @play_location(loc_id) if loc_id
