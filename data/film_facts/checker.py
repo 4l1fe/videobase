@@ -72,26 +72,37 @@ def film_scriptwriter_and_director_corrector(film):
         print u"Corrector updated scriptwriter and director info for film successfully"
 
 
+def film_no_name_corrector(film):
+    if film.kinopoisk_id:
+        kinopoisk_parse_one_film.apply_async(
+                     (
+                     film.kinopoisk_id,
+                     film.name
+                     )
+                )
+        print u"Corrector updated film name successfully"
+
+
 def film_produced_country_name_corrector(film):
     film_countries = film.countries
     dictinary = {}
     a = re.compile("^[a-zA-Z]")
-    with open(os.path.dirname(__file__) + "/../countries") as f:
-        for line in f:
-            spl_str = line.split('\t')
-            print(spl_str)
-            if len(spl_str) > 1:
-                key = unicode(spl_str[0], "utf-8").encode("utf-8")
-                print (key)
-                val = unicode(spl_str[1], "utf-8").encode("utf-8")
-                dictinary[str(key)] = val
+    try:
+        with open(os.path.dirname(__file__) + "/../countries") as f:
+            for line in f:
+                spl_str = line.split('\t')
+                if len(spl_str) > 1:
+                    key = unicode(spl_str[0], "utf-8").encode("utf-8")
+                    val = unicode(spl_str[1], "utf-8").encode("utf-8")
+                    dictinary[str(key)] = val
 
-    for fc in film_countries.iterator():
-        if a.match(fc.name.encode("utf-8")):
-            print("KEY", fc.name, "Vietnam" in dictinary)
-            fc.name = dictinary[fc.name]
-            #print dictinary[fc.name.encode("utf-8")]
-            fc.save()
+        for fc in film_countries.iterator():
+            if a.match(fc.name.encode("utf-8")):
+                fc.name = dictinary[fc.name]
+                fc.save()
+    except:
+        print u"Corrector can't translated produced country name to russian"
+
     print u"Corrector translated produced country name to russian successfully"
 
 
@@ -192,6 +203,15 @@ def film_kinopoisk_id_check(film):
         return True
     else:
         return False
+
+@film_checker.add(u"Film Name is no name", corrector=film_no_name_corrector)
+def film_no_name_check(film):
+    film_name = film.name
+    if film_name == "NoName":
+        return False
+    else:
+        return True
+
 
 
 @film_checker.add(u"Film description contains html tags", corrector=film_description_html_corrector)
