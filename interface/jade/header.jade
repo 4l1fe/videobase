@@ -1,39 +1,40 @@
 #log
 header(role='banner')
     .top-header
-        .container
-            .row
-                if auth_user
-                    .col-md-3.profile-block
-                        .profile-user.cf
-                            - auth_user_url = '/users/' + auth_user.id
-                            a(href=auth_user_url, title='')
-                                img.img-circle.fleft(src=auth_user.avatar || noavatar_url, alt='')
-                            ul.list-link-user
+        .bg-noise
+            .container
+                .row
+                    if auth_user
+                        .col-md-3.profile-block
+                            .profile-user.cf
+                                - auth_user_url = '/users/' + auth_user.id
+                                a(href=auth_user_url, title='')
+                                    img.img-circle.fleft(src=auth_user.avatar || noavatar_url, alt='')
+                                ul.list-link-user
+                                    li
+                                        a(href='/profile/', title='') Профиль
+                                    li
+                                        a(href='/logout/', title='') Выход
+                            //-
+                               .profile-user
+                    else
+                        .col-md-3.user-block
+                            ul
                                 li
-                                    a(href='/profile/', title='') Профиль
+                                    a.sprite.sprite-i-enter#login_btn(href='/login/', title='')
+                                        span Вход
                                 li
-                                    a(href='/logout/', title='') Выход
-                        //
-                           .profile-user
-                else
-                    .col-md-3.user-block
-                        ul
-                            li
-                                a.sprite.sprite-i-enter#login_btn(href='/login/', title='')
-                                    span Вход
-                            li
-                                a.sprite.sprite-i-reg#reg_btn(href='/register/', title='')
-                                    span Регистрация
-                .col-md-3.logo-block
-                    a(href='/', title='Все Видео')
-                        img.logo(src=img_url + 'logo-header.png', alt='')
-                .col-md-6.search-block
-                    form.input-group(action="/search",method="get")
-                        - search_text = search_text || ""
-                        input.form-control(type='text', placeholder='Поиск по сайту',name="text",value=search_text)
-                        span.input-group-btn
-                            button.btn.btn-primary(type='submit') Найти
+                                    a.sprite.sprite-i-reg#reg_btn(href='/register/', title='')
+                                        span Регистрация
+                    .col-md-3.logo-block
+                        a(href='/', title='Все Видео')
+                            img.logo(src=img_url + 'logo-header.png', alt='')
+                    .col-md-6.search-block
+                        form.input-group(action="/search",method="get")
+                            - search_text = search_text || ""
+                            input.form-control(type='text', placeholder='Поиск по сайту',name="text",value=search_text)
+                            span.input-group-btn
+                                button.btn.btn-primary(type='submit') Найти
     .bottom-header
         .container
             .row

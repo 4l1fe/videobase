@@ -1,49 +1,61 @@
 include config
 include mixins
-- film_year = film.releasedate.substr(0,4)
+- film_name_meta = film.name.replace(/"/g, " ")
+- film_descr_meta = film.description.replace(/"/g, ' ').substr(0,256)
+- film_url_meta = 'http://vsevi.ru/films/' + film.id
+- film_img_meta = film.poster || noposter_url
+- if (film_img_meta[0] == "/") film_img_meta = 'http://vsevi.ru' + film_img_meta
 - page_title_full = film.name + (film.name_orig?" (" + film.name_orig + ")":"") + " &mdash; фильмы на Все видео"
 - page_keywords = "фильм " + film.name + (film.name_orig?": " + film.name_orig:"") + " онлайн-просмотр высокое качество смотреть онлайн рекомендации все видео dvdrip hd"
 - page_description = "Онлайн просмотр без регистрации и информация о фильме " + film.name + (film.name_orig?" (" + film.name_orig + ")":"") + " рецензии, комментарии, рейтинг, русский трейлер, рекомендации к просмотру."
-- meta = ['property="og:title" content="' + film.name + '"', 'property="og:url" content="http://vsevi.ru/films/' + film.id + '"', 'property="og:description" content="' + film.description + '"', 'property="og:image" content="' + (film.poster || noposter_url) + '"']
+- meta = ['property="og:title" content="' + film_name_meta + '"', 'property="og:url" content="' + film_url_meta + '"', 'property="og:description" content="' + film_descr_meta + '"', 'property="og:image" content="' + film_img_meta + '"']
+- meta.push('name="twitter:card" content="summary"')
+- meta.push('name="twitter:url" content="' + film_url_meta + '"')
+- meta.push('name="twitter:title" content="' + film_name_meta + '"')
+- meta.push('name="twitter:description" content="' + film_descr_meta + '"')
+- meta.push('name="twitter:image" content="' + film_img_meta + '"')
 include head
 body
-    .wrap-page
+    .wrap-page.bg-noise
         include header
         .content(role='main')
             - if (film.locations && film.locations.length) {
                 section.broun-block-playlist
-                    .title-film
-                        .container
-                            .row
-                                .col-md-8.col-sm-7
-                                    .name-playlist
-                                        h2=film.name
-                                        if film.name_orig && film.name_orig != film.name
-                                            span=film.name_orig
-                                .col-md-4.col-sm-5
-                                    .range-block-playlist.cf
-                                        a.sprite.sprite-go-view.block.fright(href='#', title='')#playlist_btn
-                                        .range-style2.fright
-                                            .rateit(data-rateit-max=10,data-rateit-step=1,data-rateit-resetable=1,data-rateit-value=(film.relation && film.relation.rating)?film.relation.rating:0)#rateit
-                                        //
-                                           .range-style2
-                                    //
-                                       .range-block-tape
-                    //
-                       .title-film
-                    .film-area
-                        .container
-                            a(name="player")
-                            .frame-player-wrapper
-                                .frame-player-aspect
-                                    .frame-player#frame_player
-                            if film.locations.length > 1
-                                ul.just-list.list-btns-film#locations
-                                    each el in film.locations
-                                        mixin loc_thumb(el)
-            //
+                    .bg-noise
+                        .title-film
+                            .container
+                                .row
+                                    .col-md-8.col-sm-7
+                                        .name-playlist
+                                            h2=film.name
+                                            if film.name_orig && film.name_orig != film.name
+                                                span=film.name_orig
+                                    .col-md-4.col-sm-5
+                                        .range-block-playlist.cf
+                                            a.sprite.sprite-go-view.block.fright(href='#', title='Добавить в плейлист', alt="Добавить в плейлист")#playlist_btn
+                                            .range-style2.fright
+                                                .rateit(data-rateit-max=10,data-rateit-min=0,data-rateit-step=1,data-rateit-resetable=1,data-rateit-value=(film.relation && film.relation.rating)?film.relation.rating:0)#rateit
+                                            //-
+                                               .range-style2
+                                        //-
+                                           .range-block-tape
+                        //-
+                           .title-film
+                        .film-area
+                            .container
+                                each el in film.locations
+                                    a(name=el.id)
+                                a(name="player")
+                                .frame-player-wrapper
+                                    .frame-player-aspect
+                                        .frame-player#frame_player
+                                if film.locations.length > 1
+                                    ul.just-list.list-btns-film#locations
+                                        each el in film.locations
+                                            mixin loc_thumb(el)
+            //-
                .film-area
-        //
+        //-
            .broun-block
          - } else {
             section.section-about.brd-top
@@ -51,16 +63,16 @@ body
                     .row.title-film-play
                         .col-md-9
                             .name-film1
-                                h2.blackh1=film.name + " (" + film_year + ")"
-                                if film.name_orig
-                                    span=film.name_orig + " (" + film_year + ")"
+                                h2.blackh1=film.name
+                                if film.name_orig && film.name_orig != film.name
+                                    span=film.name_orig
                         .col-md-3
                             .range-block-playlist.range-film.cf
                                 .range-style2.fright
                                     .rateit(data-rateit-max=10,data-rateit-step=1,data-rateit-resetable=1,data-rateit-value=(film.relation && film.relation.rating)?film.relation.rating:0)#rateit
-                                //
+                                //-
                                    .range-style2
-                            //
+                            //-
                                .range-block-tape
         - }
         section.section-about
@@ -71,7 +83,7 @@ body
                             img(src=film.poster || noposter_url, alt='')
                             br
                             img(src=img_url + 'shd-small.png', alt='')
-                        //
+                        //-
                            .img-person
                     .col-md-6.col-sm-8.col-xs-12
                         ul.person-data-playlist
@@ -110,10 +122,10 @@ body
                                 li
                                     span Время
                                     |#{duration_text(film.duration)}
-                        //
+                        //-
                             .share-block
                             img(src='images/content/img42.png', alt='')
-                        //
+                        //-
                            .share-block
                     .col-md-3.col-sm-12.col-xs-12
                         if film.ratings && (film.ratings.cons || film.ratings.kp || film.ratings.imdb)
@@ -142,7 +154,7 @@ body
                                                 | Рейтинг
                                                 strong=" IMDB"
                                                 span=" " + film.ratings.imdb[0]
-                            //
+                            //-
                                .block-rate
                             .brd-bottom-rate
                         - if (!film.locations || !film.locations.length)
@@ -166,25 +178,25 @@ body
                                             - res = /v=([a-z0-9_\-]+)/ig.exec(film.trailer)
                                             - trailer_src = '//youtube.com/embed/' + res[1] + '?autoplay=0&vq=hd720&autohide=1&rel=0&showinfo=0&showsearch=0'
                                             iframe(width='100%', height='100%', src=trailer_src, frameborder='0', allowfullscreen='allowfullscreen')
-                                //
+                                //-
                                    .trailer-area
-                            //
+                            //-
                                .playlist-content
                         if film.comments && film.comments.length
                             h2.blackh1 Комментарии
                             .tape-list#comments
                                 each el in film.comments
                                     mixin comment_thumb(el)
-                        //
+                        //-
                            .tape-list
                             if film.comments.length >=5
                                 .add-filter
                                     .add-content.style-panel-action.rel.zmin
                                         a(href='#', title='') показать еще
-                                    //
+                                    //-
                                        .filter-content
                                     img.img-responsive(src='static/img/shd-big.png', alt='')
-                                //
+                                //-
                                    .filter-block
                     if film.actors && film.actors.length
                         .col-md-3.hide-actors#actors_left
@@ -197,12 +209,11 @@ body
                                 .add-filter#actors_more
                                     .add-content.style-panel-action.rel.zmin
                                         a(href='#show-actors', title='') показать всех
-                                    //
+                                    //-
                                        .filter-content
                                     img.img-responsive(src=img_url + 'shd-big.png', alt='')
-                                //
+                                //-
                                    .filter-block
-                                //
         if film.similar && film.similar.length
             section.brd-top
                 .container

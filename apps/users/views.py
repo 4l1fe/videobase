@@ -32,6 +32,7 @@ from apps.films.api.serializers import vbFilm, vbPerson
 from utils.common import url_with_querystring
 from utils.noderender import render_page
 
+HOST = 'vsevi.ru'
 
 class RegisterUserView(View):
 
@@ -83,7 +84,8 @@ class LoginUserView(View):
                 'token': user.auth_token.key,
                 '_': timezone.now().date().strftime("%H%M%S")
             }
-
+            if self.request.META['HTTP_HOST'] == HOST and not HOST+'/login' in self.request.META['HTTP_REFERER']:
+                kw.update(back_url=self.request.META['HTTP_REFERER'])
             url = url_with_querystring(reverse('tokenize'), **kw)
             return HttpResponseRedirect(url)
 
