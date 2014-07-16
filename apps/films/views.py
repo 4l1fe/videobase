@@ -178,9 +178,6 @@ def person_view(request, resource_id):
         crutch['birthdate'] = birthdate.strftime('%d %B %Y')
         crutch['years_old'] = date.today().year - birthdate.year
 
-    if not vbp.data.get('bio', None):
-        crutch['bio'] = 'Биография отсутствует'
-
     pfs = film_model.PersonsFilms.objects.filter(person=person)[:12]  # почему-то 12 первых фильмов. Был пагинатор
     vbf = vbFilm([pf.film for pf in pfs], many=True)
     crutch['filmography'] = vbf.data
