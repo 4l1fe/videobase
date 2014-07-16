@@ -260,7 +260,9 @@ def playlist_view(request, film_id=None, *args, **kwargs):
             filter(uf_films_rel__user=request.user.id, uf_films_rel__status=APP_USERFILM_STATUS_PLAYLIST).\
             order_by('uf_films_rel__created')
 
-        if len(playlist_data) > 0:
+        # Обработка плейлиста
+        len_playlist = len(playlist_data)
+        if len_playlist > 0:
             if film_id > len(playlist_data) or film_id < 1:
                 return redirect('playlist_film_view', film_id=1)
 
@@ -276,13 +278,14 @@ def playlist_view(request, film_id=None, *args, **kwargs):
             film = playlist_data[film_id-1]
             film_data, o_film = film_to_view(film.id)
 
+        # Выборка рекоммендаций
         recommended_films = vbFilm(film_model.Films.similar_default(), many=True).data
 
         # Update playlist
         playlist.update({
             'id': film_id,
             'film': film_data,
-            'total_cnt': len(playlist_data),
+            'total_cnt': len_playlist,
             'items': vbFilm(playlist_data, many=True).data,
             'films': recommended_films,
         })
