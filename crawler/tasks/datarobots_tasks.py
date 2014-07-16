@@ -58,13 +58,15 @@ def kinopoisk_films(page):
 @robot_task('kinopoisk_persons')
 def parse_kinopoisk_persons(pid):
     try:
-        response = simple_tor_get_page('http://www.kinopoisk.ru/name/{}/view_info/ok/#trivia'.format(pid))
+        response = simple_tor_get_page('http://www.kinopoisk.ru/name/{}/view_info/ok/#trivia'.format(pid), True)
         soup = BeautifulSoup(response)
         tag = soup.find('span', attrs={'itemprop': 'alternativeHeadline'})
         person_name = tag.text.strip()
         p = Persons.objects.get(name=person_name)
         tag_birthdate = soup.find('td', attrs={'class': 'birth'})
         birthdate = ''
+        print person_name
+        print "ID = ", p.id
         if not (tag_birthdate is None):
             birthdate = tag_birthdate.get('birthdate')
         else:
