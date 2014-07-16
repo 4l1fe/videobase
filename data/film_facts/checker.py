@@ -9,7 +9,7 @@ from apps.films.models import PersonsFilms
 from apps.films.models import Countries
 from data.checker import FactChecker
 from data.constants import FLATLAND_NAME
-from crawler.task_modules.kinopoisk_one_page import kinopoisk_parse_one_film
+from crawler.tasks.datarobots_tasks import kinopoisk_parse_one_film
 from bs4 import BeautifulSoup
 import requests
 import re
