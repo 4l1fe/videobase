@@ -153,7 +153,7 @@ class vbFilm(serializers.ModelSerializer):
     # ---------------------------------------------------------------------------------------
     def _rebuild_location(self):
         locations = Locations.objects.filter(content__film__in=self.list_obj_pk)\
-            .order_by('content__film').select_related('content')
+            .order_by('content__film', 'content__id').select_related('content')
 
         result = {}
         for item in locations:
