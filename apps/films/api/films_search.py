@@ -38,14 +38,14 @@ class SearchFilmsView(APIView):
     """
 
     def search_by_films(self, filter):
-        o_search = Films.objects.extra(
+        o_search = Films.search_manager.extra(
                 where=['EXTRACT(year FROM "films"."release_date") <= %s'],
                 params=[date.today().year],
             ).order_by('-rating_sort')
 
         # Поиск по имени
         if filter.get('text'):
-            o_search = o_search.filter(Q(name__icontains=filter['text']) | Q(name_orig__icontains=filter['text']))
+            o_search = o_search.search(filter['text'])
 
         # Поиск по количеству прошедших лет
         if filter.get('year_old'):
