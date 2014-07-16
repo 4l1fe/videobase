@@ -116,7 +116,7 @@ def index_view(request):
         resp_dict_serialized = json.dumps(resp_dict_data, cls=DjangoJSONEncoder)
 
         # Положим результат в кеш
-        cache.set(NEW_FILMS_CACHE_KEY, resp_dict_serialized, 9000)
+        cache.set(NEW_FILMS_CACHE_KEY, resp_dict_serialized, 86400)
 
     else:
         resp_dict_data = json.loads(resp_dict_serialized)
