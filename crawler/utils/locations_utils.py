@@ -147,7 +147,6 @@ def save_location(film, **kwargs):
                          subtitles=kwargs['subtitles'],
                          price=kwargs['price'],
                          price_type=kwargs['price_type'],
-                         created = timezone.now()
                          
     )
     print "Saving location"
