@@ -18,6 +18,7 @@ class Locations(models.Model):
     price_type = models.SmallIntegerField(choices=APP_CONTENTS_PRICE_TYPE, db_index=True, verbose_name=u'Тип цены')
     url_view   = models.URLField(max_length=255, verbose_name=u'Ссылка для просмотра')
     value      = models.TextField(verbose_name=u"Код встраивания", blank=True, null=True)
+    created    = models.DateTimeField(auto_now_add=True, verbose_name=u'Создан')    
 
     def as_vbLocation(self):
 
