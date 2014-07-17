@@ -29,9 +29,12 @@ def find_first_pattern_position(str, pat):
 
 
 def youtube_trailer_corrector(film):
-    ft = FilmExtras.objects.filter(film=film).first()
-    ft.delete()
-    print u"Corrector deleted bad trailer successfully"
+    try:
+        ft = FilmExtras.objects.filter(film=film).first()
+        ft.delete()
+        print u"Corrector deleted bad trailer successfully"
+    except:
+        print u"Can't delete trailer"
 
 
 def film_description_html_corrector(film):
@@ -156,7 +159,7 @@ def omdb_year_check(film):
 
 
 @film_checker.add(u"There is no such trailer", corrector=youtube_trailer_corrector)
-def trailer_check(film):
+def trailer_exists_check(film):
     yt_service = gdata.youtube.service.YouTubeService()
     ft = FilmExtras.objects.filter(film=film).first()
     try:
@@ -167,7 +170,7 @@ def trailer_check(film):
         return False
 
 
-@film_checker.add(u"Youtube trailer duration not within limits", corrector=youtube_trailer_corrector)
+@film_checker.add(u"Youtube trailer duration not within limits") #, corrector=youtube_trailer_corrector
 def trailer_duration_check(film):
     max_trailer_time_in_seconds = 270
     min_trailer_time_in_secons = 60
@@ -272,4 +275,50 @@ def film_produced_country_name_check(film):
         if a.match(i.name.encode("utf-8")):
             return False
     return True
+
+
+@film_checker.add(u"Film trailer title doesn't contain trailer key words")
+def trailer_title_check(film):
+    yt_service = gdata.youtube.service.YouTubeService()
+    ft = FilmExtras.objects.filter(film=film).first()
+    film_name = film.name.encode("utf-8").lower()
+    try:
+        yid = re.match('.+watch[?]v[=](?P<id>.+)(([&].+)?)', ft.url).groupdict()['id']
+        entry = yt_service.GetYouTubeVideoEntry(video_id=yid)
+        trailer_title = unicode(entry.title.text,"utf-8").lower()
+        trailers_ru_mask = [u'официальный русский трейлер фильма hd',u'русский трейлер фильма hd',u'русский трейлер HD',
+                            u'трейлер на русском',u'официальный трейлер',u'русский трейлер',u'тв-ролик',u'финальный трейлер',u'промо ролик']
+        trailers_en_mask = [u'international trailer hd', u'official trailer hd',u'trailer hd', u'international trailer', u'official teaser', u'trailer']
+        trailers_block = [u'interview',u'интервью',u'premiere',u'премьера',u'review',u'обзор',u'conference',u'behind the scenes',u'gameplay',u'parody',u'videogame']
+
+        check_ru = False
+        check_en = False
+        check_block = False
+        check_fname = False
+
+        for phrase in trailers_ru_mask:
+            if phrase in trailer_title:
+                check_ru = True
+
+        for phrase in trailers_en_mask:
+            if phrase in trailer_title:
+                check_en = True
+
+        for phrase in trailers_block:
+            if phrase in trailer_title:
+                check_block = True
+
+        tr_t_for_comparison = trailer_title.encode("utf-8")
+        if film_name in tr_t_for_comparison:
+            check_fname = True
+
+        if (check_ru or check_en) and check_fname and not check_block:
+            return True
+        else:
+            return False
+
+    except Exception, e:
+        print u"Trailer title check failed"
+        print e.message
+        return True
 
