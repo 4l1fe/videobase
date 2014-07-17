@@ -32,6 +32,8 @@ def update_robot_state_film_id(robot):
     if 'id' in pstate:
         film_id = pstate['id']
         pstate['id'] += 1
+        if pstate['id'] > Films.objects.count():
+            pstate['id'] = 1
     else:
         pstate['id'] = 1
         film_id = 1
