@@ -3,16 +3,11 @@
 import datetime
 
 from django.db import models
+
+from djorm_pgfulltext.models import SearchManager
+from djorm_pgfulltext.fields import VectorField
+
 from ..constants import *
-
-
-
-
-#############################################################################################################
-#
-class FilmManager(models.Manager):
-    def get_query_set(self):
-        return super(FilmManager, self).get_query_set().filter(type=APP_FILM_FULL_FILM)
 
 
 #############################################################################################################
@@ -24,29 +19,35 @@ class Films(models.Model):
     duration         = models.IntegerField(null=True, blank=True, verbose_name=u'Продолжительность фильма')
     budget           = models.IntegerField(null=True, blank=True, verbose_name=u'Бюджет фильма')
     description      = models.TextField(default='', blank=True, verbose_name=u'Описание фильма')
-    rating_local     = models.FloatField(null=True, blank=True, db_index=True, default=0, verbose_name=u'Рейтинг фильма по мнению пользователей нашего сайта')
-    rating_local_cnt = models.IntegerField(null=True, blank=True, db_index=True, default=0, verbose_name=u'Количество пользователей нашего сайта оценивших фильм')
+    rating_local     = models.FloatField(null=True, blank=True, default=0, verbose_name=u'Рейтинг фильма по мнению пользователей нашего сайта')
+    rating_local_cnt = models.IntegerField(null=True, blank=True, default=0, verbose_name=u'Количество пользователей нашего сайта оценивших фильм')
     imdb_id          = models.IntegerField(null=True, blank=True, verbose_name=u'Порядковый номер на IMDB')
     rating_imdb      = models.FloatField(null=True, blank=True, default=0, verbose_name=u'Рейтинг фильма на сайте imdb.com')
     rating_imdb_cnt  = models.IntegerField(null=True, blank=True, default=0, verbose_name=u'Количество пользователей imdb.com оценивших этот фильм')
     rating_cons      = models.FloatField(null=True, blank=True, default=0, verbose_name=u'Консолидированный рейтинг')
-    rating_cons_cnt  = models.IntegerField(null=True, blank=True, db_index=True, default=0, verbose_name=u'Количество голосов консолидированного рейтинга')
+    rating_cons_cnt  = models.IntegerField(null=True, blank=True, default=0, verbose_name=u'Количество голосов консолидированного рейтинга')
     rating_sort      = models.IntegerField(null=True, blank=True, db_index=True, default=0, verbose_name=u'Условный рейтинг для сортировки')
     kinopoisk_id     = models.IntegerField(unique=True, db_index=True, verbose_name=u'Порядковый номер на кинопоиске')
     age_limit        = models.PositiveSmallIntegerField(null=True, blank=True, db_index=True, verbose_name=u'Ограничение по возрасту')
     kinopoisk_lastupdate = models.DateTimeField(null=True, blank=True, verbose_name=u'Дата последнего обновления на кинопоиске')
     rating_kinopoisk     = models.FloatField(null=True, blank=True, verbose_name=u'Рейтинг фильма на сайте kinopoisk.ru')
     rating_kinopoisk_cnt = models.PositiveSmallIntegerField(null=True, blank=True, verbose_name=u'Количество пользователей kinopoisk.ru оценивших этот фильм')
-    seasons_cnt = models.PositiveSmallIntegerField(null=True, blank=True, verbose_name=u'Количество сезонов')
-    name_orig   = models.CharField(max_length=255, default='', blank=True, db_index=True, verbose_name=u'Оригинальное название фильма')
-    countries   = models.ManyToManyField('Countries', verbose_name=u'Страны производители', related_name='countries')
-    genres      = models.ManyToManyField('Genres', verbose_name=u'Жанры', related_name='genres')
-    persons     = models.ManyToManyField('Persons', through='PersonsFilms', verbose_name=u'Персоны', related_name='persons')
+    seasons_cnt  = models.PositiveSmallIntegerField(null=True, blank=True, verbose_name=u'Количество сезонов')
+    name_orig    = models.CharField(max_length=255, default='', blank=True, db_index=True, verbose_name=u'Оригинальное название фильма')
+    countries    = models.ManyToManyField('Countries', verbose_name=u'Страны производители', related_name='countries')
+    genres       = models.ManyToManyField('Genres', verbose_name=u'Жанры', related_name='genres')
+    persons      = models.ManyToManyField('Persons', through='PersonsFilms', verbose_name=u'Персоны', related_name='persons')
+    search_index = VectorField()
 
-
-    get_film_type = FilmManager()
     objects = models.Manager()
-        
+    search_manager = SearchManager(
+        fields=('name', 'name_orig'),
+        config='pg_catalog.english',
+        search_field='search_index',
+        auto_update_search_field=True
+    )
+
+
     def __unicode__(self):
         if type(self.name) is str:
             name = unicode(self.name)

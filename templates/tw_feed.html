@@ -1,10 +1,10 @@
 {% extends "base_feed.html" %}
         {% block feeditems %}
-            {% for film in films %}
+            {% for fname,fid, message in messages %}
                 <item>
-                  <title>{{film.name}}</title>
-                  <link>http://vsevi.ru/films/{{film.id}} </link>
-                  <description><![CDATA[Новый #фильм {{ film.name }} {% for ganre in film.genres.all %}#{{ganre.name}}{% endfor %} {{film.rating_cons}}/10, {{film.release_date.year}} http://vsevi.ru/films/{{film.id}}]]>
+                  <title>{{fname}}</title>
+                  <link>http://vsevi.ru/films/{{fid}} </link>
+                  <description><![CDATA[{{message}}]]>
                   </description>
                   <pubDate>
                     {{ date }}

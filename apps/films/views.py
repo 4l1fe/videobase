@@ -116,7 +116,7 @@ def index_view(request):
         resp_dict_serialized = json.dumps(resp_dict_data, cls=DjangoJSONEncoder)
 
         # Положим результат в кеш
-        cache.set(NEW_FILMS_CACHE_KEY, resp_dict_serialized, 9000)
+        cache.set(NEW_FILMS_CACHE_KEY, resp_dict_serialized, 86400)
 
     else:
         resp_dict_data = json.loads(resp_dict_serialized)
@@ -138,7 +138,7 @@ def index_view(request):
 
     if genres_data is None:
         try:
-            genres_data = film_model.Genres.get_all_genres(order=True)
+            genres_data = list(film_model.Genres.get_grouped_genres())
             cache.set(genres_cache_key, genres_data, 86400)
         except:
             genres_data = []
@@ -177,9 +177,6 @@ def person_view(request, resource_id):
         birthdate = (d1 + timedelta(seconds=seconds))
         crutch['birthdate'] = birthdate.strftime('%d %B %Y')
         crutch['years_old'] = date.today().year - birthdate.year
-
-    if not vbp.data.get('bio', None):
-        crutch['bio'] = 'Биография отсутствует'
 
     pfs = film_model.PersonsFilms.objects.filter(person=person)[:12]  # почему-то 12 первых фильмов. Был пагинатор
     vbf = vbFilm([pf.film for pf in pfs], many=True)
@@ -263,7 +260,9 @@ def playlist_view(request, film_id=None, *args, **kwargs):
             filter(uf_films_rel__user=request.user.id, uf_films_rel__status=APP_USERFILM_STATUS_PLAYLIST).\
             order_by('uf_films_rel__created')
 
-        if len(playlist_data) > 0:
+        # Обработка плейлиста
+        len_playlist = len(playlist_data)
+        if len_playlist > 0:
             if film_id > len(playlist_data) or film_id < 1:
                 return redirect('playlist_film_view', film_id=1)
 
@@ -279,13 +278,14 @@ def playlist_view(request, film_id=None, *args, **kwargs):
             film = playlist_data[film_id-1]
             film_data, o_film = film_to_view(film.id)
 
+        # Выборка рекоммендаций
         recommended_films = vbFilm(film_model.Films.similar_default(), many=True).data
 
         # Update playlist
         playlist.update({
             'id': film_id,
             'film': film_data,
-            'total_cnt': len(playlist_data),
+            'total_cnt': len_playlist,
             'items': vbFilm(playlist_data, many=True).data,
             'films': recommended_films,
         })
