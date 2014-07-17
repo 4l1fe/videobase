@@ -3,7 +3,7 @@ from apps.films.models import Seasons
 from apps.robots.constants import APP_ROBOT_VALUE
 from django.core.validators import URLValidator
 from apps.contents.constants import APP_CONTENTS_PRICE_TYPE_FREE
-
+from django.utils import timezone
 
 def sane_dict(film=None):
     '''
@@ -146,7 +146,10 @@ def save_location(film, **kwargs):
                          quality=kwargs['quality'],
                          subtitles=kwargs['subtitles'],
                          price=kwargs['price'],
-                         price_type=kwargs['price_type'])
+                         price_type=kwargs['price_type'],
+                         created = timezone.now()
+                         
+    )
     print "Saving location"
     location.save()
     if prev_location:
