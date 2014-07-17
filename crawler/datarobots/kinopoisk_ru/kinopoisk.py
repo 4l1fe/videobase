@@ -49,7 +49,7 @@ def get_person(name, kinopoisk_id):
 def get_genre(name):
     name = name.lower().strip()
     try:
-        genre = Genres.get_all_genres().get(name=name)
+        genre = Genres.get_all_genres(get_values=False).get(name=name)
     except Genres.DoesNotExist:
         genre = Genres.add_root(name=name, description='')
         genre.save()
