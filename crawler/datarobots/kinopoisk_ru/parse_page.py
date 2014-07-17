@@ -111,7 +111,7 @@ def transform_data_dict(ddict):
 def convert_file(input_data):
 
         fileobj = StringIO.StringIO()
-        fileobj.write(r)
+        fileobj.write(input_data)
         fileobj.seek(0)
         img = Image.open(fileobj).convert('RGB')
         conv_file = StringIO.StringIO()
