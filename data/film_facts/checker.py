@@ -281,7 +281,10 @@ def film_produced_country_name_check(film):
 def trailer_title_check(film):
     yt_service = gdata.youtube.service.YouTubeService()
     ft = FilmExtras.objects.filter(film=film).first()
-    film_name = film.name.encode("utf-8").lower()
+    film_name = film.name.lower().encode("utf-8")
+    film_year = film.release_date.year
+    print film_year
+    print film_name
     try:
         yid = re.match('.+watch[?]v[=](?P<id>.+)(([&].+)?)', ft.url).groupdict()['id']
         entry = yt_service.GetYouTubeVideoEntry(video_id=yid)
@@ -290,29 +293,33 @@ def trailer_title_check(film):
                             u'трейлер на русском',u'официальный трейлер',u'русский трейлер',u'тв-ролик',u'финальный трейлер',u'промо ролик']
         trailers_en_mask = [u'international trailer hd', u'official trailer hd',u'trailer hd', u'international trailer', u'official teaser', u'trailer']
         trailers_block = [u'interview',u'интервью',u'premiere',u'премьера',u'review',u'обзор',u'conference',u'behind the scenes',u'gameplay',u'parody',u'videogame']
-
+        print "TRAILER TITLE = ", trailer_title
         check_ru = False
         check_en = False
         check_block = False
         check_fname = False
+        check_fyear = False
 
         for phrase in trailers_ru_mask:
-            if phrase in trailer_title:
+            if trailer_title.find(phrase) != -1:
                 check_ru = True
 
         for phrase in trailers_en_mask:
-            if phrase in trailer_title:
+            if trailer_title.find(phrase) != -1:
                 check_en = True
 
         for phrase in trailers_block:
-            if phrase in trailer_title:
+            if trailer_title.find(phrase) != -1:
                 check_block = True
 
         tr_t_for_comparison = trailer_title.encode("utf-8")
-        if film_name in tr_t_for_comparison:
+        if tr_t_for_comparison.find(film_name) != -1:
             check_fname = True
 
-        if (check_ru or check_en) and check_fname and not check_block:
+        if tr_t_for_comparison.find(str(film_year)) != -1:
+            check_fyear = True
+        print check_ru, check_en, check_block, check_fname, check_fyear
+        if (check_ru or check_en) and check_fname and check_fyear and not check_block:
             return True
         else:
             return False
