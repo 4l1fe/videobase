@@ -7,7 +7,7 @@ import data.film_facts.checker
 
 class Command(NoArgsCommand):
     def handle_noargs(self, **options):
-        f = Films.objects.get(id=799)
+        f = Films.objects.get(id=61)
         #Les Lapins Crétins : Retour vers le passé - Trailer HD
         #f.description = u"4 " + f.description
         #f.description = f.description + u" NOW.RU  "
