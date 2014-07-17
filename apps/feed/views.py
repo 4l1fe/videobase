@@ -9,6 +9,7 @@ from apps.films.models import Films, PersonsFilms, FilmExtras
 import copy
 import time
 from email import utils
+TWITTER_MESSAGE_TEMPLATE = u"Новый #{ftype} {f_name} {genres_string} {f_rating}/10, {f_year} http://vsevi.ru/films/{film_id}"
 
 
 def get_format_time():
@@ -19,7 +20,25 @@ def get_format_time():
 
 def get_feed_tw(request):
     films = Films.get_newest_films()
-    result = {'films': films, 'date': get_format_time(), 'newdate': ''}
+    #films = Films.objects.all()[:4]
+    messages = []
+    for film in films:
+        genres = [genre.name for genre in film.genres.all()]
+        if u'мультфильм' in genres:
+            ftype = u'мультфильм'
+            genres.remove(u'мультфильм')
+        else:
+            ftype = u'фильм'
+
+        genres_string = '#'+' #'.join(genres)
+        messages.append( (film.name,film.id,TWITTER_MESSAGE_TEMPLATE.format(ftype=ftype,
+                                                         f_name=film.name,
+                                                         genres_string=genres_string,
+                                                         f_rating=film.rating_cons,
+                                                         f_year=film.release_date.year,
+                                                         film_id=film.id)))
+    result = {'messages': messages, 'date': get_format_time(), 'newdate': ''}
+        
     return HttpResponse(render(request, 'tw_feed.html',
                   result), content_type="application/rss+xml ; charset=utf-8")
 

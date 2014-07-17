@@ -2,6 +2,9 @@
 
 from django.contrib import admin
 
+from treebeard.admin import TreeAdmin
+from treebeard.forms import movenodeform_factory
+
 from apps.films.models import *
 from apps.films.forms import *
 
@@ -14,8 +17,9 @@ class CountriesAdmin(admin.ModelAdmin):
 
 #############################################################################################################
 # Администрирование таблицы жанров
-class GenresAdmin(admin.ModelAdmin):
+class GenresAdmin(TreeAdmin):
     search_fields = ('id', 'name',)
+    form = movenodeform_factory(Genres)
 
 
 #############################################################################################################

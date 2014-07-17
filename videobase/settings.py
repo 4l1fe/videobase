@@ -71,6 +71,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django_extensions',
     'south',
+    'treebeard',
     'rest_framework',
     'rest_framework.authtoken',
     'social_auth',
@@ -84,7 +85,7 @@ INSTALLED_APPS = (
     'social_auth',
     'djcelery',
     'backup_system',
-    'data'
+    'data',
 )
 
 MIDDLEWARE_CLASSES = (
