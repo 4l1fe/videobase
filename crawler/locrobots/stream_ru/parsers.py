@@ -7,6 +7,7 @@ import re
 
 
 def search_film(ul, film_name, year):
+    film_link = None
     if not (ul is None):
         for li in ul.select('li.item'):
             div = li.find(class_='description')
@@ -15,9 +16,8 @@ def search_film(ul, film_name, year):
             if div.a.text == film_name and film_year == year:
                 film_link = 'http://www.stream.ru' + div.a.get('href')
                 break
-        return film_link
-    else:
-        return None
+
+    return film_link
 
 
 def parse_search(response, film_name, film_type, year):
@@ -31,7 +31,7 @@ def parse_search(response, film_name, film_type, year):
             film_link = search_film(ul, film_name, year)
         elif film_type == APP_FILM_SERIAL:
             ul = soup.find('ul', {'class': 'item-list2'})
-            film_link = search_film(ul, film_name)
+            film_link = search_film(ul, film_name, year)
     except IndexError:
         film_link = None
     return film_link
