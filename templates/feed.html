@@ -4,7 +4,7 @@
   {% for film, actors, directors, poster, trailer, scriptwriters, cost in films %}
     <item>
       <title>{{ film.name }}</title>
-      <link>http://vsevi.ru/film/{{ film.id }}/</link>
+      <link>http://vsevi.ru/films/{{ film.id }}/</link>
       <enclosure url="{{ poster }}" type="image/jpeg"/>
       <description>
         <![CDATA[Сводный рейтинг: {{ film.rating_cons }}/10<br />
@@ -12,13 +12,11 @@
         {% if directors %}Режиссер: {{ directors }}<br />{% endif %}
         {% if scriptwriter %}Сценарист: {{ scriptwriter }}<br />{% endif %}
         Жанр:{% for ganre in film.genres.all %} {{ ganre.name }},{% endfor %}<br />
-        Стоимость: {{ cost }}.<br />
+        Стоимость: {{ cost }}<br />
         {{ film.description }}]]>
-    </description>
-      <pubDate>
-        {{ date }}
-      </pubDate>
-      <guid>http://vsevi.ru/film/{{ film.id }}/</guid>
+      </description>
+      <pubDate>{{ date }}</pubDate>
+      <guid>{{ film.id }}</guid>
     </item>
   {% endfor %}
 {% endblock %}

@@ -133,7 +133,6 @@ def get_extras(film, is_vk):
     trailer = 'http://vsevi.ru/film/{0}/'.format(film.id)
 
     for extras in film_extras:
-
         if extras.type == APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER:
             poster = APP_FILMS_EXTRAS_POSTER_HOST + extras.photo.name
 
