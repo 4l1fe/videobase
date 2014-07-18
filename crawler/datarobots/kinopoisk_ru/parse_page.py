@@ -20,6 +20,7 @@ from crawler.tor import simple_tor_get_page
 
 YANDEX_KP_ACTORS_TEMPLATE = "http://st.kp.yandex.net/images/actor_iphone/iphone360_{}.jpg"
 YANDEX_KP_FILMS_TEMPLATE = "http://st.kp.yandex.net/images/film_big/{}.jpg"
+YANDEX_KP_FILMS_SMALL_TEMPLATE = "http://st.kp.yandex.net/images/film/{}.jpg"
 
 
 class ProbablyBanned(Exception):
@@ -119,6 +120,7 @@ def get_image(template, actor_id):
         return None
 
 get_poster = partial(get_image, YANDEX_KP_FILMS_TEMPLATE)
+get_small_poster = partial(get_image, YANDEX_KP_FILMS_SMALL_TEMPLATE)
 get_photo = partial(get_image, YANDEX_KP_ACTORS_TEMPLATE)
 
 
