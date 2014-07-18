@@ -149,7 +149,7 @@ def get_extras(film, is_vk):
 
 
 def get_genres(film):
-    return film.genres.all().values('name')
+    return film.genres.all().values_list('name', flat=True)
 
 
 def get_person(film):
