@@ -9,7 +9,6 @@ from crawler.tor import simple_tor_get_page
 from apps.contents.constants import *
 
 
-
 class AyyoRobot(object):
     def __init__(self, film_id):
         self.film = Films.objects.get(id=film_id)
