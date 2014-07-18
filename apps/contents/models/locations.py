@@ -22,14 +22,14 @@ class Locations(models.Model):
 
     def as_vbLocation(self):
 
-        return {'id':self.pk,
-                'type':str(self.type),
-                'lang':self.lang,
-                'quality':self.quality,
-                'subtitles':self.subtitles,
-                'price':str(self.price),
-                'price_type':str(self.type),
-                'value':self.value
+        return {'id': self.pk,
+                'type': str(self.type),
+                'lang': self.lang,
+                'quality': self.quality,
+                'subtitles': self.subtitles,
+                'price': str(self.price),
+                'price_type': str(self.type),
+                'value': self.value
         }
 
     @classmethod

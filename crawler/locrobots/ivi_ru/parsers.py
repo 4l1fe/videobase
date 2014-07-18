@@ -1,5 +1,6 @@
 # coding: utf-8
 from crawler.core.parse import BaseParse
+from crawler.core.exceptions import NoSuchFilm
 from apps.contents.constants import *
 
 from bs4 import BeautifulSoup
@@ -42,6 +43,8 @@ class ParseFilmPage(BaseParse):
                 url = '%s%s' % (kwargs.get('url', ''), link['href'])
             else:
                 url = link['href']
+        else:
+            raise NoSuchFilm
         return url
 
     def get_seasons(self, **kwargs):
