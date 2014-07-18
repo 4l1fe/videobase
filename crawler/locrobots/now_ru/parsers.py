@@ -35,7 +35,11 @@ def parse_search(response, film, year):
             else:
                 return None
         else:
-            year_tag = soup.find('span', {'class': 'y'}).text
+            year_tag = soup.find('span', {'class': 'y'})
+            if year_tag:
+                year_tag = year_tag.text
+            else:
+                return None
             if str(year) in year_tag:
                 film_link = soup.find(attrs={'property':'og:url'}).get('content')
             else:
