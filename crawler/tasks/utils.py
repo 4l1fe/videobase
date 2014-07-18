@@ -6,6 +6,7 @@ import json
 from apps.robots.models import Robots
 from videobase.celery import app
 from apps.films.models import Films
+from crawler.core.exceptions import NoSuchFilm
 
 
 def get_robot_by_name(robot_name):
@@ -56,6 +57,9 @@ def robot_task(robot_name):
     def decor(func):
         @app.task(name=robot_name)
         def wrapper():
-            robot_launch_wrapper(robot_name, func)
+            try:
+                robot_launch_wrapper(robot_name, func)
+            except NoSuchFilm:
+                print "No Such Film"
         return wrapper
     return decor
