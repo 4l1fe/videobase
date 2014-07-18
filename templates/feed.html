@@ -1,7 +1,7 @@
 {% extends "base_feed.html" %}
 
 {% block feeditems %}
-  {% for film, actors, directors, poster, trailer, scriptwriters, cost in films %}
+  {% for film, actors, directors, poster, trailer, scriptwriters, cost, genres in films %}
     <item>
       <title>{{ film.name }}</title>
       <link>http://vsevi.ru/films/{{ film.id }}/</link>
@@ -11,7 +11,7 @@
         {% if actors %}В ролях: {{ actors }}<br />{% endif %}
         {% if directors %}Режиссер: {{ directors }}<br />{% endif %}
         {% if scriptwriter %}Сценарист: {{ scriptwriter }}<br />{% endif %}
-        Жанр:{% for ganre in film.genres.all %} {{ ganre.name }},{% endfor %}<br />
+        {% if genres|length %}Жанр: {{ genres|join:", " }}<br />{% endif %}
         Стоимость: {{ cost }}<br />
         {{ film.description }}]]>
       </description>
