@@ -2,6 +2,7 @@
 from crawler.core.exceptions import NoSuchFilm
 import parsers
 from crawler.core import BaseLoader
+from utils.common import url_with_querystring
 
 HOST = 'www.zabava.ru'
 URL_SEARCH = 'search'
@@ -16,7 +17,8 @@ class ZABAVAR_RU_Loader(BaseLoader):
 
     def get_url(self, load_function):
         url = "http://%s/%s" % (self.host, self.search_url, )
-        response = load_function(url, params=self.params, cache=False)
+        url = url_with_querystring(url, **self.params)
+        response = load_function(url)
         film_url = parsers.parse_search(response, self.film.name)
         if film_url is None:
             raise NoSuchFilm(self.film)
