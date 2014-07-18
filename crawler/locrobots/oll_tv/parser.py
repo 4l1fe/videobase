@@ -15,7 +15,7 @@ class ParseOllFilm(object):
         resp_list = []
         link = self.get_link(response, film)
         if link is None:
-            raise NoSuchFilm(self.film)
+            raise NoSuchFilm(film)
         price = self.get_price()
         seasons = self.get_seasons(response, film)
         if seasons:
