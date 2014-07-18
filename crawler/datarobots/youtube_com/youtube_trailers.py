@@ -51,7 +51,7 @@ def query_search(film_name, trailer_word):
     client = gdata.youtube.service.YouTubeService()
     query = gdata.youtube.service.YouTubeVideoQuery()
 
-    query.vq = (film_name + trailer_word).encode('utf-8')
+    query.vq = (film_name + ' '+ trailer_word).encode('utf-8')
     query.max_results = 25
 
     feed = client.YouTubeQuery(query)
