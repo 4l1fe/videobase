@@ -5,6 +5,7 @@ import json
 
 from apps.robots.models import Robots
 from videobase.celery import app
+from apps.films.models import Films
 
 
 def get_robot_by_name(robot_name):
