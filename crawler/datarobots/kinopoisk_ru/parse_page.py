@@ -123,7 +123,7 @@ def convert_file(input_data):
             
 def get_image(template, actor_id):
     try:
-        r = simple_tor_get_page(template.format(actor_id), tor_flag=True)
+        r = simple_tor_get_page(template.format(actor_id), tor_flag=False)
         return convert_file(r)
         
     except Exception as e:
