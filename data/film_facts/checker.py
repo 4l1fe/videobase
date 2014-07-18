@@ -295,7 +295,7 @@ def trailer_title_check(film):
         check_en = False
         check_block = False
         check_fname = False
-        check_fyear = False
+        check_fyear = Falses
 
         for phrase in trailers_ru_mask:
             if trailer_title.find(phrase) != -1:
