@@ -1,17 +1,17 @@
 {% extends "base_feed.html" %}
 
 {% block feeditems %}
-  {% for film, actors, directors, poster, trailer, scriptwriter, cost in films %}
+  {% for film, actors, directors, poster, trailer, scriptwriter, cost, genres in films %}
     <item>
       <title>{{film.name}}</title>
       <link>http://vsevi.ru/films/{{ film.id }}/</link>
       <enclosure url="{{ poster }}" type="image/jpeg"/>
-      <description><![CDATA[Новинка в кинотеатре "Все видео": Фильм "{{ film.name }}" ({% if film.name_orig %}{{ film.name_orig }}, {% endif %}год: {{film.release_date.year}})
+      <description><![CDATA[Новинка в кинотеатре "Все видео": Фильм "{{ film.name }}" ({% if film.name_orig %}{{ film.name_orig }}, {% endif %}год: {{film.release_date.year}})<br />
         Сводный рейтинг: {{ film.rating_cons}}/10<br />
         Смотреть: http://vsevi.ru/films/{{ film.id }}/<br />
         Стоимость: {{ cost }}<br>
         {% if actors %}В ролях: {{ actors }}<br />{% endif %}
-        Жанр:{% for ganre in film.genres.all %} #{{ ganre.name }}{% endfor %}<br />
+        {% if genres|length %}Жанр: {{ genres|join:"# " }}<br />{% endif %}
         {% if directors %}Режиссер: {{ directors }}<br />{% endif %}
         {{film.description}} http://vsevi.ru/films/{{ film.id }}]]>
       </description>
