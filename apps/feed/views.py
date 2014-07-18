@@ -1,6 +1,5 @@
 # coding: utf-8
 
-import copy
 import time
 from email import utils
 
@@ -13,7 +12,7 @@ from apps.films.models import Films, PersonsFilms, FilmExtras
 from apps.films.constants import APP_PERSON_ACTOR, APP_PERSON_DIRECTOR, APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER, \
     APP_FILMS_EXTRAS_POSTER_HOST, APP_FILM_TYPE_ADDITIONAL_MATERIAL_TRAILER
 
-TWITTER_MESSAGE_TEMPLATE = u"Новый #{ftype} {f_name} {genres_string} {f_rating}/10, {f_year} http://vsevi.ru/films/{film_id}"
+TWITTER_MESSAGE_TEMPLATE = u"Новый #{ftype} {f_name} {genres_string} {f_rating}/10, {f_year} http://vsevi.ru/films/{film_id}/"
 
 
 def get_format_time():
@@ -89,22 +88,28 @@ def get_film_description(is_vk):
     list_trailer = []
     list_scriptwriter = []
     list_cost = []
+    list_genres = []
+
     films = Films.get_newest_films()
 
     for film in films:
-        poster, trailer = get_extras(film, is_vk)
-
-        list_actor_by_film, list_director_by_film, list_scriptwriter_by_film = get_person(film)
         cost = get_price(film)
-        list_cost.append(copy.deepcopy(cost))
-        list_cost.append(cost)
-        list_director.append(copy.deepcopy(list_director_by_film))
-        list_actor.append(copy.deepcopy(list_actor_by_film))
-        list_poster.append(copy.deepcopy(poster))
-        list_trailer.append(copy.deepcopy(trailer))
-        list_scriptwriter.append(copy.deepcopy(list_scriptwriter_by_film))
+        genres = get_genres(film)
+        poster, trailer = get_extras(film, is_vk)
+        list_persons_by_film = get_person(film)
 
-    return zip(films, list_actor, list_director, list_poster, list_trailer, list_scriptwriter, list_cost)
+        list_cost.append(cost)
+        list_genres.append(genres)
+
+        # Add persons
+        list_actor.append(list_persons_by_film[0])
+        list_director.append(list_persons_by_film[1])
+        list_scriptwriter.append(list_persons_by_film[2])
+
+        list_poster.append(poster)
+        list_trailer.append(trailer)
+
+    return zip(films, list_actor, list_director, list_poster, list_trailer, list_scriptwriter, list_cost, list_genres)
 
 
 def get_price(film):
@@ -143,11 +148,16 @@ def get_extras(film, is_vk):
     return poster, trailer
 
 
+def get_genres(film):
+    return film.genres.all().values('name')
+
+
 def get_person(film):
+    cnt_actor = 0
     list_actor_by_film = []
     list_director_by_film = []
     list_scriptwriter_by_film = []
-    cnt_actor = 0
+
     persons = PersonsFilms.objects.filter(film_id=film.id).all()
 
     for person in persons:
@@ -161,5 +171,5 @@ def get_person(film):
         else:
             list_scriptwriter_by_film.append(person.person.name)
 
-    return ', '.join(list_actor_by_film), ', '.join(list_director_by_film), ', '.join(list_scriptwriter_by_film)
+    return u', '.join(list_actor_by_film), u', '.join(list_director_by_film), u', '.join(list_scriptwriter_by_film)
 
