@@ -50,16 +50,16 @@ def robot_launch_wrapper(robot_name, func):
         robot = get_robot_by_name(robot_name)
         item_id = update_robot_state_film_id(robot)
         print "Starting robot {} for id = {}".format(robot_name, item_id)
-        func(item_id)
+        try:
+            func(item_id)
+        except NoSuchFilm:
+            print "No Such Film"            
 
 
 def robot_task(robot_name):
     def decor(func):
         @app.task(name=robot_name)
         def wrapper():
-            try:
-                robot_launch_wrapper(robot_name, func)
-            except NoSuchFilm:
-                print "No Such Film"
+            robot_launch_wrapper(robot_name, func)
         return wrapper
     return decor
