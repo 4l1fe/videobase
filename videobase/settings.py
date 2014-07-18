@@ -279,11 +279,6 @@ CELERYBEAT_SCHEDULE = {
         'task': 'viaplay_ru_robot_start',
         'schedule': timedelta(days=7),
     },
-    # Searching for kinopoisk_id for films that doesn't have one in our db
-    'kinopoisk-get_id': {
-        'task': 'kinopoisk_get_id',
-        'schedule': timedelta(minutes=1),
-    },
     'kinopoisk-set_poster': {
         'task': 'kinopoisk_set_poster',
         'schedule': timedelta(seconds=10),

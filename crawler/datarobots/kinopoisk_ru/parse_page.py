@@ -108,17 +108,24 @@ def transform_data_dict(ddict):
             print u"Can't find parser for {}".format(key)
 
 
-def get_image(template, actor_id):
-    try:
-        r = simple_tor_get_page(template.format(actor_id), tor_flag=True)
+def convert_file(input_data):
+
         fileobj = StringIO.StringIO()
-        fileobj.write(r)
+        fileobj.write(input_data)
         fileobj.seek(0)
         img = Image.open(fileobj).convert('RGB')
         conv_file = StringIO.StringIO()
         img.save(conv_file, 'JPEG')
         conv_file.seek(0)
+
         return conv_file
+
+            
+def get_image(template, actor_id):
+    try:
+        r = simple_tor_get_page(template.format(actor_id), tor_flag=True)
+        return convert_file(r)
+        
     except Exception as e:
         print e
         return None
