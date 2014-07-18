@@ -109,7 +109,7 @@ def get_price(film):
 def get_extras(film, is_vk):
     film_extras = FilmExtras.objects.filter(film_id=film.id).all()
     poster = ''
-    trailer = 'http://vsevi.ru/film/' + str(film.id)
+    trailer = 'http://vsevi.ru/film/{0}/'.format(film.id)
 
     for extras in film_extras:
 
@@ -141,5 +141,5 @@ def get_person(film):
         else:
             list_scriptwriter_by_film.append(person.person.name)
 
-    return ','.join(list_actor_by_film), ','.join(list_director_by_film), ','.join(list_scriptwriter_by_film)
+    return ', '.join(list_actor_by_film), ', '.join(list_director_by_film), ', '.join(list_scriptwriter_by_film)
 
