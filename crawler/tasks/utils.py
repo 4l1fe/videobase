@@ -12,7 +12,7 @@ def get_robot_by_name(robot_name):
         return Robots.objects.get(name=robot_name)
     except Robots.DoesNotExist:
         robot = Robots(name=robot_name, last_start=timezone.now(),
-                       description=' ', delay=1, rstatus=0, state={"id": 1})
+                       description=' ', delay=1, state={"id": 1})
         robot.save()
         return robot
 
