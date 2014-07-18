@@ -7,9 +7,10 @@
       <link>http://vsevi.ru/film/{{ film.id }}/</link>
       <enclosure url="{{ poster }}" type="image/jpeg"/>
       <description>
-        <![CDATA[Сводный рейтинг: {{ film.rating_cons }}/10/<br />
-        В ролях: {{ actors }}<br />
-        Режиссер: {{ directors }} Сценарист: {{ scriptwriter }}.<br />
+        <![CDATA[Сводный рейтинг: {{ film.rating_cons }}/10<br />
+        {% if actors %}В ролях: {{ actors }}<br />{% endif %}
+        {% if directors %}Режиссер: {{ directors }}<br />{% endif %}
+        {% if scriptwriter %}Сценарист: {{ scriptwriter }}<br />{% endif %}
         Жанр:{% for ganre in film.genres.all %} {{ ganre.name }},{% endfor %}<br />
         Стоимость: {{ cost }}.<br />
         {{ film.description }}]]>
