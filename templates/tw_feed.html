@@ -1,8 +1,7 @@
+{% spaceless %}
 {% extends "base_feed.html" %}
 
-{% spaceless %}
 {% block feeditems %}
-
 {% for fname, fid, message in messages %}
 <item>
   <title>{{ fname }}</title>
@@ -12,6 +11,5 @@
   <guid>{{ fid }}</guid>
 </item>
 {% endfor %}
-
 {% endblock %}
 {% endspaceless %}
