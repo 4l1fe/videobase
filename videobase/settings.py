@@ -80,7 +80,7 @@ INSTALLED_APPS = (
     'apps.films',
     'apps.contents',
     'apps.robots',
-    'apps.feed',
+    'apps.rss',
     'crawler',
     'social_auth',
     'djcelery',
