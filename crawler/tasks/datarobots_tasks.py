@@ -24,32 +24,23 @@ information_robots = ['kinopoik_robot', 'imdb_robot']
 
 
 @app.task(name='kinopoisk_films')
-def kinopoisk_films(page):
-    count = page
+def kinopoisk_films(pages):
     try:
-        if page == 11:
-            data = BeautifulSoup(simple_tor_get_page(KINOPOISK_LIST_FILMS_URL.format(1)))
-            pages = data.find('div', attrs={'class': 'pagesFromTo'})
-            count = int(pages.text.split(' ')[2])
-
-        for i in range(1, count+1):
-            print count
-            data = BeautifulSoup(simple_tor_get_page(KINOPOISK_LIST_FILMS_URL.format(i)))
-            list_films = data.findAll('div', attrs={'class': 'name'})
-            print("!!!!!!!!"+str(i))
-            for film in list_films:
-                name = film.a.text
+        for page in range(1, pages+1):
+            print "Page number: {0} of {1}".format(page, pages)
+            html = simple_tor_get_page(KINOPOISK_LIST_FILMS_URL.format(page), tor_flag=True)
+            soup = BeautifulSoup(html)
+            films_list = soup.findAll('div', attrs={'class': 'name'})
+            for film in films_list:
+                name = film.a.text.decode("utf-8")
+                print "Film name: {0}".format(name)
                 kinopoisk_id = int(film.a.get('href').split('/')[4])
                 if u'(сериал)' in name:
-                    name = name.replace(u'(сериал)', '')
-                try:
-                    Films.objects.get(kinopoisk_id=kinopoisk_id)
-                except Films.DoesNotExist:
-                    film = Films()
-                    film.name = name
-                    film.kinopoisk_id = kinopoisk_id
-                    film.type = ''
-                    film.save()
+                    name = name.replace(u'(сериал)', u'')
+                film, flag = Films.objects.get_or_create(kinopoisk_id=kinopoisk_id,
+                                                   name=name, defaults={'type': ''})
+                print "Film: {0} {1}".format(film.name, film.kinopoisk_id)
+                kinopoisk_parse_one_film.apply_async((film.kinopoisk_id, film.name))
     except Exception, e:
         print e
 
@@ -99,7 +90,7 @@ def kinopoisk_set_paster(*args, **kwargs):
 
 
 @app.task(name='imdb_rating_update')
-def imdb_robot_start(*args,**kwargs):
+def imdb_robot_start(*args, **kwargs):
     process_all()
 
 
