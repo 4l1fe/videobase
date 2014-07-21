@@ -61,7 +61,7 @@ def get_feed_vk(request):
 
 def get_feed(request):
     result = {
-        'films': get_film_description(is_feed=True),
+        'films': get_film_description(),
         'newdate': '',
         'date': get_format_time(),
     }
@@ -81,7 +81,7 @@ def get_feed_fb(request):
                   content_type='application/rss+xml; charset=utf-8')
 
 
-def get_film_description(is_vk=False, is_feed=False):
+def get_film_description(is_vk=False):
     list_cost = []
     list_genres = []
     list_poster = []
@@ -94,7 +94,7 @@ def get_film_description(is_vk=False, is_feed=False):
     for film in films:
         cost = get_price(film)
         genres = get_genres(film)
-        poster, trailer = get_extras(film, is_vk=is_vk, is_feed=is_feed)
+        poster, trailer = get_extras(film, is_vk=is_vk)
         list_persons_by_film = get_person(film)
 
         # Add Cost and genres
@@ -134,18 +134,18 @@ def get_price(film):
     return cost
 
 
-def get_extras(film, is_vk=False, is_feed=False):
+def get_extras(film, is_vk=False):
     film_extras = FilmExtras.objects.filter(film_id=film.id).all()
     poster = u''
     trailer = u'http://vsevi.ru/film/{0}/'.format(film.id)
 
     for extras in film_extras:
-        if extras.type == APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER:
-            poster = extras.get_photo_url(prefix=True)
-
         if is_vk:
             if extras.type == APP_FILM_TYPE_ADDITIONAL_MATERIAL_TRAILER:
                 trailer = extras.url
+        else:
+            if extras.type == APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER:
+                poster = extras.get_photo_url(prefix=True)
 
     return poster, trailer
 
