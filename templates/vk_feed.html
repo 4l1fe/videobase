@@ -5,16 +5,16 @@
 <item>
   <title>{{ film.name }}</title>
   <link>{{ trailer }}</link>
-  <description><![CDATA[<img align=right src={{ poster }}>/><br />
-    Новинка в кинотеатре "Все видео": Фильм "{{ film.name }}" ({% if film.name_orig %}{{ film.name_orig }}, {% endif %}год: {{film.release_date.year}})<br />
-    Сводный рейтинг: {{ film.rating_cons }}/10<br />
-    Смотреть: http://vsevi.ru/films/{{ film.id }}/<br />
-    Стоимость: {{ cost }}<br />
-    {% if actors %}В ролях: {{ actors }}<br />{% endif %}
-    {% if genres|length %}Жанр: #{{ genres|join:' #' }}<br />{% endif %}
-    {% if directors %}Режиссер: {{ directors }}<br />{% endif %}
-    {% if scriptwriter %}Сценарист: {{ scriptwriter }}<br />{% endif %}
-    {{ film.description }} http://vsevi.ru/films/{{ film.id }}/]]>
+  <enclosure url="{{ poster }}" type="image/jpeg"/>
+  <description><![CDATA[Новинка в кинотеатре "Все видео": Фильм "{{ film.name }}" ({% if film.name_orig %}{{ film.name_orig }}, {% endif %}год: {{film.release_date.year}})<br />
+Сводный рейтинг: {{ film.rating_cons }}/10<br />
+Смотреть: http://vsevi.ru/films/{{ film.id }}/<br />
+Стоимость: {{ cost }}<br />
+{% if actors %}В ролях: {{ actors }}<br />{% endif %}
+{% if genres|length %}Жанр: #{{ genres|join:' #' }}<br />{% endif %}
+{% if directors %}Режиссер: {{ directors }}<br />{% endif %}
+{% if scriptwriter %}Сценарист: {{ scriptwriter }}<br />{% endif %}
+{{ film.description }} http://vsevi.ru/films/{{ film.id }}/]]>
   </description>
   <pubDate>{{ date }}</pubDate>
   <guid>{{ film.id }}</guid>
