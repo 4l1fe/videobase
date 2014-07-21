@@ -141,7 +141,7 @@ def get_extras(film, is_vk):
 
     for extras in film_extras:
         if extras.type == APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER:
-            poster = APP_FILMS_EXTRAS_POSTER_HOST + extras.photo.name
+            poster = extras.get_photo_url(prefix=True)#APP_FILMS_EXTRAS_POSTER_HOST + extras.photo.name
 
         if is_vk:
             if extras.type == APP_FILM_TYPE_ADDITIONAL_MATERIAL_TRAILER:
