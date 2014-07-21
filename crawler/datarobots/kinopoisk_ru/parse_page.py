@@ -58,6 +58,12 @@ def get_vote(soup):
 
     return round(child_width/parent_width*10, 2)
 
+def safe_int(istr):
+
+    try:
+        return int(istr)
+    except:
+        return None
 
 def budget(bstring):
     if u'руб.' in bstring:
@@ -67,7 +73,7 @@ def budget(bstring):
         return None
     elif '$' in bstring:
         ms = bstring.replace(u'$', '')
-        return int(u''.join(ms.split()))
+        return safe_int(u''.join(ms.split()))
     else:
         print "Encountered budget in unknown currency.Storing nothing"
         return None
@@ -93,11 +99,11 @@ def transform_data_dict(ddict):
         u'премьера (мир)': lambda d: [('Films', {'release_date': date_extract(d)})],
         u'премьера (РФ)': lambda d: [('Films', {'release_date': date_extract(d)})],
         u'сценарий': lambda d: [('Persons', {'name':name, 'kinopoisk_id': kid, 'p_type': APP_PERSON_SCRIPTWRITER}) for kid,name in extract_names_and_ids(d)],
-        u'возраст': lambda d: [('Films', {'age_limit': int(
+        u'возраст': lambda d: [('Films', {'age_limit': safe_int(
             [e for e in d.parent.select('div.ageLimit')[0].attrs['class']
              if not e.endswith(u'Limit')][0].split('age')[-1])
         })],
-        u'время': lambda d :[('Films', {'duration': int( d.parent.select('td.time')[0].text.split(u'мин.')[0])})]
+        u'время': lambda d :[('Films', {'duration': safe_int( d.parent.select('td.time')[0].text.split(u'мин.')[0])})]
     }
     tkeys = transforms.keys()
     for key, val in ddict.items():
