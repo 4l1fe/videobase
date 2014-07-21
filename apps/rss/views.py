@@ -45,51 +45,50 @@ def get_feed_tw(request):
     }
 
     return render(request, 'tw_feed.html', result,
-                  content_type="application/rss+xml; charset=utf-8")
+                  content_type='application/rss+xml; charset=utf-8')
 
 
 def get_feed_vk(request):
     result = {
         'films': get_film_description(True),
         'newdate': '',
-        'date': get_format_time()
+        'date': get_format_time(),
     }
 
     return render(request, 'vk_feed.html', result,
-                  content_type="application/rss+xml; charset=utf-8")
+                  content_type='application/rss+xml; charset=utf-8')
 
 
 def get_feed(request):
     result = {
         'films': get_film_description(False),
         'newdate': '',
-        'date': get_format_time()
+        'date': get_format_time(),
     }
 
     return render(request, 'feed.html', result,
-                  content_type="application/rss+xml; charset=utf-8")
+                  content_type='application/rss+xml; charset=utf-8')
 
 
 def get_feed_fb(request):
     result = {
         'films': get_film_description(False),
         'newdate': '',
-        'date': get_format_time()
+        'date': get_format_time(),
     }
 
     return render(request, 'fb_feed.html', result,
-                  content_type="application/rss+xml; charset=utf-8")
+                  content_type='application/rss+xml; charset=utf-8')
 
 
 def get_film_description(is_vk):
-    list_actor = []
-    list_director = []
-    list_poster = []
-    list_trailer = []
-    list_scriptwriter = []
     list_cost = []
     list_genres = []
-
+    list_poster = []
+    list_trailer = []
+    list_actor = []
+    list_director = []
+    list_scriptwriter = []
     films = Films.get_newest_films()
 
     for film in films:
@@ -98,6 +97,7 @@ def get_film_description(is_vk):
         poster, trailer = get_extras(film, is_vk)
         list_persons_by_film = get_person(film)
 
+        # Add Cost and genres
         list_cost.append(cost)
         list_genres.append(genres)
 
@@ -106,6 +106,7 @@ def get_film_description(is_vk):
         list_director.append(list_persons_by_film[1])
         list_scriptwriter.append(list_persons_by_film[2])
 
+        # Add poster and trailer
         list_poster.append(poster)
         list_trailer.append(trailer)
 

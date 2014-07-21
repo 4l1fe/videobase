@@ -5,7 +5,7 @@
 <item>
   <title>{{ film.name }}</title>
   <link>{{ trailer }}</link>
-  <description><![CDATA[{#        <img align=right src={{ poster }}>/>#}
+  <description><![CDATA[<img align=right src={{ poster }}>/><br />
     Новинка в кинотеатре "Все видео": Фильм "{{ film.name }}" ({% if film.name_orig %}{{ film.name_orig }}, {% endif %}год: {{film.release_date.year}})<br />
     Сводный рейтинг: {{ film.rating_cons }}/10<br />
     Смотреть: http://vsevi.ru/films/{{ film.id }}/<br />
