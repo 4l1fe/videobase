@@ -6,8 +6,7 @@
   <title>{{ film.name }}</title>
   <link>http://vsevi.ru/films/{{ film.id }}/</link>
   <description>
-    <![CDATA[
-  {#        <img align=right src={{ poster }}>/>#}
+    <![CDATA[<img align=right src={{ poster }}>/><br />
     Сводный рейтинг: {{ film.rating_cons }}/10<br />
     {% if actors %}В ролях: {{ actors }}<br />{% endif %}
     {% if directors %}Режиссер: {{ directors }}<br />{% endif %}
