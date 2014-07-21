@@ -29,7 +29,9 @@ def get_feed_tw(request):
         ftype = u'фильм'
         if u'мультфильм' in genres:
             ftype = u'мультфильм'
-            genres.remove(u'мультфильм')
+
+            if ftype in genres:
+                genres.remove(ftype)
 
         genres_string = '#'+' #'.join(genres)
         messages.append((film.name, film.id, TWITTER_MESSAGE_TEMPLATE.format(ftype=ftype,
