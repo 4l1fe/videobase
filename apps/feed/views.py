@@ -3,7 +3,7 @@
 import time
 from email import utils
 
-from django.shortcuts import render, HttpResponse
+from django.shortcuts import render
 from django.utils.timezone import datetime
 
 from apps.contents.models import Contents, Locations
@@ -24,7 +24,7 @@ def get_format_time():
 def get_feed_tw(request):
     messages = []
     for film in Films.get_newest_films():
-        genres = [genre.name for genre in film.genres.all()]
+        genres = get_genres(film)
 
         ftype = u'фильм'
         if u'мультфильм' in genres:
@@ -44,8 +44,8 @@ def get_feed_tw(request):
         'newdate': ''
     }
 
-    return HttpResponse(render(request, 'tw_feed.html', result),
-                        content_type="application/rss+xml; charset=utf-8")
+    return render(request, 'tw_feed.html', result,
+                  content_type="application/rss+xml; charset=utf-8")
 
 
 def get_feed_vk(request):
@@ -55,8 +55,8 @@ def get_feed_vk(request):
         'date': get_format_time()
     }
 
-    return HttpResponse(render(request, 'vk_feed.html', result),
-                        content_type="application/rss+xml; charset=utf-8")
+    return render(request, 'vk_feed.html', result,
+                  content_type="application/rss+xml; charset=utf-8")
 
 
 def get_feed(request):
@@ -66,8 +66,8 @@ def get_feed(request):
         'date': get_format_time()
     }
 
-    return HttpResponse(render(request, 'feed.html', result),
-                        content_type="application/rss+xml; charset=utf-8")
+    return render(request, 'feed.html', result,
+                  content_type="application/rss+xml; charset=utf-8")
 
 
 def get_feed_fb(request):
@@ -77,8 +77,8 @@ def get_feed_fb(request):
         'date': get_format_time()
     }
 
-    return HttpResponse(render(request, 'fb_feed.html', result),
-                        content_type="application/rss+xml; charset=utf-8")
+    return render(request, 'fb_feed.html', result,
+                  content_type="application/rss+xml; charset=utf-8")
 
 
 def get_film_description(is_vk):
@@ -113,29 +113,30 @@ def get_film_description(is_vk):
 
 
 def get_price(film):
-    content = Contents.objects.get(film=film.id)
-    locations = Locations.objects.filter(content=content.id)
+    locations = Locations.objects.filter(content__in=Contents.objects.filter(film=film.id).values_list('id', flat=True))
     min_price = locations[0].price
+
     price = -1
     cost = u'бесплатно'
+
     for location in locations:
         if min_price > location.price:
             price = min_price
             min_price = location.price
 
     if min_price != 0:
-        cost = u'от ' + str(int(min_price)) + u' рублей без рекламы'
+        cost = u'от {0} рублей без рекламы'.format(min_price)
 
-    if min_price == 0 and price != -1:
-        cost = u'бесплатно или от ' + str(int(price)) + u' рублей без рекламы'
+    elif min_price == 0 and price != -1:
+        cost = u'бесплатно или от {0} рублей без рекламы'.format(price)
 
     return cost
 
 
 def get_extras(film, is_vk):
     film_extras = FilmExtras.objects.filter(film_id=film.id).all()
-    poster = ''
-    trailer = 'http://vsevi.ru/film/{0}/'.format(film.id)
+    poster = u''
+    trailer = u'http://vsevi.ru/film/{0}/'.format(film.id)
 
     for extras in film_extras:
         if extras.type == APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER:
@@ -172,4 +173,3 @@ def get_person(film):
             list_scriptwriter_by_film.append(person.person.name)
 
     return u', '.join(list_actor_by_film), u', '.join(list_director_by_film), u', '.join(list_scriptwriter_by_film)
-
