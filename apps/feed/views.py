@@ -24,14 +24,12 @@ def get_format_time():
 def get_feed_tw(request):
     messages = []
     for film in Films.get_newest_films():
-        genres = get_genres(film)
+        genres = list(get_genres(film))
 
         ftype = u'фильм'
         if u'мультфильм' in genres:
             ftype = u'мультфильм'
-
-            if ftype in genres:
-                genres.remove(ftype)
+            genres.remove(ftype)
 
         genres_string = '#'+' #'.join(genres)
         messages.append((film.name, film.id, TWITTER_MESSAGE_TEMPLATE.format(ftype=ftype,
