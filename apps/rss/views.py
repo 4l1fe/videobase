@@ -141,8 +141,7 @@ def get_extras(film, is_vk=False, is_feed=False):
 
     for extras in film_extras:
         if extras.type == APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER:
-            poster = u'http://vsevi.ru{0}'.format(extras.get_photo_url(prefix=True))
-            #APP_FILMS_EXTRAS_POSTER_HOST + extras.photo.name
+            poster = extras.get_photo_url(prefix=True)
 
         if is_vk:
             if extras.type == APP_FILM_TYPE_ADDITIONAL_MATERIAL_TRAILER:
