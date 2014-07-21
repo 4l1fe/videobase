@@ -40,8 +40,11 @@ def extract_countries(tag):
 
 
 def date_extract(tag):
-    return datetime.datetime.strptime(tag.select("div.prem_ical")[0].attrs['data-date-premier-start-link'], "%Y%m%d")
+    try:
+        return datetime.datetime.strptime(tag.select("div.prem_ical")[0].attrs['data-date-premier-start-link'], "%Y%m%d")
 
+    except ValueError:
+        return datetime.datetime.strptime(tag.select("div.prem_ical")[0].attrs['data-date-premier-start-link'], "%Y%m")
 
 def get_vote(soup):
     csslink = [lnk.attrs['href'] for lnk in soup.find_all('link') if 'votes' in lnk.attrs['href']][0]
