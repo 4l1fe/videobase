@@ -61,7 +61,7 @@ def get_feed_vk(request):
 
 def get_feed(request):
     result = {
-        'films': get_film_description(False, is_feed=True),
+        'films': get_film_description(is_feed=True),
         'newdate': '',
         'date': get_format_time(),
     }
@@ -72,7 +72,7 @@ def get_feed(request):
 
 def get_feed_fb(request):
     result = {
-        'films': get_film_description(False),
+        'films': get_film_description(),
         'newdate': '',
         'date': get_format_time(),
     }
