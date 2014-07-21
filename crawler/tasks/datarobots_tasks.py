@@ -27,19 +27,19 @@ information_robots = ['kinopoik_robot', 'imdb_robot']
 def kinopoisk_films(pages):
     try:
         for page in range(1, pages+1):
-            print "Page number: {0} of {1}".format(page, pages)
+            print u"Page number: {0} of {1}".format(page, pages)
             html = simple_tor_get_page(KINOPOISK_LIST_FILMS_URL.format(page), tor_flag=True)
             soup = BeautifulSoup(html)
             films_list = soup.findAll('div', attrs={'class': 'name'})
             for film in films_list:
-                name = film.a.text.decode("utf-8")
-                print "Film name: {0}".format(name)
+                name = film.a.text
+                print u"Film name: {0}".format(name)
                 kinopoisk_id = int(film.a.get('href').split('/')[4])
                 if u'(сериал)' in name:
                     name = name.replace(u'(сериал)', u'')
                 film, flag = Films.objects.get_or_create(kinopoisk_id=kinopoisk_id,
-                                                   name=name, defaults={'type': ''})
-                print "Film: {0} {1}".format(film.name, film.kinopoisk_id)
+                                                    defaults={'type': '', 'name':name})
+                print u"Film: {0} {1}".format(film.name, film.kinopoisk_id)
                 kinopoisk_parse_one_film.apply_async((film.kinopoisk_id, film.name))
     except Exception, e:
         print e
