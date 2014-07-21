@@ -40,11 +40,19 @@ def extract_countries(tag):
 
 
 def date_extract(tag):
+
+    
+    
     try:
         return datetime.datetime.strptime(tag.select("div.prem_ical")[0].attrs['data-date-premier-start-link'], "%Y%m%d")
 
     except ValueError:
-        return datetime.datetime.strptime(tag.select("div.prem_ical")[0].attrs['data-date-premier-start-link'], "%Y%m")
+
+        try:
+            return datetime.datetime.strptime(tag.select("div.prem_ical")[0].attrs['data-date-premier-start-link'], "%Y%m")
+        except ValueError:
+
+            return datetime.datetime.strptime(tag.select("div.prem_ical")[0].attrs['data-date-premier-start-link'], "%Y00")
 
 def get_vote(soup):
     csslink = [lnk.attrs['href'] for lnk in soup.find_all('link') if 'votes' in lnk.attrs['href']][0]
@@ -159,10 +167,12 @@ def acquire_page(page_id):
         os.mkdir(PAGE_ARCHIVE)
 
     dump_path = os.path.join(PAGE_ARCHIVE,str(page_id))
+    page_dump = ''
     if os.path.exists(dump_path):
         with open(dump_path) as fd:
             page_dump = fd.read().decode('utf-8')
-    else:
+        
+    if not page_dump:
         url =u"http://www.kinopoisk.ru/film/%d/" % page_id
         res = simple_tor_get_page(url, tor_flag=True)
         page_dump = res.decode('cp1251')
@@ -181,6 +191,8 @@ def extract_facts_from_dump(page_dump):
 
     facts = []
     soup = BeautifulSoup(page_dump)
+    if not page_dump:
+        return []
     info_table = soup.select("div#infoTable")[0]
     tds = info_table.select("td.type")
     data_dict = dict([(f.text.strip(), s) for f, s in [td.parent.select("td") for td in tds]])
