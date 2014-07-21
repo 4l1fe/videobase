@@ -165,9 +165,20 @@ def check_and_correct_one_film(film_id):
     film = Films.objects.get(id=film_id)
     data.film_facts.checker.film_checker.check_and_correct(film)
 
+
+@app.task(name='check_one_person_by_id')
+def check_and_correct_one_person(person_id):
+    person = Persons.objects.get(id=person_id)
+    data.person_facts.checker.person_checker.check_and_correct(person)
+
     
 @app.task(name='film_info_check_and_correct')
 def check_and_correct_tasks():
     for film in Films.objects.all():
         check_and_correct_one_film.apply_async(film.id)
 
+
+@app.task(name='persons_check_and_correct')
+def person_check_and_correct_tasks():
+    for person in Persons.objects.all():
+        check_and_correct_one_person.apply_async(person.id)
