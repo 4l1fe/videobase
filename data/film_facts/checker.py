@@ -1,17 +1,19 @@
 # coding: utf-8
 from datetime import datetime
-import re
 
 import gdata.youtube
 import gdata.youtube.service
 
 from apps.films.models import Films, FilmExtras
+from apps.films.models import PersonsFilms
 from apps.films.models import Countries
 from data.checker import FactChecker
 from data.constants import FLATLAND_NAME
+from crawler.tasks.datarobots_tasks import kinopoisk_parse_one_film
 from bs4 import BeautifulSoup
 import requests
 import re
+from apps.films.constants import *
 
 
 film_checker = FactChecker(Films)
@@ -27,9 +29,12 @@ def find_first_pattern_position(str, pat):
 
 
 def youtube_trailer_corrector(film):
-    ft = FilmExtras.objects.filter(film=film).first()
-    ft.delete()
-    print u"Corrector deleted bad trailer successfully"
+    try:
+        ft = FilmExtras.objects.filter(film=film).first()
+        ft.delete()
+        print u"Corrector deleted bad trailer successfully"
+    except:
+        print u"Can't delete trailer"
 
 
 def film_description_html_corrector(film):
@@ -58,6 +63,50 @@ def film_description_useless_links_corrector(film):
         film.save()
         print u"Corrector removed useless links in film description"
 
+
+def film_scriptwriter_and_director_corrector(film):
+    if film.kinopoisk_id:
+        kinopoisk_parse_one_film.apply_async(
+                     (
+                     film.kinopoisk_id,
+                     film.name
+                     )
+                )
+        print u"Corrector updated scriptwriter and director info for film successfully"
+
+
+def film_no_name_corrector(film):
+    if film.kinopoisk_id:
+        kinopoisk_parse_one_film.apply_async(
+                     (
+                     film.kinopoisk_id,
+                     film.name
+                     )
+                )
+        print u"Corrector updated film name successfully"
+
+
+def film_produced_country_name_corrector(film):
+    film_countries = film.countries
+    dictinary = {}
+    a = re.compile("^[a-zA-Z]")
+    try:
+        with open(os.path.dirname(__file__) + "/../countries") as f:
+            for line in f:
+                spl_str = line.split('\t')
+                if len(spl_str) > 1:
+                    key = unicode(spl_str[0], "utf-8").encode("utf-8")
+                    val = unicode(spl_str[1], "utf-8").encode("utf-8")
+                    dictinary[str(key)] = val
+
+        for fc in film_countries.iterator():
+            if a.match(fc.name.encode("utf-8")):
+                fc.name = dictinary[fc.name]
+                fc.save()
+    except:
+        print u"Corrector can't translated produced country name to russian"
+
+    print u"Corrector translated produced country name to russian successfully"
 
 
 @film_checker.add(u'Flatland in countries')
@@ -110,7 +159,7 @@ def omdb_year_check(film):
 
 
 @film_checker.add(u"There is no such trailer", corrector=youtube_trailer_corrector)
-def trailer_check(film):
+def trailer_exists_check(film):
     yt_service = gdata.youtube.service.YouTubeService()
     ft = FilmExtras.objects.filter(film=film).first()
     try:
@@ -121,7 +170,7 @@ def trailer_check(film):
         return False
 
 
-@film_checker.add(u"Youtube trailer duration not within limits", corrector=youtube_trailer_corrector)
+@film_checker.add(u"Youtube trailer duration not within limits") #, corrector=youtube_trailer_corrector
 def trailer_duration_check(film):
     max_trailer_time_in_seconds = 270
     min_trailer_time_in_secons = 60
@@ -158,6 +207,15 @@ def film_kinopoisk_id_check(film):
     else:
         return False
 
+@film_checker.add(u"Film Name is no name", corrector=film_no_name_corrector)
+def film_no_name_check(film):
+    film_name = film.name
+    if film_name == "NoName":
+        return False
+    else:
+        return True
+
+
 
 @film_checker.add(u"Film description contains html tags", corrector=film_description_html_corrector)
 def film_description_contains_html_tags_check(film):
@@ -185,8 +243,85 @@ def film_description_contains_digits_check(film):
 def film_description_contains_useless_site_names_check(film):
     film_description = film.description.encode("utf-8")
     i = find_first_pattern_position(film_description, "(NOW.RU)|(ZOOMBY.RU)")
-    print "INDEX", i, len(film_description)
     if i!=-1:
         return False
     else:
         return True
+
+
+@film_checker.add(u"Film has no Kinopoisk rating")
+def film_kinopoisk_rating_check(film):
+    film_kinopoisk_rating = film.rating_kinopoisk
+    if film_kinopoisk_rating:
+        return True
+    else:
+        return False
+
+@film_checker.add(u"Film has no scriptwriter or director", corrector=film_scriptwriter_and_director_corrector)
+def film_scriptwriter_check(film):
+    persons_film = PersonsFilms.objects.filter(film=film)
+    film_script_writers = persons_film.filter(p_type=APP_PERSON_SCRIPTWRITER)
+    film_directors = persons_film.filter(p_type=APP_PERSON_DIRECTOR)
+    if not (film_script_writers or film_directors):
+        return False
+    else:
+        return True
+
+@film_checker.add(u"Film has produced country name in english", corrector=film_produced_country_name_corrector)
+def film_produced_country_name_check(film):
+    film_countries = film.countries
+    a = re.compile("^[a-zA-Z]")
+    for i in film_countries.all():
+        if a.match(i.name.encode("utf-8")):
+            return False
+    return True
+
+
+@film_checker.add(u"Film trailer title doesn't contain trailer key words", corrector=youtube_trailer_corrector)
+def trailer_title_check(film):
+    yt_service = gdata.youtube.service.YouTubeService()
+    ft = FilmExtras.objects.filter(film=film).first()
+    film_name = film.name.lower().encode("utf-8")
+    film_year = film.release_date.year
+    try:
+        yid = re.match('.+watch[?]v[=](?P<id>.+)(([&].+)?)', ft.url).groupdict()['id']
+        entry = yt_service.GetYouTubeVideoEntry(video_id=yid)
+        trailer_title = unicode(entry.title.text, "utf-8").lower()
+        trailers_ru_mask = [u'официальный русский трейлер фильма hd',u'русский трейлер фильма hd',u'русский трейлер HD',
+                            u'трейлер на русском',u'официальный трейлер',u'русский трейлер',u'тв-ролик',u'финальный трейлер',u'промо ролик']
+        trailers_en_mask = [u'international trailer hd', u'official trailer hd',u'trailer hd', u'international trailer', u'official teaser', u'trailer']
+        trailers_block = [u'interview',u'интервью',u'premiere',u'премьера',u'review',u'обзор',u'conference',u'behind the scenes',u'gameplay',u'parody',u'videogame']
+        check_ru = False
+        check_en = False
+        check_block = False
+        check_fname = False
+        check_fyear = Falses
+
+        for phrase in trailers_ru_mask:
+            if trailer_title.find(phrase) != -1:
+                check_ru = True
+
+        for phrase in trailers_en_mask:
+            if trailer_title.find(phrase) != -1:
+                check_en = True
+
+        for phrase in trailers_block:
+            if trailer_title.find(phrase) != -1:
+                check_block = True
+
+        tr_t_for_comparison = trailer_title.encode("utf-8")
+        if tr_t_for_comparison.find(film_name) != -1:
+            check_fname = True
+
+        if tr_t_for_comparison.find(str(film_year)) != -1:
+            check_fyear = True
+        if (check_ru or check_en) and check_fname and check_fyear and not check_block:
+            return True
+        else:
+            return False
+
+    except Exception, e:
+        print u"Trailer title check failed"
+        print e.message
+        return True
+
