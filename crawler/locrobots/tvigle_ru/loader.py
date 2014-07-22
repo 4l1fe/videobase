@@ -8,6 +8,7 @@ import urllib
 HOST = 'www.tvigle.ru'
 URL_LOAD = ''
 
+
 class TVIGLE_Loader(BaseLoader):
     def __init__(self, film, host=HOST, url_load=URL_LOAD):
         super(TVIGLE_Loader, self).__init__(film, host, url_load)

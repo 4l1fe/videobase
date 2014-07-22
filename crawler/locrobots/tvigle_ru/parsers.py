@@ -11,7 +11,7 @@ def parse_search(response, film_name, serial):
     mas = []
     reg = re.compile('(?P<season>'+ s +')[ ](?P<number>\d+)')
     try:
-        soup = BeautifulSoup(response.content)
+        soup = BeautifulSoup(response)
         url_seasons = None
         if serial:
             tag_seasons = soup.find('h4')
@@ -38,7 +38,6 @@ def parse_search(response, film_name, serial):
             tag = soup.find('h4', text=film_name)
             tag_a = tag.a
             film_link = tag_a.get('href')
-
     except:
         film_link = None
     return film_link

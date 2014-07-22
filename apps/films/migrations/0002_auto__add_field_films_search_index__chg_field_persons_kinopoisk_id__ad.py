@@ -8,54 +8,32 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding field 'Films.rating_cons'
-        db.add_column('films', 'rating_cons',
-                      self.gf('django.db.models.fields.FloatField')(null=True, blank=True),
+        # Adding field 'Films.search_index'
+        db.add_column('films', 'search_index',
+                      self.gf('djorm_pgfulltext.fields.VectorField')(default='', null=True, db_index=True),
                       keep_default=False)
 
-        # Adding field 'Films.rating_cons_cnt'
-        db.add_column('films', 'rating_cons_cnt',
-                      self.gf('django.db.models.fields.FloatField')(null=True, blank=True),
-                      keep_default=False)
+        # Drop Indexes
+        db.delete_index('films', 'rating_cons_cnt')
+        db.delete_index('films', 'rating_local')
+        db.delete_index('films', 'rating_local_cnt')
 
+        # Changing field 'Persons.kinopoisk_id'
+        db.alter_column('persons', 'kinopoisk_id', self.gf('django.db.models.fields.IntegerField')(unique=True))
 
-        # Changing field 'UsersFilms.status'
-        db.alter_column('users_films', 'status', self.gf('django.db.models.fields.PositiveSmallIntegerField')(null=True))
+        # Adding unique constraint on 'Persons', fields ['kinopoisk_id']
+        db.create_unique('persons', ['kinopoisk_id'])
 
-        # Changing field 'UsersFilms.rating'
-        db.alter_column('users_films', 'rating', self.gf('django.db.models.fields.PositiveSmallIntegerField')(null=True))
-
-        # Changing field 'UsersFilms.subscribed'
-        db.alter_column('users_films', 'subscribed', self.gf('django.db.models.fields.PositiveSmallIntegerField')(null=True))
-
-        # Changing field 'UsersFilms.user'
-        db.alter_column('users_films', 'user_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User']))
-
-        # Changing field 'UsersPersons.user'
-        db.alter_column('users_persons', 'user_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], max_length=255))
 
     def backwards(self, orm):
-        # Deleting field 'Films.rating_cons'
-        db.delete_column('films', 'rating_cons')
+        # Deleting field 'Films.search_index'
+        db.delete_column('films', 'search_index')
 
-        # Deleting field 'Films.rating_cons_cnt'
-        db.delete_column('films', 'rating_cons_cnt')
+        # Removing unique constraint on 'Persons', fields ['kinopoisk_id']
+        db.delete_unique('persons', ['kinopoisk_id'])
 
-
-        # Changing field 'UsersFilms.status'
-        db.alter_column('users_films', 'status', self.gf('django.db.models.fields.PositiveSmallIntegerField')())
-
-        # Changing field 'UsersFilms.rating'
-        db.alter_column('users_films', 'rating', self.gf('django.db.models.fields.PositiveSmallIntegerField')())
-
-        # Changing field 'UsersFilms.subscribed'
-        db.alter_column('users_films', 'subscribed', self.gf('django.db.models.fields.PositiveSmallIntegerField')())
-
-        # Changing field 'UsersFilms.user'
-        db.alter_column('users_films', 'user_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['users.Users']))
-
-        # Changing field 'UsersPersons.user'
-        db.alter_column('users_persons', 'user_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['users.Users'], max_length=255))
+        # Changing field 'Persons.kinopoisk_id'
+        db.alter_column('persons', 'kinopoisk_id', self.gf('django.db.models.fields.IntegerField')(null=True))
 
     models = {
         u'auth.group': {
@@ -94,27 +72,34 @@ class Migration(SchemaMigration):
             'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
+        'films.cities': {
+            'Meta': {'object_name': 'Cities', 'db_table': "'cities'"},
+            'country': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'cities'", 'to': "orm['films.Countries']"}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
+            'name_orig': ('django.db.models.fields.CharField', [], {'max_length': '255'})
+        },
         'films.countries': {
             'Meta': {'object_name': 'Countries', 'db_table': "'countries'"},
             'description': ('django.db.models.fields.TextField', [], {}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
             'name_orig': ('django.db.models.fields.CharField', [], {'max_length': '255'})
         },
         'films.filmextras': {
             'Meta': {'object_name': 'FilmExtras', 'db_table': "'films_extras'"},
             'description': ('django.db.models.fields.TextField', [], {}),
-            'film': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'extras'", 'to': "orm['films.Films']"}),
+            'film': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'fe_film_rel'", 'to': "orm['films.Films']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'name_orig': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'photo': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
-            'type': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'type': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
             'url': ('django.db.models.fields.URLField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'})
         },
         'films.films': {
             'Meta': {'object_name': 'Films', 'db_table': "'films'"},
-            'age_limit': ('django.db.models.fields.PositiveSmallIntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'age_limit': ('django.db.models.fields.PositiveSmallIntegerField', [], {'db_index': 'True', 'null': 'True', 'blank': 'True'}),
             'budget': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'countries': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'countries'", 'symmetrical': 'False', 'to': "orm['films.Countries']"}),
             'description': ('django.db.models.fields.TextField', [], {'default': "''", 'blank': 'True'}),
@@ -122,41 +107,51 @@ class Migration(SchemaMigration):
             'genres': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'genres'", 'symmetrical': 'False', 'to': "orm['films.Genres']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'imdb_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'kinopoisk_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'kinopoisk_id': ('django.db.models.fields.IntegerField', [], {'unique': 'True', 'db_index': 'True'}),
             'kinopoisk_lastupdate': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'name_orig': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '255', 'blank': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
+            'name_orig': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '255', 'db_index': 'True', 'blank': 'True'}),
             'persons': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'persons'", 'symmetrical': 'False', 'through': "orm['films.PersonsFilms']", 'to': "orm['films.Persons']"}),
-            'rating_cons': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
-            'rating_cons_cnt': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
-            'rating_imdb': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
-            'rating_imdb_cnt': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'rating_cons': ('django.db.models.fields.FloatField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
+            'rating_cons_cnt': ('django.db.models.fields.IntegerField', [], {'default': '0', 'null': 'True', 'db_index': 'True', 'blank': 'True'}),
+            'rating_imdb': ('django.db.models.fields.FloatField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
+            'rating_imdb_cnt': ('django.db.models.fields.IntegerField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
             'rating_kinopoisk': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
             'rating_kinopoisk_cnt': ('django.db.models.fields.PositiveSmallIntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'rating_local': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
-            'rating_local_cnt': ('django.db.models.fields.PositiveSmallIntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'release_date': ('django.db.models.fields.DateField', [], {}),
+            'rating_local': ('django.db.models.fields.FloatField', [], {'default': '0', 'null': 'True', 'db_index': 'True', 'blank': 'True'}),
+            'rating_local_cnt': ('django.db.models.fields.IntegerField', [], {'default': '0', 'null': 'True', 'db_index': 'True', 'blank': 'True'}),
+            'rating_sort': ('django.db.models.fields.IntegerField', [], {'default': '0', 'null': 'True', 'db_index': 'True', 'blank': 'True'}),
+            'release_date': ('django.db.models.fields.DateField', [], {'db_index': 'True', 'null': 'True', 'blank': 'True'}),
+            'search_index': ('djorm_pgfulltext.fields.VectorField', [], {'default': "''", 'null': 'True', 'db_index': 'True'}),
             'seasons_cnt': ('django.db.models.fields.PositiveSmallIntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'type': ('django.db.models.fields.CharField', [], {'max_length': '255'})
+            'type': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'})
         },
         'films.genres': {
             'Meta': {'object_name': 'Genres', 'db_table': "'genres'"},
+            'depth': ('django.db.models.fields.PositiveIntegerField', [], {'db_index': 'True'}),
             'description': ('django.db.models.fields.TextField', [], {}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '255'})
+            'lft': ('django.db.models.fields.PositiveIntegerField', [], {'db_index': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
+            'rating_sort': ('django.db.models.fields.SmallIntegerField', [], {'db_index': 'True', 'null': 'True', 'blank': 'True'}),
+            'rgt': ('django.db.models.fields.PositiveIntegerField', [], {'db_index': 'True'}),
+            'tree_id': ('django.db.models.fields.PositiveIntegerField', [], {'db_index': 'True'})
         },
         'films.persons': {
             'Meta': {'object_name': 'Persons', 'db_table': "'persons'"},
             'bio': ('django.db.models.fields.TextField', [], {}),
+            'birthdate': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
+            'city': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'persons'", 'null': 'True', 'to': "orm['films.Cities']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'name_orig': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'kinopoisk_id': ('django.db.models.fields.IntegerField', [], {'unique': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
+            'name_orig': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
             'photo': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'})
         },
         'films.personsextras': {
             'Meta': {'object_name': 'PersonsExtras', 'db_table': "'persons_extras'"},
             'description': ('django.db.models.fields.TextField', [], {}),
-            'etype': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'etype': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.TextField', [], {}),
             'name_orig': ('django.db.models.fields.TextField', [], {}),
@@ -166,11 +161,11 @@ class Migration(SchemaMigration):
         'films.personsfilms': {
             'Meta': {'unique_together': "(('film', 'person', 'p_type'),)", 'object_name': 'PersonsFilms', 'db_table': "'persons_films'"},
             'description': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '255'}),
-            'film': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['films.Films']"}),
+            'film': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'pf_films_rel'", 'to': "orm['films.Films']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'p_character': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '255'}),
-            'p_type': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'person': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['films.Persons']"})
+            'p_type': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
+            'person': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'pf_persons_rel'", 'to': "orm['films.Persons']"})
         },
         'films.seasons': {
             'Meta': {'unique_together': "(('film', 'number'),)", 'object_name': 'Seasons', 'db_table': "'seasons'"},
@@ -183,20 +178,29 @@ class Migration(SchemaMigration):
         },
         'films.usersfilms': {
             'Meta': {'unique_together': "(('user', 'film'),)", 'object_name': 'UsersFilms', 'db_table': "'users_films'"},
-            'film': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['films.Films']"}),
+            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'film': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'uf_films_rel'", 'to': "orm['films.Films']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'rating': ('django.db.models.fields.PositiveSmallIntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'status': ('django.db.models.fields.PositiveSmallIntegerField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
+            'rating': ('django.db.models.fields.PositiveSmallIntegerField', [], {'db_index': 'True', 'null': 'True', 'blank': 'True'}),
+            'status': ('django.db.models.fields.PositiveSmallIntegerField', [], {'default': '0', 'null': 'True', 'db_index': 'True', 'blank': 'True'}),
             'subscribed': ('django.db.models.fields.PositiveSmallIntegerField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"})
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'uf_users_rel'", 'to': u"orm['auth.User']"})
         },
         'films.userspersons': {
             'Meta': {'object_name': 'UsersPersons', 'db_table': "'users_persons'"},
+            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'person': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['films.Persons']", 'max_length': '255'}),
-            'subscribed': ('django.db.models.fields.IntegerField', [], {}),
-            'upstatus': ('django.db.models.fields.IntegerField', [], {}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']", 'max_length': '255'})
+            'person': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'up_persons_rel'", 'max_length': '255', 'to': "orm['films.Persons']"}),
+            'subscribed': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
+            'upstatus': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'up_users_rel'", 'max_length': '255', 'to': u"orm['auth.User']"})
+        },
+        'films.youtubetrailercheck': {
+            'Meta': {'object_name': 'YoutubeTrailerCheck', 'db_table': "'youtube_trailer_check'"},
+            'film': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['films.Films']"}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'last_check': ('django.db.models.fields.DateTimeField', [], {}),
+            'was_successfull': ('django.db.models.fields.BooleanField', [], {})
         }
     }
 
