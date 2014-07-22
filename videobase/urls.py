@@ -34,6 +34,7 @@ urlpatterns = patterns('',
     url(r'^legal/$', 'apps.contents.views.legal'),
     url(r'^about/$', 'apps.contents.views.about'),
 
+    # RSS
     url(r'^rss/', include('apps.rss.urls')),
 )
 
