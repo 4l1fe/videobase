@@ -28,13 +28,9 @@ class Genres(NS_Node):
 
     @classmethod
     def get_all_genres(cls, get_values=True):
+        query = cls.objects.extra(where=['lft-rgt=-1']).order_by('name')
+        return query.values('id', 'name') if get_values else query
 
-        query =cls.objects.extra(where=['lft-rgt=-1']).order_by('name')
-
-        if get_values:
-            return query.values('id', 'name')
-        else:
-            return query
 
     @classmethod
     def get_children_list_id(cls, id):
