@@ -106,10 +106,14 @@ def index_view(request):
     # Выбираем 4 новых фильма, у которых есть локации
     NEW_FILMS_CACHE_KEY = 'new_films'
     resp_dict_serialized = cache.get(NEW_FILMS_CACHE_KEY)
-
     # Расчитываем новинки, если их нет в кеше
     if resp_dict_serialized is None:
         o_film = film_model.Films.get_newest_films()
+
+        # Фильмы показывались => ставим флаг просмотрено в true
+        for film in o_film:
+             film.was_shown = True
+             film.save()
 
         # Сериализуем новинки и конвертируем результат в строку
         resp_dict_data = vbFilm(o_film, require_relation=False, extend=True, many=True).data
@@ -122,8 +126,8 @@ def index_view(request):
         resp_dict_data = json.loads(resp_dict_serialized)
 
     # Для этих 4-х фильмов ставим флаг "отображалсяв в новинках" = true
-    for film in resp_dict_serialized:
-        film.was_shown = True
+    #for film in resp_dict_serialized:
+    #    film.was_shown = True
 
     # Найдем relation для фильмов, если пользователь авторизован
     if request.user.is_authenticated():

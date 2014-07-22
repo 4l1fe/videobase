@@ -245,7 +245,7 @@ class Films(models.Model):
         FROM (SELECT DISTINCT ON ("locations"."content_id") "locations"."content_id", "locations"."id" FROM "locations") AS loc
             INNER JOIN "content" ON ("loc"."content_id" = "content"."id")
             INNER JOIN "films" ON ("content"."film_id" = "films"."id")
-        WHERE ("films"."rating_cons" >= %s AND "films"."rating_cons_cnt" > %s)
+        WHERE ("films"."rating_cons" >= %s AND "films"."rating_cons_cnt" > %s AND "films"."was_shown" = False)
         ORDER BY "loc"."id" DESC LIMIT %s;
         """
 
