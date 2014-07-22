@@ -10,7 +10,7 @@ from apps.contents.models import Contents, Locations
 from apps.films.models import Films, PersonsFilms, FilmExtras
 
 from apps.films.constants import APP_PERSON_ACTOR, APP_PERSON_DIRECTOR, APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER, \
-    APP_FILMS_EXTRAS_POSTER_HOST, APP_FILM_TYPE_ADDITIONAL_MATERIAL_TRAILER
+    APP_FILMS_EXTRAS_POSTER_HOST, APP_FILM_TYPE_ADDITIONAL_MATERIAL_TRAILER, APP_PERSON_SCRIPTWRITER
 
 TWITTER_MESSAGE_TEMPLATE = u"Новый #{ftype} {f_name} {genres_string} {f_rating}/10, {f_year} http://vsevi.ru/films/{film_id}/"
 
@@ -61,7 +61,7 @@ def get_feed_vk(request):
 
 def get_feed(request):
     result = {
-        'films': get_film_description(),
+        'films': get_film_description(big_poster=False),
         'newdate': '',
         'date': get_format_time(),
     }
@@ -81,7 +81,7 @@ def get_feed_fb(request):
                   content_type='application/rss+xml; charset=utf-8')
 
 
-def get_film_description(is_vk=False):
+def get_film_description(**kwargs):
     list_cost = []
     list_genres = []
     list_poster = []
@@ -94,7 +94,7 @@ def get_film_description(is_vk=False):
     for film in films:
         cost = get_price(film)
         genres = get_genres(film)
-        poster, trailer = get_extras(film, is_vk=is_vk)
+        poster, trailer = get_extras(film, **kwargs)
         list_persons_by_film = get_person(film)
 
         # Add Cost and genres
@@ -134,7 +134,7 @@ def get_price(film):
     return cost
 
 
-def get_extras(film, is_vk=False):
+def get_extras(film, is_vk=False, big_poster=True):
     film_extras = FilmExtras.objects.filter(film_id=film.id).all()
     poster = u''
     trailer = u'http://vsevi.ru/film/{0}/'.format(film.id)
@@ -143,9 +143,12 @@ def get_extras(film, is_vk=False):
         if is_vk:
             if extras.type == APP_FILM_TYPE_ADDITIONAL_MATERIAL_TRAILER:
                 trailer = extras.url
-        else:
-            if extras.type == APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER:
-                poster = extras.get_photo_url(prefix=True)
+
+        if extras.type == APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER:
+            poster = extras.photo.url if big_poster else extras.get_photo_url(prefix=True)
+
+            if len(poster):
+                poster = u"http://vsevi.ru{0}".format(poster)
 
     return poster, trailer
 
@@ -170,7 +173,7 @@ def get_person(film):
         elif person.p_type == APP_PERSON_DIRECTOR:
             list_director_by_film.append(person.person.name)
 
-        else:
+        elif person.p_type == APP_PERSON_SCRIPTWRITER:
             list_scriptwriter_by_film.append(person.person.name)
 
     return u', '.join(list_actor_by_film), u', '.join(list_director_by_film), u', '.join(list_scriptwriter_by_film)

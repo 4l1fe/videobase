@@ -1,11 +1,9 @@
 # coding: utf-8
 
-import os
 from collections import defaultdict
 
 from django.db.models import Q
 from django.core.paginator import Page
-import operator
 
 from rest_framework import serializers
 
@@ -156,8 +154,6 @@ class vbFilm(serializers.ModelSerializer):
         locations = Locations.objects.filter(content__film__in=self.list_obj_pk)\
             .order_by('content__film', 'content__id', 'price').select_related('content')
 
-        # ordered = sorted(locations.objects, key=operator.attrgetter('price'))
-        # locations = ordered
         result = {}
         for item in locations:
             v = item.content.film_id
