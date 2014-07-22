@@ -1060,7 +1060,7 @@
         if (action === "subscribe") {
           action_str += "d";
         }
-        new_state = state_toggle(rel.status, rel[action_str]);
+        new_state = state_toggle(opts.status, rel[action_str]);
         if (action === "rate") {
           console.log(opts.value);
           if (!opts.value) {
@@ -1346,7 +1346,8 @@
         year_old: $("#filter_year_old"),
         rating: $("#filter_rating"),
         price: $("#filter_price"),
-        sort: $("#filter_sort")
+        sort: $("#filter_sort"),
+        instock: $("#filter_instock")
       };
       params = this._app.query_params();
       $.each(this._e.filter, function(index) {

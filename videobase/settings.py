@@ -71,6 +71,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django_extensions',
     'south',
+    'treebeard',
     'rest_framework',
     'rest_framework.authtoken',
     'social_auth',
@@ -79,12 +80,12 @@ INSTALLED_APPS = (
     'apps.films',
     'apps.contents',
     'apps.robots',
-    'apps.feed',
+    'apps.rss',
     'crawler',
     'social_auth',
     'djcelery',
     'backup_system',
-    'data'
+    'data',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -278,11 +279,6 @@ CELERYBEAT_SCHEDULE = {
         'task': 'viaplay_ru_robot_start',
         'schedule': timedelta(days=7),
     },
-    # Searching for kinopoisk_id for films that doesn't have one in our db
-    'kinopoisk-get_id': {
-        'task': 'kinopoisk_get_id',
-        'schedule': timedelta(minutes=1),
-    },
     'kinopoisk-set_poster': {
         'task': 'kinopoisk_set_poster',
         'schedule': timedelta(seconds=10),
@@ -344,3 +340,6 @@ CELERYBEAT_SCHEDULE = {
 CELERY_TIMEZONE = 'UTC'
 CELERY_ACCEPT_CONTENT = ['pickle', 'json', 'msgpack', 'yaml']
 POSTER_URL_PREFIX = '_260x360'
+
+
+# какяа то фигня, надо миграцию доделать

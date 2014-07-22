@@ -1,7 +1,7 @@
-from crawler.parse_page import crawler_get
+from crawler.tor import simple_tor_get_page 
 from django.core.management.base import NoArgsCommand
 from apps.robots.models import  RobotsTries, Robots
-from crawler.robot_start import sites_crawler
+from crawler.locrobots import sites_crawler
 
 import datetime
 from django.utils import timezone
@@ -21,7 +21,7 @@ def add_robot_if_not_exist(robot_name):
                       last_start = timezone.now() - datetime.timedelta(days=7),
                       state='{}',
                       description=' ',
-        rstatus = 0)
+        )
         robot.save()
 
 
