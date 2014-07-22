@@ -15,6 +15,7 @@ import datetime
 class FilmFactory(factory.DjangoModelFactory):
     FACTORY_FOR = Films
     FACTORY_DJANGO_GET_OR_CREATE = ('name',)
+    kinopoisk_id = factory.Sequence(lambda i: i)
     name = factory.Sequence(lambda n: u'Фильм{0}'.format(n))
     type = APP_FILM_FULL_FILM
     release_date = datetime.date(2014, 3, 21)
@@ -94,6 +95,7 @@ class CityFactory(factory.DjangoModelFactory):
 
 class PersonFactory(factory.DjangoModelFactory):
     FACTORY_FOR = Persons
+    kinopoisk_id = factory.Sequence(lambda i: i)
     # city = factory.SubFactory(CityFactory)
     name = factory.Sequence(lambda u: u'Персона{0}'.format(u))
     name_orig = factory.Sequence(lambda u: u'Person{0}'.format(u))

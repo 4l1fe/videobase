@@ -5,6 +5,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase, APISimpleTestCase
 from rest_framework.reverse import reverse
 
+from apps.films.models import Genres
 from apps.films.constants import APP_FILM_FULL_FILM, APP_FILM_SERIAL, APP_USERFILM_STATUS_PLAYLIST, \
     APP_PERSON_DIRECTOR, APP_PERSON_ACTOR, APP_PERSON_SCRIPTWRITER, APP_PERSON_PRODUCER
 from apps.users import Feed
@@ -15,6 +16,7 @@ from apps.users.tests.factories_users_api import *
 from apps.users.api.users_persons import persons_type
 from apps.users.constants import USER_ASK, USER_FRIENDSHIP
 from apps.users.constants import APP_USER_REL_TYPE_FRIENDS
+
 import random
 
 
@@ -107,7 +109,7 @@ class APIUsersGenresTestCase(APITestCase):
         genres = []
         films = []
         for i in range(10):
-            genres.append(GenreFactory.create())
+            genres.append(Genres.add_root(instance=GenreFactory.build()))
 
         for i in range(4):
             films.append(FilmFactory.create(genres=[genres[2*i], genres[2*i+1]]))
@@ -127,7 +129,7 @@ class APIUsersGenresTestCase(APITestCase):
 
     def test_api_users_genres_200_get(self):
         response = self.client.get(reverse(self.url_name, kwargs=self.kwargs))
-        genres = Genres.objects.filter(genres__uf_films_rel__user=self.user).distinct()
+        genres = Genres.get_all_genres(get_values=False).filter(genres__uf_films_rel__user=self.user).distinct()
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         for i in range(len(genres)):
@@ -153,7 +155,7 @@ class APIUsersTestCase(APITestCase):
         genres = []
         films = []
         for i in range(10):
-            genres.append(GenreFactory.create())
+            genres.append(Genres.add_root(instance=GenreFactory.build()))
 
         for i in range(4):
             films.append(FilmFactory.create(genres=[genres[2*i], genres[2*i+1]]))

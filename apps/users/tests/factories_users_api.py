@@ -34,6 +34,7 @@ class GenreFactory(factory.DjangoModelFactory):
 class FilmFactory(factory.DjangoModelFactory):
     FACTORY_FOR = Films
     FACTORY_DJANGO_GET_OR_CREATE = ('name',)
+    kinopoisk_id = factory.Sequence(lambda i: i)
     name = factory.Sequence(lambda n: u'Фильм{0}'.format(n))
     type = APP_FILM_FULL_FILM
     release_date = datetime.datetime.now()
@@ -97,6 +98,7 @@ class CitiesFactory(factory.DjangoModelFactory):
 
 class PersonsFactory(factory.DjangoModelFactory):
     FACTORY_FOR = Persons
+    kinopoisk_id = factory.Sequence(lambda i: i)
     name = factory.Sequence(lambda n: u'Персона_{0}'.format(n))
     bio = factory.Sequence(lambda n: u'Биография_{0}'.format(n))
     photo = ImageField(color='red')
