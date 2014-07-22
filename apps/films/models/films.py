@@ -5,7 +5,8 @@ import datetime
 from django.db import models
 from ..constants import *
 
-
+from djorm_pgfulltext.models import SearchManager
+from djorm_pgfulltext.fields import VectorField
 
 
 #############################################################################################################
@@ -42,11 +43,20 @@ class Films(models.Model):
     countries   = models.ManyToManyField('Countries', verbose_name=u'Страны производители', related_name='countries')
     genres      = models.ManyToManyField('Genres', verbose_name=u'Жанры', related_name='genres')
     persons     = models.ManyToManyField('Persons', through='PersonsFilms', verbose_name=u'Персоны', related_name='persons')
-
-
+    was_shown     = models.BooleanField(default=False, verbose_name=u'Фильм отображался в новинках')
+    search_index = VectorField()
+    
+    
     get_film_type = FilmManager()
     objects = models.Manager()
-        
+    search_manager = SearchManager(
+        fields=('name', 'name_orig'),
+        config='pg_catalog.english',
+        search_field='search_index',
+        auto_update_search_field=True
+    )
+
+
     def __unicode__(self):
         if type(self.name) is str:
             name = unicode(self.name)

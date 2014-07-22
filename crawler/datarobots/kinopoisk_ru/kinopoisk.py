@@ -1,18 +1,17 @@
 # coding: utf-8
-import time
-import random
+
 import re
 from bs4 import BeautifulSoup
 
-from django.core.files import File
 from django.utils.timezone import now, datetime
 
-from apps.films.models import Films, PersonsFilms, Persons, Genres, Countries
 from apps.films.constants import APP_FILM_FULL_FILM
-from crawler.datarobots.kinopoisk_ru.parse_page import acquire_page, extract_facts_from_dump
-from crawler.datarobots.kinopoisk_ru.kinopoisk_poster import set_kinopoisk_poster
-from crawler.tor import simple_tor_get_page as simple_get
+from apps.films.models import Films, PersonsFilms, Persons, Genres, Countries
 
+from crawler.tor import simple_tor_get_page as simple_get
+from crawler.datarobots.kinopoisk_ru.parse_page import acquire_page, extract_facts_from_dump
+
+LIMIT = 10
 KINOPOISK = 'www.kinopoisk.ru'
 
 
@@ -23,15 +22,17 @@ def get_link_from_html(html):
 
 
 def get_id_by_film(film, load_function=simple_get):
-    url = "http://%s/%s" % (KINOPOISK, 'index.php')
-    #time.sleep(random.randint(1, 16))
-    response = load_function(url, params={'first': 'no', 'what': '',
-                                         'kp_query': film.name})
-    href = get_link_from_html(response.text)
-    id = int(re.findall(r'/film/(\d+)', href)[0])
-    return id
+    params = {
+        'first': 'no',
+        'what': '',
+        'kp_query': film.name
+    }
 
-LIMIT = 10
+    url = "http://%s/%s" % (KINOPOISK, 'index.php')
+    response = load_function(url, params=params)
+
+    href = get_link_from_html(response.text)
+    return int(re.findall(r'/film/(\d+)', href)[0])
 
 
 def get_person(name, kinopoisk_id):
@@ -41,33 +42,31 @@ def get_person(name, kinopoisk_id):
         person = Persons(name=name, photo='', kinopoisk_id=kinopoisk_id)
         person.save()
         print u'Added Person {}'.format(name)
+
     return person
 
 
 def get_genre(name):
     name = name.lower().strip()
     try:
-        genre = Genres.objects.get(name=name)
-        return genre
+        genre = Genres.get_all_genres(get_values=False).get(name=name)
     except Genres.DoesNotExist:
-        genre = Genres(name=name, description='')
+        genre = Genres.add_root(name=name, description='')
         genre.save()
         print u'Added Genre {}'.format(name)
-        return genre
+
+    return genre
 
 
 def get_country(name):
-
     try:
-        return Countries.objects.get(name=name)
+        country = Countries.objects.get(name=name)
     except Countries.DoesNotExist:
         country = Countries(name=name, description='')
         country.save()
         print u'Added Country {}'.format(name)
-        return country
 
-flatland = get_country(u'Флатландию')
-
+    return country
 
 def process_person_dict(film, person_dict):
     try:
@@ -90,8 +89,7 @@ def process_genre_dict(film, genre_dict):
 
 
 def process_country_dict(film, country_dict):
-    if flatland in film.countries.all():
-        film.countries.remove(flatland)
+
     country_object = get_country(country_dict['name'])
     if not country_object in film.countries.all():
         print u"Adding {} country to {} film".format(country_object, film)
@@ -108,12 +106,14 @@ def process_film_facts(film, facts):
 
     for data_entry in facts['Films']:
         film_array.extend(data_entry.items())
+
     for key, value in dict(film_array).items():
         setattr(film, key, value)
+
     film.kinopoisk_lastupdate = now()
     film.save()
-    print u"Updated data for {}".format(film)
 
+    print u"Updated data for {}".format(film)
     for person_dict in facts['Persons']:
         process_person_dict(film, person_dict)
 
@@ -141,12 +141,10 @@ def parse_from_kinopoisk(kinopoisk_id, name=None, film=None):
                          type=APP_FILM_FULL_FILM,
                          release_date=datetime.utcfromtimestamp(0))
             film.save()
+
     try:
         page_dump = acquire_page(film.kinopoisk_id)
         facts = extract_facts_from_dump(page_dump)
         process_film_facts(film, facts)
     except Exception, exception:
         print exception
-
-
-

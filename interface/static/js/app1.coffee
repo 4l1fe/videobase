@@ -653,7 +653,7 @@ class App
       rel = opts.rel || {}
       action_str = action
       action_str+= "d" if action == "subscribe"
-      new_state = state_toggle(rel.status, rel[action_str])
+      new_state = state_toggle(opts.status, rel[action_str])
       if action == "rate"
         console.log opts.value
         if !opts.value
@@ -833,6 +833,7 @@ class Page_Main extends Page
         rating: $("#filter_rating")
         price: $("#filter_price")
         sort: $("#filter_sort")
+        instock: $("#filter_instock")
 
     params = @_app.query_params()
     $.each(@_e.filter, (index) ->

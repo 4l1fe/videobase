@@ -74,7 +74,7 @@ def get_price(film):
     price = -1
     cost = u'бесплатно'
     for location in locations:
-        if location.price < min_price:
+        if min_price > location.price:
             price = min_price
             min_price = location.price
 

@@ -1,23 +1,23 @@
 {% extends "base_feed.html" %}
-        {% block feeditems %}
-            {% for film, actors, directors, poster, trailer, scriptwriter, cost in films %}
-                <item>
-                  <title>{{film.name}}</title>
-                  <link>http://vsevi.ru/film/{{film.id}} </link>
-                  <enclosure url="{{ poster }}" type="image/jpeg"/>
-                  <description><![CDATA[Новинка в кинотеатре "Все видео": Фильм "{{ film.name }}"({{ film.name_orig }}, год: {{film.release_date.year}})
-                      Сводный рейтинг: {{ film.rating_cons}}/10
-                      Смотреть: http://vsevi.ru/film/{{film.id}}
-                      Стоимость:{{ cost }}.
-                      В ролях: {{ actors }}.
-                      Жанр: {% for ganre in film.genres.all %} #{{ganre.name}} {% endfor %}
-                      Режиссер: {{ directors }}.
-                     {{film.description}} http://vsevi.ru/film/{{film.id}}]]>
-                  </description>
-                  <pubDate>
-                    {{date }}
-                  </pubDate>
-                  <guid>http://vsevi.ru/film/{{film.id}}</guid>
-                </item>
-            {% endfor %}
-        {% endblock %}
+
+{% block feeditems %}
+{% for film, actors, directors, poster, trailer, scriptwriters, cost, genres in films %}
+<item>
+  <title>{{ film.name }}</title>
+  <link>http://vsevi.ru/films/{{ film.id }}/</link>
+  <enclosure url="{{ poster }}" type="image/jpeg" />
+  <description><![CDATA[Новинка в кинотеатре "Все видео": Фильм "{{ film.name }}" ({% if film.name_orig %}{{ film.name_orig }}, {% endif %}год: {{film.release_date.year}})<br />
+    Сводный рейтинг: {{ film.rating_cons}}/10<br />
+    Смотреть: http://vsevi.ru/films/{{ film.id }}/<br />
+    Стоимость: {{ cost }}<br>
+    {% if actors %}В ролях: {{ actors }}<br />{% endif %}
+    {% if genres|length %}Жанр: #{{ genres|join:" #" }}<br />{% endif %}
+    {% if directors %}Режиссер: {{ directors }}<br />{% endif %}
+    {% if scriptwriters %}Сценарист: {{ scriptwriters }}<br />{% endif %}
+    {{film.description}} http://vsevi.ru/films/{{ film.id }}]]>
+  </description>
+  <pubDate>{{ date }}</pubDate>
+  <guid>{{ film.id }}</guid>
+</item>
+{% endfor %}
+{% endblock %}
