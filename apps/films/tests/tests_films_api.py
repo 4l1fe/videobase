@@ -17,7 +17,7 @@ from apps.films.constants import (APP_FILM_SERIAL, APP_PERSON_DIRECTOR, APP_PERS
 from apps.users.models.api_session import SessionToken, UsersApiSessions
 from apps.users.constants import FILM_SUBSCRIBE, FILM_COMMENT, FILM_NOTWATCH, FILM_RATE
 from apps.films.models import UsersFilms
-from apps.contents.models import Comments
+from apps.contents.models import Comments, Genres
 from apps.users.models import Feed
 
 
@@ -35,7 +35,7 @@ class FilmsTestCase(APISimpleTestCase):
         self.countries = []
 
         for i in range(4):
-            self.genres.append(GenreFactory.create())
+            self.genres.append(Genres.add_root(instance=GenreFactory.build()))
             self.countries.append(CountriesFactory.create())
         self.genres.append(GenreFactory.create())
 
