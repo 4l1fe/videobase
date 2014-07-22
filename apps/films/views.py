@@ -125,10 +125,6 @@ def index_view(request):
     else:
         resp_dict_data = json.loads(resp_dict_serialized)
 
-    # Для этих 4-х фильмов ставим флаг "отображалсяв в новинках" = true
-    #for film in resp_dict_serialized:
-    #    film.was_shown = True
-
     # Найдем relation для фильмов, если пользователь авторизован
     if request.user.is_authenticated():
         o_user = film_model.UsersFilms.objects.filter(
