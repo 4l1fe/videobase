@@ -3,12 +3,11 @@ Class for fact cheking and information fixing
 '''
 class FactChecker(object):
 
-    checkers = {}
-    correctors = {}
-
     def __init__(self, target_type):
 
         self.target_type = target_type
+        self.checkers = {}
+        self.correctors = {}
 
     def add(self, message, corrector = None):
         '''
@@ -38,6 +37,6 @@ class FactChecker(object):
             for failure in failures:
                 if failure in self.correctors:
                     self.correctors[failure](target)
-        return self.check(target)
+        return failures
 
 
