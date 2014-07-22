@@ -1,11 +1,9 @@
 # coding: utf-8
 
-import os
 from collections import defaultdict
 
 from django.db.models import Q
 from django.core.paginator import Page
-import operator
 
 from rest_framework import serializers
 

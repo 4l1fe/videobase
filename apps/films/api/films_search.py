@@ -16,7 +16,7 @@ from apps.films.models import Films, Genres
 from apps.films.forms import SearchForm
 from apps.films.constants import APP_USERFILM_STATUS_NOT_WATCH, APP_FILMS_API_DEFAULT_PAGE, \
                                  APP_FILMS_API_DEFAULT_PER_PAGE
-from apps.contents.models import Contents, Locations
+from apps.contents.models import Locations
 
 import videobase.settings as settings
 
@@ -38,10 +38,8 @@ class SearchFilmsView(APIView):
     """
 
     def search_by_films(self, filter):
-        o_search = Films.search_manager.extra(
-                where=['EXTRACT(year FROM "films"."release_date") <= %s'],
-                params=[date.today().year],
-            ).order_by('-rating_sort')
+        o_search = Films.search_manager.filter(release_date__lte=date.today())\
+            .order_by('-rating_sort')
 
         # Поиск по имени
         if filter.get('text'):
