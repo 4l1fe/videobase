@@ -67,7 +67,7 @@ class SearchFilmsView(APIView):
                 SELECT "users_films"."film_id" FROM "users_films"
                 WHERE "users_films"."user_id" = %s AND
                       "users_films"."status" = %s AND
-                      "users_films"."rating" != ''
+                      "users_films"."rating" NOT IS NULL
             )
             """
 
@@ -126,7 +126,7 @@ class SearchFilmsView(APIView):
         # Копируем запрос, т.к. в форме его изменяем
         self.get_copy = request.GET.copy()
 
-        if recommend:
+        if recommend or self.get_copy.get('recommend'):
            self.get_copy['recommend'] = True
 
         if use_thread:
