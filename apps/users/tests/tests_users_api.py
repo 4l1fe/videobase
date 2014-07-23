@@ -506,8 +506,8 @@ class APIUsersFilmsTestCase(APITestCase):
 
     def test_api_users_films_200_all_get(self):
         response = self.client.get(reverse(self.url_name, kwargs=self.kwargs),
-                                   data={'type': 's'})
-        ftype = [APP_FILM_SERIAL]
+                                   data={'type': 'all'})
+        ftype = [APP_FILM_SERIAL, APP_FILM_FULL_FILM]
         films = Films.objects.filter(uf_films_rel__user=self.user, type__in=ftype,
                                      uf_films_rel__status=APP_USERFILM_STATUS_PLAYLIST)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -532,8 +532,8 @@ class APIUsersFilmsTestCase(APITestCase):
             self.assertEqual(response.data['items'][i]['ratings']['cons'][0], films[i].rating_cons_cnt)
 
     def test_api_users_films_200_serial_get(self):
-        response = self.client.get(reverse(self.url_name, kwargs=self.kwargs))
-        ftype = [APP_FILM_SERIAL, APP_FILM_FULL_FILM]
+        response = self.client.get(reverse(self.url_name, kwargs=self.kwargs), data={'type': 's'})
+        ftype = [APP_FILM_SERIAL]
         films = Films.objects.filter(uf_films_rel__user=self.user, type__in=ftype,
                                      uf_films_rel__status=APP_USERFILM_STATUS_PLAYLIST)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
