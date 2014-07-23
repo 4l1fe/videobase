@@ -16,7 +16,7 @@ from apps.films.constants import (APP_FILM_SERIAL, APP_PERSON_DIRECTOR, APP_PERS
                                   APP_USERFILM_SUBS_TRUE, APP_USERFILM_SUBS_FALSE, APP_USERFILM_STATUS)
 from apps.users.models.api_session import SessionToken, UsersApiSessions
 from apps.users.constants import FILM_SUBSCRIBE, FILM_COMMENT, FILM_NOTWATCH, FILM_RATE
-from apps.films.models import UsersFilms, Genres
+from apps.films.models import UsersFilms, Genres, FilmExtras
 from apps.contents.models import Comments
 from apps.users.models import Feed
 
@@ -411,7 +411,6 @@ class FilmsTestCase(APISimpleTestCase):
         self.assertEqual(user_film.status, APP_USERFILM_STATUS_NOT_WATCH)
 
 
-
     def test_api_action_not_watch_not_authenticated(self):
         film = self.films[0]
         response = self.client.post(reverse('act_film_notwatch_view', kwargs={'film_id': film.id, 'format': 'json'}))
@@ -514,7 +513,6 @@ class FilmsTestCase(APISimpleTestCase):
         self.assertEqual(users_films.user, self.user)
         self.assertEqual(users_films.rating, float(data['rating']))
 
-
     def test_api_action_rate_bad(self):
         film = self.films[0]
         response = self.client.put(reverse('act_film_rate_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_X_MI_SESSION=self.headers)
@@ -571,7 +569,8 @@ class FilmsTestCase(APISimpleTestCase):
 
     def subscribe_update(self, film):
         film = film
-        obj_val = dict(id=film.id, name=film.name)
+        poster = FilmExtras.get_poster_by_film(film.fe_film_rel.all())
+        obj_val = dict(id=film.id, name=film.name, description=film.description, poster=poster)
         UsersFilmsFactory.create(user=self.user, film=film)
         response = self.client.get(reverse('act_film_subscribe_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_X_MI_SESSION=self.headers)
         users_films = UsersFilms.objects.all().last()
@@ -581,7 +580,6 @@ class FilmsTestCase(APISimpleTestCase):
         self.assertEqual(users_films.film, film)
         self.assertEqual(users_films.user, self.user)
         self.assertEqual(users_films.subscribed, APP_USERFILM_SUBS_TRUE)
-
 
     def test_api_action_subscribe_serial_update(self):
         self.subscribe_update(self.films[1])
