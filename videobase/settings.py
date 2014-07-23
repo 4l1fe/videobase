@@ -343,4 +343,4 @@ CELERY_ACCEPT_CONTENT = ['pickle', 'json', 'msgpack', 'yaml']
 POSTER_URL_PREFIX = '_260x360'
 
 
-# какяа то фигня, надо миграцию доделать
+from local_settings import *
