@@ -147,18 +147,13 @@ def index_view(request):
         except:
             genres_data = []
 
-    # Список рекомендуемых фильмов
-    try:
-        o_recommend = SearchFilmsView.as_view()(request, use_thread=True, recommend=True).data
-        o_recommend = o_recommend['items']
-    except Exception, e:
-        o_recommend = []
-
     # Формируем ответ
     data = {
         'films_new': resp_dict_data,
         'filter_genres': genres_data,
-        'films': o_recommend,
+
+         # Список рекомендуемых фильмов
+        'films': get_recommend_film(request),
     }
 
     return HttpResponse(render_page('index', data), status.HTTP_200_OK)
@@ -282,8 +277,6 @@ def playlist_view(request, film_id=None, *args, **kwargs):
             film = playlist_data[film_id-1]
             film_data, o_film = film_to_view(film.id)
 
-        # Выборка рекоммендаций
-        recommended_films = vbFilm(film_model.Films.similar_default(), many=True).data
 
         # Update playlist
         playlist.update({
@@ -291,7 +284,9 @@ def playlist_view(request, film_id=None, *args, **kwargs):
             'film': film_data,
             'total_cnt': len_playlist,
             'items': vbFilm(playlist_data, many=True).data,
-            'films': recommended_films,
+
+            # Список рекомендуемых фильмов
+            'films': get_recommend_film(request),
         })
 
         return HttpResponse(render_page('playlist', {'playlist': playlist, 'film': film_data}))
@@ -345,3 +340,13 @@ def search_view(request, *args, **kwargs):
             pass
 
     return HttpResponse(render_page('search', resp_dict))
+
+
+def get_recommend_film(request):
+    try:
+        o_recommend = SearchFilmsView.as_view()(request, use_thread=True, recommend=True).data
+        o_recommend = o_recommend['items']
+    except Exception, e:
+        o_recommend = []
+
+    return o_recommend
