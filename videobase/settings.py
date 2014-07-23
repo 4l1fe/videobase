@@ -81,6 +81,7 @@ INSTALLED_APPS = (
     'apps.contents',
     'apps.robots',
     'apps.rss',
+    'apps.git',
     'crawler',
     'social_auth',
     'djcelery',
