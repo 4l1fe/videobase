@@ -3,8 +3,6 @@
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 
-import admin_tools
-
 from videobase import settings
 
 from apps.films.views import test_view
@@ -36,6 +34,9 @@ urlpatterns = patterns('',
 
     # RSS
     url(r'^rss/', include('apps.rss.urls')),
+
+    # GIT
+    url(r'^git/', include('apps.git.urls')),
 )
 
 if settings.DEBUG:
