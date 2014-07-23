@@ -136,7 +136,7 @@ class FilmsTestCase(APISimpleTestCase):
             self.assertEqual(response_data['items'][i]['id'], comments[start_count+i].id)
             self.assertEqual(response_data['items'][i]['text'], comments[start_count+i].text)
             self.assertEqual(response_data['items'][i]['film'], {'id': film.id, 'name': film.name})
-            self.assertEqual(response_data['items'][i]['user'], {'avatar': u'', 'id': user.id, 'user': user.profile.nickname})
+            self.assertEqual(response_data['items'][i]['user'], {'avatar': u'', 'id': user.id, 'user': user.profile.get_name()})
 
     def extras_assert(self, response_data, extras):
         self.assertEqual(response_data['id'], extras.id)

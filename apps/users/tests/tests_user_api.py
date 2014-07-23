@@ -12,6 +12,7 @@ from utils.common import random_string
 class APIUserTestCase(APITestCase):
     def setUp(self):
         self.user = UserFactory.create()
+
         self.profile = self.user.profile
         self.url_name = ''
         s_token = SessionToken.objects.create(user=self.user)
@@ -36,7 +37,7 @@ class APIUserInfoTestCase(APIUserTestCase):
     def test_api_user_info_get(self):
         response = self.client.get(reverse(self.url_name, kwargs={'format': 'json'}), HTTP_X_MI_SESSION=self.headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(self.profile.nickname, response.data['name'])
+        self.assertEqual(self.profile.get_name(), response.data['name'])
         self.assertEqual(self.user.id, response.data['id'])
         self.assertEqual(self.user.email, response.data['email'])
 
@@ -47,7 +48,7 @@ class APIUserInfoTestCase(APIUserTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         user = User.objects.get(pk=self.user.pk)
-        self.assertEqual(user.profile.nickname, name)
+        self.assertEqual(user.profile.get_name(), name)
 
     def test_api_user_info_post_not_valid_name(self):
         not_valid_name = random_string(size=31)
@@ -56,7 +57,7 @@ class APIUserInfoTestCase(APIUserTestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
         user = User.objects.get(pk=self.user.pk)
-        self.assertNotEqual(user.profile.nickname, not_valid_name)
+        self.assertNotEqual(user.profile.get_name(), not_valid_name)
 
     def test_api_user_info_post_valid_email(self):
         email = 'wolko_dav@mail.ru'
@@ -80,14 +81,12 @@ class APIUserInfoTestCase(APIUserTestCase):
         name = 'admin_admin'
         email = 'wolko_dav@mail.ru'
         response = self.client.post(reverse(self.url_name, kwargs={'format': 'json'}),
-                                    data={'email': email,
-                                          'name': name},
-                                    HTTP_X_MI_SESSION=self.headers)
+                                    data={'email': email, 'name': name}, HTTP_X_MI_SESSION=self.headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         user = User.objects.get(pk=self.user.pk)
         self.assertEqual(user.email, email)
-        self.assertEqual(user.profile.nickname, name)
+        self.assertEqual(user.profile.get_name(), name)
 
 
 class APIUserPasswordTestCase(APIUserTestCase):
