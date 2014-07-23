@@ -552,7 +552,8 @@ class FilmsTestCase(APISimpleTestCase):
 
     def add_subscribe_ok(self, film):
         film = film
-        obj_val = dict(id=film.id, name=film.name)
+        poster = FilmExtras.get_poster_by_film(film.fe_film_rel.all())
+        obj_val = dict(id=film.id, name=film.name, description=film.description, poster=poster)
         response = self.client.get(reverse('act_film_subscribe_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_X_MI_SESSION=self.headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         users_films = UsersFilms.objects.all().last()
@@ -613,7 +614,8 @@ class FilmsTestCase(APISimpleTestCase):
     def subscribe_delete_ok(self, film):
         film = film
         UsersFilmsFactory.create(user=self.user, film=film, subscribed=APP_USERFILM_SUBS_TRUE)
-        obj_val = dict(id=film.id, name=film.name)
+        poster = FilmExtras.get_poster_by_film(film.fe_film_rel.all())
+        obj_val = dict(id=film.id, name=film.name, description=film.description, poster=poster)
         FeedFactory.create(user=self.user, type=FILM_SUBSCRIBE, object=obj_val)
         response = self.client.delete(
             reverse('act_film_subscribe_view', kwargs={'film_id': film.id, 'format': 'json'}),
