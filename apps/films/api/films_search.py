@@ -66,8 +66,8 @@ class SearchFilmsView(APIView):
             NOT "films"."id" IN (
                 SELECT "users_films"."film_id" FROM "users_films"
                 WHERE "users_films"."user_id" = %s AND
-                      "users_films"."status" = %s AND
-                      "users_films"."rating" NOT IS NULL
+                      ("users_films"."status" = %s OR
+                      "users_films"."rating" IS NOT NULL)
             )
             """
 
@@ -130,7 +130,7 @@ class SearchFilmsView(APIView):
            self.get_copy['recommend'] = True
 
         if use_thread:
-            request = get_current_request()
+            self.request = get_current_request()
 
         # Валидируем форму
         form = SearchForm(data=self.get_copy)
