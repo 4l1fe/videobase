@@ -43,11 +43,13 @@ class APIUsersFriendShipActionTestCase(APISimpleTestCase):
         kw['user_id'] = user.pk
         response = self.client.get(reverse(self.url_name, kwargs=kw),
                                    HTTP_X_MI_SESSION=self.headers)
+
         flag = UsersRels.objects.filter(user=self.user, user_rel=user).exists()
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(flag, True)
+
         feed = Feed.objects.last()
-        obj_val = dict(id=user.id, name=user.profile.get_name(), avatar='')
+        obj_val = dict(id=user.id, name=user.username, avatar='')
         self.assertEqual(feed.user, self.user)
         self.assertEqual(feed.type, USER_ASK)
         self.assertDictEqual(feed.object, obj_val)
@@ -56,7 +58,7 @@ class APIUsersFriendShipActionTestCase(APISimpleTestCase):
         user = UserFactory.create()
         kw = self.kwargs.copy()
         kw['user_id'] = user.pk
-        obj_val = dict(id=user.id, name=user.profile.get_name(), avatar='')
+        obj_val = dict(id=user.id, name=user.username, avatar='')
         UserRelsFactory.create(user=user, user_rel=self.user, rel_type=APP_USER_REL_TYPE_FRIENDS)
         FeedFactory.create(user=self.user, type=USER_ASK, object=obj_val)
         response = self.client.get(reverse(self.url_name, kwargs=kw),
@@ -70,7 +72,8 @@ class APIUsersFriendShipActionTestCase(APISimpleTestCase):
         user = UserFactory.create()
         kw = self.kwargs.copy()
         kw['user_id'] = user.pk
-        obj_val = dict(id=user.id, name=user.profile.get_name(), avatar='')
+
+        obj_val = dict(id=user.id, name=user.username, avatar='')
         UserRelsFactory.create(user=self.user, user_rel=user)
         FeedFactory.create(user=self.user, type=USER_ASK, object=obj_val)
         response = self.client.delete(reverse(self.url_name, kwargs=kw),
