@@ -450,7 +450,6 @@ class FilmsTestCase(APISimpleTestCase):
         self.assertEqual(users_films.film, film)
         self.assertEqual(users_films.user, self.user)
         self.assertEqual(users_films.status, APP_USERFILM_STATUS_PLAYLIST)
-        self.assertEqual(users_films.subscribed, APP_USERFILM_SUBS_TRUE)
 
     def test_api_action_playlist_already_exist(self):
         film = self.films[0]
@@ -485,8 +484,7 @@ class FilmsTestCase(APISimpleTestCase):
         users_films = UsersFilms.objects.all().last()
         self.assertEqual(users_films.film, film)
         self.assertEqual(users_films.user, self.user)
-        self.assertEqual(users_films.status, APP_USERFILM_STATUS_PLAYLIST)
-        self.assertEqual(users_films.subscribed, APP_USERFILM_SUBS_FALSE)
+        self.assertEqual(users_films.status, APP_USERFILM_STATUS_UNDEF)
 
     def test_api_action_rate_add(self):
         film = self.films[0]
