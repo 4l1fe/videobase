@@ -122,12 +122,12 @@ class SearchFilmsView(APIView):
         return filter
 
 
-    def get(self, request, format=None, recommend=False, use_thread=False,  *args, **kwargs):
+    def get(self, request, format=None, recommend=False, use_thread=False, *args, **kwargs):
         # Копируем запрос, т.к. в форме его изменяем
         self.get_copy = request.GET.copy()
 
         if recommend or self.get_copy.get('recommend'):
-           self.get_copy['recommend'] = True
+            self.get_copy['recommend'] = True
 
         if use_thread:
             self.request = get_current_request()
@@ -137,8 +137,8 @@ class SearchFilmsView(APIView):
 
         if form.is_valid():
             # Init data
-            location_group = 1 if 'price' in form.data or 'instock' in form.data else 0
             filter = self.validation_pagination(self.get_copy.get('page'), self.get_copy.get('per_page'), form.cleaned_data)
+            location_group = 1 if filter.get('price') or filter.get('instock') else 0
 
             # Init cache params
             use_cache = self.use_cache()
