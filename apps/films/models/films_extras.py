@@ -85,10 +85,8 @@ class FilmExtras(PhotoClass):
         Пример использования FilmExtras.get_poster_by_film(film_ins.fe_film_rel.all())
         """
 
-        # if not isinstance(film_extras, QuerySet):
-        #     raise TypeError('film_extras is not a QuerySet')
-        # elif not film_extras.exists():
-        #     raise EmptyQuerySet('films_extras has not items')
+        if not isinstance(film_extras, QuerySet):
+            raise TypeError('film_extras is not a QuerySet')
 
         poster = ''
         for fe in film_extras:  # в каком-то есть изображение
