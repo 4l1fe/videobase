@@ -34,7 +34,13 @@ html
                                                     span=film.name_orig
                                         .col-md-4.col-sm-5
                                             .range-block-playlist.cf
-                                                a.sprite.sprite-go-view.block.fright(href='#', title='Добавить в плейлист', alt="Добавить в плейлист")#playlist_btn
+                                                if film.relation && film.relation.subscribed
+                                                    - cls = "sprite-listof-view"
+                                                    - text = "Удалить из плейлиста"
+                                                else
+                                                    - cls = "sprite-liston-view"
+                                                    - text = "Добавить в плейлист"
+                                                a.sprite.block.fright(href='#', title=text, alt=text,class=cls)#playlist_btn
                                                 .range-style2.fright
                                                     .rateit(data-rateit-max=10,data-rateit-min=0,data-rateit-step=1,data-rateit-resetable=1,data-rateit-value=(film.relation && film.relation.rating)?film.relation.rating:0)#rateit
                                                 //-

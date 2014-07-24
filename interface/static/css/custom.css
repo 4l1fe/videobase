@@ -651,7 +651,7 @@ a.btn-more-friends, .btn-more-friends {
     padding-bottom: 20px;
     line-height: 0px;font-size: 0px;padding-top: 3px;
 }
-.img-person-playlist img {max-width: 100%}
+.img-person-playlist img {width: 100%; max-width: 260px;}
 .img-person img {width: 211px;}
 .person-info {padding-left: 50px;}
 .person-name span, .person-data {
@@ -875,6 +875,7 @@ a.toggle-playlist.active {
 .actor-list li {
     padding-top: 5px;
     width: 210px;height: 76px;
+    overflow: hidden;
 }
 .actor-list {padding-top: 10px;padding-bottom: 20px;}
 
@@ -950,8 +951,8 @@ a.toggle-playlist.active {
 .sprite-i-toggle-bottom{ background-position: right -1236px;}
 .sprite-i-triangle{ background-position: 0 -1298px; width: 50px; height: 44px; }
 .sprite-i-tv{ background-position: 0 -1392px; width: 32px; height: 33px; }
-.sprite-stop-view { background-position: 0 -1490px; width: 27px; height: 20px;margin-left: 12px;}
-.sprite-go-view { background-position: 0 -1587px; width: 27px; height: 20px;margin-left: 12px; }
+.sprite-listof-view { background-position: 0 -1490px; width: 27px; height: 20px;margin-left: 12px;}
+.sprite-liston-view { background-position: 0 -1587px; width: 27px; height: 20px;margin-left: 12px; }
 .sprite-i-user{ background-position: 0 -1665px; width: 19px; height: 20px; }
 .sprite-del-view { background-position: 0 -1750px; width: 27px; height: 20px;margin-left: 12px; }
 .sprite-i-view{ background-position: 0 -1848px;}
@@ -986,6 +987,7 @@ a.toggle-playlist.active {
     }
     .choose-def .btn-film {float: none;margin: 0 auto;}
     #films_new .film-thumb:nth-child(4) {display: none}
+    .row {margin: 0}
 }
 
 .list-btns-film {text-align: center;}
