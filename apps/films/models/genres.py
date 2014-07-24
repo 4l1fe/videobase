@@ -28,7 +28,7 @@ class Genres(NS_Node):
 
     @classmethod
     def get_all_genres(cls, get_values=True):
-        query = cls.objects.extra(where=['lft-rgt=-1']).order_by('name')
+        query = cls.objects.extra(where=['lft-rgt=-1']).order_by('tree_id')
         return query.values('id', 'name') if get_values else query
 
 
