@@ -72,8 +72,8 @@ class Page
   isVisible: ->
     return @_visible
 
-  user_is_auth: ->
-    return @_app.user_is_auth()
+  user_is_auth: (modal) ->
+    return @_app.user_is_auth(modal)
 
 class Item
   constructor: (opts = {}, callback = undefined) ->
@@ -527,8 +527,9 @@ class FilmsDeck extends Deck
     $(window).resize(=> @onchange())
 
   onchange: (global = false) ->
+    body_width = $("body").width()
     items_inrow = Math.floor($("body").width() / 250)
-    if items_inrow > 4
+    if body_width > 974 || items_inrow > 4
       items_inrow = 4
     if items_inrow < 2
       items_inrow = 2
@@ -605,10 +606,11 @@ class App
     q = @query_params("q")
     @_e.search.input.val(q) if q
 
+    @auth_modal = $("#reg_enter")
+
     if name != undefined
       @show_page(name, conf.page_conf)
 
-    @auth_modal = $("#reg-enter")
 
     $("#login_btn").click (e)=>
       e.preventDefault()
@@ -620,6 +622,26 @@ class App
       e.preventDefault()
       e.stopPropagation()
       @show_modal("reg")
+
+    current_url = encodeURI(window.location.href.toString().split(window.location.host)[1])
+    $("form", @auth_modal).each ->
+      $this = $(this)
+      action = $this.attr("action")
+      if /\?/.test(action)
+        action+= "&"
+      else
+        action+= "?"
+      $this.attr("action", action + "next=" + current_url)
+
+    $("a", $(".soc-hor", @auth_modal)).each ->
+      $this = $(this)
+      href = $this.attr("href")
+      if /\?/.test(href)
+        href+= "&"
+      else
+        href+= "?"
+      $this.attr("href", href + "next=" + current_url)
+
 
   show_modal: (index) ->
     index = "reg" if index == undefined
@@ -655,7 +677,6 @@ class App
       action_str+= "d" if action == "subscribe"
       new_state = state_toggle(opts.status, rel[action_str])
       if action == "rate"
-        console.log opts.value
         if !opts.value
           @rest.films.action.rate.destroy(id)
           .done(
@@ -706,6 +727,7 @@ class App
       return conf[name]
 
   user_is_auth: (ask_sign_in = true) ->
+    console.log @auth_modal
     if !@rest.has_auth()
       if ask_sign_in
         @auth_modal.modal("show")
@@ -769,12 +791,12 @@ class App
       name = active_page
     if pages[name]
       return pages[name]
-    try
-      page_obj = new (eval("Page_" + name))(conf)
-      return pages[name] = page_obj
-    catch
-      error "Unable to init page " + name, "crit"
-      return undefined
+    #try
+    page_obj = new (eval("Page_" + name))(conf)
+    return pages[name] = page_obj
+    #catch
+#      error "Unable to init page " + name, "crit"
+#      return undefined
 
 class Page_Simple extends Page
 
@@ -826,16 +848,17 @@ class Page_Main extends Page
       ->
         new FilmThumb({place: $(this), do_not_set: true})
     )
-
     @_e.filter =
         genre: $("#filter_genres")
         year_old: $("#filter_year_old")
         rating: $("#filter_rating")
         price: $("#filter_price")
         sort: $("#filter_sort")
-        instock: $("#filter_instock")
 
     params = @_app.query_params()
+    params["price"] = (params["price"] || "") + "|"
+    params["price"]+= params["instock"] if params["instock"]
+
     $.each(@_e.filter, (index) ->
       el = this
       el._title = $(".sprite > span", el)
@@ -865,7 +888,7 @@ class Page_Main extends Page
     if (films_deck.get_items().length >= 12)
       @load_more_films(films_deck, {page: 2})
     else
-      films_deck.load_more_hide()
+      films_deck.load_more_hide(false)
 
   filter_changed: (text) ->
     _filter_counter++
@@ -894,12 +917,27 @@ class Page_Main extends Page
 
     for key, el of @_e.filter
       val = el._selected._val
-      if val && val != "0"
-        _filter_params[key] = val
-        query_string+= "&" if query_string
-        query_string+= key + "=" + val
+      if key == "price"
+        vals = val.split("|")
+        if vals[0] || vals[0] == "0"
+          _filter_params["price"] = vals[0]
+          query_string+= "&" if query_string
+          query_string+= "price=" + vals[0]
+        else
+          _filter_params["price"] = null
+        if vals[1] || vals[1] == "0"
+          _filter_params["instock"] = vals[1]
+          query_string+= "&" if query_string
+          query_string+= "instock=" + vals[1]
+        else
+          _filter_params["instock"] = null
       else
-        _filter_params[key] = null
+        if val && val != "0"
+          _filter_params[key] = val
+          query_string+= "&" if query_string
+          query_string+= key + "=" + val
+        else
+          _filter_params[key] = null
 
     query_string = "?" + query_string if query_string
     if update_href
@@ -909,6 +947,7 @@ class Page_Main extends Page
   load_more_films: (deck, opts = {}) ->
     deck.load_more_hide()
     params = $.extend(_filter_params, opts.params || {})
+    params["recommend"] = 1 if @user_is_auth(false)
     if opts.clear_output
       deck.clear()
       params.page = 1
@@ -922,14 +961,19 @@ class Page_Main extends Page
         if data.items
           deck.add_items(data.items)
           if data.items.length >= 12
-           deck.load_more_show()
+            deck.load_more_show()
+          else
+            deck.load_more_hide(false)
           deck.page = data.page
           if opts.clear_output
             scroll_to_obj $("#filter_content")
+        else
+          deck.load_more_hide(false)
         opts.callback() if opts.callback
     )
     .fail(
       (data) =>
+        deck.load_more_hide(false)
     )
 
 # implementing Login and Register Page class
@@ -960,7 +1004,7 @@ class Page_Film extends Page
     @_e.rateit = $("#rateit")
     @_e.rateit
     .bind("beforerated beforereset", (event) =>
-      if !@user_is_auth() && false
+      if !@user_is_auth()
         event.preventDefault()
     )
     .bind "rated", (event) => console.log @_e.rateit.rateit("value"); @action_rate(@_e.rateit.rateit("value"))
@@ -1014,14 +1058,14 @@ class Page_Film extends Page
                 loc_price = 1
       if !loc_id
         loc_id = loc_price_id
-      @play_location(loc_id) if loc_id
+      @play_location(loc_id, false) if loc_id
 
-  play_location: (id) ->
-    @player.load(locations[id]) if locations[id]
+  play_location: (id, scroll = false) ->
+    @player.load(locations[id], scroll) if locations[id]
     return false
 
   load_all_actors: () ->
-    actors_deck.load_more_hide();
+    actors_deck.load_more_hide(false);
     @_app.rest.films.persons.read(@conf.id, {type: "a", top: actors_deck.get_items().length})
     .done(
       (data)=>
@@ -1094,9 +1138,14 @@ class Page_Person extends Page
           if data.items.length >= 12
             deck.load_more_show()
             deck.page = data.page
+          else
+            deck.load_more_hide(false)
+        else
+          deck.load_more_hide(false)
     )
     .fail(
       (data) =>
+        deck.load_more_hide(false)
     )
 
 class Page_Playlist extends Page
@@ -1111,6 +1160,41 @@ class Page_Playlist extends Page
           $('.toggle-playlist span').text('Скрыть плейлист')
         else
           $('.toggle-playlist span').text('Показать плейлист');
+    $("#playlistof_btn").bind("click", =>
+      @_app.film_action(@conf.id, "playlist", {
+        status: false
+        rel: @conf.relation
+        callback: =>
+          if @conf.next && @conf.next.id
+            location.href = "/playlist/" + @conf.id + "/"
+          else if @conf.previous && @conf.previous.id
+            location.href = "/playlist/" + @conf.previous.id + "/"
+          else
+            location.href = "/playlist/"
+      })
+    )
+    if $('#slider-playlist').size() > 0
+      params =
+        auto: false
+        responsive: true
+        height: 'variable'
+        items:
+          width: 100
+          height: 'variable'
+        swipe:
+          onMouse: true
+          onTouch: true
+        scroll:
+          items: 1
+          duration: 1100
+        prev:
+          button: '.prev-slide-playlist'
+          key: 'left'
+        next:
+          button: '.next-slide-playlist'
+          key: 'right'
+
+      $('#slider-playlist').carouFredSel params
 
 class Page_Feed extends Page
   feed_deck = undefined
@@ -1132,9 +1216,14 @@ class Page_Feed extends Page
           if data.items.length >= 12
             deck.load_more_show()
             deck.page = data.page
+          else
+            deck.load_more_hide(false)
+        else
+          deck.load_more_hide(false)
     )
     .fail(
       (data) =>
+        deck.load_more_hide(false)
     )
 
 class Page_Account extends Page
@@ -1206,9 +1295,12 @@ class Page_User extends Page
           if data.items.length >= 12
             deck.load_more_show()
             deck.page = data.page
+          else deck.load_more_hide(false)
+        else deck.load_more_hide(false)
     )
     .fail(
       (data) =>
+        deck.load_more_hide(false)
     )
 
   load_more_feed: (deck) ->
@@ -1223,9 +1315,14 @@ class Page_User extends Page
           if data.items.length >= 12
             deck.load_more_show()
             deck.page = data.page
+          else
+            deck.load_more_hide(false)
+        else
+          deck.load_more_hide(false)
     )
     .fail(
       (data) =>
+        deck.load_more_hide(false)
     )
 
 window.InitApp =  (opts = {}, page_name) ->
