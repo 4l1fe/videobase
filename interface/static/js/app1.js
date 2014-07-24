@@ -118,8 +118,8 @@
       return this._visible;
     };
 
-    Page.prototype.user_is_auth = function() {
-      return this._app.user_is_auth();
+    Page.prototype.user_is_auth = function(modal) {
+      return this._app.user_is_auth(modal);
     };
 
     return Page;
@@ -865,12 +865,13 @@
     }
 
     FilmsDeck.prototype.onchange = function(global) {
-      var el, i, items_inrow, _i, _ref, _results;
+      var body_width, el, i, items_inrow, _i, _ref, _results;
       if (global == null) {
         global = false;
       }
+      body_width = $("body").width();
       items_inrow = Math.floor($("body").width() / 250);
-      if (items_inrow > 4) {
+      if (body_width > 974 || items_inrow > 4) {
         items_inrow = 4;
       }
       if (items_inrow < 2) {
@@ -935,7 +936,7 @@
     query_params = void 0;
 
     function App(opts, name) {
-      var q;
+      var current_url, q;
       if (opts == null) {
         opts = {};
       }
@@ -987,10 +988,10 @@
       if (q) {
         this._e.search.input.val(q);
       }
+      this.auth_modal = $("#reg_enter");
       if (name !== void 0) {
         this.show_page(name, conf.page_conf);
       }
-      this.auth_modal = $("#reg-enter");
       $("#login_btn").click((function(_this) {
         return function(e) {
           e.preventDefault();
@@ -1006,6 +1007,29 @@
           return _this.show_modal("reg");
         };
       })(this));
+      current_url = encodeURI(window.location.href.toString().split(window.location.host)[1]);
+      $("form", this.auth_modal).each(function() {
+        var $this, action;
+        $this = $(this);
+        action = $this.attr("action");
+        if (/\?/.test(action)) {
+          action += "&";
+        } else {
+          action += "?";
+        }
+        return $this.attr("action", action + "next=" + current_url);
+      });
+      $("a", $(".soc-hor", this.auth_modal)).each(function() {
+        var $this, href;
+        $this = $(this);
+        href = $this.attr("href");
+        if (/\?/.test(href)) {
+          href += "&";
+        } else {
+          href += "?";
+        }
+        return $this.attr("href", href + "next=" + current_url);
+      });
     }
 
     App.prototype.show_modal = function(index) {
@@ -1062,7 +1086,6 @@
         }
         new_state = state_toggle(opts.status, rel[action_str]);
         if (action === "rate") {
-          console.log(opts.value);
           if (!opts.value) {
             return this.rest.films.action.rate.destroy(id).done(function() {
               if (opts.rel) {
@@ -1142,6 +1165,7 @@
       if (ask_sign_in == null) {
         ask_sign_in = true;
       }
+      console.log(this.auth_modal);
       if (!this.rest.has_auth()) {
         if (ask_sign_in) {
           this.auth_modal.modal("show");
@@ -1231,13 +1255,8 @@
       if (pages[name]) {
         return pages[name];
       }
-      try {
-        page_obj = new (eval("Page_" + name))(conf);
-        return pages[name] = page_obj;
-      } catch (_error) {
-        error("Unable to init page " + name, "crit");
-        return void 0;
-      }
+      page_obj = new (eval("Page_" + name))(conf);
+      return pages[name] = page_obj;
     };
 
     return App;
@@ -1346,10 +1365,13 @@
         year_old: $("#filter_year_old"),
         rating: $("#filter_rating"),
         price: $("#filter_price"),
-        sort: $("#filter_sort"),
-        instock: $("#filter_instock")
+        sort: $("#filter_sort")
       };
       params = this._app.query_params();
+      params["price"] = (params["price"] || "") + "|";
+      if (params["instock"]) {
+        params["price"] += params["instock"];
+      }
       $.each(this._e.filter, function(index) {
         var el;
         el = this;
@@ -1386,7 +1408,7 @@
           page: 2
         });
       } else {
-        films_deck.load_more_hide();
+        films_deck.load_more_hide(false);
       }
     }
 
@@ -1414,7 +1436,7 @@
     };
 
     Page_Main.prototype.update_filter_params = function(update_href) {
-      var el, key, query_string, val, _ref;
+      var el, key, query_string, val, vals, _ref;
       if (update_href == null) {
         update_href = true;
       }
@@ -1430,14 +1452,36 @@
       for (key in _ref) {
         el = _ref[key];
         val = el._selected._val;
-        if (val && val !== "0") {
-          _filter_params[key] = val;
-          if (query_string) {
-            query_string += "&";
+        if (key === "price") {
+          vals = val.split("|");
+          if (vals[0] || vals[0] === "0") {
+            _filter_params["price"] = vals[0];
+            if (query_string) {
+              query_string += "&";
+            }
+            query_string += "price=" + vals[0];
+          } else {
+            _filter_params["price"] = null;
           }
-          query_string += key + "=" + val;
+          if (vals[1] || vals[1] === "0") {
+            _filter_params["instock"] = vals[1];
+            if (query_string) {
+              query_string += "&";
+            }
+            query_string += "instock=" + vals[1];
+          } else {
+            _filter_params["instock"] = null;
+          }
         } else {
-          _filter_params[key] = null;
+          if (val && val !== "0") {
+            _filter_params[key] = val;
+            if (query_string) {
+              query_string += "&";
+            }
+            query_string += key + "=" + val;
+          } else {
+            _filter_params[key] = null;
+          }
         }
       }
       if (query_string) {
@@ -1457,6 +1501,9 @@
       }
       deck.load_more_hide();
       params = $.extend(_filter_params, opts.params || {});
+      if (this.user_is_auth(false)) {
+        params["recommend"] = 1;
+      }
       if (opts.clear_output) {
         deck.clear();
         params.page = 1;
@@ -1473,18 +1520,24 @@
             deck.add_items(data.items);
             if (data.items.length >= 12) {
               deck.load_more_show();
+            } else {
+              deck.load_more_hide(false);
             }
             deck.page = data.page;
             if (opts.clear_output) {
               scroll_to_obj($("#filter_content"));
             }
+          } else {
+            deck.load_more_hide(false);
           }
           if (opts.callback) {
             return opts.callback();
           }
         };
       })(this)).fail((function(_this) {
-        return function(data) {};
+        return function(data) {
+          return deck.load_more_hide(false);
+        };
       })(this));
     };
 
@@ -1555,7 +1608,7 @@
       this._e.rateit = $("#rateit");
       this._e.rateit.bind("beforerated beforereset", (function(_this) {
         return function(event) {
-          if (!_this.user_is_auth() && false) {
+          if (!_this.user_is_auth()) {
             return event.preventDefault();
           }
         };
@@ -1646,20 +1699,23 @@
           loc_id = loc_price_id;
         }
         if (loc_id) {
-          this.play_location(loc_id);
+          this.play_location(loc_id, false);
         }
       }
     }
 
-    Page_Film.prototype.play_location = function(id) {
+    Page_Film.prototype.play_location = function(id, scroll) {
+      if (scroll == null) {
+        scroll = false;
+      }
       if (locations[id]) {
-        this.player.load(locations[id]);
+        this.player.load(locations[id], scroll);
       }
       return false;
     };
 
     Page_Film.prototype.load_all_actors = function() {
-      actors_deck.load_more_hide();
+      actors_deck.load_more_hide(false);
       this._app.rest.films.persons.read(this.conf.id, {
         type: "a",
         top: actors_deck.get_items().length
@@ -1776,11 +1832,17 @@
             if (data.items.length >= 12) {
               deck.load_more_show();
               return deck.page = data.page;
+            } else {
+              return deck.load_more_hide(false);
             }
+          } else {
+            return deck.load_more_hide(false);
           }
         };
       })(this)).fail((function(_this) {
-        return function(data) {};
+        return function(data) {
+          return deck.load_more_hide(false);
+        };
       })(this));
     };
 
@@ -1792,7 +1854,7 @@
     __extends(Page_Playlist, _super);
 
     function Page_Playlist(conf) {
-      var film_page;
+      var film_page, params;
       this.conf = conf;
       Page_Playlist.__super__.constructor.apply(this, arguments);
       film_page = new Page_Film(this.conf);
@@ -1807,6 +1869,51 @@
           }
         });
       });
+      $("#playlistof_btn").bind("click", (function(_this) {
+        return function() {
+          return _this._app.film_action(_this.conf.id, "playlist", {
+            status: false,
+            rel: _this.conf.relation,
+            callback: function() {
+              if (_this.conf.next && _this.conf.next.id) {
+                return location.href = "/playlist/" + _this.conf.id + "/";
+              } else if (_this.conf.previous && _this.conf.previous.id) {
+                return location.href = "/playlist/" + _this.conf.previous.id + "/";
+              } else {
+                return location.href = "/playlist/";
+              }
+            }
+          });
+        };
+      })(this));
+      if ($('#slider-playlist').size() > 0) {
+        params = {
+          auto: false,
+          responsive: true,
+          height: 'variable',
+          items: {
+            width: 100,
+            height: 'variable'
+          },
+          swipe: {
+            onMouse: true,
+            onTouch: true
+          },
+          scroll: {
+            items: 1,
+            duration: 1100
+          },
+          prev: {
+            button: '.prev-slide-playlist',
+            key: 'left'
+          },
+          next: {
+            button: '.next-slide-playlist',
+            key: 'right'
+          }
+        };
+        $('#slider-playlist').carouFredSel(params);
+      }
     }
 
     return Page_Playlist;
@@ -1850,11 +1957,17 @@
             if (data.items.length >= 12) {
               deck.load_more_show();
               return deck.page = data.page;
+            } else {
+              return deck.load_more_hide(false);
             }
+          } else {
+            return deck.load_more_hide(false);
           }
         };
       })(this)).fail((function(_this) {
-        return function(data) {};
+        return function(data) {
+          return deck.load_more_hide(false);
+        };
       })(this));
     };
 
@@ -1977,11 +2090,17 @@
             if (data.items.length >= 12) {
               deck.load_more_show();
               return deck.page = data.page;
+            } else {
+              return deck.load_more_hide(false);
             }
+          } else {
+            return deck.load_more_hide(false);
           }
         };
       })(this)).fail((function(_this) {
-        return function(data) {};
+        return function(data) {
+          return deck.load_more_hide(false);
+        };
       })(this));
     };
 
@@ -2001,11 +2120,17 @@
             if (data.items.length >= 12) {
               deck.load_more_show();
               return deck.page = data.page;
+            } else {
+              return deck.load_more_hide(false);
             }
+          } else {
+            return deck.load_more_hide(false);
           }
         };
       })(this)).fail((function(_this) {
-        return function(data) {};
+        return function(data) {
+          return deck.load_more_hide(false);
+        };
       })(this));
     };
 
@@ -2022,5 +2147,3 @@
   };
 
 }).call(this);
-
-//# sourceMappingURL=app1.map
