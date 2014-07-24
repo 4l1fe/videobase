@@ -112,8 +112,8 @@ def index_view(request):
 
         # Фильмы показывались => ставим флаг просмотрено в true
         for film in o_film:
-             film.was_shown = True
-             film.save()
+            film.was_shown = True
+            film.save()
 
         # Сериализуем новинки и конвертируем результат в строку
         resp_dict_data = vbFilm(o_film, require_relation=False, extend=True, many=True).data
