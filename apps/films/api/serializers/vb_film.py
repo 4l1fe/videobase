@@ -69,7 +69,6 @@ class vbFilm(serializers.ModelSerializer):
 
     # Признак person
     persons = serializers.SerializerMethodField('persons_list')
-    # persons = vbPerson()
 
 
     def __init__(self, *args, **kwargs):
