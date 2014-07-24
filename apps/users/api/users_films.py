@@ -1,5 +1,4 @@
 # coding: utf-8
-
 from django.core.paginator import Paginator
 
 from rest_framework import status
