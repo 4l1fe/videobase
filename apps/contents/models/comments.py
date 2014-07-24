@@ -18,20 +18,6 @@ class Comments(models.Model):
     created    = models.DateTimeField(auto_now_add=True, verbose_name=u'Создан')
 
 
-    def as_vbComment(self):
-        try:
-            user_profile = UsersProfile.objects.get(user = self.user)
-        except UsersProfile.DoesNotExist :
-            raise NameError("UserProfile doesn't exist for this user")
-
-
-        return {'user':user_profile.as_comment_vbUser(),
-                'films': {self.content.film.name,
-                          self.content.film.id},
-                'text': self.text,
-                'created': self.created
-        }
-
     def __unicode__(self):
         return u'[{0}] {1} ({2})'.format(self.pk, self.user, self.content)
 

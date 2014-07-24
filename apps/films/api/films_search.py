@@ -66,8 +66,8 @@ class SearchFilmsView(APIView):
             NOT "films"."id" IN (
                 SELECT "users_films"."film_id" FROM "users_films"
                 WHERE "users_films"."user_id" = %s AND
-                      "users_films"."status" = %s AND
-                      "users_films"."rating" != ''
+                      ("users_films"."status" = %s OR
+                      "users_films"."rating" IS NOT NULL)
             )
             """
 
@@ -122,23 +122,23 @@ class SearchFilmsView(APIView):
         return filter
 
 
-    def get(self, request, format=None, recommend=False, use_thread=False,  *args, **kwargs):
+    def get(self, request, format=None, recommend=False, use_thread=False, *args, **kwargs):
         # Копируем запрос, т.к. в форме его изменяем
         self.get_copy = request.GET.copy()
 
-        if recommend:
-           self.get_copy['recommend'] = True
+        if recommend or self.get_copy.get('recommend'):
+            self.get_copy['recommend'] = True
 
         if use_thread:
-            request = get_current_request()
+            self.request = get_current_request()
 
         # Валидируем форму
         form = SearchForm(data=self.get_copy)
 
         if form.is_valid():
             # Init data
-            location_group = 1 if 'price' in form.data or 'instock' in form.data else 0
             filter = self.validation_pagination(self.get_copy.get('page'), self.get_copy.get('per_page'), form.cleaned_data)
+            location_group = 1 if filter.get('price') or filter.get('instock') else 0
 
             # Init cache params
             use_cache = self.use_cache()
