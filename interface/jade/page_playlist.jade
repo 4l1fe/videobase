@@ -56,7 +56,7 @@ html
                                                     span=film.name_orig
                                         .col-md-4.col-sm-5
                                             .range-block-playlist.cf
-                                                a.sprite.sprite-go-view.block.fright(href='#', title='')#playlist_btn
+                                                a.sprite.sprite-listof-view.block.fright(href='#', title='Удалить из плейлиста')#playlistof_btn
                                                 .range-style2.fright
                                                     .rateit(data-rateit-max=10,data-rateit-step=1,data-rateit-resetable=1,data-rateit-value=(film.relation && film.relation.rating)?film.relation.rating:0)#rateit
                                                 //-
@@ -84,21 +84,28 @@ html
                                     .container
                                         .playlist-wrap
                                             .playlist-slider-wrap.cf.rel.zmin
+                                                - index = 0
                                                 ul#slider-playlist.cf
-                                                    li
-                                                        .row
-                                                            - items_cnt = playlist.items.length
-                                                            - for (var i = 0; i < items_cnt; i++)
-                                                                - el = playlist.items[i]
-                                                                .col-md-2.col-sm-3.col-xs-4
-                                                                    - url_tmp = '/playlist/' + (i+1)
-                                                                    a(href=url_tmp, title='')
-                                                                        - poster_url = el.poster || noposter_url
-                                                                        img(src=poster_url, alt='')
-                                                                    p
-                                                                        | #{el.name}
-                                                                        br
-                                                                        span=el.year
+                                                    - items_cnt = playlist.items.length
+                                                    while index < items_cnt
+                                                        li
+                                                            .row
+                                                                - i = 0
+                                                                while i < 6 && index < items_cnt
+                                                                    - el = playlist.items[index]
+                                                                    - index++
+                                                                    - i++
+                                                                    .col-md-2.col-sm-3.col-xs-4
+                                                                        - url_tmp = '/playlist/' + (i+1)
+                                                                        a(href=url_tmp, title='')
+                                                                            - poster_url = el.poster || noposter_url
+                                                                            img(src=poster_url, alt='')
+                                                                        p
+                                                                            | #{el.name}
+                                                                            br
+                                                                            span=el.year
+                                                i(class="sprite ab block control-slider prev-slide-playlist")
+                                                i(class="sprite ab block control-slider next-slide-playlist")
                                 //-
                                              .playlist-slider
                                 //-
@@ -239,5 +246,10 @@ html
                                         //-
             include footer
             - delete film.description; delete playlist.items;
+        script(src=js_url + 'jquery.carouFredSel-6.2.1-packed.js')
+        script(src=js_url + 'helper-caroufredsel/jquery.ba-throttle-debounce.min.js')
+        script(src=js_url + 'helper-caroufredsel/jquery.mousewheel.min.js')
+        script(src=js_url + 'helper-caroufredsel/jquery.touchSwipe.min.js')
+        script(src=js_url + 'helper-caroufredsel/jquery.transit.min.js')
         script.
             $(document).ready(function () {window.InitApp({page_conf: !{JSON.stringify(film)}}, "Playlist")})
