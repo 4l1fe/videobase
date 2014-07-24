@@ -23,7 +23,7 @@ class Genres(NS_Node):
 
     @classmethod
     def get_grouped_genres(cls):
-        return cls.objects.filter(depth=1, default=False).order_by('tree_id', 'name').values('id', 'name')
+        return cls.objects.filter(depth=1, hidden=False).order_by('tree_id', 'name').values('id', 'name')
 
 
     @classmethod
