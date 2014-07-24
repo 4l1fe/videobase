@@ -1,7 +1,11 @@
 # coding: utf-8
 
 import time
+import json
 from email import utils
+from StringIO import StringIO
+
+from rest_framework.parsers import JSONParser
 
 from django.shortcuts import render
 from django.utils.timezone import datetime
@@ -11,6 +15,9 @@ from apps.films.models import Films, PersonsFilms, FilmExtras
 
 from apps.films.constants import APP_PERSON_ACTOR, APP_PERSON_DIRECTOR, APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER, \
     APP_FILMS_EXTRAS_POSTER_HOST, APP_FILM_TYPE_ADDITIONAL_MATERIAL_TRAILER, APP_PERSON_SCRIPTWRITER
+from django.core.serializers.json import DjangoJSONEncoder
+from django.core.cache import cache
+from apps.films.api.serializers import vbFilm, vbComment, vbPerson
 
 TWITTER_MESSAGE_TEMPLATE = u"Новый #{ftype} {f_name} {genres_string} {f_rating}/10, {f_year} http://vsevi.ru/films/{film_id}/"
 
@@ -82,6 +89,30 @@ def get_feed_fb(request):
 
 
 def get_film_description(**kwargs):
+
+    NEW_FILMS_CACHE_KEY = 'new_films'
+
+    cached_films = cache.get(NEW_FILMS_CACHE_KEY)
+
+    # Расчитываем новинки, если их нет в кеше
+    if cached_films is None:
+        films = Films.get_newest_films()
+
+        for film in films:
+            # Фильмы показывались => ставим флаг просмотрено в true
+            film.was_shown = True
+            film.save()
+
+        # Сериализуем новинки и конвертируем результат в строку
+        dict_data = vbFilm(films, require_relation=False, extend=True, many=True).data
+        json_dict_serialized = json.dumps(dict_data, cls=DjangoJSONEncoder)
+
+        # Положим результат в кеш
+        cache.set(NEW_FILMS_CACHE_KEY, json_dict_serialized, 86400)
+
+    else:
+        dict_data = json.loads(cached_films)
+
     list_cost = []
     list_genres = []
     list_poster = []
@@ -89,9 +120,11 @@ def get_film_description(**kwargs):
     list_actor = []
     list_director = []
     list_scriptwriter = []
-    films = Films.get_newest_films()
+    list_films = []
 
-    for film in films:
+    for index, item in enumerate(dict_data):
+        film = Films.objects.get(id=item['id'])
+        list_films.append(film)
         cost = get_price(film)
         genres = get_genres(film)
         poster, trailer = get_extras(film, **kwargs)
@@ -110,15 +143,15 @@ def get_film_description(**kwargs):
         list_poster.append(poster)
         list_trailer.append(trailer)
 
-    return zip(films, list_actor, list_director, list_poster, list_trailer, list_scriptwriter, list_cost, list_genres)
+    return zip(list_films, list_actor, list_director, list_poster, list_trailer, list_scriptwriter, list_cost, list_genres)
 
 
 def get_price(film):
-    locations = Locations.objects.filter(content__in=Contents.objects.filter(film=film.id).values_list('id', flat=True))
-    min_price = locations[0].price
-
+    cont_id_list = Contents.objects.filter(film=film.id).values_list('id', flat=True)
+    locations = Locations.objects.filter(content__in=cont_id_list)
     price = -1
-    cost = u'бесплатно'
+    cost = u"бесплатно"
+    min_price = locations[0].price
 
     for location in locations:
         if min_price > location.price:
@@ -130,7 +163,6 @@ def get_price(film):
 
     elif min_price == 0 and price != -1:
         cost = u'бесплатно или от {0} рублей без рекламы'.format(price)
-
     return cost
 
 
