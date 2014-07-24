@@ -23,12 +23,12 @@ class Genres(NS_Node):
 
     @classmethod
     def get_grouped_genres(cls):
-        return cls.objects.filter(depth=1).order_by('rating_sort', 'name').values('id', 'name')
+        return cls.objects.filter(depth=1).order_by('tree_id', 'name').values('id', 'name')
 
 
     @classmethod
     def get_all_genres(cls, get_values=True):
-        query = cls.objects.extra(where=['lft-rgt=-1']).order_by('tree_id')
+        query = cls.objects.extra(where=['lft-rgt=-1']).order_by('name')
         return query.values('id', 'name') if get_values else query
 
 
