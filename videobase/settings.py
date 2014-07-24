@@ -81,6 +81,7 @@ INSTALLED_APPS = (
     'apps.contents',
     'apps.robots',
     'apps.rss',
+    'apps.git',
     'crawler',
     'social_auth',
     'djcelery',
@@ -211,6 +212,7 @@ VKONTAKTE_APP_SECRET = VK_API_SECRET
 # Facebook
 FACEBOOK_APP_ID     = '212532105624824'
 FACEBOOK_API_SECRET = 'a99fcef38b7054279d73beb4ebb7b6cc'
+FACEBOOK_EXTENDED_PERMISSIONS = ['email', ]
 
 # Twitter
 TWITTER_CONSUMER_KEY    = 'HACuJARrAXJyeHdeD5viHULZR'
@@ -342,4 +344,4 @@ CELERY_ACCEPT_CONTENT = ['pickle', 'json', 'msgpack', 'yaml']
 POSTER_URL_PREFIX = '_260x360'
 
 
-# какяа то фигня, надо миграцию доделать
+from local_settings import *

@@ -16,7 +16,7 @@ class UserInfoView(APIView):
     def get(self, request, format=None, *args, **kwargs):
         user = request.user
         result = {
-            'name': user.profile.nickname,
+            'name': user.profile.get_name(),
             'id': user.pk,
             'email': user.email,
         }
@@ -25,16 +25,18 @@ class UserInfoView(APIView):
     def post(self, request, format=None, *args, **kwargs):
         form = UserUpdateForm(request.DATA)
         user = request.user
-        profile, flag = UsersProfile.objects.get_or_create(user=user)
         if form.is_valid():
             try:
-                nickname = form.cleaned_data.get('name', None)
-                profile.nickname = nickname or profile.nickname
+                first_name = form.cleaned_data.get('name', None)
+                if not first_name is None:
+                   user.first_name = first_name
+
                 email = form.cleaned_data.get('email', None)
-                user.email = email or user.email
+                if not email is None:
+                    user.email = email or user.email
+
                 user.save()
-                profile.save()
-            except Exception as e:
+            except Exception, e:
                 Response({'e': e.message}, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)

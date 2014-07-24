@@ -5,16 +5,16 @@ from rest_framework import status
 from rest_framework.test import APITestCase, APISimpleTestCase
 from rest_framework.reverse import reverse
 
-from apps.films.constants import APP_FILM_FULL_FILM, APP_FILM_SERIAL, APP_USERFILM_STATUS_PLAYLIST, \
-    APP_PERSON_DIRECTOR, APP_PERSON_ACTOR, APP_PERSON_SCRIPTWRITER, APP_PERSON_PRODUCER
-from apps.users import Feed
-from apps.users.constants import APP_USER_REL_TYPE_FRIENDS, APP_USER_REL_TYPE_NONE,\
+from apps.films.constants import APP_FILM_SERIAL, APP_USERFILM_STATUS_PLAYLIST, \
+    APP_PERSON_DIRECTOR, APP_PERSON_ACTOR, APP_PERSON_SCRIPTWRITER, APP_PERSON_PRODUCER, APP_USERFILM_SUBS_TRUE
+from apps.users.constants import APP_USER_REL_TYPE_NONE,\
     APP_USERS_API_DEFAULT_PER_PAGE, APP_USERS_API_DEFAULT_PAGE
 from apps.users.models.api_session import SessionToken, UsersApiSessions
 from apps.users.tests.factories_users_api import *
 from apps.users.api.users_persons import persons_type
 from apps.users.constants import USER_ASK, USER_FRIENDSHIP
 from apps.users.constants import APP_USER_REL_TYPE_FRIENDS
+
 import random
 
 
@@ -41,11 +41,13 @@ class APIUsersFriendShipActionTestCase(APISimpleTestCase):
         kw['user_id'] = user.pk
         response = self.client.get(reverse(self.url_name, kwargs=kw),
                                    HTTP_X_MI_SESSION=self.headers)
+
         flag = UsersRels.objects.filter(user=self.user, user_rel=user).exists()
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(flag, True)
+
         feed = Feed.objects.last()
-        obj_val = dict(id=user.id, name=user.profile.get_name(), avatar='')
+        obj_val = dict(id=user.id, name=user.username, avatar='')
         self.assertEqual(feed.user, self.user)
         self.assertEqual(feed.type, USER_ASK)
         self.assertDictEqual(feed.object, obj_val)
@@ -54,7 +56,7 @@ class APIUsersFriendShipActionTestCase(APISimpleTestCase):
         user = UserFactory.create()
         kw = self.kwargs.copy()
         kw['user_id'] = user.pk
-        obj_val = dict(id=user.id, name=user.profile.get_name(), avatar='')
+        obj_val = dict(id=user.id, name=user.username, avatar='')
         UserRelsFactory.create(user=user, user_rel=self.user, rel_type=APP_USER_REL_TYPE_FRIENDS)
         FeedFactory.create(user=self.user, type=USER_ASK, object=obj_val)
         response = self.client.get(reverse(self.url_name, kwargs=kw),
@@ -68,7 +70,8 @@ class APIUsersFriendShipActionTestCase(APISimpleTestCase):
         user = UserFactory.create()
         kw = self.kwargs.copy()
         kw['user_id'] = user.pk
-        obj_val = dict(id=user.id, name=user.profile.get_name(), avatar='')
+
+        obj_val = dict(id=user.id, name=user.username, avatar='')
         UserRelsFactory.create(user=self.user, user_rel=user)
         FeedFactory.create(user=self.user, type=USER_ASK, object=obj_val)
         response = self.client.delete(reverse(self.url_name, kwargs=kw),
@@ -107,7 +110,7 @@ class APIUsersGenresTestCase(APITestCase):
         genres = []
         films = []
         for i in range(10):
-            genres.append(GenreFactory.create())
+            genres.append(Genres.add_root(instance=GenreFactory.build()))
 
         for i in range(4):
             films.append(FilmFactory.create(genres=[genres[2*i], genres[2*i+1]]))
@@ -127,7 +130,7 @@ class APIUsersGenresTestCase(APITestCase):
 
     def test_api_users_genres_200_get(self):
         response = self.client.get(reverse(self.url_name, kwargs=self.kwargs))
-        genres = Genres.objects.filter(genres__uf_films_rel__user=self.user).distinct()
+        genres = Genres.get_all_genres(get_values=False).filter(genres__uf_films_rel__user=self.user).distinct()
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         for i in range(len(genres)):
@@ -153,7 +156,7 @@ class APIUsersTestCase(APITestCase):
         genres = []
         films = []
         for i in range(10):
-            genres.append(GenreFactory.create())
+            genres.append(Genres.add_root(instance=GenreFactory.build()))
 
         for i in range(4):
             films.append(FilmFactory.create(genres=[genres[2*i], genres[2*i+1]]))
@@ -490,7 +493,7 @@ class APIUsersFilmsTestCase(APITestCase):
             LocationsFactory.create(content=content)
 
         for i in range(10):
-            UserFilmsFactory.create(user=self.user, status=APP_USERFILM_STATUS_PLAYLIST, film=films[i])
+            UserFilmsFactory.create(user=self.user, status=APP_USERFILM_STATUS_PLAYLIST, film=films[i], subscribed=APP_USERFILM_SUBS_TRUE)
 
     def test_api_users_films_400_get(self):
         pk = User.objects.latest('id').pk
@@ -501,11 +504,12 @@ class APIUsersFilmsTestCase(APITestCase):
 
     def test_api_users_films_200_all_get(self):
         response = self.client.get(reverse(self.url_name, kwargs=self.kwargs),
-                                   data={'type': 's'})
-        ftype = [APP_FILM_SERIAL]
+                                   data={'type': 'all'})
+        ftype = [APP_FILM_SERIAL, APP_FILM_FULL_FILM]
         films = Films.objects.filter(uf_films_rel__user=self.user, type__in=ftype,
-                                     uf_films_rel__status=APP_USERFILM_STATUS_PLAYLIST)
+                                     uf_films_rel__subscribed=APP_USERFILM_SUBS_TRUE)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data['items']), len(films))
         for i in range(len(films)):
             loc = Locations.objects.get(content__film=films[i])
             self.assertEqual(response.data['items'][i]['id'], films[i].pk)
@@ -527,11 +531,12 @@ class APIUsersFilmsTestCase(APITestCase):
             self.assertEqual(response.data['items'][i]['ratings']['cons'][0], films[i].rating_cons_cnt)
 
     def test_api_users_films_200_serial_get(self):
-        response = self.client.get(reverse(self.url_name, kwargs=self.kwargs))
-        ftype = [APP_FILM_SERIAL, APP_FILM_FULL_FILM]
+        response = self.client.get(reverse(self.url_name, kwargs=self.kwargs), data={'type': 's'})
+        ftype = [APP_FILM_SERIAL]
         films = Films.objects.filter(uf_films_rel__user=self.user, type__in=ftype,
-                                     uf_films_rel__status=APP_USERFILM_STATUS_PLAYLIST)
+                                     uf_films_rel__subscribed=APP_USERFILM_SUBS_TRUE)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data['items']), len(films))
         for i in range(len(films)):
             loc = Locations.objects.get(content__film=films[i])
             self.assertEqual(response.data['items'][i]['id'], films[i].pk)
@@ -556,9 +561,9 @@ class APIUsersFilmsTestCase(APITestCase):
         response = self.client.get(reverse(self.url_name, kwargs=self.kwargs), data={'type': 'f'})
         films = Films.objects.filter(uf_films_rel__user=self.user,
                                      type__in=[APP_FILM_FULL_FILM],
-                                     uf_films_rel__status=APP_USERFILM_STATUS_PLAYLIST)
+                                     uf_films_rel__subscribed=APP_USERFILM_SUBS_TRUE)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-
+        self.assertEqual(len(response.data['items']), len(films))
         for i in range(len(films)):
             loc = Locations.objects.get(content__film=films[i])
             self.assertEqual(response.data['items'][i]['id'], films[i].pk)
