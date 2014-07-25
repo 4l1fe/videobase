@@ -51,7 +51,7 @@ html
                                                 ul.dropdown-menu
                                                     li
                                                         a(href='?genres=0', title='',data-mi-id=0) все жанры
-                                                    each item in filter_genres.sort(function (a,b){return a.order - b.order})
+                                                    each item in filter_genres
                                                         li
                                                             - url_tmp = "?genres=" + i
                                                             a(href=url_tmp, title='',data-mi-id=item.id)=item.name
