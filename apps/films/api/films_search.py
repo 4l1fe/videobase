@@ -138,7 +138,9 @@ class SearchFilmsView(APIView):
         if form.is_valid():
             # Init data
             filter = self.validation_pagination(self.get_copy.get('page'), self.get_copy.get('per_page'), form.cleaned_data)
-            location_group = 1 if filter.get('price') or filter.get('instock') else 0
+
+            flag_price = True if ('price' in filter and not filter['price'] is None) else False
+            location_group = 1 if flag_price or filter.get('instock') else 0
 
             # Init cache params
             use_cache = self.use_cache()
