@@ -44,19 +44,22 @@ html
                                                 li
                                                     span Карьера
                                                     - delim = false
-                                                    each c in person.roles
-                                                        =(delim?", ":"") + c
-                                                        - delim = true
+                                                    div
+                                                        each c in person.roles
+                                                            =(delim?", ":"") + c
+                                                            - delim = true
                                             if person.birhtplace
                                                 li
                                                     span Место рождения
                                                     - delim = false
-                                                    each c in person.birthplace
-                                                        =(delim?", ":"") + c
-                                                        - delim = true
+                                                    div
+                                                        each c in person.birthplace
+                                                            =(delim?", ":"") + c
+                                                            - delim = true
                                             li
                                                 span Дата рождения
-                                                |#{date_text_str(person.birthdate)}, #{how_long_str(person.birthdate)}
+                                                div
+                                                    |#{date_text_str(person.birthdate)}, #{how_long_str(person.birthdate)}
                                         if person.bio
                                             .person-text-short
                                                 h3 Биография
