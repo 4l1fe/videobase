@@ -26,7 +26,7 @@ html
                                         ul.list-profile
                                             li
                                                 i На сайте
-                                                span=how_long_str(user.regdate, 1)
+                                                span=how_long_str(user.regdate, 2)
                                             if user.friends_cnt
                                                 li
                                                     i Друзей
@@ -42,7 +42,8 @@ html
                                             if user.genre_fav && user.genre_fav.name
                                                 li
                                                     i Любимый жанр
-                                                    span=user.genre_fav.name
+                                                    span
+                                                        a(href='/?genre=' + user.genre_fav.id)=user.genre_fav.name
                                     //-
                                        .profile-column
                             //-
