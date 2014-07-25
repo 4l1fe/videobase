@@ -9,7 +9,7 @@ from treebeard.ns_tree import NS_Node
 class Genres(NS_Node):
     name        = models.CharField(max_length=255, db_index=True, verbose_name=u'Название жанра')
     description = models.TextField(verbose_name=u'Описание жанра')
-    rating_sort = models.SmallIntegerField(null=True, blank=True, db_index=True, verbose_name=u'Сортировочный индекс')
+    hidden      = models.NullBooleanField(db_index=True, default=False, verbose_name=u'Скрытый')
 
 
     def __unicode__(self):
@@ -23,7 +23,7 @@ class Genres(NS_Node):
 
     @classmethod
     def get_grouped_genres(cls):
-        return cls.objects.filter(depth=1).order_by('rating_sort', 'name').values('id', 'name')
+        return cls.objects.filter(depth=1, hidden=False).order_by('tree_id', 'name').values('id', 'name')
 
 
     @classmethod
