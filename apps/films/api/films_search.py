@@ -58,7 +58,7 @@ class SearchFilmsView(APIView):
 
         # Поиск по жанрам
         if filter.get('genre'):
-            o_search = o_search.filter(genres__in=Genres.get_children_list_id(filter['genre']))
+            o_search = o_search.distinct().filter(genres__in=Genres.get_children_list_id(filter['genre']))
 
         # Персоноализация выборки
         if self.request.user.is_authenticated() and filter.get('recommend'):
