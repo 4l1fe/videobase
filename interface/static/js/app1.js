@@ -1019,7 +1019,7 @@
           return _this.show_modal("reg");
         };
       })(this));
-      current_url = encodeURI(window.location.href.toString().split(window.location.host)[1]);
+      current_url = window.location.href.toString().split(window.location.host)[1];
       $("form", this.auth_modal).each(function() {
         var $this, action;
         $this = $(this);
@@ -1029,7 +1029,7 @@
         } else {
           action += "?";
         }
-        return $this.attr("action", action + "next=" + current_url);
+        return $this.attr("action", action + "back_url=" + encodeURIComponent(current_url));
       });
       $("a", $(".soc-hor", this.auth_modal)).each(function() {
         var $this, href;
@@ -1040,7 +1040,7 @@
         } else {
           href += "?";
         }
-        return $this.attr("href", href + "next=" + current_url);
+        return $this.attr("href", href + "next=" + encodeURIComponent("/tokenize/?back_url=" + current_url));
       });
     }
 
