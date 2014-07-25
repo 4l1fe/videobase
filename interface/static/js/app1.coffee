@@ -632,7 +632,7 @@ class App
       e.stopPropagation()
       @show_modal("reg")
 
-    current_url = encodeURI(window.location.href.toString().split(window.location.host)[1])
+    current_url = window.location.href.toString().split(window.location.host)[1]
     $("form", @auth_modal).each ->
       $this = $(this)
       action = $this.attr("action")
@@ -640,7 +640,7 @@ class App
         action+= "&"
       else
         action+= "?"
-      $this.attr("action", action + "next=" + current_url)
+      $this.attr("action", action + "back_url=" + encodeURIComponent(current_url))
 
     $("a", $(".soc-hor", @auth_modal)).each ->
       $this = $(this)
@@ -649,7 +649,7 @@ class App
         href+= "&"
       else
         href+= "?"
-      $this.attr("href", href + "next=" + current_url)
+      $this.attr("href", href + "next=" + encodeURIComponent("/tokenize/?back_url=" + current_url))
 
 
   show_modal: (index) ->
