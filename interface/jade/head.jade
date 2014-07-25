@@ -4,7 +4,6 @@ head
     meta(name='viewport', content='width=device-width, initial-scale=1')
     if (meta)
         each item in meta
-            - params = ""
             |!{"<meta " + item + "/>"}
     - title = page_title_full?page_title_full:(page_title?page_title + " &mdash; ":"") + "Все видео: онлайн просмотр глобальный видео-архив фильмов, сериалов, видео-трансляций, ТВ"
     title!=title
@@ -17,5 +16,8 @@ head
     link(href=css_url + 'custom.css', rel='stylesheet')
     link(href=css_url + 'rateit.css', rel='stylesheet')
     link(href=css_url + 'uniform.default.min.css', rel='stylesheet')
-    link(rel="icon",type="image/png",href="/favicon.ico")
+    link(rel="icon",type="image/ico",href="/favicon.ico")
     link(href="/rss/feed", rel="alternate", title="RSS", type="application/rss+xml")
+    if (head_link)
+        each item in head_link
+            | !{"<link " + item + "/>"}
