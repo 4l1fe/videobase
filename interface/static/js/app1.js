@@ -1165,7 +1165,6 @@
       if (ask_sign_in == null) {
         ask_sign_in = true;
       }
-      console.log(this.auth_modal);
       if (!this.rest.has_auth()) {
         if (ask_sign_in) {
           this.auth_modal.modal("show");
@@ -1351,7 +1350,11 @@
       Page_Main.__super__.constructor.apply(this, arguments);
       this._app.get_tpl("film-thumb");
       films_deck = new FilmsDeck($("#films"), {
-        load_func: this.load_more_films
+        load_func: (function(_this) {
+          return function(deck) {
+            return _this.load_more_films(deck);
+          };
+        })(this)
       });
       films_deck.load_more_bind($("#films_more"));
       $(".film-thumb", $("#films_new")).each(function() {
@@ -1614,7 +1617,6 @@
         };
       })(this)).bind("rated", (function(_this) {
         return function(event) {
-          console.log(_this._e.rateit.rateit("value"));
           return _this.action_rate(_this._e.rateit.rateit("value"));
         };
       })(this)).bind("reset", (function(_this) {
@@ -1857,7 +1859,7 @@
       var film_page, params;
       this.conf = conf;
       Page_Playlist.__super__.constructor.apply(this, arguments);
-      film_page = new Page_Film(this.conf);
+      film_page = new Page_Film(this.conf.film);
       $('.toggle-playlist').click(function(e) {
         e.preventDefault();
         $(this).toggleClass('active');

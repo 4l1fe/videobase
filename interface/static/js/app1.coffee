@@ -727,7 +727,6 @@ class App
       return conf[name]
 
   user_is_auth: (ask_sign_in = true) ->
-    console.log @auth_modal
     if !@rest.has_auth()
       if ask_sign_in
         @auth_modal.modal("show")
@@ -842,7 +841,7 @@ class Page_Main extends Page
     self = @
     super
     @_app.get_tpl("film-thumb")
-    films_deck = new FilmsDeck($("#films"), {load_func: @load_more_films})
+    films_deck = new FilmsDeck($("#films"), {load_func: (deck) => @load_more_films(deck)})
     films_deck.load_more_bind($("#films_more"))
     $(".film-thumb", $("#films_new")).each(
       ->
@@ -1007,7 +1006,7 @@ class Page_Film extends Page
       if !@user_is_auth()
         event.preventDefault()
     )
-    .bind "rated", (event) => console.log @_e.rateit.rateit("value"); @action_rate(@_e.rateit.rateit("value"))
+    .bind "rated", (event) => @action_rate(@_e.rateit.rateit("value"))
     .bind "reset", (event) => @action_notwatch_toggle()
     .bind "over", (event, value) -> $(this).attr('title', stars_tootltips[value]);
 
@@ -1151,7 +1150,7 @@ class Page_Person extends Page
 class Page_Playlist extends Page
   constructor: (@conf) ->
     super
-    film_page = new Page_Film(@conf)
+    film_page = new Page_Film(@conf.film)
     $('.toggle-playlist').click (e)->
       e.preventDefault();
       $(this).toggleClass('active')
@@ -1162,15 +1161,17 @@ class Page_Playlist extends Page
           $('.toggle-playlist span').text('Показать плейлист');
     $("#playlistof_btn").bind("click", =>
       @_app.film_action(@conf.id, "playlist", {
-        status: false
-        rel: @conf.relation
-        callback: =>
-          if @conf.next && @conf.next.id
-            location.href = "/playlist/" + @conf.id + "/"
-          else if @conf.previous && @conf.previous.id
-            location.href = "/playlist/" + @conf.previous.id + "/"
-          else
-            location.href = "/playlist/"
+          status: false
+          rel: @conf.relation
+          callback: =>
+            if @conf.next && @conf.next.id
+              location.href = "/playlist/" + @conf.id + "/"
+            else if @conf.previous && @conf.previous.id
+              location.href = "/playlist/" + @conf.previous.id + "/"
+            else
+              location.href = "/playlist/"
+
+
       })
     )
     if $('#slider-playlist').size() > 0

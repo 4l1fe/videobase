@@ -252,4 +252,4 @@ html
         script(src=js_url + 'helper-caroufredsel/jquery.touchSwipe.min.js')
         script(src=js_url + 'helper-caroufredsel/jquery.transit.min.js')
         script.
-            $(document).ready(function () {window.InitApp({page_conf: !{JSON.stringify(film)}}, "Playlist")})
+            $(document).ready(function () {window.InitApp({page_conf: {id: !{playlist.id}, film: !{JSON.stringify(film)}, previous: !{JSON.stringify(playlist.previous)}, next: !{JSON.stringify(playlist.next)}}}, "Playlist")})
