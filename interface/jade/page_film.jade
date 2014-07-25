@@ -16,6 +16,10 @@ html
     - meta.push('name="twitter:title" content="' + film_name_meta + '"')
     - meta.push('name="twitter:description" content="' + film_descr_meta + '"')
     - meta.push('name="twitter:image" content="' + film_img_meta + '"')
+    - head_link = ['rel="canonical" href="http://vsevi.ru/films/' + film.id + '/"']
+    - title_alt = film.name
+    - if (film.name_orig && film.name_orig != film.name) title_alt+= " (" + film.name_orig + ")"
+    - if (film.releasedate) title_alt+= " " + film.releasedate.substr(0,4)
     include head
     body
         .wrap-page.bg-noise
@@ -52,8 +56,8 @@ html
                             .film-area
                                 .container
                                     each el in film.locations
-                                        a(name=el.id)
-                                    a(name="player")
+                                        a(id=el.id)
+                                    a(id="player")
                                     .frame-player-wrapper
                                         .frame-player-aspect
                                             .frame-player#frame_player
@@ -88,7 +92,7 @@ html
                     .row
                         .col-md-3.col-sm-4.col-xs-12
                             .img-person-playlist
-                                img(src=film.poster || noposter_url, alt='')
+                                img(src=film.poster || noposter_url, alt=title_alt, title=title_alt)
                                 br
                                 img(src=img_url + 'shd-small.png', alt='')
                             //-
@@ -99,37 +103,43 @@ html
                                     li
                                         span Страна
                                         - delim = false
-                                        each c in film.countries
-                                            =(delim?", ":"") + c.name
-                                            - delim = true
+                                        div
+                                            each c in film.countries
+                                                =(delim?", ":"") + c.name
+                                                - delim = true
                                 if film.directors && film.directors.length
                                     li
                                         span Режиссер
                                         - delim = false
-                                        each c in film.directors
-                                            =(delim?", ":"") + c.name
-                                            - delim = true
+                                        div
+                                            each c in film.directors
+                                                !=(delim?", ":"")+ '<a href="/persons/' + c.id + '/">' + c.name + "</a>"
+                                                - delim = true
                                 if film.scriptwriters && film.scriptwriters.length
                                     li
                                         span Сценарист
                                         - delim = false
-                                        each c in film.scriptwriters
-                                            =(delim?", ":"") + c.name
-                                            - delim = true
+                                        div
+                                            each c in film.scriptwriters
+                                                !=(delim?", ":"") + '<a href="/persons/' + c.id + '/">' + c.name + "</a>"
+                                                - delim = true
                                 if film.genres && film.genres.length
                                     li
                                         span Жанр
-                                        - delim = false
-                                        each c in film.genres
-                                            =(delim?", ":"") + c.name
-                                            - delim = true
+                                        div
+                                            - delim = false
+                                            each c in film.genres
+                                                !=(delim?", ":"") + '<a href="/?genre=' + c.id + '">' + c.name + "</a>"
+                                                - delim = true
                                 li
                                     span Дата выхода
-                                    |#{date_text_str(film.releasedate)}
+                                    div
+                                        |#{date_text_str(film.releasedate)}
                                 if film.duration
                                     li
                                         span Время
-                                        |#{duration_text(film.duration)}
+                                        div
+                                            |#{duration_text(film.duration)}
                             //-
                                 .share-block
                                 img(src='images/content/img42.png', alt='')
