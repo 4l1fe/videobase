@@ -249,11 +249,12 @@ section {padding:37px 0 6px 0;}
 .filter-content {padding: 18px 0 0 0;}
 .filter-instock label {display: inline}
 
-.search-block input {color: #fff}
+.search-block input {color: #fff; background-color: #615858}
 
 .add-filter {padding-bottom: 16px;}
 .add-filter .img-responsive {width: 100%}
 .add-filter-loading .add-content a {visibility: hidden}
+.add-filter .img-responsive, .filter-block .img-responsive {width: 100%}
 .add-content {
     text-align: center;
     padding: 17px 0 16px 0;
