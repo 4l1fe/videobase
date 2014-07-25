@@ -64,12 +64,12 @@ header(role='banner')
                     ul.menu-header
                         li
                             - auth_modal = auth_user?"":'modal'
-                            a(href='/playlist', title='', data-toggle=auth_modal, data-target='#reg-enter', data-remote="false")
+                            a(href='/playlist', title='', data-toggle=auth_modal, data-target='#reg_enter', data-remote="false")
                                 i.sprite.sprite-i-play
                                 br
                                 | Плейлист
                         li
-                            a(href='/stream', title='',data-toggle=auth_modal, data-target='#reg-enter', data-remote="false")
+                            a(href='/stream', title='',data-toggle=auth_modal, data-target='#reg_enter', data-remote="false")
                                 i.sprite.sprite-i-tape
                                 br
                                 | Лента
