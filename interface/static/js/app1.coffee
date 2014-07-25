@@ -254,6 +254,13 @@ class FilmThumb extends Item
       super
 
   set_vals: (vals, do_not_set) ->
+    if vals.title_alt == undefined
+      vals.title_alt = vals.name
+      if vals.name_orig && vals.name != vals.name_orig
+        vals.title_alt+= " (" + vals.name_orig + ")"
+      if vals.releasedate
+        vals.title_alt+= " " + vals.releasedate.substr(0,4)
+
     @elements["btn_price"].self.hide()
     if vals.locations && vals.locations.length
       vals.hasFree = false
@@ -287,8 +294,10 @@ class FilmThumb extends Item
     super
     if !vals.hasFree && vals.price
       @elements["btn_text"].self.attr("href", @elements["btn_text"].self.attr("href") + "#" + vals.price_loc)
-    else if vals.price
-      @elements["price"].self.parent().attr("href", @elements["price"].self.parent().attr("href") + "#" + vals.price_loc)
+    else
+      @elements["btn_text"].self.attr("href", @elements["btn_text"].self.attr("href") + "#player")
+      if vals.price
+        @elements["price"].self.parent().attr("href", @elements["price"].self.parent().attr("href") + "#" + vals.price_loc)
 
   action_rate: (val) ->
     @_app.film_action @vals.id, "rate", {
@@ -884,6 +893,7 @@ class Page_Main extends Page
         el._selected = el._options[0]
         el._title.text(el._options[0]._text)
     )
+    @update_filter_params(false)
     if (films_deck.get_items().length >= 12)
       @load_more_films(films_deck, {page: 2})
     else
@@ -1174,28 +1184,7 @@ class Page_Playlist extends Page
 
       })
     )
-    if $('#slider-playlist').size() > 0
-      params =
-        auto: false
-        responsive: true
-        height: 'variable'
-        items:
-          width: 100
-          height: 'variable'
-        swipe:
-          onMouse: true
-          onTouch: true
-        scroll:
-          items: 1
-          duration: 1100
-        prev:
-          button: '.prev-slide-playlist'
-          key: 'left'
-        next:
-          button: '.next-slide-playlist'
-          key: 'right'
-
-      $('#slider-playlist').carouFredSel params
+    $('.crsl-items').carousel({itemMinWidth: 155, itemEqualHeight: true, visible: 6});
 
 class Page_Feed extends Page
   feed_deck = undefined
@@ -1214,7 +1203,7 @@ class Page_Feed extends Page
         return if current_counter != deck.load_counter
         if data.items
           deck.add_items(data.items)
-          if data.items.length >= 12
+          if data.items.length >= 10
             deck.load_more_show()
             deck.page = data.page
           else
@@ -1313,7 +1302,7 @@ class Page_User extends Page
         return if current_counter != deck.load_counter
         if data.items
           deck.add_items(data.items)
-          if data.items.length >= 12
+          if data.items.length >= 10
             deck.load_more_show()
             deck.page = data.page
           else
