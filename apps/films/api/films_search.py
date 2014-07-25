@@ -82,7 +82,7 @@ class SearchFilmsView(APIView):
     def search_by_location(self, filter, o_search=None):
         o_loc = Locations.objects.values_list('content__film', flat=True)
 
-        if filter.get('price'):
+        if self.flag_price:
             o_loc = o_loc.filter(price__lte=filter['price'])
 
         if filter.get('instock'):
@@ -139,8 +139,8 @@ class SearchFilmsView(APIView):
             # Init data
             filter = self.validation_pagination(self.get_copy.get('page'), self.get_copy.get('per_page'), form.cleaned_data)
 
-            flag_price = True if ('price' in filter and not filter['price'] is None) else False
-            location_group = 1 if flag_price or filter.get('instock') else 0
+            self.flag_price = True if ('price' in filter and not filter['price'] is None) else False
+            location_group = 1 if self.flag_price or filter.get('instock') else 0
 
             # Init cache params
             use_cache = self.use_cache()
