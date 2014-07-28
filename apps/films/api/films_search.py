@@ -58,7 +58,7 @@ class SearchFilmsView(APIView):
 
         # Поиск по жанрам
         if filter.get('genre'):
-            o_search = o_search.filter(genres__in=Genres.get_children_list_id(filter['genre']))
+            o_search = o_search.distinct().filter(genres__in=Genres.get_children_list_id(filter['genre']))
 
         # Персоноализация выборки
         if self.request.user.is_authenticated() and filter.get('recommend'):
@@ -82,7 +82,7 @@ class SearchFilmsView(APIView):
     def search_by_location(self, filter, o_search=None):
         o_loc = Locations.objects.values_list('content__film', flat=True)
 
-        if filter.get('price'):
+        if self.flag_price:
             o_loc = o_loc.filter(price__lte=filter['price'])
 
         if filter.get('instock'):
@@ -138,7 +138,9 @@ class SearchFilmsView(APIView):
         if form.is_valid():
             # Init data
             filter = self.validation_pagination(self.get_copy.get('page'), self.get_copy.get('per_page'), form.cleaned_data)
-            location_group = 1 if filter.get('price') or filter.get('instock') else 0
+
+            self.flag_price = True if ('price' in filter and not filter['price'] is None) else False
+            location_group = 1 if self.flag_price or filter.get('instock') else 0
 
             # Init cache params
             use_cache = self.use_cache()
