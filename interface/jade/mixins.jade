@@ -106,7 +106,7 @@ mixin film_thumb(item)
             -       obj = item.locations[i];
             -       if (obj.price_type == 0) {
             -            has_free = true;
-            -       } else if (min_price === false || min_price > obj.price) {
+            -       } else if (min_price === false || min_price < obj.price) {
             -           min_price = obj.price;
             -           price_loc = obj.id
             -       }
