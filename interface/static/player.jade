@@ -5,9 +5,10 @@ html
         meta(charset="utf-8")
         style.
             html, body {margin: 0; overflow: hidden}
+            .black_body {background: #000; width: 100%; height: 100%}
             #player {width: 100%; height: 100%}
-            .inner {position: absolute; top: 50%; height: 6em;margin-top: -3em; text-align: center; width: 90%; color: white; font-size: 24px}
-            .inner a {color: white; font-weight: bold}
+            .inner {position: absolute; top: 50%; height: 6em;margin-top: -3em; text-align: center; width: 100%; color: white; font-size: 24px}
+            .pay_film {font-size: 22px; color: #827272; position: absolute; top: 20px; left: 20px; background: #000; width: 70%; max-width: 580px}
     body
         #player
         script.
@@ -23,7 +24,9 @@ html
             }
             location_names = {"ivi": "IVI.ru", "nowru": "Now.ru", "megogo": "Megogo", "tvigle": "TVigle", "zoomby": "Zoomby.ru", playfamily: "PlayFamily.ru", "olltv": "Oll.tv", amediateka: "Amediateka", molodejj: "Molodejj.tv", streamru: "Stream.ru", tvzavr: "TVzavr.ru", viaplay: "Viaplay.ru", zabava: "Zabava.ru", playgoogle: "Play Google", itunes: "Apple Itunes", ayyo: "Ayyo.ru", mosfilm: "Cinema.mosfilm.ru", "default": "Онлайн-кинотеатре"}
             if (vals.price && vals.view) {
-                html = '<div class="inner">Чтобы посмотреть фильм за ' + Math.floor(vals.price) + ' руб. на ' + (location_names[vals.type] || location_names["default"]) + '<br>вам необходимо перейти по <a href="' + vals.view + '" target="_blank" ref="nofollow">ссылке</a></div>'
+                price = Math.floor(vals.price);
+                link_title = 'Ссылка на страницу фильма на ' + (location_names[vals.type] || location_names["default"]) + ' за ' + price + ' руб.';
+                html = '<div class="black_body"><div class="pay_film">Нам пока не удалось договориться с админстрацией ' + (location_names[vals.type] || location_names["default"]) + ' об отображении плеера с платными фильмами на нашем сайте, поэтому фильм доступен к просмотру только в новом окне. Нажмите на кнопку, чтобы открыть новое окно для просмотра фильма за ' + price + ' руб.</div><div class="inner"><a href="' + vals.view + '" target=_new rel="nofollow"><img src="/static/img/player_play.png" alt="' + link_title + '" title="' + link_title + '"/></a></div></div>';
             } else if (vals.type && (vals.value || vals.view)) {
                 html = false;
                 value = vals.value || false

@@ -67,7 +67,9 @@ html
                                .title-film
                             .film-area
                                 .container
-                                    a(name="player")
+                                    each el in film.locations
+                                        a(id=el.id)
+                                    a(id="player")
                                     .frame-player-wrapper
                                         .frame-player-aspect
                                             .frame-player#frame_player
@@ -84,28 +86,22 @@ html
                                     .container
                                         .playlist-wrap
                                             .playlist-slider-wrap.cf.rel.zmin
-                                                - index = 0
-                                                ul#slider-playlist.cf
-                                                    - items_cnt = playlist.items.length
-                                                    while index < items_cnt
-                                                        li
-                                                            .row
-                                                                - i = 0
-                                                                while i < 6 && index < items_cnt
-                                                                    - el = playlist.items[index]
-                                                                    - index++
-                                                                    - i++
-                                                                    .col-md-2.col-sm-3.col-xs-4
-                                                                        - url_tmp = '/playlist/' + (i+1)
-                                                                        a(href=url_tmp, title='')
-                                                                            - poster_url = el.poster || noposter_url
-                                                                            img(src=poster_url, alt='')
-                                                                        p
-                                                                            | #{el.name}
-                                                                            br
-                                                                            span=el.year
-                                                i(class="sprite ab block control-slider prev-slide-playlist")
-                                                i(class="sprite ab block control-slider next-slide-playlist")
+                                                ul.cf#slider-playlist
+                                                    li.crsl-items(data-navigation="slider_nav")
+                                                        .row.crsl-wrap
+                                                            each el in playlist.items
+                                                                figure.col-md-2.col-sm-3.col-xs-4.crsl-item
+                                                                    - url_tmp = '/playlist/' + el.id
+                                                                    a(href=url_tmp, title='')
+                                                                        - poster_url = el.poster || noposter_url
+                                                                        img(src=poster_url, alt='')
+                                                                    p
+                                                                        | #{el.name}
+                                                                        br
+                                                                        span=el.year
+                                                #slider_nav.crsl-nav
+                                                    i(class="sprite ab block control-slider prev-slide-playlist previous")
+                                                    i(class="sprite ab block control-slider next-slide-playlist next")
                                 //-
                                              .playlist-slider
                                 //-
@@ -134,37 +130,43 @@ html
                                             li
                                                 span Страна
                                                 - delim = false
-                                                each c in film.countries
-                                                    =(delim?", ":"") + c.name
-                                                    - delim = true
+                                                div
+                                                    each c in film.countries
+                                                        =(delim?", ":"") + c.name
+                                                        - delim = true
                                         if film.directors && film.directors.length
                                             li
                                                 span Режиссер
                                                 - delim = false
-                                                each c in film.directors
-                                                    =(delim?", ":"") + c.name
-                                                    - delim = true
+                                                div
+                                                    each c in film.directors
+                                                        !=(delim?", ":"")+ '<a href="/persons/' + c.id + '/">' + c.name + "</a>"
+                                                        - delim = true
                                         if film.scriptwriters && film.scriptwriters.length
                                             li
                                                 span Сценарист
                                                 - delim = false
-                                                each c in film.scriptwriters
-                                                    =(delim?", ":"") + c.name
-                                                    - delim = true
+                                                div
+                                                    each c in film.scriptwriters
+                                                        !=(delim?", ":"") + '<a href="/persons/' + c.id + '/">' + c.name + "</a>"
+                                                        - delim = true
                                         if film.genres && film.genres.length
                                             li
                                                 span Жанр
-                                                - delim = false
-                                                each c in film.genres
-                                                    =(delim?", ":"") + c.name
-                                                    - delim = true
+                                                div
+                                                    - delim = false
+                                                    each c in film.genres
+                                                        !=(delim?", ":"") + '<a href="/?genre=' + c.id + '">' + c.name + "</a>"
+                                                        - delim = true
                                         li
                                             span Дата выхода
-                                            | #{date_text_str(film.releasedate)}
+                                            div
+                                                | #{date_text_str(film.releasedate)}
                                         if film.duration
                                             li
                                                 span Время
-                                                | #{duration_text(film.duration)}
+                                                div
+                                                    | #{duration_text(film.duration)}
                                     //-
                                         .share-block
                                         img(src='images/content/img42.png', alt='')
@@ -246,10 +248,6 @@ html
                                         //-
             include footer
             - delete film.description; delete playlist.items;
-        script(src=js_url + 'jquery.carouFredSel-6.2.1-packed.js')
-        script(src=js_url + 'helper-caroufredsel/jquery.ba-throttle-debounce.min.js')
-        script(src=js_url + 'helper-caroufredsel/jquery.mousewheel.min.js')
-        script(src=js_url + 'helper-caroufredsel/jquery.touchSwipe.min.js')
-        script(src=js_url + 'helper-caroufredsel/jquery.transit.min.js')
+        script(src=js_url + 'responsiveCarousel.min.js')
         script.
-            $(document).ready(function () {window.InitApp({page_conf: {id: !{playlist.id}, film: !{JSON.stringify(film)}, previous: !{JSON.stringify(playlist.previous)}, next: !{JSON.stringify(playlist.next)}}}, "Playlist")})
+            $(document).ready(function () {window.InitApp({page_conf: {id: !{playlist.id}, film: !{JSON.stringify(film)}, previous: !{JSON.stringify(playlist.previous || {})}, next: !{JSON.stringify(playlist.next || {})}}}, "Playlist")})

@@ -10,22 +10,28 @@
 -   }
 - }
 - function how_long(dt, level) {
--   res = ""
--   if (level == undefined) level = 0
--   year_diff = date_now.getFullYear() - dt.getFullYear()
--   now_month = date_now.getMonth()
--   dt_month = dt.getMonth()
--   now_date = date_now.getDate()
--   dt_date = dt.getDate()
--   if ((now_month < dt_month) || (now_month == dt_month && now_date < dt_date)) year_diff--;
--   if (year_diff > 0) res = year_diff + cardinal(year_diff, " год", " года", " лет");
--   if (level > 0) {
--       month_diff = now_month - dt_month
--       if (month_diff < 0) month_diff+= 12
--       if (month_diff == 0) month_diff = 1
--       res+= (res?" ":"") + month_diff + cardinal(month_diff, " месяц", " месяца", " месяцев")
+-   var months, years, days, res;
+-   years = date_now.getFullYear() - dt.getFullYear();
+-   months = date_now.getMonth() - dt.getMonth();
+-   days = date_now.getDate() - dt.getDate();
+-   if (days < 0) {
+-       months--;
+-       days = date_now.getDate() + new Date(dt.getFullYear(), dt.getMonth() + 1, 0).getDate() - dt.getDate()
 -   }
--   return res
+-   res = "";
+-   if (months < 0) {
+-	    years--;
+-	    months+= 12;
+-   }
+-   if (level == undefined) level = 0
+-   if (years > 0 || level == 0) res = years + cardinal(years, " год", " года", " лет");
+-   if (level > 0) {
+- 	    if (months > 0 || level == 1) res+= (res?" ":"") + months + cardinal(months, " месяц", " месяца", " месяцев")
+-	    if (level > 1) {
+-		    if (days > 0 || level == 2) res+= (res?" ":"") + days + cardinal(days, " день", " дня", " дней");
+-	    }
+-   }
+-   return res;
 - }
 - function string_to_date(str) {
 -   //yyyy-mm-dd hh:mm:ss
@@ -108,20 +114,25 @@ mixin film_thumb(item)
             -   if (min_price)
             -       min_price = Math.floor(min_price)
             -   url_loc = price_loc?(url+"#" + price_loc):""
+            -   url_btn = url
             -   if (min_price && !has_free) {
             -       btn_cls = "btn-price"
             -       btn_text = "Смотреть<br><i>от " + min_price + " р. без рекламы</i>"
-            -       url = url_loc
+            -       url_btn = url_loc
             -   } else {
             -       btn_cls = "btn-free"
             -       btn_text = "Смотреть<br/>бесплатно"
+            -       url_btn = url + "#player"
             -   }
             - } else {
             -   btn_cls = "btn-subscribe"
             -   btn_text = "Подписаться"
             - }
             a(href=url, title='',data-mi-athref="id").poster-place
-                img(src=item.poster || noposter_url,data-mi-atsrc="poster",data-mi-default=noposter_url,alt='',data-mi-id="poster").img-poster
+                - title_alt = item.name
+                - if (item.name_orig && item.name_orig != item.name) title_alt+= " (" +item.name_orig + ")"
+                - title_alt+= " " + year
+                img(src=item.poster || noposter_url,data-mi-atsrc="poster",data-mi-default=noposter_url,data-mi-id="poster",title=title_alt, alt=title_alt,data-mi-attitle="title_alt", data-mi-atalt="title_alt").img-poster
             img(src=img_url + 'shd-small.png', alt='')
             .rel.zmin.num
                 i(data-mi-name="ratings.cons.0")=(item.ratings && item.ratings.cons)?item.ratings.cons[0]:""
@@ -135,7 +146,7 @@ mixin film_thumb(item)
                 .range-style.range-block
                     .rateit(data-mi-id="relation.rating",data-mi-val=(item.relation && item.relation.rating)?item.relation.rating:0,data-rateit-step=1,data-rateit-max=10,data-rateit-resetable=1,data-rateit-value=(item.relation && item.relation.rating)?item.relation.rating:0)
                 .btn-def.block.margin0a(class=btn_cls,data-mi-id="btn")
-                    a(href=url, title='',data-mi-id="btn_text",data-mi-athref="id")!=btn_text
+                    a(href=url_btn , title='',data-mi-id="btn_text",data-mi-athref="id")!=btn_text
                     a.btn-add.ab(href=url, title='Добавить в плейлист',data-mi-id="relation.playlist",data-mi-onclick="toggle_playlist",data-mi-val=item.relation && item.relation.playlist?1:0)
                 p(class=min_price && has_free?'':'display-none',data-mi-id="btn_price")
                     | или
