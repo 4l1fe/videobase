@@ -415,6 +415,15 @@
 
     FilmThumb.prototype.set_vals = function(vals, do_not_set) {
       var btn_cls, btn_text, loc, _i, _len, _ref;
+      if (vals.title_alt === void 0) {
+        vals.title_alt = vals.name;
+        if (vals.name_orig && vals.name !== vals.name_orig) {
+          vals.title_alt += " (" + vals.name_orig + ")";
+        }
+        if (vals.releasedate) {
+          vals.title_alt += " " + vals.releasedate.substr(0, 4);
+        }
+      }
       this.elements["btn_price"].self.hide();
       if (vals.locations && vals.locations.length) {
         vals.hasFree = false;
@@ -460,8 +469,11 @@
       FilmThumb.__super__.set_vals.apply(this, arguments);
       if (!vals.hasFree && vals.price) {
         return this.elements["btn_text"].self.attr("href", this.elements["btn_text"].self.attr("href") + "#" + vals.price_loc);
-      } else if (vals.price) {
-        return this.elements["price"].self.parent().attr("href", this.elements["price"].self.parent().attr("href") + "#" + vals.price_loc);
+      } else {
+        this.elements["btn_text"].self.attr("href", this.elements["btn_text"].self.attr("href") + "#player");
+        if (vals.price) {
+          return this.elements["price"].self.parent().attr("href", this.elements["price"].self.parent().attr("href") + "#" + vals.price_loc);
+        }
       }
     };
 
@@ -1007,7 +1019,7 @@
           return _this.show_modal("reg");
         };
       })(this));
-      current_url = encodeURI(window.location.href.toString().split(window.location.host)[1]);
+      current_url = window.location.href.toString().split(window.location.host)[1];
       $("form", this.auth_modal).each(function() {
         var $this, action;
         $this = $(this);
@@ -1017,7 +1029,7 @@
         } else {
           action += "?";
         }
-        return $this.attr("action", action + "next=" + current_url);
+        return $this.attr("action", action + "back_url=" + encodeURIComponent(current_url));
       });
       $("a", $(".soc-hor", this.auth_modal)).each(function() {
         var $this, href;
@@ -1028,7 +1040,7 @@
         } else {
           href += "?";
         }
-        return $this.attr("href", href + "next=" + current_url);
+        return $this.attr("href", href + "next=" + encodeURIComponent("/tokenize/?back_url=" + current_url));
       });
     }
 
@@ -1406,6 +1418,7 @@
           return el._title.text(el._options[0]._text);
         }
       });
+      this.update_filter_params(false);
       if (films_deck.get_items().length >= 12) {
         this.load_more_films(films_deck, {
           page: 2
@@ -1856,7 +1869,7 @@
     __extends(Page_Playlist, _super);
 
     function Page_Playlist(conf) {
-      var film_page, params;
+      var film_page;
       this.conf = conf;
       Page_Playlist.__super__.constructor.apply(this, arguments);
       film_page = new Page_Film(this.conf.film);
@@ -1888,34 +1901,11 @@
           });
         };
       })(this));
-      if ($('#slider-playlist').size() > 0) {
-        params = {
-          auto: false,
-          responsive: true,
-          height: 'variable',
-          items: {
-            width: 100,
-            height: 'variable'
-          },
-          swipe: {
-            onMouse: true,
-            onTouch: true
-          },
-          scroll: {
-            items: 1,
-            duration: 1100
-          },
-          prev: {
-            button: '.prev-slide-playlist',
-            key: 'left'
-          },
-          next: {
-            button: '.next-slide-playlist',
-            key: 'right'
-          }
-        };
-        $('#slider-playlist').carouFredSel(params);
-      }
+      $('.crsl-items').carousel({
+        itemMinWidth: 155,
+        itemEqualHeight: true,
+        visible: 6
+      });
     }
 
     return Page_Playlist;
@@ -1956,7 +1946,7 @@
           }
           if (data.items) {
             deck.add_items(data.items);
-            if (data.items.length >= 12) {
+            if (data.items.length >= 10) {
               deck.load_more_show();
               return deck.page = data.page;
             } else {
@@ -2119,7 +2109,7 @@
           }
           if (data.items) {
             deck.add_items(data.items);
-            if (data.items.length >= 12) {
+            if (data.items.length >= 10) {
               deck.load_more_show();
               return deck.page = data.page;
             } else {
