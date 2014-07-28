@@ -4,7 +4,7 @@ from crawler.core.exceptions import NoSuchFilm
 from apps.contents.constants import APP_CONTENTS_PRICE_TYPE_SUBSCRIPTION
 from apps.films.constants import APP_FILM_FULL_FILM, APP_FILM_SERIAL
 
-HOST = 'http://oll.tv'
+HOST = 'http://oll.tv/'
 
 
 class ParseOllFilm(object):
@@ -34,7 +34,7 @@ class ParseOllFilm(object):
         film_name = film.name
         film_link = None
         try:
-            soup = BeautifulSoup(response.content)
+            soup = BeautifulSoup(response)
             if film.type == APP_FILM_SERIAL:
                 tags_h1 = soup.findAll('h1', attrs={'itemprop': 'name'})
                 for h1 in tags_h1:
@@ -64,7 +64,7 @@ class ParseOllFilm(object):
             mas = [0, ]
             if film.type == APP_FILM_FULL_FILM:
                 return mas
-            soup = BeautifulSoup(response.content)
+            soup = BeautifulSoup(response)
             tag_season = soup.findAll('a', attrs={'class': 'accordion-toggle collapsed'})
             for tag_a in tag_season:
                 season_text = tag_a.text
