@@ -1886,7 +1886,7 @@
       });
       $("#playlistof_btn").bind("click", (function(_this) {
         return function() {
-          return _this._app.film_action(_this.conf.id, "playlist", {
+          _this._app.film_action(_this.conf.film.id, "playlist", {
             status: false,
             rel: _this.conf.relation,
             callback: function() {
@@ -1899,6 +1899,7 @@
               }
             }
           });
+          return false;
         };
       })(this));
       $('.crsl-items').carousel({
