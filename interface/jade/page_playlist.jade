@@ -89,9 +89,9 @@ html
                                                 ul.cf#slider-playlist
                                                     li.crsl-items(data-navigation="slider_nav")
                                                         .row.crsl-wrap
-                                                            each el in playlist.items
+                                                            each el,i in playlist.items
                                                                 figure.col-md-2.col-sm-3.col-xs-4.crsl-item
-                                                                    - url_tmp = '/playlist/' + el.id
+                                                                    - url_tmp = '/playlist/' + (i + 1) + '/'
                                                                     a(href=url_tmp, title='')
                                                                         - poster_url = el.poster || noposter_url
                                                                         img(src=poster_url, alt='')

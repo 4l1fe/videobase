@@ -1170,7 +1170,7 @@ class Page_Playlist extends Page
         else
           $('.toggle-playlist span').text('Показать плейлист');
     $("#playlistof_btn").bind("click", =>
-      @_app.film_action(@conf.id, "playlist", {
+      @_app.film_action(@conf.film.id, "playlist", {
           status: false
           rel: @conf.relation
           callback: =>
@@ -1180,9 +1180,8 @@ class Page_Playlist extends Page
               location.href = "/playlist/" + @conf.previous.id + "/"
             else
               location.href = "/playlist/"
-
-
       })
+      return false
     )
     $('.crsl-items').carousel({itemMinWidth: 155, itemEqualHeight: true, visible: 6});
 
