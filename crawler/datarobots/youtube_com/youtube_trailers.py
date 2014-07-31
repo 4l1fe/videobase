@@ -76,7 +76,7 @@ def get_film_trailer(film):
     return trailer_name, link
 
 
-def process_film(film):
+def find_youtube_trailer(film):
 
     try:
         ytchk = YoutubeTrailerCheck.objects.get(film=film)
