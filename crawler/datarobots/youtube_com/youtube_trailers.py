@@ -47,7 +47,7 @@ FAIL_STRINGS = (u'interview', u'интервью', u'premiere', u'премьер
                 u'parody', u'videogame')
 
 
-def query_search(film_name, trailer_word):
+def query_search(film_name, year, trailer_word):
     client = gdata.youtube.service.YouTubeService()
     query = gdata.youtube.service.YouTubeVideoQuery()
 
@@ -58,18 +58,20 @@ def query_search(film_name, trailer_word):
 
     for f in feed.entry:
         title = f.title.text.lower().decode('utf-8')
-        if (film_name.lower() in title) and (trailer_word.lower() in title and sum(s in title for s in FAIL_STRINGS)==0):
+        if (film_name.lower() in title) and (trailer_word.lower() in title and sum(s in title for s in FAIL_STRINGS)==0) and (str(year) in title) and bool(film_name):
             yield f.title.text, f.link[0].href
 
 
 def get_film_trailer(film):
 
+    year = film.release_date.year
+    
     trailer_name, link = next(
         chain(
             chain(
-                *(query_search(film.name, w) for w in SEARCH_STRINGS_RU)),
+                *(query_search(film.name,year, w) for w in SEARCH_STRINGS_RU)),
         chain(
-            *(query_search(film.name_orig, w) for w in SEARCH_STRINGS_EN))
+            *(query_search(film.name_orig,year, w) for w in SEARCH_STRINGS_EN))
         ),
         None)
     
