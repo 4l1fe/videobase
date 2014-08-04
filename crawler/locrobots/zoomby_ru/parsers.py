@@ -13,9 +13,12 @@ def parse_search(response, film_name, year):
         tag = soup.find(attrs={'class': 'element_row_3'}, text=film_name)
         par_div = tag.parent
         year_tag = par_div.find_all('div', {'class': 'element_row_5'})
-        for tag in year_tag:
-            if tag.span:
-                year_text = tag.span.text
+        for tag_sp in year_tag:
+            tag_span = tag_sp.find('span')
+            if tag_span:
+                break
+                
+        year_text = tag_span.text
         film_year = re.search(ur'\d+', year_text).group()
         if year != int(film_year):
             return None

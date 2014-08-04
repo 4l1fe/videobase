@@ -10,7 +10,7 @@ def set_kinopoisk_poster(film):
     poster = get_poster(film.kinopoisk_id)
     if not poster:
         poster = get_small_poster(film.kinopoisk_id)
-    if poster:
+    if poster and poster.len > 2000:
         print u"Adding poster for {}".format(film)
         fe = FilmExtras(film=film, type=APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER, name=u"Постер для {}".format(film.name),
                         name_orig=u"Poster for {}".format(film.name), description=" ")

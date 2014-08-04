@@ -1,13 +1,15 @@
 # coding: utf-8
+
+import os
+import time
+import logging
+import subprocess
+from optparse import make_option
+
 from django.core.management import BaseCommand
 
 from backup_system.constants import APP_BACKUP_FILENAME_TEMPLATE
 
-from optparse import make_option
-import subprocess
-import logging
-import os
-import time
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -28,8 +30,10 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         logger.info("Start: processed params to restore backup")
         settings_module = options['settings']
+
         if settings_module is None:
             settings_module = 'videobase.settings'
+
         settings = __import__(settings_module).settings
         try:
             path = settings.BACKUP_PATH
@@ -39,6 +43,7 @@ class Command(BaseCommand):
             db_user = settings.DATABASES['default']['USER']
             db_host = settings.DATABASES['default']['HOST']
             db_port = settings.DATABASES['default']['PORT']
+            db_pass = settings.DATABASES['default']['PASSWORD']
             filename = options['filename']
         except Exception as e:
             logger.error("End: restore DATABASE with error: {0}".format(e))
@@ -47,39 +52,41 @@ class Command(BaseCommand):
         if filename is None:
             times = map(lambda f: f.split('_')[2].split('.')[0], os.listdir(path))
             s_times = sorted(times, key=lambda t: time.strptime(t, "%Y-%m-%d-%H-%M"))
-            filename = APP_BACKUP_FILENAME_TEMPLATE.format(db_name=db_name,
-                                                           time=s_times[-1])
+            filename = APP_BACKUP_FILENAME_TEMPLATE.format(db_name=db_name, time=s_times[-1])
 
         file_path = os.path.join(path, filename)
         logger.info("End: processed params to restore backup")
         if not os.path.exists(file_path):
             logger.error("File doesn't exists: {0}".format(file_path))
             return None
+
         try:
             logger.info("Start: drop and create schema 'public' in DATABASE: {}".format(db_name))
-            command = """psql --username={user} --dbname={name} --host={host} --port={port} --command='DROP SCHEMA IF EXISTS public CASCADE;'""".\
-                format(name=db_name, user=db_user, host=db_host, port=db_port)
+            command = "PGPASSWORD={passwd} psql --username={user} --dbname={name} --host={host} --port={port} --command='DROP SCHEMA IF EXISTS public CASCADE;'".\
+                format(passwd=db_pass, name=db_name, user=db_user, host=db_host, port=db_port)
+
             p = subprocess.Popen(command, shell=True).wait()
             logger.info("Delete schema.")
-            command = """psql --username={user} --dbname={name} --host={host} --port={port} --command='CREATE SCHEMA public AUTHORIZATION {user};'""".\
-                format(name=db_name, user=db_user, host=db_host, port=db_port)
+            command = "PGPASSWORD={passwd} psql --username={user} --dbname={name} --host={host} --port={port} --command='CREATE SCHEMA public AUTHORIZATION {user};'".\
+                format(passwd=db_pass, name=db_name, user=db_user, host=db_host, port=db_port)
+
             p = subprocess.Popen(command, shell=True).wait()
             logger.info("Create schema.")
             logger.info("End: drop and create schema 'public' in DATABASE: {}".format(db_name))
         except Exception as e:
-            logger.error("""End: drop and create schema 'public' in DATABASE: {1}
-                            error: {2}""".format(db_name, e))
+            logger.error("End: drop and create schema 'public' in DATABASE: {1} error: {2}".format(db_name, e))
             return None
 
         logger.info("Start: restore DATABASE: {0} from {1}".format(db_name, file_path))
         try:
-            command = "pg_restore --dbname={name} --username={user} --host={host} --port={port} -F c {filename}".\
-                format(filename=file_path, name=db_name, user=db_user,
+            command = "PGPASSWORD={passwd} pg_restore --dbname={name} --username={user} --host={host} --port={port} -F c {filename}".\
+                format(passwd=db_pass, filename=file_path, name=db_name, user=db_user,
                        host=db_host, port=db_port)
+
             p = subprocess.Popen(command, shell=True).wait()
             logger.info("End: restore DATABASE: {0} from {1}".format(db_name, file_path))
         except Exception as e:
-            logger.error("""End: restore DATABASE: {0} from {1}
-                            error: {2}""".format(db_name, file_path, e))
+            logger.error("End: restore DATABASE: {0} from {1} error: {2}".format(db_name, file_path, e))
+
         return None
 
