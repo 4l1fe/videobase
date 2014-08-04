@@ -11,7 +11,7 @@ from crawler.datarobots.kinopoisk_ru.parse_page import get_photo
 from crawler.datarobots.kinopoisk_ru.kinopoisk_poster import poster_robot_wrapper
 from crawler.datarobots.imdbratings import process_all
 from crawler.datarobots.kinopoisk_ru.kinopoisk_premiere import kinopoisk_news
-from crawler.datarobots.youtube_com.youtube_trailers import process_film
+from crawler.datarobots.youtube_com.youtube_trailers import find_youtube_trailer
 from crawler.tasks.kinopoisk_one_page import kinopoisk_parse_one_film
 from crawler.tor import simple_tor_get_page
 from crawler.tasks.utils import robot_task, update_robot_state_film_id
@@ -120,7 +120,7 @@ def parse_kinopoisk_news():
 @app.task(name="find_trailer_for_film")
 def find_trailer(film_id):
     film = Films.objects.get(id=film_id)
-    process_film(film)
+    find_youtube_trailer(film)
 
 
 @app.task(name='youtube_trailers_all')

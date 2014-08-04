@@ -111,7 +111,11 @@ def film_produced_country_name_corrector(film):
 
 @film_checker.add(u'Flatland in countries')
 def flatland_check(film):
-    flatland = Countries.objects.get(name = FLATLAND_NAME)
+    try:
+        flatland = Countries.objects.get(name = FLATLAND_NAME)
+    except Countries.DoesNotExist:
+        return True
+        
     return not ( flatland in film.countries.all() )
 
 
