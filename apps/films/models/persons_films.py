@@ -10,6 +10,7 @@ class PersonsFilms(models.Model):
     film        = models.ForeignKey('Films', verbose_name=u'Фильм', related_name="pf_films_rel")
     person      = models.ForeignKey('Persons', verbose_name=u'Персона', related_name='pf_persons_rel')
     p_type      = models.CharField(max_length=255, db_index=True, choices=APP_FILM_PERSON_TYPES, verbose_name=u'Тип персоны')
+    p_index     = models.IntegerField(default = 0)
     p_character = models.CharField(max_length=255, default = '')
     description = models.CharField(max_length=255, default = '')
 

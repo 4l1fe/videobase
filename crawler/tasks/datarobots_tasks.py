@@ -6,6 +6,7 @@ from django.utils import timezone
 from apps.robots.models import Robots
 from apps.films.models import Persons
 from apps.films.models import Films
+from crawler.datarobots.kinopoisk_ru.parse_actors import PersoneParser
 from crawler.datarobots.kinopoisk_ru.parse_page import get_photo
 from crawler.datarobots.kinopoisk_ru.kinopoisk_poster import poster_robot_wrapper
 from crawler.datarobots.imdbratings import process_all
@@ -22,6 +23,14 @@ from bs4 import BeautifulSoup
 
 KINOPOISK_LIST_FILMS_URL = "http://www.kinopoisk.ru/top/navigator/m_act%5Begenre%5D/999/m_act%5Bnum_vote%5D/10/m_act%5Brating%5D/1:/m_act%5Bis_film%5D/on/m_act%5Bis_mult%5D/on/order/year/page/{}/#results"
 information_robots = ['kinopoik_robot', 'imdb_robot']
+
+
+
+@app.task(name='persons_films_update_with_indexes')
+def persons_films_update_with_indexes(kinopoisk_film_id):
+    persone_parser = PersoneParser()
+    page_dump = persone_parser.acquire_page(kinopoisk_film_id)
+    persone_parser.update_persons_films_with_indexes(page_dump, kinopoisk_film_id)
 
 
 @app.task(name='kinopoisk_films')
@@ -42,41 +51,10 @@ def kinopoisk_films(pages):
                                                     defaults={'type': '', 'name':name})
                 print u"Film: {0} {1}".format(film.name, film.kinopoisk_id)
                 kinopoisk_parse_one_film.apply_async((film.kinopoisk_id, film.name))
+                persons_films_update_with_indexes.apply_async((film.kinopoisk_id,))
     except Exception, e:
         print e
 
-
-@robot_task('kinopoisk_persons')
-def parse_kinopoisk_persons(pid):
-    try:
-        response = simple_tor_get_page('http://www.kinopoisk.ru/name/{}/view_info/ok/#trivia'.format(pid), True)
-        soup = BeautifulSoup(response)
-        tag = soup.find('span', attrs={'itemprop': 'alternativeHeadline'})
-        person_name = tag.text.strip()
-        p = Persons.objects.get(name=person_name)
-        tag_birthdate = soup.find('td', attrs={'class': 'birth'})
-        birthdate = ''
-        print person_name
-        print "ID = ", p.id
-        if not (tag_birthdate is None):
-            birthdate = tag_birthdate.get('birthdate')
-        else:
-            print 'No data birthdate for this person id = {}'.format(pid)
-        tags_bio = soup.findAll('li', attrs={'class': 'trivia'})
-        bio = ''
-        if len(tags_bio):
-            for li in tags_bio:
-                bio = bio + ' ' + li.text
-        else:
-            print 'No biography for this person id = {}'.format(pid)
-        p.birthdate = birthdate
-        p.bio = bio
-        p.kinopoisk_id = pid
-        if p.photo == '' and p.kinopoisk_id != 0:
-            p.photo.save('profile.jpg', File(get_photo(p.kinopoisk_id)))
-        p.save()
-    except Exception, e:
-        print e
 
 
 @app.task(name='kinopoisk_set_poster')
@@ -173,3 +151,4 @@ def check_and_correct_tasks():
 def person_check_and_correct_tasks():
     for person in Persons.objects.all():
         check_and_correct_one_person.apply_async(person.id)
+

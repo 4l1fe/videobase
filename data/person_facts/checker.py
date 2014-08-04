@@ -7,7 +7,7 @@ from apps.films.models import Countries
 
 from data.checker import FactChecker
 from data.constants import FLATLAND_NAME
-from crawler.tasks.datarobots_tasks import parse_kinopoisk_persons
+from crawler.tasks.person_task import parse_kinopoisk_persons
 from apps.films.models import Persons
 
 person_checker = FactChecker(Persons)
