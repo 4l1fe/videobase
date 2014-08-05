@@ -29,7 +29,7 @@ BACKUP_PATH = os.path.join(BASE_PATH, '..', '.backup')
 SECRET_KEY = '7-dsc0--i_ej94w9as#-5p_5a)ql*9o80v1rs9krx!_-9%^b5$'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 TEMPLATE_DEBUG = DEBUG
 
@@ -255,7 +255,7 @@ if not DEBUG:
     )
 
     RAVEN_CONFIG = {
-        'dsn': 'http://8684bf8b497047d9ac170fd16aefc873:41e89f4666b24f998125370f3d1a1789@sentry.aaysm.com/2'
+        'dsn': 'http://8684bf8b497047d9ac170fd16aefc873:41e89f4666b24f998125370f3d1a1789@sentry.aaysm.com:9000/2'
     }
 
 ###########################################################
@@ -315,7 +315,7 @@ CELERYBEAT_SCHEDULE = {
     'kinopoisk_films_monthly': {
         'task': 'kinopoisk_films',
         'schedule': timedelta(days=31),
-        'args': (11,),
+        'args': (1100,),
     },
     # Task that periodically requests information from kinopoisk depending on film age
     'kinopoisk_refresh': {

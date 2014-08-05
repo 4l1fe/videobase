@@ -41,6 +41,7 @@ def update_kinopoisk_persone(pid):
             p.photo.save('profile.jpg', File(get_photo(p.kinopoisk_id)))
         p.save()
     except Exception, e:
-        print e
+        import traceback
+        traceback.print_exc()
 
 
