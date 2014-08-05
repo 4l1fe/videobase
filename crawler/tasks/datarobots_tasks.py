@@ -53,7 +53,8 @@ def kinopoisk_films(pages):
                 kinopoisk_parse_one_film.apply_async((film.kinopoisk_id, film.name))
                 persons_films_update_with_indexes.apply_async((film.kinopoisk_id,))
     except Exception, e:
-        print e
+        import traceback
+        traceback.print_exc()
 
 
 

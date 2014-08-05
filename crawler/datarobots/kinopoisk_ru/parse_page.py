@@ -145,7 +145,8 @@ def get_image(template, actor_id):
         return convert_file(r)
         
     except Exception as e:
-        print e
+        import traceback
+        traceback.print_exc()
         return None
 
 get_poster = partial(get_image, YANDEX_KP_FILMS_TEMPLATE)

@@ -78,7 +78,9 @@ def process_person_dict(film, person_dict):
             person_film = PersonsFilms(person=person_object, film=film, p_type=person_dict['p_type'])
             person_film.save()
     except Exception, e:
-        print e
+        print "Exception caught in process_person_dict"
+        import traceback
+        traceback.print_exc()
 
 
 def process_genre_dict(film, genre_dict):
@@ -147,4 +149,7 @@ def parse_from_kinopoisk(kinopoisk_id, name=None, film=None):
         facts = extract_facts_from_dump(page_dump)
         process_film_facts(film, facts)
     except Exception, exception:
-        print exception
+        print "Caught Exception in parse_from_kinopoisk"
+        import traceback
+        traceback.print_exc()
+
