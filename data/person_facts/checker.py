@@ -1,5 +1,5 @@
 # coding: utf-8
-from apps.films.models import Films
+from apps.films.models import Films, PersonsExtras
 from apps.films.models import FilmExtras
 from apps.films.constants import APP_FILM_TYPE_ADDITIONAL_MATERIAL_TRAILER
 
@@ -26,6 +26,17 @@ def person_info_reload_corrector(person):
 @person_checker.add("Person name is not in Russian")
 def russian_name_check(person):
     pass
+
+
+def person_poster_corrector(person):
+    try:
+        if person.photo.size < 2000:
+            person.photo.delete()
+        person.save()
+        print u"Corrector removed person poster"
+    except Exception, e:
+        pass
+
 
 
 @person_checker.add(u"Person has missing information", corrector=person_info_reload_corrector)
@@ -59,3 +70,11 @@ def person_check(person):
     else:
         return True
 
+@person_checker.add(u"Person has incorrect poster size", corrector=person_poster_corrector)
+def film_poster_size_check(person):
+    try:
+        if person.photo.size < 2000:
+            return False
+    except Exception, e:
+        pass
+    return True

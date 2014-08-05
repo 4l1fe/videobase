@@ -28,6 +28,18 @@ def find_first_pattern_position(str, pat):
             return -1
 
 
+def film_poster_corrector(film):
+    try:
+        film_extras = FilmExtras.objects.filter(film=film)
+        for oneExtra in film_extras:
+            if oneExtra.photo.size < 2000:
+                oneExtra.delete()
+        film.save()
+        print u"Corrector removed film poster"
+    except Exception:
+        pass
+
+
 def youtube_trailer_corrector(film):
     try:
         ft = FilmExtras.objects.filter(film=film).first()
@@ -299,7 +311,7 @@ def trailer_title_check(film):
         check_en = False
         check_block = False
         check_fname = False
-        check_fyear = Falses
+        check_fyear = False
 
         for phrase in trailers_ru_mask:
             if trailer_title.find(phrase) != -1:
@@ -329,3 +341,17 @@ def trailer_title_check(film):
         print e.message
         return True
 
+
+@film_checker.add(u"Film has incorrect poster size", corrector=film_poster_corrector)
+def film_poster_size_check(film):
+    try:
+        film_extras = FilmExtras.objects.filter(film=film)
+        if not film_extras:
+            return True
+        for oneExtra in film_extras:
+            if oneExtra.photo.size < 2000:
+                return False
+    except Exception:
+        pass
+
+    return True
