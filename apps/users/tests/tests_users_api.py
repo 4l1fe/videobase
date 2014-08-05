@@ -131,7 +131,7 @@ class APIUsersGenresTestCase(APITestCase):
     def test_api_users_genres_200_get(self):
         response = self.client.get(reverse(self.url_name, kwargs=self.kwargs))
         genres = Genres.get_all_genres(get_values=False).filter(genres__uf_films_rel__user=self.user).distinct()
-
+        genres = [i.get_root() for i in set(genres)]
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         for i in range(len(genres)):
             self.assertEqual(response.data[i]['id'], genres[i].pk)
