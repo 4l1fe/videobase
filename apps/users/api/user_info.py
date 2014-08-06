@@ -37,7 +37,7 @@ class UserInfoView(APIView):
 
                 user.save()
             except Exception, e:
-                Response({'e': e.message}, status=status.HTTP_400_BAD_REQUEST)
+                Response({'e': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 

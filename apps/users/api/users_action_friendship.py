@@ -33,7 +33,7 @@ class UsersFriendshipView(APIView):
         try:
             user_friend = User.objects.get(pk=user_id)
         except Exception as e:
-            return Response({'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         ur_fields = {'user': request.user, 'user_rel': user_friend}
         ur_fr_fields = {'user': user_friend, 'user_rel': request.user, 'rel_type': APP_USER_REL_TYPE_FRIENDS}
@@ -60,7 +60,7 @@ class UsersFriendshipView(APIView):
         try:
             user_friend = User.objects.get(pk=user_id)
         except Exception as e:
-            return Response({'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         obj_val = {'id': user_friend.id, 'name': user_friend.username}
         UsersRels.objects.filter(user=request.user, user_rel=user_friend).update(rel_type=APP_USER_REL_TYPE_NONE)
