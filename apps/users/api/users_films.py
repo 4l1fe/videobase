@@ -24,7 +24,7 @@ class UsersFilmsView(APIView):
         try:
             user = User.objects.get(pk=user_id)
         except Exception as e:
-            return Response({'e': e.message}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'e': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         page = request.QUERY_PARAMS.get('page', APP_USERS_API_DEFAULT_PAGE)
         per_page = request.QUERY_PARAMS.get('per_page', APP_USERS_API_DEFAULT_PER_PAGE)
@@ -32,14 +32,14 @@ class UsersFilmsView(APIView):
         try:
             ftype = films_type[type_]
         except KeyError as e:
-            return Response({'e': e.message}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'e': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         films = Films.objects.filter(uf_films_rel__user=user, type__in=ftype,
                                      uf_films_rel__subscribed=APP_USERFILM_SUBS_TRUE)
         try:
             page = Paginator(films, per_page).page(page)
         except Exception as e:
-            return Response({'e': e.message}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'e': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         serializer = vbFilm(page.object_list, request=self.request, many=True)
 

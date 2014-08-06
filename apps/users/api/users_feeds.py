@@ -19,7 +19,7 @@ class UsersFeedsView(APIView):
         try:
             user = User.objects.get(pk=user_id)
         except Exception, e:
-            return Response({'e': e.message}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'e': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         page = request.QUERY_PARAMS.get('page', APP_USERS_API_DEFAULT_PAGE)
         per_page = request.QUERY_PARAMS.get('per_page', APP_USERS_API_DEFAULT_PER_PAGE)
@@ -55,7 +55,7 @@ class UsersFeedsView(APIView):
         try:
             serializer = vbFeedElement(o_feed, many=True).data
         except Exception as e:
-            return Response({'e': e.message}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'e': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         result = {
             'per_page': per_page,
