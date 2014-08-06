@@ -1,6 +1,7 @@
 # coding: utf-8
 from apps.films.models import Films, Countries
 from django.utils.datetime_safe import datetime, date
+from django.utils import timezone
 
 
 def film_statistics():
@@ -34,5 +35,10 @@ def film_statistics():
     print u'Колличетсво фильмов с датой выпуска:' + str(release_date_count)
 
 
+def film_at_least_years_old(film, years):
+    '''
+    Returns true if @film less than @years old
+    '''
+    return timezone.now().date() - film.release_date < timezone.timedelta(days=365*years)
 
 
