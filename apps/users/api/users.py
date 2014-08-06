@@ -16,7 +16,7 @@ class UsersView(APIView):
         try:
             user = User.objects.get(pk=user_id)
         except Exception as e:
-            return Response({'e': e.message}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'e': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         serializer = vbUser(user, cer_user=request.user)
 
@@ -26,7 +26,7 @@ class UsersView(APIView):
         try:
             user = User.objects.get(pk=user_id)
         except Exception as e:
-            return Response({'e': e.message}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'e': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         ser_par = dict(extend=request.DATA.get('extend', False),
                        friends=request.DATA.get('friends', False),

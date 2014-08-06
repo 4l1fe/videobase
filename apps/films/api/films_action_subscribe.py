@@ -67,7 +67,7 @@ class ActSubscribeFilmView(APIView):
                     if f.object == obj_val: f.delete()                                      # с типом film-nw может и не быть
                 Feed.objects.create(user=request.user, type='film-s', object=obj_val)      # значит нечего обновлять
             except Exception as e:
-                return Response({'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(status=status.HTTP_200_OK)
 

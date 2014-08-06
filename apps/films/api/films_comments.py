@@ -47,7 +47,7 @@ class CommentsFilmView(APIView):
         try:
             page = Paginator(o_comments, per_page=per_page).page(page)
         except Exception as e:
-            return Response({'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         serializer = vbComment(page.object_list, many=True)
         result = {

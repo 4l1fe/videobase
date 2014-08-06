@@ -167,7 +167,7 @@ class SearchFilmsView(APIView):
                     page = Paginator(o_search, per_page=filter['per_page']).\
                         page(filter['page'])
                 except Exception, e:
-                    return Response({'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
+                    return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
                 # Формируем ответ
                 result = {
