@@ -262,10 +262,10 @@ if not DEBUG:
 CELERYBEAT_SCHEDULE = {
 
     # Launching robots that are described in Robots table.
-    'robot-launch': {
-        'task': 'robot_launch',
-        'schedule': timedelta(seconds=10),
-    },
+    #'robot-launch': {
+    #    'task': 'robot_launch',
+    #    'schedule': timedelta(seconds=10),
+    #},
 
     # Updating ratings from IMDB DB via archive
     'imdb_rating_update_command': {
@@ -337,7 +337,27 @@ CELERYBEAT_SCHEDULE = {
     'persons_check_and_correct': {
         'task': 'persons_check_and_correct',
         'schedule': timedelta(days=7),
-    }
+    },
+
+    # Checking locations for new films weekly
+    'age_weighted_robot_launch_task_weekly': {
+        'task': 'age_weighted_robot_launch',
+        'schedule': timedelta(days=7),
+        'args': (1,)
+    },
+    # Checking locations for aged films monthly
+    'age_weighted_robot_launch_task_monthly': {
+        'task': 'age_weighted_robot_launch',
+        'schedule': timedelta(days=31),
+        'args': (3,)
+    },
+
+    # Checking locations for aged films yearly
+    'age_weighted_robot_launch_task_six_month': {
+        'task': 'age_weighted_robot_launch',
+        'schedule': timedelta(days=31*6),
+        'args': (120,)
+    } 
 }
 
 CELERY_TIMEZONE = 'UTC'
