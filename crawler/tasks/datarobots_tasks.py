@@ -76,11 +76,6 @@ def imdb_robot_start(*args, **kwargs):
     process_all()
 
 
-def film_at_least_years_old(film, years):
-    '''
-    Returns true if @film less than @years old
-    '''
-    return timezone.now().date() - film.release_date < timezone.timedelta(days=365*years)
 
 
 def film_checked_on_kp_at_least_days_ago(film, days):
