@@ -22,7 +22,7 @@ def parse_search(response, film):
     return search_film
 
 
-# Парсер для страници фильма
+# Парсер для страницы фильма
 class ParseFilmPage(BaseParse):
     def __init__(self, html):
         super(ParseFilmPage, self).__init__(html)
