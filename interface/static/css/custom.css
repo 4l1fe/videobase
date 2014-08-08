@@ -666,7 +666,7 @@ a.btn-more-friends, .btn-more-friends {
 .person-data-playlist li {
     padding-top: 18px;font-size: 14px;color: #000;
 }
-.person-data-playlist span {
+.person-data-playlist span.th {
     color: #7c7c7c;display: inline-block;width: 134px; float: left;
 }
 .person-data-playlist div {margin-left: 135px;}
