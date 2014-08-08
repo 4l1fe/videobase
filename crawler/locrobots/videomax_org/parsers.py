@@ -60,8 +60,8 @@ class ParseVIDEOMAXPage(BaseParse):
         soup = BeautifulSoup(self.html)
         try:
             has_seasons = unicode(soup.find('div', {'id': 'placenta'}).find('div', {'class': 'list_dvds'}).find('div', {'class': 'block_header'}).contents[0])
-            if has_seasons:
-                seasons_block_content = soup.find('div', {'class': 'block_content'})
+            if has_seasons == u'Все сезоны':
+                seasons_block_content = soup.find('div', {'class': 'list_dvds'}).find('div', {'class': 'block_content'})
                 season_items = seasons_block_content.findAll('div', {'class': 'item'})
                 return range(1, len(season_items)+1)
         except Exception:
