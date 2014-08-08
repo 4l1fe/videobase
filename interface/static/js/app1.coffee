@@ -37,7 +37,7 @@ class Player
   constructor: (@place, opts = {}) ->
     @current = undefined
 
-  load: (loc, scroll = true) ->
+  load: (loc, scroll = true, autoplay = true) ->
     if @current != undefined
       @clear()
     if (loc.price_type != 0 && loc.type != "playfamily")
@@ -47,6 +47,7 @@ class Player
         value = "&value=" + loc.value
       else
         value = "&view=" + encodeURI(loc.url_view)
+    value+= "&autoplay=" + autoplay
     @place.empty().html('<iframe src="' + window.mi_conf.player_url + '?type=' + loc.type + value + '"></iframe>')
     if (scroll)
       scroll_to_obj @place
@@ -919,11 +920,6 @@ class Page_Main extends Page
   update_filter_params: (update_href = true) ->
     query_string=""
 
-    if films_deck.page
-      _filter_params.page = films_deck.page
-      query_string+= "&" if query_string
-      query_string+= "page=" + films_deck.page
-
     for key, el of @_e.filter
       val = el._selected._val
       if key == "price"
@@ -948,17 +944,26 @@ class Page_Main extends Page
         else
           _filter_params[key] = null
 
+    page = films_deck.page || 1
+    _filter_params.page = page
+    query_string+= "&" if query_string
+    more_btn_href = "/?" + query_string + "page=" + (page+1)
+    query_string+= "page=" + films_deck.page
+
     query_string = "?" + query_string if query_string
     if update_href
       if history && history.pushState
         history.pushState null, null, query_string
+
+      $("a", $("#films_more")).attr("href", more_btn_href)
+
 
   load_more_films: (deck, opts = {}) ->
     deck.load_more_hide()
     params = $.extend(_filter_params, opts.params || {})
     params["recommend"] = 1 if @user_is_auth(false)
     if opts.clear_output
-      deck.clear()
+      deck.clear(false)
       params.page = 1
     else
       params.page = opts.page || (deck.page + 1)
@@ -978,6 +983,7 @@ class Page_Main extends Page
             scroll_to_obj $("#filter_content")
         else
           deck.load_more_hide(false)
+        @update_filter_params()
         opts.callback() if opts.callback
     )
     .fail(
@@ -1071,7 +1077,6 @@ class Page_Film extends Page
 
   play_location: (id, scroll = false) ->
     @player.load(locations[id], scroll) if locations[id]
-    return false
 
   load_all_actors: () ->
     actors_deck.load_more_hide(false);
