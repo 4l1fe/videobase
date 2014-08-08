@@ -45,23 +45,21 @@ def parse_search(response, film):
     return search_film_url
 
 
-# Парсер для страници фильма
+# Парсер для страницы фильма
 class ParseVIDEOMAXPage(BaseParse):
     def __init__(self, html):
         super(ParseVIDEOMAXPage, self).__init__(html)
-        self.html = html
+        self.soup = BeautifulSoup(self.html)
 
     def get_link(self, **kwargs):
-        soup = BeautifulSoup(self.html)
-        link = soup.head.find('link', rel='canonical').get('href')
+        link = self.soup.head.find('link', rel='canonical').get('href')
         return link
 
     def get_seasons(self, **kwargs):
-        soup = BeautifulSoup(self.html)
         try:
-            has_seasons = unicode(soup.find('div', {'id': 'placenta'}).find('div', {'class': 'list_dvds'}).find('div', {'class': 'block_header'}).contents[0])
+            has_seasons = unicode(self.soup.find('div', {'id': 'placenta'}).find('div', {'class': 'list_dvds'}).find('div', {'class': 'block_header'}).contents[0])
             if has_seasons == u'Все сезоны':
-                seasons_block_content = soup.find('div', {'class': 'list_dvds'}).find('div', {'class': 'block_content'})
+                seasons_block_content = self.soup.find('div', {'class': 'list_dvds'}).find('div', {'class': 'block_content'})
                 season_items = seasons_block_content.findAll('div', {'class': 'item'})
                 return range(1, len(season_items)+1)
         except Exception:
@@ -75,8 +73,7 @@ class ParseVIDEOMAXPage(BaseParse):
         return price, price_type
 
     def get_value(self, **kwargs):
-        soup = BeautifulSoup(self.html)
-        link = soup.head.find('link', rel='canonical').get('href')
+        link = self.soup.head.find('link', rel='canonical').get('href')
         return link
 
     def get_type(self, **kwargs):
