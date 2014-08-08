@@ -37,7 +37,8 @@
                   value = vals.view.substr(24)
                   value = value.substr(0, value.indexOf("#"))
               }
-              html = '<iframe src="http://www.ivi.ru/player/?videoid=' + value + '&amp;subsite=138&amp;enableseries=0&amp;autostart=0" width="100%" height="100%" frameborder="0" allowfullscreen=""></iframe>'
+              autoplay = vals["autoplay"] && (vals["autoplay"] == 1 || vals["autoplay"] == true || vals["autoplay"] == "true")?1:0;
+              html = '<iframe src="http://www.ivi.ru/player/?videoid=' + value + '&amp;subsite=138&amp;enableseries=0&amp;autostart=' + autoplay + '" width="100%" height="100%" frameborder="0" allowfullscreen=""></iframe>'
           } else if (vals.type == "nowru") {
               if (value == false) {
                   arr = vals.view.split("/")

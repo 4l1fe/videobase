@@ -25,12 +25,10 @@ KINOPOISK_LIST_FILMS_URL = "http://www.kinopoisk.ru/top/navigator/m_act%5Begenre
 information_robots = ['kinopoik_robot', 'imdb_robot']
 
 
-
 @app.task(name='persons_films_update_with_indexes')
 def persons_films_update_with_indexes(kinopoisk_film_id):
-    persone_parser = PersoneParser()
-    page_dump = persone_parser.acquire_page(kinopoisk_film_id)
-    persone_parser.update_persons_films_with_indexes(page_dump, kinopoisk_film_id)
+    page_dump = PersoneParser.acquire_page(kinopoisk_film_id)
+    PersoneParser.update_persons_films_with_indexes(page_dump, kinopoisk_film_id)
 
 
 @app.task(name='kinopoisk_films')

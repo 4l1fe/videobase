@@ -66,10 +66,13 @@
       this.current = void 0;
     }
 
-    Player.prototype.load = function(loc, scroll) {
+    Player.prototype.load = function(loc, scroll, autoplay) {
       var value;
       if (scroll == null) {
         scroll = true;
+      }
+      if (autoplay == null) {
+        autoplay = true;
       }
       if (this.current !== void 0) {
         this.clear();
@@ -83,6 +86,7 @@
           value = "&view=" + encodeURI(loc.url_view);
         }
       }
+      value += "&autoplay=" + autoplay;
       this.place.empty().html('<iframe src="' + window.mi_conf.player_url + '?type=' + loc.type + value + '"></iframe>');
       if (scroll) {
         return scroll_to_obj(this.place);
@@ -1452,18 +1456,11 @@
     };
 
     Page_Main.prototype.update_filter_params = function(update_href) {
-      var el, key, query_string, val, vals, _ref;
+      var el, key, more_btn_href, page, query_string, val, vals, _ref;
       if (update_href == null) {
         update_href = true;
       }
       query_string = "";
-      if (films_deck.page) {
-        _filter_params.page = films_deck.page;
-        if (query_string) {
-          query_string += "&";
-        }
-        query_string += "page=" + films_deck.page;
-      }
       _ref = this._e.filter;
       for (key in _ref) {
         el = _ref[key];
@@ -1500,13 +1497,21 @@
           }
         }
       }
+      page = films_deck.page || 1;
+      _filter_params.page = page;
+      if (query_string) {
+        query_string += "&";
+      }
+      more_btn_href = "/?" + query_string + "page=" + (page + 1);
+      query_string += "page=" + films_deck.page;
       if (query_string) {
         query_string = "?" + query_string;
       }
       if (update_href) {
         if (history && history.pushState) {
-          return history.pushState(null, null, query_string);
+          history.pushState(null, null, query_string);
         }
+        return $("a", $("#films_more")).attr("href", more_btn_href);
       }
     };
 
@@ -1521,7 +1526,7 @@
         params["recommend"] = 1;
       }
       if (opts.clear_output) {
-        deck.clear();
+        deck.clear(false);
         params.page = 1;
       } else {
         params.page = opts.page || (deck.page + 1);
@@ -1546,6 +1551,7 @@
           } else {
             deck.load_more_hide(false);
           }
+          _this.update_filter_params();
           if (opts.callback) {
             return opts.callback();
           }
@@ -1724,9 +1730,8 @@
         scroll = false;
       }
       if (locations[id]) {
-        this.player.load(locations[id], scroll);
+        return this.player.load(locations[id], scroll);
       }
-      return false;
     };
 
     Page_Film.prototype.load_all_actors = function() {
