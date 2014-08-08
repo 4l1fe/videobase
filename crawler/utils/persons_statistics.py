@@ -17,7 +17,9 @@ def persons_statistics():
             if not(person.birthdate is None):
                 count_birthdate += 1
         except Persons.DoesNotExist, e:
-            print e
+            import traceback
+            traceback.print_exc()
+
     print u'Колличество персон с биографией:' + str(count_bio)
     print u'Колличетсво персон с фотографией:' + str(count_photo)
     print u'Колличетсво персон с датой рождения:' + str(count_birthdate)

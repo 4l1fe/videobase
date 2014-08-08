@@ -338,7 +338,8 @@ def trailer_title_check(film):
 
     except Exception, e:
         print u"Trailer title check failed"
-        print e.message
+        import traceback
+        traceback.print_exc()
         return True
 
 

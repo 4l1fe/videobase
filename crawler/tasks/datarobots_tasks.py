@@ -53,7 +53,8 @@ def kinopoisk_films(pages):
                 kinopoisk_parse_one_film.apply_async((film.kinopoisk_id, film.name))
                 persons_films_update_with_indexes.apply_async((film.kinopoisk_id,))
     except Exception, e:
-        print e
+        import traceback
+        traceback.print_exc()
 
 
 
@@ -75,11 +76,6 @@ def imdb_robot_start(*args, **kwargs):
     process_all()
 
 
-def film_at_least_years_old(film, years):
-    '''
-    Returns true if @film less than @years old
-    '''
-    return timezone.now().date() - film.release_date < timezone.timedelta(days=365*years)
 
 
 def film_checked_on_kp_at_least_days_ago(film, days):

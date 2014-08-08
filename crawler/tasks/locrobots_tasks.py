@@ -5,7 +5,9 @@ from crawler.locrobots.amediateka_ru.loader import Amediateka_robot
 from crawler.locrobots.viaplay_ru.robot import ViaplayRobot
 from crawler.locrobots.playfamily_dot_ru.playfamily_xml import process
 from crawler.tasks.utils import robot_launch_wrapper
+from crawler.utils.films_statistics import film_at_least_years_old
 from videobase.celery import app
+from collections import defaultdict
 
 from django.utils import timezone
 
@@ -35,7 +37,12 @@ def viaplay_robot_start():
 def launch_individual_film_site_task(site):
     robot_launch_wrapper(site, partial(process_film_on_site, site))
 
+@app.task(name='process_film_on_site')
+def process_individual_film_on_site(site,film_id):
 
+    process_film_on_site(site,film_id)
+
+    
 @app.task(name='robot_launch')
 def robot_launcher(*args, **kwargs):
     print 'Start'
@@ -46,5 +53,20 @@ def robot_launcher(*args, **kwargs):
                 launch_individual_film_site_task.apply_async((robot.name,))
         else:
             print u'Skipping robot %s' % robot.name
+
+
+@app.task(name='age_weighted_robot_launch')
+def age_weighted_robot_launcher(years):
+    print "Starting locations checks for every film at least {} days old".format(days)
+
+    delays=defaultdict(int)
+
+    for robot in Robots.objects.all():
+
+        for film in Films.objects.all():
+            if film_at_least_years_old(film, years):
+
+                process_individual_film_on_site.apply_async((robot.name,film.id), countdown=15*delays[robot.name])
+                delays[robot.name]+=1
 
 

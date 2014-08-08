@@ -1,6 +1,6 @@
 # coding: utf-8
-
 from pytils import numeral
+import datetime
 
 from django.db import transaction
 from django.core.paginator import Paginator
@@ -33,6 +33,7 @@ from utils.common import url_with_querystring
 from utils.noderender import render_page
 
 HOST = 'vsevi.ru'
+
 
 class RegisterUserView(View):
 
@@ -117,8 +118,10 @@ class TokenizeView(View):
         session = create_new_session(user)
 
         response = HttpResponseRedirect(back_url)
-        response.set_cookie('x-token', token)
-        response.set_cookie('x-session', session.token.key)
+        max_age = 30 * 24 * 60 * 60 # two weeks
+        expires = datetime.datetime.strftime(datetime.datetime.utcnow() + datetime.timedelta(seconds=max_age), "%a, %d-%b-%Y %H:%M:%S GMT")
+        response.set_cookie('x-token', token, max_age=max_age, expires=expires)
+        response.set_cookie('x-session', session.token.key, max_age=max_age, expires=expires)
         response.delete_cookie('sessionid')
 
         return response
