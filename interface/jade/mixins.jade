@@ -165,7 +165,8 @@ mixin loc_thumb(item)
     - if (item.price)
     -   price = Math.floor(item.price)
     li(data-mi-val=item.id).location-thumb
-        a.block.margin0a.btn-film(href='#', title='',class=btn_cls)=quality_texts[item.quality] || quality_texts["default"]
+        - href = "#" + item.id
+        a.block.margin0a.btn-film(href=href, title='',class=btn_cls)=quality_texts[item.quality] || quality_texts["default"]
         p
             |#{location_names[item.type] || location_names["default"]}
             br
