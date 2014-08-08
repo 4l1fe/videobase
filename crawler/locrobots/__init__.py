@@ -13,6 +13,8 @@ from crawler.locrobots.play_google_com.loader import PLAY_GOOGLE_Loader
 from crawler.locrobots.play_google_com.parsers import ParsePlayGoogleFilm
 from crawler.locrobots.tvigle_ru.loader import TVIGLE_Loader
 from crawler.locrobots.tvigle_ru.parsers import ParseTvigleFilm
+from crawler.locrobots.videomax_org.loader import VIDEOMAX_Loader
+from crawler.locrobots.videomax_org.parsers import ParseVIDEOMAXPage
 from crawler.locrobots.zabava_ru.loader import ZABAVAR_RU_Loader
 from crawler.locrobots.zabava_ru.parsers import ParseZabavaFilm
 from crawler.locrobots.oll_tv.loader import Oll_Loader
@@ -66,6 +68,10 @@ sites_crawler = {
     'zabava_ru': {
         'loader': ZABAVAR_RU_Loader,
         'parser': ParseZabavaFilm
+    },
+    'videomax_org': {
+        'loader': VIDEOMAX_Loader,
+        'parser': ParseVIDEOMAXPage,
     }
 }
 
