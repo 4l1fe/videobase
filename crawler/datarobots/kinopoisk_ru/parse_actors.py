@@ -14,11 +14,11 @@ __author__ = 'vladimir'
 
 
 class PersoneParser(object):
+    def __init__(self, data):
+        pass
 
-    def __init__(self):
-        self.pers_type = 0
-
-    def acquire_page(self, page_id):
+    @staticmethod
+    def acquire_page(page_id):
         if not os.path.exists(PAGE_ARCHIVE):
             os.mkdir(PAGE_ARCHIVE)
 
@@ -37,41 +37,45 @@ class PersoneParser(object):
 
         return page_dump
 
-    def is_persone_exists(self, kinopoisk_id):
+    @staticmethod
+    def is_persone_exists(kinopoisk_id):
         try:
             Persons.objects.get(kinopoisk_id = kinopoisk_id)
             return 1
         except ObjectDoesNotExist:
             return 0
 
-    def detect_type_of_persone(self, div):
-        self.pers_type = 0
+    @staticmethod
+    def detect_type_of_persone(div):
+        pers_type = 0
         if div.text == u"Режиссеры":
-            self.pers_type = APP_PERSON_DIRECTOR
+            pers_type = APP_PERSON_DIRECTOR
         if div.text == u"Актеры":
-            self.pers_type = APP_PERSON_ACTOR
+            pers_type = APP_PERSON_ACTOR
 
         if div.text == u"Продюсеры":
-            self.pers_type = APP_PERSON_PRODUCER
+            pers_type = APP_PERSON_PRODUCER
 
         if div.text == u"Сценаристы":
-            self.pers_type = APP_PERSON_SCRIPTWRITER
-        return self.pers_type
+            pers_type = APP_PERSON_SCRIPTWRITER
+        return pers_type
 
-    def get_persone_id(self, div):
+    @staticmethod
+    def get_persone_id(div):
         photo_div = div.find('div',{ "class" : "photo" })
         href = photo_div.find('a').get('href')
         id = href.split('/')[2]
         return id
 
-    def get_persone_name(self, div):
+    @staticmethod
+    def get_persone_name(div):
         photo_div = div.find('div',{ "class" : "name" })
         a = photo_div.find('a')
         name = a.contents[0]
         return name
 
-    def get_persons_films(self, film, person, pers_type):
-
+    @staticmethod
+    def get_persons_films(film, person, pers_type):
         person_film = PersonsFilms.objects.get(film=film, person=person, p_type=pers_type)
         if not person_film:
             print u"Adding link for film {} and person {}".format(film, person)
@@ -79,7 +83,8 @@ class PersoneParser(object):
             person_film.save()
         return person_film
 
-    def get_person(self, name, kinopoisk_id):
+    @staticmethod
+    def get_person(name, kinopoisk_id):
         person = Persons.objects.get(kinopoisk_id=kinopoisk_id)
         if not person:
             person = Persons(name=name, photo='', kinopoisk_id=kinopoisk_id)
@@ -87,38 +92,40 @@ class PersoneParser(object):
             print u'Added Person {}'.format(name)
         return person
 
-    def update_persons_films_with_indexes(self, page_dump, film_id):
+    @staticmethod
+    def update_persons_films_with_indexes(page_dump, film_id):
         try:
             film = Films.objects.get(kinopoisk_id=film_id)
             soup = BeautifulSoup(page_dump)
             div_wrap = soup.find("div", "block_left")
             index = 0
+            pers_type = 0
             old_pers_type = 0
             for div in div_wrap.findAll('div'):
-                actor_info_div = div.find('div', { "class" : "actorInfo" })
+                actor_info_div = div.find('div', {"class": "actorInfo"})
                 if not actor_info_div:
                     if not div.get("class"):
-                        self.detect_type_of_persone(div)
+                        pers_type = PersoneParser.detect_type_of_persone(div)
                 else:
-                    if self.pers_type == 0:
+                    if pers_type == 0:
                         continue
-                    pers_id = self.get_persone_id(actor_info_div)
-                    pers_name = self.get_persone_name(actor_info_div)
+                    pers_id = PersoneParser.get_persone_id(actor_info_div)
+                    pers_name = PersoneParser.get_persone_name(actor_info_div)
                     if old_pers_type == 0:
-                        old_pers_type = self.pers_type
-                    if self.pers_type == old_pers_type:
+                        old_pers_type = pers_type
+                    if pers_type == old_pers_type:
                         index += 1
                     else:
-                        old_pers_type = self.pers_type
+                        old_pers_type = pers_type
                         index = 1
 
-                    persone = self.get_person(name = pers_name, kinopoisk_id = pers_id)
+                    persone = PersoneParser.get_person(name=pers_name, kinopoisk_id=pers_id)
                     update_kinopoisk_persone(pers_id)
-                    person_for_film = self.get_persons_films(film=film, person=persone, pers_type=self.pers_type)
+                    person_for_film = PersoneParser.get_persons_films(film=film, person=persone, pers_type=pers_type)
                     person_for_film.p_index = index
-                    person_for_film.p_type = self.pers_type
+                    person_for_film.p_type = pers_type
                     person_for_film.save()
-                    print persone, person_for_film, person_for_film.p_type ,person_for_film.p_index
+                    print persone, person_for_film, person_for_film.p_type, person_for_film.p_index
 
         except Exception, e:
             import traceback
