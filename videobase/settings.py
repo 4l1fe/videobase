@@ -29,7 +29,7 @@ BACKUP_PATH = os.path.join(BASE_PATH, '..', '.backup')
 SECRET_KEY = '7-dsc0--i_ej94w9as#-5p_5a)ql*9o80v1rs9krx!_-9%^b5$'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 TEMPLATE_DEBUG = DEBUG
 
@@ -199,7 +199,7 @@ REST_FRAMEWORK = {
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 
 LOGIN_URL = '/login'
-SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/tokenize'
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/tokenize/'
 LOGIN_ERROR_URL = '/'
 
 ###########################################################
@@ -255,17 +255,17 @@ if not DEBUG:
     )
 
     RAVEN_CONFIG = {
-        'dsn': 'http://8684bf8b497047d9ac170fd16aefc873:41e89f4666b24f998125370f3d1a1789@sentry.aaysm.com/2'
+        'dsn': 'http://8684bf8b497047d9ac170fd16aefc873:41e89f4666b24f998125370f3d1a1789@sentry.aaysm.com:9000/2'
     }
 
 ###########################################################
 CELERYBEAT_SCHEDULE = {
 
     # Launching robots that are described in Robots table.
-    'robot-launch': {
-        'task': 'robot_launch',
-        'schedule': timedelta(seconds=10),
-    },
+    #'robot-launch': {
+    #    'task': 'robot_launch',
+    #    'schedule': timedelta(seconds=10),
+    #},
 
     # Updating ratings from IMDB DB via archive
     'imdb_rating_update_command': {
@@ -315,7 +315,7 @@ CELERYBEAT_SCHEDULE = {
     'kinopoisk_films_monthly': {
         'task': 'kinopoisk_films',
         'schedule': timedelta(days=31),
-        'args': (11,),
+        'args': (1100,),
     },
     # Task that periodically requests information from kinopoisk depending on film age
     'kinopoisk_refresh': {
@@ -337,7 +337,27 @@ CELERYBEAT_SCHEDULE = {
     'persons_check_and_correct': {
         'task': 'persons_check_and_correct',
         'schedule': timedelta(days=7),
-    }
+    },
+
+    # Checking locations for new films weekly
+    'age_weighted_robot_launch_task_weekly': {
+        'task': 'age_weighted_robot_launch',
+        'schedule': timedelta(days=7),
+        'args': (1,)
+    },
+    # Checking locations for aged films monthly
+    'age_weighted_robot_launch_task_monthly': {
+        'task': 'age_weighted_robot_launch',
+        'schedule': timedelta(days=31),
+        'args': (3,)
+    },
+
+    # Checking locations for aged films yearly
+    'age_weighted_robot_launch_task_six_month': {
+        'task': 'age_weighted_robot_launch',
+        'schedule': timedelta(days=31*6),
+        'args': (120,)
+    } 
 }
 
 CELERY_TIMEZONE = 'UTC'

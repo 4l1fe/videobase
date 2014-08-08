@@ -42,7 +42,8 @@ class Command(NoArgsCommand):
                         data = get_omdb_data(film.imdb_id)
                         omdb_shelve[film.imdb_id] = get_omdb_data(film.imdb_id)
                 except Exception,e:
-                    print e
+                    import traceback
+                    traceback.print_exc()
                 
                 if data:
                     try:
