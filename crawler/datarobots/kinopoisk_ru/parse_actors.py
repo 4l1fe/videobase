@@ -121,4 +121,6 @@ class PersoneParser(object):
                     print persone, person_for_film, person_for_film.p_type ,person_for_film.p_index
 
         except Exception, e:
-            print e
+            import traceback
+            traceback.print_exc()
+
