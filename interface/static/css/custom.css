@@ -347,7 +347,9 @@ section {padding:37px 0 6px 0;}
 .btns-slider a.selected {background-position: 0 -131px;}
 
 footer[role=contentinfo] {padding: 18px 0 0 0;}
-.block-footer {text-align: center;}
+.block-footer {text-align: left;}
+.block-footer .solaris-logo {margin-left: 25px;}
+.block-footer:last-child {text-align: right}
 .menu-footer {
     text-align: center;font-size: 0px;padding-top: 30px;padding-bottom: 30px;
 }
@@ -372,6 +374,7 @@ footer[role=contentinfo] {padding: 18px 0 0 0;}
 .bottom-footer p {
     color: #7a7a7a;font-size: 14px;
 }
+.bottom-footer a {color: #7a7a7a; text-decoration: underline}
 .bottom-footer {
     border-top:1px dashed #b0b0b0;margin-top: 2px;
     padding: 20px 0;
@@ -654,7 +657,7 @@ a.btn-more-friends, .btn-more-friends {
     padding-bottom: 20px;
     line-height: 0px;font-size: 0px;padding-top: 3px;
 }
-.img-person-playlist img {width: 100%; max-width: 260px;}
+.img-person-playlist img {width: 100%; max-width: 280px;}
 .img-person img {width: 211px;}
 .person-info {padding-left: 50px;}
 .person-name span, .person-data {
@@ -1017,7 +1020,7 @@ a.toggle-playlist.active {
     .menu-header li {background: none;}
 }
 
-@media only screen and (max-width: 769px) {
+@media only screen and (max-width: 767px) {
     .bottom-header .col-md-8 .menu-header, .bottom-header .col-md-4 .menu-header {text-align: center;}
     .range-block-playlist {margin: 0 auto;width: 257px;}
     .name-playlist {text-align: center;padding-bottom: 20px;}
@@ -1130,7 +1133,7 @@ a.toggle-playlist.active {
 .page-profile .title-item-tape {margin-left: 15px; padding-left: 0}
 .page-profile .content-item-tape {margin-left: 15px; padding-left: 0}
 
-.playlist-empty {margin-bottom: 40px}
+.playlist-empty {margin-bottom: 40px; padding-top: 40px}
 .playlist-empty h2 {font-size: 28px; font-weight: bold;}
 .playlist-empty span {color: #a08c8c; font-size: 14px;}
 

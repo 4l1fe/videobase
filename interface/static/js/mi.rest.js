@@ -249,13 +249,9 @@
                 if (xhr.status === 200 && xhr.responseJSON && xhr.responseJSON.session_token) {
                   _this.session_token = xhr.responseJSON.session_token;
                   $.cookie("x-session", _this.session_token, {
-                    secure: true,
-                    path: "/",
                     expires: 30
                   });
                   $.cookie("x-token", _this.token, {
-                    secure: true,
-                    path: "/",
                     expires: 30
                   });
                 } else {
@@ -450,9 +446,9 @@
         self = this.parent;
         ajaxOpts.error = function(xhr) {
           if (xhr.status === 401) {
-            return self.refreshSession(function(success) {
+            return self.refreshSession((function() {
               return self.ajax(method, url, data, true);
-            });
+            }));
           }
         };
       }
