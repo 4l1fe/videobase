@@ -246,7 +246,7 @@ class FilmThumb extends Item
     if attr == "href" && name == "id"
       return "/films/" + val + "/"
     else
-      return val
+      super
 
   transform_val: (name, val) ->
     if name == "releasedate"
@@ -266,21 +266,28 @@ class FilmThumb extends Item
     if vals.locations && vals.locations.length
       vals.hasFree = false
       vals.price = 0
+      price_loc_cnt = 0
       for loc in vals.locations
         loc.price = parseFloat(loc.price || 0)
         if loc.price_type == 0
           vals.hasFree = true
-        else if loc.price && (vals.price == 0 || loc.price < vals.price)
-          vals.price = loc.price
-          vals.price_loc = loc.id
+        else
+          if loc.price && (vals.price == 0 || loc.price < vals.price)
+            vals.price = loc.price
+            vals.price_loc = loc.id
+          price_loc_cnt++
       btn_cls = false
       btn_text = ""
       if !vals.hasFree && vals.price
         btn_cls = "btn-price"
-        btn_text = "Смотреть<br><i>от " + vals.price + " р. без рекламы</i>"
+        btn_text = "Смотреть<br><i>"
+        btn_text+= "от " if price_loc_cnt > 1
+        btn_text+= vals.price + " р. без рекламы</i>"
       else if vals.price
         @elements["btn_price"].self.css("display", "block")
-        @elements["price"].self.text("от " + vals.price + " р. без рекламы")
+        text = vals.price + " р. без рекламы"
+        text = "от " + text if price_loc_cnt > 1
+        @elements["price"].self.text(text)
       if !vals.price || vals.hasFree
         btn_cls = "btn-free"
         btn_text = "Смотреть<br/>бесплатно"
@@ -384,9 +391,15 @@ class FeedThumb extends Item
         if @_type == "film-r"
           @elements["object.rating"].self.rateit().rateit("value", opts.vals.object.rating)
 
+  transform_val: (name, val) ->
+    if name == "user.name"
+      return val || "Пользователь"
+    super
+
   transform_attr: (attr, name, val) ->
     type = @_type
     if type.substr(0,4) == "film"
+      console.log name
       if name == "object.id" && attr="href"
         return "/films/" + val + "/"
       if name == "object.name"
@@ -404,6 +417,7 @@ class FeedThumb extends Item
         return time_text(new Date(val))
       catch
         return val
+    super
 
 class Deck
   constructor: (@_place, opts = {}) ->
@@ -538,11 +552,14 @@ class FilmsDeck extends Deck
 
   onchange: (global = false) ->
     body_width = $("body").width()
-    items_inrow = Math.floor($("body").width() / 250)
-    if body_width > 974 || items_inrow > 4
+    # items_inrow = Math.floor($("body").width() / 250)
+    if body_width > 991
       items_inrow = 4
-    if items_inrow < 2
+    else if body_width > 767
+      items_inrow = 3
+    else
       items_inrow = 2
+
     if @current_items_inrow != items_inrow
       global = true
     @current_items_inrow = items_inrow
@@ -621,11 +638,9 @@ class App
     if name != undefined
       @show_page(name, conf.page_conf)
 
-
     $("#login_btn").click (e)=>
       e.preventDefault()
       e.stopPropagation()
-      @auth_modal.modal("show")
       @show_modal("login")
 
     $("#reg_btn").click (e) =>
@@ -696,22 +711,22 @@ class App
           )
         else
           @rest.films.action.rate.update id, {rating: opts.value}
-          .done(
-            ->
-              rel.rating = false if opts.rel
-              opts.callback(opts.value) if opts.callback
-          )
+            .done(
+              ->
+                rel.rating = false if opts.rel
+                opts.callback(opts.value) if opts.callback
+            )
       else
         if new_state
           doit = "update"
         else
           doit = "destroy"
         @rest.films.action[action][doit](id)
-        .done(
-          ->
-            rel[action_str] = new_state if opts.rel
-            opts.callback(new_state) if opts.callback
-        )
+          .done(
+            ->
+              rel[action_str] = new_state if opts.rel
+              opts.callback(new_state) if opts.callback
+          )
 
   person_action: (id, action, opts = {}) ->
     if @user_is_auth()
@@ -972,7 +987,9 @@ class Page_Main extends Page
     .done(
       (data) =>
         return if current_counter != deck.load_counter
+        console.log data
         if data.items
+          console.log "items1"
           deck.add_items(data.items)
           if data.items.length >= 12
             deck.load_more_show()
@@ -1126,6 +1143,7 @@ class Page_Person extends Page
   films_deck = undefined
   constructor: (@conf) ->
     super
+    @_app.get_tpl("film-thumb")
     films_deck = new FilmsDeck($("#films"), {load_func: (deck) =>@load_more_films(deck) })
     films_deck.load_more_bind($("#films_more"))
     films_deck.page = 1
@@ -1179,6 +1197,7 @@ class Page_Playlist extends Page
           status: false
           rel: @conf.relation
           callback: =>
+            console.log 1
             if @conf.next && @conf.next.id
               location.href = "/playlist/" + @conf.id + "/"
             else if @conf.previous && @conf.previous.id
@@ -1189,6 +1208,7 @@ class Page_Playlist extends Page
       return false
     )
     $('.crsl-items').carousel({itemMinWidth: 155, itemEqualHeight: true, visible: 6});
+    @_app.get_tpl("person-thumb")
 
 class Page_Feed extends Page
   feed_deck = undefined
@@ -1197,6 +1217,7 @@ class Page_Feed extends Page
     feed_deck = new FeedDeck($("#feed"), {load_func: (deck) =>@load_more_feed(deck) })
     feed_deck.load_more_bind($("#feed_more"))
     feed_deck.page = 1
+    @_app.get_tpl("feed-thumb")
 
   load_more_feed: (deck) ->
     current_counter = deck.load_counter
@@ -1267,6 +1288,8 @@ class Page_User extends Page
     feed_deck = new FeedDeck($("#feed"), {load_func: (deck) =>@load_more_feed(deck) })
     feed_deck.load_more_bind($("#feed_more"))
     feed_deck.page = 1
+    @_app.get_tpl("feed-thumb")
+    @_app.get_tpl("film-thumb")
 
   action_friendship: (status) ->
     @_app.user_action(@conf.id, "friendship", {
