@@ -7,7 +7,9 @@ html
     - film_url_meta = 'http://vsevi.ru/films/' + film.id
     - film_img_meta = film.poster || noposter_url
     - if (film_img_meta[0] == "/") film_img_meta = 'http://vsevi.ru' + film_img_meta
-    - page_title_full = film.name + (film.name_orig?" (" + film.name_orig + ")":"") + " &mdash; фильмы на Все видео"
+    - title_alt = film.name
+    - if (film.name_orig && film.name_orig != film.name) title_alt+= " (" + film.name_orig + ")"
+    - page_title_full = title_alt + " &mdash; фильмы на Все видео"
     - page_keywords = "фильм " + film.name + (film.name_orig?": " + film.name_orig:"") + " онлайн-просмотр высокое качество смотреть онлайн рекомендации все видео dvdrip hd"
     - page_description = "Онлайн просмотр без регистрации и информация о фильме " + film.name + (film.name_orig?" (" + film.name_orig + ")":"") + " рецензии, комментарии, рейтинг, русский трейлер, рекомендации к просмотру."
     - meta = ['property="og:title" content="' + film_name_meta + '"', 'property="og:url" content="' + film_url_meta + '"', 'property="og:description" content="' + film_descr_meta + '"', 'property="og:image" content="' + film_img_meta + '"']
@@ -17,8 +19,6 @@ html
     - meta.push('name="twitter:description" content="' + film_descr_meta + '"')
     - meta.push('name="twitter:image" content="' + film_img_meta + '"')
     - head_link = ['rel="canonical" href="http://vsevi.ru/films/' + film.id + '/"']
-    - title_alt = film.name
-    - if (film.name_orig && film.name_orig != film.name) title_alt+= " (" + film.name_orig + ")"
     - if (film.releasedate) title_alt+= " " + film.releasedate.substr(0,4)
     include head
     body
