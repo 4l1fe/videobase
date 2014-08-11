@@ -1,12 +1,14 @@
 # coding: utf-8
 
 from django.db.models import Count, Max
+from django.db.models import Q
 
 from rest_framework import serializers
 
 from apps.films.api.serializers import vbUserGenre
 from apps.films.models import Genres, UsersFilms, Films
-from apps.films.constants import APP_USERFILM_STATUS_NOT_WATCH
+from apps.films.constants import APP_USERFILM_STATUS_NOT_WATCH, APP_USERFILM_STATUS_UNDEF, APP_USERFILM_STATUS_PLAYLIST
+
 from apps.users.models import User, UsersPics, UsersRels
 from apps.users.constants import APP_USER_REL_TYPE_NONE, APP_USER_REL_TYPE_FRIENDS
 
@@ -108,9 +110,7 @@ class vbUser(serializers.ModelSerializer):
 
 
     def genres_list(self, obj):
-        genres = Genres.objects.filter(genres__uf_films_rel__user=obj).\
-            exclude(genres__uf_films_rel__status=APP_USERFILM_STATUS_NOT_WATCH).\
-            distinct()
+        genres = Genres.objects.filter(genres__uf_films_rel__user=obj).filter(Q(genres__uf_films_rel__status=APP_USERFILM_STATUS_UNDEF)|Q(genres__uf_films_rel__status=APP_USERFILM_STATUS_PLAYLIST)).distinct()
 
         return sorted(vbUserGenre(genres, user=obj, many=True).data, key=lambda g: g['percent'], reverse=True)
 
