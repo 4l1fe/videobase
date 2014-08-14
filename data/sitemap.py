@@ -6,7 +6,6 @@ from django.contrib.auth.models import User
 import data.person_facts.checker
 from itertools import chain
 import re
-import ipdb
 
 LINES_PER_FILE = 50000
 ROBOT_FILE = 'interface/static/robots.txt'
