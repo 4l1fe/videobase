@@ -16,7 +16,7 @@ class UsersGenresView(APIView):
         try:
             user = User.objects.get(pk=user_id)
         except Exception as e:
-            return Response({'e': e.message}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'e': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         genres = Genres.get_all_genres(get_values=False).filter(genres__uf_films_rel__user=user).distinct()
         genres = set(i.get_root() for i in genres)

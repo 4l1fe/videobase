@@ -66,10 +66,13 @@
       this.current = void 0;
     }
 
-    Player.prototype.load = function(loc, scroll) {
+    Player.prototype.load = function(loc, scroll, autoplay) {
       var value;
       if (scroll == null) {
         scroll = true;
+      }
+      if (autoplay == null) {
+        autoplay = true;
       }
       if (this.current !== void 0) {
         this.clear();
@@ -83,6 +86,7 @@
           value = "&view=" + encodeURI(loc.url_view);
         }
       }
+      value += "&autoplay=" + autoplay;
       this.place.empty().html('<iframe src="' + window.mi_conf.player_url + '?type=' + loc.type + value + '"></iframe>');
       if (scroll) {
         return scroll_to_obj(this.place);
@@ -401,7 +405,7 @@
       if (attr === "href" && name === "id") {
         return "/films/" + val + "/";
       } else {
-        return val;
+        return FilmThumb.__super__.transform_attr.apply(this, arguments);
       }
     };
 
@@ -414,7 +418,7 @@
     };
 
     FilmThumb.prototype.set_vals = function(vals, do_not_set) {
-      var btn_cls, btn_text, loc, _i, _len, _ref;
+      var btn_cls, btn_text, loc, price_loc_cnt, text, _i, _len, _ref;
       if (vals.title_alt === void 0) {
         vals.title_alt = vals.name;
         if (vals.name_orig && vals.name !== vals.name_orig) {
@@ -428,25 +432,37 @@
       if (vals.locations && vals.locations.length) {
         vals.hasFree = false;
         vals.price = 0;
+        price_loc_cnt = 0;
         _ref = vals.locations;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           loc = _ref[_i];
           loc.price = parseFloat(loc.price || 0);
           if (loc.price_type === 0) {
             vals.hasFree = true;
-          } else if (loc.price && (vals.price === 0 || loc.price < vals.price)) {
-            vals.price = loc.price;
-            vals.price_loc = loc.id;
+          } else {
+            if (loc.price && (vals.price === 0 || loc.price < vals.price)) {
+              vals.price = loc.price;
+              vals.price_loc = loc.id;
+            }
+            price_loc_cnt++;
           }
         }
         btn_cls = false;
         btn_text = "";
         if (!vals.hasFree && vals.price) {
           btn_cls = "btn-price";
-          btn_text = "Смотреть<br><i>от " + vals.price + " р. без рекламы</i>";
+          btn_text = "Смотреть<br><i>";
+          if (price_loc_cnt > 1) {
+            btn_text += "от ";
+          }
+          btn_text += vals.price + " р. без рекламы</i>";
         } else if (vals.price) {
           this.elements["btn_price"].self.css("display", "block");
-          this.elements["price"].self.text("от " + vals.price + " р. без рекламы");
+          text = vals.price + " р. без рекламы";
+          if (price_loc_cnt > 1) {
+            text = "от " + text;
+          }
+          this.elements["price"].self.text(text);
         }
         if (!vals.price || vals.hasFree) {
           btn_cls = "btn-free";
@@ -611,10 +627,18 @@
       })(this));
     }
 
+    FeedThumb.prototype.transform_val = function(name, val) {
+      if (name === "user.name") {
+        return val || "Пользователь";
+      }
+      return FeedThumb.__super__.transform_val.apply(this, arguments);
+    };
+
     FeedThumb.prototype.transform_attr = function(attr, name, val) {
       var type;
       type = this._type;
       if (type.substr(0, 4) === "film") {
+        console.log(name);
         if (name === "object.id" && (attr = "href")) {
           return "/films/" + val + "/";
         }
@@ -642,6 +666,7 @@
           return val;
         }
       }
+      return FeedThumb.__super__.transform_attr.apply(this, arguments);
     };
 
     return FeedThumb;
@@ -882,11 +907,11 @@
         global = false;
       }
       body_width = $("body").width();
-      items_inrow = Math.floor($("body").width() / 250);
-      if (body_width > 974 || items_inrow > 4) {
+      if (body_width > 991) {
         items_inrow = 4;
-      }
-      if (items_inrow < 2) {
+      } else if (body_width > 767) {
+        items_inrow = 3;
+      } else {
         items_inrow = 2;
       }
       if (this.current_items_inrow !== items_inrow) {
@@ -1008,7 +1033,6 @@
         return function(e) {
           e.preventDefault();
           e.stopPropagation();
-          _this.auth_modal.modal("show");
           return _this.show_modal("login");
         };
       })(this));
@@ -1452,18 +1476,11 @@
     };
 
     Page_Main.prototype.update_filter_params = function(update_href) {
-      var el, key, query_string, val, vals, _ref;
+      var el, key, more_btn_href, page, query_string, val, vals, _ref;
       if (update_href == null) {
         update_href = true;
       }
       query_string = "";
-      if (films_deck.page) {
-        _filter_params.page = films_deck.page;
-        if (query_string) {
-          query_string += "&";
-        }
-        query_string += "page=" + films_deck.page;
-      }
       _ref = this._e.filter;
       for (key in _ref) {
         el = _ref[key];
@@ -1500,13 +1517,21 @@
           }
         }
       }
+      page = films_deck.page || 1;
+      _filter_params.page = page;
+      if (query_string) {
+        query_string += "&";
+      }
+      more_btn_href = "/?" + query_string + "page=" + (page + 1);
+      query_string += "page=" + films_deck.page;
       if (query_string) {
         query_string = "?" + query_string;
       }
       if (update_href) {
         if (history && history.pushState) {
-          return history.pushState(null, null, query_string);
+          history.pushState(null, null, query_string);
         }
+        return $("a", $("#films_more")).attr("href", more_btn_href);
       }
     };
 
@@ -1521,7 +1546,7 @@
         params["recommend"] = 1;
       }
       if (opts.clear_output) {
-        deck.clear();
+        deck.clear(false);
         params.page = 1;
       } else {
         params.page = opts.page || (deck.page + 1);
@@ -1532,7 +1557,9 @@
           if (current_counter !== deck.load_counter) {
             return;
           }
+          console.log(data);
           if (data.items) {
+            console.log("items1");
             deck.add_items(data.items);
             if (data.items.length >= 12) {
               deck.load_more_show();
@@ -1546,6 +1573,7 @@
           } else {
             deck.load_more_hide(false);
           }
+          _this.update_filter_params();
           if (opts.callback) {
             return opts.callback();
           }
@@ -1724,9 +1752,8 @@
         scroll = false;
       }
       if (locations[id]) {
-        this.player.load(locations[id], scroll);
+        return this.player.load(locations[id], scroll);
       }
-      return false;
     };
 
     Page_Film.prototype.load_all_actors = function() {
@@ -1804,6 +1831,7 @@
     function Page_Person(conf) {
       this.conf = conf;
       Page_Person.__super__.constructor.apply(this, arguments);
+      this._app.get_tpl("film-thumb");
       films_deck = new FilmsDeck($("#films"), {
         load_func: (function(_this) {
           return function(deck) {
@@ -1890,6 +1918,7 @@
             status: false,
             rel: _this.conf.relation,
             callback: function() {
+              console.log(1);
               if (_this.conf.next && _this.conf.next.id) {
                 return location.href = "/playlist/" + _this.conf.id + "/";
               } else if (_this.conf.previous && _this.conf.previous.id) {
@@ -1907,6 +1936,7 @@
         itemEqualHeight: true,
         visible: 6
       });
+      this._app.get_tpl("person-thumb");
     }
 
     return Page_Playlist;
@@ -1932,6 +1962,7 @@
       });
       feed_deck.load_more_bind($("#feed_more"));
       feed_deck.page = 1;
+      this._app.get_tpl("feed-thumb");
     }
 
     Page_Feed.prototype.load_more_feed = function(deck) {
@@ -2054,6 +2085,8 @@
       });
       feed_deck.load_more_bind($("#feed_more"));
       feed_deck.page = 1;
+      this._app.get_tpl("feed-thumb");
+      this._app.get_tpl("film-thumb");
     }
 
     Page_User.prototype.action_friendship = function(status) {

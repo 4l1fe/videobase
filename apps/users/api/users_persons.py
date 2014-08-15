@@ -29,7 +29,7 @@ class UsersPersonsView(APIView):
         try:
             user = User.objects.get(pk=user_id)
         except Exception as e:
-            return Response({'e': e.message}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'e': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         page = request.QUERY_PARAMS.get('page', APP_USERS_API_DEFAULT_PAGE)
         per_page = request.QUERY_PARAMS.get('per_page', APP_USERS_API_DEFAULT_PER_PAGE)
@@ -38,13 +38,13 @@ class UsersPersonsView(APIView):
         try:
             ptype = persons_type[type_]
         except KeyError as e:
-            return Response({'e': e.message}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'e': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         persons = Persons.objects.filter(up_persons_rel__user=user, pf_persons_rel__p_type__in=ptype)
         try:
             page = Paginator(persons, per_page).page(page)
         except Exception as e:
-            return Response({'e': e.message}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'e': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         serializer = vbPerson(page.object_list, user=user, many=True)
         result = {

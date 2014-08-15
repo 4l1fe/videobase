@@ -45,7 +45,7 @@ class ObtainSessionToken(APIView):
             session.active = False
             session.save()
         except UsersApiSessions.DoesNotExist as e:
-            return Response({'e': e.message}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'e': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(status=status.HTTP_200_OK)
 

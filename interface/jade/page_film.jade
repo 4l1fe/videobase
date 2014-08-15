@@ -7,7 +7,9 @@ html
     - film_url_meta = 'http://vsevi.ru/films/' + film.id
     - film_img_meta = film.poster || noposter_url
     - if (film_img_meta[0] == "/") film_img_meta = 'http://vsevi.ru' + film_img_meta
-    - page_title_full = film.name + (film.name_orig?" (" + film.name_orig + ")":"") + " &mdash; фильмы на Все видео"
+    - title_alt = film.name
+    - if (film.name_orig && film.name_orig != film.name) title_alt+= " (" + film.name_orig + ")"
+    - page_title_full = title_alt + " &mdash; фильмы на Все видео"
     - page_keywords = "фильм " + film.name + (film.name_orig?": " + film.name_orig:"") + " онлайн-просмотр высокое качество смотреть онлайн рекомендации все видео dvdrip hd"
     - page_description = "Онлайн просмотр без регистрации и информация о фильме " + film.name + (film.name_orig?" (" + film.name_orig + ")":"") + " рецензии, комментарии, рейтинг, русский трейлер, рекомендации к просмотру."
     - meta = ['property="og:title" content="' + film_name_meta + '"', 'property="og:url" content="' + film_url_meta + '"', 'property="og:description" content="' + film_descr_meta + '"', 'property="og:image" content="' + film_img_meta + '"']
@@ -17,8 +19,6 @@ html
     - meta.push('name="twitter:description" content="' + film_descr_meta + '"')
     - meta.push('name="twitter:image" content="' + film_img_meta + '"')
     - head_link = ['rel="canonical" href="http://vsevi.ru/films/' + film.id + '/"']
-    - title_alt = film.name
-    - if (film.name_orig && film.name_orig != film.name) title_alt+= " (" + film.name_orig + ")"
     - if (film.releasedate) title_alt+= " " + film.releasedate.substr(0,4)
     include head
     body
@@ -101,7 +101,7 @@ html
                             ul.person-data-playlist
                                 if film.countries
                                     li
-                                        span Страна
+                                        span.th Страна
                                         - delim = false
                                         div
                                             each c in film.countries
@@ -109,7 +109,7 @@ html
                                                 - delim = true
                                 if film.directors && film.directors.length
                                     li
-                                        span Режиссер
+                                        span.th Режиссер
                                         - delim = false
                                         div
                                             each c in film.directors
@@ -117,7 +117,7 @@ html
                                                 - delim = true
                                 if film.scriptwriters && film.scriptwriters.length
                                     li
-                                        span Сценарист
+                                        span.th Сценарист
                                         - delim = false
                                         div
                                             each c in film.scriptwriters
@@ -125,24 +125,25 @@ html
                                                 - delim = true
                                 if film.genres && film.genres.length
                                     li
-                                        span Жанр
+                                        span.th Жанр
                                         div
                                             - delim = false
                                             each c in film.genres
                                                 !=(delim?", ":"") + '<a href="/?genre=' + c.id + '">' + c.name + "</a>"
                                                 - delim = true
                                 li
-                                    span Дата выхода
+                                    span.th Дата выхода
                                     div
                                         |#{date_text_str(film.releasedate)}
                                 if film.duration
                                     li
-                                        span Время
+                                        span.th Время
                                         div
                                             |#{duration_text(film.duration)}
-                            //-
-                                .share-block
-                                img(src='images/content/img42.png', alt='')
+
+                            .share-block
+                                script(src="http://yandex.st/share/share.js", charset="utf-8")
+                                .yashare-auto-init(data-yasharetype="big", data-yashareL10n="ru", data-yashareQuickServices="vkontakte,odnoklassniki,moimir,facebook,twitter,gplus", data-yashareTheme="counter")
                             //-
                                .share-block
                         .col-md-3.col-sm-12.col-xs-12
