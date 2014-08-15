@@ -111,11 +111,13 @@ def get_content(film, kwargs):
 
 
 def save_location(film, **kwargs):
+
     '''
     Creating content if necessary and creating location
 
     for given dictionary based on one produced by sane_dict
     '''
+
     if kwargs['type'] in APP_ROBOT_VALUE and kwargs['value'] == '':
         return
 
@@ -124,7 +126,6 @@ def save_location(film, **kwargs):
 
     # Validating that given url_view exists
     val(kwargs['url_view'])
-
     try:
         prev_location = Locations.objects.get(type=kwargs['type'], content = content)
         print "Found location with such type and film."
@@ -136,7 +137,6 @@ def save_location(film, **kwargs):
         locations = Locations.objects.filter(type=kwargs['type'], content = content)
         locations.delete()
         prev_location = None
-        
 
 
     location = Locations(content=content,

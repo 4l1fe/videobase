@@ -366,7 +366,12 @@ CELERYBEAT_SCHEDULE = {
     'sitemap_refresh_schedule': {
         'task': 'refresh_sitemap',
         'schedule': timedelta(days=14)
-    } 
+    },
+     # Parsing videos from YouTubeMoviesRU
+    'parse_you_tube_movies_ru': {
+        'task': 'parse_you_tube_movies_ru',
+        'schedule': timedelta(days=1)
+    }
 }
 
 CELERY_TIMEZONE = 'UTC'
