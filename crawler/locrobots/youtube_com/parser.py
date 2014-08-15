@@ -1,0 +1,128 @@
+import json
+from bs4 import BeautifulSoup
+import re
+import requests
+from apps.films.models import Films
+from crawler.utils.locations_utils import sane_dict, save_location
+
+from apps.contents.constants import APP_CONTENTS_PRICE_TYPE_FREE, APP_CONTENTS_PRICE_TYPE_PAY
+
+
+__author__ = 'vladimir'
+
+CHANNEL_LINK = u'http://www.youtube.com/user/YouTubeMoviesRU'
+
+class YoutubeChannelParser():
+    def __init__(self, data):
+        pass
+
+    @staticmethod
+    def get_list_of_channels():
+        channels_list = {}
+        domen = u'http://www.youtube.com'
+        # response = requests.get(CHANNEL_LINK)
+        # beatiful_soup = BeautifulSoup(response.content)
+        # divs = beatiful_soup.findAll('div',{ "class" : "yt-lockup-content"})
+        #
+        # for div in divs:
+        #     module = div.find('ul',{ "class" : "yt-lockup-meta-info"})
+        #     if not module:
+        #         continue
+        #     atag = module.find('a', {"class" : "g-hovercard yt-uix-sessionlink yt-user-name spf-link "})
+        #     title = unicode(atag.contents[0])
+        #     print title
+        #     link = atag.get('href')
+        #     channels_list[title] = domen + link
+
+        s = requests.Session()
+
+        response = s.get('http://www.youtube.com/user/YouTubeMoviesRU/videos?sort=dd&view=25') #s.get('http://www.youtube.com/browse_ajax?action_continuation=1&continuation=CkQSGFVDYzRHai1XZFBJYkY4ZkJtQ1lCMndxQRooRWdaMmFXUmxiM01ZQXlBWk1BRTRBVW9BWUFGcUFIb0JOUSUzRCUzRA%253D%253D&fluid=True')
+        beatiful_soup = BeautifulSoup(response.json()['content_html'])
+        divs = beatiful_soup.findAll('div',{ "class" : "yt-lockup-content"})
+
+        for div in divs:
+            module = div.find('h3',{ "class" : "yt-lockup-title"})
+            if not module:
+                continue
+            atag = module.find('a', {"class" : "yt-uix-sessionlink yt-uix-tile-link yt-ui-ellipsis yt-ui-ellipsis-2"})
+            title = unicode(atag.contents[0])
+            print title
+            link = atag.get('href')
+            channels_list[title] = domen + link
+
+        #return channels_list
+
+    @staticmethod
+    def save_location_for_film(film, link):
+        try:
+            resp_dict = sane_dict(film)
+            price, type = YoutubeChannelParser.get_film_price(link)
+            print price, type
+            resp_dict['price'] = price
+            resp_dict['price_type'] = type
+            resp_dict['url_view'] = link
+            resp_dict['value'] = link
+            resp_dict['type'] = u'YouTubeMoviesRU'
+            save_location(**resp_dict)
+        except Exception,e:
+            print e.message
+
+
+    @staticmethod
+    def process_all_films_for_channel_name(channel_name=u'DreamWorksFilmsRu'):
+        r = requests.get('http://gdata.youtube.com/feeds/api/videos?author=' + channel_name + '&alt=json')
+        js = r.json()
+        try:
+            for entr in js['feed']['entry']:
+                title = entr['title']['$t'].encode('UTF-8')
+                link = entr['link'][0]['href']
+                if YoutubeChannelParser.is_film(title):
+                    print '########## ' + title, link
+                    film = Films.objects.get(name = title)
+                    if film:
+                        YoutubeChannelParser.save_location_for_film(film, link)
+        except Exception:
+            pass
+
+    @staticmethod
+    def process_channels_list():
+        channels_list = YoutubeChannelParser.get_list_of_channels()
+
+        for channel in channels_list:
+            YoutubeChannelParser.process_all_films_for_channel_name(channel)
+
+
+    @staticmethod
+    def get_film_price(film_link):
+        try:
+            response = requests.get(film_link)
+            beautiful_soup = BeautifulSoup(response.content)
+            div_container = beautiful_soup.body.find('div',{ "id" : "page-container"})
+            div_offer = div_container.find('div',{ "id" : "watch-checkout-offers"})
+            pre_button_span = div_offer.find('span',{ "class" : "ypc-container ypc-delayedloader-target interim-checkout"})
+            button_span = pre_button_span.find('span',{ "class" : "yt-uix-button-content"})
+            button_label = button_span.find('span',{ "class" : "button-label"})
+            price = YoutubeChannelParser.get_price_from_string(unicode(button_label.contents[0]))
+            return price, APP_CONTENTS_PRICE_TYPE_PAY
+        except Exception,e:
+            print e.message
+            return 0, APP_CONTENTS_PRICE_TYPE_FREE
+
+    @staticmethod
+    def get_price_from_string(str_price):
+        currrency_price = re.split('\s+', str_price, flags=re.UNICODE)[1]
+        digit_price = float(currrency_price.replace(',','.'))
+        return int(digit_price)
+
+    @staticmethod
+    def is_film(title):
+        trailers_masks = [u'трейлер', u'trailer']
+        check = False
+        trailer_title = unicode(title, "utf-8").lower()
+        for phrase in trailers_masks:
+            if trailer_title.find(phrase) != -1:
+                check = True
+        if check:
+            return False
+        else:
+            return True
