@@ -5,6 +5,7 @@ from crawler.locrobots.amediateka_ru.loader import Amediateka_robot
 from crawler.locrobots.viaplay_ru.robot import ViaplayRobot
 from crawler.locrobots.playfamily_dot_ru.playfamily_xml import process
 from crawler.locrobots.drugoe_kino.robot import update_drugoe_kino_listing
+from crawler.locrobots.youtube_com.parser import YoutubeChannelParser
 from crawler.tasks.utils import robot_launch_wrapper
 from crawler.utils.films_statistics import film_at_least_years_old
 from videobase.celery import app
@@ -75,3 +76,7 @@ def age_weighted_robot_launcher(years):
 def dg_update():
     update_drugoe_kino_listing()
 
+
+@app.task(name="parse_you_tube_movies_ru")
+def parse_you_tube_movies_ru():
+    YoutubeChannelParser.process_channels_list()
