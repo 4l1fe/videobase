@@ -140,14 +140,13 @@ class Resource
     @_updating_session = false
     @_session_callback_queue = []
 
-    if (@token && !@session_token)
-      @refreshSession()
+    @refreshSession() if (@token && !@session_token)
 
   revokeSession: (callback) ->
     if @name != 'ROOT'
       @root.revokeSession(callback)
     else
-      pass
+      #pass
 
   refreshSession: (callback) ->
     if @name != 'ROOT'
@@ -160,26 +159,27 @@ class Resource
           cache: false
           headers: {"X-MI-Token": @token}
           complete: (xhr) =>
+            success = true
             if xhr.status == 200 && xhr.responseJSON && xhr.responseJSON.session_token
               @session_token = xhr.responseJSON.session_token
-              $.cookie("x-session", @session_token, {secure: true, path: "/"})
-              for cb in @_session_callback_queue
-                cb(true)
+              $.cookie("x-session", @session_token, {expires: 30})
+              $.cookie("x-token", @token, {expires: 30})
             else
-              @token = ""
-              @session_token = ""
-              if @opts.auth_error
-                @opts.auth_error(xhr)
+              @token = undefined
+              @session_token = undefined
+              $.cookie("x-session", "", -1)
+              $.cookie("x-token", "", -1)
+              @opts.auth_error(xhr) if @opts.auth_error
+              success = false
+            for cb in @_session_callback_queue
+              cb(success)
             @_session_callback_queue = []
             @_updating_session = false
           type: "GET"
         })
 
   has_auth: () ->
-    if @root.token && @root.session_token
-      true
-    else
-      false
+    @root.token && @root.session_token
 
   constructChild: (@parent, options) ->
     validateStr 'name', @name
@@ -278,7 +278,6 @@ class Resource
     if @opts.methodOverride and method not in ['GET', 'HEAD', 'POST']
       headers['X-HTTP-Method-Override'] = method
       method = 'POST'
-
     headers['X-MI-Session'] = @root.session_token
     # KT: add extension to the end of url
 
@@ -302,17 +301,12 @@ class Resource
     if @opts.cache and @opts.autoClearCache and $.inArray(method, @opts.cachableMethods) is -1
       escapedUrl = url.replace(/([.?*+^$[\]\\(){}|-])/g, "\\$1")
       @root.cache.clear(new RegExp(escapedUrl))
-
     if !noloop
       error = ajaxOpts.error || undefined
       self = @parent
       ajaxOpts.error = (xhr) ->
         if xhr.status == 401
-          self.refreshSession (success) ->
-            if success
-              self.ajax method, url, data, true
-            else
-              error(xhr)
+          self.refreshSession (-> self.ajax(method, url, data, true))
 
     req = @opts.request @parent, ajaxOpts
 

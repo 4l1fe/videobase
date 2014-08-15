@@ -18,7 +18,7 @@ class UsersFriendsView(APIView):
         try:
             user = User.objects.get(pk=user_id)
         except Exception as e:
-            return Response({'e': e.message}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'e': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         page = request.DATA.get('page', APP_USERS_API_DEFAULT_PAGE)
         per_page = request.DATA.get('per_page', APP_USERS_API_DEFAULT_PER_PAGE)
@@ -29,7 +29,7 @@ class UsersFriendsView(APIView):
         try:
             page = Paginator(friends, per_page).page(page)
         except Exception as e:
-            return Response({'e': e.message}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'e': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         serializer = vbUser(page.object_list, many=True)
         result = {
