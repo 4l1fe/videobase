@@ -20,44 +20,25 @@ class YoutubeChannelParser():
     def get_list_of_channels():
         channels_list = {}
         domen = u'http://www.youtube.com'
-        # response = requests.get(CHANNEL_LINK)
-        # beatiful_soup = BeautifulSoup(response.content)
-        # divs = beatiful_soup.findAll('div',{ "class" : "yt-lockup-content"})
-        #
-        # for div in divs:
-        #     module = div.find('ul',{ "class" : "yt-lockup-meta-info"})
-        #     if not module:
-        #         continue
-        #     atag = module.find('a', {"class" : "g-hovercard yt-uix-sessionlink yt-user-name spf-link "})
-        #     title = unicode(atag.contents[0])
-        #     print title
-        #     link = atag.get('href')
-        #     channels_list[title] = domen + link
-
-        s = requests.Session()
-
-        response = s.get('http://www.youtube.com/user/YouTubeMoviesRU/videos?sort=dd&view=25') #s.get('http://www.youtube.com/browse_ajax?action_continuation=1&continuation=CkQSGFVDYzRHai1XZFBJYkY4ZkJtQ1lCMndxQRooRWdaMmFXUmxiM01ZQXlBWk1BRTRBVW9BWUFGcUFIb0JOUSUzRCUzRA%253D%253D&fluid=True')
-        beatiful_soup = BeautifulSoup(response.json()['content_html'])
+        response = requests.get(CHANNEL_LINK)
+        beatiful_soup = BeautifulSoup(response.content)
         divs = beatiful_soup.findAll('div',{ "class" : "yt-lockup-content"})
 
         for div in divs:
-            module = div.find('h3',{ "class" : "yt-lockup-title"})
+            module = div.find('ul',{ "class" : "yt-lockup-meta-info"})
             if not module:
                 continue
-            atag = module.find('a', {"class" : "yt-uix-sessionlink yt-uix-tile-link yt-ui-ellipsis yt-ui-ellipsis-2"})
+            atag = module.find('a', {"class" : "g-hovercard yt-uix-sessionlink yt-user-name spf-link "})
             title = unicode(atag.contents[0])
-            print title
             link = atag.get('href')
             channels_list[title] = domen + link
-
-        #return channels_list
+        return channels_list
 
     @staticmethod
     def save_location_for_film(film, link):
         try:
             resp_dict = sane_dict(film)
             price, type = YoutubeChannelParser.get_film_price(link)
-            print price, type
             resp_dict['price'] = price
             resp_dict['price_type'] = type
             resp_dict['url_view'] = link
@@ -77,7 +58,7 @@ class YoutubeChannelParser():
                 title = entr['title']['$t'].encode('UTF-8')
                 link = entr['link'][0]['href']
                 if YoutubeChannelParser.is_film(title):
-                    print '########## ' + title, link
+                    print '### ' + title, link
                     film = Films.objects.get(name = title)
                     if film:
                         YoutubeChannelParser.save_location_for_film(film, link)
