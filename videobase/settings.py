@@ -357,6 +357,15 @@ CELERYBEAT_SCHEDULE = {
         'task': 'age_weighted_robot_launch',
         'schedule': timedelta(days=31*6),
         'args': (120,)
+    },
+    'drugoe_kino_update_schedule': {
+        'task': 'drugoe_kino_update',
+        'schedule': timedelta(days=7)
+    },
+    # Checking locations for aged films yearly
+    'sitemap_refresh_schedule': {
+        'task': 'refresh_sitemap',
+        'schedule': timedelta(days=14)
     } 
 }
 

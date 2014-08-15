@@ -224,7 +224,7 @@
       if (this.name !== 'ROOT') {
         return this.root.revokeSession(callback);
       } else {
-        return pass;
+
       }
     };
 
@@ -244,24 +244,30 @@
             },
             complete: (function(_this) {
               return function(xhr) {
-                var cb, _i, _len, _ref;
+                var cb, success, _i, _len, _ref;
+                success = true;
                 if (xhr.status === 200 && xhr.responseJSON && xhr.responseJSON.session_token) {
                   _this.session_token = xhr.responseJSON.session_token;
                   $.cookie("x-session", _this.session_token, {
-                    secure: true,
-                    path: "/"
+                    expires: 30
                   });
-                  _ref = _this._session_callback_queue;
-                  for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-                    cb = _ref[_i];
-                    cb(true);
-                  }
+                  $.cookie("x-token", _this.token, {
+                    expires: 30
+                  });
                 } else {
-                  _this.token = "";
-                  _this.session_token = "";
+                  _this.token = void 0;
+                  _this.session_token = void 0;
+                  $.cookie("x-session", "", -1);
+                  $.cookie("x-token", "", -1);
                   if (_this.opts.auth_error) {
                     _this.opts.auth_error(xhr);
                   }
+                  success = false;
+                }
+                _ref = _this._session_callback_queue;
+                for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+                  cb = _ref[_i];
+                  cb(success);
                 }
                 _this._session_callback_queue = [];
                 return _this._updating_session = false;
@@ -274,11 +280,7 @@
     };
 
     Resource.prototype.has_auth = function() {
-      if (this.root.token && this.root.session_token) {
-        return true;
-      } else {
-        return false;
-      }
+      return this.root.token && this.root.session_token;
     };
 
     Resource.prototype.constructChild = function(parent, options) {
@@ -444,13 +446,9 @@
         self = this.parent;
         ajaxOpts.error = function(xhr) {
           if (xhr.status === 401) {
-            return self.refreshSession(function(success) {
-              if (success) {
-                return self.ajax(method, url, data, true);
-              } else {
-                return error(xhr);
-              }
-            });
+            return self.refreshSession((function() {
+              return self.ajax(method, url, data, true);
+            }));
           }
         };
       }
