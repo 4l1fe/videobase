@@ -1,3 +1,4 @@
+# coding: utf-8
 import json
 from bs4 import BeautifulSoup
 import re
