@@ -82,8 +82,9 @@
       } else {
         if (loc.value) {
           value = "&value=" + loc.value;
-        } else {
-          value = "&view=" + encodeURI(loc.url_view);
+        }
+        if (loc.url_view) {
+          value = "&view=" + encodeURIComponent(loc.url_view);
         }
       }
       value += "&autoplay=" + autoplay;
