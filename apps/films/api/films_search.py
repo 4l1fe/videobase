@@ -22,7 +22,6 @@ import videobase.settings as settings
 
 from utils.middlewares.local_thread import get_current_request
 
-
 #############################################################################################################
 class SearchFilmsView(APIView):
     """
@@ -152,6 +151,7 @@ class SearchFilmsView(APIView):
             # Проверим, есть ли результат в кеше
             result = cache.get(cache_key) if use_cache else None
 
+
             if result is None:
                 # Наложение условий фильтрации на фильмы
                 o_search = self.search_by_films(filter)
@@ -174,7 +174,7 @@ class SearchFilmsView(APIView):
                     'total_cnt': page.paginator.count,
                     'per_page': page.paginator.per_page,
                     'page': page.number,
-                    'items': vbFilm(page.object_list, request=request, many=True).data,
+                    'items': vbFilm(page.object_list, request=self.request, many=True).data,
                 }
 
                 if use_cache:
