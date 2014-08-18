@@ -158,7 +158,7 @@ class UserView(View):
             actors = Paginator(actors, APP_USERS_API_DEFAULT_PER_PAGE).page(APP_USERS_API_DEFAULT_PAGE)
             vba = vbPerson(actors.object_list, many=True)
 
-            directors = Persons.objects.filter(up_persons_rel__user=user, pf_persons_rel__p_type=APP_PERSON_DIRECTOR)
+            directors = Persons.objects.filter(up_persons_rel__user=user, pf_persons_rel__p_type=APP_PERSON_DIRECTOR).distinct()
             directors = Paginator(directors, APP_USERS_API_DEFAULT_PER_PAGE).page(APP_USERS_API_DEFAULT_PAGE)
             vbd = vbPerson(directors.object_list, many=True)
 
