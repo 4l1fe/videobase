@@ -43,10 +43,11 @@ class Player
     if (loc.price_type != 0 && loc.type != "playfamily")
       value = "&price=" + loc.price + "&view=" + encodeURI(loc.url_view)
     else
+      value = ""
       if loc.value
         value = "&value=" + loc.value
       if loc.url_view
-        value = "&view=" + encodeURIComponent(loc.url_view)
+        value+= "&view=" + encodeURIComponent(loc.url_view)
     value+= "&autoplay=" + autoplay
     @place.empty().html('<iframe src="' + window.mi_conf.player_url + '?type=' + loc.type + value + '"></iframe>')
     if (scroll)
