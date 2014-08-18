@@ -358,11 +358,20 @@ CELERYBEAT_SCHEDULE = {
         'schedule': timedelta(days=31*6),
         'args': (120,)
     },
-        # Checking locations for aged films yearly
     'drugoe_kino_update_schedule': {
         'task': 'drugoe_kino_update',
         'schedule': timedelta(days=7)
-    } 
+    },
+    # Checking locations for aged films yearly
+    'sitemap_refresh_schedule': {
+        'task': 'refresh_sitemap',
+        'schedule': timedelta(days=14)
+    },
+     # Parsing videos from YouTubeMoviesRU
+    'parse_you_tube_movies_ru': {
+        'task': 'parse_you_tube_movies_ru',
+        'schedule': timedelta(days=1)
+    }
 }
 
 CELERY_TIMEZONE = 'UTC'
