@@ -19,10 +19,11 @@ html
                 params = query_arr[1].split("&");
                 for (var i = 0; i < params.length; i++) {
                     param_arr = params[i].split("=")
-                    vals[param_arr[0]] = decodeURI(param_arr[1])
+                    vals[param_arr[0]] = decodeURIComponent(param_arr[1])
                 }
             }
-            location_names = {"ivi": "IVI.ru", "nowru": "Now.ru", "megogo": "Megogo", "tvigle": "TVigle", "zoomby": "Zoomby.ru", playfamily: "PlayFamily.ru", "olltv": "Oll.tv", amediateka: "Amediateka", molodejj: "Molodejj.tv", streamru: "Stream.ru", tvzavr: "TVzavr.ru", viaplay: "Viaplay.ru", zabava: "Zabava.ru", playgoogle: "Play Google", itunes: "Apple Itunes", ayyo: "Ayyo.ru", mosfilm: "Cinema.mosfilm.ru", "default": "Онлайн-кинотеатре"}
+            location_names = {"drugeokino": "Другое Кино", "youtubemoviesru": "Youtube Movies", "ivi": "IVI.ru", "nowru": "Now.ru", "megogo": "Megogo", "tvigle": "TVigle", "zoomby": "Zoomby.ru", playfamily: "PlayFamily.ru", "olltv": "Oll.tv", amediateka: "Amediateka", molodejj: "Molodejj.tv", streamru: "Stream.ru", tvzavr: "TVzavr.ru", viaplay: "Viaplay.ru", zabava: "Zabava.ru", playgoogle: "Play Google", itunes: "Apple Itunes", ayyo: "Ayyo.ru", mosfilm: "Cinema.mosfilm.ru", "default": "Онлайн-кинотеатре"}
+            vals.type = (vals.type || "").toLowerCase()
             if (vals.price && vals.view) {
                 price = Math.floor(vals.price);
                 link_title = 'Ссылка на страницу фильма на ' + (location_names[vals.type] || location_names["default"]) + ' за ' + price + ' руб.';
@@ -30,12 +31,12 @@ html
             } else if (vals.type && (vals.value || vals.view)) {
                 html = false;
                 value = vals.value || false
+                autoplay = vals["autoplay"] && (vals["autoplay"] == 1 || vals["autoplay"] == true || vals["autoplay"] == "true")?1:0;
                 if (vals.type == "ivi") {
                     if (value == false) {
                         value = vals.view.substr(24)
                         value = value.substr(0, value.indexOf("#"))
                     }
-                    autoplay = vals["autoplay"] && (vals["autoplay"] == 1 || vals["autoplay"] == true || vals["autoplay"] == "true")?1:0;
                     html = '<iframe src="http://www.ivi.ru/player/?videoid=' + value + '&amp;subsite=138&amp;enableseries=0&amp;autostart=' + autoplay + '" width="100%" height="100%" frameborder="0" allowfullscreen=""></iframe>'
                 } else if (vals.type == "nowru") {
                     if (value == false) {
@@ -49,6 +50,11 @@ html
                             value = arr[arr.length - 1]
                         }
                     html = '<object codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=9,0,0,0" width="100%" height="100%"><param name="FlashVars" value="vote=0&amp;srv=pub.tvigle.ru&amp;prt=e0d0f9ff7176e333398f17de0dbdabb2&amp;id=' + value + '&amp;w=640&amp;h=400&amp;type=&amp;dopparam=&amp;modes=1&amp;autoplay=1"><param name="allowFullScreen" value="true"><param name="movie" value="http://pub.tvigle.ru/swf/tvigle_single_v2.swf"><param name="quality" value="high"><param name="bgcolor" value="#000000"><param name="allowscriptaccess" value="always"><embed src="http://pub.tvigle.ru/swf/tvigle_single_v2.swf" allowscriptaccess="always" quality="high" width="100%" height="100%" bgcolor="#000000" allowfullscreen="true" flashvars="vote=0&amp;srv=pub.tvigle.ru&amp;prt=e0d0f9ff7176e333398f17de0dbdabb2&amp;id=' + value + '&amp;w=640&amp;h=400&amp;type=&amp;dopparam=&amp;modes=1&amp;autoplay=1" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer"></object>'
+                } else if (vals.type == "drugoekino") {
+                    html = '<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" width="100%" height="100%" id="player" align="middle"><param name="movie" value="http://drugoekino.ru/player.swf"><param name="flashvars" value="filmID=' + value + '"><param name="bgcolor" value="#000000"><param name="play" value="false"><param name="loop" value="false"><param name="wmode" value="window"><param name="scale" value="showall"><param name="menu" value="false"><param name="devicefont" value="false"><param name="salign" value=""><param name="allowScriptAccess" value="true"><param name="allowFullScreen" value="true"><embed src="http://drugoekino.ru/player.swf" allowscriptaccess="always" quality="high" width="100%" height="100%" bgcolor="#000000" allowfullscreen="true" flashvars="filmID=' + value + '&amp;play=false" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer"></object>'
+                } else if (vals.type == "youtubemoviesru") {
+                    value = /v=([a-z0-9_\-]+)/i.exec(vals.view)[1]
+                    html = '<iframe width="100%" height="100%" src="//www.youtube-nocookie.com/embed/' + value + '?rel=0&autoplay=' + autoplay + '" frameborder="0" allowfullscreen></iframe>'
                 } else if (vals.type == "zoomby") {
                     html = '<iframe src="' + value + '" width="100%" height="100%" frameborder="0"></iframe>'
                 } else if (vals.type == "meogogo") {

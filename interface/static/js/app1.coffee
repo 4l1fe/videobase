@@ -45,8 +45,8 @@ class Player
     else
       if loc.value
         value = "&value=" + loc.value
-      else
-        value = "&view=" + encodeURI(loc.url_view)
+      if loc.url_view
+        value = "&view=" + encodeURIComponent(loc.url_view)
     value+= "&autoplay=" + autoplay
     @place.empty().html('<iframe src="' + window.mi_conf.player_url + '?type=' + loc.type + value + '"></iframe>')
     if (scroll)
