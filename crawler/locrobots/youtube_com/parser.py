@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup
 import re
 import requests
 from apps.films.models import Films
+from apps.robots.models import Robots
 from crawler.utils.locations_utils import sane_dict, save_location
 
 from apps.contents.constants import APP_CONTENTS_PRICE_TYPE_FREE, APP_CONTENTS_PRICE_TYPE_PAY
@@ -18,8 +19,45 @@ class YoutubeChannelParser():
         pass
 
     @staticmethod
+    def get_or_create_robot():
+        try:
+            robot = Robots.objects.get(name="YouTubeMoviesRU")
+        except:
+            robot = Robots.objects.create(name="YouTubeMoviesRU", last_start='2014-07-01', delay=1440)
+            robot.save()
+        return robot
+
+    @staticmethod
+    def init_or_return_state_for_robot(robot):
+        state = robot.state
+        d = json.loads(state)
+        if type(d) is dict:
+            return d
+        else:
+            return {}
+
+    @staticmethod
+    def get_already_saved_channels():
+        robot = YoutubeChannelParser.get_or_create_robot()
+        state = YoutubeChannelParser.init_or_return_state_for_robot(robot)
+        return state
+
+    @staticmethod
+    def save_channels_list_to_robot_state(channels_list):
+        robot = YoutubeChannelParser.get_or_create_robot()
+        state = YoutubeChannelParser.init_or_return_state_for_robot(robot)
+        for key, value in channels_list.iteritems():
+            try:
+                state[key] = value
+            except:
+                continue
+        robot.state = json.dumps(state)
+        robot.save()
+        print "Robot state was saved"
+
+    @staticmethod
     def get_list_of_channels():
-        channels_list = {}
+        channels_list = YoutubeChannelParser.get_already_saved_channels()
         domen = u'http://www.youtube.com'
         response = requests.get(CHANNEL_LINK)
         beatiful_soup = BeautifulSoup(response.content)
@@ -69,6 +107,7 @@ class YoutubeChannelParser():
     @staticmethod
     def process_channels_list():
         channels_list = YoutubeChannelParser.get_list_of_channels()
+        YoutubeChannelParser.save_channels_list_to_robot_state(channels_list)
 
         for channel in channels_list:
             YoutubeChannelParser.process_all_films_for_channel_name(channel)
