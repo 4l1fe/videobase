@@ -24,6 +24,7 @@ from apps.films.models import YoutubeTrailerCheck
 from apps.films.models import FilmExtras
 from apps.films.constants import APP_FILM_TYPE_ADDITIONAL_MATERIAL_TRAILER
 from django.utils import timezone
+from data.film_facts.trailer_title_check import is_correct_trailer_title
 
 delays = (
     #1. Для фильмов с датой выхода больше текущей и фильмов не старше одного года - раз в день
@@ -98,6 +99,10 @@ def find_youtube_trailer(film):
                     trtuple = get_film_trailer(film)
                     if trtuple:
                         trailer_name, link = trtuple
+
+                        if not is_correct_trailer_title(trailer_name, film):
+                            return None
+
                         fe = FilmExtras(film=film,
                                         type=APP_FILM_TYPE_ADDITIONAL_MATERIAL_TRAILER,
                                         name=trailer_name,
