@@ -14,6 +14,7 @@ from bs4 import BeautifulSoup
 import requests
 import re
 from apps.films.constants import *
+from data.film_facts.trailer_title_check import is_correct_trailer_title
 
 
 film_checker = FactChecker(Films)
@@ -296,45 +297,15 @@ def film_produced_country_name_check(film):
 @film_checker.add(u"Film trailer title doesn't contain trailer key words", corrector=youtube_trailer_corrector)
 def trailer_title_check(film):
     yt_service = gdata.youtube.service.YouTubeService()
-    ft = FilmExtras.objects.filter(film=film).first()
-    film_name = film.name.lower().encode("utf-8")
-    film_year = film.release_date.year
+    ft = FilmExtras.objects.filter(film=film).last()
     try:
         yid = re.match('.+watch[?]v[=](?P<id>.+)(([&].+)?)', ft.url).groupdict()['id']
         entry = yt_service.GetYouTubeVideoEntry(video_id=yid)
         trailer_title = unicode(entry.title.text, "utf-8").lower()
-        trailers_ru_mask = [u'официальный русский трейлер фильма hd',u'русский трейлер фильма hd',u'русский трейлер HD',
-                            u'трейлер на русском',u'официальный трейлер',u'русский трейлер',u'тв-ролик',u'финальный трейлер',u'промо ролик']
-        trailers_en_mask = [u'international trailer hd', u'official trailer hd',u'trailer hd', u'international trailer', u'official teaser', u'trailer']
-        trailers_block = [u'interview',u'интервью',u'premiere',u'премьера',u'review',u'обзор',u'conference',u'behind the scenes',u'gameplay',u'parody',u'videogame']
-        check_ru = False
-        check_en = False
-        check_block = False
-        check_fname = False
-        check_fyear = False
-
-        for phrase in trailers_ru_mask:
-            if trailer_title.find(phrase) != -1:
-                check_ru = True
-
-        for phrase in trailers_en_mask:
-            if trailer_title.find(phrase) != -1:
-                check_en = True
-
-        for phrase in trailers_block:
-            if trailer_title.find(phrase) != -1:
-                check_block = True
-
-        tr_t_for_comparison = trailer_title.encode("utf-8")
-        if tr_t_for_comparison.find(film_name) != -1:
-            check_fname = True
-
-        if tr_t_for_comparison.find(str(film_year)) != -1:
-            check_fyear = True
-        if (check_ru or check_en) and check_fname and check_fyear and not check_block:
-            return True
-        else:
+        if is_correct_trailer_title(trailer_title, film):
             return False
+        else:
+            return True
 
     except Exception, e:
         print u"Trailer title check failed"
