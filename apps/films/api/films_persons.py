@@ -32,7 +32,7 @@ class PersonsFilmView(APIView):
                      values_list('person', flat=True)
 
         if not len(result):
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return Response(DEFAULT_REST_API_RESPONSE, status=status.HTTP_404_NOT_FOUND)
 
         return result
 
