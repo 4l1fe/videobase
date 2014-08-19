@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from django.db import IntegrityError
+from videobase.settings import DEFAULT_REST_API_RESPONSE
 
 
 class UsersFriendshipView(APIView):
@@ -68,4 +69,4 @@ class UsersFriendshipView(APIView):
             if all(item in f.object.items() for item in obj_val.items()): f.delete()
         for f in Feed.objects.filter(user=request.user, type='user-a').iterator():
             if all(item in f.object.items() for item in obj_val.items()): f.delete()
-        return Response(status=status.HTTP_200_OK)
+        return Response(DEFAULT_REST_API_RESPONSE,status=status.HTTP_200_OK)
