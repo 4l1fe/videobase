@@ -35,7 +35,7 @@ class ActCommentFilmView(APIView):
 
             return c
         except ObjectDoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return Response(DEFAULT_REST_API_RESPONSE, status=status.HTTP_404_NOT_FOUND)
 
     def post(self, request, film_id, format=None, *args, **kwargs):
         form = CommentForm(request.DATA)
@@ -54,6 +54,6 @@ class ActCommentFilmView(APIView):
             obj_val = {'id': o_com.id, 'text': o_com.text,
                        'film': {'id': o_content.film_id, 'name': o_content.name}}
             Feed.objects.create(user=request.user, type='film-c', object=obj_val)  # под каждый комент новое событие.
-            return Response(status=status.HTTP_200_OK)
+            return Response(DEFAULT_REST_API_RESPONSE, status=status.HTTP_200_OK)
 
         return Response({'error': form.errors}, status=status.HTTP_400_BAD_REQUEST)

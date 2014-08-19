@@ -30,7 +30,7 @@ class ActNotwatchFilmView(APIView):
         try:
             return Films.objects.get(pk=film_id)
         except Films.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return Response(DEFAULT_REST_API_RESPONSE, status=status.HTTP_404_NOT_FOUND)
 
     def get(self, request, film_id, format=None, *args, **kwargs):
         # Выбираем и проверяем, что фильм существует
@@ -58,7 +58,7 @@ class ActNotwatchFilmView(APIView):
             except Exception as e:
                 return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response(status=status.HTTP_200_OK)
+        return Response(DEFAULT_REST_API_RESPONSE, status=status.HTTP_200_OK)
 
     def put(self, request, film_id, format=None, *args, **kwargs):
         return self.get(request, film_id, format=None, *args, **kwargs)
@@ -77,4 +77,4 @@ class ActNotwatchFilmView(APIView):
         for f in Feed.objects.filter(user=request.user, type='film-nw').iterator():
             if f.object == obj_val: f.delete()
 
-        return Response(status=status.HTTP_200_OK)
+        return Response(DEFAULT_REST_API_RESPONSE, status=status.HTTP_200_OK)

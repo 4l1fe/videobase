@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from apps.films.models import UsersPersons, Persons
 from apps.users import Feed
 
+from videobase.settings import DEFAULT_REST_API_RESPONSE
 
 class PersonActionAPIView(APIView):
 
@@ -38,9 +39,9 @@ class PersonActionAPIView(APIView):
                 for f in Feed.objects.filter(user=request.user, type='pers-s'):
                     if f.object == obj_val: f.delete()
 
-            return Response(status=status.HTTP_200_OK)
+            return Response(DEFAULT_REST_API_RESPONSE, status=status.HTTP_200_OK)
         except Exception, e:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            return Response(DEFAULT_REST_API_RESPONSE, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, format=None, resource_id=None):
         return self._handle(1, request, format, resource_id)
