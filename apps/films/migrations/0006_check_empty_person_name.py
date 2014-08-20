@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+
+import json
+
 from south.utils import datetime_utils as datetime
 from south.db import db
 from south.v2 import SchemaMigration
@@ -8,7 +11,15 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        db.execute("SELECT * FROM users_feed WHERE type = %s AND object->>'photo' = %s", ['pers-s', '/static/'])
+        persons = db.execute("SELECT * FROM users_feed WHERE type = %s AND object->>'photo' = %s", ['pers-s', '/static/'])
+
+        for item in persons:
+            obj = json.loads(item[4])
+            if 'photo' in obj:
+                obj['photo'] = ''
+
+                db.execute("UPDATE users_feed SET object = %s WHERE id = %s", [json.dumps(obj), item[0]])
+
 
     def backwards(self, orm):
         pass
