@@ -8,10 +8,10 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        db.execute("UPDATE users_feed SET type = 'pers-o' WHERE type = 'pers=o'")
+        db.execute("UPDATE users_feed SET type = %s WHERE type = %s", ['pers-o', 'pers=o'])
 
     def backwards(self, orm):
-        db.execute("UPDATE users_feed SET type = 'pers=o' WHERE type = 'pers-o'")
+        db.execute("UPDATE users_feed SET type = %s WHERE type = %s", ['pers=o', 'pers-o'])
 
     models = {
         u'auth.group': {

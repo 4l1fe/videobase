@@ -1,4 +1,5 @@
 # coding: utf-8
+
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
@@ -13,10 +14,12 @@ class PersonActionAPIView(APIView):
 
     permission_classes = (IsAuthenticated, )
 
+
     def _update_or_create_feed(self, type_, obj_val):
         ffeeds = Feed.objects.filter(user=self.request.user, type=type_)
         feeds = [f for f in ffeeds]
         objs = [f.object for f in ffeeds]
+
         try:
             f = feeds[objs.index(obj_val)]
             f.save()
@@ -27,9 +30,20 @@ class PersonActionAPIView(APIView):
     def _handle(self, subscribed, request, format=None, resource_id=None):
         try:
             person = Persons.objects.get(id=resource_id)
-            filter_ = {'user': request.user, 'person': person}
-            photo_url = person.photo.storage.url(person.photo.name)
-            obj_val = {'id': person.id, 'name': person.name, 'photo': photo_url}
+            filter_ = {
+                'user': request.user,
+                'person': person
+            }
+
+            photo = person.photo.name
+            if len(person.photo.name):
+                photo = person.photo.storage.url(photo)
+
+            obj_val = {
+                'id': person.id,
+                'name': person.name,
+                'photo': photo,
+            }
 
             up, up_created = UsersPersons.objects.get_or_create(**filter_)
             up.subscribed = subscribed
@@ -42,6 +56,7 @@ class PersonActionAPIView(APIView):
                         f.delete()
 
             return Response(status=status.HTTP_200_OK)
+
         except Exception, e:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
