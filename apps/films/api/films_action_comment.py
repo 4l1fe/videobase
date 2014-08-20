@@ -10,6 +10,7 @@ from apps.contents.models import Comments, Contents
 from apps.films.forms import CommentForm
 from apps.films.models import Films
 from apps.users import Feed
+from apps.users.constants import FILM_COMMENT
 
 
 #############################################################################################################
@@ -23,19 +24,23 @@ class ActCommentFilmView(APIView):
 
     permission_classes = (IsAuthenticated,)
 
+
     def __get_object(self, film_id):
         """
         Return object Contents or Response object with 404 error
         """
         try:
             f = Films.objects.get(id=film_id)
-            c, created = Contents.objects.get_or_create(film=f, name=f.name, name_orig=f.name_orig,
-                                                    description=f.description, release_date=f.release_date,
-                                                    viewer_cnt=0, viewer_lastweek_cnt=0, viewer_lastmonth_cnt=0)
+            c, created = Contents.objects.get_or_create(
+                film=f, name=f.name, name_orig=f.name_orig,
+                description=f.description, release_date=f.release_date,
+                viewer_cnt=0, viewer_lastweek_cnt=0, viewer_lastmonth_cnt=0
+            )
 
             return c
         except ObjectDoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
+
 
     def post(self, request, film_id, format=None, *args, **kwargs):
         form = CommentForm(request.DATA)
@@ -46,14 +51,20 @@ class ActCommentFilmView(APIView):
                 return o_content
 
             # Init data
-            filter_ = {'user': request.user,
-                      'text': form.cleaned_data['text'],
-                      'content': o_content}
+            filter_ = {
+                'user': request.user,
+                'text': form.cleaned_data['text'],
+                'content': o_content
+            }
 
             o_com = Comments.objects.create(**filter_)
-            obj_val = {'id': o_com.id, 'text': o_com.text,
-                       'film': {'id': o_content.film_id, 'name': o_content.name}}
-            Feed.objects.create(user=request.user, type='film-c', object=obj_val)  # под каждый комент новое событие.
+            obj_val = {
+                'id': o_com.id,
+                'text': o_com.text,
+                'film': {'id': o_content.film_id, 'name': o_content.name}
+            }
+
+            Feed.objects.create(user=request.user, type=FILM_COMMENT, object=obj_val)
             return Response(status=status.HTTP_200_OK)
 
         return Response({'error': form.errors}, status=status.HTTP_400_BAD_REQUEST)
