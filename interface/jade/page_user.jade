@@ -16,8 +16,9 @@ html
                                     .person-img
                                         - url_tmp = user.avatar || noavatar_url
                                         img.img-circle(src=url_tmp, alt='')
-                                        br
-                                        a.btn-yellow3.rel.zmin(href='#', title='')#friendship Добавить в друзья
+                                        if !auth_user || auth_user.id != user.id
+                                            br
+                                            a.btn-yellow3.rel.zmin(href='#', title='')#friendship Добавить в друзья
                                     //-
                                        .person-img
                                 .col-md-6
