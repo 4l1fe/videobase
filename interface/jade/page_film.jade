@@ -201,20 +201,34 @@ html
                                        .trailer-area
                                 //-
                                    .playlist-content
-                            if film.comments && film.comments.length
+                            .add-comment#add_comment
+                                if auth_user
+                                    h2.blackh1 Добавить комментарий
+                                    form
+                                        textarea(placeholder="Опишите, что именно вам понравилось или не понравилось в фильме", name="text", rows="5").form-control
+                                        input.btn-yellow3.rel.zmin(type="submit", value="Добавить")
+                                else
+                                    p
+                                        | Чтобы добавить комментарий, пожалуйста,&nbsp;
+                                        a(href="/register", title="").register зарегистрируйтесь
+                                        |&nbsp;или&nbsp;
+                                        a(href="/login").login войдите
+                                        |&nbsp;в систему.
+                            - has_comments_cls = film.comments && film.comments.length ? "":"display-none"
+                            .has-comments(class=has_comments_cls)#has_comments
                                 h2.blackh1 Комментарии
                                 .tape-list#comments
-                                    each el in film.comments
-                                        mixin comment_thumb(el)
-                            //-
-                               .tape-list
-                                if film.comments.length >=5
-                                    .add-filter
+                                    if film.comments && film.comments.length
+                                        each el in film.comments
+                                            mixin comment_thumb(el)
+                                if film.comments && film.comments.length >= 10
+                                    .add-filter#comments_more
                                         .add-content.style-panel-action.rel.zmin
                                             a(href='#', title='') показать еще
                                         //-
                                            .filter-content
-                                        img.img-responsive(src='static/img/shd-big.png', alt='')
+                                        - tmp_url = img_url + "shd-big.png"
+                                        img.img-responsive(src=tmp_url, alt='')
                                     //-
                                        .filter-block
                         if film.actors && film.actors.length
