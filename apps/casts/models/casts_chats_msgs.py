@@ -21,6 +21,6 @@ class CastsChatsMsgs(models.Model):
         # Имя таблицы в БД
         db_table = 'casts_chats_msgs'
         app_label = 'casts'
-        verbose_name = u'Сообщение пользователя в чате трансляции'
-        verbose_name_plural = u'Сообщения пользователей в чатах трансляций'
+        verbose_name = u'Сообщение в чате трансляции'
+        verbose_name_plural = u'Сообщения в чатах трансляций'
 
