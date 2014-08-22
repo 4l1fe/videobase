@@ -58,4 +58,4 @@ class CommentsFilmView(APIView):
             'items': serializer.data,
         }
 
-        return Response(DEFAULT_REST_API_RESPONSE, result, status=status.HTTP_200_OK)
+        return Response(result, status=status.HTTP_200_OK)
