@@ -13,7 +13,7 @@ class Casts(models.Model):
     status      = models.CharField(max_length=255, db_index=True, blank=False, verbose_name=u'Статус')
     description = models.TextField(max_length=255, db_index=True, blank=False, verbose_name=u'Описание')
     pg_rating   = models.CharField(max_length=255, db_index=True, blank=False, verbose_name=u'Возрастной рейтинг')
-    tags        = models.ManyToManyField('AbstractClassTags', verbose_name=u'Страны производители', related_name='casts')
+    tags        = models.ManyToManyField('AbstractCastsTags', verbose_name=u'Страны производители', related_name='casts')
 
     def __unicode__(self):
         return u'[{0}] {1}'.format(self.pk, self.title)
