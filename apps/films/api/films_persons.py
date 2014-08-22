@@ -9,6 +9,7 @@ from apps.films.forms import PersonApiForm
 from apps.films.api.serializers import vbPerson
 from apps.films.constants import APP_FILM_PERSON_TYPES_OUR
 
+from videobase.settings import DEFAULT_REST_API_RESPONSE
 
 #############################################################################################################
 class PersonsFilmView(APIView):
@@ -32,7 +33,7 @@ class PersonsFilmView(APIView):
                      values_list('person', flat=True)
 
         if not len(result):
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return Response(DEFAULT_REST_API_RESPONSE, status=status.HTTP_404_NOT_FOUND)
 
         return result
 
