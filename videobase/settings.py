@@ -45,6 +45,7 @@ HTTP_USER_TOKEN_TYPE = b'X-MI-TOKEN'
 STANDART_HTTP_SESSION_TOKEN_HEADER = b'HTTP_{}'.format(HTTP_SESSION_TOKEN_TYPE.replace('-', '_'))
 STANDART_HTTP_USER_TOKEN_HEADER = b'HTTP_{}'.format(HTTP_USER_TOKEN_TYPE.replace('-', '_'))
 
+DEFAULT_REST_API_RESPONSE = {}
 ###########################################################
 emailconf = RawConfigParser()
 emailconf.read(CONFIGS_PATH + '/email.ini')
@@ -83,6 +84,7 @@ INSTALLED_APPS = (
     'apps.robots',
     'apps.rss',
     'apps.git',
+    'apps.casts',
     'crawler',
     'social_auth',
     'djcelery',
@@ -255,7 +257,7 @@ if not DEBUG:
     )
 
     RAVEN_CONFIG = {
-        'dsn': 'http://8684bf8b497047d9ac170fd16aefc873:41e89f4666b24f998125370f3d1a1789@sentry.aaysm.com:9000/2'
+        'dsn': 'http://8684bf8b497047d9ac170fd16aefc873:41e89f4666b24f998125370f3d1a1789@sentry.aaysm.com/2'
     }
 
 ###########################################################
