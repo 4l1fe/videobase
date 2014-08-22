@@ -162,6 +162,9 @@ section {padding:37px 0 6px 0;}
     border: none;
     box-shadow: none;
 }
+
+.films-new {padding-top: 0}
+.films-new .container {padding-top: 37px}
 .blue-block .list-film {
 
 }
@@ -1142,3 +1145,6 @@ a.toggle-playlist.active {
 
 .big-text {font-size: 150px; color: #fff; text-align: center; padding: 60px 0 40px 0}
 .sad-text {font-size: 30px; color: #fff; text-align: center; padding: 40px 0 60px 0}
+
+.add-comment {margin-bottom: 50px}
+.add-comment textarea {margin-top: 20px; margin-bottom: 20px; border-width: 0}

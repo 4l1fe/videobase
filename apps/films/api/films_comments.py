@@ -9,6 +9,7 @@ from rest_framework import status
 from apps.contents.models import Comments, Contents
 from apps.films.api.serializers import vbComment
 
+from videobase.settings import DEFAULT_REST_API_RESPONSE
 
 #############################################################################################################
 class CommentsFilmView(APIView):
@@ -57,4 +58,4 @@ class CommentsFilmView(APIView):
             'items': serializer.data,
         }
 
-        return Response(DEFAULT_REST_API_RESPONSE, result, status=status.HTTP_200_OK)
+        return Response(result, status=status.HTTP_200_OK)
