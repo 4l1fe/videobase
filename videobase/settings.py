@@ -1,9 +1,19 @@
 # coding: utf-8
 
+from __future__ import absolute_import
+
 import os
-import djcelery
 from datetime import timedelta
 from ConfigParser import RawConfigParser
+
+import djcelery
+from celery.schedules import crontab
+
+
+##########################################################
+# Import Local config
+from .local_settings import *
+
 
 ###########################################################
 # Celery settings
@@ -28,9 +38,6 @@ BACKUP_PATH = os.path.join(BASE_PATH, '..', '.backup')
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '7-dsc0--i_ej94w9as#-5p_5a)ql*9o80v1rs9krx!_-9%^b5$'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
-
 TEMPLATE_DEBUG = DEBUG
 
 ALLOWED_HOSTS = ['*']
@@ -46,6 +53,7 @@ STANDART_HTTP_SESSION_TOKEN_HEADER = b'HTTP_{}'.format(HTTP_SESSION_TOKEN_TYPE.r
 STANDART_HTTP_USER_TOKEN_HEADER = b'HTTP_{}'.format(HTTP_USER_TOKEN_TYPE.replace('-', '_'))
 
 ###########################################################
+# Email config
 emailconf = RawConfigParser()
 emailconf.read(CONFIGS_PATH + '/email.ini')
 EMAIL_HOST = emailconf.get('email', 'EMAIL_HOST')
@@ -371,7 +379,12 @@ CELERYBEAT_SCHEDULE = {
     'parse_you_tube_movies_ru': {
         'task': 'parse_you_tube_movies_ru',
         'schedule': timedelta(days=1)
-    }
+    },
+    # Do weekly newsletter
+    'week_notification_schedule': {
+            'task': 'week_notification',
+            'schedule': crontab(minute=0, hour=16, day_of_week=6)
+        },
 }
 
 CELERY_TIMEZONE = 'UTC'
@@ -379,4 +392,4 @@ CELERY_ACCEPT_CONTENT = ['pickle', 'json', 'msgpack', 'yaml']
 POSTER_URL_PREFIX = '_260x360'
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
-from local_settings import *
+
