@@ -71,7 +71,7 @@ class Migration(SchemaMigration):
         # Adding model 'CastsLocations'
         db.create_table('casts_locations', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('cast_service', self.gf('django.db.models.fields.related.ForeignKey')(related_name='uf_users_rel', to=orm['casts.CastsServices'])),
+            ('cast_service', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['casts.CastsServices'])),
             ('cast', self.gf('django.db.models.fields.related.ForeignKey')(related_name='cl_location_rel', to=orm['casts.Casts'])),
             ('quality', self.gf('django.db.models.fields.CharField')(default='', max_length=255, db_index=True, blank=True)),
             ('price_type', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
@@ -104,7 +104,7 @@ class Migration(SchemaMigration):
         # Adding model 'ExtrasCasts'
         db.create_table('extras_casts', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('cast', self.gf('django.db.models.fields.related.ForeignKey')(related_name='uf_users_rel', to=orm['casts.Casts'])),
+            ('cast', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['casts.Casts'])),
             ('extra', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
         ))
         db.send_create_signal('casts', ['ExtrasCasts'])
@@ -113,7 +113,7 @@ class Migration(SchemaMigration):
         db.create_table('users_casts', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('cast', self.gf('django.db.models.fields.related.ForeignKey')(related_name='uf_films_rel', to=orm['casts.Casts'])),
+            ('cast', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['casts.Casts'])),
             ('rating', self.gf('django.db.models.fields.PositiveSmallIntegerField')(db_index=True, null=True, blank=True)),
             ('subscribed', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
         ))
@@ -230,7 +230,7 @@ class Migration(SchemaMigration):
         'casts.castslocations': {
             'Meta': {'object_name': 'CastsLocations', 'db_table': "'casts_locations'"},
             'cast': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'cl_location_rel'", 'to': "orm['casts.Casts']"}),
-            'cast_service': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'uf_users_rel'", 'to': "orm['casts.CastsServices']"}),
+            'cast_service': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['casts.CastsServices']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'offline': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'price': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
@@ -250,13 +250,13 @@ class Migration(SchemaMigration):
         },
         'casts.extrascasts': {
             'Meta': {'object_name': 'ExtrasCasts', 'db_table': "'extras_casts'"},
-            'cast': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'uf_users_rel'", 'to': "orm['casts.Casts']"}),
+            'cast': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['casts.Casts']"}),
             'extra': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
         },
         'casts.userscasts': {
             'Meta': {'object_name': 'UsersCasts', 'db_table': "'users_casts'"},
-            'cast': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'uf_films_rel'", 'to': "orm['casts.Casts']"}),
+            'cast': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['casts.Casts']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'rating': ('django.db.models.fields.PositiveSmallIntegerField', [], {'db_index': 'True', 'null': 'True', 'blank': 'True'}),
             'subscribed': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
