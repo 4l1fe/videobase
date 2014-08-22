@@ -13,18 +13,15 @@ from apps.users.constants import APP_USERPROFILE_NOTIFICATION_WEEK
 def best_of_the_best_this_week():
     o_films = Films.get_newest_films(limit=10)
 
-    # Сформируем контекст
-    context = {
-        'films': [],
-        'serials': [],
-        'streams': [],
-    }
-
-    # Основные параметры рассылки
+    # Основные параметры рассылки и контекст
     params_email = {
         'subject': 'Eженедельная рассылка ВсеВи',
         'tpl_name': 'newsletter.html',
-        'context': context,
+        'context': {
+            'films': [],
+            'serials': [],
+            'streams': []
+        },
     }
 
     # Все пользователи у которых есть email и выбрана недельная нотификация
