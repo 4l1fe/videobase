@@ -8,6 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from apps.films.models import Films, UsersFilms
 from apps.films.constants import APP_FILM_SERIAL, APP_USERFILM_STATUS_PLAYLIST
 
+from videobase.settings import DEFAULT_REST_API_RESPONSE
 
 #############################################################################################################
 class ActPlaylistFilmView(APIView):
@@ -58,7 +59,7 @@ class ActPlaylistFilmView(APIView):
                 o_subs.status = APP_USERFILM_STATUS_PLAYLIST
                 o_subs.save()
             # Исправлена логика ответа на ошибочное действие
-            return Response(status=status.HTTP_200_OK)
+            return Response(DEFAULT_REST_API_RESPONSE, status=status.HTTP_200_OK)
         except Exception as e:
             try:
                 filter.update(add_params)
@@ -67,7 +68,7 @@ class ActPlaylistFilmView(APIView):
             except Exception as e:
                 return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response(status=status.HTTP_200_OK)
+        return Response(DEFAULT_REST_API_RESPONSE, status=status.HTTP_200_OK)
 
     def put(self, request, film_id, format=None, *args, **kwargs):
         return self.get(request, film_id, format=None, *args, **kwargs)
@@ -85,4 +86,4 @@ class ActPlaylistFilmView(APIView):
         }
         UsersFilms.objects.filter(**filter).delete()
 
-        return Response(status=status.HTTP_200_OK)
+        return Response(DEFAULT_REST_API_RESPONSE, status=status.HTTP_200_OK)
