@@ -1,8 +1,10 @@
 # coding: utf-8
-from pytils import numeral
+
 import datetime
+from pytils import numeral
 
 from django.db import transaction
+from django.forms.models import model_to_dict
 from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponse,\
@@ -13,17 +15,17 @@ from django.views.generic import View
 from django.views.decorators.cache import never_cache
 from django.shortcuts import redirect
 from django.contrib.auth.forms import AuthenticationForm
-from tasks import send_template_mail
-from social_auth.models import UserSocialAuth
 
+from social_auth.models import UserSocialAuth
 from rest_framework.authtoken.models import Token
 
 from apps.users.models import Feed
+from apps.users.tasks import send_template_mail
 from apps.users.api.serializers import vbUser, vbFeedElement, vbUserProfile
 from apps.users.forms import CustomRegisterForm, UsersProfileForm
 from apps.users.api.utils import create_new_session
 from apps.users.constants import APP_USERS_API_DEFAULT_PAGE, APP_USERS_API_DEFAULT_PER_PAGE,\
-    APP_SUBJECT_TO_RESTORE_PASSWORD
+    APP_SUBJECT_TO_RESTORE_PASSWORD, APP_SUBJECT_TO_CONFIRM_REGISTER
 
 from apps.films.models import Films, Persons, UsersFilms, UsersPersons
 from apps.films.constants import APP_PERSON_DIRECTOR, APP_PERSON_ACTOR, APP_USERFILM_SUBS_TRUE
@@ -40,27 +42,40 @@ class RegisterUserView(View):
     def get(self, *args, **kwargs):
         return HttpResponse(render_page('register', {}))
 
+
     @transaction.commit_manually
     def post(self, *args, **kwargs):
         register_form = CustomRegisterForm(data=self.request.POST)
         if register_form.is_valid():
             user = register_form.save()
-            kw = {
-                'token': user.auth_token.key,
-                '_': timezone.now().date().strftime("%H%M%S"),
-            }
 
-            url_redirect = url_with_querystring(reverse('tokenize'), **kw)
-            # url = "http://{host}{url}".format(host=self.request.get_host(), url=url_redirect)
-            # context = {'user': user, 'redirect_url': url}
-            #
-            # kw = dict(subject=APP_SUBJECT_TO_CONFIRM_REGISTER,
-            #           tpl_name='confirmation_register.html',
-            #           context=context,
-            #           to=[user.email])
-            # send_template_mail.apply_async(kwargs=kw)
+            url_redirect = url_with_querystring(
+                reverse('tokenize'),
+                **{
+                    'token': user.auth_token.key,
+                    '_': timezone.now().date().strftime("%H%M%S"),
+                }
+            )
 
             transaction.commit()
+
+            try:
+                context = {
+                    'user': model_to_dict(user, fields=[field.name for field in user._meta.fields]),
+                    'redirect_url': "http://{host}{url}".format(host=self.request.get_host(), url=url_redirect),
+                }
+
+                param_email = {
+                    'to':       [user.email],
+                    'context':  context,
+                    'subject':  APP_SUBJECT_TO_CONFIRM_REGISTER,
+                    'tpl_name': 'confirmation_register.html',
+                }
+
+                send_template_mail.apply_async(kwargs=param_email)
+            except Exception, e:
+                pass
+
             return redirect(url_redirect)
 
         else:

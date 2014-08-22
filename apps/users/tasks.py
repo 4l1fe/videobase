@@ -1,4 +1,5 @@
 # coding: utf-8
+
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 
@@ -20,21 +21,25 @@ def send_template_mail(subject, tpl_name, context, to):
 
 @app.task(name="notification", queue="notification")
 def notification(id_, type_):
-    if type_ not in (FILM_O, PERSON_O, ):
+    if type_ not in (FILM_O, PERSON_O):
         raise ValueError("Not valid argument")
+
     tpl_name = APP_NOTIFICATION_TEMPLATE[type_]
     subject = APP_NOTIFICATION_EMAIL_SUBJECT[type_]
     if type_ == FILM_O:
         model_obj = Films
         model_user = UsersFilms
-        query = {'film': id_,
-                 'subscribed': APP_USERFILM_SUBS_TRUE,
+
+        query = {
+            'film': id_,
+            'subscribed': APP_USERFILM_SUBS_TRUE,
         }
     else:
         model_obj = Persons
         model_user = UsersPersons
-        query = {'person': id_,
-                 'subscribed': APP_PERSONFILM_SUBS_TRUE,
+        query = {
+            'person': id_,
+            'subscribed': APP_PERSONFILM_SUBS_TRUE,
         }
 
     try:
