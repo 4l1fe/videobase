@@ -1,0 +1,26 @@
+# coding: utf-8
+
+from django.db import models
+
+#############################################################################################################
+# Модель Пользовательских трансляций
+class CastsLocations(models.Model):
+    cast_service = models.ForeignKey('CastsService', verbose_name=u'Сервис трансляций', related_name='uf_users_rel')
+    cast       = models.ForeignKey('Casts', verbose_name=u'Трансляция', related_name='cl_location_rel')
+    quality    = models.CharField(max_length=255, default='', blank=True, db_index=True, verbose_name=u'Качество')
+    price_type =  models.IntegerField(null=True, blank=True, verbose_name=u'Тип цены')
+    price      =  models.FloatField(null=True, blank=True, verbose_name=u'Цена')
+    offline    = models.BooleanField(default = True, verbose_name = "Оффлайн в данный момент времени ?")
+    url_view   = models.CharField(max_length=255, default='', blank=True, db_index=True, verbose_name=u'Ссылка для просмотра')
+    value      = models.CharField(max_length=255, default='', blank=True, db_index=True, verbose_name=u'Значение')
+
+
+    def __unicode__(self):
+        return u'[{0}] {1} - {2}'.format(self.pk, self.cast_service, self.cast) 
+
+    class  Meta(object):
+        # Имя таблицы в БД
+        db_table = 'casts_locations'
+        app_label = 'casts'
+        verbose_name = u'Ссылка на трансляцию'
+        verbose_name_plural = u'Ссылки на трансляции'
