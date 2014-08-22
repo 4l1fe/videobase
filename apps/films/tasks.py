@@ -11,7 +11,14 @@ from apps.users.constants import APP_USERPROFILE_NOTIFICATION_WEEK
 
 @app.task(name="week_notification", queue="week_notification")
 def best_of_the_best_this_week():
+    # Выборка фильмов
     o_films = Films.get_newest_films(limit=10)
+
+    # Выборка сериалов
+    pass
+
+    # Выборка трансляций
+    pass
 
     # Основные параметры рассылки и контекст
     params_email = {
