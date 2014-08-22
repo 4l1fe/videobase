@@ -9,6 +9,7 @@ from apps.films.forms import PersonApiForm
 from apps.films.api.serializers import vbPerson
 from apps.films.constants import APP_FILM_PERSON_TYPES_OUR
 
+from videobase.settings import DEFAULT_REST_API_RESPONSE
 
 #############################################################################################################
 class PersonsFilmView(APIView):

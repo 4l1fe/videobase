@@ -92,7 +92,10 @@ class Item
     if opts.place == undefined
       @_place = $('<span class="preload-' + @_name + '"></span>')
       if opts.parent
-        @_place.appendTo(opts.parent)
+        if opts.up
+          @_place.prependTo(opts.parent)
+        else
+          @_place.appendTo(opts.parent)
       @_app.get_tpl(
         @_name
         (tpl_obj) =>
@@ -361,9 +364,8 @@ class CommentThumb extends Item
 
   set_vals: (vals, do_not_set) ->
     if vals.created
-      if !vals.time_text
-        vals.time_text = time_text(new Date(vals.created))
-      @elements["time_text"].val = vals.created
+      vals.created_orig = vals.created
+      vals.created = time_text(new Date(vals.created))
     super
 
 class PersonThumb extends Item
@@ -444,8 +446,8 @@ class Deck
     @items.push(new @item_class({place: obj, do_not_set: true}))
     @onchange()
 
-  add_item: (item, onchange_call = true) ->
-    @items.push(new @item_class({parent: @_place, vals: item}))
+  add_item: (item, onchange_call = true, up = false) ->
+    @items.push(new @item_class({parent: @_place, vals: item, up: up}))
     if onchange_call
       @onchange()
 
@@ -509,9 +511,14 @@ class CommentsDeck extends Deck
     @time_update()
 
   time_update: ->
+    ###
+
     for item in @items
+      created = item.vals["created_orig"]
+      item.set_val("created", time_text())
       if item.elements.time_text.val
         item.elements.time_text.self.text(time_text(new Date(item.elements.time_text.val)))
+    ###
 
 class FeedDeck extends Deck
   constructor: (place, opts = {}) ->
@@ -616,11 +623,13 @@ class App
     @rest.add("films")
     @rest.films.add("search")
     @rest.films.add("persons")
+    @rest.films.add("comments")
     @rest.films.add("action", {isSingle: true})
     @rest.films.action.add("rate")
     @rest.films.action.add("subscribe")
     @rest.films.action.add("notwatch")
     @rest.films.action.add("playlist")
+    @rest.films.action.add("comment")
     @rest.add("persons")
     @rest.persons.add("filmography", {isSingle: true})
     @rest.persons.add("action", {isSingle: true})
@@ -716,6 +725,16 @@ class App
               ->
                 rel.rating = false if opts.rel
                 opts.callback(opts.value) if opts.callback
+            )
+      else if action == "comment"
+        @rest.films.action.comment.update id, {text: opts.text}
+            .done(
+              ->
+                opts.callback(true) if opts.callback
+            )
+            .fail(
+              ->
+                opts.callback(false) if opts.callback
             )
       else
         if new_state
@@ -1030,7 +1049,8 @@ class Page_Film extends Page
   constructor: (@conf) ->
     super
     films_deck = new FilmsDeck($("#films"))
-    comments_deck = new CommentsDeck($("#comments"))
+    comments_deck = new CommentsDeck($("#comments"), {load_func: => @load_more_comments()})
+    comments_deck.load_more_bind($("#comments_more"))
     actors_deck = new PersonsDeck($("#actors"), {load_func: => @load_all_actors()})
     actors_deck.load_more_bind($("#actors_more"))
 
@@ -1051,6 +1071,17 @@ class Page_Film extends Page
     @_e.playlist_btn.bind("click", => @action_playlist_toggle()) if @_e.playlist_btn.length
     @_e.subscribe_btn = $("#subscribe_btn")
     @_e.subscribe_btn.bind("click", => @action_subscribe_toggle()) if @_e.subscribe_btn.length
+
+    @_e.add_comment = {}
+    @_e.add_comment.place = $("#add_comment")
+    @_e.add_comment.submit_btn = $("input[type=submit]", @_e.add_comment.place)
+
+    if @_e.add_comment.submit_btn.size()
+      $("form", @_e.add_comment.place).submit( => @add_comment(); return false)
+      @_e.add_comment.text = $("textarea", @_e.add_comment.place)
+    else
+      $(".login", @_e.add_comment.place).click(=> @_app.show_modal("login"); return false)
+      $(".register", @_e.add_comment.place).click(=> @_app.show_modal("reg"); return false)
 
     self = @
     if @conf.locations && @conf.locations.length
@@ -1092,6 +1123,50 @@ class Page_Film extends Page
       if !loc_id
         loc_id = loc_price_id
       @play_location(loc_id, false) if loc_id
+
+  load_more_comments: ->
+    comments_deck.load_more_hide()
+    @_app.rest.films.comments.read(@conf.id, {page: comments_deck.page + 1})
+    .done(
+      (data) ->
+        if data && data.items
+          comments_deck.add_items(data.items)
+          comments_deck.page = data.page
+          if data.items.length >= 10
+            comments_deck.load_more_show()
+          else
+            comments_deck.load_more_hide(false)
+        else
+          comments_deck.load_more_hide(false)
+    )
+    .fail(
+      ->
+        comments_deck.load_more_hide(false)
+    )
+
+  add_comment: ->
+    text = @_e.add_comment.text.val()
+    if text != ""
+      @_e.add_comment.text.attr("disabled", "disabled")
+      @_e.add_comment.submit_btn.attr("disabled", "disabled")
+      @_app.film_action(@conf.id, "comment", {
+        text: text,
+        callback: (result) =>
+          @_e.add_comment.text.removeAttr("disabled")
+          @_e.add_comment.submit_btn.removeAttr("disabled")
+          if result
+            @_e.add_comment.text.val("")
+            @_app.rest.films.comments.read @conf.id, {per_page: 1, page: 1}
+              .done(
+                (res) =>
+                  if res.items && res.items.length
+                    $("#has_comments").show()
+                    comments_deck.add_item(res.items[0], true, true)
+              )
+      })
+    else
+      @_e.add_comment.text.focus()
+
 
   play_location: (id, scroll = false) ->
     @player.load(locations[id], scroll) if locations[id]
