@@ -70,3 +70,7 @@ class ActCommentFilmView(APIView):
             return Response(DEFAULT_REST_API_RESPONSE,status=status.HTTP_200_OK)
 
         return Response({'error': form.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+
+    def put(self, request, film_id, format=None, *args, **kwargs):
+        return self.post(request, film_id, format=None, *args, **kwargs)
