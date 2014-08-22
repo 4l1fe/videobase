@@ -3,6 +3,7 @@
 var zerorpc = require("zerorpc");
 var jade = require('jade');
 var path = require('path');
+var util = require('util');
 
 // Setup paths directories
 var current_path = path.dirname(require.main.filename);
@@ -41,4 +42,8 @@ server.on("error", function(error) {
    console.log(error);
 });
 
-server.bind("tcp://*:4242");
+var port = 4242;
+var tcp_path = util.format("tcp://*:%s", port);
+
+console.log(util.format("Render server started on %s port.", port));
+server.bind(tcp_path);
