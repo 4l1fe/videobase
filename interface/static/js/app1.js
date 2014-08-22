@@ -155,7 +155,11 @@
       if (opts.place === void 0) {
         this._place = $('<span class="preload-' + this._name + '"></span>');
         if (opts.parent) {
-          this._place.appendTo(opts.parent);
+          if (opts.up) {
+            this._place.prependTo(opts.parent);
+          } else {
+            this._place.appendTo(opts.parent);
+          }
         }
         this._app.get_tpl(this._name, (function(_this) {
           return function(tpl_obj) {
@@ -567,10 +571,8 @@
 
     CommentThumb.prototype.set_vals = function(vals, do_not_set) {
       if (vals.created) {
-        if (!vals.time_text) {
-          vals.time_text = time_text(new Date(vals.created));
-        }
-        this.elements["time_text"].val = vals.created;
+        vals.created_orig = vals.created;
+        vals.created = time_text(new Date(vals.created));
       }
       return CommentThumb.__super__.set_vals.apply(this, arguments);
     };
@@ -710,13 +712,17 @@
       return this.onchange();
     };
 
-    Deck.prototype.add_item = function(item, onchange_call) {
+    Deck.prototype.add_item = function(item, onchange_call, up) {
       if (onchange_call == null) {
         onchange_call = true;
       }
+      if (up == null) {
+        up = false;
+      }
       this.items.push(new this.item_class({
         parent: this._place,
-        vals: item
+        vals: item,
+        up: up
       }));
       if (onchange_call) {
         return this.onchange();
@@ -827,18 +833,15 @@
     }
 
     CommentsDeck.prototype.time_update = function() {
-      var item, _i, _len, _ref, _results;
-      _ref = this.items;
-      _results = [];
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        item = _ref[_i];
-        if (item.elements.time_text.val) {
-          _results.push(item.elements.time_text.self.text(time_text(new Date(item.elements.time_text.val))));
-        } else {
-          _results.push(void 0);
-        }
-      }
-      return _results;
+
+      /*
+      
+      for item in @items
+        created = item.vals["created_orig"]
+        item.set_val("created", time_text())
+        if item.elements.time_text.val
+          item.elements.time_text.self.text(time_text(new Date(item.elements.time_text.val)))
+       */
     };
 
     return CommentsDeck;
@@ -1001,6 +1004,7 @@
       this.rest.add("films");
       this.rest.films.add("search");
       this.rest.films.add("persons");
+      this.rest.films.add("comments");
       this.rest.films.add("action", {
         isSingle: true
       });
@@ -1008,6 +1012,7 @@
       this.rest.films.action.add("subscribe");
       this.rest.films.action.add("notwatch");
       this.rest.films.action.add("playlist");
+      this.rest.films.action.add("comment");
       this.rest.add("persons");
       this.rest.persons.add("filmography", {
         isSingle: true
@@ -1145,6 +1150,18 @@
               }
             });
           }
+        } else if (action === "comment") {
+          return this.rest.films.action.comment.update(id, {
+            text: opts.text
+          }).done(function() {
+            if (opts.callback) {
+              return opts.callback(true);
+            }
+          }).fail(function() {
+            if (opts.callback) {
+              return opts.callback(false);
+            }
+          });
         } else {
           if (new_state) {
             doit = "update";
@@ -1642,7 +1659,14 @@
       this.conf = conf;
       Page_Film.__super__.constructor.apply(this, arguments);
       films_deck = new FilmsDeck($("#films"));
-      comments_deck = new CommentsDeck($("#comments"));
+      comments_deck = new CommentsDeck($("#comments"), {
+        load_func: (function(_this) {
+          return function() {
+            return _this.load_more_comments();
+          };
+        })(this)
+      });
+      comments_deck.load_more_bind($("#comments_more"));
       actors_deck = new PersonsDeck($("#actors"), {
         load_func: (function(_this) {
           return function() {
@@ -1685,6 +1709,31 @@
         this._e.subscribe_btn.bind("click", (function(_this) {
           return function() {
             return _this.action_subscribe_toggle();
+          };
+        })(this));
+      }
+      this._e.add_comment = {};
+      this._e.add_comment.place = $("#add_comment");
+      this._e.add_comment.submit_btn = $("input[type=submit]", this._e.add_comment.place);
+      if (this._e.add_comment.submit_btn.size()) {
+        $("form", this._e.add_comment.place).submit((function(_this) {
+          return function() {
+            _this.add_comment();
+            return false;
+          };
+        })(this));
+        this._e.add_comment.text = $("textarea", this._e.add_comment.place);
+      } else {
+        $(".login", this._e.add_comment.place).click((function(_this) {
+          return function() {
+            _this._app.show_modal("login");
+            return false;
+          };
+        })(this));
+        $(".register", this._e.add_comment.place).click((function(_this) {
+          return function() {
+            _this._app.show_modal("reg");
+            return false;
           };
         })(this));
       }
@@ -1748,6 +1797,59 @@
         }
       }
     }
+
+    Page_Film.prototype.load_more_comments = function() {
+      comments_deck.load_more_hide();
+      return this._app.rest.films.comments.read(this.conf.id, {
+        page: comments_deck.page + 1
+      }).done(function(data) {
+        if (data && data.items) {
+          comments_deck.add_items(data.items);
+          comments_deck.page = data.page;
+          if (data.items.length >= 10) {
+            return comments_deck.load_more_show();
+          } else {
+            return comments_deck.load_more_hide(false);
+          }
+        } else {
+          return comments_deck.load_more_hide(false);
+        }
+      }).fail(function() {
+        return comments_deck.load_more_hide(false);
+      });
+    };
+
+    Page_Film.prototype.add_comment = function() {
+      var text;
+      text = this._e.add_comment.text.val();
+      if (text !== "") {
+        this._e.add_comment.text.attr("disabled", "disabled");
+        this._e.add_comment.submit_btn.attr("disabled", "disabled");
+        return this._app.film_action(this.conf.id, "comment", {
+          text: text,
+          callback: (function(_this) {
+            return function(result) {
+              _this._e.add_comment.text.removeAttr("disabled");
+              _this._e.add_comment.submit_btn.removeAttr("disabled");
+              if (result) {
+                _this._e.add_comment.text.val("");
+                return _this._app.rest.films.comments.read(_this.conf.id, {
+                  per_page: 1,
+                  page: 1
+                }).done(function(res) {
+                  if (res.items && res.items.length) {
+                    $("#has_comments").show();
+                    return comments_deck.add_item(res.items[0], true, true);
+                  }
+                });
+              }
+            };
+          })(this)
+        });
+      } else {
+        return this._e.add_comment.text.focus();
+      }
+    };
 
     Page_Film.prototype.play_location = function(id, scroll) {
       if (scroll == null) {

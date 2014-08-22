@@ -8,6 +8,7 @@ from apps.films.models import Films, UsersFilms
 from apps.films.constants import APP_USERFILM_STATUS_NOT_WATCH, APP_USERFILM_STATUS_UNDEF
 from apps.users import Feed
 from apps.users.constants import FILM_NOTWATCH
+from videobase.settings import DEFAULT_REST_API_RESPONSE
 
 
 #############################################################################################################

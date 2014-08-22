@@ -12,6 +12,7 @@ from apps.films.models import Films
 from apps.users import Feed
 from apps.users.constants import FILM_COMMENT
 
+from videobase.settings import DEFAULT_REST_API_RESPONSE
 
 #############################################################################################################
 
