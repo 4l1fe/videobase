@@ -11,7 +11,7 @@ from apps.films.constants import APP_USERFILM_STATUS, APP_USERFILM_STATUS_UNDEF,
 #############################################################################################################
 # Модель Пользовательских трансляций
 class ExtrasCasts(models.Model):
-    cast       = models.ForeignKey('Casts', verbose_name=u'Идентификатор пользоваля', related_name='uf_users_rel')
+    cast       = models.ForeignKey('Casts', verbose_name=u'Идентификатор пользоваля')
     extra      = models.IntegerField(null=True, blank=True, verbose_name=u'Бюджет фильма')
 
 
