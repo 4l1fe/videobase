@@ -2,6 +2,7 @@
 
 __author__ = 'vladimir'
 
+
 def is_correct_trailer_title(title, film):
     film_name = film.name.lower().encode("utf-8")
     film_year = film.release_date.year
@@ -15,7 +16,6 @@ def is_correct_trailer_title(title, film):
         check_block = False
         check_fname = False
         check_fyear = False
-
         for phrase in trailers_ru_mask:
             if title.find(phrase) != -1:
                 check_ru = True
@@ -28,16 +28,16 @@ def is_correct_trailer_title(title, film):
             if title.find(phrase) != -1:
                 check_block = True
 
-        tr_t_for_comparison = title.encode("utf-8")
+        tr_t_for_comparison = title.lower().encode("utf-8")
         if tr_t_for_comparison.find(film_name) != -1:
             check_fname = True
 
         if tr_t_for_comparison.find(str(film_year)) != -1:
             check_fyear = True
         if (check_ru or check_en) and check_fname and check_fyear and not check_block:
-            return False
-        else:
             return True
-    except:
+        else:
+            return False
+    except Exception, ex:
         return True
 
