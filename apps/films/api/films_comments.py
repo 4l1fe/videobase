@@ -9,6 +9,7 @@ from rest_framework import status
 from apps.contents.models import Comments, Contents
 from apps.films.api.serializers import vbComment
 
+from videobase.settings import DEFAULT_REST_API_RESPONSE
 
 #############################################################################################################
 class CommentsFilmView(APIView):
