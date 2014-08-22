@@ -11,7 +11,7 @@ from apps.films.constants import APP_USERFILM_STATUS, APP_USERFILM_STATUS_UNDEF,
 #############################################################################################################
 # Модель Пользовательских трансляций
 class UsersCasts(models.Model):
-    user       = models.ForeignKey(User, verbose_name=u'Идентификатор пользоваля', related_name='uf_users_rel')
+    user       = models.ForeignKey(User, verbose_name=u'Идентификатор пользоваля')
     cast       = models.ForeignKey('Casts', verbose_name=u'Трансляция', related_name='uf_films_rel')
     rating     = models.PositiveSmallIntegerField(null=True, blank=True, db_index=True, verbose_name=u'Рейтинг поставленный пользователем')
     subscribed = models.DateTimeField(auto_now_add=True, verbose_name=u'Дата создания')
