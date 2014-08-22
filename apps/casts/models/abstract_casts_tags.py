@@ -6,8 +6,8 @@ from django.db import models
 # Модель Тегов Трансляций
 class AbstractCastsTags(models.Model):
 
-    name   = models.CharField(max_length=255, default='', blank=True, db_index=True, verbose_name=u'Оригинальное название тега')
-    name_orig   = models.CharField(max_length=255, default='', blank=True, db_index=True, verbose_name=u'Оригинальное название тега')
+    name   = models.CharField(max_length=255, default='', blank=True, db_index=True, verbose_name=u'название')
+    name_orig   = models.CharField(max_length=255, default='', blank=True, db_index=True, verbose_name=u'Оригинальное название')
     description = models.TextField(max_length=255, db_index=True, blank=False, verbose_name=u'Описание')
     type   = models.CharField(max_length=255, default='', blank=True, db_index=True, verbose_name=u'Тип')
         

@@ -24,8 +24,7 @@ class CastsLocations(models.Model):
     rating     = models.PositiveSmallIntegerField(null=True, blank=True, db_index=True, verbose_name=u'Рейтинг поставленный пользователем')
 
     def __unicode__(self):
-        return u'[{0}] {1} - {2}
-        '.format(self.pk, self.user.username, self.cast.name)
+        return u'[{0}] {1} - {2}'.format(self.pk, self.user.username, self.cast.name)
 
         
     class  Meta(object):
