@@ -30,17 +30,26 @@ class ActCommentFilmView(APIView):
         """
         Return object Contents or Response object with 404 error
         """
-        try:
-            f = Films.objects.get(id=film_id)
-            c, created = Contents.objects.get_or_create(
-                film=f, name=f.name, name_orig=f.name_orig,
-                description=f.description, release_date=f.release_date,
-                viewer_cnt=0, viewer_lastweek_cnt=0, viewer_lastmonth_cnt=0
-            )
 
-            return c
+        try:
+            o_film = Films.objects.get(id=film_id)
         except ObjectDoesNotExist:
             return Response(DEFAULT_REST_API_RESPONSE, status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            o_content = Contents.objects.get(film=o_film.id)
+        except Exception, e:
+            try:
+                o_content = Contents(
+                    film=o_film, name=o_film.name, nagme_orig=o_film.name_orig,
+                    description=o_film.description, release_date=o_film.release_date,
+                    viewer_cnt=0, viewer_lastweek_cnt=0, viewer_lastmonth_cnt=0
+                )
+                o_content.save()
+            except Exception, e:
+                return Response(DEFAULT_REST_API_RESPONSE, status=status.HTTP_404_NOT_FOUND)
+
+        return o_content
 
 
     def post(self, request, film_id, format=None, *args, **kwargs):
@@ -67,7 +76,7 @@ class ActCommentFilmView(APIView):
 
             Feed.objects.create(user=request.user, type=FILM_COMMENT, object=obj_val)
 
-            return Response(DEFAULT_REST_API_RESPONSE,status=status.HTTP_200_OK)
+            return Response(DEFAULT_REST_API_RESPONSE, status=status.HTTP_200_OK)
 
         return Response({'error': form.errors}, status=status.HTTP_400_BAD_REQUEST)
 
