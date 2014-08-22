@@ -4,11 +4,13 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
-from apps.films.models import Films, UsersFilms, FilmExtras
 from apps.contents.models import Locations
+from apps.films.models import Films, UsersFilms, FilmExtras
 from apps.films.constants import APP_USERFILM_SUBS_TRUE, APP_USERFILM_SUBS_FALSE, APP_FILM_SERIAL
 from apps.users.models import Feed
+from apps.users.constants import FILM_SUBSCRIBE
 
+from videobase.settings import DEFAULT_REST_API_RESPONSE
 
 #############################################################################################################
 class ActSubscribeFilmView(APIView):
@@ -34,6 +36,7 @@ class ActSubscribeFilmView(APIView):
 
         return result
 
+
     def get(self, request, film_id, format=None, *args, **kwargs):
         # Выбираем и проверяем, что фильм существует
         o_film = self.__get_object(film_id)
@@ -53,23 +56,31 @@ class ActSubscribeFilmView(APIView):
             'film': o_film,
         }
         poster = FilmExtras.get_poster_by_film(o_film.fe_film_rel.all())
-        obj_val = {'id': o_film.id, 'name': o_film.name , 'description': o_film.description, 'poster': poster}
+        obj_val = {
+            'id': o_film.id,
+            'name': o_film.name,
+            'description': o_film.description,
+            'poster': poster
+        }
 
         # Устанавливаем подписку
         try:
             o_subs = UsersFilms(subscribed=subscribed, **filter_)
             o_subs.save()
-            Feed.objects.create(user=request.user, type='film-s', object=obj_val)
+            Feed.objects.create(user=request.user, type=FILM_SUBSCRIBE, object=obj_val)
         except Exception as e:
             try:
                 UsersFilms.objects.filter(**filter_).update(subscribed=subscribed)
-                for f in Feed.objects.filter(user=request.user, type='film-s').iterator(): # До этого момента Feed
-                    if f.object == obj_val: f.delete()                                      # с типом film-nw может и не быть
-                Feed.objects.create(user=request.user, type='film-s', object=obj_val)      # значит нечего обновлять
+                for f in Feed.objects.filter(user=request.user, type=FILM_SUBSCRIBE).iterator(): # До этого момента Feed
+                    if f.object == obj_val:
+                        # с типом film-nw может и не быть
+                        f.delete()
+
+                Feed.objects.create(user=request.user, type=FILM_SUBSCRIBE, object=obj_val)      # значит нечего обновлять
             except Exception as e:
                 return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response(status=status.HTTP_200_OK)
+        return Response(DEFAULT_REST_API_RESPONSE, status=status.HTTP_200_OK)
 
     def delete(self, request, film_id, format=None, *args, **kwargs):
         o_film = self.__get_object(film_id)
@@ -84,17 +95,27 @@ class ActSubscribeFilmView(APIView):
 
         # Init data
         subscribed = APP_USERFILM_SUBS_FALSE
-        filter_ = {'user': request.user.pk,
-                   'film': o_film.pk}
+        filter_ = {
+            'user': request.user.pk,
+            'film': o_film.pk
+        }
+
         poster = FilmExtras.get_poster_by_film(o_film.fe_film_rel.all())
-        obj_val = {'id': o_film.id, 'name': o_film.name , 'description': o_film.description, 'poster': poster}
+        obj_val = {
+            'id': o_film.id,
+            'name': o_film.name,
+            'description': o_film.description,
+            'poster': poster
+        }
 
         # Удалим подписку
         UsersFilms.objects.filter(**filter_).update(subscribed=subscribed)
-        for f in Feed.objects.filter(user=request.user, type='film-s').iterator():
-            if f.object == obj_val: f.delete()
+        for f in Feed.objects.filter(user=request.user, type=FILM_SUBSCRIBE).iterator():
+            if f.object == obj_val:
+                f.delete()
 
-        return Response(status=status.HTTP_200_OK)
+        return Response(DEFAULT_REST_API_RESPONSE, status=status.HTTP_200_OK)
+
 
     def put(self, request, film_id, format=None, *args, **kwargs):
         return self.get(request, film_id, format=format, *args, **kwargs)
