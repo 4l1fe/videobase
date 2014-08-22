@@ -6,6 +6,10 @@ from apps.films.models import Persons
 import data.person_facts.checker
 
 
+
+#command to run checkers
+#print(data.film_facts.checker.film_checker.check_and_correct(f))
+
 class Command(NoArgsCommand):
     def handle_noargs(self, **options):
         f = Films.objects.get(id=33665)
