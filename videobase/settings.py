@@ -362,7 +362,7 @@ CELERYBEAT_SCHEDULE = {
         'task': 'drugoe_kino_update',
         'schedule': timedelta(days=7)
     },
-    # Checking locations for aged films yearly
+    # Refreshing sitemap
     'sitemap_refresh_schedule': {
         'task': 'refresh_sitemap',
         'schedule': timedelta(days=14)
@@ -371,7 +371,14 @@ CELERYBEAT_SCHEDULE = {
     'parse_you_tube_movies_ru': {
         'task': 'parse_you_tube_movies_ru',
         'schedule': timedelta(days=1)
+    },
+    # Refreshing consolidate rating
+    'consolidate_rating_schedule': {
+        'task': 'consolidate_rating',
+        'schedule': timedelta(days=1)
     }
+
+    
 }
 
 CELERY_TIMEZONE = 'UTC'

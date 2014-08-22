@@ -9,7 +9,7 @@ from rest_framework.decorators import permission_classes
 
 from apps.users.models.api_session import UsersApiSessions, SessionToken
 from apps.users.api.utils import create_new_session
-from videobase.settings import HTTP_USER_TOKEN_TYPE
+from videobase.settings import HTTP_USER_TOKEN_TYPE, DEFAULT_REST_API_RESPONSE
 
 
 class ObtainAuthToken(views.ObtainAuthToken):
@@ -33,7 +33,7 @@ class ObtainSessionToken(APIView):
                 'session_token': session.token.key,
             }
         except Exception as e:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return Response(DEFAULT_REST_API_RESPONSE,status=status.HTTP_404_NOT_FOUND)
 
         return Response(response_dict, status=status.HTTP_200_OK)
 
@@ -47,7 +47,7 @@ class ObtainSessionToken(APIView):
         except UsersApiSessions.DoesNotExist as e:
             return Response({'e': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response(status=status.HTTP_200_OK)
+        return Response({},status=status.HTTP_200_OK)
 
 
 class RevokeSessionToken(APIView):
@@ -61,4 +61,4 @@ class RevokeSessionToken(APIView):
         token = user.auth_token
         token.delete()
         Token.objects.create(user=user)
-        return Response(status.HTTP_200_OK)
+        return Response(DEFAULT_REST_API_RESPONSE, status = status.HTTP_200_OK)
