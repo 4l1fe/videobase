@@ -53,5 +53,6 @@ def notification(id_, type_):
             'context': context,
         }
         send_template_mail.apply_async(kwargs=kw)
+
     except:
         pass
