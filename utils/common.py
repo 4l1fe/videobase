@@ -131,4 +131,5 @@ def random_string(size=30, chars=string.ascii_letters+string.digits):
 def url_with_querystring(path, **kwargs):
     for key, value in kwargs.iteritems():
         kwargs[key] = unicode(value).encode('utf-8')
+
     return path + u'?' + urllib.urlencode(kwargs)
