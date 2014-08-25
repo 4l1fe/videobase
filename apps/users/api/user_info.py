@@ -7,6 +7,7 @@ from rest_framework.response import Response
 
 from apps.users.forms import UserUpdateForm
 from apps.users.models import UsersProfile, User
+from videobase.settings import DEFAULT_REST_API_RESPONSE
 
 
 class UserInfoView(APIView):
@@ -41,7 +42,7 @@ class UserInfoView(APIView):
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-        return Response(status=status.HTTP_200_OK)
+        return Response(DEFAULT_REST_API_RESPONSE,status=status.HTTP_200_OK)
 
 
 class UserChangePasswordView(APIView):
