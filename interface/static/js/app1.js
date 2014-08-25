@@ -552,29 +552,35 @@
   CommentThumb = (function(_super) {
     __extends(CommentThumb, _super);
 
-    function CommentThumb() {
+    function CommentThumb(opts, callback) {
+      if (opts == null) {
+        opts = {};
+      }
       this._name = "comment-thumb";
-      CommentThumb.__super__.constructor.apply(this, arguments);
+      if (opts.vals) {
+        this.vals_orig = opts.vals;
+      }
+      CommentThumb.__super__.constructor.call(this, opts, (function(_this) {
+        return function() {
+          if (!opts.place) {
+            return $(".time-tape", _this._place).data("miVal", _this.vals_orig.created);
+          }
+        };
+      })(this));
     }
 
     CommentThumb.prototype.transform_attr = function(attr, name, val) {
       if (attr === "href" && name === "user.id") {
         return "/users/" + val + "/";
-      } else {
-        return CommentThumb.__super__.transform_attr.apply(this, arguments);
       }
+      return CommentThumb.__super__.transform_attr.apply(this, arguments);
     };
 
     CommentThumb.prototype.transform_val = function(name, val) {
-      return CommentThumb.__super__.transform_val.apply(this, arguments);
-    };
-
-    CommentThumb.prototype.set_vals = function(vals, do_not_set) {
-      if (vals.created) {
-        vals.created_orig = vals.created;
-        vals.created = time_text(new Date(vals.created));
+      if (name === "user.name") {
+        return val || "Пользователь";
       }
-      return CommentThumb.__super__.set_vals.apply(this, arguments);
+      return CommentThumb.__super__.transform_val.apply(this, arguments);
     };
 
     return CommentThumb;
@@ -642,7 +648,6 @@
       var type;
       type = this._type;
       if (type.substr(0, 4) === "film") {
-        console.log(name);
         if (name === "object.id" && (attr = "href")) {
           return "/films/" + val + "/";
         }
@@ -833,15 +838,22 @@
     }
 
     CommentsDeck.prototype.time_update = function() {
-
-      /*
-      
-      for item in @items
-        created = item.vals["created_orig"]
-        item.set_val("created", time_text())
-        if item.elements.time_text.val
-          item.elements.time_text.self.text(time_text(new Date(item.elements.time_text.val)))
-       */
+      return $(".time-tape", this._place).each(function() {
+        var $this;
+        $this = $(this);
+        if ($this._failed) {
+          return;
+        }
+        if (!$this._datetime) {
+          try {
+            $this._datetime = new Date($this.data("miVal"));
+          } catch (_error) {
+            $this._failed = true;
+            return;
+          }
+        }
+        return $this.text(time_text($this._datetime));
+      });
     };
 
     return CommentsDeck;
@@ -1576,9 +1588,7 @@
           if (current_counter !== deck.load_counter) {
             return;
           }
-          console.log(data);
           if (data.items) {
-            console.log("items1");
             deck.add_items(data.items);
             if (data.items.length >= 12) {
               deck.load_more_show();
@@ -1715,6 +1725,8 @@
       this._e.add_comment = {};
       this._e.add_comment.place = $("#add_comment");
       this._e.add_comment.submit_btn = $("input[type=submit]", this._e.add_comment.place);
+      this._e.add_comment.textarea_wrapper = $("#comment_textarea_wrapper");
+      this._e.add_comment.textarea_error = $("p", this._e.add_comment.textarea_wrapper);
       if (this._e.add_comment.submit_btn.size()) {
         $("form", this._e.add_comment.place).submit((function(_this) {
           return function() {
@@ -1822,10 +1834,19 @@
     Page_Film.prototype.add_comment = function() {
       var text;
       text = this._e.add_comment.text.val();
-      if (text !== "") {
+      this._e.add_comment.textarea_wrapper.removeClass("has-error");
+      this._e.add_comment.textarea_error.text("");
+      error = false;
+      if (text === "") {
+        error = "Введите, пожалуйста, текст комментария.";
+      } else if (text.length < 80) {
+        error = "Количество букв в тексте не должно быть меньше 80.";
+      } else if (text.length > 8000) {
+        error = "Количество букв в тексте не должно превышать 8000.";
+      } else {
         this._e.add_comment.text.attr("disabled", "disabled");
         this._e.add_comment.submit_btn.attr("disabled", "disabled");
-        return this._app.film_action(this.conf.id, "comment", {
+        this._app.film_action(this.conf.id, "comment", {
           text: text,
           callback: (function(_this) {
             return function(result) {
@@ -1841,12 +1862,23 @@
                     $("#has_comments").show();
                     return comments_deck.add_item(res.items[0], true, true);
                   }
+                }).fail(function(res) {
+                  error = "Не удалось сохранить комментарий.";
+                  if (res.error && res.error.text) {
+                    error = res.error.text;
+                  }
+                  _this._e.add_comment.textarea_wrapper.addClass("has-error");
+                  _this._e.add_comment.textarea_error.text(error);
+                  return _this._e.add_comment.text.focus();
                 });
               }
             };
           })(this)
         });
-      } else {
+      }
+      if (error) {
+        this._e.add_comment.textarea_wrapper.addClass("has-error");
+        this._e.add_comment.textarea_error.text(error);
         return this._e.add_comment.text.focus();
       }
     };
@@ -2022,7 +2054,6 @@
             status: false,
             rel: _this.conf.relation,
             callback: function() {
-              console.log(1);
               if (_this.conf.next && _this.conf.next.id) {
                 return location.href = "/playlist/" + _this.conf.id + "/";
               } else if (_this.conf.previous && _this.conf.previous.id) {

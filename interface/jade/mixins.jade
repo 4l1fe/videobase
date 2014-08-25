@@ -194,9 +194,9 @@ mixin user_thumb(item)
                 span(data-mi-name="name")=item.name
 
 mixin comment_thumb(item)
-    .tape-item.cf(data-mi-id="id", data-mi-val=item.id)
+    .tape-item.cf(data-mi-id="id", data-mi-val=item.id).comment-thumb
         - if (item.user) {
-        -   name = item.user.name || ""; avatar = item.user.avatar || noavatar_url; href = "/users/" + item.user.id;
+        -   name = item.user.name || ("Пользователь #" + item.user.id); avatar = item.user.avatar || noavatar_url; href = "/users/" + item.user.id;
         - } else {
         -   name = "Неизвестно"; avatar = noavatar_url; href = "#";
         - }
