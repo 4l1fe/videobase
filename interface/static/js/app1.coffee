@@ -1154,8 +1154,8 @@ class Page_Film extends Page
     error = false
     if text == ""
       error = "Введите, пожалуйста, текст комментария."
-    else if text.length < 80
-      error = "Количество букв в тексте не должно быть меньше 80."
+    else if text.length < 20
+      error = "Количество букв в тексте не должно быть меньше 20."
     else if text.length > 8000
       error = "Количество букв в тексте не должно превышать 8000."
     else
