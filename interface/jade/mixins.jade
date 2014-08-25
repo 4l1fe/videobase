@@ -200,6 +200,7 @@ mixin comment_thumb(item)
         - } else {
         -   name = "Неизвестно"; avatar = noavatar_url; href = "#";
         - }
+        - text = item.text.replace(/\n+/gm, "<br/>")
         .row
             .col-md-1.col-sm-2.col-xs-2
                 .tape-img
@@ -217,13 +218,7 @@ mixin comment_thumb(item)
                        .title-item-tape
                     .content-item-tape
                         .short-text-tape
-                            p(data-mi-name="text")=item.text
-                        //-
-                           .short-text-tape
-                    //-
-                       .content-item-tape
-    //-
-       .tape-item
+                            p(data-mi-name="text")!=text
 
 mixin feed_thumb(item, for_tpl)
     - same_user = false

@@ -365,6 +365,8 @@ class CommentThumb extends Item
   transform_val: (name, val) ->
     if name == "user.name"
       return val || "Пользователь"
+    if name == "text"
+      return val.replace(/\n+/gm, "<br/>")
     super
 
 class PersonThumb extends Item

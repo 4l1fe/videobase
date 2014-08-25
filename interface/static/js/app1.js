@@ -580,6 +580,9 @@
       if (name === "user.name") {
         return val || "Пользователь";
       }
+      if (name === "text") {
+        return val.replace(/\n+/gm, "<br/>");
+      }
       return CommentThumb.__super__.transform_val.apply(this, arguments);
     };
 
