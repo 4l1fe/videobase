@@ -14,6 +14,7 @@ from apps.users.constants import FILM_COMMENT
 
 from videobase.settings import DEFAULT_REST_API_RESPONSE
 
+from cgi import escape
 #############################################################################################################
 
 
@@ -63,7 +64,7 @@ class ActCommentFilmView(APIView):
             # Init data
             filter_ = {
                 'user': request.user,
-                'text': form.cleaned_data['text'],
+                'text': escape(form.cleaned_data['text']),
                 'content': o_content
             }
 
