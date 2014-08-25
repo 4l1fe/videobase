@@ -3,7 +3,6 @@
 import sys
 from datetime import date
 
-from django.db.models import Q
 from django.core.cache import cache
 from django.core.paginator import Paginator
 
