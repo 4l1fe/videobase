@@ -98,6 +98,7 @@ class CommentForm(Form):
     """
 
     text = fields.CharField(max_length=255, help_text=u'Комментарий')
+    # text = fields.TextField(max_length=8000, help_text=u'Комментарий')
 
 
 #############################################################################################################
