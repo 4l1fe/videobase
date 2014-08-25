@@ -6,7 +6,7 @@ from django.db import models
 #############################################################################################################
 # Модель Чатов Трансляций
 class CastsChats(models.Model):
-    cast   = models.ForeignKey('Casts', verbose_name=u'Трансляция')
+    cast   = models.ForeignKey('Casts', verbose_name=u'Трансляция', unique = True)
     status = models.IntegerField(verbose_name=u'Статус')
     
     def __unicode__(self):
