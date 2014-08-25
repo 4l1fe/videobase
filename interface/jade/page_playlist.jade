@@ -218,8 +218,11 @@ html
                                         if auth_user
                                             h2.blackh1 Добавить комментарий
                                             form
-                                                textarea(placeholder="Опишите, что именно вам понравилось или не понравилось в фильме", name="text", rows="5").form-control
-                                                input.btn-yellow3.rel.zmin(type="submit", value="Добавить")
+                                                .form-group#comment_textarea_wrapper
+                                                    textarea(placeholder="Опишите, что именно вам понравилось или не понравилось в фильме", name="text", rows="5").form-control
+                                                    p
+                                                .form-group
+                                                    input.btn-yellow3.rel.zmin(type="submit", value="Добавить")
                                         else
                                             p
                                                 | Чтобы добавить комментарий, пожалуйста,&nbsp;
