@@ -223,7 +223,7 @@ def calc_comments(o_film):
     except Exception, e:
         return []
 
-    result_list = content_model.Comments.objects.filter(content=content.id)[:5]
+    result_list = content_model.Comments.objects.filter(content=content.id).order_by('-created')[:5]
     try:
         result_list = vbComment(result_list, many=True).data
     except:
