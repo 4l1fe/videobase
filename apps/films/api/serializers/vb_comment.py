@@ -32,7 +32,7 @@ class vbComment(serializers.ModelSerializer):
 
         return {
             'id': user.id,
-            'user': profile.get_name(),
+            'name': profile.get_name(),
             'avatar': path,
         }
 
