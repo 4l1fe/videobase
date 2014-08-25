@@ -382,9 +382,14 @@ CELERYBEAT_SCHEDULE = {
     },
     # Do weekly newsletter
     'week_notification_schedule': {
-            'task': 'week_notification',
-            'schedule': crontab(minute=0, hour=16, day_of_week=6)
-        },
+        'task': 'week_notification',
+        'schedule': crontab(minute=0, hour=16, day_of_week=6)
+    },
+    # Do every day personal newsletter
+    'personal_notification_schedule': {
+        'task': 'personal_notification',
+        'schedule': crontab(minute=0, hour=18)
+    },
 }
 
 CELERY_TIMEZONE = 'UTC'
