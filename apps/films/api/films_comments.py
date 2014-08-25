@@ -63,7 +63,7 @@ class CommentsFilmView(APIView):
         # Проверка пагинации
         filter = self.__validation_pagination(copy_req.get('page'), copy_req.get('per_page'), {})
 
-        o_comments = Comments.objects.filter(content=content).order_by('created')
+        o_comments = Comments.objects.filter(content=content).order_by('-created')
 
         try:
             page = Paginator(o_comments, per_page=filter['per_page']).page(filter['page'])
