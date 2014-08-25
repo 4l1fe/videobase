@@ -10,7 +10,7 @@ from apps.films.models import Films
 from apps.films.forms import DetailForm
 from apps.films.api.serializers import vbFilm
 
-
+from videobase.settings import DEFAULT_REST_API_RESPONSE
 #############################################################################################################
 class DetailFilmView(APIView):
     """
@@ -31,7 +31,7 @@ class DetailFilmView(APIView):
 
         result = Films.objects.filter(pk=film_id).prefetch_related(*prefetch)
         if not len(result):
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return Response(DEFAULT_REST_API_RESPONSE, status=status.HTTP_404_NOT_FOUND)
 
         return result[0]
 
