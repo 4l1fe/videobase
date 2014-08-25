@@ -224,7 +224,7 @@ html
                                     if film.comments && film.comments.length
                                         each el in film.comments
                                             mixin comment_thumb(el)
-                                if film.comments && film.comments.length >= 10
+                                if film.comments && film.comments.length >= 5
                                     .add-filter#comments_more
                                         .add-content.style-panel-action.rel.zmin
                                             a(href='#', title='') показать еще
