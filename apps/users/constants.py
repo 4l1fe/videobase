@@ -53,6 +53,8 @@ USER_ASK = 'user-a'
 USER_FRIENDSHIP = 'user-f'
 SYS_ALL = 'sys-a'
 
+FILM_NEWSLETTER = [FILM_RATE, FILM_SUBSCRIBE, FILM_COMMENT, FILM_O]
+
 APP_FEED_TYPE = (
     (FILM_RATE, u"Оценка фильма"),
     (FILM_SUBSCRIBE, u"Подписка на фильм"),

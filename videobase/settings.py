@@ -381,13 +381,13 @@ CELERYBEAT_SCHEDULE = {
         'schedule': timedelta(days=1)
     },
     # Do weekly newsletter
-    'week_notification_schedule': {
-        'task': 'week_notification',
+    'week_newsletter_schedule': {
+        'task': 'week_newsletter',
         'schedule': crontab(minute=0, hour=16, day_of_week=6)
     },
     # Do every day personal newsletter
-    'personal_notification_schedule': {
-        'task': 'personal_notification',
+    'personal_newsletter_schedule': {
+        'task': 'personal_newsletter',
         'schedule': crontab(minute=0, hour=18)
     },
 }

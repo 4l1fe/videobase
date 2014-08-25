@@ -4,13 +4,16 @@ from videobase.celery import app
 
 from apps.films.models import Films
 from apps.films.api.serializers import vbFilm
+from apps.films.constants import APP_USERFILM_SUBS_TRUE
 
-from apps.users.models import User
+from apps.users.models import User, Feed, UsersRels
 from apps.users.tasks import send_template_mail
-from apps.users.constants import APP_USERPROFILE_NOTIFICATION_WEEK, APP_USERPROFILE_NOTIFICATION_DAY
+from apps.users.api.serializers import vbFeedElement
+from apps.users.constants import APP_USERPROFILE_NOTIFICATION_WEEK, APP_USERPROFILE_NOTIFICATION_DAY, \
+    FILM_NEWSLETTER
 
 
-@app.task(name="week_notification", queue="week_notification")
+@app.task(name="week_newsletter", queue="week_newsletter")
 def best_of_the_best_this_week():
     # Выборка фильмов
     o_films = Films.get_newest_films(limit=10)
@@ -46,32 +49,44 @@ def best_of_the_best_this_week():
         send_template_mail.apply_async(kwargs=params_email)
 
 
-@app.task(name="personal_notification", queue="personal_notification")
-def personal_notification():
-    # Выборка ленты друзей
-    friend_feeds = []
-
-    # Выборка сериалов
-    films = []
-
+@app.task(name="personal_newsletter", queue="personal_newsletter")
+def personal_newsletter():
     # Основные параметры рассылки и контекст
     params_email = {
         'subject': 'Персональная рассылка ВсеВи',
         'tpl_name': 'personal_newsletter.html',
-        'context': {
-            'feeds': friend_feeds,
-            'films': films,
-        },
+        'context': {},
     }
 
-    # Все пользователи у которых есть email и выбрана недельная нотификация
+    # Все пользователи у которых есть email и выбрана недельная рассылка
     o_users = User.objects.filter(
         email__isnull=False,
         profile__ntf_frequency=APP_USERPROFILE_NOTIFICATION_DAY
     )
 
     for item in o_users:
-        params_email.update({'to': item.email})
+        # Init data
+        feeds = []
+        films = []
+
+        # Выборка ленты друзей
+        user_friends = UsersRels.get_all_friends_user(user_id=item.id, flat=True)
+
+        # Проверка длинны
+        if len(user_friends):
+            feeds = Feed.objects.filter(user__in=user_friends, type__in=FILM_NEWSLETTER)
+            feeds = vbFeedElement(feeds, many=True).data
+
+        # Выборка фильмов
+        films = Films.objects.filter(uf_films_rel__user=item.id, uf_films_rel__subscribed=APP_USERFILM_SUBS_TRUE)
+
+        # Проверка длинны
+        if len(films):
+            films = vbFilm(films, many=True).data
+
+        # Update
+        params_email['to'] = item.email
+        params_email['context'] = {'feeds': feeds, 'films': films}
 
         # Отправляем email в очередь
         send_template_mail.apply_async(kwargs=params_email)
