@@ -162,8 +162,8 @@ class Resource
             success = true
             if xhr.status == 200 && xhr.responseJSON && xhr.responseJSON.session_token
               @session_token = xhr.responseJSON.session_token
-              $.cookie("x-session", @session_token, {expires: 30})
-              $.cookie("x-token", @token, {expires: 30})
+              $.cookie("x-session", @session_token, {expires: 30, path: "/"})
+              $.cookie("x-token", @token, {expires: 30, path: "/"})
             else
               @token = undefined
               @session_token = undefined
