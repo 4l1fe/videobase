@@ -349,23 +349,22 @@ class FilmThumb extends Item
     location.href = "/films/" + @vals.id + "/"
 
 class CommentThumb extends Item
-  constructor: ->
+  constructor: (opts = {}, callback) ->
     @_name = "comment-thumb"
-    super
+    if opts.vals
+      @vals_orig = opts.vals
+    super opts, =>
+      if !opts.place
+        $(".time-tape", @_place).data("miVal", @vals_orig.created)
 
   transform_attr: (attr, name, val) ->
     if attr == "href" && name == "user.id"
       return "/users/" + val + "/"
-    else
-      super
-
-  transform_val: (name, val) ->
     super
 
-  set_vals: (vals, do_not_set) ->
-    if vals.created
-      vals.created_orig = vals.created
-      vals.created = time_text(new Date(vals.created))
+  transform_val: (name, val) ->
+    if name == "user.name"
+      return val || "Пользователь"
     super
 
 class PersonThumb extends Item
@@ -402,7 +401,6 @@ class FeedThumb extends Item
   transform_attr: (attr, name, val) ->
     type = @_type
     if type.substr(0,4) == "film"
-      console.log name
       if name == "object.id" && attr="href"
         return "/films/" + val + "/"
       if name == "object.name"
@@ -511,14 +509,17 @@ class CommentsDeck extends Deck
     @time_update()
 
   time_update: ->
-    ###
-
-    for item in @items
-      created = item.vals["created_orig"]
-      item.set_val("created", time_text())
-      if item.elements.time_text.val
-        item.elements.time_text.self.text(time_text(new Date(item.elements.time_text.val)))
-    ###
+    $(".time-tape", @_place).each ->
+      $this = $(this)
+      if $this._failed
+        return
+      if !$this._datetime
+        try
+          $this._datetime = new Date($this.data("miVal"))
+        catch
+          $this._failed = true
+          return
+      $this.text(time_text($this._datetime))
 
 class FeedDeck extends Deck
   constructor: (place, opts = {}) ->
@@ -1007,9 +1008,7 @@ class Page_Main extends Page
     .done(
       (data) =>
         return if current_counter != deck.load_counter
-        console.log data
         if data.items
-          console.log "items1"
           deck.add_items(data.items)
           if data.items.length >= 12
             deck.load_more_show()
@@ -1075,6 +1074,8 @@ class Page_Film extends Page
     @_e.add_comment = {}
     @_e.add_comment.place = $("#add_comment")
     @_e.add_comment.submit_btn = $("input[type=submit]", @_e.add_comment.place)
+    @_e.add_comment.textarea_wrapper = $("#comment_textarea_wrapper")
+    @_e.add_comment.textarea_error = $("p", @_e.add_comment.textarea_wrapper)
 
     if @_e.add_comment.submit_btn.size()
       $("form", @_e.add_comment.place).submit( => @add_comment(); return false)
@@ -1146,7 +1147,16 @@ class Page_Film extends Page
 
   add_comment: ->
     text = @_e.add_comment.text.val()
-    if text != ""
+    @_e.add_comment.textarea_wrapper.removeClass("has-error")
+    @_e.add_comment.textarea_error.text("")
+    error = false
+    if text == ""
+      error = "Введите, пожалуйста, текст комментария."
+    else if text.length < 80
+      error = "Количество букв в тексте не должно быть меньше 80."
+    else if text.length > 8000
+      error = "Количество букв в тексте не должно превышать 8000."
+    else
       @_e.add_comment.text.attr("disabled", "disabled")
       @_e.add_comment.submit_btn.attr("disabled", "disabled")
       @_app.film_action(@conf.id, "comment", {
@@ -1163,8 +1173,19 @@ class Page_Film extends Page
                     $("#has_comments").show()
                     comments_deck.add_item(res.items[0], true, true)
               )
+              .fail(
+                (res) =>
+                  error = "Не удалось сохранить комментарий."
+                  if res.error && res.error.text
+                    error = res.error.text
+                  @_e.add_comment.textarea_wrapper.addClass("has-error")
+                  @_e.add_comment.textarea_error.text(error)
+                  @_e.add_comment.text.focus()
+              )
       })
-    else
+    if error
+      @_e.add_comment.textarea_wrapper.addClass("has-error")
+      @_e.add_comment.textarea_error.text(error)
       @_e.add_comment.text.focus()
 
 
@@ -1273,7 +1294,6 @@ class Page_Playlist extends Page
           status: false
           rel: @conf.relation
           callback: =>
-            console.log 1
             if @conf.next && @conf.next.id
               location.href = "/playlist/" + @conf.id + "/"
             else if @conf.previous && @conf.previous.id
