@@ -10,6 +10,7 @@ from apps.films.forms import PersonFilmographyApiForm
 from apps.films.constants import APP_FILM_PERSON_TYPES_OUR
 from apps.films.api.serializers import vbFilm
 
+from videobase.settings import DEFAULT_REST_API_RESPONSE
 
 class PersonFilmographyAPIView(APIView):
 
@@ -32,6 +33,6 @@ class PersonFilmographyAPIView(APIView):
                 }
                 return Response(result, status=status.HTTP_200_OK)
             except Exception as e:
-                return Response(status=status.HTTP_400_BAD_REQUEST)
+                return Response(DEFAULT_REST_API_RESPONSE, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response(DEFAULT_REST_API_RESPONSE, status=status.HTTP_400_BAD_REQUEST)
