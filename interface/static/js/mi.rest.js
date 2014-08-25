@@ -249,10 +249,12 @@
                 if (xhr.status === 200 && xhr.responseJSON && xhr.responseJSON.session_token) {
                   _this.session_token = xhr.responseJSON.session_token;
                   $.cookie("x-session", _this.session_token, {
-                    expires: 30
+                    expires: 30,
+                    path: "/"
                   });
                   $.cookie("x-token", _this.token, {
-                    expires: 30
+                    expires: 30,
+                    path: "/"
                   });
                 } else {
                   _this.token = void 0;
