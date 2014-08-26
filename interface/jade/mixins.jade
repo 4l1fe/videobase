@@ -265,6 +265,7 @@ mixin feed_thumb(item, for_tpl)
                             .short-text-tape
                                 h4
                                     a(href=film_url, title='', data-mi-athref="object.id", data-mi-name="object.name")=item.object.name
+                                - text = (item.object.text || "").replace(/\n+/gm, "<br/>")
                                 p(data-mi-name="object.text")=item.object.text
                             //-
                                .short-text-tape
