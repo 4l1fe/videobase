@@ -39,7 +39,8 @@ def best_of_the_best_this_week():
     # Все пользователи у которых есть email и выбрана недельная нотификация
     o_users = User.objects.filter(
         email__isnull=False,
-        profile__ntf_frequency=APP_USERPROFILE_NOTIFICATION_WEEK
+        profile__ntf_frequency=APP_USERPROFILE_NOTIFICATION_WEEK,
+        profile__confirm_email=True,
     )
 
     for item in o_users:
@@ -61,7 +62,8 @@ def personal_newsletter():
     # Все пользователи у которых есть email и выбрана недельная рассылка
     o_users = User.objects.filter(
         email__isnull=False,
-        profile__ntf_frequency=APP_USERPROFILE_NOTIFICATION_DAY
+        profile__ntf_frequency=APP_USERPROFILE_NOTIFICATION_DAY,
+        profile__confirm_email=True,
     )
 
     for item in o_users:

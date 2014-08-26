@@ -55,12 +55,13 @@ class RegisterUserView(View):
                     '_': timezone.now().date().strftime("%H%M%S"),
                 }
             )
-
             transaction.commit()
 
             try:
+                profile = user.profile
                 context = {
                     'user': model_to_dict(user, fields=[field.name for field in user._meta.fields]),
+                    'profile': model_to_dict(profile, fields=[field.name for field in profile._meta.fields]),
                     'redirect_url': 'http://{host}{url}'.format(host=self.request.get_host(), url=url_redirect),
                 }
 

@@ -13,7 +13,8 @@ import json
 @receiver(post_save, sender=User)
 def add_profile_to_user(instance, **kwargs):
     profile, flag = UsersProfile.objects.get_or_create(user=instance)
-    profile.save()
+    # Лишний раз вызывается save()
+    # profile.save()
 
 
 @receiver(post_save, sender=Feed)
