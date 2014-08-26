@@ -19,7 +19,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from social_auth.models import UserSocialAuth
 from rest_framework.authtoken.models import Token
 
-from apps.users.models import Feed
+from apps.users.models import Feed, UsersProfile
 from apps.users.tasks import send_template_mail
 from apps.users.api.serializers import vbUser, vbFeedElement, vbUserProfile
 from apps.users.forms import CustomRegisterForm, UsersProfileForm
@@ -202,6 +202,20 @@ class UserView(View):
 
         except Exception as e:
             return HttpResponseServerError(e)
+
+
+class ConfirmEmailView(View):
+
+    def get(self, activation_key, *args, **kwargs):
+        try:
+            profile = UsersProfile.objects.get(activation_key=activation_key)
+        except self.model.DoesNotExist:
+            raise Http404
+
+        profile.confirm_email = True
+        profile.save()
+
+        return HttpResponse(render_page('confirm_email', {}))
 
 
 class RestorePasswordView(View):
