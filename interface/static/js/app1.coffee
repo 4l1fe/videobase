@@ -398,6 +398,8 @@ class FeedThumb extends Item
   transform_val: (name, val) ->
     if name == "user.name"
       return val || "Пользователь"
+    else if @_type == "film-c" && name == "object.text"
+      return val.replace(/\n+/gm, "<br/>")
     super
 
   transform_attr: (attr, name, val) ->
@@ -937,6 +939,7 @@ class Page_Main extends Page
       @load_more_films(films_deck, {page: 2})
     else
       films_deck.load_more_hide(false)
+    $('.crsl-items').carousel({itemMinWidth: 200, itemEqualHeight: true, visible: 3});
 
   filter_changed: (text) ->
     _filter_counter++

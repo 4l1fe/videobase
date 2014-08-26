@@ -643,6 +643,8 @@
     FeedThumb.prototype.transform_val = function(name, val) {
       if (name === "user.name") {
         return val || "Пользователь";
+      } else if (this._type === "film-c" && name === "object.text") {
+        return val.replace(/\n+/gm, "<br/>");
       }
       return FeedThumb.__super__.transform_val.apply(this, arguments);
     };
@@ -1484,6 +1486,11 @@
       } else {
         films_deck.load_more_hide(false);
       }
+      $('.crsl-items').carousel({
+        itemMinWidth: 200,
+        itemEqualHeight: true,
+        visible: 3
+      });
     }
 
     Page_Main.prototype.filter_changed = function(text) {
