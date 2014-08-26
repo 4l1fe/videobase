@@ -1,7 +1,12 @@
 # coding: utf-8
-from django.contrib.auth.models import User
+
+import sha
+import random
+import binascii
+
 from django.db import models
-from users_pics import UsersPics
+from django.utils.crypto import pbkdf2
+from django.contrib.auth.models import User
 
 from ..constants import *
 
@@ -27,14 +32,27 @@ class UsersProfile(models.Model):
     pvt_actors     = models.IntegerField(verbose_name=u'Любимые актеры пользователя', choices=APP_USERPROFILE_PRIVACY, default=APP_USERPROFILE_PRIVACY_ALL)
     pvt_directors  = models.IntegerField(verbose_name=u'Любимые режисеры пользователя', choices=APP_USERPROFILE_PRIVACY, default=APP_USERPROFILE_PRIVACY_ALL)
 
+    # Confirmation email
+    confirm_email  = models.BooleanField(verbose_name=u'Подтверждение email на рассылку и уведомления', default=False)
+    activation_key = models.CharField(u'Ключ активации', max_length=64)
+
 
     def __unicode__(self):
-        return u'[%s] %s' % (self.id, self.user.username, )
+        return u'[{0}] {1}'.format(self.id, self.user.username)
 
 
     def get_name(self):
         return self.user.first_name
 
+
+    def save(self, *args, **kwargs):
+        if self.id is None:
+            salt = '{0}_{1}'.format(sha.new(str(random.random())).hexdigest(), self.user.id)
+            self.activation_key = sha.new(salt).hexdigest()
+
+            # self.activation_key = binascii.hexlify(pbkdf2('qwerty', '1233', 100000))
+
+        super(UsersProfile, self).save(*args, **kwargs)
 
     class Meta:
         db_table = 'users_profile'
