@@ -48,7 +48,6 @@ class RegisterUserView(View):
         register_form = CustomRegisterForm(data=self.request.POST)
         if register_form.is_valid():
             user = register_form.save()
-
             url_redirect = url_with_querystring(
                 reverse('tokenize'),
                 **{
@@ -62,7 +61,7 @@ class RegisterUserView(View):
             try:
                 context = {
                     'user': model_to_dict(user, fields=[field.name for field in user._meta.fields]),
-                    'redirect_url': "http://{host}{url}".format(host=self.request.get_host(), url=url_redirect),
+                    'redirect_url': 'http://{host}{url}'.format(host=self.request.get_host(), url=url_redirect),
                 }
 
                 param_email = {
@@ -81,6 +80,7 @@ class RegisterUserView(View):
         else:
             transaction.rollback()
             resp_dict = {'error': dict(((i[0], i[1][0]) for i in register_form.errors.items()))}
+
             return HttpResponse(render_page('register', resp_dict))
 
 
@@ -92,6 +92,7 @@ class LoginUserView(View):
         response.delete_cookie("x-token")
         return response
 
+
     def post(self, *args, **kwargs):
         login_form = AuthenticationForm(data=self.request.POST)
         if login_form.is_valid():
@@ -100,8 +101,10 @@ class LoginUserView(View):
                 'token': user.auth_token.key,
                 '_': timezone.now().date().strftime("%H%M%S")
             }
+
             if self.request.META['HTTP_HOST'] == HOST and not HOST+'/login' in self.request.META['HTTP_REFERER']:
                 kw.update(back_url=self.request.META['HTTP_REFERER'])
+
             url = url_with_querystring(reverse('tokenize'), **kw)
             return HttpResponseRedirect(url)
 
@@ -132,9 +135,15 @@ class TokenizeView(View):
 
         session = create_new_session(user)
 
+        # 30 days in the seconds
+        max_age = 30 * 86400
+
+        # Set expires
+        expires = datetime.datetime.utcnow() + datetime.timedelta(seconds=max_age)
+        expires = datetime.datetime.strftime(expires, "%a, %d-%b-%Y %H:%M:%S GMT")
+
+        # Set Response
         response = HttpResponseRedirect(back_url)
-        max_age = 30 * 24 * 60 * 60 # two weeks
-        expires = datetime.datetime.strftime(datetime.datetime.utcnow() + datetime.timedelta(seconds=max_age), "%a, %d-%b-%Y %H:%M:%S GMT")
         response.set_cookie('x-token', token, max_age=max_age, expires=expires)
         response.set_cookie('x-session', session.token.key, max_age=max_age, expires=expires)
         response.delete_cookie('sessionid')
@@ -143,6 +152,7 @@ class TokenizeView(View):
 
 
 class UserView(View):
+
     def get(self, *args, **kwargs):
         try:
             user_id = self.kwargs['user_id']
@@ -198,20 +208,25 @@ class RestorePasswordView(View):
     def get(self, *args, **kwargs):
         return HttpResponse(render_page('restore_password', {}))
 
+
     def post(self, *args, **kwargs):
-        if 'to' in self.request.POST:
-            to = self.request.POST['to']
-        else:
+        if not 'to' in self.request.POST:
             return HttpResponseBadRequest()
+
         try:
-            user = User.objects.get(username=to)
+            user = User.objects.get(username=self.request.POST['to'])
             password = User.objects.make_random_password()
             user.set_password(password)
-            kw = dict(subject=APP_SUBJECT_TO_RESTORE_PASSWORD,
-                      tpl_name='restore_password_email.html',
-                      context={'password': password},
-                      to=[user.email])
-            send_template_mail.apply_async(kwargs=kw)
+
+            param_email = {
+                'to': [user.email],
+                'context': {'password': password},
+                'subject': APP_SUBJECT_TO_RESTORE_PASSWORD,
+                'tpl_name': 'restore_password_email.html',
+            }
+
+            send_template_mail.apply_async(kwargs=param_email)
+
         except User.DoesNotExist as e:
             return HttpResponseBadRequest(e)
         except Exception as e:
@@ -225,9 +240,14 @@ class UserProfileView(View):
     def get(self, request, **kwargs):
         if isinstance(request.user, AnonymousUser):
             return redirect("login_view")
-        resp_dict = {'user': vbUserProfile(request.user.profile).data,
-                     'error': request.GET.get('e', None)}
+
+        resp_dict = {
+            'user': vbUserProfile(request.user.profile).data,
+            'error': request.GET.get('e', None)
+        }
+
         return HttpResponse(render_page('profile', resp_dict))
+
 
     def post(self, request, **kwargs):
         uprofile_form = UsersProfileForm(data=request.POST, instance=request.user)
@@ -236,12 +256,14 @@ class UserProfileView(View):
                 uprofile_form.save()
             except Exception as e:
                 return HttpResponse(render_page('profile', {'error': e}))
+
         return redirect('profile_view')
 
 
 def delete_social_provider(request, provider):
     if isinstance(request.user, AnonymousUser):
         return redirect("login_view")
+
     try:
         users_social = UserSocialAuth.objects.filter(user=request.user)
         if request.user.has_usable_password() or users_social.count() > 1:
@@ -250,8 +272,9 @@ def delete_social_provider(request, provider):
             kw = {'e': u'Невозможно удалить аккаунт социальной сети'.encode('utf-8')}
             url = url_with_querystring(reverse('profile_view'), **kw)
             return redirect(url)
-    except:
+    except Exception, e:
         pass
+
     return redirect('profile_view')
 
 
