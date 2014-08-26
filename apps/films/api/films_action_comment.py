@@ -43,7 +43,7 @@ class ActCommentFilmView(APIView):
         except Exception, e:
             try:
                 o_content = Contents(
-                    film=o_film, name=o_film.name, nagme_orig=o_film.name_orig,
+                    film=o_film, name=o_film.name, name_orig=o_film.name_orig,
                     description=o_film.description, release_date=o_film.release_date,
                     viewer_cnt=0, viewer_lastweek_cnt=0, viewer_lastmonth_cnt=0
                 )
