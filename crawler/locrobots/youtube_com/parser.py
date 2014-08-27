@@ -5,6 +5,7 @@ import re
 import requests
 from apps.films.models import Films
 from apps.robots.models import Robots
+from crawler.locations_saver import save_location_to_list
 from crawler.utils.locations_utils import sane_dict, save_location
 
 from apps.contents.constants import APP_CONTENTS_PRICE_TYPE_FREE, APP_CONTENTS_PRICE_TYPE_PAY
@@ -74,7 +75,7 @@ class YoutubeChannelParser():
         return channels_list
 
     @staticmethod
-    def save_location_for_film(film, link):
+    def save_location_for_film(film, link, locations):
         try:
             resp_dict = sane_dict(film)
             price, type = YoutubeChannelParser.get_film_price(link)
@@ -84,12 +85,16 @@ class YoutubeChannelParser():
             resp_dict['value'] = link
             resp_dict['type'] = u'YouTubeMoviesRU'
             save_location(**resp_dict)
-        except Exception,e:
+            save_location_to_list(locations, **resp_dict)
+
+        except Exception, e:
             print e.message
+
+        return locations
 
 
     @staticmethod
-    def process_all_films_for_channel_name(channel_name=u'DreamWorksFilmsRu'):
+    def process_all_films_for_channel_name( locations, channel_name=u'DreamWorksFilmsRu'):
         r = requests.get('http://gdata.youtube.com/feeds/api/videos?author=' + channel_name + '&alt=json')
         js = r.json()
         try:
@@ -100,18 +105,20 @@ class YoutubeChannelParser():
                     print '### ' + title, link
                     film = Films.objects.get(name = title)
                     if film:
-                        YoutubeChannelParser.save_location_for_film(film, link)
+                        YoutubeChannelParser.save_location_for_film(film, link, locations)
         except Exception:
             pass
 
     @staticmethod
     def process_channels_list():
+        locations = []
+        site_name = 'www.youtube.com'
         channels_list = YoutubeChannelParser.get_list_of_channels()
         YoutubeChannelParser.save_channels_list_to_robot_state(channels_list)
 
         for channel in channels_list:
-            YoutubeChannelParser.process_all_films_for_channel_name(channel)
-
+            YoutubeChannelParser.process_all_films_for_channel_name(locations, channel)
+        return site_name, locations
 
     @staticmethod
     def get_film_price(film_link):
