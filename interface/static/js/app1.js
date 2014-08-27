@@ -155,7 +155,11 @@
       if (opts.place === void 0) {
         this._place = $('<span class="preload-' + this._name + '"></span>');
         if (opts.parent) {
-          this._place.appendTo(opts.parent);
+          if (opts.up) {
+            this._place.prependTo(opts.parent);
+          } else {
+            this._place.appendTo(opts.parent);
+          }
         }
         this._app.get_tpl(this._name, (function(_this) {
           return function(tpl_obj) {
@@ -548,31 +552,35 @@
   CommentThumb = (function(_super) {
     __extends(CommentThumb, _super);
 
-    function CommentThumb() {
+    function CommentThumb(opts, callback) {
+      if (opts == null) {
+        opts = {};
+      }
       this._name = "comment-thumb";
-      CommentThumb.__super__.constructor.apply(this, arguments);
+      if (opts.vals) {
+        this.vals_orig = opts.vals;
+      }
+      CommentThumb.__super__.constructor.call(this, opts, (function(_this) {
+        return function() {
+          if (!opts.place) {
+            return $(".time-tape", _this._place).data("miVal", _this.vals_orig.created);
+          }
+        };
+      })(this));
     }
 
     CommentThumb.prototype.transform_attr = function(attr, name, val) {
       if (attr === "href" && name === "user.id") {
         return "/users/" + val + "/";
-      } else {
-        return CommentThumb.__super__.transform_attr.apply(this, arguments);
       }
+      return CommentThumb.__super__.transform_attr.apply(this, arguments);
     };
 
     CommentThumb.prototype.transform_val = function(name, val) {
-      return CommentThumb.__super__.transform_val.apply(this, arguments);
-    };
-
-    CommentThumb.prototype.set_vals = function(vals, do_not_set) {
-      if (vals.created) {
-        if (!vals.time_text) {
-          vals.time_text = time_text(new Date(vals.created));
-        }
-        this.elements["time_text"].val = vals.created;
+      if (name === "user.name") {
+        return val || "Пользователь";
       }
-      return CommentThumb.__super__.set_vals.apply(this, arguments);
+      return CommentThumb.__super__.transform_val.apply(this, arguments);
     };
 
     return CommentThumb;
@@ -640,7 +648,6 @@
       var type;
       type = this._type;
       if (type.substr(0, 4) === "film") {
-        console.log(name);
         if (name === "object.id" && (attr = "href")) {
           return "/films/" + val + "/";
         }
@@ -710,13 +717,17 @@
       return this.onchange();
     };
 
-    Deck.prototype.add_item = function(item, onchange_call) {
+    Deck.prototype.add_item = function(item, onchange_call, up) {
       if (onchange_call == null) {
         onchange_call = true;
       }
+      if (up == null) {
+        up = false;
+      }
       this.items.push(new this.item_class({
         parent: this._place,
-        vals: item
+        vals: item,
+        up: up
       }));
       if (onchange_call) {
         return this.onchange();
@@ -827,18 +838,22 @@
     }
 
     CommentsDeck.prototype.time_update = function() {
-      var item, _i, _len, _ref, _results;
-      _ref = this.items;
-      _results = [];
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        item = _ref[_i];
-        if (item.elements.time_text.val) {
-          _results.push(item.elements.time_text.self.text(time_text(new Date(item.elements.time_text.val))));
-        } else {
-          _results.push(void 0);
+      return $(".time-tape", this._place).each(function() {
+        var $this;
+        $this = $(this);
+        if ($this._failed) {
+          return;
         }
-      }
-      return _results;
+        if (!$this._datetime) {
+          try {
+            $this._datetime = new Date($this.data("miVal"));
+          } catch (_error) {
+            $this._failed = true;
+            return;
+          }
+        }
+        return $this.text(time_text($this._datetime));
+      });
     };
 
     return CommentsDeck;
@@ -1001,6 +1016,7 @@
       this.rest.add("films");
       this.rest.films.add("search");
       this.rest.films.add("persons");
+      this.rest.films.add("comments");
       this.rest.films.add("action", {
         isSingle: true
       });
@@ -1008,6 +1024,7 @@
       this.rest.films.action.add("subscribe");
       this.rest.films.action.add("notwatch");
       this.rest.films.action.add("playlist");
+      this.rest.films.action.add("comment");
       this.rest.add("persons");
       this.rest.persons.add("filmography", {
         isSingle: true
@@ -1145,6 +1162,18 @@
               }
             });
           }
+        } else if (action === "comment") {
+          return this.rest.films.action.comment.update(id, {
+            text: opts.text
+          }).done(function() {
+            if (opts.callback) {
+              return opts.callback(true);
+            }
+          }).fail(function() {
+            if (opts.callback) {
+              return opts.callback(false);
+            }
+          });
         } else {
           if (new_state) {
             doit = "update";
@@ -1559,9 +1588,7 @@
           if (current_counter !== deck.load_counter) {
             return;
           }
-          console.log(data);
           if (data.items) {
-            console.log("items1");
             deck.add_items(data.items);
             if (data.items.length >= 12) {
               deck.load_more_show();
@@ -1642,7 +1669,14 @@
       this.conf = conf;
       Page_Film.__super__.constructor.apply(this, arguments);
       films_deck = new FilmsDeck($("#films"));
-      comments_deck = new CommentsDeck($("#comments"));
+      comments_deck = new CommentsDeck($("#comments"), {
+        load_func: (function(_this) {
+          return function() {
+            return _this.load_more_comments();
+          };
+        })(this)
+      });
+      comments_deck.load_more_bind($("#comments_more"));
       actors_deck = new PersonsDeck($("#actors"), {
         load_func: (function(_this) {
           return function() {
@@ -1685,6 +1719,33 @@
         this._e.subscribe_btn.bind("click", (function(_this) {
           return function() {
             return _this.action_subscribe_toggle();
+          };
+        })(this));
+      }
+      this._e.add_comment = {};
+      this._e.add_comment.place = $("#add_comment");
+      this._e.add_comment.submit_btn = $("input[type=submit]", this._e.add_comment.place);
+      this._e.add_comment.textarea_wrapper = $("#comment_textarea_wrapper");
+      this._e.add_comment.textarea_error = $("p", this._e.add_comment.textarea_wrapper);
+      if (this._e.add_comment.submit_btn.size()) {
+        $("form", this._e.add_comment.place).submit((function(_this) {
+          return function() {
+            _this.add_comment();
+            return false;
+          };
+        })(this));
+        this._e.add_comment.text = $("textarea", this._e.add_comment.place);
+      } else {
+        $(".login", this._e.add_comment.place).click((function(_this) {
+          return function() {
+            _this._app.show_modal("login");
+            return false;
+          };
+        })(this));
+        $(".register", this._e.add_comment.place).click((function(_this) {
+          return function() {
+            _this._app.show_modal("reg");
+            return false;
           };
         })(this));
       }
@@ -1748,6 +1809,79 @@
         }
       }
     }
+
+    Page_Film.prototype.load_more_comments = function() {
+      comments_deck.load_more_hide();
+      return this._app.rest.films.comments.read(this.conf.id, {
+        page: comments_deck.page + 1
+      }).done(function(data) {
+        if (data && data.items) {
+          comments_deck.add_items(data.items);
+          comments_deck.page = data.page;
+          if (data.items.length >= 10) {
+            return comments_deck.load_more_show();
+          } else {
+            return comments_deck.load_more_hide(false);
+          }
+        } else {
+          return comments_deck.load_more_hide(false);
+        }
+      }).fail(function() {
+        return comments_deck.load_more_hide(false);
+      });
+    };
+
+    Page_Film.prototype.add_comment = function() {
+      var text;
+      text = this._e.add_comment.text.val();
+      this._e.add_comment.textarea_wrapper.removeClass("has-error");
+      this._e.add_comment.textarea_error.text("");
+      error = false;
+      if (text === "") {
+        error = "Введите, пожалуйста, текст комментария.";
+      } else if (text.length < 80) {
+        error = "Количество букв в тексте не должно быть меньше 80.";
+      } else if (text.length > 8000) {
+        error = "Количество букв в тексте не должно превышать 8000.";
+      } else {
+        this._e.add_comment.text.attr("disabled", "disabled");
+        this._e.add_comment.submit_btn.attr("disabled", "disabled");
+        this._app.film_action(this.conf.id, "comment", {
+          text: text,
+          callback: (function(_this) {
+            return function(result) {
+              _this._e.add_comment.text.removeAttr("disabled");
+              _this._e.add_comment.submit_btn.removeAttr("disabled");
+              if (result) {
+                _this._e.add_comment.text.val("");
+                return _this._app.rest.films.comments.read(_this.conf.id, {
+                  per_page: 1,
+                  page: 1
+                }).done(function(res) {
+                  if (res.items && res.items.length) {
+                    $("#has_comments").show();
+                    return comments_deck.add_item(res.items[0], true, true);
+                  }
+                }).fail(function(res) {
+                  error = "Не удалось сохранить комментарий.";
+                  if (res.error && res.error.text) {
+                    error = res.error.text;
+                  }
+                  _this._e.add_comment.textarea_wrapper.addClass("has-error");
+                  _this._e.add_comment.textarea_error.text(error);
+                  return _this._e.add_comment.text.focus();
+                });
+              }
+            };
+          })(this)
+        });
+      }
+      if (error) {
+        this._e.add_comment.textarea_wrapper.addClass("has-error");
+        this._e.add_comment.textarea_error.text(error);
+        return this._e.add_comment.text.focus();
+      }
+    };
 
     Page_Film.prototype.play_location = function(id, scroll) {
       if (scroll == null) {
@@ -1920,7 +2054,6 @@
             status: false,
             rel: _this.conf.relation,
             callback: function() {
-              console.log(1);
               if (_this.conf.next && _this.conf.next.id) {
                 return location.href = "/playlist/" + _this.conf.id + "/";
               } else if (_this.conf.previous && _this.conf.previous.id) {

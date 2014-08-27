@@ -8,6 +8,7 @@ from apps.films.models import Films, UsersFilms
 from apps.films.constants import APP_USERFILM_STATUS_NOT_WATCH, APP_USERFILM_STATUS_UNDEF
 from apps.users import Feed
 from apps.users.constants import FILM_NOTWATCH
+from videobase.settings import DEFAULT_REST_API_RESPONSE
 
 
 #############################################################################################################
@@ -31,7 +32,7 @@ class ActNotwatchFilmView(APIView):
         try:
             return Films.objects.get(pk=film_id)
         except Films.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return Response(DEFAULT_REST_API_RESPONSE, status=status.HTTP_404_NOT_FOUND)
 
 
     def get(self, request, film_id, format=None, *args, **kwargs):
@@ -68,7 +69,7 @@ class ActNotwatchFilmView(APIView):
             except Exception as e:
                 return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response(status=status.HTTP_200_OK)
+        return Response(DEFAULT_REST_API_RESPONSE, status=status.HTTP_200_OK)
 
 
     def put(self, request, film_id, format=None, *args, **kwargs):
@@ -97,4 +98,5 @@ class ActNotwatchFilmView(APIView):
             if f.object == obj_val:
                 f.delete()
 
-        return Response(status=status.HTTP_200_OK)
+        return Response(DEFAULT_REST_API_RESPONSE, status=status.HTTP_200_OK)
+

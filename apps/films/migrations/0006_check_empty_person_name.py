@@ -14,7 +14,7 @@ class Migration(SchemaMigration):
         persons = db.execute("SELECT * FROM users_feed WHERE type = %s AND object->>'photo' = %s", ['pers-s', '/static/'])
 
         for item in persons:
-            obj = json.loads(item[4])
+            obj = item[4]
             if 'photo' in obj:
                 obj['photo'] = ''
 

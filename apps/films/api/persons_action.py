@@ -9,6 +9,7 @@ from apps.users import Feed
 from apps.users.constants import PERSON_SUBSCRIBE
 from apps.films.models import UsersPersons, Persons
 
+from videobase.settings import DEFAULT_REST_API_RESPONSE
 
 class PersonActionAPIView(APIView):
 
@@ -55,10 +56,11 @@ class PersonActionAPIView(APIView):
                     if f.object == obj_val:
                         f.delete()
 
-            return Response(status=status.HTTP_200_OK)
+
+            return Response(DEFAULT_REST_API_RESPONSE, status=status.HTTP_200_OK)
 
         except Exception, e:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            return Response(DEFAULT_REST_API_RESPONSE, status=status.HTTP_400_BAD_REQUEST)
 
 
     def put(self, request, format=None, resource_id=None):

@@ -10,6 +10,7 @@ from apps.films.constants import APP_USERFILM_SUBS_TRUE, APP_USERFILM_SUBS_FALSE
 from apps.users.models import Feed
 from apps.users.constants import FILM_SUBSCRIBE
 
+from videobase.settings import DEFAULT_REST_API_RESPONSE
 
 #############################################################################################################
 class ActSubscribeFilmView(APIView):
@@ -79,7 +80,7 @@ class ActSubscribeFilmView(APIView):
             except Exception as e:
                 return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response(status=status.HTTP_200_OK)
+        return Response(DEFAULT_REST_API_RESPONSE, status=status.HTTP_200_OK)
 
     def delete(self, request, film_id, format=None, *args, **kwargs):
         o_film = self.__get_object(film_id)
@@ -113,7 +114,7 @@ class ActSubscribeFilmView(APIView):
             if f.object == obj_val:
                 f.delete()
 
-        return Response(status=status.HTTP_200_OK)
+        return Response(DEFAULT_REST_API_RESPONSE, status=status.HTTP_200_OK)
 
 
     def put(self, request, film_id, format=None, *args, **kwargs):
