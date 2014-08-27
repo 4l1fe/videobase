@@ -7,6 +7,9 @@ from rest_framework.permissions import IsAuthenticated
 from apps.films.forms import RatingForm
 from apps.films.models import Films, UsersFilms
 
+#############################################################################################################
+
+from videobase.settings import DEFAULT_REST_API_RESPONSE
 from apps.users import Feed
 from apps.users.constants import FILM_RATE
 
@@ -30,7 +33,7 @@ class ActRateFilmView(APIView):
         try:
             return Films.objects.get(pk=film_id)
         except Films.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return Response(DEFAULT_REST_API_RESPONSE, status=status.HTTP_404_NOT_FOUND)
 
 
     def put(self, request, film_id, format=None, *args, **kwargs):
@@ -76,7 +79,7 @@ class ActRateFilmView(APIView):
                 except Exception as e:
                     return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-            return Response(status=status.HTTP_200_OK)
+            return Response(DEFAULT_REST_API_RESPONSE, status=status.HTTP_200_OK)
 
         return Response({'error': form.errors}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -95,4 +98,4 @@ class ActRateFilmView(APIView):
         for f in Feed.objects.filter(user=request.user, type=FILM_RATE).iterator():
             if all(item in f.object.items() for item in obj_val.items()): f.delete()
 
-        return Response(status=status.HTTP_200_OK)
+        return Response(DEFAULT_REST_API_RESPONSE, status=status.HTTP_200_OK)

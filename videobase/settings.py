@@ -52,6 +52,7 @@ HTTP_USER_TOKEN_TYPE = b'X-MI-TOKEN'
 STANDART_HTTP_SESSION_TOKEN_HEADER = b'HTTP_{}'.format(HTTP_SESSION_TOKEN_TYPE.replace('-', '_'))
 STANDART_HTTP_USER_TOKEN_HEADER = b'HTTP_{}'.format(HTTP_USER_TOKEN_TYPE.replace('-', '_'))
 
+DEFAULT_REST_API_RESPONSE = {}
 ###########################################################
 # Email config
 emailconf = RawConfigParser()
@@ -91,6 +92,7 @@ INSTALLED_APPS = (
     'apps.robots',
     'apps.rss',
     'apps.git',
+    'apps.casts',
     'crawler',
     'social_auth',
     'djcelery',
@@ -263,7 +265,7 @@ if not DEBUG:
     )
 
     RAVEN_CONFIG = {
-        'dsn': 'http://8684bf8b497047d9ac170fd16aefc873:41e89f4666b24f998125370f3d1a1789@sentry.aaysm.com:9000/2'
+        'dsn': 'http://8684bf8b497047d9ac170fd16aefc873:41e89f4666b24f998125370f3d1a1789@sentry.aaysm.com/2'
     }
 
 ###########################################################
@@ -370,7 +372,7 @@ CELERYBEAT_SCHEDULE = {
         'task': 'drugoe_kino_update',
         'schedule': timedelta(days=7)
     },
-    # Checking locations for aged films yearly
+    # Refreshing sitemap
     'sitemap_refresh_schedule': {
         'task': 'refresh_sitemap',
         'schedule': timedelta(days=14)
@@ -378,6 +380,11 @@ CELERYBEAT_SCHEDULE = {
      # Parsing videos from YouTubeMoviesRU
     'parse_you_tube_movies_ru': {
         'task': 'parse_you_tube_movies_ru',
+        'schedule': timedelta(days=1)
+    },
+    # Refreshing consolidate rating
+    'consolidate_rating_schedule': {
+        'task': 'consolidate_rating',
         'schedule': timedelta(days=1)
     },
     # Do weekly newsletter
