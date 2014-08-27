@@ -16,8 +16,8 @@ from apps.users.constants import APP_USERPROFILE_NOTIFICATION_WEEK, APP_USERPROF
 @app.task(name="week_newsletter", queue="week_newsletter")
 def best_of_the_best_this_week():
     # Выборка фильмов
-    o_films = Films.get_newest_films(limit=10)
-    films = vbFilm(o_films).data
+    new_films = Films.get_newest_films(limit=10)
+    new_films = vbFilm(new_films).data
 
     # Выборка сериалов
     serials = []
@@ -30,7 +30,7 @@ def best_of_the_best_this_week():
         'subject': 'Eженедельная рассылка ВсеВи',
         'tpl_name': 'newsletter.html',
         'context': {
-            'films': films,
+            'films': new_films,
             'serials': serials,
             'streams': streams,
         },
