@@ -41,7 +41,7 @@ def best_of_the_best_this_week():
         email__isnull=False,
         profile__ntf_frequency=APP_USERPROFILE_NOTIFICATION_WEEK,
         profile__confirm_email=True,
-    )
+    ).prefetch_related('profile__user')
 
     for item in o_users:
         params_email.update({'to': item.email})
