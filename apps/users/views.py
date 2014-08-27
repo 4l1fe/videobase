@@ -25,7 +25,7 @@ from apps.users.api.serializers import vbUser, vbFeedElement, vbUserProfile
 from apps.users.forms import CustomRegisterForm, UsersProfileForm
 from apps.users.api.utils import create_new_session
 from apps.users.constants import APP_USERS_API_DEFAULT_PAGE, APP_USERS_API_DEFAULT_PER_PAGE,\
-    APP_SUBJECT_TO_RESTORE_PASSWORD, APP_SUBJECT_TO_CONFIRM_REGISTER
+    APP_SUBJECT_TO_RESTORE_PASSWORD, APP_SUBJECT_TO_CONFIRM_REGISTER, APP_USER_ACTIVE_KEY
 
 from apps.films.models import Films, Persons, UsersFilms, UsersPersons
 from apps.films.constants import APP_PERSON_DIRECTOR, APP_PERSON_ACTOR, APP_USERFILM_SUBS_TRUE
@@ -58,11 +58,12 @@ class RegisterUserView(View):
             transaction.commit()
 
             try:
-                profile = user.profile
                 context = {
                     'user': model_to_dict(user, fields=[field.name for field in user._meta.fields]),
-                    'profile': model_to_dict(profile, fields=[field.name for field in profile._meta.fields]),
-                    'redirect_url': 'http://{host}{url}'.format(host=self.request.get_host(), url=url_redirect),
+                    'redirect_url': 'http://{host}{url}'.format(
+                        host=self.request.get_host(),
+                        url=url_with_querystring(reverse('confirm_email'), **{APP_USER_ACTIVE_KEY: user.profile.activation_key})
+                    )
                 }
 
                 param_email = {
@@ -206,7 +207,11 @@ class UserView(View):
 
 class ConfirmEmailView(View):
 
-    def get(self, activation_key, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
+        activation_key = request.GET.get(APP_USER_ACTIVE_KEY, None)
+        if activation_key is None:
+            raise Http404
+
         try:
             profile = UsersProfile.objects.get(activation_key=activation_key)
         except self.model.DoesNotExist:
@@ -220,7 +225,7 @@ class ConfirmEmailView(View):
 
 class RestorePasswordView(View):
 
-    def get(self, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         return HttpResponse(render_page('restore_password', {}))
 
 
