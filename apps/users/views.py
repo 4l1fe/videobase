@@ -3,6 +3,7 @@
 import datetime
 from pytils import numeral
 
+from django.contrib.auth.views import *
 from django.db import transaction
 from django.forms.models import model_to_dict
 from django.core.paginator import Paginator
@@ -15,6 +16,7 @@ from django.views.generic import View
 from django.views.decorators.cache import never_cache
 from django.shortcuts import redirect
 from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.tokens import default_token_generator
 
 from social_auth.models import UserSocialAuth
 from rest_framework.authtoken.models import Token
@@ -223,32 +225,38 @@ class ConfirmEmailView(View):
         return HttpResponse(render_page('confirm_email', {}))
 
 
-class RestorePasswordView(View):
+class ResetPasswordView(View):
 
     def get(self, request, *args, **kwargs):
         return HttpResponse(render_page('restore_password', {}))
 
 
-    def post(self, *args, **kwargs):
-        if not 'to' in self.request.POST:
-            return HttpResponseBadRequest()
-
+    def post(self, request, *args, **kwargs):
         try:
-            user = User.objects.get(username=self.request.POST['to'])
-            password = User.objects.make_random_password()
-            user.set_password(password)
+            form = PasswordResetForm(request.POST)
+            if form.is_valid():
+                cl_data = form.cleaned_data
+                email = cl_data.get('email', False)
 
-            param_email = {
-                'to': [user.email],
-                'context': {'password': password},
-                'subject': APP_SUBJECT_TO_RESTORE_PASSWORD,
-                'tpl_name': 'restore_password_email.html',
-            }
+                active_users = User.objects.filter(email__iexact=email, email__isnull=False, is_active=True)
+                for user in active_users:
+                    # Формируем параметры email
+                    param_email = {
+                        'to': [user.email],
+                        'context': {
+                            'token': default_token_generator.make_token(user),
+                            'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+                            'user': model_to_dict(user, fields=[field.name for field in user._meta.fields]),
+                        },
+                        'subject': APP_SUBJECT_TO_RESTORE_PASSWORD,
+                        'tpl_name': 'restore_password_email.html',
+                    }
 
-            send_template_mail.apply_async(kwargs=param_email)
+                    # Отправляем email
+                    send_template_mail.apply_async(kwargs=param_email)
 
-        except User.DoesNotExist as e:
-            return HttpResponseBadRequest(e)
+                return HttpResponseRedirect(reverse('password_reset_done'))
+
         except Exception as e:
             return HttpResponseBadRequest(e)
 
@@ -322,3 +330,24 @@ def feed_view(request):
         return HttpResponse(render_page('feed', {'feed': o_feed}))
 
     return redirect('login_view')
+
+
+def password_reset_confirm(request, uidb64, token):
+    try:
+        uid = urlsafe_base64_decode(uidb64)
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+
+    if user is not None and default_token_generator.check_token(user, token):
+        if request.method == 'POST':
+            form = SetPasswordForm(user, request.POST)
+            if form.is_valid():
+                form.save()
+                return HttpResponseRedirect(reverse('password_reset_complete'))
+        else:
+            form = SetPasswordForm(None)
+    else:
+        form = None
+
+    return HttpResponse(render_page('password_reset_confirm', {}))
