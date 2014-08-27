@@ -12,6 +12,7 @@ from apps.films.constants import APP_COMMENTS_API_DEFAULT_PAGE, APP_COMMENTS_API
 
 from videobase.settings import DEFAULT_REST_API_RESPONSE
 
+
 #############################################################################################################
 class CommentsFilmView(APIView):
     """
@@ -26,7 +27,7 @@ class CommentsFilmView(APIView):
         try:
             result = Contents.objects.get(film=film_id)
         except Contents.DoesNotExist:
-            result = Response(status=status.HTTP_404_NOT_FOUND)
+            result = Response(DEFAULT_REST_API_RESPONSE,status=status.HTTP_404_NOT_FOUND)
 
         return result
 
