@@ -1,0 +1,40 @@
+doctype html
+html
+    include config
+    - page_title = "Логин"
+    include head
+    body
+        .wrap-page.bg-noise
+            include header
+            .content(role='main')
+                section.blue-block
+                    .bg-noise
+                        .container
+                            h1.whiteh1 Вход на сайт
+                            .enter-block.row
+                                .col-md-5
+                                    .form-enter
+                                        p Форма  E-mail
+                                        form.form-horizontal(role='form', method='post')
+                                            input(type="hidden",name="csrfmiddlewaretoken",value=csrf_token)
+                                            - error_cls = error?"has-error":""
+                                            .form-group(class=error_cls)
+                                                label.col-sm-2.control-label(for='inputEmail3') Email
+                                                .col-sm-10
+                                                    input#inputEmail3.form-control(type='email', name='email',required)
+                                            .form-group
+                                                .col-sm-offset-2.col-sm-10
+                                                    button.btn.btn-yellow1(type='submit') Войти
+                                    //-
+                                       .form-enter
+                                    //-
+                                       .more-enter
+                            //-
+                               .enter-block
+                    //-
+                       .blue-block
+                //-
+                   .content
+            include footer
+        script.
+            $(document).ready(function () {window.InitApp({}, "Login")})

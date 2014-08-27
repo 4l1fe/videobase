@@ -228,7 +228,7 @@ class ConfirmEmailView(View):
 class ResetPasswordView(View):
 
     def get(self, request, *args, **kwargs):
-        return HttpResponse(render_page('restore_password', {}))
+        return HttpResponse(render_page('reset_passwd', {}))
 
 
     def post(self, request, *args, **kwargs):
@@ -260,7 +260,7 @@ class ResetPasswordView(View):
         except Exception as e:
             return HttpResponseBadRequest(e)
 
-        return redirect('login_view')
+        return HttpResponse(render_page('reset_passwd', {}))
 
 
 class UserProfileView(View):
