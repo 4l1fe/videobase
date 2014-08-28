@@ -403,6 +403,3 @@ CELERY_TIMEZONE = 'UTC'
 CELERY_ACCEPT_CONTENT = ['pickle', 'json', 'msgpack', 'yaml']
 POSTER_URL_PREFIX = '_260x360'
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
-
-
-PASSWORD_RESET_TIMEOUT_DAYS = 1
