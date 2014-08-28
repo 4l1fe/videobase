@@ -243,7 +243,8 @@ class ResetPasswordView(View):
                     'to': [user.email],
                     'context': {
                         'url': 'http://{0}{1}'.format(HOST, reverse('pwd_reset',
-                            args=(urlsafe_base64_encode(force_bytes(user.pk)), default_token_generator.make_token(user))
+                            args=(urlsafe_base64_encode(force_bytes(user.pk)),
+                                  default_token_generator.make_token(user))
                         )),
                         'user': model_to_dict(user, fields=[field.name for field in user._meta.fields]),
                     },
