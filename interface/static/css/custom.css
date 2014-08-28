@@ -52,6 +52,7 @@ h5 {color: #fff;font-size: 14px;font-weight: bold;text-transform: uppercase;}
 .centerh1 {text-align: center;}
 
 .margin0a {margin: 0 auto;}
+.padding0a {padding: 0}
 
 .top-header {
     min-height: 100px;
@@ -318,7 +319,7 @@ section {padding:37px 0 6px 0;}
 .block-text p {
     color: #585858;font-style: italic;line-height: 20px;font-family: Georgia;
 }
-.mark {padding: 12px 0;}
+.mark-comment {padding: 12px 0;}
 .block-text ins {
     bottom: -44px;left: 50%;margin-left: -60px;
 }
@@ -1148,3 +1149,6 @@ a.toggle-playlist.active {
 
 .add-comment {margin-bottom: 50px}
 .add-comment textarea {margin-top: 20px; margin-bottom: 20px; border-width: 0}
+
+.index-comments-block {margin: 0 auto; padding: 0}
+.index-comments-block .bg-noise {padding: 34px 0}
