@@ -335,7 +335,7 @@ def password_reset_done(request):
 
 
 def password_reset_confirm(request):
-    return HttpResponse(render_page('reset_passwd', {'send': True}))
+    return HttpResponse(render_page('confirm_passwd', {'confirm': True}))
 
 
 class ConfirmResetPwdView(View):
