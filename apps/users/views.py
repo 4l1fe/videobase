@@ -232,35 +232,31 @@ class ResetPasswordView(View):
 
 
     def post(self, request, *args, **kwargs):
-        try:
-            form = PasswordResetForm(request.POST)
-            if form.is_valid():
-                cl_data = form.cleaned_data
-                email = cl_data.get('email', False)
+        form = PasswordResetForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data.get('email', False)
 
-                active_users = User.objects.filter(email__iexact=email, email__isnull=False, is_active=True)
-                for user in active_users:
-                    # Формируем параметры email
-                    param_email = {
-                        'to': [user.email],
-                        'context': {
-                            'token': default_token_generator.make_token(user),
-                            'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-                            'user': model_to_dict(user, fields=[field.name for field in user._meta.fields]),
-                        },
-                        'subject': APP_SUBJECT_TO_RESTORE_PASSWORD,
-                        'tpl_name': 'restore_password_email.html',
-                    }
+            active_users = User.objects.filter(email__iexact=email, email__isnull=False, is_active=True)
+            for user in active_users:
+                # Формируем параметры email
+                param_email = {
+                    'to': [user.email],
+                    'context': {
+                        'token': default_token_generator.make_token(user),
+                        'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+                        'user': model_to_dict(user, fields=[field.name for field in user._meta.fields]),
+                    },
+                    'subject': APP_SUBJECT_TO_RESTORE_PASSWORD,
+                    'tpl_name': 'restore_password_email.html',
+                }
 
-                    # Отправляем email
-                    send_template_mail.apply_async(kwargs=param_email)
+                # Отправляем email
+                send_template_mail.apply_async(kwargs=param_email)
 
-                return HttpResponseRedirect(reverse('password_reset_done'))
+            return HttpResponseRedirect(reverse('reset_done'))
 
-        except Exception as e:
-            return HttpResponseBadRequest(e)
-
-        return HttpResponse(render_page('reset_passwd', {}))
+        else:
+             HttpResponse(render_page('reset_passwd', {'error': u'Введите корректный email'}))
 
 
 class UserProfileView(View):
@@ -330,6 +326,10 @@ def feed_view(request):
         return HttpResponse(render_page('feed', {'feed': o_feed}))
 
     return redirect('login_view')
+
+
+def password_reset_done(request):
+    return HttpResponse(render_page('reset_passwd', {'send': True}))
 
 
 def password_reset_confirm(request, uidb64, token):
