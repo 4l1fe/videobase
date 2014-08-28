@@ -97,7 +97,7 @@ class CommentForm(Form):
     Форма для комментария к фильму
     """
 
-    text = fields.CharField(max_length=255, help_text=u'Комментарий')
+    text = fields.CharField(min_length=20, max_length=8000, help_text=u'Комментарий')
 
 
 #############################################################################################################

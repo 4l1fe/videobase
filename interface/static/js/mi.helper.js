@@ -10,23 +10,23 @@ function cardinal(val, form1, form2, form3) {
 }
 
 function time_text(dt) {
- var date_now = new Date()
- var diff, curday, curtime, ho, min;
- curtime = dt.getTime();
- diff = (date_now.getTime() - curtime) / 1000;
- if (diff < 60) return "сейчас";
- if (diff < 3600) {
-    min = Math.floor(diff / 60)
-    return min + cardinal(min, " минуту", " минуты", " минут") + " назад"
+    var date_now = new Date()
+    var diff, curday, curtime, ho, min;
+    curtime = dt.getTime();
+    diff = (date_now.getTime() - curtime) / 1000;
+    if (diff < 60) return "сейчас";
+    if (diff < 3600) {
+        min = Math.floor(diff / 60)
+        return min + cardinal(min, " минуту", " минуты", " минут") + " назад"
     }
-    curday = Math.floor(date_now.getTime() / 86400) * 86400;
+    curday = Math.floor(date_now.getTime() / 86400000) * 86400000;
     if (curday < curtime) {
         ho = Math.floor(diff / 3600);
         if (ho <= 6) {
             return ho + cardinal(ho, " час", " часа", " часов") + " назад";
         } else return "сегодня";
     }
-    if ((curday - 86400) < curtime) return "вчера";
+    if ((curday - 86400000) < curtime) return "вчера";
     if (dt.getFullYear() == date_now.getFullYear()) return dt.getDate() + " " + months[dt.getMonth()];
     return dt.getDate() + " " + months[dt.getMonth()] + " " + dt.getFullYear();
  }
@@ -210,7 +210,7 @@ jQuery.fn.visibilityToggle = function() {
             return (document.cookie = [
                 encode(key), '=', stringifyCookieValue(value),
                 options.expires ? '; expires=' + options.expires.toUTCString() : '', // use expires attribute, max-age is not supported by IE
-                options.path    ? '; path=' + options.path : '',
+                options.path    ? '; path=' + options.path : '; path=/',
                 options.domain  ? '; domain=' + options.domain : '',
                 options.secure  ? '; secure' : ''
             ].join(''));
