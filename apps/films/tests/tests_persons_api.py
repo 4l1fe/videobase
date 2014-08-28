@@ -91,7 +91,7 @@ class PersonsTestCase(APITestCase):
         UsersApiSessions.objects.create(token=self.s_token)
         headers = self.s_token.key
         obj_val = dict(id=self.person_filmography.person.id, name=self.person_filmography.person.name, photo=self.person_filmography.person.photo.\
-                       storage.url(self.person_filmography.person.photo.name))
+                       storage.url(self.person_filmography.person.photo.name) if len(self.person_filmography.person.photo.name) else self.person_filmography.person.photo.name)
         response = self.client.put(reverse('person_action_view', kwargs={'resource_id': self.person_filmography.person.id, 'format': 'json'}), HTTP_X_MI_SESSION=headers)
         user_person = UsersPersons.objects.all().last()
         feed = Feed.objects.last()
@@ -106,7 +106,7 @@ class PersonsTestCase(APITestCase):
         UsersApiSessions.objects.create(token=self.s_token)
         headers = self.s_token.key
         obj_val = dict(id=self.person_filmography.person.id, name=self.person_filmography.person.name, photo=self.person_filmography.person.photo.\
-                       storage.url(self.person_filmography.person.photo.name))
+                       storage.url(self.person_filmography.person.photo.name) if len(self.person_filmography.person.photo.name) else self.person_filmography.person.photo.name)
         FeedFactory.create(user=self.user, type=PERSON_SUBSCRIBE, object=obj_val)
         response = self.client.put(reverse('person_action_view', kwargs={'resource_id': self.person_filmography.person.id, 'format': 'json'}), HTTP_X_MI_SESSION=headers)
         user_person = UsersPersons.objects.all().last()
