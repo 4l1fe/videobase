@@ -242,15 +242,14 @@ class ResetPasswordView(View):
                 param_email = {
                     'to': [user.email],
                     'context': {
-                        'url': '',
-                        'token': default_token_generator.make_token(user),
-                        'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+                        'url': 'http://{0}{1}'.format(HOST, reverse('pwd_reset',
+                            args=(urlsafe_base64_encode(force_bytes(user.pk)), default_token_generator.make_token(user))
+                        )),
                         'user': model_to_dict(user, fields=[field.name for field in user._meta.fields]),
                     },
                     'subject': APP_SUBJECT_TO_RESTORE_PASSWORD,
-                    'tpl_name': 'restore_password_email.html',
+                    'tpl_name': 'password_email_restore.html',
                 }
-                print  param_email
 
                 # Отправляем email
                 send_template_mail.apply_async(kwargs=param_email)
@@ -368,6 +367,21 @@ class ConfirmResetPwdView(View):
             form = SetPasswordForm(user, request.POST)
             if form.is_valid():
                 form.save()
+
+                if len(user.email):
+                    # Формируем параметры email
+                    param_email = {
+                        'to': [user.email],
+                        'context': {
+                            'user': model_to_dict(user, fields=[field.name for field in user._meta.fields]),
+                        },
+                        'subject': APP_SUBJECT_TO_RESTORE_PASSWORD,
+                        'tpl_name': 'password_email_confirm.html',
+                    }
+
+                    # Отправляем email
+                    send_template_mail.apply_async(kwargs=param_email)
+
                 return HttpResponseRedirect(reverse('reset_confirm'))
 
             else:
