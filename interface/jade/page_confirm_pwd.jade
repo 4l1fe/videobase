@@ -12,6 +12,8 @@ html
                         .container
                             if error && error.token
                                 p Время действия токена истек или неверный пользователь
+                            else if confirm
+                                p Пароль успешно заменен
                             else
                                 h1.whiteh1 Восстановление пароля
                                 .enter-block.row
