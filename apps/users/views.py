@@ -242,6 +242,7 @@ class ResetPasswordView(View):
                 param_email = {
                     'to': [user.email],
                     'context': {
+                        'url': '',
                         'token': default_token_generator.make_token(user),
                         'uid': urlsafe_base64_encode(force_bytes(user.pk)),
                         'user': model_to_dict(user, fields=[field.name for field in user._meta.fields]),
@@ -249,6 +250,7 @@ class ResetPasswordView(View):
                     'subject': APP_SUBJECT_TO_RESTORE_PASSWORD,
                     'tpl_name': 'restore_password_email.html',
                 }
+                print  param_email
 
                 # Отправляем email
                 send_template_mail.apply_async(kwargs=param_email)
@@ -332,22 +334,43 @@ def password_reset_done(request):
     return HttpResponse(render_page('reset_passwd', {'send': True}))
 
 
-def password_reset_confirm(request, uidb64, token):
-    try:
-        uid = urlsafe_base64_decode(uidb64)
-        user = User.objects.get(pk=uid)
-    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
-        user = None
+def password_reset_confirm(request):
+    return HttpResponse(render_page('reset_passwd', {'send': True}))
 
-    if user is not None and default_token_generator.check_token(user, token):
-        if request.method == 'POST':
+
+class ConfirmResetPwdView(View):
+
+    def get_user(self, uidb64):
+        try:
+            uid = urlsafe_base64_decode(uidb64)
+            user = User.objects.get(pk=uid)
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+            user = None
+
+        return user
+
+
+    def check_user_and_token(self, user, token):
+        return True if user is not None and default_token_generator.check_token(user, token) else False
+
+
+    def get(self, request, uidb64, token, *args, **kwargs):
+        user = self.get_user(uidb64)
+        if self.check_user_and_token(user, token):
+            return HttpResponse(render_page('confirm_passwd', {}))
+
+        return HttpResponse(render_page('confirm_passwd', {'error': {'token': True}}))
+
+
+    def post(self, request, uidb64, token, *args, **kwargs):
+        user = self.get_user(uidb64)
+        if self.check_user_and_token(user, token):
             form = SetPasswordForm(user, request.POST)
             if form.is_valid():
                 form.save()
-                return HttpResponseRedirect(reverse('password_reset_complete'))
-        else:
-            form = SetPasswordForm(None)
-    else:
-        form = None
+                return HttpResponseRedirect(reverse('reset_confirm'))
 
-    return HttpResponse(render_page('password_reset_confirm', {}))
+            else:
+                return HttpResponse(render_page('confirm_passwd', {'error': dict(((i[0], i[1][0]) for i in form.errors.items()))}))
+
+        return HttpResponse(render_page('confirm_passwd', {'error': {'token': True}}))

@@ -14,11 +14,12 @@ urlpatterns = patterns('',
     # Reset password
     url(r'^forgotpwd/$', views.ResetPasswordView.as_view(), name='forgot_pwd'),
     url(r'^pwd-reset-done/$', 'apps.users.views.password_reset_done', name='reset_done'),
-    url(r'^password/reset/(?P<uidb64>[0-9A-Za-z]+)-(?P<token>.+)/$', 'apps.users.views.password_reset_confirm', name="password_reset"),
+    url(r'^pwd-reset-confirm/$', 'apps.users.views.password_reset_confirm', name='reset_confirm'),
+    url(r'^pwd-reset/(?P<uidb64>[0-9A-Za-z]+)-(?P<token>.+)/$', views.ConfirmResetPwdView.as_view(), name="pwd_reset"),
 
     # Auth
     url(r'^login/$', views.LoginUserView.as_view(), name='login_view'),
     url(r'^logout/$', views.UserLogoutView.as_view(), name='logout_view'),
-    url('^tokenize/?$', views.TokenizeView.as_view(), name="tokenize"),
+    url(r'^tokenize/?$', views.TokenizeView.as_view(), name="tokenize"),
 )
 
