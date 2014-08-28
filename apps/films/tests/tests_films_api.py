@@ -129,14 +129,14 @@ class FilmsTestCase(APISimpleTestCase):
 
     def comment_assert(self, response_data, comments, film, start_count, data, user):
         self.assertEqual(response_data['page'], data['page'])
-        self.assertEqual(response_data['per_page'], data['per_page'])
+        self.assertEqual(response_data['ipp'], data['per_page'])
         self.assertEqual(response_data['total_cnt'], len(comments))
         for i in range(len(response_data['items'])):
             self.assertEqual(response_data['items'][i]['created'], comments[start_count+i].created)
             self.assertEqual(response_data['items'][i]['id'], comments[start_count+i].id)
             self.assertEqual(response_data['items'][i]['text'], comments[start_count+i].text)
-            self.assertEqual(response_data['items'][i]['film'], {'id': film.id, 'name': film.name})
-            self.assertEqual(response_data['items'][i]['user'], {'avatar': u'', 'id': user.id, 'user': user.profile.get_name()})
+            self.assertDictEqual(response_data['items'][i]['film'], {'id': film.id, 'name': film.name})
+            self.assertDictEqual(response_data['items'][i]['user'], {'avatar': u'', 'id': user.id, 'name': user.profile.get_name()})
 
     def extras_assert(self, response_data, extras):
         self.assertEqual(response_data['id'], extras.id)
@@ -352,7 +352,7 @@ class FilmsTestCase(APISimpleTestCase):
 
     def test_api_action_comments_add_ok(self):
         film = self.films[0]
-        data = {'text': u'Отличный фильм'}
+        data = {'text': u'Я был польщен! Режиссерская работа на высоте! А какие ракурсы!.. Опреаторы я на коленях пред вами! Смотрите смерды и несудимы будете!'}
         response = self.client.post(
             reverse('act_film_comment_view', kwargs={'film_id': film.id, 'format': 'json'}),
             HTTP_X_MI_SESSION=self.headers, data=data
@@ -377,10 +377,10 @@ class FilmsTestCase(APISimpleTestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_api_action_comments_add_404(self):
+    def test_api_action_comments_add_bad_2(self):
         data = {'text': u'Отличный фильм'}
         response = self.client.post(reverse('act_film_comment_view', kwargs={'film_id': 0, 'format': 'json'}), HTTP_X_MI_SESSION=self.headers, data=data)
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_api_action_comments_add_not_authenticated(self):
         film = self.films[0]
@@ -725,11 +725,11 @@ class FilmsTestCase(APISimpleTestCase):
 
     def test_api_comments_ok(self):
         film = self.films[0]
-        response = self.client.post(reverse('film_comments_view', kwargs={'film_id': film.id, 'format': 'json'}))
+        response = self.client.get(reverse('film_comments_view', kwargs={'film_id': film.id, 'format': 'json'}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_api_comments_404(self):
-        response = self.client.post(reverse('film_comments_view', kwargs={'film_id': 0, 'format': 'json'}))
+        response = self.client.get(reverse('film_comments_view', kwargs={'film_id': 0, 'format': 'json'}))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_api_comment_default_param(self):
@@ -738,9 +738,9 @@ class FilmsTestCase(APISimpleTestCase):
         for comment in self.comments:
             if film.id == comment.content.film.id:
                 comments.append(comment)
-
+        comments = sorted(comments, key=lambda x: x.created, reverse=True)
         data = {'page': 1, 'per_page': 10}
-        response = self.client.post(reverse('film_comments_view', kwargs={'film_id': film.id, 'format': 'json'}))
+        response = self.client.get(reverse('film_comments_view', kwargs={'film_id': film.id, 'format': 'json'}))
         self.assertEqual(len(comments), len(response.data['items']))
 
         self.comment_assert(response.data, comments, film, 0, data, self.user)
@@ -751,13 +751,13 @@ class FilmsTestCase(APISimpleTestCase):
         for comment in self.comments:
             if film.id == comment.content.film.id:
                 comments.append(comment)
-
+        comments = sorted(comments, key=lambda x: x.created, reverse=True)
         data = {'page': 2, 'per_page': 3}
-        response = self.client.post(reverse('film_comments_view', kwargs={'film_id': film.id, 'format': 'json'}), data=data)
+        response = self.client.get(reverse('film_comments_view', kwargs={'film_id': film.id, 'format': 'json'}), data=data)
         self.comment_assert(response.data, comments, film, 3, data, self.user)
 
         data = {'page': 2, 'per_page': 2}
-        response = self.client.post(reverse('film_comments_view', kwargs={'film_id': film.id, 'format': 'json'}), data=data)
+        response = self.client.get(reverse('film_comments_view', kwargs={'film_id': film.id, 'format': 'json'}), data=data)
         self.comment_assert(response.data, comments, film, 2, data, self.user)
 
     def test_api_persons_ok(self):
