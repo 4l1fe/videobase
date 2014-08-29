@@ -1,5 +1,7 @@
 # coding: utf-8
 
+from __future__ import absolute_import
+
 import os
 from datetime import timedelta
 from ConfigParser import RawConfigParser
@@ -21,7 +23,11 @@ AMQP_HOST = 'localhost'
 BROKER_HOST = 'localhost'
 BROKER_PORT = 5672
 
+CELERY_TIMEZONE = 'UTC'
+CELERY_ACCEPT_CONTENT = ['pickle', 'json', 'msgpack', 'yaml']
+
 ###########################################################
+# Base path for project
 BASE_PATH = os.path.dirname(__file__)
 BASE_DIR = os.path.dirname(BASE_PATH)
 
@@ -135,6 +141,10 @@ ROOT_URLCONF = 'videobase.urls'
 
 WSGI_APPLICATION = 'videobase.wsgi.application'
 
+SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
+
+PASSWORD_RESET_TIMEOUT_DAYS = 1
+
 ###########################################################
 # Database
 dbconf = RawConfigParser()
@@ -185,7 +195,7 @@ USE_L10N = True
 
 USE_TZ = True
 
-
+###########################################################
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 MEDIA_ROOT = os.path.abspath(BASE_PATH + '/../static')
@@ -196,6 +206,8 @@ STATIC_ROOT = os.path.join('/var/www/')
 
 SITE_ID = 1
 
+###########################################################
+# Rest Framework configuration
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
@@ -205,12 +217,6 @@ REST_FRAMEWORK = {
         'apps.users.backends.UserTokenAuthentication',
     )
 }
-
-SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
-
-LOGIN_URL = '/login'
-SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/tokenize/'
-LOGIN_ERROR_URL = '/'
 
 ###########################################################
 # Ключи для OAuth2 авторизации
@@ -259,14 +265,13 @@ SOCIAL_AUTH_PIPELINE = (
 API_SESSION_EXPIRATION_TIME = 15
 
 ###########################################################
+# Celery schedule
 CELERYBEAT_SCHEDULE = {
-
     # Launching robots that are described in Robots table.
     #'robot-launch': {
     #    'task': 'robot_launch',
     #    'schedule': timedelta(seconds=10),
     #},
-
     # Updating ratings from IMDB DB via archive
     'imdb_rating_update_command': {
         'task': 'imdb_rating_update',
@@ -282,6 +287,7 @@ CELERYBEAT_SCHEDULE = {
         'task': 'viaplay_ru_robot_start',
         'schedule': timedelta(days=7),
     },
+    # Takes poster with kinopoisk
     'kinopoisk-set_poster': {
         'task': 'kinopoisk_set_poster',
         'schedule': timedelta(seconds=10),
@@ -307,11 +313,13 @@ CELERYBEAT_SCHEDULE = {
         'schedule': timedelta(days=1),
         'args': (3,),
     },
+    #
     'kinopoisk_films_weekly': {
         'task': 'kinopoisk_films',
         'schedule': timedelta(days=7),
         'args': (10,),
     },
+    #
     'kinopoisk_films_monthly': {
         'task': 'kinopoisk_films',
         'schedule': timedelta(days=31),
@@ -332,13 +340,11 @@ CELERYBEAT_SCHEDULE = {
         'task': 'film_info_check_and_correct',
         'schedule': timedelta(days=7),
     },
-
-     # Persons check and correct
+    # Persons check and correct
     'persons_check_and_correct': {
         'task': 'persons_check_and_correct',
         'schedule': timedelta(days=7),
     },
-
     # Checking locations for new films weekly
     'age_weighted_robot_launch_task_weekly': {
         'task': 'age_weighted_robot_launch',
@@ -351,13 +357,13 @@ CELERYBEAT_SCHEDULE = {
         'schedule': timedelta(days=31),
         'args': (3,)
     },
-
     # Checking locations for aged films yearly
     'age_weighted_robot_launch_task_six_month': {
         'task': 'age_weighted_robot_launch',
         'schedule': timedelta(days=31*6),
         'args': (120,)
     },
+    #
     'drugoe_kino_update_schedule': {
         'task': 'drugoe_kino_update',
         'schedule': timedelta(days=7)
@@ -367,7 +373,7 @@ CELERYBEAT_SCHEDULE = {
         'task': 'refresh_sitemap',
         'schedule': timedelta(days=14)
     },
-     # Parsing videos from YouTubeMoviesRU
+    # Parsing videos from YouTubeMoviesRU
     'parse_you_tube_movies_ru': {
         'task': 'parse_you_tube_movies_ru',
         'schedule': timedelta(days=1)
@@ -389,8 +395,14 @@ CELERYBEAT_SCHEDULE = {
     },
 }
 
-CELERY_TIMEZONE = 'UTC'
-CELERY_ACCEPT_CONTENT = ['pickle', 'json', 'msgpack', 'yaml']
+###########################################################
+# Default URL
+LOGIN_URL = '/login'
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/tokenize/'
+LOGIN_ERROR_URL = '/'
+
+###########################################################
+# Another configuration
 POSTER_URL_PREFIX = '_260x360'
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
