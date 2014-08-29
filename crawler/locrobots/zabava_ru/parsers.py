@@ -9,19 +9,35 @@ import re
 def parse_search(response, film_name):
     film_link = None
     try:
-        content = response.content
-        soup = BeautifulSoup(content)
+        flag = False
+        soup = BeautifulSoup(response)
         if soup.find(attrs={'data-href': 'video_search'}) is None:
             return None
-        search_divs = soup.find_all('div', {'class': ['catalog-list', 'search']})
-        for div in search_divs:
-            if div.figure:
-                film_div = div
-        films = film_div.find_all('figure')
-        for film in films:
-            if film_name == film.figcaption.div.header.strong.text:
-                film_link = 'http://www.zabava.ru' + film.a.get('href')
-                break
+        class_tag = soup.find('aside', {'role': 'complementary'})
+
+        if class_tag:
+            li_list = class_tag.find_all('li')
+            for li in li_list:
+                if u'Видео' in li.text:
+                    flag = True
+                    break
+        if flag:
+            search_divs = soup.find_all('div', {'class': 'catalog-list search'})
+            film_div = None
+            for div in search_divs:
+                if div.figure:
+                    film_div = div
+                    break
+            if film_div:
+                films = film_div.find_all('figure')
+                for film in films:
+                    if film_name == film.figcaption.div.header.strong.text:
+                        film_link = 'http://www.zabava.ru' + film.a.get('href')
+                        break
+            else:
+                return None
+        else:
+            return None
     except:
         film_link = None
     return film_link
@@ -67,3 +83,9 @@ class ParseZabavaFilm(BaseParse):
             return range(1, len(seasons_ul) + 1)
         else:
             return [0]
+
+    def get_type(self, **kwargs):
+        return 'zabavaru'
+
+    def get_value(self, **kwargs):
+        pass
