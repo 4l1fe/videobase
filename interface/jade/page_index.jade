@@ -98,33 +98,42 @@ html
                         //-
                            .filter-block
                 if comments && comments.length
-                    section.broun-block
-                        .container-brown.margin0a
-                            h1.dots3.whiteh1.centerh1 рецензии
-                            .slider-comments
-                                ul#slider-comments.slide-comments
-                                    li
-                                        .row
-                                            each item,i in comments
-                                                .col-md-4.col-sm-6
-                                                    .block-text.rel.zmin
-                                                        - url_tmp = '/films/' + item.film.id + '/'
-                                                        a(href=url_tmp, title='')=item.film.name
-                                                        .mark
-                                                            strong Оценка:
-                                                            |#{item.film.rating}
-                                                        p=item.text
-                                                        ins.ab.zmin.sprite.sprite-i-triangle.block
-                                                    //-
-                                                       .block-text
-                                                    .person-text.rel
-                                                        - avatar = item.user.avatar || noavatar_url
-                                                        img(src=avatar, alt='')
-                                                        - url_tmp = '/users/' + item.user.id + '/'
-                                                        a(href=url_tmp, title='')=item.user.name
-                                                        i=item.user.city || ""
-                                                    //-
-                                                       .person-text
+                    section.broun-block.index-comments-block
+                        .bg-noise
+                            .container
+                                h1.dots3.whiteh1.centerh1 рецензии
+                                .playlist-wrap
+                                    .playlist-slider-wrap.cf.rel.zmin
+                                        ul.cf
+                                            li.crsl-items(data-navigation="slider_nav")
+                                                .row.crsl-wrap
+                                                    - mark_tootltips = ["не смотреть", "хуже не бывает", "очень плохо", "плохо", "ниже среднего", "средне", "неплохо", "хорошо", "отлично", "великолепно", "лучше не бывает"]
+                                                    each item,i in comments
+                                                        figure.col-md-4.col-sm-6.crsl-item
+                                                            .block-text.rel.zmin
+                                                                - url_tmp = '/films/' + item.film.id + '/'
+                                                                a(href=url_tmp, title='')=item.film.name
+                                                                .mark-comment
+                                                                    strong Оценка:
+                                                                    |&nbsp;#{mark_tootltips[item.film.rating]}
+                                                                - text = item.text.replace(/\n+/gm, "<br/>")
+                                                                - if (text.length > 300) text = text.substr(0, 300) + "..."
+                                                                p!=text
+                                                                ins.ab.zmin.sprite.sprite-i-triangle.block
+                                                            //-
+                                                               .block-text
+                                                            .person-text.rel
+                                                                - avatar = item.user.avatar || noavatar_url
+                                                                img(src=avatar, alt='').img-circle
+                                                                - url_tmp = '/users/' + item.user.id + '/'
+                                                                a(href=url_tmp, title='')=item.user.name
+                                                                i=item.user.city || ""
+                                                            //-
+                                                               .person-text
+                                        #slider_nav.crsl-nav
+                                            i(class="sprite ab block control-slider prev-slide-playlist previous")
+                                            i(class="sprite ab block control-slider next-slide-playlist next")
             include footer
+        script(src=js_url + 'responsiveCarousel.min.js')
         script.
             $(document).ready(function () {window.InitApp({}, "Main")})

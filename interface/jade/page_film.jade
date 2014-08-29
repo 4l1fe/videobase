@@ -224,7 +224,7 @@ html
                                     if film.comments && film.comments.length
                                         each el in film.comments
                                             mixin comment_thumb(el)
-                                if film.comments && film.comments.length >= 10
+                                if film.comments && film.comments.length >= 5
                                     .add-filter#comments_more
                                         .add-content.style-panel-action.rel.zmin
                                             a(href='#', title='') показать еще
@@ -260,5 +260,6 @@ html
                                     mixin film_thumb(el)
             include footer
             - delete(film.similar); delete(film.description); delete(film.trailer);
+            - delete(film.comments);
             script.
                $(document).ready(function () {window.InitApp({page_conf: !{JSON.stringify(film)}}, "Film")})
