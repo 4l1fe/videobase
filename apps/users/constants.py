@@ -34,6 +34,7 @@ APP_USER_PIC_TYPES = (
 )
 
 APP_SUBJECT_TO_RESTORE_PASSWORD = u'Востановление пароля'
+APP_SUBJECT_TO_RESTORE_EMAIL = u'Смена Email'
 APP_SUBJECT_TO_CONFIRM_REGISTER = u'Подтверждение регистрации'
 APP_SUBJECT_TO_NOTIFICATION_FILM = u'Появился фильм'
 APP_SUBJECT_TO_NOTIFICATION_PERSON = u'Новый фильм у персоны'
