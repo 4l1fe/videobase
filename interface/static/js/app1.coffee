@@ -365,6 +365,8 @@ class CommentThumb extends Item
   transform_val: (name, val) ->
     if name == "user.name"
       return val || "Пользователь"
+    if name == "text"
+      return val.replace(/\n+/gm, "<br/>")
     super
 
 class PersonThumb extends Item
@@ -396,6 +398,8 @@ class FeedThumb extends Item
   transform_val: (name, val) ->
     if name == "user.name"
       return val || "Пользователь"
+    else if @_type == "film-c" && name == "object.text"
+      return val.replace(/\n+/gm, "<br/>")
     super
 
   transform_attr: (attr, name, val) ->
@@ -935,6 +939,7 @@ class Page_Main extends Page
       @load_more_films(films_deck, {page: 2})
     else
       films_deck.load_more_hide(false)
+    $('.crsl-items').carousel({itemMinWidth: 200, itemEqualHeight: true, visible: 3});
 
   filter_changed: (text) ->
     _filter_counter++
@@ -1152,8 +1157,8 @@ class Page_Film extends Page
     error = false
     if text == ""
       error = "Введите, пожалуйста, текст комментария."
-    else if text.length < 80
-      error = "Количество букв в тексте не должно быть меньше 80."
+    else if text.length < 20
+      error = "Количество букв в тексте не должно быть меньше 20."
     else if text.length > 8000
       error = "Количество букв в тексте не должно превышать 8000."
     else

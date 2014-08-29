@@ -1,7 +1,5 @@
 # coding: utf-8
 
-from __future__ import absolute_import
-
 import os
 from datetime import timedelta
 from ConfigParser import RawConfigParser
@@ -14,7 +12,6 @@ from celery.schedules import crontab
 # Import Local config
 from .local_settings import *
 
-
 ###########################################################
 # Celery settings
 os.environ["CELERY_LOADER"] = "django"
@@ -23,8 +20,8 @@ djcelery.setup_loader()
 AMQP_HOST = 'localhost'
 BROKER_HOST = 'localhost'
 BROKER_PORT = 5672
-###########################################################
 
+###########################################################
 BASE_PATH = os.path.dirname(__file__)
 BASE_DIR = os.path.dirname(BASE_PATH)
 
@@ -53,6 +50,7 @@ STANDART_HTTP_SESSION_TOKEN_HEADER = b'HTTP_{}'.format(HTTP_SESSION_TOKEN_TYPE.r
 STANDART_HTTP_USER_TOKEN_HEADER = b'HTTP_{}'.format(HTTP_USER_TOKEN_TYPE.replace('-', '_'))
 
 DEFAULT_REST_API_RESPONSE = {}
+
 ###########################################################
 # Email config
 emailconf = RawConfigParser()
@@ -137,6 +135,7 @@ ROOT_URLCONF = 'videobase.urls'
 
 WSGI_APPLICATION = 'videobase.wsgi.application'
 
+###########################################################
 # Database
 dbconf = RawConfigParser()
 dbconf.read(CONFIGS_PATH + '/db.ini')
@@ -160,6 +159,7 @@ CACHES = {
     }
 }
 
+###########################################################
 # Backends for social auth
 AUTHENTICATION_BACKENDS = (
     # OAuth
@@ -255,18 +255,8 @@ SOCIAL_AUTH_PIPELINE = (
     'social_auth.backends.pipeline.social.load_extra_data',
 )
 
-
 # In minutes
 API_SESSION_EXPIRATION_TIME = 15
-
-if not DEBUG:
-    INSTALLED_APPS += (
-        'raven.contrib.django.raven_compat',  # may be delete later
-    )
-
-    RAVEN_CONFIG = {
-        'dsn': 'http://8684bf8b497047d9ac170fd16aefc873:41e89f4666b24f998125370f3d1a1789@sentry.aaysm.com/2'
-    }
 
 ###########################################################
 CELERYBEAT_SCHEDULE = {
@@ -403,3 +393,12 @@ CELERY_TIMEZONE = 'UTC'
 CELERY_ACCEPT_CONTENT = ['pickle', 'json', 'msgpack', 'yaml']
 POSTER_URL_PREFIX = '_260x360'
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+
+if not DEBUG:
+    INSTALLED_APPS += (
+        'raven.contrib.django.raven_compat',  # may be delete later
+    )
+
+    RAVEN_CONFIG = {
+        'dsn': 'http://8684bf8b497047d9ac170fd16aefc873:41e89f4666b24f998125370f3d1a1789@sentry.aaysm.com/2'
+    }

@@ -580,6 +580,9 @@
       if (name === "user.name") {
         return val || "Пользователь";
       }
+      if (name === "text") {
+        return val.replace(/\n+/gm, "<br/>");
+      }
       return CommentThumb.__super__.transform_val.apply(this, arguments);
     };
 
@@ -640,6 +643,8 @@
     FeedThumb.prototype.transform_val = function(name, val) {
       if (name === "user.name") {
         return val || "Пользователь";
+      } else if (this._type === "film-c" && name === "object.text") {
+        return val.replace(/\n+/gm, "<br/>");
       }
       return FeedThumb.__super__.transform_val.apply(this, arguments);
     };
@@ -1481,6 +1486,11 @@
       } else {
         films_deck.load_more_hide(false);
       }
+      $('.crsl-items').carousel({
+        itemMinWidth: 200,
+        itemEqualHeight: true,
+        visible: 3
+      });
     }
 
     Page_Main.prototype.filter_changed = function(text) {
@@ -1839,8 +1849,8 @@
       error = false;
       if (text === "") {
         error = "Введите, пожалуйста, текст комментария.";
-      } else if (text.length < 80) {
-        error = "Количество букв в тексте не должно быть меньше 80.";
+      } else if (text.length < 20) {
+        error = "Количество букв в тексте не должно быть меньше 20.";
       } else if (text.length > 8000) {
         error = "Количество букв в тексте не должно превышать 8000.";
       } else {
@@ -2308,3 +2318,5 @@
   };
 
 }).call(this);
+
+//# sourceMappingURL=app1.map

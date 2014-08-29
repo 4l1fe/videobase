@@ -237,7 +237,7 @@ html
                                             if film.comments && film.comments.length
                                                 each el in film.comments
                                                     mixin comment_thumb(el)
-                                        if film.comments && film.comments.length >= 10
+                                        if film.comments && film.comments.length >= 5
                                             .add-filter#comments_more
                                                 .add-content.style-panel-action.rel.zmin
                                                     a(href='#', title='') показать еще
@@ -265,6 +265,7 @@ html
                                         //-
             include footer
             - delete film.description; delete playlist.items;
+            - delete film.comments;
         script(src=js_url + 'responsiveCarousel.min.js')
         script.
             $(document).ready(function () {window.InitApp({page_conf: {id: !{playlist.id}, film: !{JSON.stringify(film)}, previous: !{JSON.stringify(playlist.previous || {})}, next: !{JSON.stringify(playlist.next || {})}}}, "Playlist")})

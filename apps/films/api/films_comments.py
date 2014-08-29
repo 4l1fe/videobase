@@ -12,6 +12,7 @@ from apps.films.constants import APP_COMMENTS_API_DEFAULT_PAGE, APP_COMMENTS_API
 
 from videobase.settings import DEFAULT_REST_API_RESPONSE
 
+
 #############################################################################################################
 class CommentsFilmView(APIView):
     """
@@ -26,7 +27,7 @@ class CommentsFilmView(APIView):
         try:
             result = Contents.objects.get(film=film_id)
         except Contents.DoesNotExist:
-            result = Response(status=status.HTTP_404_NOT_FOUND)
+            result = Response(DEFAULT_REST_API_RESPONSE,status=status.HTTP_404_NOT_FOUND)
 
         return result
 
@@ -63,7 +64,7 @@ class CommentsFilmView(APIView):
         # Проверка пагинации
         filter = self.__validation_pagination(copy_req.get('page'), copy_req.get('per_page'), {})
 
-        o_comments = Comments.objects.filter(content=content)
+        o_comments = Comments.objects.filter(content=content).order_by('-created')
 
         try:
             page = Paginator(o_comments, per_page=filter['per_page']).page(filter['page'])
