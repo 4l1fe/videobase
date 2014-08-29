@@ -27,8 +27,7 @@ from apps.users.api.serializers import vbUser, vbFeedElement, vbUserProfile
 from apps.users.forms import CustomRegisterForm, UsersProfileForm
 from apps.users.api.utils import create_new_session
 from apps.users.constants import APP_USERS_API_DEFAULT_PAGE, APP_USERS_API_DEFAULT_PER_PAGE,\
-    APP_SUBJECT_TO_RESTORE_PASSWORD, APP_SUBJECT_TO_CONFIRM_REGISTER, APP_USER_ACTIVE_KEY, \
-    APP_SUBJECT_TO_RESTORE_EMAIL
+    APP_SUBJECT_TO_RESTORE_PASSWORD, APP_SUBJECT_TO_CONFIRM_REGISTER, APP_USER_ACTIVE_KEY
 
 from apps.films.models import Films, Persons, UsersFilms, UsersPersons
 from apps.films.constants import APP_PERSON_DIRECTOR, APP_PERSON_ACTOR, APP_USERFILM_SUBS_TRUE
@@ -61,18 +60,16 @@ class RegisterUserView(View):
             transaction.commit()
 
             try:
-                context = {
-                    'user': model_to_dict(user, fields=[field.name for field in user._meta.fields]),
-                    'redirect_url': 'http://{host}{url}'.format(
-                        host=self.request.get_host(),
-                        url=url_with_querystring(reverse('confirm_email'), **{APP_USER_ACTIVE_KEY: user.profile.activation_key})
-                    )
-                }
-
                 param_email = {
-                    'to':       [user.email],
-                    'context':  context,
-                    'subject':  APP_SUBJECT_TO_CONFIRM_REGISTER,
+                    'to': [user.email],
+                    'context': {
+                        'user': model_to_dict(user, fields=[field.name for field in user._meta.fields]),
+                        'redirect_url': 'http://{host}{url}'.format(
+                            host=self.request.get_host(),
+                            url=url_with_querystring(reverse('confirm_email'), **{APP_USER_ACTIVE_KEY: user.profile.activation_key})
+                        )
+                    },
+                    'subject': APP_SUBJECT_TO_CONFIRM_REGISTER,
                     'tpl_name': 'confirmation_register.html',
                 }
 
@@ -280,26 +277,7 @@ class UserProfileView(View):
         form = UsersProfileForm(data=request.POST, instance=request.user)
         if form.is_valid():
             try:
-                t = form.save()
-
-                if t[1]:
-                    t[0].confirm_email = False
-                    t[0].activation_key = t[0].generate_key()
-                    t[0].save()
-
-                # # Формируем параметры email
-                # param_email = {
-                #     'to': [form.user.username],
-                #     'context': {
-                #         'user': ''# model_to_dict(form, fields=[field.name for field in form._meta.fields]),
-                #     },
-                #     'subject': APP_SUBJECT_TO_RESTORE_EMAIL,
-                #     'tpl_name': 'password_email_confirm.html',
-                # }
-                #
-                # # Отправляем email
-                # send_template_mail.apply_async(kwargs=param_email)
-
+                form.save(send_email=True)
             except Exception as e:
                 return HttpResponse(render_page('profile', {'error': e}))
 
