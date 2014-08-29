@@ -48,6 +48,7 @@ class UsersProfile(models.Model):
 
     def save(self, *args, **kwargs):
         if self.id is None:
+            self.confirm_email = False
             self.activation_key = self.generate_key()
 
         super(UsersProfile, self).save(*args, **kwargs)

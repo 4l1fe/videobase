@@ -1,8 +1,11 @@
 # coding: utf-8
-from django import forms
-from django.contrib.auth.forms import UserCreationForm
 
-from .models import User, UsersProfile
+from django import forms
+from django.forms.models import model_to_dict
+
+from apps.users.tasks import send_template_mail
+from apps.users.models import User, UsersProfile
+from apps.users.constants import APP_SUBJECT_TO_RESTORE_EMAIL
 
 
 class UsersProfileForm(forms.ModelForm):
@@ -12,23 +15,45 @@ class UsersProfileForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('instance')
         kwargs['instance'] = self.user.profile
+
         super(UsersProfileForm, self).__init__(*args, **kwargs)
         self.fields['email'].initial = self.user.email
 
-    def save(self, commit=True):
-        super(UsersProfileForm, self).save(commit)
-        self.user.first_name = self.cleaned_data['username']
-
-        flag = False
+    def save(self, commit=True, send_email=False):
         email = self.cleaned_data['email']
-        if self.user.username != email or self.user.email != email:
+        flag = True if self.user.username != email or self.user.email != email else False
+
+        if flag:
+            self.confirm_email = False
+            self.activation_key = self.instance.generate_key()
+
+        instance = super(UsersProfileForm, self).save(commit)
+
+        self.user.first_name = self.cleaned_data['username']
+        if flag:
             self.user.email = email
             self.user.username = email
-            flag = True
 
         self.user.save()
 
-        return self.instance, flag
+        if send_email:
+            try:
+                # Формируем параметры email
+                param_email = {
+                    'to': [email],
+                    'context': {
+                        'user': model_to_dict(self.user, fields=[field.name for field in self.user._meta.fields]),
+                        'profile': model_to_dict(instance, fields=[field.name for field in instance._meta.fields])
+                    },
+                    'subject': APP_SUBJECT_TO_RESTORE_EMAIL,
+                    'tpl_name': 'email_confirm.html',
+                }
+
+                # Отправляем email
+                send_template_mail.apply_async(kwargs=param_email)
+            except Exception, e:
+                pass
+
 
     class Meta:
         model = UsersProfile
@@ -64,11 +89,18 @@ class CustomRegisterForm(forms.ModelForm):
         else:
             raise forms.ValidationError('Password is required field')
 
-    def save(self, commit=True):
+    def save(self, commit=True, send_email=False):
         instance = super(CustomRegisterForm, self).save(commit)
         instance.first_name = self.cleaned_data['email'].split('@')[0]
         instance.set_password(self.cleaned_data['password1'])
         instance.save()
+
+        if send_email:
+            try:
+                pass
+            except Exception, e:
+                pass
+
         return instance
 
     class Meta:
