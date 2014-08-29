@@ -1,7 +1,7 @@
 # coding: utf-8
-
 import os
 import djcelery
+
 from datetime import timedelta
 from ConfigParser import RawConfigParser
 
@@ -198,7 +198,7 @@ REST_FRAMEWORK = {
     )
 }
 
-SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
+SESSION_SERIALIZER = 'django.con trib.sessions.serializers.PickleSerializer'
 
 LOGIN_URL = '/login'
 SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/tokenize/'
