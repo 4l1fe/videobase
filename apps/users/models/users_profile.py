@@ -2,10 +2,8 @@
 
 import sha
 import random
-import binascii
 
 from django.db import models
-from django.utils.crypto import pbkdf2
 from django.contrib.auth.models import User
 
 from ..constants import *
@@ -34,7 +32,7 @@ class UsersProfile(models.Model):
 
     # Confirmation email
     confirm_email  = models.BooleanField(verbose_name=u'Подтверждение email на рассылку и уведомления', default=False)
-    activation_key = models.CharField(u'Ключ активации', max_length=64)
+    activation_key = models.CharField(u'Ключ активации', null=True, blank=True, max_length=64)
 
 
     def __unicode__(self):
@@ -44,13 +42,13 @@ class UsersProfile(models.Model):
     def get_name(self):
         return self.user.first_name
 
+    def generate_key(self):
+        salt = '{0}_{1}'.format(sha.new(str(random.random())).hexdigest(), self.user.id)
+        return sha.new(salt).hexdigest()
 
     def save(self, *args, **kwargs):
         if self.id is None:
-            salt = '{0}_{1}'.format(sha.new(str(random.random())).hexdigest(), self.user.id)
-            self.activation_key = sha.new(salt).hexdigest()
-
-            # self.activation_key = binascii.hexlify(pbkdf2('qwerty', '1233', 100000))
+            self.activation_key = self.generate_key()
 
         super(UsersProfile, self).save(*args, **kwargs)
 

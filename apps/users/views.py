@@ -27,7 +27,8 @@ from apps.users.api.serializers import vbUser, vbFeedElement, vbUserProfile
 from apps.users.forms import CustomRegisterForm, UsersProfileForm
 from apps.users.api.utils import create_new_session
 from apps.users.constants import APP_USERS_API_DEFAULT_PAGE, APP_USERS_API_DEFAULT_PER_PAGE,\
-    APP_SUBJECT_TO_RESTORE_PASSWORD, APP_SUBJECT_TO_CONFIRM_REGISTER, APP_USER_ACTIVE_KEY
+    APP_SUBJECT_TO_RESTORE_PASSWORD, APP_SUBJECT_TO_CONFIRM_REGISTER, APP_USER_ACTIVE_KEY, \
+    APP_SUBJECT_TO_RESTORE_EMAIL
 
 from apps.films.models import Films, Persons, UsersFilms, UsersPersons
 from apps.films.constants import APP_PERSON_DIRECTOR, APP_PERSON_ACTOR, APP_USERFILM_SUBS_TRUE
@@ -276,66 +277,33 @@ class UserProfileView(View):
 
 
     def post(self, request, **kwargs):
-        uprofile_form = UsersProfileForm(data=request.POST, instance=request.user)
-        if uprofile_form.is_valid():
+        form = UsersProfileForm(data=request.POST, instance=request.user)
+        if form.is_valid():
             try:
-                uprofile_form.save()
+                t = form.save()
+
+                if t[1]:
+                    t[0].confirm_email = False
+                    t[0].activation_key = t[0].generate_key()
+                    t[0].save()
+
+                # # Формируем параметры email
+                # param_email = {
+                #     'to': [form.user.username],
+                #     'context': {
+                #         'user': ''# model_to_dict(form, fields=[field.name for field in form._meta.fields]),
+                #     },
+                #     'subject': APP_SUBJECT_TO_RESTORE_EMAIL,
+                #     'tpl_name': 'password_email_confirm.html',
+                # }
+                #
+                # # Отправляем email
+                # send_template_mail.apply_async(kwargs=param_email)
+
             except Exception as e:
                 return HttpResponse(render_page('profile', {'error': e}))
 
         return redirect('profile_view')
-
-
-def delete_social_provider(request, provider):
-    if isinstance(request.user, AnonymousUser):
-        return redirect("login_view")
-
-    try:
-        users_social = UserSocialAuth.objects.filter(user=request.user)
-        if request.user.has_usable_password() or users_social.count() > 1:
-            users_social.get(provider=provider).delete()
-        else:
-            kw = {'e': u'Невозможно удалить аккаунт социальной сети'.encode('utf-8')}
-            url = url_with_querystring(reverse('profile_view'), **kw)
-            return redirect(url)
-    except Exception, e:
-        pass
-
-    return redirect('profile_view')
-
-
-def calc_feed(user_id):
-    # Список подписок на фильм
-    uf = UsersFilms.get_subscribed_films_by_user(user_id, flat=True)
-
-    # Список подписок на персону
-    up = UsersPersons.get_subscribed_persons_by_user(user_id, flat=True)
-
-    # Выборка фидов
-    o_feed = Feed.get_feeds_by_user(user_id, uf=uf, up=up)
-
-    return o_feed
-
-
-def feed_view(request):
-    if request.user.is_authenticated():
-        # Сериализуем
-        try:
-            o_feed = vbFeedElement(calc_feed(request.user.id), many=True).data
-        except Exception, e:
-            raise Http404
-
-        return HttpResponse(render_page('feed', {'feed': o_feed}))
-
-    return redirect('login_view')
-
-
-def password_reset_done(request):
-    return HttpResponse(render_page('reset_passwd', {'send': True}))
-
-
-def password_reset_confirm(request):
-    return HttpResponse(render_page('confirm_passwd', {'confirm': True}))
 
 
 class ConfirmResetPwdView(View):
@@ -389,3 +357,55 @@ class ConfirmResetPwdView(View):
                 return HttpResponse(render_page('confirm_passwd', {'error': dict(((i[0], i[1][0]) for i in form.errors.items()))}))
 
         return HttpResponse(render_page('confirm_passwd', {'error': {'token': True}}))
+
+
+def delete_social_provider(request, provider):
+    if isinstance(request.user, AnonymousUser):
+        return redirect("login_view")
+
+    try:
+        users_social = UserSocialAuth.objects.filter(user=request.user)
+        if request.user.has_usable_password() or users_social.count() > 1:
+            users_social.get(provider=provider).delete()
+        else:
+            kw = {'e': u'Невозможно удалить аккаунт социальной сети'.encode('utf-8')}
+            url = url_with_querystring(reverse('profile_view'), **kw)
+            return redirect(url)
+    except Exception, e:
+        pass
+
+    return redirect('profile_view')
+
+
+def calc_feed(user_id):
+    # Список подписок на фильм
+    uf = UsersFilms.get_subscribed_films_by_user(user_id, flat=True)
+
+    # Список подписок на персону
+    up = UsersPersons.get_subscribed_persons_by_user(user_id, flat=True)
+
+    # Выборка фидов
+    o_feed = Feed.get_feeds_by_user(user_id, uf=uf, up=up)
+
+    return o_feed
+
+
+def feed_view(request):
+    if request.user.is_authenticated():
+        # Сериализуем
+        try:
+            o_feed = vbFeedElement(calc_feed(request.user.id), many=True).data
+        except Exception, e:
+            raise Http404
+
+        return HttpResponse(render_page('feed', {'feed': o_feed}))
+
+    return redirect('login_view')
+
+
+def password_reset_done(request):
+    return HttpResponse(render_page('reset_passwd', {'send': True}))
+
+
+def password_reset_confirm(request):
+    return HttpResponse(render_page('confirm_passwd', {'confirm': True}))

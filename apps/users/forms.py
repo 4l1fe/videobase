@@ -17,9 +17,18 @@ class UsersProfileForm(forms.ModelForm):
 
     def save(self, commit=True):
         super(UsersProfileForm, self).save(commit)
-        self.user.username = self.user.email = self.cleaned_data['email']
         self.user.first_name = self.cleaned_data['username']
+
+        flag = False
+        email = self.cleaned_data['email']
+        if self.user.username != email or self.user.email != email:
+            self.user.email = email
+            self.user.username = email
+            flag = True
+
         self.user.save()
+
+        return self.instance, flag
 
     class Meta:
         model = UsersProfile
