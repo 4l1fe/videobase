@@ -21,6 +21,44 @@ class Comments(models.Model):
     def __unicode__(self):
         return u'[{0}] {1} ({2})'.format(self.pk, self.user, self.content)
 
+
+    @classmethod
+    def get_top_comments_with_rating(cls, struct=False, limit=12):
+        sql = """
+            SELECT comments.*, films.id AS film_id, films.name as name,
+                   users_films.rating as rating, auth_user.first_name as us_name
+            FROM comments
+            JOIN content ON content.id = comments.content_id
+            JOIN users_films ON users_films.film_id = content.film_id
+            LEFT JOIN films ON users_films.film_id = films.id
+            LEFT JOIN auth_user ON comments.user_id = auth_user.user_id
+            WHERE users_films.rating IS NOT NULL AND users_films.rating > 0
+            ORDER BY comments.created DESC LIMIT %s;
+        """
+
+        obj = cls.objects.raw(sql, [limit])
+        if struct:
+            comments = []
+            for item in obj:
+                comments.append({
+                    'film': {
+                        'id':item.film_id,
+                        'name': item.name,
+                        'rating': item.rating,
+                    },
+                    'user': {
+                        'id': item.user_id,
+                        'name': item.us_name,
+                        'city': '',
+                    },
+                    'text': item.text,
+                })
+
+            return comments
+
+        return obj
+
+
     class Meta:
         # Имя таблицы в БД
         db_table = 'comments'
