@@ -31,7 +31,7 @@ class Comments(models.Model):
             JOIN content ON content.id = comments.content_id
             JOIN users_films ON users_films.film_id = content.film_id
             LEFT JOIN films ON users_films.film_id = films.id
-            LEFT JOIN auth_user ON comments.user_id = auth_user.user_id
+            LEFT JOIN auth_user ON comments.user_id = auth_user.id
             WHERE users_films.rating IS NOT NULL AND users_films.rating > 0
             ORDER BY comments.created DESC LIMIT %s;
         """
@@ -42,7 +42,7 @@ class Comments(models.Model):
             for item in obj:
                 comments.append({
                     'film': {
-                        'id':item.film_id,
+                        'id': item.film_id,
                         'name': item.name,
                         'rating': item.rating,
                     },
