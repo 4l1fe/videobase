@@ -1,7 +1,7 @@
 # coding: utf-8
-
 import os
 import djcelery
+
 from datetime import timedelta
 from ConfigParser import RawConfigParser
 
