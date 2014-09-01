@@ -10,6 +10,7 @@ from djcelery.models import TaskMeta
 from djcelery.picklefield import decode
 from djcelery.views import task_status
 from apps.robots.models.robots_logs import RobotsInfoLogging
+from apps.robots.models.robots_mail_list import RobotsMailList
 from apps.users.tasks import send_template_mail, send_statistic_to_mail
 
 __author__ = 'vladimir'
@@ -67,7 +68,11 @@ def send_statistic_to_email_for_each_robot():
     for key, value in robo_dict.iteritems():
         one_report_str = create_one_email_report_str_for_statistic(key, value)
         str_for_send += one_report_str
-    to = ['vmikrukov@aaysm.com']
+    to = []
+    for item in RobotsMailList.objects.all():
+        to.append(item.email)
+    if len(to) == 0:
+        return
     subject = "robots logs"
     kwrg = {
             'subject': subject,
