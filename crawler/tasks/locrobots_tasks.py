@@ -36,13 +36,14 @@ def viaplay_robot_start():
     ViaplayRobot().get_data()
 
 
-@app.task(name='individual_site_film')
+@app.task(name='individual_site_film', base=DebugTask)
 def launch_individual_film_site_task(site):
-    robot_launch_wrapper(site, partial(process_film_on_site, site))
+    return robot_launch_wrapper(site, partial(process_film_on_site, site))
+
 
 @app.task(name='process_film_on_site')
-def process_individual_film_on_site(site,film_id):
-    return process_film_on_site(site,film_id)
+def process_individual_film_on_site(site, film_id):
+    return process_film_on_site(site, film_id)
 
     
 @app.task(name='robot_launch')
