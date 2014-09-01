@@ -1,4 +1,5 @@
 # coding: utf-8
+from apps.films.models import Films
 from apps.robots.models import Robots
 from crawler.locrobots import sites_crawler, process_film_on_site
 from crawler.locrobots.amediateka_ru.loader import Amediateka_robot
@@ -59,7 +60,7 @@ def robot_launcher(*args, **kwargs):
 
 @app.task(name='age_weighted_robot_launch')
 def age_weighted_robot_launcher(years):
-    print "Starting locations checks for every film at least {} days old".format(days)
+    print "Starting locations checks for every film at least {} days old".format(years)
 
     delays=defaultdict(int)
 
