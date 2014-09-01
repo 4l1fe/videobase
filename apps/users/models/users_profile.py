@@ -42,9 +42,11 @@ class UsersProfile(models.Model):
     def get_name(self):
         return self.user.first_name
 
+
     def generate_key(self):
         salt = '{0}_{1}'.format(sha.new(str(random.random())).hexdigest(), self.user.id)
         return sha.new(salt).hexdigest()
+
 
     def save(self, *args, **kwargs):
         if self.id is None:
@@ -52,6 +54,7 @@ class UsersProfile(models.Model):
             self.activation_key = self.generate_key()
 
         super(UsersProfile, self).save(*args, **kwargs)
+
 
     class Meta:
         db_table = 'users_profile'

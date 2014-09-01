@@ -49,35 +49,28 @@ class RegisterUserView(View):
     def post(self, *args, **kwargs):
         register_form = CustomRegisterForm(data=self.request.POST)
         if register_form.is_valid():
-            user = register_form.save()
-            url_redirect = url_with_querystring(
-                reverse('tokenize'),
-                **{
-                    'token': user.auth_token.key,
-                    '_': timezone.now().date().strftime("%H%M%S"),
-                }
-            )
-            transaction.commit()
-
+            committed = False
             try:
-                param_email = {
-                    'to': [user.email],
-                    'context': {
-                        'user': model_to_dict(user, fields=[field.name for field in user._meta.fields]),
-                        'redirect_url': 'http://{host}{url}'.format(
-                            host=self.request.get_host(),
-                            url=url_with_querystring(reverse('confirm_email'), **{APP_USER_ACTIVE_KEY: user.profile.activation_key})
-                        )
-                    },
-                    'subject': APP_SUBJECT_TO_CONFIRM_REGISTER,
-                    'tpl_name': 'confirmation_register.html',
-                }
+                user = register_form.save()
+                url_redirect = url_with_querystring(
+                    reverse('tokenize'),
+                    **{
+                        'token': user.auth_token.key,
+                        '_': timezone.now().date().strftime("%H%M%S"),
+                    }
+                )
+                transaction.commit()
+                committed = True
 
-                send_template_mail.apply_async(kwargs=param_email)
+                return redirect(url_redirect)
+
             except Exception, e:
-                pass
+                resp_dict = {'error': 'Ошибка в сохранении данных.'}
+                return HttpResponse(render_page('register', resp_dict))
 
-            return redirect(url_redirect)
+            finally:
+                if not committed:
+                    transaction.rollback()
 
         else:
             transaction.rollback()
@@ -208,12 +201,15 @@ class UserView(View):
 class ConfirmEmailView(View):
 
     def get(self, request, *args, **kwargs):
-        activation_key = request.GET.get(APP_USER_ACTIVE_KEY, None)
-        if activation_key is None:
+        if isinstance(request.user, AnonymousUser):
+            return redirect("login_view")
+
+        key = request.GET.get(APP_USER_ACTIVE_KEY, None)
+        if key is None:
             raise Http404
 
         try:
-            profile = UsersProfile.objects.get(activation_key=activation_key)
+            profile = UsersProfile.objects.get(id=request.user.id, activation_key=key)
         except self.model.DoesNotExist:
             raise Http404
 
