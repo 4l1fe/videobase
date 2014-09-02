@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup
 from crawler.core import BaseParse
 from apps.films.constants import APP_FILM_FULL_FILM, APP_FILM_SERIAL
 import re
+import string
 
 
 def search_film(ul, film_name, year):
@@ -13,7 +14,7 @@ def search_film(ul, film_name, year):
             div = li.find(class_='description')
             tag_year = div.find('p', {'class':'genre-year'}).text
             film_year = int(re.search(ur'\d+', tag_year).group())
-            if div.a.text == film_name and film_year == year:
+            if div.a.text.lower().strip().encode('utf-8').translate(None, string.punctuation) == film_name.lower().strip().encode('utf-8').translate(None, string.punctuation) and film_year == year:
                 film_link = 'http://www.stream.ru' + div.a.get('href')
                 break
 
