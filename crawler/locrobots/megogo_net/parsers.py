@@ -2,6 +2,7 @@
 from crawler.core import BaseParse
 from bs4 import BeautifulSoup
 from apps.contents.constants import *
+import string
 import re
 import json
 
@@ -13,7 +14,7 @@ def parse_search(response, filmName, year):
         films = json.loads(response)
         for film in films:
             search = regFilmname.search(film['title'])
-            if search.group('name').lower().strip() == filmName.lower().strip() and str(year) in search.group('year'):
+            if search.group('name').lower().strip().encode('utf-8').translate(None, string.punctuation) == filmName.lower().strip().encode('utf-8').translate(None, string.punctuation) and str(year) in search.group('year'):
                 search_film = film
                 break
     except IndexError:

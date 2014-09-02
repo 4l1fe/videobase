@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup
 from crawler.utils.locations_utils import save_location, sane_dict
 from apps.contents.constants import *
 from crawler.tor import simple_tor_get_page
+import string
 
 
 class ViaplayRobot(object):
@@ -18,7 +19,7 @@ class ViaplayRobot(object):
         films = Films.objects.values('name', 'id')
         for li_film in soup_films:
             for film in films:
-                if li_film.a.text == film['name']:
+                if li_film.a.text.lower().strip().encode('utf-8').translate(None, string.punctuation) == film['name'].lower().strip().encode('utf-8').translate(None, string.punctuation):
                     link = 'http://viaplay.ru' + li_film.a.get('href')
                     film_query_set = Films.objects.filter(id=film['id'])
                     for obj in film_query_set:

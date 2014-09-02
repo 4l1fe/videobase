@@ -2,6 +2,7 @@
 from crawler.core import BaseParse
 from apps.contents.constants import *
 import re
+import string
 from bs4 import BeautifulSoup
 
 
@@ -25,7 +26,7 @@ def parse_search(response, film, year):
                 for h2 in tag.find_all('h2'):
                     year_tag = h2.span.text
                     h2.span.extract()
-                    if h2.text.lower().strip() == film.lower().strip() and str(year) in year_tag:
+                    if h2.text.lower().strip().encode('utf-8').translate(None, string.punctuation) == film.lower().strip().encode('utf-8').translate(None, string.punctuation) and str(year) in year_tag:
                         film_div = h2.parent.parent.parent
                         exit_flag = True
                         break
