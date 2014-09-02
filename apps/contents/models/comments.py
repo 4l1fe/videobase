@@ -33,7 +33,7 @@ class Comments(models.Model):
             LEFT JOIN films ON users_films.film_id = films.id
             LEFT JOIN auth_user ON comments.user_id = auth_user.id
 
-            WHERE users_films.rating IS NOT NULL AND users_films.rating > 0
+            WHERE users_films.rating IS NOT NULL AND users_films.rating > 0 and  NOT auth_user.first_name = ''
             ORDER BY comments.created DESC LIMIT %s;
         """
 
