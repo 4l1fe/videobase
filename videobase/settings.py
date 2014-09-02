@@ -383,6 +383,11 @@ CELERYBEAT_SCHEDULE = {
         'task': 'consolidate_rating',
         'schedule': timedelta(days=1)
     },
+    # Send robots statistic to email
+    'send_robots_statistic_to_email': {
+        'task': 'send_robots_statistic_to_email',
+        'schedule': timedelta(days=1)
+    },
     # Do weekly newsletter
     'week_newsletter_schedule': {
         'task': 'week_newsletter',

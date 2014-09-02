@@ -24,6 +24,7 @@ from rest_framework import status
 
 import apps.films.models as film_model
 import apps.contents.models as content_model
+import apps.users.models as user_model
 
 from apps.films.api.serializers import vbFilm, vbComment, vbPerson
 from apps.films.constants import APP_USERFILM_STATUS_PLAYLIST
@@ -136,6 +137,9 @@ def index_view(request):
             if item['id'] in o_user:
                 resp_dict_data[index]['relation'] = o_user[item['id']].relation_for_vb_film
 
+    # Топ комментариев к фильмам  пользователей
+    comments = content_model.Comments.get_top_comments_with_rating(struct=True)
+
     # Выборка списка жанров из кеша, если есть
     genres_cache_key = film_model.Genres.get_cache_key()
     genres_data = cache.get(genres_cache_key)
@@ -151,7 +155,7 @@ def index_view(request):
     data = {
         'films_new': resp_dict_data,
         'filter_genres': genres_data,
-
+        'comments': comments,
          # Список рекомендуемых фильмов
         'films': get_recommend_film(request),
     }
