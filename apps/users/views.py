@@ -15,8 +15,11 @@ from django.contrib.auth.models import User, AnonymousUser
 from django.views.generic import View
 from django.views.decorators.cache import never_cache
 from django.shortcuts import redirect
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.tokens import default_token_generator
+from django.utils.decorators import method_decorator
+
 
 from social_auth.models import UserSocialAuth
 from rest_framework.authtoken.models import Token
@@ -200,10 +203,8 @@ class UserView(View):
 
 class ConfirmEmailView(View):
 
+    @method_decorator(login_required)
     def get(self, request, *args, **kwargs):
-        if isinstance(request.user, AnonymousUser):
-            return redirect("login_view")
-
         key = request.GET.get(APP_USER_ACTIVE_KEY, None)
         if key is None:
             raise Http404
@@ -257,10 +258,8 @@ class ResetPasswordView(View):
 
 class UserProfileView(View):
 
+    @method_decorator(login_required)
     def get(self, request, **kwargs):
-        if isinstance(request.user, AnonymousUser):
-            return redirect("login_view")
-
         resp_dict = {
             'user': vbUserProfile(request.user.profile).data,
             'error': request.GET.get('e', None)
@@ -269,6 +268,7 @@ class UserProfileView(View):
         return HttpResponse(render_page('profile', resp_dict))
 
 
+    @method_decorator(login_required)
     def post(self, request, **kwargs):
         form = UsersProfileForm(data=request.POST, instance=request.user)
         if form.is_valid():
