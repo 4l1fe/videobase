@@ -28,7 +28,15 @@ class RobotsLogAdmin(admin.ModelAdmin):
         super(RobotsLogAdmin, self).__init__(*args, **kwargs)
         #self.list_display_links = (None,)
 
+
+#############################################################################################################
+# Администрирование списка рассылки роботов
+class RobotsMailListAdmin(admin.ModelAdmin):
+    pass
+
+
 #############################################################################################################
 # Регистрация моделей в админке
 admin.site.register(Robots, RobotsAdmin)
 admin.site.register(RobotsLog, RobotsLogAdmin)
+admin.site.register(RobotsMailList, RobotsMailListAdmin)

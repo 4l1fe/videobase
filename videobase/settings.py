@@ -370,6 +370,12 @@ CELERYBEAT_SCHEDULE = {
     'consolidate_rating_schedule': {
         'task': 'consolidate_rating',
         'schedule': timedelta(days=1)
+    },
+
+    # Send robots statistic to email
+    'send_robots_statistic_to_email': {
+        'task': 'send_robots_statistic_to_email',
+        'schedule': timedelta(days=1)
     }
 
     

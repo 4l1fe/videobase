@@ -1,6 +1,8 @@
 # coding: utf-8
 import json
 import urllib
+from crawler.locations_saver import save_location_to_list
+
 HOST = 'www.ayyo.ru'
 URL_SEARCH = 'api/search/live/?{}'
 from apps.films.models import Films
@@ -19,6 +21,8 @@ class AyyoRobot(object):
         self.response = simple_tor_get_page(url)
 
     def get_data(self):
+        locations = []
+        site_name = 'www.ayyo.ru'
         try:
             films = json.loads(self.response)['live_search']['search_movies_result']
             for film in films:
@@ -31,8 +35,10 @@ class AyyoRobot(object):
             price = float(json.loads(film_response)['movies']['data'][str(ayyo_film_id)]['streaming_price'])
             d = self.film_dict(self.film, film_link, price)
             save_location(**d)
+            save_location_to_list(locations, **d)
         except Exception, e:
             pass
+        return site_name, locations
 
     def film_dict(self, film, film_link, price):
         if price == 0:

@@ -51,7 +51,7 @@ def robot_launch_wrapper(robot_name, func):
         item_id = update_robot_state_film_id(robot)
         print "Starting robot {} for id = {}".format(robot_name, item_id)
         try:
-            func(item_id)
+            return func(item_id)
         except NoSuchFilm:
             print "No Such Film"            
 
