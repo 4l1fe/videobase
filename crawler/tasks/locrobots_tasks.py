@@ -7,6 +7,7 @@ from crawler.locrobots.viaplay_ru.robot import ViaplayRobot
 from crawler.locrobots.playfamily_dot_ru.playfamily_xml import process
 from crawler.locrobots.drugoe_kino.robot import update_drugoe_kino_listing
 from crawler.locrobots.youtube_com.parser import YoutubeChannelParser
+from crawler.tasks.locrobots_logging import DebugTask
 from crawler.tasks.utils import robot_launch_wrapper
 from crawler.utils.films_statistics import film_at_least_years_old
 from videobase.celery import app
@@ -36,14 +37,14 @@ def viaplay_robot_start():
     ViaplayRobot().get_data()
 
 
-@app.task(name='individual_site_film')
+@app.task(name='individual_site_film', base=DebugTask)
 def launch_individual_film_site_task(site):
-    robot_launch_wrapper(site, partial(process_film_on_site, site))
+    return robot_launch_wrapper(site, partial(process_film_on_site, site))
+
 
 @app.task(name='process_film_on_site')
-def process_individual_film_on_site(site,film_id):
-
-    process_film_on_site(site,film_id)
+def process_individual_film_on_site(site, film_id):
+    return process_film_on_site(site, film_id)
 
     
 @app.task(name='robot_launch')
@@ -69,7 +70,7 @@ def age_weighted_robot_launcher(years):
         for film in Films.objects.all():
             if film_at_least_years_old(film, years):
 
-                process_individual_film_on_site.apply_async((robot.name,film.id), countdown=15*delays[robot.name])
+                process_individual_film_on_site.apply_async((robot.name, film.id), countdown=15*delays[robot.name])
                 delays[robot.name]+=1
 
 
@@ -78,6 +79,6 @@ def dg_update():
     update_drugoe_kino_listing()
 
 
-@app.task(name="parse_you_tube_movies_ru")
+@app.task(name="parse_you_tube_movies_ru", base=DebugTask)
 def parse_you_tube_movies_ru():
-    YoutubeChannelParser.process_channels_list()
+    return  YoutubeChannelParser.process_channels_list()

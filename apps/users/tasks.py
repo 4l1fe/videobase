@@ -50,3 +50,10 @@ def notification(id_, type_):
         send_template_mail.apply_async(kwargs=kw)
     except:
         pass
+
+
+@app.task(name="send_robots_statistic_to_email", queue="send_mail")
+def send_statistic_to_mail(subject, text, to):
+    msg = EmailMultiAlternatives(subject=subject, to=to)
+    msg.attach_alternative(text, 'text/html')
+    msg.send()
