@@ -78,20 +78,23 @@ sites_crawler = {
 
 sites = sites_crawler.keys()
 
-
-def process_film_on_site(site, film_id):
-    locations = []
-    try:
-        film = Films.objects.get(id=film_id)
-    except Films.DoesNotExist:
-        print "There is no film in db with such id"
-        return None
-
-    loaded_data = sites_crawler[site]['loader'](film).load()
-
-    for data in sites_crawler[site]['parser'].parse(loaded_data['html'], sane_dict, film, url=loaded_data['url']):
-        print u"Trying to put data from %s for %s to db" % (site, unicode(data['film']))
-        save_location(**data)
-        save_location_to_list(locations, **data)
-
-    return site, locations
+#
+# def process_film_on_site(site, film_id):
+#
+#     load_and_save_film_page_from_site.apply_async((site, film_id), link=process_one_film.s((site, film_id), queue=site))
+#
+#     # locations = []
+#     # try:
+#     #     film = Films.objects.get(id=film_id)
+#     # except Films.DoesNotExist:
+#     #     print "There is no film in db with such id"
+#     #     return None
+#     #
+#     # loaded_data = sites_crawler[site]['loader'](film).load() #загрузка страницы
+#     #
+#     # for data in sites_crawler[site]['parser'].parse(loaded_data['html'], sane_dict, film, url=loaded_data['url']): # здесь уже по готовому результату парсим
+#     #     print u"Trying to put data from %s for %s to db" % (site, unicode(data['film']))
+#     #     save_location(**data)
+#     #     save_location_to_list(locations, **data)
+#     #
+#     # return site, locations

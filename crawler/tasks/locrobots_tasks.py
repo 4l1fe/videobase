@@ -1,8 +1,10 @@
 # coding: utf-8
 from apps.films.models import Films
 from apps.robots.models import Robots
-from crawler.locrobots import sites_crawler, process_film_on_site
+from crawler.locations_saver import save_location_to_list
+from crawler.locrobots import sites_crawler
 from crawler.locrobots.amediateka_ru.loader import Amediateka_robot
+from crawler.locrobots.process_film_from_site import process_film_on_site
 from crawler.locrobots.viaplay_ru.robot import ViaplayRobot
 from crawler.locrobots.playfamily_dot_ru.playfamily_xml import process
 from crawler.locrobots.drugoe_kino.robot import update_drugoe_kino_listing
@@ -10,6 +12,7 @@ from crawler.locrobots.youtube_com.parser import YoutubeChannelParser
 from crawler.tasks.locrobots_logging import DebugTask
 from crawler.tasks.utils import robot_launch_wrapper
 from crawler.utils.films_statistics import film_at_least_years_old
+from crawler.utils.locations_utils import save_location, sane_dict
 from videobase.celery import app
 from collections import defaultdict
 
@@ -19,7 +22,7 @@ from functools import partial
 import datetime
 
 
-@app.task(name='amediateka_ru_robot_start')
+@app.task(name='amediateka_ru_robot_start', queue='amediateka_ru')
 def amediateka_robot_start(*args, **kwargs):
     '''
     Amediateka_robot
@@ -32,7 +35,7 @@ def pltask():
     process()
 
 
-@app.task(name='viaplay_ru_robot_start')
+@app.task(name='viaplay_ru_robot_start', queue='viaplay_ru')
 def viaplay_robot_start():
     ViaplayRobot().get_data()
 
@@ -54,7 +57,7 @@ def robot_launcher(*args, **kwargs):
         print u'Checking robot %s' % robot.name
         if robot.last_start + datetime.timedelta(seconds=robot.delay) < timezone.now():
             if robot.name in sites_crawler:
-                launch_individual_film_site_task.apply_async((robot.name,))
+                launch_individual_film_site_task.apply_async((robot.name,), queue=robot.name)
         else:
             print u'Skipping robot %s' % robot.name
 
@@ -79,6 +82,7 @@ def dg_update():
     update_drugoe_kino_listing()
 
 
-@app.task(name="parse_you_tube_movies_ru", base=DebugTask)
+@app.task(name="parse_you_tube_movies_ru", base=DebugTask, queue='you_tube_movies_ru')
 def parse_you_tube_movies_ru():
-    return  YoutubeChannelParser.process_channels_list()
+    return YoutubeChannelParser.process_channels_list()
+
