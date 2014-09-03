@@ -16,7 +16,7 @@ class Feed(models.Model):
     user = models.ForeignKey(User, verbose_name="Пользователь", null=True, blank=True)
     created = models.DateTimeField(verbose_name="Дата создания", auto_now=True)
     type = models.CharField(verbose_name="Тип связанного объекта", choices=APP_FEED_TYPE, max_length=255, name='type')
-    object = jsonfield.JSONField(verbose_name="Связанный объект", name='object')
+    obj_id = models.IntegerField(verbose_name='Идентификатор объекта')
     text = models.TextField(verbose_name="Текст", null=True, blank=True)
 
 
