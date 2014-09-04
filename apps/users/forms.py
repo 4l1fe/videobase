@@ -5,6 +5,8 @@ from django.core.urlresolvers import reverse
 from django.forms.models import model_to_dict
 from django.db import transaction, IntegrityError
 
+from videobase.settings import HOST
+
 from apps.users.tasks import send_template_mail
 from apps.users.models import User, UsersProfile, UsersHash
 from apps.users.constants import APP_SUBJECT_TO_RESTORE_EMAIL, APP_USER_ACTIVE_KEY, \
@@ -77,7 +79,7 @@ class UsersProfileForm(forms.ModelForm):
                     'user': model_to_dict(self.user, fields=[field.name for field in self.user._meta.fields]),
                     'profile': model_to_dict(instance, fields=[field.name for field in instance._meta.fields]),
                     'url': 'http://{host}{url}'.format(
-                        host='vsevi.ru',
+                        host=HOST,
                         url=url_with_querystring(reverse('confirm_email'), **{APP_USER_ACTIVE_KEY: o_hash.hash_key})
                     ),
                 },
@@ -144,7 +146,7 @@ class CustomRegisterForm(forms.ModelForm):
                 'context': {
                     'user': model_to_dict(instance, fields=[field.name for field in instance._meta.fields]),
                     'redirect_url': 'http://{host}{url}'.format(
-                        host='vsevi.ru',
+                        host=HOST,
                         url=url_with_querystring(reverse('confirm_email'), **{APP_USER_ACTIVE_KEY: o_hash.hash_key})
                     )
                 },

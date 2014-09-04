@@ -20,7 +20,6 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.decorators import method_decorator
 
-
 from social_auth.models import UserSocialAuth
 from rest_framework.authtoken.models import Token
 
@@ -38,8 +37,6 @@ from apps.films.api.serializers import vbFilm, vbPerson
 
 from utils.common import url_with_querystring
 from utils.noderender import render_page
-
-HOST = 'vsevi.ru'
 
 
 class RegisterUserView(View):
