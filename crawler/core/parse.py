@@ -4,7 +4,7 @@
 # Базовый класс парсера для страници
 class BaseParse(object):
     def __init__(self, html):
-        self.html = html['html']
+        self.html = html
 
     # Стоимость и варианты оплаты (подписка/просмотр/бесплатно)
     def get_price(self, **kwargs):
