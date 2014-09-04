@@ -212,8 +212,9 @@ class ConfirmEmailView(View):
         if user_hash is None:
             raise Http404
 
-        user_hash.user.confirm_email = True
-        user_hash.user.save()
+        profile = user_hash.user.profile
+        profile.confirm_email = True
+        profile.save()
 
         return HttpResponse(render_page('confirm_email', {}))
 
@@ -274,8 +275,8 @@ class UserProfileView(View):
 
             if isinstance(result, dict):
                 t = vbUserProfile(request.user.profile).data
-                copy = request.POST.copy()
-                return HttpResponse(render_page('profile', {'user': t.update(copy), 'error': result}))
+                t.update(request.POST.dict())
+                return HttpResponse(render_page('profile', {'user': t, 'error': result}))
 
             return HttpResponse(render_page('profile', {'user': vbUserProfile(result).data}))
 
