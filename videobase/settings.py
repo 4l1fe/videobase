@@ -399,6 +399,7 @@ CELERYBEAT_SCHEDULE = {
 LOGIN_URL = '/login'
 SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/tokenize/'
 LOGIN_ERROR_URL = '/'
+HOST = 'vsevi.ru'
 
 ###########################################################
 # Another configuration
