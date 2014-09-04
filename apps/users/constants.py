@@ -100,5 +100,15 @@ APP_USERPROFILE_NOTIFICATION = (
     (APP_USERPROFILE_NOTIFICATION_NEVER, u'Никогда'),
 )
 
-
 APP_USER_ACTIVE_KEY = 'act_key'
+
+#############################################################################################################
+APP_USER_HASH_EMAIL = 1
+APP_USER_HASH_PASSWD = 2
+APP_USER_HASH_REGISTR = 3
+
+TYPE_PASSWD_HASH = (
+    (APP_USER_HASH_EMAIL, u'Смена email'),
+    (APP_USER_HASH_PASSWD, u'Смена пароля'),
+    (APP_USER_HASH_REGISTR, u'При регистрации'),
+)

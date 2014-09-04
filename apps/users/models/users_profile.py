@@ -32,7 +32,6 @@ class UsersProfile(models.Model):
 
     # Confirmation email
     confirm_email  = models.BooleanField(verbose_name=u'Подтверждение email на рассылку и уведомления', default=False)
-    activation_key = models.CharField(u'Ключ активации', null=True, blank=True, max_length=64)
 
 
     def __unicode__(self):
@@ -48,10 +47,13 @@ class UsersProfile(models.Model):
         return sha.new(salt).hexdigest()
 
 
+    def deactivation_email(self):
+        self.confirm_email = False
+
+
     def save(self, *args, **kwargs):
         if self.id is None:
-            self.confirm_email = False
-            self.activation_key = self.generate_key()
+            self.deactivation_email()
 
         super(UsersProfile, self).save(*args, **kwargs)
 

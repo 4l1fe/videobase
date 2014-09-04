@@ -3,10 +3,12 @@
 from django import forms
 from django.core.urlresolvers import reverse
 from django.forms.models import model_to_dict
+from django.db import transaction, IntegrityError
 
 from apps.users.tasks import send_template_mail
-from apps.users.models import User, UsersProfile
-from apps.users.constants import APP_SUBJECT_TO_RESTORE_EMAIL, APP_USER_ACTIVE_KEY, APP_SUBJECT_TO_CONFIRM_REGISTER
+from apps.users.models import User, UsersProfile, UsersHash
+from apps.users.constants import APP_SUBJECT_TO_RESTORE_EMAIL, APP_USER_ACTIVE_KEY, \
+    APP_SUBJECT_TO_CONFIRM_REGISTER, APP_USER_HASH_EMAIL, APP_USER_HASH_REGISTR
 
 from utils.common import url_with_querystring
 
@@ -24,44 +26,67 @@ class UsersProfileForm(forms.ModelForm):
         self.fields['email'].initial = self.user.email
 
 
+    @transaction.commit_manually
     def save(self, commit=True, send_email=False):
-        email = self.cleaned_data['email']
-        email_flag = True if self.user.username != email or self.user.email != email else False
+        try:
+            email = self.cleaned_data['email']
+            email_flag = True if self.user.username != email or self.user.email != email else False
+
+            if email_flag:
+                # Save confirm email
+                self.instance.deactivation_email()
+
+                # Save hash
+                o_hash = UsersHash(user=self.user, hash_type=APP_USER_HASH_EMAIL)
+                o_hash.save()
+
+            instance = super(UsersProfileForm, self).save(commit=False)
+        except IntegrityError, e:
+            transaction.rollback()
+            return {'error': e.message}
 
         if email_flag:
-            # Save email
-            self.user.email = email
-            self.user.username = email
+            try:
+                # Save email
+                self.user.email = email
+                self.user.username = email
 
-            # Save confirm email
-            self.confirm_email = False
-            self.activation_key = self.instance.generate_key()
+                self.user.save()
+            except Exception, e:
+                transaction.rollback()
+                return {'email': "Ошибка в сохранении email"}
 
-        instance = super(UsersProfileForm, self).save(commit)
+        try:
+            self.user.first_name = self.cleaned_data['username']
+            self.user.save()
+        except IntegrityError, e:
+            transaction.rollback()
+            return {'username': "Ошибка в сохранении имени"}
 
-        self.user.first_name = self.cleaned_data['username']
-        self.user.save()
+        try:
+            transaction.commit()
+        except IntegrityError, e:
+            transaction.rollback()
+            return {'error': "Ошибка в сохранении имени"}
 
         if send_email and email_flag:
-            try:
-                # Формируем параметры email
-                param_email = {
-                    'to': [email],
-                    'context': {
-                        'user': model_to_dict(self.user, fields=[field.name for field in self.user._meta.fields]),
-                        'profile': model_to_dict(instance, fields=[field.name for field in instance._meta.fields]),
-                        'url': 'http://vsevi.ru{0}'.format(
-                            url_with_querystring(reverse('confirm_email'), **{APP_USER_ACTIVE_KEY: self.activation_key})
-                        ),
-                    },
-                    'subject': APP_SUBJECT_TO_RESTORE_EMAIL,
-                    'tpl_name': 'confirm_change_email.html',
-                }
+            # Формируем параметры email
+            param_email = {
+                'to': [email],
+                'context': {
+                    'user': model_to_dict(self.user, fields=[field.name for field in self.user._meta.fields]),
+                    'profile': model_to_dict(instance, fields=[field.name for field in instance._meta.fields]),
+                    'url': 'http://{host}{url}'.format(
+                        host='vsevi.ru',
+                        url=url_with_querystring(reverse('confirm_email'), **{APP_USER_ACTIVE_KEY: o_hash.hash_key})
+                    ),
+                },
+                'subject': APP_SUBJECT_TO_RESTORE_EMAIL,
+                'tpl_name': 'confirm_change_email.html',
+            }
 
-                # Отправляем email
-                send_template_mail.apply_async(kwargs=param_email)
-            except Exception, e:
-                pass
+            # Отправляем email
+            send_template_mail.apply_async(kwargs=param_email)
 
         return instance
 
@@ -102,30 +127,32 @@ class CustomRegisterForm(forms.ModelForm):
             raise forms.ValidationError('Password is required field')
 
 
+    @transaction.commit_on_success
     def save(self, commit=True, send_email=False):
         instance = super(CustomRegisterForm, self).save(commit)
         instance.first_name = self.cleaned_data['email'].split('@')[0]
         instance.set_password(self.cleaned_data['password1'])
         instance.save()
 
-        if send_email:
-            try:
-                param_email = {
-                    'to': [instance.email],
-                    'context': {
-                        'user': model_to_dict(instance, fields=[field.name for field in instance._meta.fields]),
-                        'redirect_url': 'http://{host}{url}'.format(
-                            host=self.request.get_host(),
-                            url=url_with_querystring(reverse('confirm_email'), **{APP_USER_ACTIVE_KEY: instance.profile.activation_key})
-                        )
-                    },
-                    'subject': APP_SUBJECT_TO_CONFIRM_REGISTER,
-                    'tpl_name': 'confirmation_register.html',
-                }
+        # save hash
+        o_hash = UsersHash(user=instance.user, hash_type=APP_USER_HASH_REGISTR)
+        o_hash.save()
 
-                send_template_mail.apply_async(kwargs=param_email)
-            except Exception, e:
-                pass
+        if send_email:
+            param_email = {
+                'to': [instance.email],
+                'context': {
+                    'user': model_to_dict(instance, fields=[field.name for field in instance._meta.fields]),
+                    'redirect_url': 'http://{host}{url}'.format(
+                        host='vsevi.ru',
+                        url=url_with_querystring(reverse('confirm_email'), **{APP_USER_ACTIVE_KEY: o_hash.hash_key})
+                    )
+                },
+                'subject': APP_SUBJECT_TO_CONFIRM_REGISTER,
+                'tpl_name': 'confirmation_register.html',
+            }
+
+            send_template_mail.apply_async(kwargs=param_email)
 
         return instance
 
