@@ -24,7 +24,7 @@ from django.utils.decorators import method_decorator
 from social_auth.models import UserSocialAuth
 from rest_framework.authtoken.models import Token
 
-from apps.users.models import Feed, UsersProfile
+from apps.users.models import Feed, UsersHash
 from apps.users.tasks import send_template_mail
 from apps.users.api.serializers import vbUser, vbFeedElement, vbUserProfile
 from apps.users.forms import CustomRegisterForm, UsersProfileForm
@@ -203,19 +203,17 @@ class UserView(View):
 
 class ConfirmEmailView(View):
 
-    @method_decorator(login_required)
     def get(self, request, *args, **kwargs):
         key = request.GET.get(APP_USER_ACTIVE_KEY, None)
         if key is None:
             raise Http404
 
-        try:
-            profile = UsersProfile.objects.get(id=request.user.id, activation_key=key)
-        except self.model.DoesNotExist:
+        user_hash = UsersHash.get_by_hash(hash_key=key)
+        if user_hash is None:
             raise Http404
 
-        profile.confirm_email = True
-        profile.save()
+        user_hash.user.confirm_email = True
+        user_hash.user.save()
 
         return HttpResponse(render_page('confirm_email', {}))
 
@@ -272,10 +270,14 @@ class UserProfileView(View):
     def post(self, request, **kwargs):
         form = UsersProfileForm(data=request.POST, instance=request.user)
         if form.is_valid():
-            try:
-                form.save(send_email=True)
-            except Exception as e:
-                return HttpResponse(render_page('profile', {'error': e}))
+            result = form.save(send_email=True)
+
+            if isinstance(result, dict):
+                t = vbUserProfile(request.user.profile).data
+                copy = request.POST.copy()
+                return HttpResponse(render_page('profile', {'user': t.update(copy), 'error': result}))
+
+            return HttpResponse(render_page('profile', {'user': vbUserProfile(result).data}))
 
         return redirect('profile_view')
 

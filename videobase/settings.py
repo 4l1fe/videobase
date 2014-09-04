@@ -10,10 +10,6 @@ import djcelery
 from celery.schedules import crontab
 
 
-##########################################################
-# Import Local config
-from .local_settings import *
-
 ###########################################################
 # Celery settings
 os.environ["CELERY_LOADER"] = "django"
@@ -40,6 +36,9 @@ BACKUP_PATH = os.path.join(BASE_PATH, '..', '.backup')
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '7-dsc0--i_ej94w9as#-5p_5a)ql*9o80v1rs9krx!_-9%^b5$'
+
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = False
 
 TEMPLATE_DEBUG = DEBUG
 
@@ -267,11 +266,6 @@ API_SESSION_EXPIRATION_TIME = 15
 ###########################################################
 # Celery schedule
 CELERYBEAT_SCHEDULE = {
-    # Launching robots that are described in Robots table.
-    #'robot-launch': {
-    #    'task': 'robot_launch',
-    #    'schedule': timedelta(seconds=10),
-    #},
     # Updating ratings from IMDB DB via archive
     'imdb_rating_update_command': {
         'task': 'imdb_rating_update',
