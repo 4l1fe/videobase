@@ -38,6 +38,8 @@ class DebugTask(Task):
     abstract = True
 
     def after_return(self, *args, **kwargs):
+        if len(args[1][1]) == 0:
+            return
         try:
             print create_structures_string(args[1][0], args[1][1])
             write_logs_to_table(args[1][0], args[1][1])

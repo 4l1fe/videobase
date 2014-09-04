@@ -6,6 +6,8 @@ __author__ = 'vladimir'
 
 
 def save_location_to_list(locations_list, film, **film_dict):
+    if len(locations_list) == 0:
+        pass
     try:
         content = get_content(film, film_dict)
         location = Locations.objects.get(type=film_dict['type'], content=content)
