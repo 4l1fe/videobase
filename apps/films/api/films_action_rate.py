@@ -51,31 +51,17 @@ class ActRateFilmView(APIView):
                 'film': o_film,
             }
 
-            obj_val = {
-                'id': o_film.id,
-                'name': o_film.name
-            }
-
-            obj_valr = {
-                'id': o_film.id,
-                'name': o_film.name,
-                'rating': rating
-            }
-
             # Устанавливаем оценку
             try:
                 o_user_film = UsersFilms(rating=rating, **filter_)
                 o_user_film.save()
-                Feed.objects.create(user=request.user, type=FILM_RATE, object=obj_valr)
+                Feed.objects.create(user=request.user, type=FILM_RATE, obj_id=o_film.id)
             except Exception as e:
                 try:
                     UsersFilms.objects.filter(**filter_).update(rating=rating)
-                    for f in Feed.objects.filter(user=request.user, type=FILM_RATE).iterator():
-                        if all(item in f.object.items() for item in obj_val.items()):
-                            # с типом film-nw может и не быть
-                            f.delete()
-
-                    Feed.objects.create(user=request.user, type=FILM_RATE, object=obj_valr)
+                    feed, created = Feed.objects.get_or_create(user=request.user, type=FILM_RATE, obj_id=o_film.id)
+                    if not created:
+                        feed.save()
                 except Exception as e:
                     return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -95,7 +81,6 @@ class ActRateFilmView(APIView):
 
         # Удалим оценку
         UsersFilms.objects.filter(**filter_).update(rating=None)
-        for f in Feed.objects.filter(user=request.user, type=FILM_RATE).iterator():
-            if all(item in f.object.items() for item in obj_val.items()): f.delete()
+        Feed.objects.filter(user=request.user, type=FILM_RATE, obj_id=o_film.id).delete()
 
         return Response(DEFAULT_REST_API_RESPONSE, status=status.HTTP_200_OK)

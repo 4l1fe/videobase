@@ -55,28 +55,18 @@ class ActSubscribeFilmView(APIView):
             'user': request.user,
             'film': o_film,
         }
-        poster = FilmExtras.get_poster_by_film(o_film.fe_film_rel.all())
-        obj_val = {
-            'id': o_film.id,
-            'name': o_film.name,
-            'description': o_film.description,
-            'poster': poster
-        }
 
         # Устанавливаем подписку
         try:
             o_subs = UsersFilms(subscribed=subscribed, **filter_)
             o_subs.save()
-            Feed.objects.create(user=request.user, type=FILM_SUBSCRIBE, object=obj_val)
+            Feed.objects.create(user=request.user, type=FILM_SUBSCRIBE, obj_id=o_film.id)
         except Exception as e:
             try:
                 UsersFilms.objects.filter(**filter_).update(subscribed=subscribed)
-                for f in Feed.objects.filter(user=request.user, type=FILM_SUBSCRIBE).iterator(): # До этого момента Feed
-                    if f.object == obj_val:
-                        # с типом film-nw может и не быть
-                        f.delete()
-
-                Feed.objects.create(user=request.user, type=FILM_SUBSCRIBE, object=obj_val)      # значит нечего обновлять
+                feed, created = Feed.objects.create(user=request.user, type=FILM_SUBSCRIBE, obj_id=o_film.id)
+                if not created:
+                    feed.save()
             except Exception as e:
                 return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -100,19 +90,9 @@ class ActSubscribeFilmView(APIView):
             'film': o_film.pk
         }
 
-        poster = FilmExtras.get_poster_by_film(o_film.fe_film_rel.all())
-        obj_val = {
-            'id': o_film.id,
-            'name': o_film.name,
-            'description': o_film.description,
-            'poster': poster
-        }
-
         # Удалим подписку
         UsersFilms.objects.filter(**filter_).update(subscribed=subscribed)
-        for f in Feed.objects.filter(user=request.user, type=FILM_SUBSCRIBE).iterator():
-            if f.object == obj_val:
-                f.delete()
+        Feed.objects.filter(user=request.user, type=FILM_SUBSCRIBE, obj_id=o_film.id).delete()
 
         return Response(DEFAULT_REST_API_RESPONSE, status=status.HTTP_200_OK)
 

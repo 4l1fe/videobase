@@ -70,13 +70,13 @@ class ActCommentFilmView(APIView):
             }
 
             o_com = Comments.objects.create(**filter_)
-            obj_val = {
-                'id': o_com.id,
-                'text': o_com.text,
-                'film': {'id': o_content.film_id, 'name': o_content.name}
-            }
+            # obj_val = {
+            #     'id': o_com.id,
+            #     'text': o_com.text,
+            #     'film': {'id': o_content.film_id, 'name': o_content.name}
+            # }
 
-            Feed.objects.create(user=request.user, type=FILM_COMMENT, object=obj_val)
+            Feed.objects.create(user=request.user, type=FILM_COMMENT, obj_id=o_com.id)
 
             return Response(DEFAULT_REST_API_RESPONSE, status=status.HTTP_200_OK)
 
