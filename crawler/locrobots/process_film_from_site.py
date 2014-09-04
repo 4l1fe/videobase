@@ -6,11 +6,14 @@ __author__ = 'vladimir'
 
 
 def get_html_json_for_file_name(file_name):
-    f = open(file_name, 'r')
-    print file_name
-    raw_text = f.read()
-    html = json.loads(raw_text)
-    f.close()
+    html=''
+    try:
+        f = open(file_name, 'r')
+        raw_text = f.read()
+        html = json.loads(raw_text)
+        f.close()
+    except:
+        return None
     return html
 
 
