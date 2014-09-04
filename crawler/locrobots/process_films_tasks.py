@@ -18,7 +18,7 @@ def process_one_film(site, film_id, html_page_json):
         print "There is no film in db with such id"
         return site, locations
     print "call back ok", type(html_page_json)
-    for data in sites_crawler[site]['parser'].parse(html_page_json, sane_dict, film): # здесь уже по готовому результату парсим
+    for data in sites_crawler[site]['parser'].parse(html_page_json['html'], sane_dict, film, url=html_page_json['url']): # здесь уже по готовому результату парсим
         print u"Trying to put data from %s for %s to db" % (site, unicode(data['film']))
         save_location(**data)
         save_location_to_list(locations, **data)
