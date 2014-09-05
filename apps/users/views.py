@@ -3,25 +3,29 @@
 import datetime
 from pytils import numeral
 
-from django.contrib.auth.views import *
 from django.db import transaction
 from django.forms.models import model_to_dict
 from django.core.paginator import Paginator
-from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponse,\
     HttpResponseBadRequest, HttpResponseServerError, Http404
+
 from django.utils import timezone
-from django.contrib.auth.models import User, AnonymousUser
+from django.utils.decorators import method_decorator
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+
 from django.views.generic import View
-from django.views.decorators.cache import never_cache
 from django.shortcuts import redirect
+
+from django.contrib.auth.views import *
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.tokens import default_token_generator
-from django.utils.decorators import method_decorator
+from django.contrib.auth.models import User, AnonymousUser
 
 from social_auth.models import UserSocialAuth
 from rest_framework.authtoken.models import Token
+
+from videobase.settings import HOST
 
 from apps.users.models import Feed, UsersHash
 from apps.users.tasks import send_template_mail
@@ -29,7 +33,8 @@ from apps.users.api.serializers import vbUser, vbFeedElement, vbUserProfile
 from apps.users.forms import CustomRegisterForm, UsersProfileForm
 from apps.users.api.utils import create_new_session
 from apps.users.constants import APP_USERS_API_DEFAULT_PAGE, APP_USERS_API_DEFAULT_PER_PAGE,\
-    APP_SUBJECT_TO_RESTORE_PASSWORD, APP_SUBJECT_TO_CONFIRM_REGISTER, APP_USER_ACTIVE_KEY
+    APP_SUBJECT_TO_RESTORE_PASSWORD, APP_SUBJECT_TO_CONFIRM_REGISTER, APP_USER_ACTIVE_KEY, \
+    APP_USER_HASH_EMAIL, APP_USER_HASH_REGISTR, APP_USER_HASH_PASSWD
 
 from apps.films.models import Films, Persons, UsersFilms, UsersPersons
 from apps.films.constants import APP_PERSON_DIRECTOR, APP_PERSON_ACTOR, APP_USERFILM_SUBS_TRUE
@@ -37,6 +42,7 @@ from apps.films.api.serializers import vbFilm, vbPerson
 
 from utils.common import url_with_querystring
 from utils.noderender import render_page
+
 
 
 class RegisterUserView(View):
@@ -205,7 +211,7 @@ class ConfirmEmailView(View):
         if key is None:
             raise Http404
 
-        user_hash = UsersHash.get_by_hash(hash_key=key)
+        user_hash = UsersHash.get_by_hash(hash_key=key, hash_type=[APP_USER_HASH_EMAIL, APP_USER_HASH_REGISTR])
         if user_hash is None:
             raise Http404
 
@@ -219,7 +225,10 @@ class ConfirmEmailView(View):
 class ResetPasswordView(View):
 
     def get(self, request, *args, **kwargs):
-        return HttpResponse(render_page('reset_passwd', {}))
+        if not request.user.is_authenticated():
+            return HttpResponse(render_page('reset_passwd', {}))
+
+        raise Http404
 
 
     def post(self, request, *args, **kwargs):
@@ -227,16 +236,20 @@ class ResetPasswordView(View):
         if form.is_valid():
             email = form.cleaned_data.get('email', False)
 
-            active_users = User.objects.filter(email__iexact=email, email__isnull=False, is_active=True)
+            active_users = User.objects.filter(username__iexact=email, email__isnull=False, is_active=True)
             for user in active_users:
+                # Save hash
+                o_hash = UsersHash(user=user, hash_type=APP_USER_HASH_PASSWD)
+                o_hash.save()
+
                 # Формируем параметры email
                 param_email = {
                     'to': [user.email],
                     'context': {
-                        'url': 'http://{0}{1}'.format(HOST, reverse('pwd_reset',
-                            args=(urlsafe_base64_encode(force_bytes(user.pk)),
-                                  default_token_generator.make_token(user))
-                        )),
+                        'url': 'http://{host}{url}'.format(
+                            host=HOST,
+                            url=reverse('reset_pwd', args=(urlsafe_base64_encode(str(user.id)), o_hash.hash_key)),
+                        ),
                         'user': model_to_dict(user, fields=[field.name for field in user._meta.fields]),
                     },
                     'subject': APP_SUBJECT_TO_RESTORE_PASSWORD,
@@ -293,7 +306,8 @@ class ConfirmResetPwdView(View):
 
 
     def check_user_and_token(self, user, token):
-        return True if user is not None and default_token_generator.check_token(user, token) else False
+        user_hash = UsersHash.get_by_hash(hash_key=token, hash_type=[APP_USER_HASH_PASSWD])
+        return True if not (user is None or user_hash is None) and user.id == user_hash.user.id else False
 
 
     def get(self, request, uidb64, token, *args, **kwargs):

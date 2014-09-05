@@ -17,27 +17,26 @@ html
                             else
                                 h1.whiteh1 Восстановление пароля
                                 .enter-block.row
-                                    .col-md-5
+                                    .col-md-6
                                         .form-enter
                                             form.form-horizontal(role='form', method='post')
                                                 input(type="hidden",name="csrfmiddlewaretoken",value=csrf_token)
                                                 - error_cls = error?"has-error":""
 
+                                                - error_cls = error && error.password?"has-error":""
                                                 .form-group(class=error_cls)
-                                                label.col-sm-4.control-label(for='inputPassword1') Пароль
-                                                .col-sm-8
-                                                    input#inputPassword1.form-control(type='password',name='new_password1',required)
-                                                    if error && error.new_password1
-                                                        p=error.new_password1
-
+                                                    label.col-sm-4.control-label(for='inputPassword1') Пароль
+                                                    .col-sm-8
+                                                        input#inputPassword3.form-control(type='password',name='new_password1',required)
+                                                        if error && error.new_password1
+                                                            p=error.new_password1
                                                 - error_cls = error && error.new_password2?"has-error":""
                                                 .form-group(class=error_cls)
                                                     label.col-sm-4.control-label(for='inputPassword2') Повторите пароль
                                                     .col-sm-8
-                                                        input#inputPassword2.form-control(type='password',name='new_password2',required)
+                                                        input#inputPassword4.form-control(type='password',name='new_password2',required)
                                                         if error && error.new_password2
                                                             p=error.new_password2
-
                                                 .form-group
                                                     .col-sm-offset-2.col-sm-10
                                                         button.btn.btn-yellow1(type='submit') Применить
