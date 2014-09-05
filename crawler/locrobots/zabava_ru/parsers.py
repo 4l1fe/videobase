@@ -4,6 +4,7 @@ from apps.contents.constants import *
 from bs4 import BeautifulSoup
 from crawler.core import BaseParse
 import re
+import string
 
 
 def parse_search(response, film_name):
@@ -31,7 +32,7 @@ def parse_search(response, film_name):
             if film_div:
                 films = film_div.find_all('figure')
                 for film in films:
-                    if film_name == film.figcaption.div.header.strong.text:
+                    if film_name.lower().strip().encode('utf-8').translate(None, string.punctuation) == film.figcaption.div.header.strong.text.lower().strip().encode('utf-8').translate(None, string.punctuation):
                         film_link = 'http://www.zabava.ru' + film.a.get('href')
                         break
             else:
