@@ -9,6 +9,7 @@ from apps.films.models import Films
 from crawler.utils.locations_utils import save_location, sane_dict
 from crawler.tor import simple_tor_get_page
 from apps.contents.constants import *
+import string
 
 
 class AyyoRobot(object):
@@ -25,7 +26,7 @@ class AyyoRobot(object):
         try:
             films = json.loads(self.response)['live_search']['search_movies_result']
             for film in films:
-                if film['rus_title'] == self.film.name:
+                if film['rus_title'].lower().strip().encode('utf-8').translate(None, string.punctuation) == self.film.name.lower().strip().encode('utf-8').translate(None, string.punctuation):
                     film_link = 'https://www.ayyo.ru/movies/%s/' % (film['slug'])
                     ayyo_film_id = film['movie']
                     break
