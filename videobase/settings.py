@@ -376,7 +376,19 @@ CELERYBEAT_SCHEDULE = {
     'send_robots_statistic_to_email': {
         'task': 'send_robots_statistic_to_email',
         'schedule': timedelta(days=1)
-    }
+    },
+
+    # News from now.ru
+    'parse_news_from_now_ru': {
+        'task': 'parse_news_from_now_ru',
+        'schedule': timedelta(hours=12)
+    },
+
+    # News from stream.ru
+    'parse_news_from_stream_ru': {
+        'task': 'parse_news_from_stream_ru',
+        'schedule': timedelta(hours=12)
+    },
 
     
 }

@@ -7,6 +7,7 @@ from crawler.locrobots.viaplay_ru.robot import ViaplayRobot
 from crawler.locrobots.playfamily_dot_ru.playfamily_xml import process
 from crawler.locrobots.drugoe_kino.robot import update_drugoe_kino_listing
 from crawler.locrobots.youtube_com.parser import YoutubeChannelParser
+from crawler.locrobots.news import parse_news
 from crawler.tasks.locrobots_logging import DebugTask
 from crawler.tasks.utils import robot_launch_wrapper
 from crawler.utils.films_statistics import film_at_least_years_old
@@ -43,8 +44,8 @@ def launch_individual_film_site_task(site):
 
 
 @app.task(name='process_film_on_site')
-def process_individual_film_on_site(site, film_id):
-    return process_film_on_site(site, film_id)
+def process_individual_film_on_site(site, film_id, url=None):
+    return process_film_on_site(site, film_id, url)
 
     
 @app.task(name='robot_launch')
@@ -77,6 +78,22 @@ def age_weighted_robot_launcher(years):
 @app.task(name="drugoe_kino_update")
 def dg_update():
     update_drugoe_kino_listing()
+
+
+@app.task(name="parse_news_from_now_ru")
+def parse_news_from_now_ru():
+    robot = 'now_ru'
+    now_news = parse_news('robot')
+    for film in now_news:
+        process_individual_film_on_site.apply_async(args=(robot, film['film_id'], film['url']))
+
+
+@app.task(name="parse_news_from_stream_ru")
+def parse_news_from_stream_ru():
+    robot = 'stream_ru'
+    stream_news = parse_news('robot')
+    for film in stream_news:
+        process_individual_film_on_site.apply_async(args=(robot, film['film_id'], film['url']))
 
 
 @app.task(name="parse_you_tube_movies_ru", base=DebugTask)
