@@ -15,7 +15,7 @@ urlpatterns = patterns('',
     url(r'^forgotpwd/$', views.ResetPasswordView.as_view(), name='forgot_pwd'),
     url(r'^pwd-reset-done/$', 'apps.users.views.password_reset_done', name='reset_done'),
     url(r'^pwd-reset-confirm/$', 'apps.users.views.password_reset_confirm', name='reset_confirm'),
-    url(r'^pwd-reset/(?P<uidb64>[0-9A-Za-z]+)-(?P<token>.+)/$', views.ConfirmResetPwdView.as_view(), name="pwd_reset"),
+    url(r'^pwd-reset/(?P<uidb64>[0-9A-Za-z]+)-(?P<token>.+)/$', views.ConfirmResetPwdView.as_view(), name="reset_pwd"),
 
     # Auth
     url(r'^login/$', views.LoginUserView.as_view(), name='login_view'),
