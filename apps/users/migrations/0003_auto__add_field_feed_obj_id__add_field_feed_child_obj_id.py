@@ -1,23 +1,31 @@
 # -*- coding: utf-8 -*-
 from south.utils import datetime_utils as datetime
 from south.db import db
-from south.v2 import DataMigration
+from south.v2 import SchemaMigration
 from django.db import models
 
-class Migration(DataMigration):
+
+class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        "Write your forwards methods here."
-        # Note: Don't use "from appname.models import ModelName". 
-        # Use orm.ModelName to refer to models in this application,
-        # and orm['appname.ModelName'] for models in other applications.
-        for u in orm.Feed.objects.iterator():
-            obj_id = u.object.get('id', 0)
-            u.obj_id = obj_id
-            u.save()
+        # Adding field 'Feed.obj_id'
+        db.add_column('users_feed', 'obj_id',
+                      self.gf('django.db.models.fields.IntegerField')(null=True, blank=True),
+                      keep_default=False)
+
+        # Adding field 'Feed.child_obj_id'
+        db.add_column('users_feed', 'child_obj_id',
+                      self.gf('django.db.models.fields.IntegerField')(null=True, blank=True),
+                      keep_default=False)
+
 
     def backwards(self, orm):
-        raise RuntimeError("Cannot reverse this migration.")
+        # Deleting field 'Feed.obj_id'
+        db.delete_column('users_feed', 'obj_id')
+
+        # Deleting field 'Feed.child_obj_id'
+        db.delete_column('users_feed', 'child_obj_id')
+
 
     models = {
         u'auth.group': {
@@ -58,6 +66,7 @@ class Migration(DataMigration):
         },
         'users.feed': {
             'Meta': {'object_name': 'Feed'},
+            'child_obj_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'obj_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
@@ -134,4 +143,3 @@ class Migration(DataMigration):
     }
 
     complete_apps = ['users']
-    symmetrical = True

@@ -1,25 +1,23 @@
 # -*- coding: utf-8 -*-
 from south.utils import datetime_utils as datetime
 from south.db import db
-from south.v2 import SchemaMigration
+from south.v2 import DataMigration
 from django.db import models
 
-
-class Migration(SchemaMigration):
+class Migration(DataMigration):
 
     def forwards(self, orm):
-
-        # Changing field 'Feed.obj_id'
-        db.alter_column('users_feed', 'obj_id', self.gf('django.db.models.fields.IntegerField')(null=True))
+        "Write your forwards methods here."
+        # Note: Don't use "from appname.models import ModelName". 
+        # Use orm.ModelName to refer to models in this application,
+        # and orm['appname.ModelName'] for models in other applications.
+        db.execute("""update users_feed set obj_id = (object->'id')::text::int""")
+        db.execute("""update users_feed set child_obj_id = (object->'film'->'id')::text::int where type = 'film-c';""")
+        db.execute("""update users_feed set child_obj_id = (object->'film'->'id')::text::int where type = 'pers-o';""")
+        db.execute("""update users_feed set child_obj_id = (object->'location'->'id')::text::int where type = 'film-o';""")
 
     def backwards(self, orm):
-
-        # User chose to not deal with backwards NULL issues for 'Feed.obj_id'
-        raise RuntimeError("Cannot reverse this migration. 'Feed.obj_id' and its values cannot be restored.")
-        
-        # The following code is provided here to aid in writing a correct migration
-        # Changing field 'Feed.obj_id'
-        db.alter_column('users_feed', 'obj_id', self.gf('django.db.models.fields.IntegerField')())
+        "Write your backwards methods here."
 
     models = {
         u'auth.group': {
@@ -60,9 +58,11 @@ class Migration(SchemaMigration):
         },
         'users.feed': {
             'Meta': {'object_name': 'Feed'},
+            'child_obj_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'obj_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'object': ('jsonfield.fields.JSONField', [], {}),
             'text': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'type': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']", 'null': 'True', 'blank': 'True'})
@@ -135,3 +135,4 @@ class Migration(SchemaMigration):
     }
 
     complete_apps = ['users']
+    symmetrical = True
