@@ -107,6 +107,7 @@ def index_view(request):
     # Выбираем 4 новых фильма, у которых есть локации
     NEW_FILMS_CACHE_KEY = 'new_films'
     resp_dict_serialized = cache.get(NEW_FILMS_CACHE_KEY)
+
     # Расчитываем новинки, если их нет в кеше
     if resp_dict_serialized is None:
         o_film = film_model.Films.get_newest_films()
@@ -137,7 +138,7 @@ def index_view(request):
             if item['id'] in o_user:
                 resp_dict_data[index]['relation'] = o_user[item['id']].relation_for_vb_film
 
-    # Топ комментариев к фильмам  пользователей
+    # Топ комментариев к фильмам пользователей
     comments = content_model.Comments.get_top_comments_with_rating(struct=True)
 
     # Выборка списка жанров из кеша, если есть
@@ -148,7 +149,7 @@ def index_view(request):
         try:
             genres_data = list(film_model.Genres.get_grouped_genres())
             cache.set(genres_cache_key, genres_data, 86400)
-        except:
+        except Exception, e:
             genres_data = []
 
     # Формируем ответ
@@ -156,7 +157,6 @@ def index_view(request):
         'films_new': resp_dict_data,
         'filter_genres': genres_data,
         'comments': comments,
-         # Список рекомендуемых фильмов
         'films': get_recommend_film(request),
     }
 
@@ -181,9 +181,8 @@ def person_view(request, resource_id):
         crutch['birthdate'] = birthdate.strftime('%d %B %Y')
         crutch['years_old'] = date.today().year - birthdate.year
 
-    pfs = film_model.PersonsFilms.objects.filter(person=person)[:12]  # почему-то 12 первых фильмов. Был пагинатор
-    vbf = vbFilm([pf.film for pf in pfs], many=True)
-    crutch['filmography'] = vbf.data
+    person_films = film_model.PersonsFilms.objects.filter(person=person)[:12]
+    crutch['filmography'] = vbFilm([item.film for item in person_films], many=True).data
 
     return HttpResponse(render_page('person', {'person': crutch}))
 
