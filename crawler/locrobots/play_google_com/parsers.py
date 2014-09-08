@@ -3,6 +3,7 @@ from apps.contents.constants import *
 from bs4 import BeautifulSoup
 from crawler.core import BaseParse
 import re
+import string
 from crawler.tor import simple_tor_get_page
 
 
@@ -16,7 +17,7 @@ def parse_search(response, film_name, year):
         film_divs = search_div.find_all('div', {'class': ['card', 'no-rationale', 'tall-cover', 'movies tiny']})
         for film in film_divs:
             film_tag = film.find('a', {'class': 'title'})
-            if film_name == film_tag.get('title'):
+            if film_name.lower().strip().encode('utf-8').translate(None, string.punctuation) == film_tag.get('title').lower().strip().encode('utf-8').translate(None, string.punctuation):
                 film_link = 'http://play.google.com' + film_tag.get('href')
         if film_link:
             page = simple_tor_get_page(film_link)
