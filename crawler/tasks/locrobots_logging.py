@@ -1,17 +1,13 @@
 # coding: utf-8
-from email.mime.text import MIMEText
 import json
-import smtplib
 from celery import Task
 import datetime
-from django.forms.models import model_to_dict
-import djcelery
 from djcelery.models import TaskMeta
 from djcelery.picklefield import decode
 from djcelery.views import task_status
 from apps.robots.models.robots_logs import RobotsInfoLogging
 from apps.robots.models.robots_mail_list import RobotsMailList
-from apps.users.tasks import send_template_mail, send_statistic_to_mail
+from apps.users.tasks import  send_statistic_to_mail
 
 __author__ = 'vladimir'
 
@@ -34,15 +30,25 @@ def write_logs_to_table(robot_name, location_ids):
     RobotsInfoLogging.objects.create(robot_name=robot_name, locations=location_ids, log_time=datetime.date.today())
 
 
+def get_locations_list_from_locations_dict_list(locations_dict_list):
+    res_list = []
+    for location in locations_dict_list:
+        res_list.append(location['location_id'])
+    return res_list
+
+
 class DebugTask(Task):
     abstract = True
 
     def after_return(self, *args, **kwargs):
-        if len(args[1][1]) == 0:
+        if not args[1]:
             return
+        locations_dict = args[1]
         try:
-            print create_structures_string(args[1][0], args[1][1])
-            write_logs_to_table(args[1][0], args[1][1])
+            if len(locations_dict['info']) == 0:
+                return
+            print create_structures_string(locations_dict['type'], get_locations_list_from_locations_dict_list(locations_dict['info']))
+            write_logs_to_table(locations_dict['type'], get_locations_list_from_locations_dict_list(locations_dict['info']))
         except Exception, e:
             pass
 

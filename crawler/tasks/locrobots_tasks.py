@@ -1,7 +1,7 @@
 # coding: utf-8
 from apps.films.models import Films
 from apps.robots.models import Robots
-from crawler.locations_saver import save_location_to_list
+from crawler.locations_saver import save_location_to_locs_dict
 from crawler.locrobots import sites_crawler
 from crawler.locrobots.amediateka_ru.loader import Amediateka_robot
 from crawler.locrobots.process_film_from_site import process_film_on_site
@@ -49,7 +49,7 @@ def launch_individual_film_site_task(site):
 def process_individual_film_on_site(site, film_id):
     return process_film_on_site(site, film_id)
 
-    
+
 @app.task(name='robot_launch')
 def robot_launcher(*args, **kwargs):
     print 'Start'
@@ -72,8 +72,8 @@ def age_weighted_robot_launcher(years):
 
         for film in Films.objects.all():
             if film_at_least_years_old(film, years):
-
-                process_individual_film_on_site.apply_async((robot.name, film.id), countdown=15*delays[robot.name])
+                launch_individual_film_site_task.apply_async((robot.name,), queue=robot.name, countdown=15*delays[robot.name])
+                #process_individual_film_on_site.apply_async((robot.name, film.id), countdown=15*delays[robot.name])
                 delays[robot.name]+=1
 
 
