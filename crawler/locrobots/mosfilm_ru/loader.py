@@ -3,8 +3,8 @@ import urllib
 import urllib2
 from apps.films.models import Films
 from crawler.core.exceptions import NoSuchFilm
-from crawler.mosfilm_ru.parser import parse_search
-from crawler.robot_start import sane_dict, save_location
+from crawler.locrobots.mosfilm_ru.parser import parse_search
+from crawler.utils.locations_utils import sane_dict, save_location
 
 
 URL_LOAD = ''
@@ -25,7 +25,6 @@ class MosfilmRobot(object):
             raise NoSuchFilm(self.film)
         dict_film = self.get_dict(self.film, film_link)
         save_location(**dict_film)
-
 
     def get_dict(self, film, film_link):
         link = film_link
