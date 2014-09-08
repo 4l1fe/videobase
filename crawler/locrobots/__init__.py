@@ -79,7 +79,7 @@ sites_crawler = {
 sites = sites_crawler.keys()
 
 
-def process_film_on_site(site, film_id):
+def process_film_on_site(site, film_id, url=None):
     locations = []
     try:
         film = Films.objects.get(id=film_id)
@@ -87,7 +87,7 @@ def process_film_on_site(site, film_id):
         print "There is no film in db with such id"
         return None
 
-    loaded_data = sites_crawler[site]['loader'](film).load()
+    loaded_data = sites_crawler[site]['loader'](film).load(url=url)
 
     for data in sites_crawler[site]['parser'].parse(loaded_data['html'], sane_dict, film, url=loaded_data['url']):
         print u"Trying to put data from %s for %s to db" % (site, unicode(data['film']))

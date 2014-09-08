@@ -382,6 +382,16 @@ CELERYBEAT_SCHEDULE = {
         'task': 'send_robots_statistic_to_email',
         'schedule': timedelta(days=1)
     },
+    # News from now.ru
+    'parse_news_from_now_ru': {
+        'task': 'parse_news_from_now_ru',
+        'schedule': timedelta(hours=12)
+    },
+    # News from stream.ru
+    'parse_news_from_stream_ru': {
+        'task': 'parse_news_from_stream_ru',
+        'schedule': timedelta(hours=12)
+    },
     # Do weekly newsletter
     'week_newsletter_schedule': {
         'task': 'week_newsletter',
@@ -405,6 +415,8 @@ HOST = 'vsevi.ru'
 # Another configuration
 POSTER_URL_PREFIX = '_260x360'
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+
+from local_settings import *
 
 if not DEBUG:
     INSTALLED_APPS += (
