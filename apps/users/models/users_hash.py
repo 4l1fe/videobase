@@ -16,7 +16,7 @@ class UsersHash(models.Model):
     hash_type = models.CharField(choices=TYPE_PASSWD_HASH, max_length=255, editable=False, verbose_name=u'Хеш тип')
     # activated = models.BooleanField(default=False, verbose_name=u'Использован')
     created   = models.DateTimeField(auto_now=True, editable=False, verbose_name=u'Дата создания')
-    expired   = models.DateTimeField(default=datetime.datetime.now, editable=False, verbose_name=u'Дата истечения')
+    expired   = models.DateTimeField(editable=False, verbose_name=u'Дата истечения')
 
 
     def __unicode__(self):
