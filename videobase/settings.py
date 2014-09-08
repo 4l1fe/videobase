@@ -416,8 +416,6 @@ HOST = 'vsevi.ru'
 POSTER_URL_PREFIX = '_260x360'
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
-from local_settings import *
-
 if not DEBUG:
     INSTALLED_APPS += (
         'raven.contrib.django.raven_compat',  # may be delete later
