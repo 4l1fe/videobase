@@ -13,5 +13,7 @@ def generate_config_file():
     f = open('robots_config', 'w')
     for robot in Robots.objects.all():
         f.write(create_queue_str(robot.name))
+    f.write(create_queue_str('location_saver')) #Queue for saving locations
+    f.write(create_queue_str('thor')) #Queue for page downloading
     result_file_name = 'robots_config'
     return result_file_name

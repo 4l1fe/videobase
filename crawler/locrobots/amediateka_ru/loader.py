@@ -1,6 +1,6 @@
 # coding: utf-8
 import json
-from crawler.locations_saver import save_location_to_list
+from crawler.locations_saver import save_location_to_locs_dict
 from crawler.tor import simple_tor_get_page
 from apps.films.constants import APP_FILM_SERIAL
 from crawler.utils.locations_utils import save_location, sane_dict
@@ -24,7 +24,10 @@ class Amediateka_robot(object):
         data_site = json.loads(response)['films']
         film = Films.objects.values_list('id', 'name')
         data = film.values('name', 'id')
-        locations = []
+        locations = {
+        'info': [],
+        'type': 'amediateka_ru'
+                }
         for f in data_site:
             for film in data:
                 if f['name'] == film['name']:
@@ -32,9 +35,9 @@ class Amediateka_robot(object):
                     for dict_film in film_data:
                         d = self.film_dict(dict_film, f)
                         save_location(**d)
-                        save_location_to_list(locations, **d)
+                        save_location_to_locs_dict(locations, **d)
                     break
-        return site_name, locations
+        return locations
 
     def get_serials_data(self):
         search_serials_url = '/hbo/api/v1/serials.json?'
