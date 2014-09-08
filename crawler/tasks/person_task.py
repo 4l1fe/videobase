@@ -5,11 +5,9 @@ from django.core.files import File
 
 from apps.films.models import Persons
 
-from crawler.datarobots.kinopoisk_ru.parse_page import get_photo
+from crawler.datarobots.kinopoisk_ru.parse_page import get_photo, traceback_own
 from crawler.tasks.utils import robot_task
 from crawler.tor import simple_tor_get_page
-
-from utils.common import traceback_own
 
 
 __author__ = 'vladimir'
