@@ -8,5 +8,11 @@ def kinopoisk_parse_one_film(kinopoisk_id_str, name):
     '''
     Task for parsing particual kinopoisk id
     '''
+
+    result_dict = {
+    'info': [],
+    'type': 'kinopoisk_ru'
+            }
     kinopoisk_id = kinopoisk_id_str if type(kinopoisk_id_str) is int else int(kinopoisk_id_str)
     parse_from_kinopoisk(kinopoisk_id=kinopoisk_id, name=name)
+    return result_dict
