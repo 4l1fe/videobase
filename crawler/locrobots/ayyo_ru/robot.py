@@ -1,7 +1,7 @@
 # coding: utf-8
 import json
 import urllib
-from crawler.locations_saver import save_location_to_list
+from crawler.locations_saver import save_location_to_locs_dict
 
 HOST = 'www.ayyo.ru'
 URL_SEARCH = 'api/search/live/?{}'
@@ -35,7 +35,7 @@ class AyyoRobot(object):
             price = float(json.loads(film_response)['movies']['data'][str(ayyo_film_id)]['streaming_price'])
             d = self.film_dict(self.film, film_link, price)
             save_location(**d)
-            save_location_to_list(locations, **d)
+            save_location_to_locs_dict(locations, **d)
         except Exception, e:
             pass
         return site_name, locations

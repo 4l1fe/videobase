@@ -81,6 +81,10 @@ def get_film_trailer(film):
 
 def find_youtube_trailer(film):
 
+    res_dict = {
+        'info': [],
+        'type': 'youtube_com'
+                }
     try:
         ytchk = YoutubeTrailerCheck.objects.get(film=film)
     except YoutubeTrailerCheck.DoesNotExist:
@@ -90,7 +94,7 @@ def find_youtube_trailer(film):
 
     if ytchk.was_successfull:
         print u"Trailer already set"
-        return None
+        return res_dict
     else:
         for delta, delay in delays:
             if timezone.now().date() - film.release_date < delta:
@@ -101,7 +105,7 @@ def find_youtube_trailer(film):
                         trailer_name, link = trtuple
 
                         if not is_correct_trailer_title(trailer_name, film):
-                            return None
+                            return res_dict
 
                         fe = FilmExtras(film=film,
                                         type=APP_FILM_TYPE_ADDITIONAL_MATERIAL_TRAILER,
@@ -117,4 +121,4 @@ def find_youtube_trailer(film):
                         
                     ytchk.last_check = timezone.now()
                     ytchk.save()
-                return None
+                return res_dict

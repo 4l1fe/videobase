@@ -1,6 +1,6 @@
 # coding: utf-8
 from apps.films.models import Films
-from crawler.locations_saver import save_location_to_list
+from crawler.locations_saver import save_location_to_locs_dict
 
 from crawler.locrobots.ivi_ru.loader import IVI_Loader
 from crawler.locrobots.ivi_ru.parsers import ParseFilmPage
@@ -77,21 +77,3 @@ sites_crawler = {
 }
 
 sites = sites_crawler.keys()
-
-
-def process_film_on_site(site, film_id, url=None):
-    locations = []
-    try:
-        film = Films.objects.get(id=film_id)
-    except Films.DoesNotExist:
-        print "There is no film in db with such id"
-        return None
-
-    loaded_data = sites_crawler[site]['loader'](film).load(url=url)
-
-    for data in sites_crawler[site]['parser'].parse(loaded_data['html'], sane_dict, film, url=loaded_data['url']):
-        print u"Trying to put data from %s for %s to db" % (site, unicode(data['film']))
-        save_location(**data)
-        save_location_to_list(locations, **data)
-
-    return site, locations
