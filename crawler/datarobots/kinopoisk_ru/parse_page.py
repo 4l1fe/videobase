@@ -209,7 +209,7 @@ def extract_facts_from_dump(page_dump):
     tds = info_table.select("td.type")
     data_dict = dict([(f.text.strip(), s) for f, s in [td.parent.select("td") for td in tds]])
 
-    actor_list = soup.select("div#actorList")[0]
+    actor_list = soup.find('div', {'id': 'actorList'}).find_all('ul')[0]
     actors_n_l = [(a.text, a.attrs['href']) for a in actor_list.find_all('a')
                   if not 'film' in a.attrs['href']]
 
