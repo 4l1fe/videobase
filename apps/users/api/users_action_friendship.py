@@ -14,19 +14,6 @@ class UsersFriendshipView(APIView):
 
     permission_classes = (IsAuthenticated, )
 
-    def _get_avatar_url(self, u):
-        try:
-            a = UsersPics.objects.get(user=u).image
-            return a.storage.url(a.name)
-        except:
-            return ''
-
-    def _update_or_create_feed(self, type_, obj_id):
-        if Feed.objects.filter(user=self.request.user, type=type_, obj_id=obj_id).exists():
-            Feed.objects.filter(user=self.request.user, type=type_, obj_id=obj_id).update(obj_id=obj_id)
-        else:
-            Feed.objects.create(user=self.request.user, type=type_, obj_id=obj_id)
-
     def get(self, request, user_id, format=None, *args, **kwargs):
         try:
             user_friend = User.objects.get(pk=user_id)
@@ -44,13 +31,6 @@ class UsersFriendshipView(APIView):
             'rel_type': APP_USER_REL_TYPE_FRIENDS
         }
 
-        # avatar_url = self._get_avatar_url(user_friend)
-        # obj_val = {
-        #     'id': user_friend.id,
-        #     'name': user_friend.username,
-        #     'avatar': avatar_url
-        # }
-
         try:
             ur = UsersRels(**ur_fields)
             ur.rel_type = APP_USER_REL_TYPE_FRIENDS
@@ -59,10 +39,12 @@ class UsersFriendshipView(APIView):
             UsersRels.objects.filter(**ur_fields).update(rel_type=APP_USER_REL_TYPE_FRIENDS)
 
         if UsersRels.objects.filter(**ur_fr_fields).exists():
-            Feed.objects.filter(user=request.user, type=USER_ASK, obj_id=request.user.id).delete()
-            self._update_or_create_feed(USER_FRIENDSHIP, request.user.id)
+            Feed.objects.filter(user=request.user, type=USER_ASK, obj_id=user_friend.id).delete()
+            feed, created = Feed.objects.get_or_create(user=self.request.user, type=USER_FRIENDSHIP, obj_id=user_friend.id)
+            if not created: feed.save()
         else:
-            self._update_or_create_feed(USER_ASK, request.user.id)
+            feed, created = Feed.objects.get_or_create(user=self.request.user, type=USER_ASK, obj_id=user_friend.id)
+            if not created: feed.save()
 
         return Response(status=status.HTTP_200_OK)
 
@@ -73,7 +55,7 @@ class UsersFriendshipView(APIView):
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         UsersRels.objects.filter(user=request.user, user_rel=user_friend).update(rel_type=APP_USER_REL_TYPE_NONE)
-        Feed.objects.filter(user=request.user, type__in=[USER_FRIENDSHIP, USER_ASK], obj_id=user_friend).delete()
+        Feed.objects.filter(user=request.user, type__in=[USER_FRIENDSHIP, USER_ASK], obj_id=user_friend.id).delete()
 
         return Response(DEFAULT_REST_API_RESPONSE,status=status.HTTP_200_OK)
         

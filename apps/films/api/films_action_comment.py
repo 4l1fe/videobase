@@ -53,7 +53,6 @@ class ActCommentFilmView(APIView):
 
         return o_content
 
-
     def post(self, request, film_id, format=None, *args, **kwargs):
         form = CommentForm(request.DATA)
         if form.is_valid():
@@ -70,13 +69,7 @@ class ActCommentFilmView(APIView):
             }
 
             o_com = Comments.objects.create(**filter_)
-            # obj_val = {
-            #     'id': o_com.id,
-            #     'text': o_com.text,
-            #     'film': {'id': o_content.film_id, 'name': o_content.name}
-            # }
-
-            Feed.objects.create(user=request.user, type=FILM_COMMENT, obj_id=o_com.id)
+            Feed.objects.create(user=request.user, type=FILM_COMMENT, obj_id=o_com.id, child_obj_id=o_content.film_id)
 
             return Response(DEFAULT_REST_API_RESPONSE, status=status.HTTP_200_OK)
 

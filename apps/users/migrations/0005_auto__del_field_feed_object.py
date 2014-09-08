@@ -12,9 +12,6 @@ class Migration(SchemaMigration):
         db.delete_column(u'users_feed', 'object')
 
 
-        # Changing field 'Feed.obj_id'
-        db.alter_column('users_feed', 'obj_id', self.gf('django.db.models.fields.IntegerField')(default=0))
-
     def backwards(self, orm):
 
         # User chose to not deal with backwards NULL issues for 'Feed.object'
@@ -25,9 +22,6 @@ class Migration(SchemaMigration):
                       self.gf('jsonfield.fields.JSONField')(),
                       keep_default=False)
 
-
-        # Changing field 'Feed.obj_id'
-        db.alter_column('users_feed', 'obj_id', self.gf('django.db.models.fields.IntegerField')(null=True))
 
     models = {
         u'auth.group': {
@@ -68,9 +62,10 @@ class Migration(SchemaMigration):
         },
         'users.feed': {
             'Meta': {'object_name': 'Feed'},
+            'child_obj_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'obj_id': ('django.db.models.fields.IntegerField', [], {}),
+            'obj_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'text': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'type': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']", 'null': 'True', 'blank': 'True'})

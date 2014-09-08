@@ -35,7 +35,7 @@ def post_save_handler(sender, **kwargs):
             #         'price': location.price, 'price_type': location.price_type
             #     }
             # }
-            Feed.objects.create(type=FILM_O, obj_id=film.id)
+            Feed.objects.create(type=FILM_O, obj_id=film.id, child_obj_id=location.id)
 
             # Событие появление подписки на персону
             persons = Persons.objects.filter(pf_persons_rel__film=film.id).\
@@ -47,4 +47,4 @@ def post_save_handler(sender, **kwargs):
                 #     'photo': person.get_path_to_photo, 'type': person.p_type,
                 #     'film': {'id': film.id, 'name': film.name}
                 # }
-                Feed.objects.create(type=PERSON_O, obj_id=person.id)
+                Feed.objects.create(type=PERSON_O, obj_id=person.id, child_obj_id=film.id)

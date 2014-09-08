@@ -27,8 +27,7 @@ class PersonActionAPIView(APIView):
 
             if subscribed:
                 feed, created = Feed.objects.get_or_create(user=self.request.user, type=PERSON_SUBSCRIBE, obj_id=person.id)
-                if not created:
-                    feed.save()
+                if not created: feed.save()
             else:
                 Feed.objects.filter(user=request.user, type=PERSON_SUBSCRIBE, obj_id=person.id).delete()
 
