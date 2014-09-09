@@ -1,11 +1,17 @@
 # coding: utf-8
+
 from __future__ import absolute_import
+
+import datetime
+from bs4 import BeautifulSoup
+
 from django.core.files import File
 from django.utils import timezone
 
 from apps.robots.models import Robots
 from apps.films.models import Persons
 from apps.films.models import Films
+
 from crawler.datarobots.kinopoisk_ru.parse_actors import PersoneParser
 from crawler.datarobots.kinopoisk_ru.parse_page import get_photo
 from crawler.datarobots.kinopoisk_ru.kinopoisk_poster import poster_robot_wrapper
@@ -16,10 +22,9 @@ from crawler.tasks.kinopoisk_one_page import kinopoisk_parse_one_film
 from crawler.tor import simple_tor_get_page
 from crawler.tasks.utils import robot_task, update_robot_state_film_id
 from videobase.celery import app
-import data.film_facts.checker
 
-import datetime
-from bs4 import BeautifulSoup
+import data.film_facts.checker
+from utils.common import traceback_own
 
 KINOPOISK_LIST_FILMS_URL = "http://www.kinopoisk.ru/top/navigator/m_act%5Begenre%5D/999/m_act%5Bnum_vote%5D/10/m_act%5Brating%5D/1:/m_act%5Bis_film%5D/on/m_act%5Bis_mult%5D/on/order/year/page/{}/#results"
 information_robots = ['kinopoik_robot', 'imdb_robot']
@@ -40,20 +45,21 @@ def kinopoisk_films(pages):
             soup = BeautifulSoup(html)
             films_list = soup.findAll('div', attrs={'class': 'name'})
             for film in films_list:
+                kinopoisk_id = int(film.a.get('href').split('/')[4])
+
                 name = film.a.text
                 print u"Film name: {0}".format(name)
-                kinopoisk_id = int(film.a.get('href').split('/')[4])
                 if u'(сериал)' in name:
                     name = name.replace(u'(сериал)', u'')
+
                 film, flag = Films.objects.get_or_create(kinopoisk_id=kinopoisk_id,
                                                     defaults={'type': '', 'name':name})
                 print u"Film: {0} {1}".format(film.name, film.kinopoisk_id)
+
                 kinopoisk_parse_one_film.apply_async((film.kinopoisk_id, film.name))
                 persons_films_update_with_indexes.apply_async((film.kinopoisk_id,))
     except Exception, e:
-        import traceback
-        traceback.print_exc()
-
+        traceback_own(e)
 
 
 @app.task(name='kinopoisk_set_poster')
@@ -66,7 +72,7 @@ def kinopoisk_set_paster(*args, **kwargs):
         poster_robot_wrapper(film_id)
 
     else:
-        print u'Skipping robot %s' % robot.name
+        print u'Skipping robot {name}'.format(name=robot.name)
 
 
 @app.task(name='imdb_rating_update')
@@ -74,6 +80,11 @@ def imdb_robot_start(*args, **kwargs):
     process_all()
 
 
+def film_at_least_years_old(film, years):
+    '''
+    Returns true if @film less than @years old
+    '''
+    return timezone.now().date() - film.release_date < timezone.timedelta(days=365 * years)
 
 
 def film_checked_on_kp_at_least_days_ago(film, days):
@@ -89,13 +100,14 @@ def film_checked_on_kp_at_least_days_ago(film, days):
 @app.task(name='kinopoisk_refresher')
 def create_due_refresh_tasks():
     for film in Films.objects.all():
-
         if film_at_least_years_old(film, years=2):
             if film_checked_on_kp_at_least_days_ago(film, days=7):
                 kinopoisk_parse_one_film.apply_async((film.kinopoisk_id, film.name))
+
         elif film_at_least_years_old(film, years=4):
             if film_checked_on_kp_at_least_days_ago(film, days=30):
                 kinopoisk_parse_one_film.apply_async((film.kinopoisk_id, film.name))
+
         else:
             if film_checked_on_kp_at_least_days_ago(film, days=180):
                 kinopoisk_parse_one_film.apply_async((film.kinopoisk_id, film.name))
@@ -145,4 +157,3 @@ def check_and_correct_tasks():
 def person_check_and_correct_tasks():
     for person in Persons.objects.all():
         check_and_correct_one_person.apply_async(person.id)
-
