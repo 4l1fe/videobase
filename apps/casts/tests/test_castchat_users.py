@@ -5,7 +5,7 @@ from rest_framework.reverse import reverse
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APISimpleTestCase
 
-from apps.casts.models import CastsChatsMsgs
+from apps.casts.models import CastsChatsMsgs, CastsChats
 from apps.casts.tests.factories import UserCastsFactory, UserFactory, CastsFactory, CastsChatFactory
 
 from apps.users.models.api_session import SessionToken, UsersApiSessions
@@ -17,8 +17,8 @@ class CastChatMsgSendTestCase(APISimpleTestCase):
         self.user = UserFactory.create()
         self.cast = CastsFactory.create(tags=[])
         self.user_cast = UserCastsFactory(user=self.user, cast=self.cast)
-        
-        self.cast_chat = CastsChatFactory.create(cast=self.cast)
+
+        self.cast_chat = CastsChatFactory._get_or_create(CastsChats, cast=self.cast, status=1)
 
         token = Token.objects.get(user=self.user)
         s_token = SessionToken.objects.create(user=self.user)
@@ -26,7 +26,7 @@ class CastChatMsgSendTestCase(APISimpleTestCase):
         self.headers = s_token.key
 
     def test_send(self):
-        COMM_TEXT = 'Commentary text'
+        COMM_TEXT = u'Commentary text'
         response = self.client.post(
             reverse('castchat_send_view', kwargs={'cast_id': self.cast_chat.id, 'format': 'json'}),
             HTTP_X_MI_SESSION=self.headers, data={'text': COMM_TEXT})
@@ -35,9 +35,3 @@ class CastChatMsgSendTestCase(APISimpleTestCase):
 
         ccm = CastsChatsMsgs.objects.get(cast__id=self.cast_chat.cast.id)
         self.assertEqual(ccm.text, COMM_TEXT)
-
-    def tearDown(self):
-        UsersApiSessions.objects.all().delete()
-        SessionToken.objects.all().delete()
-        Token.objects.all().delete
-        CastsChatsMsgs.objects.all().delete()

@@ -5,7 +5,7 @@ from rest_framework.reverse import reverse
 from rest_framework.test import APISimpleTestCase
 from rest_framework.authtoken.models import Token
 
-from apps.casts.models import UsersCasts
+from apps.casts.models import UsersCasts, CastsChats
 from apps.casts.tests.factories import UserFactory, CastsFactory, CastsChatFactory
 
 from apps.users.models.api_session import SessionToken, UsersApiSessions
@@ -17,7 +17,7 @@ class RatingTestCase(APISimpleTestCase):
         self.user = UserFactory.create()
         self.cast = CastsFactory.create(tags=[])
 
-        self.cast_chat = CastsChatFactory.create(cast=self.cast)
+        self.cast_chat = CastsChatFactory._get_or_create(CastsChats, cast=self.cast, status=1)
 
         token = Token.objects.get(user=self.user)
         s_token = SessionToken.objects.create(user=self.user)
