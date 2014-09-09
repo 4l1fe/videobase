@@ -49,8 +49,10 @@ class vbFeedElement(serializers.ModelSerializer):
                               'description': film.description}
                 elif obj.type == FILM_NOTWATCH:
                     film = Films.objects.get(pk=obj.obj_id)
+                    poster = FilmExtras.get_poster_by_film(film.fe_film_rel.all())
                     object_ = {'id': film.id,
-                              'name': film.name}
+                              'name': film.name,
+                              'poster': poster}
                 elif obj.type == FILM_COMMENT:
                     comment = Comments.objects.get(pk=obj.obj_id)
                     film = Films.objects.get(pk=obj.child_obj_id)
@@ -119,12 +121,3 @@ class vbFeedElement(serializers.ModelSerializer):
     class Meta:
         model = Feed
         fields = ('user', 'created', 'type', 'object', 'text')
-
-
-if __name__ == '__main__':
-    from datetime import datetime
-    start = datetime.now()
-    data = vbFeedElement(Feed.objects.filter(user_id=1), many=True).data
-    end = datetime.now()
-    print('taken time:'+str((end-start).sec)
-    cache.set('result', data, 120)
