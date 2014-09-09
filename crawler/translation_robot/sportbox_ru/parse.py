@@ -15,6 +15,8 @@ def parse_translation():
         url = HOST + '/video?date={}'.format(date)
         content = requests.get(url).content
         soup = BeautifulSoup(content)
+
+        #Список трансляций на один день
         a_translation = soup.findAll('a', attrs={'class': 'sb_trans_preview_img'})
 
         for translation in a_translation:
@@ -23,6 +25,7 @@ def parse_translation():
             content = requests.get(translation_url).content
             soup = BeautifulSoup(content)
 
+            #Получаем код вставки плеера
             share_link = soup.find('textarea', attrs={'class': 'share_link_content'}).next.prettify()
 
             name_translation = soup.find('h1', attrs={'itemprop': 'name'}).text
