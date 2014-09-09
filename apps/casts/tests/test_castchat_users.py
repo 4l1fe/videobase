@@ -1,5 +1,4 @@
 #coding: utf-8
-#coding: utf-8
 from rest_framework.test import APISimpleTestCase
 from apps.casts.tests.factories import UserCastsFactory, UserFactory, CastsFactory, CastsChatFactory 
 from rest_framework.reverse import reverse
@@ -47,5 +46,3 @@ class CastChatMsgSendTestCase(APISimpleTestCase):
         Token.objects.all().delete
         CastsChatsMsgs.objects.all().delete()
 
-
-        

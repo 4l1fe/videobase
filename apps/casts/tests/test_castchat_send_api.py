@@ -45,5 +45,3 @@ class CastChatMsgSendTestCase(APISimpleTestCase):
         Token.objects.all().delete
         CastsChatsMsgs.objects.all().delete()
 
-
-
