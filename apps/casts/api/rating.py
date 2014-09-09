@@ -1,12 +1,13 @@
 # coding: utf-8
 
+from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 
 from apps.casts.models import Casts, UsersCasts 
 from apps.casts.forms import CastRatingForm
-from rest_framework.permissions import IsAuthenticated
+
 
 #############################################################################################################
 class CastsRatingView(APIView):
@@ -19,7 +20,6 @@ class CastsRatingView(APIView):
     def get(self, request, cast_id, *args, **kwargs):
         try:
             user_cast = UsersCasts.objects.get(cast__id=cast_id, user__id=request.user.id)
-
             return Response({'rating': user_cast.rating}, status=status.HTTP_200_OK)
 
         except Casts.DoesNotExist:
@@ -29,7 +29,6 @@ class CastsRatingView(APIView):
         try:
             user_cast = UsersCasts.objects.get(cast__id=cast_id, user__id=request.user.id)
         except UsersCasts.DoesNotExist:
-
             try:
                 cast = Casts.objects.get(pk=cast_id)
             except Casts.DoesNotExist:
@@ -38,7 +37,6 @@ class CastsRatingView(APIView):
             user_cast = UsersCasts(cast=cast, user=request.user)
 
             form = CastRatingForm(request.POST)
-
             if form.is_valid():
                 user_cast.rating = form.cleaned_data['rating']
                 user_cast.save()
@@ -46,14 +44,13 @@ class CastsRatingView(APIView):
 
             return Response(form.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
     def delete(self, request, cast_id, *args, **kwargs):
         try:
-            user_cast = UserCasts.objects.get(cast__id=cast_id, user__id = request.user.id)
+            user_cast = UsersCasts.objects.get(cast__id=cast_id, user__id=request.user.id)
             user_cast.rating = None
             user_cast.save()
+
             return Response({'rating': user_cast.rating}, status=status.HTTP_200_OK)
 
         except Casts.DoesNotExist:
             return Response({}, status=status.HTTP_404_NOT_FOUND)
-
