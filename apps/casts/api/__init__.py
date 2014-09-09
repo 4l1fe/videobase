@@ -1,3 +1,5 @@
+# coding: utf-8
+
 from apps.casts.api.list import CastsListView
 from apps.casts.api.info import CastsInfoView
 from apps.casts.api.extras import CastsExtraView
