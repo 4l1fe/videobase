@@ -1,5 +1,4 @@
 # coding: utf-8
-
 from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APISimpleTestCase
@@ -8,7 +7,7 @@ from rest_framework.authtoken.models import Token
 from apps.casts.models import Casts
 from apps.casts.tests.factories import UserFactory, CastsFactory
 
-from apps.users.models.api_session import SessionToken, UsersApiSessions
+from apps.users.models import SessionToken
 
 
 class CastListTestCase(APISimpleTestCase):
@@ -19,7 +18,6 @@ class CastListTestCase(APISimpleTestCase):
 
         token = Token.objects.get(user=self.user)
         s_token = SessionToken.objects.create(user=self.user)
-        UsersApiSessions.objects.create(token=s_token)
         self.headers = s_token.key
 
     def test_list(self):

@@ -29,7 +29,7 @@ BACKUP_PATH = os.path.join(BASE_PATH, '..', '.backup')
 SECRET_KEY = '7-dsc0--i_ej94w9as#-5p_5a)ql*9o80v1rs9krx!_-9%^b5$'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 TEMPLATE_DEBUG = DEBUG
 
@@ -99,7 +99,6 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'utils.middlewares.AuthTokenMiddleware',
     'utils.middlewares.ThreadLocals',
     'utils.middlewares.ExceptionMiddleware'
 )
@@ -159,9 +158,15 @@ AUTHENTICATION_BACKENDS = (
     'social_auth.backends.facebook.FacebookBackend',
     'social_auth.backends.contrib.vk.VKOAuth2Backend',
     'social_auth.backends.google.GoogleOAuth2Backend',
-
     # Django
     'django.contrib.auth.backends.ModelBackend',
+)
+
+# Backends for template auth
+TEMPLATE_AUTHENTICATION_BACKENDS = (
+    # Auth
+    'apps.users.backends.CookiesSessionAuthentication',
+    'apps.users.backends.CookiesTokenAuthentication',
 )
 
 ###########################################################
@@ -249,7 +254,6 @@ SOCIAL_AUTH_PIPELINE = (
 
 # In minutes
 API_SESSION_EXPIRATION_TIME = 15
-
 
 ###########################################################
 CELERYBEAT_SCHEDULE = {

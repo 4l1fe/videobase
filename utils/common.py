@@ -1,11 +1,12 @@
 # coding: utf-8
-
 import os
 import sys
 import traceback
 import random
 import string
 import urllib
+from PIL import Image
+
 from PIL import Image
 
 
