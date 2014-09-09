@@ -1,8 +1,11 @@
-#coding: utf-8
+# coding: utf-8
+
 from django.conf.urls import patterns, url
 from rest_framework.urlpatterns import format_suffix_patterns
 
-from apps.casts.api import CastsListView, CastsInfoView, CastsExtraView, CastsSubscribeView , CastsChatSendView, CastsRatingView, CastsChatsMsgsView , CastsChatsUsersView
+from apps.casts.api import CastsListView, CastsInfoView, CastsExtraView, CastsSubscribeView, \
+    CastsChatSendView, CastsRatingView, CastsChatsMsgsView, CastsChatsUsersView
+
 
 v1_api_patterns = patterns('',
     url(r'^v1/casts/list', CastsListView.as_view(), name='cast_list_view'),
@@ -16,4 +19,3 @@ v1_api_patterns = patterns('',
 )
 
 urlpatterns = format_suffix_patterns(v1_api_patterns, suffix_required=True)
-

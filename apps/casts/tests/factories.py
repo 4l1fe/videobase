@@ -1,10 +1,11 @@
-#coding: utf-8
+# coding: utf-8
+
 import factory
 from django.utils import timezone
-from apps.casts.models import Casts, AbstractCastsTags, CastsExtras, UsersCasts, CastsChatsMsgs, CastsChats
-from apps.films.tests.factories import FilmsExtrasFactory, UserFactory
 
-from django.utils import timezone
+from apps.films.tests.factories import FilmsExtrasFactory, UserFactory
+from apps.casts.models import Casts, AbstractCastsTags, CastsExtras, UsersCasts, CastsChatsMsgs, CastsChats
+
 
 class CastsFactory(factory.DjangoModelFactory):
     FACTORY_FOR = Casts
@@ -18,27 +19,27 @@ class CastsFactory(factory.DjangoModelFactory):
     pg_rating   = 18
 
     @factory.post_generation
-    def tags(self,create,extracted,**kwargs):
-
+    def tags(self, create, extracted, **kwargs):
         if not create:
             return
 
         if extracted:
             for tag in extracted:
                 self.tags.add(tag)
-        
+
 
 class TagFactory(factory.DjangoModelFactory):
     FACTORY_FOR = AbstractCastsTags
-    name      = 'Имя тега'
-    name_orig = 'Tag Name'
+    name        = 'Имя тега'
+    name_orig   = 'Tag Name'
     description = 'Tag description'
-    
-    
+
+
 class CastsExtrasFactory(factory.DjangoModelFactory):
     FACTORY_FOR = CastsExtras
     cast        = factory.SubFactory(CastsFactory)
     extra       = factory.SubFactory(FilmsExtrasFactory)
+
 
 class UserCastsFactory(factory.DjangoModelFactory):
     FACTORY_FOR = UsersCasts
@@ -47,17 +48,16 @@ class UserCastsFactory(factory.DjangoModelFactory):
     subscribed  = timezone.now()
     rating      = 1
 
+
 class CastsChatFactory(factory.DjangoModelFactory):
     FACTORY_FOR = CastsChats
-    cast = factory.SubFactory(CastsFactory)
-    status = 1
+    cast        = factory.SubFactory(CastsFactory)
+    status      = 1
 
-    
+
 class CastsChatsMsgsFactory(factory.DjangoModelFactory):
-
     FACTORY_FOR = CastsChatsMsgs
-    cast = factory.SubFactory(CastsFactory)
-    created = timezone.now()
-    user = factory.SubFactory(UserFactory)
-    text = "Factory generated text"
-
+    cast        = factory.SubFactory(CastsFactory)
+    created     = timezone.now()
+    user        = factory.SubFactory(UserFactory)
+    text        = "Factory generated text"

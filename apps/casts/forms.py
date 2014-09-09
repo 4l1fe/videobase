@@ -1,6 +1,8 @@
 # coding: utf-8
+
 from django.forms import Form
 from django.forms import fields
+
 
 class CastChatSendForm(Form):
     """
@@ -29,9 +31,8 @@ class CastsListFormBase(Form):
     price_high = fields.IntegerField(min_value=0, required=False)
     start_in   = fields.IntegerField(min_value=0, required=False)
     subscribed = fields.BooleanField(required=False)
-    
-    
-    
+
+
     def __init__(self, *args, **kwargs):
         super(CastsListFormBase, self).__init__(*args, **kwargs)
 
@@ -40,16 +41,17 @@ class CastsListFormBase(Form):
                 if self.fields[k].required == False:
                     self.fields[k].required = True
 
-
     class Meta:
-        fields = ('id', 'text', 'pg_rating', 'status', 'service', 'price_type','price_low','price_high','start_in','subscribed')
+        fields = ('id', 'text', 'pg_rating', 'status', 'service',
+                  'price_type', 'price_low', 'price_high', 'start_in',
+                  'subscribed')
 
 
 class CastsChatGetForm(Form):
     id_low  = fields.IntegerField(min_value=0, required=False)
     id_high = fields.IntegerField(min_value=0, required=False)
     limit   = fields.IntegerField(min_value=0, required=False)
-    
+
     def __init__(self, *args, **kwargs):
         super(CastsListFormBase, self).__init__(*args, **kwargs)
 
@@ -58,10 +60,5 @@ class CastsChatGetForm(Form):
                 if self.fields[k].required == False:
                     self.fields[k].required = True
 
-
     class Meta:
         fields = ('id_low', 'id_high', 'limit')
-
-
-
-        
