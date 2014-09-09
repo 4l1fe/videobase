@@ -1,5 +1,4 @@
 # coding: utf-8
-
 from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APISimpleTestCase
@@ -8,7 +7,7 @@ from rest_framework.authtoken.models import Token
 from apps.casts.models import CastsChatsMsgs, CastsChats
 from apps.casts.tests.factories import UserFactory, CastsFactory, CastsChatFactory
 
-from apps.users.models.api_session import SessionToken, UsersApiSessions
+from apps.users.models import SessionToken
 
 
 class CastChatMsgSendTestCase(APISimpleTestCase):
@@ -21,7 +20,6 @@ class CastChatMsgSendTestCase(APISimpleTestCase):
 
         token = Token.objects.get(user=self.user)
         s_token = SessionToken.objects.create(user=self.user)
-        UsersApiSessions.objects.create(token=s_token)
         self.headers = s_token.key
 
 
@@ -37,7 +35,6 @@ class CastChatMsgSendTestCase(APISimpleTestCase):
         self.assertEqual(ccm.text, COMM_TEXT)
 
     def tearDown(self):
-        UsersApiSessions.objects.all().delete()
         SessionToken.objects.all().delete()
-        Token.objects.all().delete
+        Token.objects.all().delete()
         CastsChatsMsgs.objects.all().delete()
