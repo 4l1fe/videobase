@@ -3,7 +3,6 @@ from rest_framework.test import APISimpleTestCase
 from apps.casts.tests.factories import TagFactory, CastsFactory, CastsExtrasFactory
 from rest_framework.reverse import reverse
 from rest_framework import status
-import ipdb
 
 class CastTestCase(APISimpleTestCase):
 

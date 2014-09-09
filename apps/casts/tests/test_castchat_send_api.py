@@ -5,7 +5,6 @@ from rest_framework.reverse import reverse
 from rest_framework import status
 
 from apps.casts.models import CastsChatsMsgs
-import ipdb
 
 from rest_framework.authtoken.models import Token
 from apps.users.models.api_session import SessionToken, UsersApiSessions
