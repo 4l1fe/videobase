@@ -64,7 +64,7 @@ class ActSubscribeFilmView(APIView):
         except Exception as e:
             try:
                 UsersFilms.objects.filter(**filter_).update(subscribed=subscribed)
-                feed, created = Feed.objects.create(user=request.user, type=FILM_SUBSCRIBE, obj_id=o_film.id)
+                feed, created = Feed.objects.get_or_create(user=request.user, type=FILM_SUBSCRIBE, obj_id=o_film.id)
                 if not created: feed.save()
             except Exception as e:
                 return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)

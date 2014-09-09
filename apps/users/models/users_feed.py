@@ -38,15 +38,13 @@ class Feed(models.Model):
     def get_feeds_by_user(cls, user_id, uf=[], up=[], offset=0, limit=APP_USERS_API_DEFAULT_PER_PAGE, count=False, *args, **kwargs):
         sql = """("users_feed"."user_id"=%s OR "users_feed"."user_id" IS NULL) AND (CASE
             WHEN "users_feed"."user_id" IS NULL AND "users_feed"."type"=%s THEN
-              CAST(coalesce(object->>'id', '0') AS integer)=ANY(%s::integer[])
+              CAST(coalesce(obj_id, '0') AS integer)=ANY(%s::integer[])
             WHEN "users_feed"."user_id" IS NULL AND "users_feed"."type"=%s THEN
-              CAST(coalesce(object->>'id', '0') AS integer)=ANY(%s::integer[])
+              CAST(coalesce(obj_id, '0') AS integer)=ANY(%s::integer[])
             ELSE true END)"""
 
-        o_feed = cls.objects.extra(
-            where=[sql],
-            params=[user_id, FILM_O, cls.list_to_str(uf), PERSON_O, cls.list_to_str(up)]
-        )
+        o_feed = cls.objects.extra(where=[sql],
+                                   params=[user_id, FILM_O, cls.list_to_str(uf), PERSON_O, cls.list_to_str(up)])
         result = o_feed.order_by('-created')[offset:(limit + offset)]
 
         if count:
