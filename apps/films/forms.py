@@ -154,3 +154,4 @@ class PersonFilmographyApiForm(Form):
            kwargs['data']['type'] = 'all'
 
         super(PersonFilmographyApiForm, self).__init__(*args, **kwargs)
+        

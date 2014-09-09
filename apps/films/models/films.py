@@ -21,6 +21,7 @@ class FilmManager(models.Manager):
 class Films(models.Model):
     name             = models.CharField(max_length=255, db_index=True, blank=False, verbose_name=u'Название фильма')
     type             = models.CharField(max_length=255, db_index=True, choices=APP_FILM_FILM_TYPES, verbose_name=u'Тип фильма')
+    world_release_date = models.DateField(null=True, blank=True, db_index=True, verbose_name=u'Мировая дата выхода')
     release_date     = models.DateField(null=True, blank=True, db_index=True, verbose_name=u'Дата выхода')
     duration         = models.IntegerField(null=True, blank=True, verbose_name=u'Продолжительность фильма')
     budget           = models.IntegerField(null=True, blank=True, verbose_name=u'Бюджет фильма')
@@ -45,8 +46,8 @@ class Films(models.Model):
     persons     = models.ManyToManyField('Persons', through='PersonsFilms', verbose_name=u'Персоны', related_name='persons')
     was_shown     = models.BooleanField(default=False, verbose_name=u'Фильм отображался в новинках')
     search_index = VectorField()
-    
-    
+
+
     get_film_type = FilmManager()
     objects = models.Manager()
     search_manager = SearchManager(
