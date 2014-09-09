@@ -41,3 +41,11 @@ class CastChatMsgSendTestCase(APISimpleTestCase):
 
         self.assertEqual(ccm.text, COMM_TEXT)
 
+    def tearDown(self):
+        UsersApiSessions.objects.all().delete()
+        SessionToken.objects.all().delete()
+        Token.objects.all().delete
+        CastsChatsMsgs.objects.all().delete()
+
+
+        
