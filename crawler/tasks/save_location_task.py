@@ -1,4 +1,5 @@
 # coding: utf-8
+
 from crawler.utils.locations_utils import save_location
 from videobase.celery import app
 
