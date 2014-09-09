@@ -247,7 +247,6 @@ SOCIAL_AUTH_PIPELINE = (
     'social_auth.backends.pipeline.social.load_extra_data',
 )
 
-
 # In minutes
 API_SESSION_EXPIRATION_TIME = 15
 
@@ -326,13 +325,11 @@ CELERYBEAT_SCHEDULE = {
         'task': 'film_info_check_and_correct',
         'schedule': timedelta(days=7),
     },
-
-     # Persons check and correct
+    # Persons check and correct
     'persons_check_and_correct': {
         'task': 'persons_check_and_correct',
         'schedule': timedelta(days=7),
     },
-
     # Checking locations for new films weekly
     'age_weighted_robot_launch_task_weekly': {
         'task': 'age_weighted_robot_launch',
@@ -345,7 +342,6 @@ CELERYBEAT_SCHEDULE = {
         'schedule': timedelta(days=31),
         'args': (3,)
     },
-
     # Checking locations for aged films yearly
     'age_weighted_robot_launch_task_six_month': {
         'task': 'age_weighted_robot_launch',
@@ -361,7 +357,7 @@ CELERYBEAT_SCHEDULE = {
         'task': 'refresh_sitemap',
         'schedule': timedelta(days=14)
     },
-     # Parsing videos from YouTubeMoviesRU
+    # Parsing videos from YouTubeMoviesRU
     'parse_you_tube_movies_ru': {
         'task': 'parse_you_tube_movies_ru',
         'schedule': timedelta(days=1)
@@ -371,7 +367,6 @@ CELERYBEAT_SCHEDULE = {
         'task': 'consolidate_rating',
         'schedule': timedelta(days=1)
     },
-
     # Send robots statistic to email
     'send_robots_statistic_to_email': {
         'task': 'send_robots_statistic_to_email',
@@ -383,20 +378,17 @@ CELERYBEAT_SCHEDULE = {
         'task': 'parse_news_from_now_ru',
         'schedule': timedelta(hours=12)
     },
-
     # News from stream.ru
     'parse_news_from_stream_ru': {
         'task': 'parse_news_from_stream_ru',
         'schedule': timedelta(hours=12)
     },
-
-    
 }
 
 CELERY_TIMEZONE = 'UTC'
 CELERY_ACCEPT_CONTENT = ['pickle', 'json', 'msgpack', 'yaml']
 POSTER_URL_PREFIX = '_260x360'
-# TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 from local_settings import *
 
