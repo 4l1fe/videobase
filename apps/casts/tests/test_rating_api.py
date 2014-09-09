@@ -33,5 +33,5 @@ class RatingTestCase(APISimpleTestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        uc = UsersCasts.objects.get(cast__id=self.cast.id)
+        uc = UsersCasts.objects.filter(cast__id=self.cast.id).first()
         self.assertEqual(uc.rating, 5)
