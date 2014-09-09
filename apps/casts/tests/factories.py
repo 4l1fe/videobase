@@ -61,4 +61,3 @@ class CastsChatsMsgsFactory(factory.DjangoModelFactory):
     user = factory.SubFactory(UserFactory)
     text = "Factory generated text"
 
-    
