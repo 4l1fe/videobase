@@ -24,12 +24,13 @@ class CastChatMsgSendTestCase(APISimpleTestCase):
         self.headers = s_token.key
 
     def test_send(self):
-        COMM_TEXT = u'Commentary text'
+        COMM_TEXT = u'Commentary text1'
         response = self.client.post(
             reverse('castchat_send_view', kwargs={'cast_id': self.cast_chat.id, 'format': 'json'}),
-            HTTP_X_MI_SESSION=self.headers, data={'text': COMM_TEXT})
+            HTTP_X_MI_SESSION=self.headers, data={'text': COMM_TEXT}
+        )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        ccm = CastsChatsMsgs.objects.get(cast__id=self.cast_chat.cast.id)
+        ccm = CastsChatsMsgs.objects.get(cast__id=self.cast_chat.cast.id, user=self.user)
         self.assertEqual(ccm.text, COMM_TEXT)
