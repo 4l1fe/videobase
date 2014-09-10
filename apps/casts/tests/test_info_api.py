@@ -13,5 +13,8 @@ class CastTestCase(APISimpleTestCase):
         self.cast = CastsFactory.create(tags=self.tags)
 
     def test_info(self):
-        response = self.client.get(reverse('cast_info_view', kwargs={'cast_id': self.cast.id, 'format': 'json'}))
+        response = self.client.get(
+            reverse('cast_info_view', kwargs={'cast_id': self.cast.id, 'format': 'json'})
+        )
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)

@@ -22,19 +22,19 @@ class CastChatMsgSendTestCase(APISimpleTestCase):
         s_token = SessionToken.objects.create(user=self.user)
         self.headers = s_token.key
 
-
     def test_send(self):
         COMM_TEXT = 'Commentary text'
         response = self.client.post(
             reverse('castchat_send_view', kwargs={'cast_id': self.cast_chat.id, 'format': 'json'}),
-            HTTP_X_MI_SESSION=self.headers, data={'text': COMM_TEXT})
+            HTTP_X_MI_SESSION=self.headers, data={'text': COMM_TEXT}
+        )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        ccm = CastsChatsMsgs.objects.filter(cast__id=self.cast_chat.cast.id).first()
-        self.assertEqual(ccm.text, COMM_TEXT)
+        ccm = CastsChatsMsgs.objects.filter(cast__id=self.cast_chat.cast.id, user=self.user)
+        self.assertEqual(ccm[0].text, COMM_TEXT)
 
-    def tearDown(self):
-        SessionToken.objects.all().delete()
-        Token.objects.all().delete()
-        CastsChatsMsgs.objects.all().delete()
+    # def tearDown(self):
+    #     SessionToken.objects.all().delete()
+    #     Token.objects.all().delete()
+    #     CastsChatsMsgs.objects.all().delete()

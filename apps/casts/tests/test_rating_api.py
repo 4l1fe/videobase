@@ -22,14 +22,13 @@ class RatingTestCase(APISimpleTestCase):
         s_token = SessionToken.objects.create(user=self.user)
         self.headers = s_token.key
 
-
     def test_rating(self):
-        COMM_TEXT = u'Commentary text'
         response = self.client.post(
             reverse('cast_rating_view', kwargs={'cast_id': self.cast_chat.id, 'format': 'json'}),
-            HTTP_X_MI_SESSION=self.headers, data={'rating': 5})
+            HTTP_X_MI_SESSION=self.headers, data={'rating': 5}
+        )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        uc = UsersCasts.objects.get(cast__id=self.cast.id)
-        self.assertEqual(uc.rating, 5)
+        uc = UsersCasts.objects.filter(cast__id=self.cast.id, user=self.user)
+        self.assertEqual(uc[0].rating, 5)

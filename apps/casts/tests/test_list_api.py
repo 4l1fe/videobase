@@ -21,10 +21,10 @@ class CastListTestCase(APISimpleTestCase):
         self.headers = s_token.key
 
     def test_list(self):
-        COMM_TEXT = 'Commentary text'
         response = self.client.get(
             reverse('cast_list_view', kwargs={'format': 'json'}),
-            HTTP_X_MI_SESSION=self.headers, data={'text': 'Football'})
+            HTTP_X_MI_SESSION=self.headers, data={'text': 'Football'}
+        )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
