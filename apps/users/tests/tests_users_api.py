@@ -36,44 +36,38 @@ class APIUsersFriendShipActionTestCase(APISimpleTestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_api_user_friendship_200_get(self):
-        user = UserFactory.create()
+        user_friend = UserFactory.create()
         kw = self.kwargs.copy()
-        kw['user_id'] = user.pk
+        kw['user_id'] = user_friend.pk
         response = self.client.get(reverse(self.url_name, kwargs=kw),
                                    HTTP_X_MI_SESSION=self.headers)
-
-        flag = UsersRels.objects.filter(user=self.user, user_rel=user).exists()
+        flag = UsersRels.objects.filter(user=self.user, user_rel=user_friend).exists()
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(flag, True)
-
         feed = Feed.objects.last()
-        obj_val = dict(id=user.id, name=user.username, avatar='')
         self.assertEqual(feed.user, self.user)
         self.assertEqual(feed.type, USER_ASK)
-        self.assertDictEqual(feed.object, obj_val)
+        self.assertEqual(feed.obj_id, user_friend.id)
 
     def test_api_user_friendship_confirm_200_get(self):
-        user = UserFactory.create()
+        user_friend = UserFactory.create()
         kw = self.kwargs.copy()
-        kw['user_id'] = user.pk
-        obj_val = dict(id=user.id, name=user.username, avatar='')
-        UserRelsFactory.create(user=user, user_rel=self.user, rel_type=APP_USER_REL_TYPE_FRIENDS)
-        FeedFactory.create(user=self.user, type=USER_ASK, object=obj_val)
+        kw['user_id'] = user_friend.pk
+        UserRelsFactory.create(user=user_friend, user_rel=self.user, rel_type=APP_USER_REL_TYPE_FRIENDS)
+        FeedFactory.create(user=self.user, type=USER_ASK, obj_id=user_friend.id)
         response = self.client.get(reverse(self.url_name, kwargs=kw),
                                    HTTP_X_MI_SESSION=self.headers)
         feed = Feed.objects.last()
         self.assertEqual(feed.user, self.user)
         self.assertEqual(feed.type, USER_FRIENDSHIP)
-        self.assertDictEqual(feed.object, obj_val)
+        self.assertEqual(feed.obj_id, user_friend.id)
 
     def test_api_user_friendship_200_with_rel_delete(self):
-        user = UserFactory.create()
+        user_friend = UserFactory.create()
         kw = self.kwargs.copy()
-        kw['user_id'] = user.pk
-
-        obj_val = dict(id=user.id, name=user.username, avatar='')
-        UserRelsFactory.create(user=self.user, user_rel=user)
-        FeedFactory.create(user=self.user, type=USER_ASK, object=obj_val)
+        kw['user_id'] = user_friend.pk
+        UserRelsFactory.create(user=self.user, user_rel=user_friend)
+        FeedFactory.create(user=self.user, type=USER_ASK, obj_id=user_friend.id)
         response = self.client.delete(reverse(self.url_name, kwargs=kw),
                                    HTTP_X_MI_SESSION=self.headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)

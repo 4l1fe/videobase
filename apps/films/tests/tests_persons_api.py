@@ -90,14 +90,12 @@ class PersonsTestCase(APITestCase):
     def test_person_action_subscribe_api_view(self):
         UsersApiSessions.objects.create(token=self.s_token)
         headers = self.s_token.key
-        obj_val = dict(id=self.person_filmography.person.id, name=self.person_filmography.person.name, photo=self.person_filmography.person.photo.\
-                       storage.url(self.person_filmography.person.photo.name) if len(self.person_filmography.person.photo.name) else self.person_filmography.person.photo.name)
         response = self.client.put(reverse('person_action_view', kwargs={'resource_id': self.person_filmography.person.id, 'format': 'json'}), HTTP_X_MI_SESSION=headers)
         user_person = UsersPersons.objects.all().last()
         feed = Feed.objects.last()
         self.assertEqual(feed.user, self.user)
         self.assertEqual(feed.type, PERSON_SUBSCRIBE)
-        self.assertDictEqual(feed.object, obj_val)
+        self.assertEqual(feed.obj_id, self.person_filmography.person.id)
         self.assertEqual(user_person.person, self.person_filmography.person)
         self.assertEqual(user_person.user, self.user)
         self.assertEqual(user_person.subscribed, 1)
@@ -105,15 +103,13 @@ class PersonsTestCase(APITestCase):
     def test_person_action_subscribe_update_api_view(self):
         UsersApiSessions.objects.create(token=self.s_token)
         headers = self.s_token.key
-        obj_val = dict(id=self.person_filmography.person.id, name=self.person_filmography.person.name, photo=self.person_filmography.person.photo.\
-                       storage.url(self.person_filmography.person.photo.name) if len(self.person_filmography.person.photo.name) else self.person_filmography.person.photo.name)
-        FeedFactory.create(user=self.user, type=PERSON_SUBSCRIBE, object=obj_val)
+        FeedFactory.create(user=self.user, type=PERSON_SUBSCRIBE, obj_id=self.person_filmography.person.id)
         response = self.client.put(reverse('person_action_view', kwargs={'resource_id': self.person_filmography.person.id, 'format': 'json'}), HTTP_X_MI_SESSION=headers)
         user_person = UsersPersons.objects.all().last()
         feed = Feed.objects.last()
         self.assertEqual(feed.user, self.user)
         self.assertEqual(feed.type, PERSON_SUBSCRIBE)
-        self.assertDictEqual(feed.object, obj_val)
+        self.assertEqual(feed.obj_id, self.person_filmography.person.id)
         self.assertEqual(user_person.person, self.person_filmography.person)
         self.assertEqual(user_person.user, self.user)
         self.assertEqual(user_person.subscribed, 1)

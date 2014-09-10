@@ -1,7 +1,7 @@
 # coding: utf-8
 import os
 import djcelery
-
+import logging
 from datetime import timedelta
 from ConfigParser import RawConfigParser
 
@@ -32,6 +32,12 @@ SECRET_KEY = '7-dsc0--i_ej94w9as#-5p_5a)ql*9o80v1rs9krx!_-9%^b5$'
 DEBUG = False
 
 TEMPLATE_DEBUG = DEBUG
+
+SOUTH_TESTS_MIGRATE = False
+
+logger = logging.getLogger('factory')
+logger.addHandler(logging.NullHandler())
+logger.setLevel(logging.INFO)
 
 ALLOWED_HOSTS = ['*']
 
