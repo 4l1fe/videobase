@@ -1,0 +1,4 @@
+# coding: utf-8
+
+APP_CASTS_DEFAULT_PAGE = 1
+APP_CASTS_CASTS_PER_PAGE = 12

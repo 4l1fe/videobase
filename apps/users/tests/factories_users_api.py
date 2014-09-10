@@ -1,4 +1,8 @@
 # coding: utf-8
+import datetime
+import factory
+from factory.django import ImageField
+
 from apps.users import Feed
 from apps.users.models import User, UsersPics, UsersRels
 from apps.contents.models import Comments, Contents, Locations
@@ -6,9 +10,6 @@ from apps.contents.constants import APP_CONTENTS_PRICE_TYPE_FREE
 from apps.films.models import Films, Genres, UsersFilms, UsersPersons, Persons, Countries, Cities, PersonsFilms
 from apps.films.constants import APP_FILM_FULL_FILM
 from apps.contents.constants import APP_CONTENTS_LOC_TYPE
-import datetime
-import factory
-from factory.django import ImageField
 
 
 class UserFactory(factory.DjangoModelFactory):

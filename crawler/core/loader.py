@@ -20,9 +20,10 @@ class BaseLoader(object):
         raise NotImplementedError()
 
     # сама функция загрузки
-    def load(self, load_function=simple_get):
+    def load(self, load_function=simple_get, url=None):
         try:
-            url = self.get_url(load_function)
+            if url is None:
+                url = self.get_url(load_function)
             return {'html': load_function(url), 'url': url}
         except RetrievePageException as e:
             raise RetrievePageException(url=e.url, status_code=e.status_code, film=self.film)

@@ -98,3 +98,5 @@ class ActSubscribeFilmView(APIView):
 
     def put(self, request, film_id, format=None, *args, **kwargs):
         return self.get(request, film_id, format=format, *args, **kwargs)
+
+        

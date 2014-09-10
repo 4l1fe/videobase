@@ -20,7 +20,7 @@ pyparsing==1.5.7
 pydot
 BeautifulSoup4
 html5lib
-djangorestframework
+djangorestframework==2.3.13
 requests
 requesocks
 factory_boy

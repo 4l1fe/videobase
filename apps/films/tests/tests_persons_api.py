@@ -1,5 +1,4 @@
 #coding: utf-8
-
 from django.core.urlresolvers import reverse
 
 from rest_framework.authtoken.models import Token
@@ -9,10 +8,9 @@ from apps.films.models import UsersPersons
 
 from apps.films.tests.factories import PersonsFilmFactory, PersonsExtrasFactory, UserFactory, FeedFactory
 from apps.films.api.serializers import vbPerson
-from apps.users import UsersApiSessions
-from apps.users.models.api_session import SessionToken
+from apps.users.models.session_token import SessionToken
 from apps.users.models import Feed
-from apps.users.constants import PERSON_SUBSCRIBE, PERSON_O
+from apps.users.constants import PERSON_SUBSCRIBE
 
 
 class PersonsTestCase(APITestCase):
@@ -35,7 +33,6 @@ class PersonsTestCase(APITestCase):
         """В силу невозможности расширить PersonFactory нестандартными полями, несуществующими в модели,
         делаем сравнение с сериализованными полями vbPerson, т.к. такие поля возвращаются оттуда(по специф-и).
         """
-        UsersApiSessions.objects.create(token=self.s_token)
         headers = self.s_token.key
         response = self.client.get(reverse('person_api_view', kwargs={'resource_id': self.person_filmography.person.id, 'format': 'json'}),
                                    HTTP_X_MI_SESSION=headers)
@@ -51,7 +48,6 @@ class PersonsTestCase(APITestCase):
         """В силу невозможности расширить PersonFactory нестандартными полями, несуществующими в модели,
         делаем сравнение с сериализованными полями vbPerson, т.к. такие поля возвращаются оттуда(по специф-и).
         """
-        UsersApiSessions.objects.create(token=self.s_token)
         headers = self.s_token.key
         response = self.client.post(reverse('person_api_view', kwargs={'resource_id': self.person_filmography.person.id, 'format': 'json'}),
                                     data={'extend': True}, HTTP_X_MI_SESSION=headers)
@@ -82,13 +78,11 @@ class PersonsTestCase(APITestCase):
             self.assertEqual(response.data['items'][i]['releasedate'], self.person_filmography.film.release_date)
 
     def test_person_action_subscribe_api_view_ok(self):
-        UsersApiSessions.objects.create(token=self.s_token)
         headers = self.s_token.key
         response = self.client.put(reverse('person_action_view', kwargs={'resource_id': self.person_filmography.person.id, 'format': 'json'}), HTTP_X_MI_SESSION=headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_person_action_subscribe_api_view(self):
-        UsersApiSessions.objects.create(token=self.s_token)
         headers = self.s_token.key
         response = self.client.put(reverse('person_action_view', kwargs={'resource_id': self.person_filmography.person.id, 'format': 'json'}), HTTP_X_MI_SESSION=headers)
         user_person = UsersPersons.objects.all().last()
@@ -101,7 +95,6 @@ class PersonsTestCase(APITestCase):
         self.assertEqual(user_person.subscribed, 1)
 
     def test_person_action_subscribe_update_api_view(self):
-        UsersApiSessions.objects.create(token=self.s_token)
         headers = self.s_token.key
         FeedFactory.create(user=self.user, type=PERSON_SUBSCRIBE, obj_id=self.person_filmography.person.id)
         response = self.client.put(reverse('person_action_view', kwargs={'resource_id': self.person_filmography.person.id, 'format': 'json'}), HTTP_X_MI_SESSION=headers)
@@ -115,7 +108,6 @@ class PersonsTestCase(APITestCase):
         self.assertEqual(user_person.subscribed, 1)
 
     def test_person_action_subscribe_delete(self):
-        UsersApiSessions.objects.create(token=self.s_token)
         headers = self.s_token.key
         self.client.put(reverse('person_action_view', kwargs={'resource_id': self.person_filmography.person.id, 'format': 'json'}), HTTP_X_MI_SESSION=headers)
         self.assertTrue(Feed.objects.all().exists())
