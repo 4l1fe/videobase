@@ -35,7 +35,7 @@ TEMPLATE_DEBUG = DEBUG
 
 SOUTH_TESTS_MIGRATE = False
 
-logger = logging.getLogger('factory')
+logger = logging.getLogger('factory')  # switch off factory boy logging
 logger.addHandler(logging.NullHandler())
 logger.setLevel(logging.INFO)
 
