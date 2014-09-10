@@ -69,9 +69,9 @@ class Feed(models.Model):
     def get_feeds_by_user_all(self, user_id, uf=[], up=[], ur=[], count=False, offset=0, limit=APP_USERS_API_DEFAULT_PER_PAGE, *args, **kwargs):
         sql = """("users_feed"."user_id"=ANY(%s::integer[]) OR "users_feed"."user_id" IS NULL) AND (CASE
             WHEN "users_feed"."user_id" IS NULL AND "users_feed"."type"=%s THEN
-              CAST(coalesce(object->>'id', '0') AS integer)=ANY(%s::integer[])
+              CAST(coalesce(obj_id->>'id', '0') AS integer)=ANY(%s::integer[])
             WHEN "users_feed"."user_id" IS NULL AND "users_feed"."type"=%s THEN
-              CAST(coalesce(object->>'id', '0') AS integer)=ANY(%s::integer[])
+              CAST(coalesce(obj_id->>'id', '0') AS integer)=ANY(%s::integer[])
             ELSE true END)
         """
 
