@@ -76,7 +76,7 @@ INSTALLED_APPS = (
     'treebeard',
     'rest_framework',
     'rest_framework.authtoken',
-    'social_auth',
+    'social.apps.django_app.default',
     'csvimport',
     'apps.users',
     'apps.films',
@@ -86,7 +86,6 @@ INSTALLED_APPS = (
     'apps.git',
     'apps.casts',
     'crawler',
-    'social_auth',
     'djcelery',
     'backup_system',
     'data',
@@ -95,7 +94,6 @@ INSTALLED_APPS = (
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    #'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -154,10 +152,7 @@ CACHES = {
 # Backends for social auth
 AUTHENTICATION_BACKENDS = (
     # OAuth
-    'social_auth.backends.twitter.TwitterBackend',
-    'social_auth.backends.facebook.FacebookBackend',
-    'social_auth.backends.contrib.vk.VKOAuth2Backend',
-    'social_auth.backends.google.GoogleOAuth2Backend',
+
     # Django
     'django.contrib.auth.backends.ModelBackend',
 )
@@ -206,7 +201,6 @@ REST_FRAMEWORK = {
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 
 LOGIN_URL = '/login'
-SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/tokenize/'
 LOGIN_ERROR_URL = '/'
 
 ###########################################################
@@ -237,19 +231,7 @@ SOCIAL_AUTH_USERNAME_IS_FULL_EMAIL = True
 
 # Перечислим pipeline, которые последовательно буду обрабатывать респонс
 SOCIAL_AUTH_PIPELINE = (
-    # Получает по backend и uid инстансы social_user и user
-    'social_auth.backends.pipeline.social.social_auth_user',
-    # Получает по user.email инстанс пользователя и заменяет собой тот, который получили выше.
-    # Кстати, email выдает только Facebook и GitHub, а Vkontakte и Twitter не выдают
-    'social_auth.backends.pipeline.associate.associate_by_email',
-    # Пытается собрать правильный username, на основе уже имеющихся данных
-    'social_auth.backends.pipeline.user.get_username',
-    # Создает нового пользователя, если такого еще нет
-    'social_auth.backends.pipeline.user.create_user',
-    # Пытается связать аккаунты
-    'social_auth.backends.pipeline.social.associate_user',
-    # Получает и обновляет social_user.extra_data
-    'social_auth.backends.pipeline.social.load_extra_data',
+
 )
 
 # In minutes
