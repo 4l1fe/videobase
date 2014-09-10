@@ -1,10 +1,9 @@
 #coding: utf-8
-
 from apps.users.tests.factories_auth_api import UserFactory
 from rest_framework.authtoken.models import Token
 from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
-from apps.users.models.api_session import *
+from apps.users.models import SessionToken
 from rest_framework import status
 
 
@@ -15,8 +14,6 @@ class AuthTest(APITestCase):
         self.s_token = SessionToken.objects.create(user=self.user_factory)
 
     def test_session_token(self):
-        UsersApiSessions.objects.create(token=self.s_token)
-
         headers = self.s_token.key
         response = self.client.get(reverse('session', kwargs={'format': 'json'}), HTTP_X_MI_SESSION=headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -31,8 +28,6 @@ class AuthTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_session_token_delete(self):
-        UsersApiSessions.objects.create(token=self.s_token)
-
         headers = self.s_token.key
         response = self.client.get(reverse('session', kwargs={'format': 'json'}), HTTP_X_MI_SESSION=headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -44,8 +39,6 @@ class AuthTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_session_revoke(self):
-        UsersApiSessions.objects.create(token=self.s_token)
-
         headers = self.s_token.key
         response = self.client.get(reverse('session', kwargs={'format': 'json'}), HTTP_X_MI_SESSION=headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)

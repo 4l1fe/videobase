@@ -1,4 +1,5 @@
 # coding: utf-8
+import string
 from bs4 import BeautifulSoup
 from crawler.core.exceptions import NoSuchFilm
 from apps.contents.constants import APP_CONTENTS_PRICE_TYPE_SUBSCRIPTION
@@ -33,6 +34,7 @@ class ParseOllFilm(object):
     def get_link(self, response, film):
         film_name = film.name
         film_link = None
+        film_year = film .release_date.year
         try:
             soup = BeautifulSoup(response)
             if film.type == APP_FILM_SERIAL:
@@ -42,8 +44,9 @@ class ParseOllFilm(object):
                         tag = soup.find('meta', attrs={'property': 'og:url'})
                         return tag.get('content')
             tags_h1 = soup.findAll('h1', attrs={'itemprop': 'name'})
+            tag_year = int(soup.find('strong', attrs={'itemprop': 'copyrightYear'}).text)
             for h1 in tags_h1:
-                if h1.text.lower().strip() == film_name.lower().strip():
+                if h1.text.lower().strip().encode('utf-8').translate(None, string.punctuation) == film_name.lower().strip().encode('utf-8').translate(None, string.punctuation) and tag_year == film_year:
                     tag = soup.find('meta', attrs={'property': 'og:url'})
                     return tag.get('content')
             tags_h3 = soup.findAll('h3')
