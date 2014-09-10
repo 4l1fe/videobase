@@ -1,8 +1,4 @@
 # coding: utf-8
-import os, sys
-sys.path.append('/home/dmitriy/projects/videobase/')
-os.environ['DJANGO_SETTINGS_MODULE'] = 'videobase.settings'
-
 from django.contrib.auth.models import User
 from rest_framework import serializers
 from apps.contents.models import Comments, Locations
