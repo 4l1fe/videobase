@@ -5,9 +5,7 @@ from rest_framework import HTTP_HEADER_ENCODING
 from rest_framework.authentication import BaseAuthentication
 from rest_framework import exceptions
 
-from apps.users.models import SessionToken, UsersApiSessions
-
-
+from apps.users.models import SessionToken
 from videobase import settings
 
 
@@ -48,16 +46,11 @@ class SessionTokenAuthentication(BaseAuthentication):
         if not token.user.is_active:
             raise exceptions.AuthenticationFailed('User inactive or deleted')
 
-        try:
-            uas = UsersApiSessions.objects.get(token=token)
+        if not token.is_active:
+            raise exceptions.AuthenticationFailed('User inactive or deleted')
 
-            if uas.get_expiration_time() < timezone.now():
-                raise exceptions.AuthenticationFailed('Session expired')
-            if not uas.active:
-                raise exceptions.AuthenticationFailed('Session not active')
-
-        except UsersApiSessions.DoesNotExist:
-            raise exceptions.AuthenticationFailed('There is no session associated with this token')
+        token.updated = timezone.now()
+        token.save()
 
         return token.user, token
 

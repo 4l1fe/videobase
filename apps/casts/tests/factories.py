@@ -54,6 +54,9 @@ class CastsChatFactory(factory.DjangoModelFactory):
     cast        = factory.SubFactory(CastsFactory)
     status      = 1
 
+    class Meta:
+        django_get_or_create = ('cast',)
+
 
 class CastsChatsMsgsFactory(factory.DjangoModelFactory):
     FACTORY_FOR = CastsChatsMsgs

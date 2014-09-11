@@ -3,6 +3,8 @@
 from django.db import models
 from djorm_pgfulltext.models import SearchManager
 from djorm_pgfulltext.fields import VectorField
+
+
 #############################################################################################################
 # Модель Пользовательских фильмов
 class Casts(models.Model):
@@ -23,14 +25,13 @@ class Casts(models.Model):
         search_field='search_index',
         auto_update_search_field=True
     )
+
     def __unicode__(self):
         return u'[{0}] {1}'.format(self.pk, self.title)
 
-
-    class  Meta(object):
+    class Meta:
         # Имя таблицы в БД
         db_table = 'casts'
         app_label = 'casts'
         verbose_name = u'Трансляция'
         verbose_name_plural = u'Трансляции'
-

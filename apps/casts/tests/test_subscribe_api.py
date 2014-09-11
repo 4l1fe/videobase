@@ -1,5 +1,4 @@
 # coding: utf-8
-
 from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APISimpleTestCase
@@ -16,6 +15,7 @@ class SubscribeTestCase(APISimpleTestCase):
 
     def test_search(self):
         response = self.client.get(
-            reverse('cast_subscribe_view', kwargs={'cast_id': 1, 'format': 'json'}), data={})
+            reverse('cast_subscribe_view', kwargs={'cast_id': 1, 'format': 'json'}), data={}
+        )
 
-        self.assertEqual(response.status_code , status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
