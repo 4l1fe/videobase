@@ -387,6 +387,22 @@ CELERYBEAT_SCHEDULE = {
         'task': 'parse_news_from_stream_ru',
         'schedule': timedelta(hours=12)
     },
+    'cast_sportbox_ru_schedule': {
+        'task': 'cast_sportbox_robot',
+        'schedule': timedelta(hours=24)
+    },
+    'cast_championat_com_schedule': {
+        'task': 'cast_championat_robot',
+        'schedule': timedelta(hours=24)
+    },
+        'cast_liverussia_ru_schedule': {
+        'task': 'cast_liverussia_robot',
+        'schedule': timedelta(hours=24)
+    },
+        'cast_khl_ru_schedule': {
+        'task': 'cast_khl_robot',
+        'schedule': timedelta(hours=24)
+    },
 }
 
 CELERY_TIMEZONE = 'UTC'
