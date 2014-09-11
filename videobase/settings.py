@@ -166,7 +166,6 @@ AUTHENTICATION_BACKENDS = (
 TEMPLATE_AUTHENTICATION_BACKENDS = (
     # Auth
     'apps.users.backends.CookiesSessionAuthentication',
-    'apps.users.backends.CookiesTokenAuthentication',
 )
 
 ###########################################################
