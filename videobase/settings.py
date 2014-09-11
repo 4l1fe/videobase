@@ -60,10 +60,12 @@ DEFAULT_FROM_EMAIL = emailconf.get('email', 'DEFAULT_FROM_EMAIL')
 ###########################################################
 # Application definition
 INSTALLED_APPS = (
+    # Admin-tools
     'admin_tools',
     'admin_tools.theming',
     'admin_tools.menu',
     'admin_tools.dashboard',
+    # Django default apps
     'django.contrib.auth',
     'django.contrib.admin',
     'django.contrib.contenttypes',
@@ -74,10 +76,15 @@ INSTALLED_APPS = (
     'south',
     'django_nose',
     'treebeard',
+    # Rest api
     'rest_framework',
     'rest_framework.authtoken',
+    # Social oauth
     'social.apps.django_app.default',
+    # Celery for django
+    'djcelery',
     'csvimport',
+    # Apps
     'apps.users',
     'apps.films',
     'apps.contents',
@@ -86,7 +93,6 @@ INSTALLED_APPS = (
     'apps.git',
     'apps.casts',
     'crawler',
-    'djcelery',
     'backup_system',
     'data',
 )
@@ -113,8 +119,9 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.media',
     'django.contrib.messages.context_processors.messages',
     'django.core.context_processors.request',
-    # Social
-    'social_auth.context_processors.social_auth_by_type_backends',
+    # Social OAuth
+    'social.apps.django_app.context_processors.backends',
+    'social.apps.django_app.context_processors.login_redirect',
 )
 
 TEMPLATE_DIRS = (
@@ -152,7 +159,10 @@ CACHES = {
 # Backends for social auth
 AUTHENTICATION_BACKENDS = (
     # OAuth
-
+    'social.backends.vk.VKOAuth2',
+    'social.backends.google.GoogleOAuth2',
+    'social.backends.facebook.FacebookOAuth2',
+    'social.backends.twitter.TwitterOAuth',
     # Django
     'django.contrib.auth.backends.ModelBackend',
 )
@@ -161,7 +171,6 @@ AUTHENTICATION_BACKENDS = (
 TEMPLATE_AUTHENTICATION_BACKENDS = (
     # Auth
     'apps.users.backends.CookiesSessionAuthentication',
-    'apps.users.backends.CookiesTokenAuthentication',
 )
 
 ###########################################################
@@ -201,37 +210,53 @@ REST_FRAMEWORK = {
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 
 LOGIN_URL = '/login'
+LOGIN_REDIRECT_URL = '/tokenize'
 LOGIN_ERROR_URL = '/'
 
 ###########################################################
 # Ключи для OAuth2 авторизации
 # Vkontakte
-VK_APP_ID            = '4296663'
-VKONTAKTE_APP_ID     = VK_APP_ID
-VK_API_SECRET        = 'JAEQddzkBCm554iGXe6S'
-VKONTAKTE_APP_SECRET = VK_API_SECRET
+SOCIAL_AUTH_VK_OAUTH2_KEY = '4296663'
+SOCIAL_AUTH_VK_OAUTH2_SECRET = 'JAEQddzkBCm554iGXe6S'
+SOCIAL_AUTH_VK_OAUTH2_SCOPE = ['email', ]
 
 # Facebook
-FACEBOOK_APP_ID     = '212532105624824'
-FACEBOOK_API_SECRET = 'a99fcef38b7054279d73beb4ebb7b6cc'
-FACEBOOK_EXTENDED_PERMISSIONS = ['email', ]
+SOCIAL_AUTH_FACEBOOK_KEY = '212532105624824'
+SOCIAL_AUTH_FACEBOOK_SECRET = 'a99fcef38b7054279d73beb4ebb7b6cc'
+SOCIAL_AUTH_FACEBOOK_SCOPE = ['email', ]
+SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {'locale': 'ru_RU'}
 
 # Twitter
-TWITTER_CONSUMER_KEY    = 'HACuJARrAXJyeHdeD5viHULZR'
-TWITTER_CONSUMER_SECRET = 'Ge0k2rKltyPq3ida76IjTbhesZVdIrvckcNPXzJaBU2ouzixut'
+SOCIAL_AUTH_TWITTER_KEY = 'HACuJARrAXJyeHdeD5viHULZR'
+SOCIAL_AUTH_TWITTER_SECRET = 'Ge0k2rKltyPq3ida76IjTbhesZVdIrvckcNPXzJaBU2ouzixut'
 
 # Google+
-GOOGLE_OAUTH2_CLIENT_ID     = '729866043170.apps.googleusercontent.com'
-GOOGLE_OAUTH2_CLIENT_SECRET = 'Ga91PMNEXi28egLsTUy5Wqhw'
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '729866043170.apps.googleusercontent.com'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'Ga91PMNEXi28egLsTUy5Wqhw'
 
-GOOGLE_OAUTH2_USE_UNIQUE_USER_ID = True
+SOCIAL_AUTH_GOOGLE_OAUTH2_USE_UNIQUE_USER_ID = True
+SOCIAL_AUTH_GOOGLE_OAUTH2_IGNORE_DEFAULT_SCOPE = True
+SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
+    'https://www.googleapis.com/auth/userinfo.email',
+    'https://www.googleapis.com/auth/userinfo.profile'
+]
 
 SOCIAL_AUTH_CREATE_USERS = True
 SOCIAL_AUTH_USERNAME_IS_FULL_EMAIL = True
 
+SOCIAL_AUTH_STORAGE = 'social.apps.django_app.default.models.DjangoStorage'
+
 # Перечислим pipeline, которые последовательно буду обрабатывать респонс
 SOCIAL_AUTH_PIPELINE = (
-
+    'social.pipeline.social_auth.social_details',
+    'social.pipeline.social_auth.social_uid',
+    'social.pipeline.social_auth.auth_allowed',
+    'social.pipeline.social_auth.social_user',
+    'social.pipeline.user.get_username',
+    'social.pipeline.user.create_user',
+    'social.pipeline.social_auth.associate_user',
+    'social.pipeline.social_auth.load_extra_data',
+    'social.pipeline.user.user_details'
 )
 
 # In minutes

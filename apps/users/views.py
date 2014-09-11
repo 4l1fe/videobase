@@ -12,7 +12,7 @@ from django.contrib.auth.models import User, AnonymousUser
 from django.views.decorators.cache import never_cache
 from django.shortcuts import redirect
 from django.contrib.auth.forms import AuthenticationForm
-from social_auth.models import UserSocialAuth
+from social.apps.django_app.default.models import UserSocialAuth
 from rest_framework.authtoken.models import Token
 
 from tasks import send_template_mail
@@ -251,14 +251,15 @@ def calc_feed(user_id):
     return o_feed
 
 
-def feed_view(request):
-    if request.user.is_authenticated():
-        # Сериализуем
-        try:
-            o_feed = vbFeedElement(calc_feed(request.user.id), many=True).data
-        except Exception, e:
-            raise Http404
+class FeedView(View):
 
-        return HttpResponse(render_page('feed', {'feed': o_feed}))
+    def get(self, **kwargs):
+        if self.request.user.is_authenticated():
+            # Сериализуем
+            try:
+                o_feed = vbFeedElement(calc_feed(self.request.user.id), many=True).data
+            except Exception, e:
+                raise Http404
 
-    return redirect('login_view')
+            return HttpResponse(render_page('feed', {'feed': o_feed}))
+        return redirect('login_view')
