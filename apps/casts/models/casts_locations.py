@@ -4,6 +4,7 @@ from django.db import models
 
 #############################################################################################################
 # Модель Пользовательских трансляций
+
 class CastsLocations(models.Model):
     cast_service = models.ForeignKey('CastsServices', verbose_name=u'Сервис трансляций')
     cast       = models.ForeignKey('Casts', verbose_name=u'Трансляция', related_name='cl_location_rel')

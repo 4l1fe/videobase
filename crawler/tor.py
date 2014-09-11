@@ -100,7 +100,7 @@ def check_result(header):
     return True
 
 
-def get_page_or_renew(url,user_agent, tor_flag):
+def get_page_or_renew(url, user_agent, tor_flag):
     counter = 0
     if tor_flag:
         while counter < TOR_RECONNECTS:
@@ -114,6 +114,7 @@ def get_page_or_renew(url,user_agent, tor_flag):
                 return body
     else:
         return requests.get(url).content
+
 
 def simple_tor_get_page(url, tor_flag=False):
     return get_page_or_renew(url, get_random_weighted_browser_string(), tor_flag)

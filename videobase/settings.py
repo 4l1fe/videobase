@@ -110,7 +110,6 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'utils.middlewares.AuthTokenMiddleware',
     'utils.middlewares.ThreadLocals',
     'utils.middlewares.ExceptionMiddleware'
 )
@@ -176,9 +175,15 @@ AUTHENTICATION_BACKENDS = (
     'social_auth.backends.facebook.FacebookBackend',
     'social_auth.backends.contrib.vk.VKOAuth2Backend',
     'social_auth.backends.google.GoogleOAuth2Backend',
-
     # Django
     'django.contrib.auth.backends.ModelBackend',
+)
+
+# Backends for template auth
+TEMPLATE_AUTHENTICATION_BACKENDS = (
+    # Auth
+    'apps.users.backends.CookiesSessionAuthentication',
+    'apps.users.backends.CookiesTokenAuthentication',
 )
 
 ###########################################################
@@ -415,6 +420,8 @@ HOST = 'vsevi.ru'
 # Another configuration
 POSTER_URL_PREFIX = '_260x360'
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+
+from local_settings import *
 
 if not DEBUG:
     INSTALLED_APPS += (

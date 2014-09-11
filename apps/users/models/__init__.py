@@ -9,6 +9,6 @@ from users_feed import Feed
 from users_socials import UsersSocials
 from users_hash import UsersHash
 from api_session import UsersApiSessions
+from session_token import SessionToken
 
 from apps.users.signals import *
-from api_session import SessionToken

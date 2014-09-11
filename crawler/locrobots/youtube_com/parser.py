@@ -5,7 +5,7 @@ import re
 import requests
 from apps.films.models import Films
 from apps.robots.models import Robots
-from crawler.locations_saver import save_location_to_list
+from crawler.locations_saver import save_location_to_locs_dict
 from crawler.utils.locations_utils import sane_dict, save_location
 
 from apps.contents.constants import APP_CONTENTS_PRICE_TYPE_FREE, APP_CONTENTS_PRICE_TYPE_PAY
@@ -85,7 +85,7 @@ class YoutubeChannelParser():
             resp_dict['value'] = link
             resp_dict['type'] = u'YouTubeMoviesRU'
             save_location(**resp_dict)
-            save_location_to_list(locations, **resp_dict)
+            save_location_to_locs_dict(locations, **resp_dict)
 
         except Exception, e:
             print e.message
