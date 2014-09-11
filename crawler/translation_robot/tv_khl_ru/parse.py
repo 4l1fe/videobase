@@ -80,16 +80,15 @@ class TvKHLRuParser():
         title = TvKHLRuParser.get_title(one_item_div)
         price = TvKHLRuParser.get_price(one_item_div)
         link = TvKHLRuParser.get_link(one_item_div)
-        print "[#" + title
-        print link
-        print price
-        print time
-        print "#]"
         one_stream = {
-            'time': time,
+            'date': time,
             'price': price,
             'title': title,
-            'link': link
+            'link': link,
+            'meta': None,
+            'embed_code': None,
+            'video_id': None,
+            'player': None
         }
         streams.append(one_stream)
         return streams
@@ -102,4 +101,4 @@ class TvKHLRuParser():
             if item_div:
                 streams = TvKHLRuParser.get_info_for_one_item(item_div)
                 all_streams = all_streams + streams
-        return len(all_streams)
+        return all_streams
