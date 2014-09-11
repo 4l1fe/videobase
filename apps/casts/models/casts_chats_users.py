@@ -11,16 +11,12 @@ class CastsChatsUsers(models.Model):
     user       = models.ForeignKey(User, verbose_name=u'Идентификатор пользоваля')
     status     = models.CharField(max_length=255, default='', blank=True, db_index=True, verbose_name=u'Статус')
 
-
     def __unicode__(self):
         return u'[{0}] {1} - {2}'.format(self.pk, self.user.username, self.cast.title)
 
-        
-    class  Meta(object):
+    class Meta:
         # Имя таблицы в БД
         db_table = 'casts_chats_users'
         app_label = 'casts'
         verbose_name = u'Чат трансляции пользователя'
         verbose_name_plural = u'Чаты трансляций пользователей'
-
-        

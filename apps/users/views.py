@@ -1,7 +1,7 @@
 # coding: utf-8
-from pytils import numeral
 import datetime
 
+from pytils import numeral
 from django.db import transaction
 from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse
@@ -9,28 +9,26 @@ from django.http import HttpResponseRedirect, HttpResponse,\
     HttpResponseBadRequest, HttpResponseServerError, Http404
 from django.utils import timezone
 from django.contrib.auth.models import User, AnonymousUser
-from django.views.generic import View
 from django.views.decorators.cache import never_cache
 from django.shortcuts import redirect
 from django.contrib.auth.forms import AuthenticationForm
-from tasks import send_template_mail
 from social_auth.models import UserSocialAuth
-
 from rest_framework.authtoken.models import Token
 
+from tasks import send_template_mail
 from apps.users.models import Feed
 from apps.users.api.serializers import vbUser, vbFeedElement, vbUserProfile
 from apps.users.forms import CustomRegisterForm, UsersProfileForm
 from apps.users.api.utils import create_new_session
 from apps.users.constants import APP_USERS_API_DEFAULT_PAGE, APP_USERS_API_DEFAULT_PER_PAGE,\
     APP_SUBJECT_TO_RESTORE_PASSWORD
-
 from apps.films.models import Films, Persons, UsersFilms, UsersPersons
 from apps.films.constants import APP_PERSON_DIRECTOR, APP_PERSON_ACTOR, APP_USERFILM_SUBS_TRUE
 from apps.films.api.serializers import vbFilm, vbPerson
-
 from utils.common import url_with_querystring
+from utils.auth.views import View
 from utils.noderender import render_page
+
 
 HOST = 'vsevi.ru'
 
@@ -121,7 +119,7 @@ class TokenizeView(View):
         max_age = 30 * 24 * 60 * 60 # two weeks
         expires = datetime.datetime.strftime(datetime.datetime.utcnow() + datetime.timedelta(seconds=max_age), "%a, %d-%b-%Y %H:%M:%S GMT")
         response.set_cookie('x-token', token, max_age=max_age, expires=expires)
-        response.set_cookie('x-session', session.token.key, max_age=max_age, expires=expires)
+        response.set_cookie('x-session', session.key, max_age=max_age, expires=expires)
         response.delete_cookie('sessionid')
 
         return response
