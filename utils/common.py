@@ -1,10 +1,12 @@
 # coding: utf-8
 
 import os
+import sys
+import traceback
 import random
 import string
-from PIL import Image
 import urllib
+from PIL import Image
 
 
 def get_image_path(instance, filename):
@@ -132,3 +134,22 @@ def url_with_querystring(path, **kwargs):
     for key, value in kwargs.iteritems():
         kwargs[key] = unicode(value).encode('utf-8')
     return path + u'?' + urllib.urlencode(kwargs)
+
+
+#  Обработка Exception
+def traceback_own(excpt, msg=None):
+    if msg is None or not len(msg):
+        msg = u''
+
+    err_l = u'Error'
+    if excpt.__class__.__name__ == 'KeyError':
+        err_l = u'KeyError'
+
+    exc_type, exc_value, exc_traceback = sys.exc_info()
+    trace_msg = ''.join(traceback.format_tb(exc_traceback))
+
+    print u'============={msg}================'.format(msg.encode('utf-8'))
+    print u'%s: %s' % (err_l, excpt)
+    print u'============================='
+    print u'Traceback:\n{trace_msg}'.format(trace_msg=trace_msg)
+    print u'============================='

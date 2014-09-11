@@ -22,6 +22,8 @@ import videobase.settings as settings
 from utils.middlewares.local_thread import get_current_request
 
 #############################################################################################################
+    
+
 class SearchFilmsView(APIView):
     """
     Поиск по фильмам:
@@ -39,6 +41,7 @@ class SearchFilmsView(APIView):
         o_search = Films.search_manager.filter(release_date__lte=date.today())\
             .order_by('-rating_sort')
 
+            
         # Поиск по имени
         if filter.get('text'):
             o_search = o_search.search(filter['text'])
@@ -58,7 +61,7 @@ class SearchFilmsView(APIView):
         if filter.get('genre'):
             o_search = o_search.distinct().filter(genres__in=Genres.get_children_list_id(filter['genre']))
 
-        # Персоноализация выборки
+        # Персонализация выборки
         if self.request.user.is_authenticated() and filter.get('recommend'):
             sql = """
             NOT "films"."id" IN (
