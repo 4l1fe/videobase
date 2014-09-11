@@ -64,17 +64,16 @@ def robot_launcher(*args, **kwargs):
 
 @app.task(name='age_weighted_robot_launch')
 def age_weighted_robot_launcher(years):
-    print "Starting locations checks for every film at least {} days old".format(years)
+    msg = "Starting locations checks for every film at least {year} days old"
+    print msg.format(year=years)
 
-    delays=defaultdict(int)
-
+    delays = defaultdict(int)
     for robot in Robots.objects.all():
-
         for film in Films.objects.all():
             if film_at_least_years_old(film, years):
                 launch_individual_film_site_task.apply_async((robot.name,), queue=robot.name, countdown=15*delays[robot.name])
                 #process_individual_film_on_site.apply_async((robot.name, film.id), countdown=15*delays[robot.name])
-                delays[robot.name]+=1
+                delays[robot.name] += 1
 
 
 @app.task(name="drugoe_kino_update")
@@ -85,4 +84,3 @@ def dg_update():
 @app.task(name="parse_you_tube_movies_ru", base=DebugTask, queue='you_tube_movies_ru')
 def parse_you_tube_movies_ru():
     return YoutubeChannelParser.process_channels_list()
-

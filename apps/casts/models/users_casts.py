@@ -12,9 +12,9 @@ from apps.films.constants import APP_USERFILM_STATUS, APP_USERFILM_STATUS_UNDEF,
 # Модель Пользовательских трансляций
 class UsersCasts(models.Model):
     user       = models.ForeignKey(User, verbose_name=u'Идентификатор пользоваля')
-    cast       = models.ForeignKey('Casts', verbose_name=u'Трансляция')
+    cast       = models.ForeignKey('Casts', verbose_name=u'Трансляция', )
     rating     = models.PositiveSmallIntegerField(null=True, blank=True, db_index=True, verbose_name=u'Рейтинг поставленный пользователем')
-    subscribed = models.DateTimeField(auto_now_add=True, verbose_name=u'Дата создания')
+    subscribed = models.DateTimeField(null=True, blank=True, verbose_name=u'Дата создания')
 
     def __unicode__(self):
         return u'[{0}] {1} - {2}'.format(self.pk, self.user.username, self.cast.title)
