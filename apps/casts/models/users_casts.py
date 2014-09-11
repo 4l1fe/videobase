@@ -24,6 +24,7 @@ class UsersCasts(models.Model):
         # Имя таблицы в БД
         db_table = 'users_casts'
         app_label = 'casts'
+        unique_together = (('user', 'cast'),)
         verbose_name = u'Трансляции пользователя'
         verbose_name_plural = u'Трансляции пользователей'
 

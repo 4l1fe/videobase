@@ -29,11 +29,11 @@ def notification(id_, type_):
     if type_ == FILM_O:
         model_obj = Films
         model_user = UsersFilms
-
         query = {
             'film': id_,
             'subscribed': APP_USERFILM_SUBS_TRUE,
         }
+
     else:
         model_obj = Persons
         model_user = UsersPersons
@@ -44,17 +44,17 @@ def notification(id_, type_):
 
     try:
         obj = model_obj.objects.get(id=id_)
-        context = {'object': obj}
         to = model_user.objects.filter(**query).exclude(user__email='').values_list("user__email", flat=True)
         kw = {
             'subject': subject,
             'tpl_name': tpl_name,
             'to': to,
-            'context': context,
+            'context': {'object': obj},
         }
-        send_template_mail.apply_async(kwargs=kw)
 
-    except:
+        # Send email
+        send_template_mail.apply_async(kwargs=kw)
+    except Exception, e:
         pass
 
 
