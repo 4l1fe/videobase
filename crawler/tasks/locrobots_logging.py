@@ -1,10 +1,13 @@
 # coding: utf-8
 import json
-from celery import Task
 import datetime
+
+from celery import Task
+
 from djcelery.models import TaskMeta
 from djcelery.picklefield import decode
 from djcelery.views import task_status
+
 from apps.robots.models.robots_logs import RobotsInfoLogging
 from apps.robots.models.robots_mail_list import RobotsMailList
 from apps.users.tasks import  send_statistic_to_mail
