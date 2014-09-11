@@ -23,8 +23,8 @@ urlpatterns = patterns('',
     url('', include('apps.films.view_url')),
     url('', include('apps.users.view_url')),
 
-    # Auth
-    url(r'', include('social_auth.urls')),
+    # OAuth
+    url(r'', include('social.apps.django_app.urls', namespace='social')),
 
     # Admin
     url(r'^admin_tools/', include('admin_tools.urls')),

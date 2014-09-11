@@ -31,18 +31,3 @@ class CookiesSessionAuthentication(object):
             token.updated = timezone.now()
             token.save()
         return user, session
-
-
-class CookiesTokenAuthentication(object):
-    model = Token
-
-    def authenticate(self, x_token, request, **kwargs):
-        try:
-            token = self.model.objects.get(key=x_token)
-        except self.model.DoesNotExist:
-            return None, None
-        user = token.user
-        new_token = SessionToken(user=user)
-        new_token.save()
-        session = new_token
-        return user, session
