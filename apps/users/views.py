@@ -6,6 +6,8 @@ from pytils import numeral
 from django.db import transaction
 from django.forms.models import model_to_dict
 from django.core.paginator import Paginator
+from django.core.urlresolvers import reverse
+
 from django.http import HttpResponseRedirect, HttpResponse,\
     HttpResponseBadRequest, HttpResponseServerError, Http404
 
@@ -13,7 +15,6 @@ from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 
-from django.views.generic import View
 from django.shortcuts import redirect
 
 from django.contrib.auth.views import *
@@ -41,6 +42,7 @@ from apps.films.constants import APP_PERSON_DIRECTOR, APP_PERSON_ACTOR, APP_USER
 from apps.films.api.serializers import vbFilm, vbPerson
 
 from utils.common import url_with_querystring
+from utils.auth.views import View
 from utils.noderender import render_page
 
 
@@ -49,7 +51,6 @@ class RegisterUserView(View):
 
     def get(self, *args, **kwargs):
         return HttpResponse(render_page('register', {}))
-
 
     @transaction.commit_manually
     def post(self, *args, **kwargs):
@@ -146,7 +147,7 @@ class TokenizeView(View):
         # Set Response
         response = HttpResponseRedirect(back_url)
         response.set_cookie('x-token', token, max_age=max_age, expires=expires)
-        response.set_cookie('x-session', session.token.key, max_age=max_age, expires=expires)
+        response.set_cookie('x-session', session.key, max_age=max_age, expires=expires)
         response.delete_cookie('sessionid')
 
         return response

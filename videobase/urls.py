@@ -15,6 +15,7 @@ urlpatterns = patterns('',
     url(r'^api/image/brco/', 'apps.films.views.bri_con'),
     url(r'^api/', include('apps.films.urls')),
     url(r'^api/', include('apps.users.urls')),
+    url(r'^api/', include('apps.casts.urls')),
     url(r'^robots/', include('apps.robots.urls')),
     url(r'^api/test', test_view),
 

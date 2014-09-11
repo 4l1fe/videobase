@@ -11,10 +11,10 @@ class ParseTvigleFilm(object):
     @classmethod
     def parse_search(cls, response, film_name, serial):
         cls.url_film = 'http://www.tvigle.ru'
-        cls.seasons = [0,]
+        cls.seasons = [0, ]
         s = u'Сезон'
         film_name = film_name.lower().strip().encode('utf-8').translate(None, string.punctuation)
-        reg = re.compile('(?P<season>'+ s +')[ ](?P<number>\d+)')
+        reg = re.compile('(?P<season>'+s+')[ ](?P<number>\d+)')
         try:
             soup = BeautifulSoup(response)
             url_seasons = None
@@ -43,7 +43,6 @@ class ParseTvigleFilm(object):
         except:
             film_link = None
         return film_link
-
 
     def parse(self, response, dict_gen, film, url):
         resp_list = []
