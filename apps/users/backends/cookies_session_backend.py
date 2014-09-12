@@ -1,17 +1,33 @@
 # coding: utf-8
-from django.contrib.auth.models import AnonymousUser
+import datetime
 
-from tocken_session_backend import SessionTokenAuthentication
+from django.utils import timezone
+from rest_framework.authtoken.models import Token
+
+from apps.users.models import SessionToken
+from videobase import settings
 
 
-class CookiesSessionAuthentication(SessionTokenAuthentication):
+class CookiesSessionAuthentication(object):
 
-    def authenticate(self, request):
-        if not request.is_ajax() and isinstance(request.user, AnonymousUser):
-            token = request.COOKIES.get('x-session', None)
-            try:
-                return self.authenticate_credentials(token)[0]
-            except Exception:
-                return AnonymousUser()
+    model = SessionToken
+
+    def authenticate(self, x_session, **kwargs):
+        session = None
+        try:
+            token = self.model.objects.get(key=x_session)
+        except self.model.DoesNotExist:
+            return None, None
+        user = token.user
+        if timezone.now() - token.updated >= datetime.timedelta(minutes=settings.API_SESSION_EXPIRATION_TIME):
+            token.is_active = False
+            token.save()
+            new_token = self.model(user=user)
+            new_token.save()
+            session = new_token
+        elif not token.is_active:
+            return None, None
         else:
-            return request.user
+            token.updated = timezone.now()
+            token.save()
+        return user, session

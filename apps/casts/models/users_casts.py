@@ -19,12 +19,9 @@ class UsersCasts(models.Model):
     def __unicode__(self):
         return u'[{0}] {1} - {2}'.format(self.pk, self.user.username, self.cast.title)
 
-        
-    class  Meta(object):
+    class Meta:
         # Имя таблицы в БД
         db_table = 'users_casts'
         app_label = 'casts'
         verbose_name = u'Трансляции пользователя'
         verbose_name_plural = u'Трансляции пользователей'
-
-        
