@@ -254,7 +254,7 @@ class ResetPasswordView(View):
                         'user': model_to_dict(user, fields=[field.name for field in user._meta.fields]),
                     },
                     'subject': APP_SUBJECT_TO_RESTORE_PASSWORD,
-                    'tpl_name': 'password_email_restore.html',
+                    'tpl_name': 'mail/password_email_restore.html',
                 }
 
                 # Отправляем email
@@ -334,7 +334,7 @@ class ConfirmResetPwdView(View):
                             'user': model_to_dict(user, fields=[field.name for field in user._meta.fields]),
                         },
                         'subject': APP_SUBJECT_TO_RESTORE_PASSWORD,
-                        'tpl_name': 'password_email_confirm.html',
+                        'tpl_name': 'mail/password_email_confirm.html',
                     }
 
                     # Отправляем email

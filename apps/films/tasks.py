@@ -28,7 +28,7 @@ def best_of_the_best_this_week():
     # Основные параметры рассылки и контекст
     params_email = {
         'subject': 'Eженедельная рассылка ВсеВи',
-        'tpl_name': 'newsletter.html',
+        'tpl_name': 'mail/newsletter.html',
         'context': {
             'films': new_films,
             'serials': serials,
@@ -47,7 +47,7 @@ def best_of_the_best_this_week():
         params_email.update({'to': item.email})
 
         # Отправляем email в очередь
-        send_template_mail.apply_async(kwargs=params_email)
+        send_template_mail.s(kwargs=params_email).apply_async()
 
 
 @app.task(name="personal_newsletter", queue="personal_newsletter")
@@ -55,7 +55,7 @@ def personal_newsletter():
     # Основные параметры рассылки и контекст
     params_email = {
         'subject': 'Персональная рассылка ВсеВи',
-        'tpl_name': 'personal_newsletter.html',
+        'tpl_name': 'mail/personal_newsletter.html',
         'context': {},
     }
 
@@ -104,4 +104,4 @@ def personal_newsletter():
         params_email['context'] = {'feeds': feeds, 'films': films}
 
         # Отправляем email в очередь
-        send_template_mail.apply_async(kwargs=params_email)
+        send_template_mail.s(kwargs=params_email).apply_async()

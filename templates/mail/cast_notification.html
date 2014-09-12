@@ -1,0 +1,92 @@
+{% load value_for_key %}
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link href="http://vsevi.ru/static/css/email.css" rel="stylesheet" />
+</head>
+<body>
+<table width="800px" height="105" cellspacing="0"  cellpadding="10">
+    <tr>
+        <td align="left" colspan="4" style="color:#aeaeae; padding: 6px 10px;">
+            <span style="padding-left: 12px; font-family: Arial, sans-serif; font-style: normal; font-weight: lighter;  font-size: 9.5pt; line-height: 120%">
+            {{ cast|dict_get:"title" }}
+            </span>
+        </td>
+    </tr>
+    <tr class="logo-block">
+        <td style="padding: 10px 10px 10px 20px"><a href="http://vsevi.ru" title="Все видео"><img src="http://vsevi.ru/static/img/logo-header.png"></a></td>
+        <td  align="right" colspan="3" style="padding: 10px 20px 10px 10px">
+        <a href="http://vk.com/vsevi" title="Страница ВсеВидео в Вконтакте" rel="nofollow" target="_new"><img src="http://vsevi.ru/static/img/i-vk.png" height="30" width="30"></a>
+        <a href="http://www.odnoklassniki.ru/group/53196730400877" style="padding-left: 2px;" rel="nofollow" target="_new" title="Страница ВсеВидео в Одноклассниках"><img src="http://vsevi.ru/static/img/i-ok.png" height="30" width="30"></a>
+        <a href="https://twitter.com/vseviru" style="padding-left: 2px;" rel="nofollow" target="_new" title="Страница ВсеВидео в Твиттере"><img src="http://vsevi.ru/static/img/i-tw.png" height="30" width="30"></a>
+        <a href="https://www.facebook.com/vseviru" style="padding-left: 2px;" title="Страница ВсеВидео на Фейсбуке" rel="nofollow" target="_new"><img src="http://vsevi.ru/static/img/i-fb.png" height="30" width="30"></a>
+        <a href="http://vsevi.ru/rss/feed" style="padding-left: 2px;" title="RSS новинок на ВсеВидео" rel="nofollow" target="_new"><img src="http://vsevi.ru/static/img/i-rss.png" height="30" width="30"></a>
+        </td>
+    </tr>
+</table>
+<table width="800px" height="105" style="background: #0469a1;" cellspacing="0" cellpadding="5">
+    <tr>
+        <td width="109"></td>
+        <td  colspan="2" align="center" height="40" class="dots"><span style="text-shadow: 0px 2px 1px #444; font-family: Arial, sans-serif; font-style: bold; font-weight: bold;  font-size: 12.5pt;">Старт трансляции</span></td>
+        <td  width="109"></td>
+    </tr>
+    <tr>
+        <td width="109"></td>
+        <td>
+            <a href="#" rel="nofollow" style="color:#fff; text-decoration: none; font: bold 16pt arial"><font size="4" style="border-bottom: 2px solid white;">Хоккей</font></a>
+            <span style="color:#ffcc00; font: bold 16pt arial"><font size="4">: </font></span>
+            <a href="#" rel="nofollow" style="color:#ffcc00;  text-decoration: none; font: bold 16pt arial">
+                <font size="4" style="border-bottom: 2px solid #ffcc00;">{{ cast|dict_get:"title" }}</font>
+            </a>
+        </td>
+        <td width="173" height="45">
+            <a href="#" rel="nofollow" class="button1">
+                <span align="center" style="text-shadow: 0px 2px 1px #777; font-family: Arial, sans-serif; font-style: normal; font-weight: normal;  font-size: 14.5pt; line-height: 110%">
+                    в {{ cast|dict_get:"start"|date:"H:i" }}<br>
+                </span>
+                <span align="center"  style="text-shadow: 0px 2px 1px #777; font-family: Arial, sans-serif; font-style: normal; font-weight: normal;  font-size: 9.5pt; line-height: 110%"><nobr>менее чем через 40 минут</nobr></span>
+            </a>
+        </td>
+        <td width="109"></td>
+    </tr>
+    <tr>
+        <td width="109"></td>
+        <td colspan="2" style="padding-top: 15px;">
+         <table cellspacing="0" cellpadding="0">
+             <tr>
+                 <td width="282" height="50">
+                     <a href="#" class="button2">СМОТРЕТЬ <br> БЕСПЛАТНО</a>
+                 </td>
+                 <td width="110" height="50">
+                     <a href="#" class="button3"><nobr>или от 49 р.</nobr></a>
+                 </td>
+             </tr>
+         </table>
+        </td>
+        <td width="109"></td>
+    </tr>
+    <tr>
+        <td width="109"></td>
+        <td colspan="2" style="color:#fff;" height="170" padding="2">
+            <p style="margin-top: 10px; font-family: Arial, sans-serif; font-style: normal; font-weight: lighter;  font-size: 12.5pt; line-height: 125%">
+            {{ cast|dict_get:"description" }}
+            </p>
+        </td>
+        <td width="109"></td>
+    </tr>
+</table>
+<table width="800px" height="110" cellspacing="0" cellpadding="5">
+    <tr>
+        <td colspan="2" width="450" style="color:#7a7a7a">
+            <p style="padding-left: 12px; font-family: Arial, sans-serif; font-style: normal; font-weight: lighter;  font-size: 9.5pt; line-height: 120%">
+            Вы получили это письмо, потому что прошли регистрацию в проекте «Все Видео» и выразили согласие получать рассылку с новостями на указанный при регистрации адрес электронной почты. Вы можете <a href="#" rel="nofollow" style="color:#7a7a7a">отписаться</a> от этой рассылки или настроить частоту и формат рассылок в <a href="#" rel="nofollow" style="color:#7a7a7a">личном кабинете</a> пользователя.
+            </p>
+        </td>
+        <td style="padding-right: 0px;"><a href="http://vsevi.ru"><img src="http://vsevi.ru/static/img/logo-footer.png" width="90px" style="padding-bottom: 25px"></a></td>
+        <td style="padding-right: 0px;"><a href="http://solarispromo.com" title="" rel="nofollow"><img src="http://vsevi.ru/static/img/solaris-logo.png" style="padding-bottom: 30px"></a></td>
+    </tr>
+</table>
+</body>
+</html>
