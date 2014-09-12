@@ -10,7 +10,7 @@ def create_queue_str(robot_name):
 
 def generate_process_section_with_parameters(programm_name, command, log_file_name):
     template = '''[program:{}]
-command={}
+command=/var/www/videobase/{}
 process_name=%(program_name)s ; process_name expr (default %(program_name)s)
 numprocs=1 ; number of processes copies to start (def 1)
 directory=/var/www/videobase/ ; directory to cwd to before exec (def no cwd)
