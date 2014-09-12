@@ -38,6 +38,7 @@ def generate_config_file():
     f.write(generate_process_section_with_parameters('location_saver', saver_command, 'location_saver'))
     thor_command = create_queue_str('thor')
     f.write(generate_process_section_with_parameters('thor', thor_command, 'thor'))
-    f.write(create_main_queue_str())
+    main_command = create_main_queue_str()
+    f.write(generate_process_section_with_parameters('main_worker', main_command, 'main_worker'))
     result_file_name = 'robots_config.conf'
     return result_file_name
