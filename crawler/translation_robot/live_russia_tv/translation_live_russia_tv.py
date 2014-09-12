@@ -73,7 +73,7 @@ def parse_translation_live_russia_tv():
                 'date': date,
                 'price': float(0),
                 'link': link,
-                'meta': None,
+                'meta': {},
                 'embed_code': None,
                 'value': video_id,
                 'player': PLAYER_LINK % video_id

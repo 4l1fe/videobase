@@ -1,5 +1,4 @@
 # coding: utf-8
-
 import re
 import os
 import json
@@ -18,13 +17,11 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.template import Context
 from django.http import HttpResponse, Http404
 from django.shortcuts import render_to_response, redirect
-from django.utils import timezone
 
 from rest_framework import status
 
 import apps.films.models as film_model
 import apps.contents.models as content_model
-import apps.users.models as user_model
 
 from apps.films.api.serializers import vbFilm, vbComment, vbPerson
 from apps.films.constants import APP_USERFILM_STATUS_PLAYLIST
@@ -32,6 +29,7 @@ from apps.films.api import SearchFilmsView
 
 from utils.noderender import render_page
 from utils.common import reindex_by
+from utils.auth.views import View
 
 
 def get_new_namestring(namestring):
@@ -103,88 +101,175 @@ def bri_con(d, im, request):
     return imc
 
 
-def index_view(request):
-    # Выбираем 4 новых фильма, у которых есть локации
-    NEW_FILMS_CACHE_KEY = 'new_films'
-    resp_dict_serialized = cache.get(NEW_FILMS_CACHE_KEY)
+class IndexView(View):
 
-    # Расчитываем новинки, если их нет в кеше
-    if resp_dict_serialized is None:
-        o_film = film_model.Films.get_newest_films()
+    def get(self, *args, **kwargs):
+        # Выбираем 4 новых фильма, у которых есть локации
+        NEW_FILMS_CACHE_KEY = 'new_films'
+        resp_dict_serialized = cache.get(NEW_FILMS_CACHE_KEY)
+        # Расчитываем новинки, если их нет в кеше
+        if resp_dict_serialized is None:
+            o_film = film_model.Films.get_newest_films()
 
-        # Фильмы показывались => ставим флаг просмотрено в true
-        for film in o_film:
-            film.was_shown = True
-            film.save()
+            # Фильмы показывались => ставим флаг просмотрено в true
+            for film in o_film:
+                film.was_shown = True
+                film.save()
 
-        # Сериализуем новинки и конвертируем результат в строку
-        resp_dict_data = vbFilm(o_film, require_relation=False, extend=True, many=True).data
-        resp_dict_serialized = json.dumps(resp_dict_data, cls=DjangoJSONEncoder)
+            # Сериализуем новинки и конвертируем результат в строку
+            resp_dict_data = vbFilm(o_film, require_relation=False, extend=True, many=True).data
+            resp_dict_serialized = json.dumps(resp_dict_data, cls=DjangoJSONEncoder)
 
-        # Положим результат в кеш
-        cache.set(NEW_FILMS_CACHE_KEY, resp_dict_serialized, 86400)
+            # Положим результат в кеш
+            cache.set(NEW_FILMS_CACHE_KEY, resp_dict_serialized, 86400)
 
-    else:
-        resp_dict_data = json.loads(resp_dict_serialized)
+        else:
+            resp_dict_data = json.loads(resp_dict_serialized)
 
-    # Найдем relation для фильмов, если пользователь авторизован
-    if request.user.is_authenticated():
-        o_user = film_model.UsersFilms.objects.filter(
-            user=request.user, film__in=[item['id'] for item in resp_dict_data]
-        )
-        o_user = reindex_by(o_user, 'film_id', True)
+        # Найдем relation для фильмов, если пользователь авторизован
+        if self.request.user.is_authenticated():
+            o_user = film_model.UsersFilms.objects.filter(
+                user=self.request.user, film__in=[item['id'] for item in resp_dict_data]
+            )
+            o_user = reindex_by(o_user, 'film_id', True)
 
-        for index, item in enumerate(resp_dict_data):
-            if item['id'] in o_user:
-                resp_dict_data[index]['relation'] = o_user[item['id']].relation_for_vb_film
+            for index, item in enumerate(resp_dict_data):
+                if item['id'] in o_user:
+                    resp_dict_data[index]['relation'] = o_user[item['id']].relation_for_vb_film
 
-    # Топ комментариев к фильмам пользователей
-    comments = content_model.Comments.get_top_comments_with_rating(struct=True)
+        # Топ комментариев к фильмам  пользователей
+        comments = content_model.Comments.get_top_comments_with_rating(struct=True)
 
-    # Выборка списка жанров из кеша, если есть
-    genres_cache_key = film_model.Genres.get_cache_key()
-    genres_data = cache.get(genres_cache_key)
+        # Выборка списка жанров из кеша, если есть
+        genres_cache_key = film_model.Genres.get_cache_key()
+        genres_data = cache.get(genres_cache_key)
 
-    if genres_data is None:
+        if genres_data is None:
+            try:
+                genres_data = list(film_model.Genres.get_grouped_genres())
+                cache.set(genres_cache_key, genres_data, 86400)
+            except:
+                genres_data = []
+
+        # Формируем ответ
+        data = {
+            'films_new': resp_dict_data,
+            'filter_genres': genres_data,
+            'comments': comments,
+             # Список рекомендуемых фильмов
+            'films': get_recommend_film(self.request),
+        }
+
+        return HttpResponse(render_page('index', data), status.HTTP_200_OK)
+
+
+class PersonView(View):
+
+    def get(self, *args, **kwargs):
         try:
-            genres_data = list(film_model.Genres.get_grouped_genres())
-            cache.set(genres_cache_key, genres_data, 86400)
-        except Exception, e:
-            genres_data = []
+            person = film_model.Persons.objects.get(pk=kwargs['resource_id'])
+        except film_model.Persons.DoesNotExist:
+            raise Http404
 
-    # Формируем ответ
-    data = {
-        'films_new': resp_dict_data,
-        'filter_genres': genres_data,
-        'comments': comments,
-        'films': get_recommend_film(request),
-    }
+        vbp = vbPerson(person, extend=True)
+        crutch = vbp.data  # костыль, до починки парсинга этих данных роботом.
+        if not vbp.data['birthdate']:
+            d1 = date(1960, 1, 1)
+            d2 = date(1980, 12, 12)
+            delta = d2 - d1
+            delta = delta.days*24*60*60
+            seconds = randrange(delta)
+            birthdate = (d1 + timedelta(seconds=seconds))
+            crutch['birthdate'] = birthdate.strftime('%d %B %Y')
+            crutch['years_old'] = date.today().year - birthdate.year
 
-    return HttpResponse(render_page('index', data), status.HTTP_200_OK)
+        pfs = film_model.PersonsFilms.objects.filter(person=person)[:12]  # почему-то 12 первых фильмов. Был пагинатор
+        vbf = vbFilm([pf.film for pf in pfs], many=True)
+        crutch['filmography'] = vbf.data
+
+        return HttpResponse(render_page('person', {'person': crutch}))
 
 
-def person_view(request, resource_id):
-    try:
-        person = film_model.Persons.objects.get(pk=resource_id)
-    except film_model.Persons.DoesNotExist:
-        raise Http404
+class FilmView(View):
 
-    vbp = vbPerson(person, extend=True)
-    crutch = vbp.data  # костыль, до починки парсинга этих данных роботом.
-    if not vbp.data['birthdate']:
-        d1 = date(1960, 1, 1)
-        d2 = date(1980, 12, 12)
-        delta = d2 - d1
-        delta = delta.days*24*60*60
-        seconds = randrange(delta)
-        birthdate = (d1 + timedelta(seconds=seconds))
-        crutch['birthdate'] = birthdate.strftime('%d %B %Y')
-        crutch['years_old'] = date.today().year - birthdate.year
+    def get(self, *args, **kwargs):
+        resp_dict, o_film = film_to_view(kwargs['film_id'])
+        resp_dict['similar'] = calc_similar(o_film)
 
-    person_films = film_model.PersonsFilms.objects.filter(person=person)[:12]
-    crutch['filmography'] = vbFilm([item.film for item in person_films], many=True).data
+        # Trailer
+        trailer = film_model.FilmExtras.get_trailer_by_film(kwargs['film_id'], first=True)
+        if not trailer is None:
+            resp_dict['trailer'] = trailer.url
 
-    return HttpResponse(render_page('person', {'person': crutch}))
+        return HttpResponse(render_page('film', {'film': resp_dict}))
+
+
+class PlayListView(View):
+
+    def get(self, *args, **kwargs):
+        film_id = kwargs.get('film_id', 1)
+        if self.request.user.is_authenticated():
+            # Init data
+            film_data = {}
+            playlist = {'id': 0}
+            film_id = int(film_id)
+
+            # Выборка плейлиста
+            playlist_data = film_model.Films.objects.\
+                filter(uf_films_rel__user=self.request.user.id, uf_films_rel__status=APP_USERFILM_STATUS_PLAYLIST).\
+                order_by('uf_films_rel__created')
+
+            # Обработка плейлиста
+            len_playlist = len(playlist_data)
+            if len_playlist > 0:
+                if film_id > len(playlist_data) or film_id < 1:
+                    return redirect('playlist_film_view', film_id=1)
+
+                def arrow_data(data, f_id):
+                    return {'id': f_id, 'name': data.name}
+
+                if film_id < len(playlist_data):
+                    playlist['next'] = arrow_data(playlist_data[film_id], film_id+1)
+
+                if film_id > 1:
+                    playlist['previous'] = arrow_data(playlist_data[film_id-2], film_id-1)
+
+                film = playlist_data[film_id-1]
+                film_data, o_film = film_to_view(film.id)
+
+            # Update playlist
+            playlist.update({
+                'id': film_id,
+                'film': film_data,
+                'total_cnt': len_playlist,
+                'items': vbFilm(playlist_data, many=True).data,
+
+                # Список рекомендуемых фильмов
+                'films': get_recommend_film(self.request),
+            })
+
+            return HttpResponse(render_page('playlist', {'playlist': playlist, 'film': film_data}))
+
+        return redirect('login_view')
+
+
+class SearchView(View):
+
+    def get(self, *args, **kwargs):
+        # Устанавливаем ответ по умолчанию и вызываем сериализатор поиска
+        resp_dict = {
+            'films': [],
+        }
+
+        if self.request.REQUEST.get('text'):
+            try:
+                resp_dict['films'] = SearchFilmsView.as_view()(self.request, use_thread=True).data
+                resp_dict['search_text'] = self.request.REQUEST.get('text')
+            except Exception, e:
+                pass
+
+        return HttpResponse(render_page('search', resp_dict))
+
 
 
 def test_view(request):
@@ -235,68 +320,6 @@ def calc_comments(o_film):
     return result_list
 
 
-def film_view(request, film_id, *args, **kwargs):
-    resp_dict, o_film = film_to_view(film_id)
-    resp_dict['similar'] = calc_similar(o_film)
-
-    # Trailer
-    trailer = film_model.FilmExtras.get_trailer_by_film(film_id, first=True)
-    if not trailer is None:
-        resp_dict['trailer'] = trailer.url
-
-    return HttpResponse(render_page('film', {'film': resp_dict}))
-
-
-def playlist_view(request, film_id=None, *args, **kwargs):
-    if not film_id:
-        film_id = 1
-
-    if request.user.is_authenticated():
-        # Init data
-        film_data = {}
-        playlist = {'id': 0}
-        film_id = int(film_id)
-
-        # Выборка плейлиста
-        playlist_data = film_model.Films.objects.\
-            filter(uf_films_rel__user=request.user.id, uf_films_rel__status=APP_USERFILM_STATUS_PLAYLIST).\
-            order_by('uf_films_rel__created')
-
-        # Обработка плейлиста
-        len_playlist = len(playlist_data)
-        if len_playlist > 0:
-            if film_id > len(playlist_data) or film_id < 1:
-                return redirect('playlist_film_view', film_id=1)
-
-            def arrow_data(data, f_id):
-                return {'id': f_id, 'name': data.name}
-
-            if film_id < len(playlist_data):
-                playlist['next'] = arrow_data(playlist_data[film_id], film_id+1)
-
-            if film_id > 1:
-                playlist['previous'] = arrow_data(playlist_data[film_id-2], film_id-1)
-
-            film = playlist_data[film_id-1]
-            film_data, o_film = film_to_view(film.id)
-
-
-        # Update playlist
-        playlist.update({
-            'id': film_id,
-            'film': film_data,
-            'total_cnt': len_playlist,
-            'items': vbFilm(playlist_data, many=True).data,
-
-            # Список рекомендуемых фильмов
-            'films': get_recommend_film(request),
-        })
-
-        return HttpResponse(render_page('playlist', {'playlist': playlist, 'film': film_data}))
-
-    return redirect('login_view')
-
-
 def film_to_view(film_id):
     o_film = film_model.Films.objects.filter(pk=film_id).prefetch_related('genres', 'countries')
 
@@ -327,22 +350,6 @@ def kinopoisk_view(request, film_id, *args, **kwargs):
         pass
 
     return redirect('index_view')
-
-
-def search_view(request, *args, **kwargs):
-    # Устанавливаем ответ по умолчанию и вызываем сериализатор поиска
-    resp_dict = {
-        'films': [],
-    }
-
-    if request.REQUEST.get('text'):
-        try:
-            resp_dict['films'] = SearchFilmsView.as_view()(request, use_thread=True).data
-            resp_dict['search_text'] = request.REQUEST.get('text')
-        except Exception, e:
-            pass
-
-    return HttpResponse(render_page('search', resp_dict))
 
 
 def get_recommend_film(request):

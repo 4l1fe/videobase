@@ -41,6 +41,7 @@ djorm-ext-pgfulltext
 GitPython
 PySocks
 django-nose
+ipdb
 
-#sudo apt-get install -y mercurial memcached libmemcached-dev zlib1g-dev libssl-dev python-dev build-essential libjpeg-dev libfreetype6-dev zlib1g-dev libpng12-dev libpq-dev libgraphviz-dev graphviz nginx python-virtualenv python-pygraphviz pkg-config postgresql nodejs git-flow libxslt-dev libxml2-dev libcurl4-openssl-dev curl tor
+#sudo apt-get install -y mercurial memcached libmemcached-dev zlib1g-dev libssl-dev python-dev build-essential libjpeg-dev libfreetype6-dev zlib1g-dev libpng12-dev libpq-dev libgraphviz-dev graphviz nginx python-virtualenv python-pygraphviz pkg-config postgresql nodejs git-flow libxslt-dev libxml2-dev libcurl4-openssl-dev curl tor ipdb
 #sudo npm install jade zerorpc

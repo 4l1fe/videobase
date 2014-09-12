@@ -1,10 +1,8 @@
 #coding: utf-8
-import json
 import os
-from django.db import transaction, IntegrityError
 from rest_framework import status
 from rest_framework.reverse import reverse
-from rest_framework.test import APITestCase, APITransactionTestCase, APISimpleTestCase
+from rest_framework.test import APISimpleTestCase
 from rest_framework.authtoken.models import Token
 import videobase.settings as settings
 from apps.films.tests.factories import (UserFactory, GenreFactory, CountriesFactory, PersonFactory,
@@ -14,7 +12,7 @@ from apps.films.constants import (APP_FILM_SERIAL, APP_PERSON_DIRECTOR, APP_PERS
                                   APP_USERFILM_STATUS_UNDEF, APP_USERFILM_STATUS_NOT_WATCH, APP_USERFILM_STATUS_PLAYLIST,
                                   APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER, APP_FILM_TYPE_ADDITIONAL_MATERIAL_TRAILER,
                                   APP_USERFILM_SUBS_TRUE, APP_USERFILM_SUBS_FALSE, APP_USERFILM_STATUS)
-from apps.users.models.api_session import SessionToken, UsersApiSessions
+from apps.users.models.session_token import SessionToken
 from apps.users.constants import FILM_SUBSCRIBE, FILM_COMMENT, FILM_NOTWATCH, FILM_RATE
 from apps.films.models import UsersFilms, Genres, FilmExtras
 from apps.contents.models import Comments
@@ -70,7 +68,6 @@ class FilmsTestCase(APISimpleTestCase):
         self.films.append(FilmFactory.create())
         token = Token.objects.get(user=self.user)
         s_token = SessionToken.objects.create(user=self.user)
-        UsersApiSessions.objects.create(token=s_token)
         self.headers = s_token.key
 
     def feed_assert(self, obj_val, f_type):

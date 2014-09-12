@@ -1,12 +1,12 @@
 # coding: utf-8
 
+import datetime
+
 from django.core.paginator import Paginator
-from djorm_pgfulltext.models import SearchManager
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-
 
 from videobase.settings import DEFAULT_REST_API_RESPONSE
 
@@ -15,21 +15,18 @@ from apps.casts.api.serializers import vbCast
 from apps.casts.forms import CastsListFormBase
 from apps.casts.constants import APP_CASTS_CASTS_PER_PAGE, APP_CASTS_DEFAULT_PAGE
 
+from utils.common import traceback_own
 
-import datetime
 
-
-def ids_tranform(o_search,filter):
-    
+def ids_tranform(o_search, filter):
     ids = filter['id']
-    
+
     if type(ids) is int:
         o_search = o_search.filter(pk=ids)
     elif type(ids) is list:
-        o_search = o_search.filter(pk__in = ids)
+        o_search = o_search.filter(pk__in=ids)
 
     return o_search
-
 
 
 #############################################################################################################
@@ -42,7 +39,7 @@ class CastsListView(APIView):
         try:
             page = int(page)
         except (TypeError, ValueError):
-            page =APP_CASTS_DEFAULT_PAGE
+            page = APP_CASTS_DEFAULT_PAGE
 
         if page < APP_CASTS_DEFAULT_PAGE:
             page = APP_CASTS_DEFAULT_PAGE
@@ -58,84 +55,69 @@ class CastsListView(APIView):
         filter.update({'per_page': per_page, 'page': page})
         return filter
 
-    def validate_tags(self,tag):
 
+    def validate_tags(self, tag):
         try:
             tag = int(tag)
             return tag
         except ValueError:
-
             try:
                 tag = list(tag)
                 return tag
             except ValueError:
-
                 return Response({'error': 'Wrong tags field. Neither int nor list of ints'}, status=status.HTTP_400_BAD_REQUEST)
 
-            
 
-    def search(self,filter):
-        o_search = Casts.search_manager.filter()
+    def search(self, filter):
+        o_search = Casts.search_manager.all()
 
-        def subscribe_calc(o_s,is_subscribed):
-            
+        def subscribe_calc(o_s, is_subscribed):
             if self.request.user.is_authenticated() and filter.get('recommend'):
                 sql = """
-                NOT "casts"."id" IN (
-                SELECT "users_casts"."film_id" FROM "users_casts"
-                WHERE "users_films"."user_id" = %s AND
-                      ("users_films"."subscribed" = %s )
-            )
-            """
+                    NOT "casts"."id" IN (
+                    SELECT "users_casts"."film_id" FROM "users_casts"
+                    WHERE "users_films"."user_id" = %s AND
+                          ("users_films"."subscribed" = %s )
+                )
+                """
 
-                o_search = o_s.extra(
+                o_s = o_s.extra(
                     where=[sql],
                     params=[self.request.user.pk, is_subscribed],
                 )
 
             return o_s
-            
 
         transform_map = {
             'id': ids_tranform,
-            'text': lambda o_s,arg: o_s.search(arg),
-            'status':lambda o_s,arg:o_s.filter(status=arg),
-            'pg_rating':lambda o_s,arg:o_s.filter(pg_rating_lte=arg),
-            'service':lambda o_s,arg:o_s.filter(service=arg),
-            'price_type':lambda o_s,arg:o_s.filter(price_type=arg),
-            'price_low':lambda o_s,arg:o_s.filter(price__gte=arg),
-            'price_high':lambda o_s,arg:o_s.filter(price__lte=arg),
-            'start_in':lambda o_s,arg:o_s.filter(start=datetime.datetime.now()+datetime.timedelta(minutes=arg)),
-            'tag':lambda o_s,arg:o_s.filter(tags__id = arg),
-            'subscribed':subscribe_calc,
-            'per_page':lambda o_s,arg:o_s,
-            'page':lambda o_s,arg:o_s,
+            'text': lambda o_s, arg: o_s.search(arg),
+            'status': lambda o_s, arg: o_s.filter(status=arg),
+            'pg_rating': lambda o_s, arg: o_s.filter(pg_rating_lte=arg),
+            'service': lambda o_s, arg: o_s.filter(service=arg),
+            'price_type': lambda o_s, arg: o_s.filter(price_type=arg),
+            'price_low': lambda o_s, arg: o_s.filter(price__gte=arg),
+            'price_high': lambda o_s, arg: o_s.filter(price__lte=arg),
+            'start_in': lambda o_s, arg: o_s.filter(start=datetime.datetime.now()+datetime.timedelta(minutes=arg)),
+            'tag': lambda o_s, arg: o_s.filter(tags__id=arg),
+            'subscribed': subscribe_calc,
+            'per_page': lambda o_s, arg: o_s,
+            'page': lambda o_s, arg: o_s,
             # TODO Test that it returns correct objects in case of multiple tags per cast
         }
 
-        print filter
         for field in filter:
             if filter[field]:
-                o_search= transform_map[field](o_search,filter[field])
+                o_search = transform_map[field](o_search, filter[field])
 
         return o_search
 
-    def get(self,request,*args,**kwargs):
-        
+    def get(self, request, *args, **kwargs):
         self.get_copy = request.GET.copy()
-
-
         if 'tags' in self.get_copy:
-            pass
+            raise Exception('Need realese')
 
-
-        form = CastsListFormBase(data = self.get_copy)
-
-
-        
+        form = CastsListFormBase(data=self.get_copy)
         if form.is_valid():
-
-            #print filter['per_page']
             per_page = self.get_copy.get('per_page')
             page = self.get_copy.get('page')
             
@@ -143,29 +125,20 @@ class CastsListView(APIView):
             per_page = filter['per_page']
             page = filter['page']
 
-            
             o_search = self.search(filter)
             try:
-                page = Paginator(o_search,per_page).page(page)
-
-
-                
-            except Exception,e:
-
-                import traceback
-                traceback.print_exc()
-
+                page = Paginator(o_search, per_page).page(page)
+            except Exception, e:
+                traceback_own(e)
                 return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
             result = {
-                    'total_cnt': page.paginator.count,
-                    'per_page': page.paginator.per_page,
-                    'page': page.number,
-                    'items': vbCast(page.object_list, many=True).data,
-                }
+                'total_cnt': page.paginator.count,
+                'per_page': page.paginator.per_page,
+                'page': page.number,
+                'items': vbCast(page.object_list, many=True).data,
+            }
 
-            
             return Response(result, status=status.HTTP_200_OK)
         
         return Response(form.errors, status=status.HTTP_400_BAD_REQUEST)
-

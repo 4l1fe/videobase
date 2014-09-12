@@ -9,7 +9,7 @@ from apps.films.constants import APP_FILM_SERIAL, APP_USERFILM_STATUS_PLAYLIST, 
     APP_PERSON_DIRECTOR, APP_PERSON_ACTOR, APP_PERSON_SCRIPTWRITER, APP_PERSON_PRODUCER, APP_USERFILM_SUBS_TRUE
 from apps.users.constants import APP_USER_REL_TYPE_NONE,\
     APP_USERS_API_DEFAULT_PER_PAGE, APP_USERS_API_DEFAULT_PAGE
-from apps.users.models.api_session import SessionToken, UsersApiSessions
+from apps.users.models import SessionToken
 from apps.users.tests.factories_users_api import *
 from apps.users.api.users_persons import persons_type
 from apps.users.constants import USER_ASK, USER_FRIENDSHIP
@@ -24,7 +24,6 @@ class APIUsersFriendShipActionTestCase(APISimpleTestCase):
         self.url_name = 'users_friendship_action'
         self.kwargs = {'format': 'json', 'user_id': self.user.pk}
         s_token = SessionToken.objects.create(user=self.user)
-        UsersApiSessions.objects.create(token=s_token)
         self.headers = s_token.key
 
     def test_api_users_friendship_401_get(self):
@@ -167,7 +166,6 @@ class APIUsersTestCase(APITestCase):
         self.url_name = 'users'
         self.kwargs = {'format': 'json', 'user_id': self.user.pk}
         s_token = SessionToken.objects.create(user=self.user)
-        UsersApiSessions.objects.create(token=s_token)
         self.headers = s_token.key
 
     def test_api_users_401_get(self):
@@ -205,7 +203,6 @@ class APIUsersTestCase(APITestCase):
         user = UserFactory.create()
 
         s_token = SessionToken.objects.create(user=self.user)
-        UsersApiSessions.objects.create(token=s_token)
         headers = s_token.key
 
         response = self.client.post(reverse(self.url_name, kwargs=self.kwargs),
@@ -235,7 +232,6 @@ class APIUsersTestCase(APITestCase):
 
         UserRelsFactory.create(user=self.user, user_rel=user, rel_type=APP_USER_REL_TYPE_FRIENDS)
         s_token = SessionToken.objects.create(user=user)
-        UsersApiSessions.objects.create(token=s_token)
         headers = s_token.key
 
         response = self.client.post(reverse(self.url_name, kwargs=self.kwargs),
@@ -299,7 +295,6 @@ class APIUsersTestCase(APITestCase):
         user = UserFactory.create()
 
         s_token = SessionToken.objects.create(user=self.user)
-        UsersApiSessions.objects.create(token=s_token)
         headers = s_token.key
 
         response = self.client.post(reverse(self.url_name, kwargs=self.kwargs),

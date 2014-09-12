@@ -29,7 +29,7 @@ BACKUP_PATH = os.path.join(BASE_PATH, '..', '.backup')
 SECRET_KEY = '7-dsc0--i_ej94w9as#-5p_5a)ql*9o80v1rs9krx!_-9%^b5$'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 TEMPLATE_DEBUG = DEBUG
 
@@ -99,7 +99,6 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'utils.middlewares.AuthTokenMiddleware',
     'utils.middlewares.ThreadLocals',
     'utils.middlewares.ExceptionMiddleware'
 )
@@ -159,9 +158,14 @@ AUTHENTICATION_BACKENDS = (
     'social_auth.backends.facebook.FacebookBackend',
     'social_auth.backends.contrib.vk.VKOAuth2Backend',
     'social_auth.backends.google.GoogleOAuth2Backend',
-
     # Django
     'django.contrib.auth.backends.ModelBackend',
+)
+
+# Backends for template auth
+TEMPLATE_AUTHENTICATION_BACKENDS = (
+    # Auth
+    'apps.users.backends.CookiesSessionAuthentication',
 )
 
 ###########################################################
@@ -247,10 +251,8 @@ SOCIAL_AUTH_PIPELINE = (
     'social_auth.backends.pipeline.social.load_extra_data',
 )
 
-
 # In minutes
 API_SESSION_EXPIRATION_TIME = 15
-
 
 ###########################################################
 CELERYBEAT_SCHEDULE = {
@@ -326,13 +328,11 @@ CELERYBEAT_SCHEDULE = {
         'task': 'film_info_check_and_correct',
         'schedule': timedelta(days=7),
     },
-
-     # Persons check and correct
+    # Persons check and correct
     'persons_check_and_correct': {
         'task': 'persons_check_and_correct',
         'schedule': timedelta(days=7),
     },
-
     # Checking locations for new films weekly
     'age_weighted_robot_launch_task_weekly': {
         'task': 'age_weighted_robot_launch',
@@ -345,7 +345,6 @@ CELERYBEAT_SCHEDULE = {
         'schedule': timedelta(days=31),
         'args': (3,)
     },
-
     # Checking locations for aged films yearly
     'age_weighted_robot_launch_task_six_month': {
         'task': 'age_weighted_robot_launch',
@@ -361,7 +360,7 @@ CELERYBEAT_SCHEDULE = {
         'task': 'refresh_sitemap',
         'schedule': timedelta(days=14)
     },
-     # Parsing videos from YouTubeMoviesRU
+    # Parsing videos from YouTubeMoviesRU
     'parse_you_tube_movies_ru': {
         'task': 'parse_you_tube_movies_ru',
         'schedule': timedelta(days=1)
@@ -371,7 +370,6 @@ CELERYBEAT_SCHEDULE = {
         'task': 'consolidate_rating',
         'schedule': timedelta(days=1)
     },
-
     # Send robots statistic to email
     'send_robots_statistic_to_email': {
         'task': 'send_robots_statistic_to_email',
@@ -383,14 +381,27 @@ CELERYBEAT_SCHEDULE = {
         'task': 'parse_news_from_now_ru',
         'schedule': timedelta(hours=12)
     },
-
     # News from stream.ru
     'parse_news_from_stream_ru': {
         'task': 'parse_news_from_stream_ru',
         'schedule': timedelta(hours=12)
     },
-
-    
+    'cast_sportbox_ru_schedule': {
+        'task': 'cast_sportbox_robot',
+        'schedule': timedelta(hours=24)
+    },
+    'cast_championat_com_schedule': {
+        'task': 'cast_championat_robot',
+        'schedule': timedelta(hours=24)
+    },
+        'cast_liverussia_ru_schedule': {
+        'task': 'cast_liverussia_robot',
+        'schedule': timedelta(hours=24)
+    },
+        'cast_khl_ru_schedule': {
+        'task': 'cast_khl_robot',
+        'schedule': timedelta(hours=24)
+    },
 }
 
 CELERY_TIMEZONE = 'UTC'

@@ -4,7 +4,7 @@ from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
 
 from .factories_users_api import UserFactory
-from apps.users.models.api_session import SessionToken, UsersApiSessions
+from apps.users.models import SessionToken
 from apps.users.models import User
 from utils.common import random_string
 
@@ -16,7 +16,6 @@ class APIUserTestCase(APITestCase):
         self.profile = self.user.profile
         self.url_name = ''
         s_token = SessionToken.objects.create(user=self.user)
-        UsersApiSessions.objects.create(token=s_token)
         self.headers = s_token.key
 
     def test_api_user_401_post(self):
