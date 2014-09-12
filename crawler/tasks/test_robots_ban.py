@@ -1,5 +1,4 @@
 # coding: utf-8
-from ipdb import set_trace
 from apps.contents.models import Locations, Contents
 from apps.robots.models import Robots
 from crawler.core.exceptions import NoSuchFilm
