@@ -1,5 +1,7 @@
 # coding: utf-8
 
+from operator import itemgetter
+
 from django.contrib.auth.models import User
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
@@ -10,17 +12,17 @@ from apps.casts.models import Casts, CastsLocations
 from apps.casts.constants import APP_CASTS_MAIL_SUBJECT, APP_CASTS_MAIL_TEMPLATE
 
 
-def find_min(price_list):
-    free_view = False
-    min_price = False
+def find_min_price(price_list):
+    has_free = min_obj = False
 
-    min_value = min(price_list)
-    if min_value > 0:
-        min_price = min_value
-        if price_list.index(min_value) > 0:
-            free_view = True
+    for item in price_list:
+        if item.price_type == 0:
+            has_free = True
+        else:
+            if min_obj is False or min_obj.price > item.price:
+                min_obj = item
 
-    return free_view, min_price
+    return has_free, min_obj
 
 
 @app.task(name="cast_notify", queue="send_cast_notify")
@@ -28,22 +30,13 @@ def cast_notification(cast, user):
     o_user = User.objects.get(id=user)
     o_cast = Casts.objects.get(id=cast)
 
-    o_loc = CastsLocations.objects.raw(
-        """
-        SELECT DISTINCT ON (casts_locations.price) *
-        FROM casts_locations
-        WHERE casts_locations.cast_id = %s
-        ORDER BY casts_locations.price LIMIT 2
-        """, [o_cast.id]
-    )
-
-    price_list = [i.price for i in o_loc]
-    free_view, min_price = find_min(price_list)
+    o_loc = CastsLocations.objects.filter(cast=o_cast)
+    has_free, min_obj = find_min_price(o_loc)
 
     context = {
         'cast': o_cast,
-        'free': free_view,
-        'min_price': min_price,
+        'free': has_free,
+        'min_obj': min_obj,
     }
 
     tpl = render_to_string(APP_CASTS_MAIL_TEMPLATE, context)
