@@ -6,7 +6,7 @@ __author__ = 'vladimir'
 
 
 def create_queue_str(robot_name):
-    return "python manage.py celery worker -Q {}".format(robot_name)
+    return executable + " manage.py celery worker -Q {}".format(robot_name)
 
 
 def generate_process_section_with_parameters(programm_name, command, log_file_name):
@@ -28,11 +28,11 @@ def generate_config_file():
     result_file_name = ''
     f = open('robots_config.conf', 'w')
     for robot in Robots.objects.all():
-        robo_command = create_queue_str(executable + robot.name)
+        robo_command = create_queue_str(robot.name)
         f.write(generate_process_section_with_parameters(robot.name, robo_command, robot.name))
-    saver_command = create_queue_str(executable + 'location_saver')
+    saver_command = create_queue_str('location_saver')
     f.write(generate_process_section_with_parameters('location_saver', saver_command, 'location_saver'))
-    thor_command = create_queue_str(executable + 'thor')
+    thor_command = create_queue_str('thor')
     f.write(generate_process_section_with_parameters('thor', thor_command, 'thor'))
     result_file_name = 'robots_config.conf'
     return result_file_name
