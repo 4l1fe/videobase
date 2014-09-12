@@ -1,17 +1,11 @@
 # coding: utf-8
-import os, sys
-sys.path.append('/home/dmitriy/projects/videobase/')
-os.environ['DJANGO_SETTINGS_MODULE'] = 'videobase.settings'
-
 from django.contrib.auth.models import User
 from rest_framework import serializers
 from apps.contents.models import Comments, Locations
-from apps.films.models import FilmExtras, Persons, PersonsFilms, Films, UsersFilms
+from apps.films.models import FilmExtras, PersonsFilms, Films, UsersFilms
 from apps.users import UsersPics
 from apps.users.models.users_feed import Feed
 from apps.users.api.serializers import vbUser
-from django.core.cache import cache
-from apps.users.constants import CACHED_FEED_TIMEOUT
 from apps.users.constants import (FILM_RATE, FILM_SUBSCRIBE, FILM_NOTWATCH,
                                   FILM_COMMENT, FILM_O, PERSON_SUBSCRIBE,
                                   PERSON_O, USER_ASK, USER_FRIENDSHIP, SYS_ALL)
@@ -23,121 +17,143 @@ class vbFeedElement(serializers.ModelSerializer):
     user = serializers.SerializerMethodField('get_user_field')
     object = serializers.SerializerMethodField('get_object_field')
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args,  **kwargs):
         super(vbFeedElement, self).__init__(*args, **kwargs)
-        if not (isinstance(self.object, QuerySet) or isinstance(self.object, Feed)):
-            raise TypeError('object must be QuerySet or Feed instance')
+        self.feeds = self.object
 
-        if not isiterable(self.object):
-            self.object = [self.object]
+        if not (isinstance(self.feeds, QuerySet) or isinstance(self.feeds, Feed)):
+            raise TypeError('object must be QuerySet or Feed instance')
+        
+        if not isiterable(self.feeds):
+            self.feeds = [self.feeds]
 
         self.user_data = {}  # собираем заранее данные по различным пользователям
-        for ins in self.object:
-            if ins.user_id and ins.user_id not in self.user_data:
-                self.user_data.update({ins.user_id: vbUser(ins.user).data})
+        for f in self.feeds:
+            if f.user_id and f.user_id not in self.user_data:
+                self.user_data.update({f.user_id: vbUser(f.user).data})
 
-        films_id = []
-        for feed in self.object:
+        films_id = self._get_only_films_id()  # собираем инфу по фильмам
+        self.films = {}
+        for film in Films.objects.filter(pk__in=films_id):
+            poster = FilmExtras.get_poster_by_film(film.fe_film_rel.all())
+            self.films[film.id] = {'name': film.name,
+                                   'description': film.description,
+                                   'poster': poster}
+
+        films_id = self._get_only_films_id()  # собираем инфу по рейтингам
+        users_films = UsersFilms.objects.filter(user_id__in=self.user_data.keys(),  # собираем рейтинги фильмовд
+                                                     film_id__in=films_id).values('user_id', 'film_id', 'rating')
+        self.ratings = {(uf['user_id'], uf['film_id']): uf['rating'] for uf in users_films}
+
+        self.persons = {}  # собираем инфу по персонам
+        persons_id = [f.obj_id for f in self.feeds if f.type in (PERSON_SUBSCRIBE, PERSON_O)]
+        for pf in PersonsFilms.objects.filter(person_id__in=persons_id).select_related():
+            if pf.person.id not in self.persons:
+                self.persons[pf.person.id] = {'name': pf.person.name,
+                                              'photo': pf.person.get_path_to_photo,
+                                              'type': pf.p_type}  # TODO: брать роль по статистике
+
+    #====================впомогательные
+    def _get_only_films_id(self):
+        films_id = []  # собираем из пришедших событий только id фильмов
+        for feed in self.feeds:
             if feed.type in [FILM_RATE, FILM_SUBSCRIBE, FILM_NOTWATCH, FILM_O]:
                 films_id.append(feed.obj_id)
             if feed.type in [FILM_COMMENT, PERSON_O]:
                 films_id.append(feed.child_obj_id)
+        return films_id
 
-        self.films = Films.objects.filter(pk__in=films_id)
-
-        users_films = UsersFilms.objects.filter(user_id__in=self.user_data.keys(),  # собираем рейтинги фильмов
-                                                     film_id__in=films_id).values('user_id', 'film_id', 'rating')
-        self.users_films = {(d['user_id'], d['film_id']): d['rating'] for d in users_films}
-
-    def get_film(self, id_):
-        for film in self.films:
-            if film.id == id_:
-                return film
-
+    #=====================формирование полей в отдаче
     def get_object_field(self, obj):
-        user_id = obj.user_id if obj.user_id else ''  # может придти None. Не во всех событиях указывается пользователь
-        key = '{},{},{}'.format(user_id, obj.type, obj.obj_id)
-        object_ = cache.get(key)
-        if not object_:
+        """Оборачиваем везде исключениями,
+         чтобы заглушалось только какое-то конкретное событие, но не все.
+         Не везде сделаны предвыборки, предполагается, что некоторые типы событий в ленту будут попадать не часто...
+         """
+        feed = obj
+        object_ = {}
+        if feed.type == FILM_RATE:
             try:
-                if obj.type == FILM_RATE:
-                    film = self.get_film(obj.obj_id)
-                    rating = self.users_films[(obj.user_id, obj.obj_id)]
-                    object_ = {'id': film.id,
-                               'name': film.name,
-                               'rating': rating}
-                elif obj.type == FILM_SUBSCRIBE:
-                    film = self.get_film(obj.obj_id)
-                    poster = FilmExtras.get_poster_by_film(film.fe_film_rel.all())
-                    object_ = {'id': film.id,
-                               'name': film.name,
-                               'poster': poster,
-                               'description': film.description}
-                elif obj.type == FILM_NOTWATCH:
-                    film = self.get_film(obj.obj_id)
-                    poster = FilmExtras.get_poster_by_film(film.fe_film_rel.all())
-                    object_ = {'id': film.id,
-                               'name': film.name,
-                               'poster': poster}
-                elif obj.type == FILM_COMMENT:
-                    comment = Comments.objects.get(pk=obj.obj_id)
-                    film = self.get_film(obj.child_obj_id)
-                    object_ = {'id': comment.id,
-                               'text': comment.text,
-                               'film': {'id': film.id,
-                                        'name': film.name}}
-                elif obj.obj_id == FILM_O:
-                    film = self.get_film(obj.obj_id)
-                    poster = FilmExtras.get_poster_by_film(film.fe_film_rel.all())
-                    location = Locations.objects.get(pk=obj.child_obj_id)
-                    object_ = {'id': film.id,
-                               'name': film.name,
-                               'poster': poster,
-                               'location': {'id': location.id,  # TODO: сделать массивом
-                                            'name': location.name,
-                                            'price': location.price,
-                                            'price_type': location.price_type}}
-                elif obj.type == PERSON_SUBSCRIBE:
-                    person = Persons.objects.get(pk=obj.obj_id)
-                    object_ = {'id': person.id,
-                               'name': person.name,
-                               'photo': person.get_path_to_photo}
-                elif obj.type == PERSON_O:
-                    person = Persons.objects.get(pk=obj.obj_id)
-                    film = self.get_film(obj.child_obj_id)
-                    pf = PersonsFilms.objects.filter(person=person, film=film).first()  #TODO: брать роль по статистике
-                    object_ = {'id': person.id,
-                               'name': person.name,
-                               'photo': person.get_path_to_photo,
-                               'type': pf.p_type,
-                               'film': {'id': film.id,
-                                        'name': film.name}}
-                elif obj.type == USER_ASK:
-                    friend = User.objects.get(pk=obj.obj_id)
-                    try:
-                        a = UsersPics.objects.get(user=friend).image
-                        avatar = a.storage.url(a.name)
-                    except:
-                        avatar = ''
-                    object_ = {'id': friend.id,
-                               'name': friend.username,
-                               'avatar': avatar}
-                elif obj.type == USER_FRIENDSHIP:
-                    friend = User.objects.get(pk=obj.obj_id)
-                    try:
-                        a = UsersPics.objects.get(user=friend).image
-                        avatar = a.storage.url(a.name)
-                    except:
-                        avatar = ''
-                    object_ = {'id': friend.id,
-                               'name': friend.username,
-                               'avatar': avatar}
-                elif obj.type == SYS_ALL:
-                    object_ = {}
-            except Exception as e:
+                rating = self.ratings[(feed.user_id, feed.obj_id)]
+                object_ = {'id': feed.obj_id,
+                           'name': self.films[feed.obj_id]['name'],
+                           'rating': rating}
+            except:
                 object_ = {}
-
-            cache.set(key, object_, CACHED_FEED_TIMEOUT)
+        elif feed.type == FILM_SUBSCRIBE:
+            try:
+                object_ = {'id': feed.obj_id,
+                           'name': self.films[feed.obj_id]['name'],
+                           'poster': self.films[feed.obj_id]['poster'],
+                           'description': self.films[feed.obj_id]['description']}
+            except:
+                object_ = {}
+        elif feed.type == FILM_NOTWATCH:
+            try:
+                object_ = {'id': feed.obj_id,
+                           'name': self.films[feed.obj_id]['name'],
+                           'poster': self.films[feed.obj_id]['poster']}
+            except:
+                object_ = {}
+        elif feed.type == FILM_COMMENT:
+            try:
+                comment = Comments.objects.get(pk=feed.obj_id)
+                object_ = {'id': comment.id,
+                           'text': comment.text,
+                           'film': {'id': feed.child_obj_id,
+                                    'name': self.films[feed.child_obj_id]['name']}}
+            except:
+                object_ = {}
+        elif feed.obj_id == FILM_O:
+            try:
+                location = Locations.objects.get(pk=feed.child_obj_id)
+                object_ = {'id': feed.obj_id,
+                           'name': self.films[feed.obj_id]['name'],
+                           'poster': self.films[feed.obj_id]['poster'],
+                           'locations': [{'id': location.id,  # TODO: сделать массивом
+                                        'name': location.name,
+                                        'price': location.price,
+                                        'price_type': location.price_type}]}
+            except:
+                object_ = {}
+        elif feed.type == PERSON_SUBSCRIBE:
+            try:
+                object_ = {'id': feed.obj_id,
+                           'name': self.persons[feed.obj_id]['name'],
+                           'photo': self.persons[feed.obj_id]['photo']}
+            except:
+                object_ = {}
+        elif feed.type == PERSON_O:
+            try:
+                object_ = {'id': feed.obj_id,
+                           'name': self.persons[feed.obj_id]['name'],
+                           'photo': self.persons[feed.obj_id]['photo'],
+                           'type': self.persons[feed.obj_id]['type'],
+                           'film': {'id': feed.child_obj_id,
+                                    'name': self.films[feed.child_obj_id]['name']}}
+            except:
+                object_ = {}
+        elif feed.type == USER_ASK:
+            try:
+                friend = User.objects.get(pk=feed.obj_id)
+                a = UsersPics.objects.get(user=friend).image
+                avatar = a.storage.url(a.name)
+                object_ = {'id': friend.id,
+                           'name': friend.username,
+                           'avatar': avatar}
+            except:
+                object_ = {}
+        elif feed.type == USER_FRIENDSHIP:
+            try:
+                friend = User.objects.get(pk=feed.obj_id)
+                a = UsersPics.objects.get(user=friend).image
+                avatar = a.storage.url(a.name)
+                object_ = {'id': friend.id,
+                           'name': friend.username,
+                           'avatar': avatar}
+            except:
+                object_ = {}
+        elif feed.type == SYS_ALL:
+            object_ = {}
 
         return object_
 
@@ -147,15 +163,3 @@ class vbFeedElement(serializers.ModelSerializer):
     class Meta:
         model = Feed
         fields = ('user', 'created', 'type', 'object', 'text')
-
-
-if __name__ == '__main__':
-    from datetime import datetime
-    cache.clear()
-    start = datetime.now()
-    data = vbFeedElement(Feed.objects.filter(user_id=1), many=True).data
-    end = datetime.now()
-    delta = end - start
-    sec = delta.seconds
-    ms = delta.microseconds/1000
-    print('taken time: {}.{} sec'.format(sec, ms))

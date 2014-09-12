@@ -76,7 +76,8 @@ class LoginUserView(View):
         return response
 
     def post(self, *args, **kwargs):
-        login_form = AuthenticationForm(data=self.request.POST)
+        data = self.request.POST
+        login_form = AuthenticationForm(data=data)
         if login_form.is_valid():
             user = login_form.get_user()
             kw = {
@@ -161,7 +162,7 @@ class UserView(View):
             vbd = vbPerson(directors.object_list, many=True)
 
             # Сериализуем
-            o_feed = vbFeedElement(calc_feed(user.id), many=True).data
+            o_feed = vbFeedElement(calc_feed(user.id), requested_user_id=user.id, many=True).data
 
             default_user.update({
                 'films': vbf.data,
@@ -251,14 +252,18 @@ def calc_feed(user_id):
     return o_feed
 
 
-def feed_view(request):
-    if request.user.is_authenticated():
-        # Сериализуем
-        try:
-            o_feed = vbFeedElement(calc_feed(request.user.id), many=True).data
-        except Exception, e:
-            raise Http404
+class FeedView(View):
 
-        return HttpResponse(render_page('feed', {'feed': o_feed}))
+    def get(self, request, **kwargs):
+        if request.user.is_authenticated():
+            # Сериализуем
+            try:
+                user_id = request.user.id
+                feeds = calc_feed(user_id)
+                o_feed = vbFeedElement(feeds, requested_user_id=user_id, many=True).data
+            except Exception, e:
+                raise Http404
 
-    return redirect('login_view')
+            return HttpResponse(render_page('feed', {'feed': o_feed}))
+
+        return redirect('login_view')
