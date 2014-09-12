@@ -10,7 +10,7 @@ def create_queue_str(robot_name):
 
 
 def create_main_queue_str():
-    return executable + " manage.py celery worker"
+    return "\n" + executable + " manage.py celery worker"
 
 
 def generate_process_section_with_parameters(programm_name, command, log_file_name):
