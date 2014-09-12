@@ -162,7 +162,7 @@ class UserView(View):
             vbd = vbPerson(directors.object_list, many=True)
 
             # Сериализуем
-            o_feed = vbFeedElement(calc_feed(user.id), requested_user_id=user.id, many=True).data
+            o_feed = vbFeedElement(calc_feed(user.id), many=True).data
 
             default_user.update({
                 'films': vbf.data,
@@ -260,7 +260,7 @@ class FeedView(View):
             try:
                 user_id = request.user.id
                 feeds = calc_feed(user_id)
-                o_feed = vbFeedElement(feeds, requested_user_id=user_id, many=True).data
+                o_feed = vbFeedElement(feeds, many=True).data
             except Exception, e:
                 raise Http404
 
