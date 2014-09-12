@@ -1,15 +1,14 @@
 # coding: utf-8
 
-from operator import itemgetter
-
 from django.contrib.auth.models import User
-from django.core.mail import EmailMultiAlternatives
-from django.template.loader import render_to_string
+from django.forms.models import model_to_dict
 
 from videobase.celery import app
 
 from apps.casts.models import Casts, CastsLocations
 from apps.casts.constants import APP_CASTS_MAIL_SUBJECT, APP_CASTS_MAIL_TEMPLATE
+
+from apps.users.tasks import send_template_mail
 
 
 def find_min_price(price_list):
@@ -33,13 +32,15 @@ def cast_notification(cast, user):
     o_loc = CastsLocations.objects.filter(cast=o_cast)
     has_free, min_obj = find_min_price(o_loc)
 
-    context = {
-        'cast': o_cast,
-        'free': has_free,
-        'min_obj': min_obj,
+    params = {
+        'context': {
+            'cast': model_to_dict(o_cast, fields=[field.name for field in o_cast._meta.fields]),
+            'free': has_free,
+            'min_obj': model_to_dict(min_obj, fields=[field.name for field in min_obj._meta.fields]),
+        },
+        'subject': APP_CASTS_MAIL_SUBJECT,
+        'tpl_name': APP_CASTS_MAIL_TEMPLATE,
+        'to': [o_user.email]
     }
 
-    tpl = render_to_string(APP_CASTS_MAIL_TEMPLATE, context)
-    msg = EmailMultiAlternatives(subject=APP_CASTS_MAIL_SUBJECT, to=o_user.email)
-    msg.attach_alternative(tpl, 'text/html')
-    msg.send()
+    send_template_mail.s(kwargs=params).apply_async()
