@@ -2,6 +2,9 @@
 
 
 # Базовый класс парсера для страници
+from crawler.core.exceptions import NoSuchFilm
+
+
 class BaseParse(object):
     def __init__(self, html):
         self.html = html
