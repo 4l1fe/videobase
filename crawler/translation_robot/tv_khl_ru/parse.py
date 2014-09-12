@@ -74,4 +74,4 @@ class TvKHLRuParser():
             if prog_div:
                 streams = TvKHLRuParser.get_translations_for_one_program_date_div(prog_div)
                 all_streams = all_streams + streams
-        return len(all_streams)
+        return all_streams
