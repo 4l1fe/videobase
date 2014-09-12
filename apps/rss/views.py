@@ -54,7 +54,7 @@ def get_feed_tw(request):
         'newdate': ''
     }
 
-    return render(request, 'tw_feed.html', result, content_type=CONTENT_TYPE)
+    return render(request, 'rss/tw_feed.html', result, content_type=CONTENT_TYPE)
 
 
 def get_feed_vk(request):
@@ -64,7 +64,7 @@ def get_feed_vk(request):
         'date': get_format_time(),
     }
 
-    return render(request, 'vk_feed.html', result, content_type=CONTENT_TYPE)
+    return render(request, 'rss/vk_feed.html', result, content_type=CONTENT_TYPE)
 
 
 def get_feed(request):
@@ -74,7 +74,7 @@ def get_feed(request):
         'date': get_format_time(),
     }
 
-    return render(request, 'feed.html', result, content_type=CONTENT_TYPE)
+    return render(request, 'rss/feed.html', result, content_type=CONTENT_TYPE)
 
 
 def get_feed_fb(request):
@@ -84,7 +84,7 @@ def get_feed_fb(request):
         'date': get_format_time(),
     }
 
-    return render(request, 'fb_feed.html', result, content_type=CONTENT_TYPE)
+    return render(request, 'rss/fb_feed.html', result, content_type=CONTENT_TYPE)
 
 
 def get_film_description(**kwargs):
