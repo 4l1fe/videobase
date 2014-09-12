@@ -5,4 +5,4 @@ APP_CASTS_CASTS_PER_PAGE = 12
 
 APP_CASTS_START_NOTIFY = 40
 APP_CASTS_MAIL_SUBJECT = 'Уведомление о старте трансляции'
-APP_CASTS_MAIL_TEMPLATE = 'cast_notification.html'
+APP_CASTS_MAIL_TEMPLATE = 'mail/cast_notification.html'
