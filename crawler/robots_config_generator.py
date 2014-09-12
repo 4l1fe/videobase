@@ -9,6 +9,10 @@ def create_queue_str(robot_name):
     return executable + " manage.py celery worker -Q {}".format(robot_name)
 
 
+def create_main_queue_str():
+    return executable + " manage.py celery worker"
+
+
 def generate_process_section_with_parameters(programm_name, command, log_file_name):
     template = '''
 [program:{}]
@@ -34,5 +38,6 @@ def generate_config_file():
     f.write(generate_process_section_with_parameters('location_saver', saver_command, 'location_saver'))
     thor_command = create_queue_str('thor')
     f.write(generate_process_section_with_parameters('thor', thor_command, 'thor'))
+    f.write(create_main_queue_str())
     result_file_name = 'robots_config.conf'
     return result_file_name
