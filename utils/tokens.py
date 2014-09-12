@@ -1,6 +1,5 @@
 #coding: utf-8
 """Содержит пару удобных методов для получения токенов по клиентским запросам через urllib.
-Так же есть методы на просмотрт возвращаемых значений от API проекта.
 """
 
 import sys
@@ -45,17 +44,8 @@ def get_session_token(main_token, address=ADDR):
     return json_resp['session_token']
 
 
-def get_feed(session_token, address=ADDR):
-    req = Request(urljoin(address, 'api/v1/users/2/feed.json?page=2,per_page=1000'))
-    resp = urlopen(req)
-    resp_data = resp.read()
-    json_resp = json.loads(resp_data)
-    return json_resp
-
 if __name__ == '__main__':
     mt = get_main_token(username='ak@aaysm.com', password='akka')
     print(mt)
     st = get_session_token(mt)
     print(st)
-    feed = get_feed(st)
-    print(feed)
