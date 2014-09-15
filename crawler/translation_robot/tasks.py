@@ -7,7 +7,7 @@ from utils.common import traceback_own
 
 
 def generic_task(parse_function, service_name):
-    parsed = parse_function
+    parsed = parse_function()
 
     print u'Got {} casts descriptions from {}'.format(len(parsed),service_name)
 
