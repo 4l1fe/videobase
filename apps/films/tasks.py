@@ -1,5 +1,9 @@
 # coding: utf-8
 
+from datetime import datetime, timedelta
+
+from django.forms.models import model_to_dict
+
 from videobase.celery import app
 
 from apps.films.models import Films
@@ -12,9 +16,13 @@ from apps.users.api.serializers import vbFeedElement
 from apps.users.constants import APP_USERPROFILE_NOTIFICATION_WEEK, APP_USERPROFILE_NOTIFICATION_DAY, \
     FILM_RATE, FILM_SUBSCRIBE, FILM_COMMENT
 
+from apps.casts.models import Casts
+
 
 @app.task(name="week_newsletter", queue="week_newsletter")
 def best_of_the_best_this_week():
+    curr_dt = datetime.now()
+
     # Выборка фильмов
     new_films = Films.get_newest_films(limit=10)
     new_films = vbFilm(new_films).data
@@ -43,6 +51,20 @@ def best_of_the_best_this_week():
         profile__confirm_email=True,
     ).prefetch_related('profile__user')
 
+    # Вычисляем воскресенье вечер
+    delta_days = 0
+    if curr_dt.weekday() < 6:
+        delta_days = 6 - curr_dt.weekday()
+
+    end_dt = curr_dt + timedelta(days=delta_days)
+    end_dt.replace(hour=23, minute=59, second=59)
+
+    # Вставка параметров трансляции
+    params_email['context']['casts'] = {
+        'best': model_to_dict(Casts.best_old_casts(start_dt=curr_dt - timedelta(days=7), end_dt=curr_dt)),
+        'future': model_to_dict(Casts.best_future_casts(start_dt=curr_dt, end_dt=end_dt)),
+    }
+
     for item in o_users:
         params_email.update({'to': item.email})
 
@@ -69,7 +91,6 @@ def personal_newsletter():
     for item in o_users:
         # Init data
         feeds = []
-        films = []
 
         # Выборка ленты друзей
         user_friends = UsersRels.get_all_friends_user(user_id=item.id, flat=True)
@@ -98,10 +119,15 @@ def personal_newsletter():
         # Проверка длинны
         if len(films):
             films = vbFilm(films, many=True).data
+        else:
+            films = []
 
         # Update
         params_email['to'] = item.email
-        params_email['context'] = {'feeds': feeds, 'films': films}
+        params_email['context'] = {
+            'feeds': feeds,
+            'films': films,
+        }
 
         # Отправляем email в очередь
         send_template_mail.s(kwargs=params_email).apply_async()

@@ -29,6 +29,42 @@ class Casts(models.Model):
     def __unicode__(self):
         return u'[{0}] {1}'.format(self.pk, self.title)
 
+    @classmethod
+    def best_old_casts(cls, start_dt=None, end_dt=None, limit=5):
+        if not (limit and start_dt and end_dt):
+            return []
+
+        sql = """
+        SELECT casts.* FROM (
+            SELECT casts.id, COUNT(users_casts.cast_id) AS casts_cnt
+            FROM casts INNER JOIN users_casts ON casts.id = users_casts.cast_id
+            WHERE casts.start > %s AND casts.start < %s AND users_casts.subscribed IS NOT NULL
+            GROUP BY users_casts.cast_id
+            LIMIT %s
+        ) AS cs LEFT JOIN casts.id = cs.cast_id
+        ORDER BY cs.casts_cnt DESC
+        """
+
+        return cls.objects.raw(sql, params=[start_dt, end_dt, limit])
+
+    @classmethod
+    def best_future_casts(cls, start_dt=None, end_dt=None, limit=4):
+        if not (limit and start_dt and end_dt):
+            return []
+
+        sql = """
+        SELECT casts.* FROM (
+            SELECT casts.id, COUNT(users_casts.cast_id) AS casts_cnt
+            FROM casts INNER JOIN users_casts ON casts.id = users_casts.cast_id
+            WHERE casts.start >= %s AND casts.start <= %s AND users_casts.subscribed IS NOT NULL
+            GROUP BY users_casts.cast_id
+            LIMIT %s
+        ) AS cs LEFT JOIN casts.id = cs.cast_id
+        ORDER BY cs.casts_cnt DESC
+        """
+
+        return cls.objects.raw(sql, params=[start_dt, end_dt, limit])
+
     class Meta:
         # Имя таблицы в БД
         db_table = 'casts'
