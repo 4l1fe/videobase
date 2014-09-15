@@ -111,7 +111,10 @@ class YoutubeChannelParser():
 
     @staticmethod
     def process_channels_list():
-        locations = []
+        locations = {
+        'info': [],
+        'type': 'viaplay'
+                }
         site_name = 'www.youtube.com'
         channels_list = YoutubeChannelParser.get_list_of_channels()
         YoutubeChannelParser.save_channels_list_to_robot_state(channels_list)

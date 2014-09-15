@@ -1,6 +1,7 @@
 
 from apps.films.models import Films
 from bs4 import BeautifulSoup
+from crawler.locations_saver import save_location_to_locs_dict
 from crawler.utils.locations_utils import save_location, sane_dict
 from apps.contents.constants import *
 from crawler.tor import simple_tor_get_page
@@ -14,6 +15,10 @@ class ViaplayRobot(object):
 
     def get_data(self):
         all_film_url = 'http://viaplay.ru/filmy/vse/5/alphabetical'
+        locations = {
+        'info': [],
+        'type': 'viaplay'
+                }
         content = simple_tor_get_page(all_film_url)
         soup_films = BeautifulSoup(content).find('ul', {'class': 'atoz-list'}).li.ul.find_all('li')
         films = Films.objects.values('name', 'id')
@@ -25,6 +30,7 @@ class ViaplayRobot(object):
                     for obj in film_query_set:
                         d = self.film_dict(obj, link)
                         save_location(**d)
+                        save_location_to_locs_dict(locations, **d)
                     break
 
     def film_dict(self, film, film_link):

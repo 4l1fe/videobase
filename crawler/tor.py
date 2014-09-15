@@ -8,6 +8,7 @@ import socket
 import cStringIO as StringIO
 from crawler.constants import TOR_PROXY, TOR_RECONNECTS
 from crawler.utils.headers import get_random_weighted_browser_string
+from videobase.settings import USE_THOR_FLAG
 
 DEFAULT_HEADERS = [ 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
         'Accept-Language: ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4',
@@ -117,7 +118,7 @@ def get_page_or_renew(url, user_agent, tor_flag):
 
 
 def simple_tor_get_page(url, tor_flag=False):
-    return get_page_or_renew(url, get_random_weighted_browser_string(), tor_flag)
+        return get_page_or_renew(url, get_random_weighted_browser_string(), USE_THOR_FLAG)
 
 
 ########################################################################

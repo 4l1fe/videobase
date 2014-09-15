@@ -29,7 +29,11 @@ class ParseMegogoFilm(BaseParse):
 
     def get_link(self, **kwargs):
         filmLinkDiv =  self.soup.find('div', {'class': 'fb-like'})
-        return filmLinkDiv.get('data-href')
+        lnk = filmLinkDiv.get('data-href')
+        if lnk:
+            return lnk
+        else:
+            return ''
 
     def get_price(self, **kwargs):
         price = 0
