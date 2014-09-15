@@ -135,21 +135,27 @@ class vbFeedElement(serializers.ModelSerializer):
         elif feed.type == USER_ASK:
             try:
                 friend = User.objects.get(pk=feed.obj_id)
-                a = UsersPics.objects.get(user=friend).image
-                avatar = a.storage.url(a.name)
                 object_ = {'id': friend.id,
-                           'name': friend.username,
-                           'avatar': avatar}
+                           'name': friend.username}
+                try:
+                    a = UsersPics.objects.get(user=friend).image
+                    avatar = a.storage.url(a.name)
+                    object_.update({'avatar': avatar})
+                except:
+                    object_.update({'avatar': ''})
             except:
                 object_ = {}
         elif feed.type == USER_FRIENDSHIP:
             try:
                 friend = User.objects.get(pk=feed.obj_id)
-                a = UsersPics.objects.get(user=friend).image
-                avatar = a.storage.url(a.name)
                 object_ = {'id': friend.id,
-                           'name': friend.username,
-                           'avatar': avatar}
+                           'name': friend.username}
+                try:
+                    a = UsersPics.objects.get(user=friend).image
+                    avatar = a.storage.url(a.name)
+                    object_.update({'avatar': avatar})
+                except:
+                    object_.update({'avatar': ''})
             except:
                 object_ = {}
         elif feed.type == SYS_ALL:
