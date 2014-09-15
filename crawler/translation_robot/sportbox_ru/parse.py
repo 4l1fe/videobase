@@ -41,7 +41,8 @@ def parse_translation():
                                           minute=int(minute)),
                 'price': 0,
                 'link': translation_url,
-                'embed_code': share_link
+                'embed_code': share_link,
+                'value': share_link
 
             }
             translations_list.append(translation_data)
