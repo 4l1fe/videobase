@@ -35,9 +35,13 @@
     <tr>
         <td width="109"></td>
         <td>
-            <a href="#" rel="nofollow" style="color:#fff; text-decoration: none; font: bold 16pt arial"><font size="4" style="border-bottom: 2px solid white;">Хоккей</font></a>
+            <!--
+            <a href="#" rel="nofollow" style="color:#fff; text-decoration: none; font: bold 16pt arial">
+                <font size="4" style="border-bottom: 2px solid white;">Хоккей</font>
+            </a>
             <span style="color:#ffcc00; font: bold 16pt arial"><font size="4">: </font></span>
-            <a href="#" rel="nofollow" style="color:#ffcc00;  text-decoration: none; font: bold 16pt arial">
+            -->
+            <a href="#" rel="nofollow" style="color:#ffcc00; text-decoration: none; font: bold 16pt arial">
                 <font size="4" style="border-bottom: 2px solid #ffcc00;">{{ cast|dict_get:"title" }}</font>
             </a>
         </td>
@@ -46,7 +50,9 @@
                 <span align="center" style="text-shadow: 0px 2px 1px #777; font-family: Arial, sans-serif; font-style: normal; font-weight: normal;  font-size: 14.5pt; line-height: 110%">
                     в {{ cast|dict_get:"start"|date:"H:i" }}<br>
                 </span>
-                <span align="center"  style="text-shadow: 0px 2px 1px #777; font-family: Arial, sans-serif; font-style: normal; font-weight: normal;  font-size: 9.5pt; line-height: 110%"><nobr>менее чем через 40 минут</nobr></span>
+                <span align="center" style="text-shadow: 0px 2px 1px #777; font-family: Arial, sans-serif; font-style: normal; font-weight: normal;  font-size: 9.5pt; line-height: 110%">
+                    <nobr>менее чем через 40 минут</nobr>
+                </span>
             </a>
         </td>
         <td width="109"></td>
@@ -54,23 +60,27 @@
     <tr>
         <td width="109"></td>
         <td colspan="2" style="padding-top: 15px;">
-         <table cellspacing="0" cellpadding="0">
-             <tr>
-                 <td width="282" height="50">
-                     <a href="#" class="button2">СМОТРЕТЬ <br> БЕСПЛАТНО</a>
-                 </td>
-                 <td width="110" height="50">
-                     <a href="#" class="button3"><nobr>или от 49 р.</nobr></a>
-                 </td>
-             </tr>
-         </table>
+            <table cellspacing="0" cellpadding="0">
+                <tr>
+                    {% if has_free %}
+                    <td width="282" height="50">
+                        <a href="#" class="button2">СМОТРЕТЬ <br> БЕСПЛАТНО</a>
+                    </td>
+                    {% endif %}
+                    {% if min_price %}
+                    <td width="110" height="50">
+                        <a href="#" class="button3"><nobr>{% if has_free %}или {% endif %}{% if loc_cnt > 1 %}от {% else %}за {% endif %}{{ min_price }} р.</nobr></a>
+                    </td>
+                    {% endif %}
+                </tr>
+            </table>
         </td>
         <td width="109"></td>
     </tr>
     <tr>
         <td width="109"></td>
         <td colspan="2" style="color:#fff;" height="170" padding="2">
-            <p style="margin-top: 10px; font-family: Arial, sans-serif; font-style: normal; font-weight: lighter;  font-size: 12.5pt; line-height: 125%">
+            <p style="margin-top: 10px; font-family: Arial, sans-serif; font-style: normal; font-weight: lighter; font-size: 12.5pt; line-height: 125%">
             {{ cast|dict_get:"description" }}
             </p>
         </td>
@@ -80,12 +90,16 @@
 <table width="800px" height="110" cellspacing="0" cellpadding="5">
     <tr>
         <td colspan="2" width="450" style="color:#7a7a7a">
-            <p style="padding-left: 12px; font-family: Arial, sans-serif; font-style: normal; font-weight: lighter;  font-size: 9.5pt; line-height: 120%">
+            <p style="padding-left: 12px; font-family: Arial, sans-serif; font-style: normal; font-weight: lighter; font-size: 9.5pt; line-height: 120%">
             Вы получили это письмо, потому что прошли регистрацию в проекте «Все Видео» и выразили согласие получать рассылку с новостями на указанный при регистрации адрес электронной почты. Вы можете <a href="#" rel="nofollow" style="color:#7a7a7a">отписаться</a> от этой рассылки или настроить частоту и формат рассылок в <a href="#" rel="nofollow" style="color:#7a7a7a">личном кабинете</a> пользователя.
             </p>
         </td>
-        <td style="padding-right: 0px;"><a href="http://vsevi.ru"><img src="http://vsevi.ru/static/img/logo-footer.png" width="90px" style="padding-bottom: 25px"></a></td>
-        <td style="padding-right: 0px;"><a href="http://solarispromo.com" title="" rel="nofollow"><img src="http://vsevi.ru/static/img/solaris-logo.png" style="padding-bottom: 30px"></a></td>
+        <td style="padding-right: 0px;">
+            <a href="http://vsevi.ru"><img src="http://vsevi.ru/static/img/logo-footer.png" width="90px" style="padding-bottom: 25px"></a>
+        </td>
+        <td style="padding-right: 0px;">
+            <a href="http://solarispromo.com" title="" rel="nofollow"><img src="http://vsevi.ru/static/img/solaris-logo.png" style="padding-bottom: 30px"></a>
+        </td>
     </tr>
 </table>
 </body>
