@@ -1,7 +1,7 @@
 # coding: utf-8
 
 from crawler.tasks.locrobots_tasks import amediateka_robot_start, pltask, \
-    viaplay_robot_start, launch_individual_film_site_task, robot_launcher
+    viaplay_robot_start, launch_individual_film_site_task, age_weighted_robot_launcher
 
 from crawler.tasks.datarobots_tasks import kinopoisk_films,\
     kinopoisk_set_paster, imdb_robot_start,\
