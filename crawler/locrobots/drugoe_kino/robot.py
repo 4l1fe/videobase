@@ -1,6 +1,7 @@
 import requests
 import json
 import re
+from crawler.locations_saver import save_location_to_locs_dict
 
 from crawler.utils.locations_utils import sane_dict, save_location
 from apps.contents.constants import APP_CONTENTS_PRICE_TYPE_FREE, APP_CONTENTS_PRICE_TYPE_PAY
@@ -41,7 +42,10 @@ def films_data():
 
 def update_drugoe_kino_listing():
 
-
+    locations = {
+        'info': [],
+        'type': 'amediateka_ru'
+                }
     for fdict in films_data():
 
         print fdict
@@ -85,4 +89,4 @@ def update_drugoe_kino_listing():
                 traceback.print_exc()
 
             save_location(**sd)
-            
+            save_location_to_locs_dict(locations, **sd)
