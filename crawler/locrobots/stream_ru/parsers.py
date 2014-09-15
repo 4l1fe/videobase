@@ -51,7 +51,11 @@ class ParseStreamFilm(BaseParse):
         return price, p_type
 
     def get_link(self, **kwargs):
-        return kwargs['url']
+        lnk = kwargs['url']
+        if lnk:
+            return lnk
+        else:
+            return ''
 
     def get_price(self, **kwargs):
         price = 0
