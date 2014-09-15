@@ -4,10 +4,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from django.db import IntegrityError
+from django.db.models import Q
 from videobase.settings import DEFAULT_REST_API_RESPONSE
-from apps.users.models import User, UsersRels, Feed, UsersPics
-from apps.users.constants import APP_USER_REL_TYPE_FRIENDS, APP_USER_REL_TYPE_NONE, \
-    USER_ASK, USER_FRIENDSHIP
+from apps.users.models import User, UsersRels, Feed
+from apps.users.constants import (APP_USER_REL_TYPE_NONE,
+                                  USER_ASK, USER_FRIENDSHIP,
+                                  APP_USER_REL_TYPE_SEND_NOT_RECEIVED)
 
 
 class UsersFriendshipView(APIView):
@@ -20,30 +22,23 @@ class UsersFriendshipView(APIView):
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-        ur_fields = {
-            'user': request.user,
-            'user_rel': user_friend
-        }
-
-        ur_fr_fields = {
-            'user': user_friend,
-            'user_rel': request.user,
-            'rel_type': APP_USER_REL_TYPE_FRIENDS
-        }
-
         try:
-            ur = UsersRels(**ur_fields)
-            ur.rel_type = APP_USER_REL_TYPE_FRIENDS
+            ur = UsersRels(user=request.user, user_rel=user_friend)
+            ur.rel_type = APP_USER_REL_TYPE_SEND_NOT_RECEIVED
             ur.save()
         except IntegrityError:
-            UsersRels.objects.filter(**ur_fields).update(rel_type=APP_USER_REL_TYPE_FRIENDS)
+            UsersRels.objects.filter(user=request.user, user_rel=user_friend).update(rel_type=APP_USER_REL_TYPE_SEND_NOT_RECEIVED)
 
-        if UsersRels.objects.filter(**ur_fr_fields).exists():
-            Feed.objects.filter(user=request.user, type=USER_ASK, obj_id=user_friend.id).delete()
-            feed, created = Feed.objects.get_or_create(user=self.request.user, type=USER_FRIENDSHIP, obj_id=user_friend.id)
+        if UsersRels.objects.filter(user_id=user_friend.id, user_rel_id=request.user.id,
+                                                rel_type=APP_USER_REL_TYPE_SEND_NOT_RECEIVED).exists():  # если есть встречная заявка
+            Feed.objects.filter(Q(user=request.user, type=USER_ASK, obj_id=user_friend.id)
+                                | Q(user=user_friend, type=USER_ASK, obj_id=request.user.id)).delete()
+            feed, created = Feed.objects.get_or_create(user=request.user, type=USER_FRIENDSHIP, obj_id=user_friend.id)
+            if not created: feed.save()
+            feed, created = Feed.objects.get_or_create(user=user_friend, type=USER_FRIENDSHIP, obj_id=request.user.id)
             if not created: feed.save()
         else:
-            feed, created = Feed.objects.get_or_create(user=self.request.user, type=USER_ASK, obj_id=user_friend.id)
+            feed, created = Feed.objects.get_or_create(user=request.user, type=USER_ASK, obj_id=user_friend.id)
             if not created: feed.save()
 
         return Response(status=status.HTTP_200_OK)
@@ -56,7 +51,6 @@ class UsersFriendshipView(APIView):
 
         UsersRels.objects.filter(user=request.user, user_rel=user_friend).update(rel_type=APP_USER_REL_TYPE_NONE)
         Feed.objects.filter(user=request.user, type__in=[USER_FRIENDSHIP, USER_ASK], obj_id=user_friend.id).delete()
+        Feed.objects.filter(user=user_friend, type=USER_FRIENDSHIP, obj_id=request.user.id).update(type=USER_ASK)
 
         return Response(DEFAULT_REST_API_RESPONSE,status=status.HTTP_200_OK)
-        
-

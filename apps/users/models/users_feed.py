@@ -3,8 +3,8 @@
 from django.contrib.auth.models import User
 from django.db import models
 
-from apps.users.constants import APP_FEED_TYPE, APP_USERS_API_DEFAULT_PER_PAGE,\
-                                 FILM_O, PERSON_O
+from apps.users.constants import (APP_FEED_TYPE, APP_USERS_API_DEFAULT_PER_PAGE,
+                                 FILM_O, PERSON_O, USER_ASK)
 import jsonfield
 
 
@@ -36,7 +36,7 @@ class Feed(models.Model):
 
     @classmethod
     def get_feeds_by_user(cls, user_id, uf=[], up=[], offset=0, limit=APP_USERS_API_DEFAULT_PER_PAGE, count=False, *args, **kwargs):
-        sql = """("users_feed"."user_id"=%s OR "users_feed"."user_id" IS NULL) AND (CASE
+        sql = """(("users_feed"."user_id"=%s AND "users_feed"."type"!=%s) OR "users_feed"."user_id" IS NULL) AND (CASE
             WHEN "users_feed"."user_id" IS NULL AND "users_feed"."type"=%s THEN
               CAST(coalesce(obj_id, '0') AS integer)=ANY(%s::integer[])
             WHEN "users_feed"."user_id" IS NULL AND "users_feed"."type"=%s THEN
@@ -44,7 +44,7 @@ class Feed(models.Model):
             ELSE true END)"""
 
         o_feed = cls.objects.extra(where=[sql],
-                                   params=[user_id, FILM_O, cls.list_to_str(uf), PERSON_O, cls.list_to_str(up)])
+                                   params=[user_id, USER_ASK, FILM_O, cls.list_to_str(uf), PERSON_O, cls.list_to_str(up)])
         result = o_feed.order_by('-created')[offset:(limit + offset)]
 
         if count:
