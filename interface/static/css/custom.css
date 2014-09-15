@@ -1071,7 +1071,7 @@ a.toggle-playlist.active {
 .blue-block .film-thumb .caption-def a span {color: #fff;}
 .blue-block .film-thumb .caption-def p {color: #85b6c7;}
 
-.film-thumb price_loc_cnt.poster-place {display: block; overflow:hidden; line-height: 0}
+.film-thumb .poster-place {display: block; overflow:hidden; line-height: 0}
 .film-thumb .btn-add {width: 50px;height: 50px;top: 0px;right: 0px;}
 .btn-def a {display: block;}
 .btn-def {
