@@ -68,6 +68,7 @@ def load_and_save_film_page_from_site(site, film_id):
     try:
         loaded_data = sites_crawler[site]['loader'](film).load() #загрузка страницы
         saved_file_name = save_loaded_data_to_file(loaded_data, film.id, site)
+        print "loaded ok"
     except NoSuchFilm:
         print "page loading failed"
         return None
