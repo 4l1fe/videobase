@@ -117,8 +117,8 @@ def get_page_or_renew(url, user_agent, tor_flag):
         return requests.get(url).content
 
 
-def simple_tor_get_page(url, tor_flag=USE_THOR_FLAG):
-    return get_page_or_renew(url, get_random_weighted_browser_string(), tor_flag)
+def simple_tor_get_page(url, tor_flag=False):
+        return get_page_or_renew(url, get_random_weighted_browser_string(), USE_THOR_FLAG)
 
 
 ########################################################################
