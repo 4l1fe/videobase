@@ -6,9 +6,11 @@ import re
 import string
 from bs4 import BeautifulSoup
 
-from crawler.tor import simple_tor_get_page
-
 from django.db import connection
+
+from crawler.tor import simple_tor_get_page
+from utils.common import dict_fetch_all
+
 
 NOW_HOST = 'http://www.now.ru'
 STREAM_HOST = 'http://www.stream.ru'
@@ -33,16 +35,6 @@ SITE_DICT = {
         'year_tag_args': ('p', {'class': 'genre-year'})
     },
 }
-
-
-def dict_fetch_all(cursor):
-
-    """Returns all rows from a cursor as a dict"""
-    desc = cursor.description
-    return [
-        dict(zip([col[0] for col in desc], row))
-        for row in cursor.fetchall()
-    ]
 
 
 def parse_news(robot_name):
