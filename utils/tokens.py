@@ -44,8 +44,27 @@ def get_session_token(main_token, address=ADDR):
     return json_resp['session_token']
 
 
+def add_friendship(session_token, id_):
+    req = Request(urljoin(ADDR, 'api/v1/users/{}/friendship.json'.format(id_)))
+    req.add_header('X-MI-SESSION', session_token)
+    resp = urlopen(req)
+    return resp.read()
+
+def del_friendship(session_token, id_):
+    import httplib
+    cl = httplib.HTTPConnection(HOST)
+    headers = {'X-MI-SESSION': session_token}
+    cl.request('DELETE', '/api/v1/users/{}/friendship.json'.format(id_), headers=headers)
+    resp = cl.getresponse()
+    return resp.read()
+
+
 if __name__ == '__main__':
-    mt = get_main_token(username='ak@aaysm.com', password='akka')
+    mt = get_main_token(username='nana@nana.na', password='na')
+    # mt = get_main_token(username='ak@aaysm.com', password='akka')
     print(mt)
     st = get_session_token(mt)
     print(st)
+    resp = add_friendship(st, 3)
+    print(resp)
+    # del_friendship(st, 42)
