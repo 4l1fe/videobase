@@ -9,7 +9,7 @@ from bs4 import BeautifulSoup
 from django.db import connection
 
 from crawler.tor import simple_tor_get_page
-from utils.common import dict_fetch_all
+from utils.common import dict_fetch_all_without_gen
 
 
 NOW_HOST = 'http://www.now.ru'
@@ -69,12 +69,12 @@ def parse_news(robot_name):
             year_tag = film.find(*site['year_tag_args'])
             year = int(re.search(ur'\d+', year_tag.text).group())
 
-            query = """SELECT * FROM (SELECT films.name, films.id, EXTRACT(YEAR FROM films.release_date) AS year,
+            query = """SELECT * FROM (SELECT films.id, films.name, EXTRACT(YEAR FROM films.release_date) AS year,
                 regexp_split_to_array(trim(both lower(translate(films.name, E%s, %s))), E'\\s+') AS new_name
                 FROM films) AS t WHERE t.year=%s AND t.new_name=regexp_split_to_array(%s, E'\\s+')"""
 
             cursor.execute(query, [pattern, ' ' * len(pattern), year, name])
-            result = dict_fetch_all(cursor)
+            result = dict_fetch_all_without_gen(cursor)
 
             if len(result) == 1:
                 link_tag = name_tag if robot_name == ROBOT_STREAM else name_tag.a
