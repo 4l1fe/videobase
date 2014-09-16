@@ -1,6 +1,8 @@
 # coding: utf-8
 from apps.films.models import Films
+
 from crawler.locations_saver import save_location_to_locs_dict
+
 
 from crawler.locrobots.ivi_ru.loader import IVI_Loader
 from crawler.locrobots.ivi_ru.parsers import ParseFilmPage
