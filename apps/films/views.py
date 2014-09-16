@@ -151,6 +151,7 @@ class IndexView(View):
             except:
                 genres_data = []
 
+        
         # Формируем ответ
         data = {
             'films_new': resp_dict_data,

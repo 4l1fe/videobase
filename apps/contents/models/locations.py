@@ -22,15 +22,18 @@ class Locations(models.Model):
 
     def as_vbLocation(self):
 
+        print self.price, type(self.price)
         return {'id': self.pk,
                 'type': str(self.type),
                 'lang': self.lang,
                 'quality': self.quality,
                 'subtitles': self.subtitles,
-                'price': self.price,
+                'price': float(self.price),
                 'price_type': str(self.type),
                 'value': self.value
         }
+
+        
 
     @classmethod
     def exist_location(self, pk):
