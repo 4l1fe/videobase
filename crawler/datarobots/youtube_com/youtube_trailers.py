@@ -39,7 +39,7 @@ SEARCH_STRINGS_RU = (u'официальный русский трейлер фи
                      u'русский трейлер фильма hd', u'русский трейлер HD',
                      u'трейлер на русском', u'официальный трейлер',
                      u'русский трейлер', u'тв-ролик', u'финальный трейлер',
-                     u'промо ролик')
+                     u'промо ролик', u'трейлер')
 SEARCH_STRINGS_EN = (u'international trailer hd', u'official trailer hd',
                      u'trailer hd', u'international trailer',
                      u'official teaser', u'trailer')
@@ -58,8 +58,9 @@ def query_search(film_name, year, trailer_word):
     feed = client.YouTubeQuery(query)
 
     for f in feed.entry:
-        title = f.title.text.lower().decode('utf-8')
-        if (film_name.lower() in title) and (trailer_word.lower() in title and sum(s in title for s in FAIL_STRINGS)==0) and (str(year) in title) and bool(film_name):
+        
+        title = f.title.text.decode('utf-8').lower()
+        if (film_name.lower() in title) and trailer_word.lower() in title and sum(s in title for s in FAIL_STRINGS)==0 and (str(year) in title) and bool(film_name):
             yield f.title.text, f.link[0].href
 
 

@@ -44,7 +44,8 @@ class ParseFilmPage(BaseParse):
             else:
                 url = link['href']
         else:
-            raise NoSuchFilm
+            #raise NoSuchFilm
+            print "Film not found"
         return url
 
     def get_seasons(self, **kwargs):

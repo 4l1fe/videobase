@@ -6,10 +6,10 @@ from django.db import models
 #############################################################################################################
 # Модель сервиса трансляции
 class CastsServices(models.Model):
-    name        = models.CharField(max_length=255, default='', blank=True, db_index=True, verbose_name=u'Название')
+    name        = models.CharField(max_length=255, unique =True, db_index=True, verbose_name=u'Название')
     url         = models.CharField(max_length=255, default='', blank=True, db_index=True, verbose_name=u'Ссылка')
     description = models.TextField(max_length=255, db_index=True, blank=False, verbose_name=u'Описание')
-    update      = models.DateTimeField(auto_now_add=True, verbose_name=u'Время обновления')
+    update      = models.DateTimeField(null=True, blank=True, verbose_name=u'Время обновления')
     tags        = models.ManyToManyField('AbstractCastsTags', verbose_name=u'Теги', related_name='casts_services')
 
     def __unicode__(self):

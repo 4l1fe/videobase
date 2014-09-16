@@ -21,7 +21,10 @@ class AyyoRobot(object):
         self.response = simple_tor_get_page(url)
 
     def get_data(self):
-        locations = []
+        locations = {
+        'info': [],
+        'type': 'amediateka_ru'
+                }
         site_name = 'www.ayyo.ru'
         try:
             films = json.loads(self.response)['live_search']['search_movies_result']
