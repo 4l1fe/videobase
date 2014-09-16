@@ -23,10 +23,12 @@ def calc_amount_subscribed_to_movie(*args, **kwargs):
 
     cursor = connection.cursor()
     cursor.execute(sql, params=[APP_USERFILM_SUBS_TRUE])
-    result = dict_fetch_all(cursor)
 
-    for item in result:
+    for item in dict_fetch_all(cursor):
         o_film = Films.objects.get(id=item['film_id'])
 
         o_film.subscribed_cnt = item['film_cnt']
         o_film.save()
+
+    # Закрытие курсора
+    cursor.close()
