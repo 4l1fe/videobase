@@ -12,7 +12,7 @@ from apps.films.constants import (APP_FILM_SERIAL, APP_PERSON_DIRECTOR, APP_PERS
                                   APP_USERFILM_STATUS_UNDEF, APP_USERFILM_STATUS_NOT_WATCH, APP_USERFILM_STATUS_PLAYLIST,
                                   APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER, APP_FILM_TYPE_ADDITIONAL_MATERIAL_TRAILER,
                                   APP_USERFILM_SUBS_TRUE, APP_USERFILM_SUBS_FALSE, APP_USERFILM_STATUS)
-from apps.users.models.session_token import SessionToken
+# from apps.users.models.session_token import SessionToken
 from apps.users.constants import FILM_SUBSCRIBE, FILM_COMMENT, FILM_NOTWATCH, FILM_RATE
 from apps.films.models import UsersFilms, Genres, FilmExtras
 from apps.contents.models import Comments

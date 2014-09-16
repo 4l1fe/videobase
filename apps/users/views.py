@@ -10,9 +10,12 @@ from django.http import HttpResponseRedirect, HttpResponse,\
 from django.utils import timezone
 from django.contrib.auth.models import User, AnonymousUser
 from django.views.decorators.cache import never_cache
+from django.views.generic import View
 from django.shortcuts import redirect
 from django.contrib.auth.forms import AuthenticationForm
+
 from social.apps.django_app.default.models import UserSocialAuth
+
 from rest_framework.authtoken.models import Token
 
 from tasks import send_template_mail
@@ -26,7 +29,6 @@ from apps.films.models import Films, Persons, UsersFilms, UsersPersons
 from apps.films.constants import APP_PERSON_DIRECTOR, APP_PERSON_ACTOR, APP_USERFILM_SUBS_TRUE
 from apps.films.api.serializers import vbFilm, vbPerson
 from utils.common import url_with_querystring
-from utils.auth.views import View
 from utils.noderender import render_page
 
 
