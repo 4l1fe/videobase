@@ -52,16 +52,13 @@ def best_of_the_best_this_week():
     ).prefetch_related('profile__user')
 
     # Вычисляем воскресенье вечер
-    delta_days = 0
-    if curr_dt.weekday() < 6:
-        delta_days = 6 - curr_dt.weekday()
-
-    end_dt = curr_dt + timedelta(days=delta_days)
+    start_dt = curr_dt - timedelta(days=7)
+    end_dt = curr_dt + timedelta(days=6 - curr_dt.weekday())
     end_dt.replace(hour=23, minute=59, second=59)
 
     # Вставка параметров трансляции
     params_email['context']['casts'] = {
-        'best': model_to_dict(Casts.best_old_casts(start_dt=curr_dt - timedelta(days=7), end_dt=curr_dt)),
+        'best': model_to_dict(Casts.best_old_casts(start_dt=start_dt, end_dt=curr_dt)),
         'future': model_to_dict(Casts.best_future_casts(start_dt=curr_dt, end_dt=end_dt)),
     }
 
