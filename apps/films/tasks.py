@@ -8,7 +8,7 @@ from videobase.celery import app
 
 from apps.films.models import Films
 from apps.films.api.serializers import vbFilm
-from apps.films.constants import APP_USERFILM_SUBS_TRUE
+from apps.films.constants import APP_USERFILM_SUBS_TRUE, APP_FILMS_PERSON_SUB_EMAIL, APP_FILMS_WEEK_SUB_EMAIL
 
 from apps.users.models import User, Feed, UsersRels
 from apps.users.tasks import send_template_mail
@@ -35,8 +35,8 @@ def best_of_the_best_this_week():
 
     # Основные параметры рассылки и контекст
     params_email = {
-        'subject': 'Eженедельная рассылка ВсеВи',
-        'tpl_name': 'mail/newsletter.html',
+        'subject': APP_FILMS_WEEK_SUB_EMAIL,
+        'tpl_name': u'mail/newsletter.html',
         'context': {
             'films': new_films,
             'serials': serials,
@@ -73,8 +73,8 @@ def best_of_the_best_this_week():
 def personal_newsletter():
     # Основные параметры рассылки и контекст
     params_email = {
-        'subject': 'Персональная рассылка ВсеВи',
-        'tpl_name': 'mail/personal_newsletter.html',
+        'subject': APP_FILMS_PERSON_SUB_EMAIL,
+        'tpl_name': u'mail/personal_newsletter.html',
         'context': {},
     }
 
