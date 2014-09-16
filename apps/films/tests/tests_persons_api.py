@@ -8,7 +8,7 @@ from apps.films.models import UsersPersons
 
 from apps.films.tests.factories import PersonsFilmFactory, PersonsExtrasFactory, UserFactory, FeedFactory
 from apps.films.api.serializers import vbPerson
-# from apps.users.models.session_token import SessionToken
+from apps.users.models.session_token import SessionToken
 from apps.users.models import Feed
 from apps.users.constants import PERSON_SUBSCRIBE
 
@@ -22,11 +22,11 @@ class PersonsTestCase(APITestCase):
         self.s_token = SessionToken.objects.create(user=self.user)
 
     def test_person_view_ok(self):
-        response = self.client.get(reverse('person_api_view', kwargs={'resource_id': self.person_filmography.person.id, 'format': 'json'}))
+        response = self.client.get(reverse('films_api:person_api_view', kwargs={'resource_id': self.person_filmography.person.id, 'format': 'json'}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_person_view_404(self):
-        response = self.client.get(reverse('person_api_view', kwargs={'resource_id': 0, 'format': 'json'}))
+        response = self.client.get(reverse('films_api:person_api_view', kwargs={'resource_id': 0, 'format': 'json'}))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_person_api_view_get(self):
@@ -34,7 +34,7 @@ class PersonsTestCase(APITestCase):
         делаем сравнение с сериализованными полями vbPerson, т.к. такие поля возвращаются оттуда(по специф-и).
         """
         headers = self.s_token.key
-        response = self.client.get(reverse('person_api_view', kwargs={'resource_id': self.person_filmography.person.id, 'format': 'json'}),
+        response = self.client.get(reverse('films_api:person_api_view', kwargs={'resource_id': self.person_filmography.person.id, 'format': 'json'}),
                                    HTTP_X_MI_SESSION=headers)
         self.assertEqual(response.data['id'], self.person_filmography.person.id)
         self.assertEqual(response.data['photo'], self.person_filmography.person.photo)
@@ -49,7 +49,7 @@ class PersonsTestCase(APITestCase):
         делаем сравнение с сериализованными полями vbPerson, т.к. такие поля возвращаются оттуда(по специф-и).
         """
         headers = self.s_token.key
-        response = self.client.post(reverse('person_api_view', kwargs={'resource_id': self.person_filmography.person.id, 'format': 'json'}),
+        response = self.client.post(reverse('films_api:person_api_view', kwargs={'resource_id': self.person_filmography.person.id, 'format': 'json'}),
                                     data={'extend': True}, HTTP_X_MI_SESSION=headers)
         self.assertEqual(response.data['id'], self.person_filmography.person.id)
         self.assertEqual(response.data['photo'], self.person_filmography.person.photo)
@@ -62,15 +62,15 @@ class PersonsTestCase(APITestCase):
         self.assertEqual(response.data['roles'], vbdata['roles'])
 
     def test_person_filmography_view_ok(self):
-        response = self.client.get(reverse('person_filmography_view', kwargs={'resource_id': self.person_filmography.person.id, 'format': 'json'}))
+        response = self.client.get(reverse('films_api:person_filmography_view', kwargs={'resource_id': self.person_filmography.person.id, 'format': 'json'}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     # def test_person_filmography_view_404(self):
-    #     response = self.client.get(reverse('person_filmography_view', kwargs={'resource_id': 0, 'format': 'json'}))
+    #     response = self.client.get(reverse('films_api:person_filmography_view', kwargs={'resource_id': 0, 'format': 'json'}))
     #     self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_person_filmography_view(self):
-        response = self.client.get(reverse('person_filmography_view', kwargs={'resource_id': self.person_filmography.person.id, 'format': 'json'}))
+        response = self.client.get(reverse('films_api:person_filmography_view', kwargs={'resource_id': self.person_filmography.person.id, 'format': 'json'}))
         for i in range(len(response.data['items'])):
             self.assertEqual(response.data['items'][i]['id'], self.person_filmography.film.id)
             self.assertEqual(response.data['items'][i]['name'], self.person_filmography.film.name)
@@ -79,14 +79,14 @@ class PersonsTestCase(APITestCase):
 
     def test_person_action_subscribe_api_view_ok(self):
         headers = self.s_token.key
-        response = self.client.put(reverse('person_action_view', kwargs={'resource_id': self.person_filmography.person.id, 'format': 'json'}), HTTP_X_MI_SESSION=headers)
+        response = self.client.put(reverse('films_api:person_action_view', kwargs={'resource_id': self.person_filmography.person.id, 'format': 'json'}), HTTP_X_MI_SESSION=headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_person_action_subscribe_api_view(self):
         headers = self.s_token.key
         obj_val = dict(id=self.person_filmography.person.id, name=self.person_filmography.person.name, photo=self.person_filmography.person.photo.\
                        storage.url(self.person_filmography.person.photo.name) if len(self.person_filmography.person.photo.name) else self.person_filmography.person.photo.name)
-        response = self.client.put(reverse('person_action_view', kwargs={'resource_id': self.person_filmography.person.id, 'format': 'json'}), HTTP_X_MI_SESSION=headers)
+        response = self.client.put(reverse('films_api:person_action_view', kwargs={'resource_id': self.person_filmography.person.id, 'format': 'json'}), HTTP_X_MI_SESSION=headers)
         user_person = UsersPersons.objects.all().last()
         feed = Feed.objects.last()
         self.assertEqual(feed.user, self.user)
@@ -101,7 +101,7 @@ class PersonsTestCase(APITestCase):
         obj_val = dict(id=self.person_filmography.person.id, name=self.person_filmography.person.name, photo=self.person_filmography.person.photo.\
                        storage.url(self.person_filmography.person.photo.name) if len(self.person_filmography.person.photo.name) else self.person_filmography.person.photo.name)
         FeedFactory.create(user=self.user, type=PERSON_SUBSCRIBE, object=obj_val)
-        response = self.client.put(reverse('person_action_view', kwargs={'resource_id': self.person_filmography.person.id, 'format': 'json'}), HTTP_X_MI_SESSION=headers)
+        response = self.client.put(reverse('films_api:person_action_view', kwargs={'resource_id': self.person_filmography.person.id, 'format': 'json'}), HTTP_X_MI_SESSION=headers)
         user_person = UsersPersons.objects.all().last()
         feed = Feed.objects.last()
         self.assertEqual(feed.user, self.user)
@@ -113,9 +113,9 @@ class PersonsTestCase(APITestCase):
 
     def test_person_action_subscribe_delete(self):
         headers = self.s_token.key
-        self.client.put(reverse('person_action_view', kwargs={'resource_id': self.person_filmography.person.id, 'format': 'json'}), HTTP_X_MI_SESSION=headers)
+        self.client.put(reverse('films_api:person_action_view', kwargs={'resource_id': self.person_filmography.person.id, 'format': 'json'}), HTTP_X_MI_SESSION=headers)
         self.assertTrue(Feed.objects.all().exists())
-        self.client.delete(reverse('person_action_view', kwargs={'resource_id': self.person_filmography.person.id, 'format': 'json'}), HTTP_X_MI_SESSION=headers)
+        self.client.delete(reverse('films_api:person_action_view', kwargs={'resource_id': self.person_filmography.person.id, 'format': 'json'}), HTTP_X_MI_SESSION=headers)
         user_person = UsersPersons.objects.last()
         self.assertFalse(Feed.objects.all().exists())
         self.assertEqual(user_person.subscribed, 0)
@@ -123,15 +123,15 @@ class PersonsTestCase(APITestCase):
         self.assertEqual(user_person.user, self.user)
 
     def test_person_extras_view_ok(self):
-        response = self.client.get(reverse('person_extras_view', kwargs={'resource_id': self.persons_extras.person.id, 'format': 'json'}))
+        response = self.client.get(reverse('films_api:person_extras_view', kwargs={'resource_id': self.persons_extras.person.id, 'format': 'json'}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_person_extras_view_404(self):
-        response = self.client.get(reverse('person_extras_view', kwargs={'resource_id': 0, 'format': 'json'}))
+        response = self.client.get(reverse('films_api:person_extras_view', kwargs={'resource_id': 0, 'format': 'json'}))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_person_extras_view(self):
-        response = self.client.get(reverse('person_extras_view', kwargs={'resource_id': self.persons_extras.person.id, 'format': 'json'}))
+        response = self.client.get(reverse('films_api:person_extras_view', kwargs={'resource_id': self.persons_extras.person.id, 'format': 'json'}))
         self.assertEqual(response.data[0]['name'], self.persons_extras.name)
         self.assertEqual(response.data[0]['name_orig'], self.persons_extras.name_orig)
         self.assertEqual(response.data[0]['description'], self.persons_extras.description)

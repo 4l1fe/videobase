@@ -26,7 +26,7 @@ class RatingTestCase(APISimpleTestCase):
     def test_rating(self):
         COMM_TEXT = u'Commentary text'
         response = self.client.post(
-            reverse('cast_rating_view', kwargs={'cast_id': self.cast_chat.id, 'format': 'json'}),
+            reverse('casts_api:cast_rating_view', kwargs={'cast_id': self.cast_chat.id, 'format': 'json'}),
             HTTP_X_MI_SESSION=self.headers, data={'rating': 5})
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)

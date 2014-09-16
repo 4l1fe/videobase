@@ -27,7 +27,7 @@ class APIUserTestCase(APITestCase):
 class APIUserInfoTestCase(APIUserTestCase):
     def setUp(self):
         super(APIUserInfoTestCase, self).setUp()
-        self.url_name = 'user_info'
+        self.url_name = 'users_api:user_info'
 
     def test_api_user_info_401_get(self):
         response = self.client.get(reverse(self.url_name, kwargs={'format': 'json'}))
@@ -91,7 +91,7 @@ class APIUserInfoTestCase(APIUserTestCase):
 class APIUserPasswordTestCase(APIUserTestCase):
     def setUp(self):
         super(APIUserPasswordTestCase, self).setUp()
-        self.url_name = 'user_change_password'
+        self.url_name = 'users_api:user_change_password'
 
     def test_api_user_password_change_password(self):
         response = self.client.post(reverse(self.url_name, kwargs={'format': 'json'}),
@@ -99,6 +99,6 @@ class APIUserPasswordTestCase(APIUserTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         password = response.data['password']
-        response = self.client.post(reverse('login', kwargs={'format': 'json'}),
+        response = self.client.post(reverse('users_api:login', kwargs={'format': 'json'}),
                                     data={'username': self.user.username, 'password': password})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
