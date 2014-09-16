@@ -287,7 +287,7 @@ def calc_actors(o_film):
 
     result = []
     try:
-        result = list(film_model.Persons.get_sorted_persons_by_name(**filter).values('id', 'name'))
+        result = list((pf.person.id,pf.person.name) for pf in film_model.PersonsFilms.objects.filter(film=o_film))
     except Exception, e:
         print "Caught exception {} in calc_actors".format(e)
 
