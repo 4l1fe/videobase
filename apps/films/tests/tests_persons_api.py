@@ -8,7 +8,7 @@ from apps.films.models import UsersPersons
 
 from apps.films.tests.factories import PersonsFilmFactory, PersonsExtrasFactory, UserFactory, FeedFactory
 from apps.films.api.serializers import vbPerson
-from apps.users.models.session_token import SessionToken
+# from apps.users.models.session_token import SessionToken
 from apps.users.models import Feed
 from apps.users.constants import PERSON_SUBSCRIBE
 

@@ -13,8 +13,8 @@ from django.core.files import File
 from django.core.cache import cache
 from django.core.context_processors import csrf
 from django.core.serializers.json import DjangoJSONEncoder
-
 from django.template import Context
+from django.views.generic import View
 from django.http import HttpResponse, Http404
 from django.shortcuts import render_to_response, redirect
 
@@ -22,14 +22,12 @@ from rest_framework import status
 
 import apps.films.models as film_model
 import apps.contents.models as content_model
-
 from apps.films.api.serializers import vbFilm, vbComment, vbPerson
 from apps.films.constants import APP_USERFILM_STATUS_PLAYLIST
 from apps.films.api import SearchFilmsView
 
 from utils.noderender import render_page
 from utils.common import reindex_by
-from utils.auth.views import View
 
 
 def get_new_namestring(namestring):

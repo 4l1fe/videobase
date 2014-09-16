@@ -104,7 +104,8 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'utils.middlewares.ThreadLocals',
-    'utils.middlewares.ExceptionMiddleware'
+    'utils.middlewares.ExceptionMiddleware',
+    'utils.middlewares.AuthenticationMiddleware',
 )
 
 TEMPLATE_LOADERS = (
@@ -167,12 +168,6 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
 
-# Backends for template auth
-TEMPLATE_AUTHENTICATION_BACKENDS = (
-    # Auth
-    'apps.users.backends.CookiesSessionAuthentication',
-)
-
 ###########################################################
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
@@ -203,7 +198,6 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'apps.users.backends.SessionTokenAuthentication',
-        'apps.users.backends.UserTokenAuthentication',
     )
 }
 
@@ -219,6 +213,7 @@ LOGIN_ERROR_URL = '/'
 SOCIAL_AUTH_VK_OAUTH2_KEY = '4296663'
 SOCIAL_AUTH_VK_OAUTH2_SECRET = 'JAEQddzkBCm554iGXe6S'
 SOCIAL_AUTH_VK_OAUTH2_SCOPE = ['email', ]
+SOCIAL_AUTH_VK_OAUTH2_EXTRA_DATA = ['photo_max']
 
 # Facebook
 SOCIAL_AUTH_FACEBOOK_KEY = '212532105624824'
@@ -256,11 +251,13 @@ SOCIAL_AUTH_PIPELINE = (
     'social.pipeline.user.create_user',
     'social.pipeline.social_auth.associate_user',
     'social.pipeline.social_auth.load_extra_data',
-    'social.pipeline.user.user_details'
+    'social.pipeline.user.user_details',
+    'utils.pipeline.load_avatar',
 )
 
 # In minutes
 API_SESSION_EXPIRATION_TIME = 15
+SESSION_EXPIRATION_TIME = timedelta(minutes=15)
 
 ###########################################################
 CELERYBEAT_SCHEDULE = {
