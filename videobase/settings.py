@@ -390,7 +390,6 @@ CELERYBEAT_SCHEDULE = {
         'task': 'send_robots_statistic_to_email',
         'schedule': timedelta(days=1)
     },
-
     # News from now.ru
     'parse_news_from_now_ru': {
         'task': 'parse_news_from_now_ru',
@@ -415,16 +414,30 @@ CELERYBEAT_SCHEDULE = {
         'schedule': timedelta(hours=24)
     },
     'cast_liverussia_ru_schedule': {
-    'task': 'cast_liverussia_robot',
-    'schedule': timedelta(hours=24)
+        'task': 'cast_liverussia_robot',
+        'schedule': timedelta(hours=24)
     },
     'cast_khl_ru_schedule': {
-    'task': 'cast_khl_robot',
-    'schedule': timedelta(hours=24)
+        'task': 'cast_khl_robot',
+        'schedule': timedelta(hours=24)
     },
     'itunes_update': {
         'task': 'itunes_robot_start',
         'schedule': timedelta(hours=24)
+    },
+
+    'cast_khl_ru_schedule': {
+        'task': 'cast_khl_robot',
+        'schedule': timedelta(hours=24)
+    },
+    'itunes_update':{
+            'task': 'itunes_robot_start',
+            'schedule': timedelta(hours=24)
+    },
+    #
+    'calc_amount_subscribed_to_movie': {
+        'task': 'calc_amount_subscribed_to_movie',
+        'schedule': timedelta(hours=1)
     },
 }
 
@@ -446,4 +459,8 @@ if not DEBUG:
         'dsn': 'http://8684bf8b497047d9ac170fd16aefc873:41e89f4666b24f998125370f3d1a1789@sentry.aaysm.com/2'
     }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> - добавил миграцию, которая добавляет поле для подсчета кол-ва подписанных на фильм
 ROBOTS_LIST = ['amediateka_ru', 'ayyo_ru', 'drugoe_kino', 'itunes', 'viaplay_ru', 'youtube_com' ]

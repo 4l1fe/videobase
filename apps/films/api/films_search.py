@@ -38,10 +38,19 @@ class SearchFilmsView(APIView):
     """
 
     def search_by_films(self, filter):
-        o_search = Films.search_manager.filter(release_date__lte=date.today())\
-            .order_by('-rating_sort')
+        o_search = Films.search_manager.filter(release_date__lte=date.today())
 
-            
+        # Фильтр для сортировки
+        if filter.get('sort'):
+            if filter['sort'] == 'subscribes':
+                o_search = o_search.order_by('-subscribed_cnt')
+
+            else:
+                o_search = o_search.order_by('-rating_sort')
+
+        else:
+            o_search = o_search.order_by('-rating_sort')
+
         # Поиск по имени
         if filter.get('text'):
             o_search = o_search.search(filter['text'])
@@ -138,7 +147,9 @@ class SearchFilmsView(APIView):
 
         if form.is_valid():
             # Init data
-            filter = self.validation_pagination(self.get_copy.get('page'), self.get_copy.get('per_page'), form.cleaned_data)
+            filter = self.validation_pagination(
+                self.get_copy.get('page'), self.get_copy.get('per_page'), form.cleaned_data
+            )
 
             self.flag_price = True if ('price' in filter and not filter['price'] is None) else False
             location_group = 1 if self.flag_price or filter.get('instock') else 0
@@ -152,7 +163,6 @@ class SearchFilmsView(APIView):
 
             # Проверим, есть ли результат в кеше
             result = cache.get(cache_key) if use_cache else None
-
 
             if result is None:
                 # Наложение условий фильтрации на фильмы
