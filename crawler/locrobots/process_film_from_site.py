@@ -1,10 +1,8 @@
 # coding: utf-8
 import json
 
-from crawler.locrobots.process_films_tasks import process_one_film, load_film_page_from_site
-
-__author__ = 'vladimir'
-
+from crawler.tasks.locrobots_tasks import load_film_page_from_site
+from crawler.locrobots.process_films_tasks import process_one_film
 
 def get_html_json_for_file_name(file_name):
     html=''
