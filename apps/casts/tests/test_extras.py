@@ -13,7 +13,7 @@ class CastTestCase(APISimpleTestCase):
         self.cast_extras = CastsExtrasFactory.create()
 
     def test_search(self):
-        response = self.client.get(reverse('cast_extras_view', kwargs={'cast_id': 1, 'format': 'json'}), data={})
+        response = self.client.get(reverse('casts_api:cast_extras_view', kwargs={'cast_id': 1, 'format': 'json'}), data={})
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data[0]['id'], 1)
