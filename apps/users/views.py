@@ -254,13 +254,11 @@ def calc_feed(user_id):
 
 class FeedView(View):
 
-    def get(self, request, **kwargs):
-        if request.user.is_authenticated():
+    def get(self, *args, **kwargs):
+        if self.request.user.is_authenticated():
             # Сериализуем
             try:
-                user_id = request.user.id
-                feeds = calc_feed(user_id)
-                o_feed = vbFeedElement(feeds, many=True).data
+                o_feed = vbFeedElement(calc_feed(self.request.user.id), many=True).data
             except Exception, e:
                 raise Http404
 

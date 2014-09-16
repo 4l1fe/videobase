@@ -45,22 +45,9 @@ def launch_individual_film_site_task(site):
     return robot_launch_wrapper(site, partial(process_film_on_site, site))
 
 
-@app.task(name='process_film_on_site')
+@app.task(name='process_film_on_site', base=DebugTask)
 def process_individual_film_on_site(site, film_id):
     return process_film_on_site(site, film_id)
-
-
-@app.task(name='robot_launch')
-def robot_launcher(*args, **kwargs):
-    print 'Start'
-    for robot in Robots.objects.all():
-        print u'Checking robot %s' % robot.name
-        if robot.last_start + datetime.timedelta(seconds=robot.delay) < timezone.now():
-            if robot.name in sites_crawler:
-                launch_individual_film_site_task.apply_async((robot.name,), queue=robot.name)
-        else:
-            print u'Skipping robot %s' % robot.name
-
 
 @app.task(name='age_weighted_robot_launch')
 def age_weighted_robot_launcher(years):
@@ -71,8 +58,7 @@ def age_weighted_robot_launcher(years):
     for robot in Robots.objects.all():
         for film in Films.objects.all():
             if film_at_least_years_old(film, years):
-                launch_individual_film_site_task.apply_async((robot.name,), queue=robot.name, countdown=15*delays[robot.name])
-                #process_individual_film_on_site.apply_async((robot.name, film.id), countdown=15*delays[robot.name])
+                process_individual_film_on_site.apply_async((robot.name, film.id), countdown=15*delays[robot.name])
                 delays[robot.name] += 1
 
 

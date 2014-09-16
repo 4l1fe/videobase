@@ -27,8 +27,9 @@ class CastsChatSendView(APIView):
 
             except Casts.DoesNotExist:
                 return Response({'error': 'There is no such cast with id {}'.format(cast_id)}, status=status.HTTP_400_BAD_REQUEST)
-            
+
             return Response(DEFAULT_REST_API_RESPONSE, status=status.HTTP_200_OK)
 
         else:
             return Response({'error': form.errors}, status=status.HTTP_400_BAD_REQUEST)
+

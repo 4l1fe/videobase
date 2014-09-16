@@ -14,7 +14,7 @@ def parse_source(source, film_name, hosts):
 
         film_link = hosts + ref
     except:
-        film_link = None
+        film_link = ''
     return film_link
 
 
@@ -46,4 +46,4 @@ class ParseTvzavrFilmPage(object):
         return [0, ]
 
     def get_link(self):
-        pass
+        return ''

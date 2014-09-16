@@ -172,7 +172,6 @@ AUTHENTICATION_BACKENDS = (
 TEMPLATE_AUTHENTICATION_BACKENDS = (
     # Auth
     'apps.users.backends.CookiesSessionAuthentication',
-    'apps.users.backends.CookiesTokenAuthentication',
 )
 
 ###########################################################
@@ -393,12 +392,30 @@ CELERYBEAT_SCHEDULE = {
         'task': 'parse_news_from_stream_ru',
         'schedule': timedelta(hours=12)
     },
+    'cast_sportbox_ru_schedule': {
+        'task': 'cast_sportbox_robot',
+        'schedule': timedelta(hours=24)
+    },
+    'cast_championat_com_schedule': {
+        'task': 'cast_championat_robot',
+        'schedule': timedelta(hours=24)
+    },
+        'cast_liverussia_ru_schedule': {
+        'task': 'cast_liverussia_robot',
+        'schedule': timedelta(hours=24)
+    },
+        'cast_khl_ru_schedule': {
+        'task': 'cast_khl_robot',
+        'schedule': timedelta(hours=24)
+    },
 }
 
 CELERY_TIMEZONE = 'UTC'
 CELERY_ACCEPT_CONTENT = ['pickle', 'json', 'msgpack', 'yaml']
 POSTER_URL_PREFIX = '_260x360'
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+
+USE_THOR_FLAG = False
 
 from local_settings import *
 

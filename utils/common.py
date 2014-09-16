@@ -147,7 +147,7 @@ def traceback_own(excpt, msg=None):
     exc_type, exc_value, exc_traceback = sys.exc_info()
     trace_msg = ''.join(traceback.format_tb(exc_traceback))
 
-    print u'============={msg}================'.format(msg.encode('utf-8'))
+    print u'============={msg}================'.format(msg=msg.encode('utf-8'))
     print u'%s: %s' % (err_l, excpt)
     print u'============================='
     print u'Traceback:\n{trace_msg}'.format(trace_msg=trace_msg)
