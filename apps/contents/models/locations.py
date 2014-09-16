@@ -27,7 +27,7 @@ class Locations(models.Model):
                 'lang': self.lang,
                 'quality': self.quality,
                 'subtitles': self.subtitles,
-                'price': str(self.price),
+                'price': self.price,
                 'price_type': str(self.type),
                 'value': self.value
         }
