@@ -1,7 +1,7 @@
 # coding: utf-8
 import os
 import djcelery
-
+import logging
 from datetime import timedelta
 from ConfigParser import RawConfigParser
 
@@ -29,9 +29,15 @@ BACKUP_PATH = os.path.join(BASE_PATH, '..', '.backup')
 SECRET_KEY = '7-dsc0--i_ej94w9as#-5p_5a)ql*9o80v1rs9krx!_-9%^b5$'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 TEMPLATE_DEBUG = DEBUG
+
+SOUTH_TESTS_MIGRATE = False
+
+logger = logging.getLogger('factory')  # switch off factory boy logging
+logger.addHandler(logging.NullHandler())
+logger.setLevel(logging.INFO)
 
 ALLOWED_HOSTS = ['*']
 

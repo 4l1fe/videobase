@@ -5,6 +5,7 @@ from crawler.locrobots import sites_crawler
 from apps.films.models import Films
 from crawler.core.exceptions import NoSuchFilm
 
+saved_pages_directory = 'saved_pages'
 
 
 def save_loaded_data_to_file(loaded_data, film_id, site):
