@@ -14,7 +14,7 @@ class Casts(models.Model):
     duration    = models.IntegerField(null=True, blank=True, verbose_name=u'Продолжительность')
     status      = models.CharField(max_length=255, db_index=True, blank=True, null=True, verbose_name=u'Статус')
     description = models.TextField(max_length=255, blank=True, null=True, verbose_name=u'Описание')
-    pg_rating   = models.CharField(max_length=255, blank=True, null = True, verbose_name=u'Возрастной рейтинг')
+    pg_rating   = models.CharField(max_length=255, blank=True, null=True, verbose_name=u'Возрастной рейтинг')
     tags        = models.ManyToManyField('AbstractCastsTags', verbose_name=u'Tags', related_name='casts')
     search_index = VectorField()
 

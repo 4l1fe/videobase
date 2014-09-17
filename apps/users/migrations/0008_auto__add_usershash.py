@@ -13,18 +13,24 @@ class Migration(SchemaMigration):
                       self.gf('django.db.models.fields.BooleanField')(default=False),
                       keep_default=False)
 
-        # Adding field 'UsersProfile.activation_key'
-        db.add_column('users_profile', 'activation_key',
-                      self.gf('django.db.models.fields.CharField')(default='', max_length=64),
-                      keep_default=False)
+        # Adding model 'UsersHash'
+        db.create_table('users_hash', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
+            ('hash_key', self.gf('django.db.models.fields.CharField')(unique=True, max_length=255)),
+            ('hash_type', self.gf('django.db.models.fields.CharField')(max_length=255)),
+            ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
+            ('expired', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now)),
+        ))
+        db.send_create_signal('users', ['UsersHash'])
 
 
     def backwards(self, orm):
         # Deleting field 'UsersProfile.confirm_email'
         db.delete_column('users_profile', 'confirm_email')
 
-        # Deleting field 'UsersProfile.activation_key'
-        db.delete_column('users_profile', 'activation_key')
+        # Deleting model 'UsersHash'
+        db.delete_table('users_hash')
 
 
     models = {
@@ -86,6 +92,15 @@ class Migration(SchemaMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'token': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['users.SessionToken']"})
         },
+        'users.usershash': {
+            'Meta': {'object_name': 'UsersHash', 'db_table': "'users_hash'"},
+            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
+            'expired': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
+            'hash_key': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '255'}),
+            'hash_type': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"})
+        },
         'users.userslogs': {
             'Meta': {'object_name': 'UsersLogs', 'db_table': "'users_logs'"},
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
@@ -103,7 +118,6 @@ class Migration(SchemaMigration):
         },
         'users.usersprofile': {
             'Meta': {'object_name': 'UsersProfile', 'db_table': "'users_profile'"},
-            'activation_key': ('django.db.models.fields.CharField', [], {'max_length': '64'}),
             'confirm_email': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'last_visited': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
