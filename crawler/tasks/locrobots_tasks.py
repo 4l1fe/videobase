@@ -75,5 +75,3 @@ def parse_you_tube_movies_ru():
 @app.task(name="load_film_from_site", queue="thor")
 def load_film_page_from_site(site, film_id):
     return load_and_save_film_page_from_site(site, film_id)
-
-    
