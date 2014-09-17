@@ -60,11 +60,10 @@ def del_friendship(session_token, id_):
 
 
 if __name__ == '__main__':
-    mt = get_main_token(username='nana@nana.na', password='na')
-    # mt = get_main_token(username='ak@aaysm.com', password='akka')
+    mt = get_main_token(username='xseoxruru@gmail.com', password='xs')
     print(mt)
     st = get_session_token(mt)
     print(st)
-    resp = add_friendship(st, 3)
+    resp = add_friendship(st, 42)
     print(resp)
     # del_friendship(st, 42)
