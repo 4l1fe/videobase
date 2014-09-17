@@ -6,6 +6,7 @@ from django.contrib import admin
 from videobase import settings
 
 from apps.films.views import test_view
+from apps.casts.views import cast_view
 
 admin.autodiscover()
 
@@ -38,6 +39,8 @@ urlpatterns = patterns('',
 
     # GIT
     url(r'^git/', include('apps.git.urls')),
+
+    url(r'^casts/index', cast_view),
 )
 
 if settings.DEBUG:
