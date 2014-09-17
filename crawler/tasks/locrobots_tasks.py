@@ -3,8 +3,8 @@ from apps.films.models import Films
 from apps.robots.models import Robots
 from crawler.locations_saver import save_location_to_locs_dict
 from crawler.locrobots import sites_crawler
+from crawler.locrobots.save_util import load_and_save_film_page_from_site
 from crawler.locrobots.amediateka_ru.loader import Amediateka_robot
-from crawler.locrobots.process_film_from_site import process_film_on_site
 from crawler.locrobots.viaplay_ru.robot import ViaplayRobot
 from crawler.locrobots.playfamily_dot_ru.playfamily_xml import process
 from crawler.locrobots.drugoe_kino.robot import update_drugoe_kino_listing
@@ -70,3 +70,10 @@ def dg_update():
 @app.task(name="parse_you_tube_movies_ru", base=DebugTask, queue='you_tube_movies_ru')
 def parse_you_tube_movies_ru():
     return YoutubeChannelParser.process_channels_list()
+
+
+@app.task(name="load_film_from_site", queue="thor")
+def load_film_page_from_site(site, film_id):
+    return load_and_save_film_page_from_site(site, film_id)
+
+    
