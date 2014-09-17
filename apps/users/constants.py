@@ -9,13 +9,13 @@ APP_USER_PIC_DIR = os.path.join('upload', 'users', 'user_pic')
 #############################################################################################################
 APP_USER_REL_TYPE_FRIENDS              = 'f'
 APP_USER_REL_TYPE_SEND_NOT_RECEIVED    = 's'
-APP_USER_REL_TYPE_ACCEPRED_NOT_ADOPTED = 'r'
+APP_USER_REL_TYPE_ACCEPTED_NOT_ADOPTED = 'r'
 APP_USER_REL_TYPE_NONE                 = 'null'
 
 APP_USER_REL_TYPES = (
     (APP_USER_REL_TYPE_FRIENDS, 'Друзья'),
     (APP_USER_REL_TYPE_SEND_NOT_RECEIVED, 'Заявка отправлена, но не принята'),
-    (APP_USER_REL_TYPE_ACCEPRED_NOT_ADOPTED, 'Заявка получена, но не принята'),
+    (APP_USER_REL_TYPE_ACCEPTED_NOT_ADOPTED, 'Заявка получена, но не принята'),
 )
 
 #############################################################################################################

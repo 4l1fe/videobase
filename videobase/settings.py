@@ -3,6 +3,7 @@
 from __future__ import absolute_import
 
 import os
+import logging
 from datetime import timedelta
 from ConfigParser import RawConfigParser
 
@@ -41,6 +42,12 @@ SECRET_KEY = '7-dsc0--i_ej94w9as#-5p_5a)ql*9o80v1rs9krx!_-9%^b5$'
 DEBUG = False
 
 TEMPLATE_DEBUG = DEBUG
+
+SOUTH_TESTS_MIGRATE = False
+
+logger = logging.getLogger('factory')  # switch off factory boy logging
+logger.addHandler(logging.NullHandler())
+logger.setLevel(logging.INFO)
 
 ALLOWED_HOSTS = ['*']
 
@@ -183,7 +190,6 @@ AUTHENTICATION_BACKENDS = (
 TEMPLATE_AUTHENTICATION_BACKENDS = (
     # Auth
     'apps.users.backends.CookiesSessionAuthentication',
-    'apps.users.backends.CookiesTokenAuthentication',
 )
 
 ###########################################################
@@ -397,6 +403,22 @@ CELERYBEAT_SCHEDULE = {
         'task': 'parse_news_from_stream_ru',
         'schedule': timedelta(hours=12)
     },
+    'cast_sportbox_ru_schedule': {
+        'task': 'cast_sportbox_robot',
+        'schedule': timedelta(hours=24)
+    },
+    'cast_championat_com_schedule': {
+        'task': 'cast_championat_robot',
+        'schedule': timedelta(hours=24)
+    },
+    'cast_liverussia_ru_schedule': {
+        'task': 'cast_liverussia_robot',
+        'schedule': timedelta(hours=24)
+    },
+    'cast_khl_ru_schedule': {
+        'task': 'cast_khl_robot',
+        'schedule': timedelta(hours=24)
+    },
     # Do weekly newsletter
     'week_newsletter_schedule': {
         'task': 'week_newsletter',
@@ -420,6 +442,10 @@ HOST = 'vsevi.ru'
 # Another configuration
 POSTER_URL_PREFIX = '_260x360'
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+
+USE_THOR_FLAG = False
+
+from .local_settings import *
 
 if not DEBUG:
     INSTALLED_APPS += (

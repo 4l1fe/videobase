@@ -7,8 +7,6 @@ import random
 import string
 import urllib
 
-from PIL import Image
-
 
 def get_image_path(instance, filename):
     """
@@ -155,3 +153,11 @@ def traceback_own(excpt, msg=None):
     print u'============================='
     print u'Traceback:\n{trace_msg}'.format(trace_msg=trace_msg)
     print u'============================='
+
+
+def isiterable(obj):
+    try:
+        iter(obj)
+        return True
+    except TypeError:
+        return False

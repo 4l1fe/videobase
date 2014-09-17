@@ -13,6 +13,7 @@ class ParseTvigleFilm(object):
         cls.url_film = 'http://www.tvigle.ru'
         cls.seasons = [0, ]
         s = u'Сезон'
+        film_link = ''
         film_name = film_name.lower().strip().encode('utf-8').translate(None, string.punctuation)
         reg = re.compile('(?P<season>'+s+')[ ](?P<number>\d+)')
         try:
@@ -41,7 +42,7 @@ class ParseTvigleFilm(object):
                         film_link = cls.url_film + link
                         return film_link
         except:
-            film_link = None
+            film_link = ''
         return film_link
 
     def parse(self, response, dict_gen, film, url):

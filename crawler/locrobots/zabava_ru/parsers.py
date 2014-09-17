@@ -50,7 +50,11 @@ class ParseZabavaFilm(BaseParse):
         self.soup = BeautifulSoup(html, "html")
 
     def get_link(self, **kwargs):
-        return kwargs['url']
+        lnk = kwargs['url']
+        if lnk:
+            return lnk
+        else:
+            return ''
 
     def get_price(self, **kwargs):
         price = 0

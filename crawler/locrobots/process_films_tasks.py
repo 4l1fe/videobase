@@ -29,6 +29,8 @@ def process_one_film(site, film_id, html_page_json):
     for data in sites_crawler[site]['parser'].parse(html_page_json['html'], sane_dict, film, url=html_page_json['url']): # здесь уже по готовому результату парсим
         data['film'] = film
         try:
+            if data['url_view'] == '':
+                continue
             print u"Trying to put data from %s for %s to db" % (site, unicode(data['film']))
             save_location_from_robo_task.apply_async((data,))
             status = True
@@ -66,6 +68,7 @@ def load_and_save_film_page_from_site(site, film_id):
     try:
         loaded_data = sites_crawler[site]['loader'](film).load() #загрузка страницы
         saved_file_name = save_loaded_data_to_file(loaded_data, film.id, site)
+        print "loaded ok"
     except NoSuchFilm:
         print "page loading failed"
         return None
