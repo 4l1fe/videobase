@@ -27,14 +27,11 @@ class UsersProfile(models.Model):
     pvt_actors     = models.IntegerField(verbose_name=u'Любимые актеры пользователя', choices=APP_USERPROFILE_PRIVACY, default=APP_USERPROFILE_PRIVACY_ALL)
     pvt_directors  = models.IntegerField(verbose_name=u'Любимые режисеры пользователя', choices=APP_USERPROFILE_PRIVACY, default=APP_USERPROFILE_PRIVACY_ALL)
 
-
     def __unicode__(self):
         return u'[%s] %s' % (self.id, self.user.username, )
 
-
     def get_name(self):
         return self.user.first_name
-
 
     class Meta:
         db_table = 'users_profile'

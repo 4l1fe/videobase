@@ -1,5 +1,4 @@
 # coding: utf-8
-
 import os
 from videobase.settings import STATIC_PATH
 
@@ -27,10 +26,19 @@ APP_USER_STATUS = (
     (APP_USER_INACTIVE, u'Заблокирован')
 )
 
+APP_USER_PIC_TYPE_SOCIAL_VK = 'vk-oauth2'
+APP_USER_PIC_TYPE_SOCIAL_FACEBOOK = 'facebook'
+APP_USER_PIC_TYPE_SOCIAL_TWITTER = 'twitter'
+APP_USER_PIC_TYPE_SOCIAL_GOOGLE = 'google-oauth2'
+APP_USER_PIC_TYPE_LOCAL = 'local'
+
 #############################################################################################################
 APP_USER_PIC_TYPES = (
-    ('SOCIAL', 'Из социальных сетей'),
-    ('LOCAL', 'Сохранные изображения')
+    (APP_USER_PIC_TYPE_SOCIAL_VK, 'Vkontakte'),
+    (APP_USER_PIC_TYPE_SOCIAL_FACEBOOK, 'Facebook'),
+    (APP_USER_PIC_TYPE_SOCIAL_TWITTER, 'Twitter'),
+    (APP_USER_PIC_TYPE_SOCIAL_GOOGLE, 'Google+'),
+    (APP_USER_PIC_TYPE_LOCAL, 'Из собственных загрузок'),
 )
 
 APP_SUBJECT_TO_RESTORE_PASSWORD = u'Востановление пароля'
