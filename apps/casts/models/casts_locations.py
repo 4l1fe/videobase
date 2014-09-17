@@ -11,7 +11,7 @@ class CastsLocations(models.Model):
     quality    = models.CharField(max_length=255, default='', blank=True, db_index=True, verbose_name=u'Качество')
     price_type = models.IntegerField(null=True, blank=True, choices=APP_CASTS_PRICE_TYPE, db_index=True, verbose_name=u'Тип цены')
     price      = models.FloatField(default=0, null=True, verbose_name=u'Цена')
-    offline    = models.BooleanField(default=True, verbose_name=u"Оффлайн ?")
+    offline    = models.BooleanField(default=True, verbose_name=u'Оффлайн ?')
     url_view   = models.CharField(max_length=255, default='', blank=True, db_index=True, verbose_name=u'Ссылка')
     value      = models.CharField(max_length=255, default='', blank=True, db_index=True, verbose_name=u'Значение')
 
