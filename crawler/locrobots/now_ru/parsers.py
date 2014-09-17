@@ -59,7 +59,10 @@ class ParseNowFilmPage(BaseParse):
 
     def get_link(self, **kwargs):
         link = self.soup.find(attrs={'property': 'og:url'}).get('content')
-        return link
+        if link:
+            return link
+        else:
+            return ''
 
     def get_price(self, **kwargs):
         price = 0

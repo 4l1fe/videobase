@@ -12,9 +12,9 @@ class Casts(models.Model):
     title_orig  = models.CharField(max_length=255, db_index=True, blank=False, verbose_name=u'Название оригинала')
     start       = models.DateTimeField(auto_now_add=True, verbose_name=u'Время начала трансляции')
     duration    = models.IntegerField(null=True, blank=True, verbose_name=u'Продолжительность')
-    status      = models.CharField(max_length=255, db_index=True, blank=False, verbose_name=u'Статус')
-    description = models.TextField(max_length=255, db_index=True, blank=False, verbose_name=u'Описание')
-    pg_rating   = models.CharField(max_length=255, db_index=True, blank=False, verbose_name=u'Возрастной рейтинг')
+    status      = models.CharField(max_length=255, db_index=True, blank=True, null=True, verbose_name=u'Статус')
+    description = models.TextField(max_length=255, blank=True, null=True, verbose_name=u'Описание')
+    pg_rating   = models.CharField(max_length=255, blank=True, null = True, verbose_name=u'Возрастной рейтинг')
     tags        = models.ManyToManyField('AbstractCastsTags', verbose_name=u'Tags', related_name='casts')
     search_index = VectorField()
 

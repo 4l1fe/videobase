@@ -8,11 +8,11 @@ from crawler.tor import simple_tor_get_page
 
 
 def parse_search(response, film_name, year):
-    film_link = None
+    film_link = ''
     try:
         soup = BeautifulSoup(response)
         if not (soup.find('div', {'class': 'empty-search'}) is None):
-            return None
+            return ''
         search_div = soup.find('div', {'class': 'card-list'})
         film_divs = search_div.find_all('div', {'class': ['card', 'no-rationale', 'tall-cover', 'movies tiny']})
         for film in film_divs:
@@ -25,9 +25,9 @@ def parse_search(response, film_name, year):
             film_year = soup_page.find('div', {'itemprop':'datePublished'}).text
             film_year = re.search(ur'\d+', film_year)
             if not str(year) in film_year.group():
-                return None
+                return ''
     except IndexError:
-        film_link = None
+        film_link = ''
     return film_link
 
 

@@ -96,7 +96,8 @@ class LoginUserView(View):
 
 
     def post(self, *args, **kwargs):
-        login_form = AuthenticationForm(data=self.request.POST)
+        data = self.request.POST
+        login_form = AuthenticationForm(data=data)
         if login_form.is_valid():
             user = login_form.get_user()
             kw = {
@@ -379,17 +380,19 @@ def calc_feed(user_id):
     return o_feed
 
 
-def feed_view(request):
-    if request.user.is_authenticated():
-        # Сериализуем
-        try:
-            o_feed = vbFeedElement(calc_feed(request.user.id), many=True).data
-        except Exception, e:
-            raise Http404
+class FeedView(View):
 
-        return HttpResponse(render_page('feed', {'feed': o_feed}))
+    def get(self, *args, **kwargs):
+        if self.request.user.is_authenticated():
+            # Сериализуем
+            try:
+                o_feed = vbFeedElement(calc_feed(self.request.user.id), many=True).data
+            except Exception, e:
+                raise Http404
 
-    return redirect('login_view')
+            return HttpResponse(render_page('feed', {'feed': o_feed}))
+
+        return redirect('login_view')
 
 
 def password_reset_done(request):

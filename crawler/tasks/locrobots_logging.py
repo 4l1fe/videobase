@@ -79,15 +79,18 @@ def send_statistic_to_email_for_each_robot():
     for key, value in robo_dict.iteritems():
         one_report_str = create_one_email_report_str_for_statistic(key, value)
         str_for_send += one_report_str
+    send_message_for_all_recipients(str_for_send, "robots logs")
+
+
+def send_message_for_all_recipients(message, subject):
     to = []
     for item in RobotsMailList.objects.all():
         to.append(item.email)
     if len(to) == 0:
         return
-    subject = "robots logs"
     kwrg = {
             'subject': subject,
-            'text': str_for_send,
+            'text': message,
             'to': to,
            }
     send_statistic_to_mail.apply_async(kwargs=kwrg)

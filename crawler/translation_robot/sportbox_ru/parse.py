@@ -35,13 +35,14 @@ def parse_translation():
             minute = date_translation[1]
 
             translation_data = {
-                'meta': None,
+                'meta': {},
                 'title': name_translation,
                 'date': timezone.datetime(year=date.year, month=date.month, day=date.day, hour=int(hour),
                                           minute=int(minute)),
                 'price': 0,
                 'link': translation_url,
-                'embed_code': share_link
+                'embed_code': share_link,
+                'value': share_link
 
             }
             translations_list.append(translation_data)

@@ -1,77 +1,111 @@
 # coding: utf-8
 from bs4 import BeautifulSoup
+import re
+import datetime
 import requests
 
 __author__ = 'vladimir'
 
+MAIN_SITE_LINK = 'http://video.khl.ru'
 
 class TvKHLRuParser():
     def __init__(self):
         pass
 
     @staticmethod
-    def get_time(programma_div):
-        b_tag = programma_div.find('b')
-        if b_tag:
-            return b_tag.getText()
+    def get_price_from_string(str_price):
+        currrency_price = re.split('\s+', str_price, flags=re.UNICODE)[1]
+        digit_price = float(currrency_price.replace(',','.'))
+        return int(digit_price)
+
+    @staticmethod
+    def get_time(item_div):
+        item_desc__tag = item_div.find('div', {"class": "item-desc"})
+        time_tag = item_desc__tag.find('span', {"class": "date"})
+        times = time_tag.getText().split(',')
+        t_date = datetime.datetime.strptime(times[0], '%d.%m.%Y')
+        t_time = datetime.datetime.strptime(times[1].replace(" ", ""), '%H:%M')
+        result = datetime.datetime.combine(t_date, t_time.time())
+        if result:
+            return result
+        else:
+            return None
+
+    @staticmethod
+    def get_title(item_div):
+        a_tag = item_div.find('a', {"class": "vs"})
+        divs = a_tag.findAll('div')
+        title = divs[0].find('img')['title'] + ' - ' + divs[1].find('img')['title']
+        if title:
+            return title
+        else:
+            ''
+
+    @staticmethod
+    def get_link(item_div):
+        a_tag = item_div.find('a', {"class": "vs"})
+        link = MAIN_SITE_LINK + a_tag['href']
+        if link:
+            return link
         else:
             return ''
 
     @staticmethod
-    def get_title(programma_div):
-        title_div = programma_div.find('span',{ "class" : "name"})
-        if title_div:
-            return title_div.getText()
+    def get_price(item_div):
+        item_desc_tag = item_div.find('div', {"class": "item-desc"})
+        cost_tag = item_desc_tag.find('a', {"class": "buy-transl-link"})
+        price = TvKHLRuParser.get_price_from_string(cost_tag.contents[0])
+        if price:
+            return price
         else:
-            title_div
+            return 0
 
     @staticmethod
-    def get_description(programma_div):
-        descr_div = programma_div.find('div',{ "class" : "previewtext"})
-        if descr_div:
-            return descr_div.getText()
-        else:
-            return ''
-
-    @staticmethod
-    def get_programs_list_div():
-        site_link = 'http://tv.khl.ru/'
+    def get_items_list_div():
+        site_link = MAIN_SITE_LINK + '/main'
         response = requests.get(site_link)
         beatiful_soup = BeautifulSoup(response.content)
-        main_div = beatiful_soup.find('div',{ "id" : "main"})
-        content_div = main_div.find('div',{ "id" : "content"})
-        left_block_div = content_div.find('div',{ "class" : "leftBlock"})
-        pguide_div = left_block_div.find('div',{ "class" : "pguide"})
-        chanell_act_div = pguide_div.find('div',{ "class" : "chanell act"})
-        programs_list_div = chanell_act_div.find('div',{ "class" : "programsList"})
-        programs_list = programs_list_div.findAll('div',{ "class" : "progs"})
-        active_program = programs_list_div.find('div',{ "class" : "progs active"})
-        programs_list.append(active_program)
-        return programs_list
+        main_container_div = beatiful_soup.find('div',{ "class" : "main-container"})
+        main_wrap_div = main_container_div.find('div',{ "class" : "main-wrap"})
+        main_div = main_wrap_div.find('div',{ "class" : "main"})
+        wrapper_div = main_div.find('div',{ "class" : "wrapper"})
+        announce_div = wrapper_div.find('div',{ "class" : "announce"})
+        items = announce_div.findAll('div',{ "class" : "item"})
+        return items
 
     @staticmethod
-    def get_translations_for_one_program_date_div(one_day_program_div):
-        one_day_programs = one_day_program_div.findAll('div',{ "class" : "programma"})
+    def get_info_for_one_item(one_item_div):
         streams = []
-        for item in one_day_programs:
-            time = TvKHLRuParser.get_time(item)
-            title = TvKHLRuParser.get_title(item)
-            description = TvKHLRuParser.get_description(item)
-            print "[#" +time +title + description+ "#]"
-            one_stream = {
-                'time':time,
-                'title':title,
-                'description':description
-            }
-            streams.append(one_stream)
+        time = TvKHLRuParser.get_time(one_item_div)
+        title = TvKHLRuParser.get_title(one_item_div)
+        price = TvKHLRuParser.get_price(one_item_div)
+        link = TvKHLRuParser.get_link(one_item_div)
+        one_stream = {
+            'date': time,
+            'price': price,
+            'title': title,
+            'link': link,
+            'meta': {},
+            'embed_code': None,
+            'value': None,
+            'player': None
+        }
+
+        streams.append(one_stream)
         return streams
 
     @staticmethod
     def get_translations():
-        programs_list = TvKHLRuParser.get_programs_list_div()
+        items_list = TvKHLRuParser.get_items_list_div()
         all_streams = []
-        for prog_div in programs_list:
-            if prog_div:
-                streams = TvKHLRuParser.get_translations_for_one_program_date_div(prog_div)
+        for item_div in items_list:
+            if item_div:
+                streams = TvKHLRuParser.get_info_for_one_item(item_div)
                 all_streams = all_streams + streams
-        return len(all_streams)
+
+        return all_streams
+
+
+def parse_khl():
+    return TvKHLRuParser.get_translations()
+

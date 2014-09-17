@@ -48,24 +48,16 @@ class ActNotwatchFilmView(APIView):
             'film': o_film
         }
 
-        obj_val = {
-            'id': o_film.id,
-            'name': o_film.name
-        }
-
         # Устанавливаем подписку
         try:
             o_subs = UsersFilms(status=not_watch, **filter_)
             o_subs.save()
-            Feed.objects.create(user=request.user, type=FILM_NOTWATCH, object=obj_val)
+            Feed.objects.create(user=request.user, type=FILM_NOTWATCH, obj_id=o_film.id)
         except Exception as e:
             try:
                 UsersFilms.objects.filter(**filter_).update(status=not_watch)
-                for f in Feed.objects.filter(user=request.user, type=FILM_NOTWATCH).iterator():
-                    if f.object == obj_val:
-                        f.delete()
-
-                Feed.objects.create(user=request.user, type=FILM_NOTWATCH, object=obj_val)
+                feed, created = Feed.objects.get_or_create(user=request.user, type=FILM_NOTWATCH, obj_id=o_film.id)
+                if not created: feed.save()
             except Exception as e:
                 return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -87,16 +79,9 @@ class ActNotwatchFilmView(APIView):
             'film': o_film.pk
         }
 
-        obj_val = {
-            'id': o_film.id,
-            'name': o_film.name
-        }
-
         # Удалим подписку
         UsersFilms.objects.filter(**filter).update(status=APP_USERFILM_STATUS_UNDEF)
-        for f in Feed.objects.filter(user=request.user, type=FILM_NOTWATCH).iterator():
-            if f.object == obj_val:
-                f.delete()
+        Feed.objects.filter(user=request.user, type=FILM_NOTWATCH, obj_id=o_film.id).delete()
 
         return Response(DEFAULT_REST_API_RESPONSE, status=status.HTTP_200_OK)
 
