@@ -472,3 +472,69 @@ mixin feed_thumb(item, for_tpl)
                .tape-item
             //-
                .tape-list
+
+mixin cast_thumb(item)
+    .col-md-3.col-sm-4.col-xs-6.film-thumb(data-mi-id="id",data-mi-val=item.id)
+        - year = item.releasedate?item.releasedate.substr(0,4):""
+        - url = "/films/" + item.id + "/"
+        - has_free = false
+        - min_price = false
+        - price_loc = ""
+        - btn_cls = ""
+        - price_loc_cnt = 0
+        - if (item.locations && item.locations.length>0) {
+        -   for (i = 0; i < item.locations.length; i++) {
+        -       obj = item.locations[i];
+        -       if (obj.price_type == 0) {
+        -            has_free = true;
+        -       } else {
+        -           price_loc_cnt++;
+        -           if (min_price === false || min_price > obj.price) {
+        -               min_price = obj.price;
+        -               price_loc = obj.id
+        -           }
+        -       }
+        -   }
+        -   if (min_price)
+        -       min_price = Math.floor(min_price)
+        -   url_loc = price_loc?(url+"#" + price_loc):""
+        -   url_btn = url
+        -   if (min_price && !has_free) {
+        -       btn_cls = "btn-price"
+        -       btn_text = "Смотреть<br><i>" + (price_loc_cnt > 1?"от ":"") + min_price + " р. без рекламы</i>"
+        -       url_btn = url_loc
+        -   } else {
+        -       btn_cls = "btn-free"
+        -       btn_text = "Смотреть<br/>бесплатно"
+        -       url_btn = url + "#player"
+        -   }
+        - } else {
+        -   btn_cls = "btn-subscribe"
+        -   btn_text = "Подписаться"
+        - }
+        a(href=url, title='',data-mi-athref="id").poster-place
+            - title_alt = item.name
+            - if (item.name_orig && item.name_orig != item.name) title_alt+= " (" +item.name_orig + ")"
+            - title_alt+= " " + year
+            img(src=item.poster || noposter_url,data-mi-atsrc="poster",data-mi-default=noposter_url,data-mi-id="poster",title=title_alt, alt=title_alt,data-mi-attitle="title_alt", data-mi-atalt="title_alt").img-poster
+        img(src=img_url + 'shd-small.png', alt='')
+        .rel.zmin.num
+            i(data-mi-name="ratings.cons.0")=(item.ratings && item.ratings.cons)?item.ratings.cons[0]:""
+        .caption-def
+            .name-film
+                a(href=url, title='',data-mi-athref="id")
+                    span(data-mi-name="name")=item.name
+                    | #{" ("}
+                    i(data-mi-name="releasedate",data-mi-id="releasedate",data-mi-val=item.releasedate)=year
+                    |)
+            .range-style.range-block
+                .rateit(data-mi-id="relation.rating",data-mi-val=(item.relation && item.relation.rating)?item.relation.rating:0,data-rateit-step=1,data-rateit-max=10,data-rateit-resetable=1,data-rateit-value=(item.relation && item.relation.rating)?item.relation.rating:0)
+            .btn-def.block.margin0a(class=btn_cls,data-mi-id="btn")
+                a(href=url_btn , title='',data-mi-id="btn_text",data-mi-athref="id")!=btn_text
+                a.btn-add.ab(href=url, title='Добавить в плейлист',data-mi-id="relation.playlist",data-mi-onclick="toggle_playlist",data-mi-val=item.relation && item.relation.playlist?1:0)
+            p(class=min_price && has_free?'':'display-none',data-mi-id="btn_price")
+                | или
+                br
+                a(href=url_loc, title='',data-mi-athref="id")
+                    - text = " " + (price_loc_cnt > 1?"от ":"") + min_price + " р. без рекламы"
+                    span(data-mi-id="price")=text
