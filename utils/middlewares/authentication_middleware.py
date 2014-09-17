@@ -54,7 +54,7 @@ class AuthenticationMiddleware(object):
     def process_request(self, request):
         self.session = None
         # Not API request
-        if resolve(request.get_full_path()).namespace not in self.api_namespaces:
+        if resolve(request.path).namespace not in self.api_namespaces:
             if isinstance(request.user, AnonymousUser):
                 # Check user
                 x_session = request.COOKIES.get('x-session', None)
