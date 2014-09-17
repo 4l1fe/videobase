@@ -76,7 +76,8 @@ class LoginUserView(View):
         return response
 
     def post(self, *args, **kwargs):
-        login_form = AuthenticationForm(data=self.request.POST)
+        data = self.request.POST
+        login_form = AuthenticationForm(data=data)
         if login_form.is_valid():
             user = login_form.get_user()
             kw = {
@@ -252,6 +253,7 @@ def calc_feed(user_id):
 
 
 class FeedView(View):
+
     def get(self, *args, **kwargs):
         if self.request.user.is_authenticated():
             # Сериализуем
