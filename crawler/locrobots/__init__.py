@@ -26,6 +26,8 @@ from crawler.locrobots.tvzavr_ru.loader import Tvzavr_Loader
 from crawler.locrobots.tvzavr_ru.parsers import ParseTvzavrFilmPage
 from crawler.locrobots.zoomby_ru.loader import ZOOMBY_Loader
 from crawler.locrobots.zoomby_ru.parsers import ParseFilm
+from crawler.locrobots.tvzor_ru.loader import TVZOR_Loader
+from crawler.locrobots.tvzor_ru.parsers import ParseTvzorFilmPage
 from crawler.utils.locations_utils import save_location, sane_dict
 
 # Словарь сайтов:
@@ -75,6 +77,10 @@ sites_crawler = {
     'videomax_org': {
         'loader': VIDEOMAX_Loader,
         'parser': ParseVIDEOMAXPage,
+    },
+    'tvzor_ru': {
+        'loader': TVZOR_Loader,
+        'parser': ParseTvzorFilmPage,
     }
 }
 
