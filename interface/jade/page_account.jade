@@ -14,7 +14,7 @@ html
                             .row
                                 .col-md-3
                                     .person-img
-                                        img.img-circle(src=img_url + 'content/img16.png', alt='')
+                                        img.img-circle(src=auth_user.avatar || noavatar_url, alt='')
                                         .change-img
                                             input(type='file')
                                     //-
