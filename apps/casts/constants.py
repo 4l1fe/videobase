@@ -1,4 +1,5 @@
 # coding: utf-8
+import os
 
 APP_CASTS_DEFAULT_PAGE = 1
 APP_CASTS_CASTS_PER_PAGE = 12
@@ -11,3 +12,5 @@ APP_CASTS_PRICE_TYPE = (
     (APP_CONTENTS_PRICE_TYPE_FREE, 'Бесплатно'),
     (APP_CONTENTS_PRICE_TYPE_PAY, 'Платно')
 )
+
+APP_CAST_POSTER_DIR = os.path.join('upload', 'castextras')
