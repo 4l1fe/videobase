@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from crawler.locrobots.news import parse_news
+from crawler.locrobots.now_or_stream_news import parse_news
 
 
 class Command(BaseCommand):

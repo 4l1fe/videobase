@@ -89,4 +89,4 @@ def update_drugoe_kino_listing():
                 traceback.print_exc()
 
             save_location(**sd)
-            save_location_to_locs_dict(locations, **sd)
+            save_location_to_locs_dict(locations, True, **sd)
