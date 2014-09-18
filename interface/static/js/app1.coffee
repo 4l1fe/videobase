@@ -1214,7 +1214,7 @@ class Page_Film extends Page
       rel: @conf.relation
       value: val
       callback: (new_value) =>
-        alert("done")
+        # alert("done")
     }
 
   action_notwatch_toggle: (status) ->
