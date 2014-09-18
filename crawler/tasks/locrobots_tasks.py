@@ -46,8 +46,9 @@ def age_weighted_robot_launcher(years):
     msg = "Starting locations checks for every film at least {year} days old"
     print msg.format(year=years)
     delays = defaultdict(int)
-    for robot in Robots.objects.all():
-        for film in Films.objects.all():
+    for film in Films.objects.all():
+        #ПОМЕНЯТЬ МЕСТАМИ ЦИКЛЫ
+        for robot in Robots.objects.all():
             #if film_at_least_years_old(film, years):
             if robot.name in sites_crawler:
                 process_individual_film_on_site.apply_async((robot.name, film.id), countdown=15*delays[robot.name])
