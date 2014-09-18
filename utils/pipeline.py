@@ -14,8 +14,22 @@ GET_IMAGE_URLS = {
     'google-oauth2': lambda response: response.get('image'),
 }
 
+BACKEND_HOST = {
+    'vk-oauth2': 'vk.com',
+    'facebook': 'facebook.com',
+    'twitter': 'twitter.com',
+    'google-oauth2': 'google.com',
+}
 
-def load_avatar(strategy, details, response, user, *args, **kwargs):
+
+def get_email(strategy, details, *args, **kwargs):
+    email = details.get('email')
+    if not email:
+        email = "{0}@{1}".format(details.get('username'), BACKEND_HOST[strategy.backend.name])
+    details.update({'email': email})
+
+
+def load_avatar(strategy, response, user, *args, **kwargs):
     image_url = None
     if user:
         image_url = GET_IMAGE_URLS[strategy.backend.name](response)

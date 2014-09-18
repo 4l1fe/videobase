@@ -203,6 +203,8 @@ REST_FRAMEWORK = {
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 
+USERNAME_IS_FULL_EMAIL = True
+
 LOGIN_URL = '/login'
 LOGIN_REDIRECT_URL = '/tokenize'
 LOGIN_ERROR_URL = '/'
@@ -247,6 +249,7 @@ SOCIAL_AUTH_PIPELINE = (
     'social.pipeline.social_auth.social_uid',
     'social.pipeline.social_auth.auth_allowed',
     'social.pipeline.social_auth.social_user',
+    'utils.pipeline.get_email',
     'social.pipeline.user.get_username',
     'social.pipeline.user.create_user',
     'social.pipeline.social_auth.associate_user',
