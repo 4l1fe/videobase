@@ -2,6 +2,7 @@
 from apps.films.models import Films
 from apps.robots.models import Robots
 from crawler.locrobots import sites_crawler
+from crawler.locrobots.itunes.itunes_robot import ItunesRobot
 from crawler.locrobots.amediateka_ru.loader import Amediateka_robot
 from crawler.locrobots.viaplay_ru.robot import ViaplayRobot
 from crawler.locrobots.playfamily_dot_ru.playfamily_xml import process
@@ -14,12 +15,20 @@ from collections import defaultdict
 from crawler.locrobots.individual_tasks import process_individual_film_on_site
 
 
+
+
+
 @app.task(name='amediateka_ru_robot_start', queue='amediateka_ru')
 def amediateka_robot_start(*args, **kwargs):
     '''
     Amediateka_robot
     '''
     Amediateka_robot().get_film_data()
+
+
+@app.task(name='itunes_robot_start', queue='itunes')
+def itunes_robot_start():
+    ItunesRobot().get_film_data()
 
 
 @app.task(name='playfamily_xml')
