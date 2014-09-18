@@ -4,11 +4,11 @@ from django.core.paginator import Paginator
 from rest_framework import status
 from rest_framework.test import APITestCase, APISimpleTestCase
 from rest_framework.reverse import reverse
-
-from apps.films.constants import APP_FILM_SERIAL, APP_USERFILM_STATUS_PLAYLIST, \
-    APP_PERSON_DIRECTOR, APP_PERSON_ACTOR, APP_PERSON_SCRIPTWRITER, APP_PERSON_PRODUCER, APP_USERFILM_SUBS_TRUE
-from apps.users.constants import APP_USER_REL_TYPE_NONE,\
-    APP_USERS_API_DEFAULT_PER_PAGE, APP_USERS_API_DEFAULT_PAGE
+from apps.films.constants import (APP_FILM_SERIAL, APP_USERFILM_STATUS_PLAYLIST, APP_PERSON_DIRECTOR,
+                                  APP_PERSON_ACTOR, APP_PERSON_SCRIPTWRITER, APP_PERSON_PRODUCER,
+                                  APP_USERFILM_SUBS_TRUE)
+from apps.users.constants import (APP_USER_REL_TYPE_NONE, APP_USER_REL_TYPE_SEND_NOT_RECEIVED,
+                                  APP_USERS_API_DEFAULT_PER_PAGE, APP_USERS_API_DEFAULT_PAGE)
 from apps.users.models import SessionToken
 from apps.users.tests.factories_users_api import *
 from apps.users.api.users_persons import persons_type
@@ -52,11 +52,11 @@ class APIUsersFriendShipActionTestCase(APISimpleTestCase):
         user_friend = UserFactory.create()
         kw = self.kwargs.copy()
         kw['user_id'] = user_friend.pk
-        UserRelsFactory.create(user=user_friend, user_rel=self.user, rel_type=APP_USER_REL_TYPE_FRIENDS)
-        FeedFactory.create(user=self.user, type=USER_ASK, obj_id=user_friend.id)
+        UserRelsFactory.create(user=user_friend, user_rel=self.user, rel_type=APP_USER_REL_TYPE_SEND_NOT_RECEIVED)
+        FeedFactory.create(user=user_friend, obj_id=self.user.id, type=USER_ASK)
         response = self.client.get(reverse(self.url_name, kwargs=kw),
                                    HTTP_X_MI_SESSION=self.headers)
-        feed = Feed.objects.last()
+        feed = Feed.objects.order_by('-created')[1]
         self.assertEqual(feed.user, self.user)
         self.assertEqual(feed.type, USER_FRIENDSHIP)
         self.assertEqual(feed.obj_id, user_friend.id)
