@@ -35,7 +35,7 @@ class Amediateka_robot(object):
                     for dict_film in film_data:
                         d = self.film_dict(dict_film, f)
                         save_location(**d)
-                        save_location_to_locs_dict(locations, **d)
+                        save_location_to_locs_dict(locations, True, **d)
                     break
         return locations
 
