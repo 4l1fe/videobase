@@ -23,7 +23,7 @@ from rest_framework import status
 import apps.films.models as film_model
 import apps.contents.models as content_model
 from apps.films.api.serializers import vbFilm, vbComment, vbPerson
-from apps.films.constants import APP_USERFILM_STATUS_PLAYLIST
+from apps.films.constants import APP_USERFILM_STATUS_PLAYLIST, APP_PERSON_ACTOR
 from apps.films.api import SearchFilmsView
 
 from utils.noderender import render_page
@@ -277,7 +277,11 @@ def test_view(request):
 
     return render_to_response('api_test.html', c)
 
+def serialize_actors(actors_iterable):
 
+    return [{'id':pf.person.id, 'name':pf.person.name}
+            for pf in actors_iterable]
+    
 def calc_actors(o_film):
     filter = {
         'filter': {'pf_persons_rel__film': o_film.pk},
@@ -287,10 +291,17 @@ def calc_actors(o_film):
 
     result = []
     try:
-        result = list((pf.person.id,pf.person.name) for pf in film_model.PersonsFilms.objects.filter(film=o_film))
+        enumerated_actors = film_model.PersonsFilms.objects.filter(film=o_film, p_type = APP_PERSON_ACTOR
+        ).exclude(p_index=0).order_by('p_index')
+
+        unenumerated_actors = film_model.PersonsFilms.objects.filter(film=o_film, p_type = APP_PERSON_ACTOR).filter(p_index=0)
+        
+        result = (serialize_actors(enumerated_actors) + serialize_actors(unenumerated_actors)) [slice(filter['offset'], filter['limit'])]
     except Exception, e:
         print "Caught exception {} in calc_actors".format(e)
 
+    for p in  result:
+        print p['name']
     return result
 
 
