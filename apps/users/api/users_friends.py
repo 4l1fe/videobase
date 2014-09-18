@@ -1,11 +1,8 @@
 # coding: utf-8
 from django.core.paginator import Paginator
-
 from rest_framework import status
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-
 from apps.users.constants import APP_USER_REL_TYPE_FRIENDS
 from apps.users.models import User
 from apps.users.api.serializers import vbUser
