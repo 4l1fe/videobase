@@ -39,6 +39,9 @@ def film_at_least_years_old(film, years):
     '''
     Returns true if @film less than @years old
     '''
-    return timezone.now().date() - film.release_date < timezone.timedelta(days=365*years)
+    if film.release_date:
+        return timezone.now().date() - film.release_date < timezone.timedelta(days=365*years)
+    else:
+        return True
 
 
