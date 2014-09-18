@@ -51,7 +51,7 @@ def age_weighted_robot_launcher(years):
         for robot in Robots.objects.all():
             #if film_at_least_years_old(film, years):
             if robot.name in sites_crawler:
-                process_individual_film_on_site.apply_async((robot.name, film.id), countdown=15*delays[robot.name])
+                process_individual_film_on_site.apply_async((robot.name, film.id), countdown=15*delays[robot.name], queue=robot.name)
                 delays[robot.name] += 1
 
 
