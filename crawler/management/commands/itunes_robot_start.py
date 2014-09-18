@@ -5,4 +5,4 @@ from crawler.locrobots.itunes.itunes_robot import ItunesRobot
 class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         ir = ItunesRobot()
-        ir.film_data()
+        ir.get_film_data()

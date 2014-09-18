@@ -1,11 +1,13 @@
 from bs4 import BeautifulSoup
 from apps.contents.constants import APP_CONTENTS_PRICE_TYPE_PAY
 from apps.films.models import Films
+from crawler.locations_saver import save_location_to_locs_dict
 from crawler.tor import simple_tor_get_page
-from crawler.utils.locations_utils import sane_dict
+from crawler.utils.locations_utils import sane_dict, save_location
 
 
 class ItunesRobot(object):
+
     def get_film_list(self):
         list_film_link = []
         url = 'http://www.apple.com/ru/itunes/charts/movies/'
@@ -20,15 +22,25 @@ class ItunesRobot(object):
 
         return list_film_link
 
-    def film_data(self):
+    def get_film_data(self):
+        locations = {
+                'info': [],
+                'type': 'itunes'
+        }
         list_film_link = self.get_film_list()
         for link in list_film_link:
             content = simple_tor_get_page(link)
-            a,b,c = self.parse_film_page(content)
+            film_name, film_price, price_type = self.parse_film_page(content)
+            film_dict = self.get_film_dict(film_name)
 
-            dic = self.get_film_dict(a)
-
-            print dic
+            if not film_dict is None:
+                film_dict['type'] = 'itunes'
+                film_dict['url_view'] = link
+                film_dict['price'] = film_price
+                film_dict['price_type'] = price_type
+                save_location(**film_dict)
+                save_location_to_locs_dict(locations, True, **film_dict)
+        return locations
 
     def parse_film_page(self, content):
         soup = BeautifulSoup(content)
@@ -40,8 +52,10 @@ class ItunesRobot(object):
 
     def get_film_dict(self, film_name):
         film_dict = None
-
-        film = Films.objects.get(name=film_name)
+        try:
+            film = Films.objects.get(name=film_name)
+        except Exception:
+            return film_dict
         film_dict = sane_dict(film)
 
         return film_dict
