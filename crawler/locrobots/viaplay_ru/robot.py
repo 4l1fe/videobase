@@ -30,7 +30,7 @@ class ViaplayRobot(object):
                     for obj in film_query_set:
                         d = self.film_dict(obj, link)
                         save_location(**d)
-                        save_location_to_locs_dict(locations, **d)
+                        save_location_to_locs_dict(locations, True, **d)
                     break
 
     def film_dict(self, film, film_link):

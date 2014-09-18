@@ -408,6 +408,10 @@ CELERYBEAT_SCHEDULE = {
         'task': 'cast_khl_robot',
         'schedule': timedelta(hours=24)
     },
+        'itunes_update':{
+            'task': 'itunes_robot_start',
+            'schedule': timedelta(hours=24)
+        },
 }
 
 CELERY_TIMEZONE = 'UTC'

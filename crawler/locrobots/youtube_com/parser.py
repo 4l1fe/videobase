@@ -85,7 +85,7 @@ class YoutubeChannelParser():
             resp_dict['value'] = link
             resp_dict['type'] = u'YouTubeMoviesRU'
             save_location(**resp_dict)
-            save_location_to_locs_dict(locations, **resp_dict)
+            save_location_to_locs_dict(locations, True, **resp_dict)
 
         except Exception, e:
             print e.message
