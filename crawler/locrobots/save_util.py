@@ -25,6 +25,7 @@ def save_loaded_data_to_file(loaded_data, film_id, site):
 
 
 def load_and_save_film_page_from_site(site, film_id):
+    saved_file_name = None
     try:
         film = Films.objects.get(id=film_id)
     except Films.DoesNotExist:
@@ -36,6 +37,8 @@ def load_and_save_film_page_from_site(site, film_id):
         saved_file_name = save_loaded_data_to_file(loaded_data, film.id, site)
         print "loaded ok"
     except NoSuchFilm:
-        print "page loading failed"
+        print "no such film"
+    except Exception, e:
+        print "page loading failed", e.message
         return None
     return saved_file_name
