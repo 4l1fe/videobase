@@ -31,6 +31,7 @@ def load_and_save_film_page_from_site(site, film_id):
         print "There is no film in db with such id"
         return None
     try:
+        print "trying to load " + str(film_id) +" from:", site
         loaded_data = sites_crawler[site]['loader'](film).load() #загрузка страницы
         saved_file_name = save_loaded_data_to_file(loaded_data, film.id, site)
         print "loaded ok"
