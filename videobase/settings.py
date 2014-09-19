@@ -267,6 +267,7 @@ SOCIAL_AUTH_PIPELINE = (
 
 # In minutes
 API_SESSION_EXPIRATION_TIME = 15
+SESSION_EXPIRATION_TIME = timedelta(minutes=API_SESSION_EXPIRATION_TIME)
 
 ###########################################################
 CELERYBEAT_SCHEDULE = {
@@ -413,18 +414,18 @@ CELERYBEAT_SCHEDULE = {
         'task': 'cast_championat_robot',
         'schedule': timedelta(hours=24)
     },
-        'cast_liverussia_ru_schedule': {
-        'task': 'cast_liverussia_robot',
+    'cast_liverussia_ru_schedule': {
+    'task': 'cast_liverussia_robot',
+    'schedule': timedelta(hours=24)
+    },
+    'cast_khl_ru_schedule': {
+    'task': 'cast_khl_robot',
+    'schedule': timedelta(hours=24)
+    },
+    'itunes_update': {
+        'task': 'itunes_robot_start',
         'schedule': timedelta(hours=24)
     },
-        'cast_khl_ru_schedule': {
-        'task': 'cast_khl_robot',
-        'schedule': timedelta(hours=24)
-    },
-        'itunes_update':{
-            'task': 'itunes_robot_start',
-            'schedule': timedelta(hours=24)
-        },
 }
 
 CELERY_TIMEZONE = 'UTC'

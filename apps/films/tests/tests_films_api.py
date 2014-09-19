@@ -464,7 +464,7 @@ class FilmsTestCase(APISimpleTestCase):
     def test_api_action_playlist_delete(self):
         film = self.films[0]
         UsersFilmsFactory.create(user=self.user, film=film, status=APP_USERFILM_STATUS_PLAYLIST, subscribed=APP_USERFILM_SUBS_TRUE)
-        response = self.client.delete(reverse('act_film_playlist_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_X_MI_SESSION=self.headers)
+        response = self.client.delete(reverse('films_api:act_film_playlist_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_X_MI_SESSION=self.headers)
         self.assertFalse(UsersFilms.objects.filter(user=self.user, film=film).exists())
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
