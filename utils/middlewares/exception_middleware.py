@@ -1,5 +1,5 @@
 # coding: utf-8
-from social_auth.exceptions import AuthAlreadyAssociated
+from social.exceptions import AuthAlreadyAssociated
 
 from django.shortcuts import redirect
 
