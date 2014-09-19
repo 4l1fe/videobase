@@ -419,7 +419,7 @@ CELERY_ACCEPT_CONTENT = ['pickle', 'json', 'msgpack', 'yaml']
 POSTER_URL_PREFIX = '_260x360'
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
-USE_THOR_FLAG = False
+USE_THOR = False
 
 from local_settings import *
 
@@ -433,4 +433,4 @@ if not DEBUG:
     }
 
 
-ROBOTS_LIST = ['amediateka_ru', 'ayyo_ru', 'drugoe_kino', 'itunes', 'tvzor_ru', 'viaplay_ru', 'youtube_com' ]
+ROBOTS_LIST = ['amediateka_ru', 'ayyo_ru', 'drugoe_kino', 'itunes', 'viaplay_ru', 'youtube_com' ]

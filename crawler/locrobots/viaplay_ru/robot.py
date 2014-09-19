@@ -16,8 +16,8 @@ class ViaplayRobot(object):
     def get_data(self):
         all_film_url = 'http://viaplay.ru/filmy/vse/5/alphabetical'
         locations = {
-        'info': [],
-        'type': 'viaplay'
+            'info': [],
+            'type': 'viaplay'
                 }
         content = simple_tor_get_page(all_film_url)
         soup_films = BeautifulSoup(content).find('ul', {'class': 'atoz-list'}).li.ul.find_all('li')
@@ -32,6 +32,7 @@ class ViaplayRobot(object):
                         save_location(**d)
                         save_location_to_locs_dict(locations, True, **d)
                     break
+        return locations
 
     def film_dict(self, film, film_link):
         resp_dict = sane_dict(film)
