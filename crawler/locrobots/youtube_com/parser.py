@@ -6,6 +6,7 @@ import requests
 from apps.films.models import Films
 from apps.robots.models import Robots
 from crawler.locations_saver import save_location_to_locs_dict
+from crawler.tasks.locrobots_logging import fill_log_table_for_not_schema_corresponded_robots
 from crawler.utils.locations_utils import sane_dict, save_location
 
 from apps.contents.constants import APP_CONTENTS_PRICE_TYPE_FREE, APP_CONTENTS_PRICE_TYPE_PAY
@@ -85,7 +86,7 @@ class YoutubeChannelParser():
             resp_dict['value'] = link
             resp_dict['type'] = u'YouTubeMoviesRU'
             save_location(**resp_dict)
-            save_location_to_locs_dict(locations, **resp_dict)
+            save_location_to_locs_dict(locations, True, **resp_dict)
 
         except Exception, e:
             print e.message
@@ -113,15 +114,15 @@ class YoutubeChannelParser():
     def process_channels_list():
         locations = {
         'info': [],
-        'type': 'viaplay'
+        'type': 'youtube_com'
                 }
-        site_name = 'www.youtube.com'
         channels_list = YoutubeChannelParser.get_list_of_channels()
         YoutubeChannelParser.save_channels_list_to_robot_state(channels_list)
 
         for channel in channels_list:
             YoutubeChannelParser.process_all_films_for_channel_name(locations, channel)
-        return site_name, locations
+        fill_log_table_for_not_schema_corresponded_robots(locations)
+        return locations
 
     @staticmethod
     def get_film_price(film_link):

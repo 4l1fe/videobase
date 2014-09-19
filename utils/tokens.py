@@ -1,7 +1,6 @@
 #coding: utf-8
 """Содержит пару удобных методов для получения токенов по клиентским запросам через urllib.
 """
-
 import sys
 import json
 
@@ -16,11 +15,7 @@ elif python_v == 3:
     from urllib.parse import urlencode, urljoin
 
 
-HOST = 'localvsevi'
-ADDR = 'http://{}'.format(HOST)
-
-
-def get_main_token(username, password, address=ADDR):
+def get_main_token(username, password, address):
     data = urlencode(dict(username=username, password=password))
     if python_v == 3:
         data = data.encode()
@@ -33,7 +28,7 @@ def get_main_token(username, password, address=ADDR):
     return json_resp['X-MI-TOKEN']
 
 
-def get_session_token(main_token, address=ADDR):
+def get_session_token(main_token, address):
     req = Request(urljoin(address, 'api/v1/auth/session.json'))
     req.add_header('X-MI-TOKEN', main_token)
     resp = urlopen(req)
@@ -44,15 +39,16 @@ def get_session_token(main_token, address=ADDR):
     return json_resp['session_token']
 
 
-def add_friendship(session_token, id_):
-    req = Request(urljoin(ADDR, 'api/v1/users/{}/friendship.json'.format(id_)))
+def add_friendship(session_token, id_, address):
+    req = Request(urljoin(address, 'api/v1/users/{}/friendship.json'.format(id_)))
     req.add_header('X-MI-SESSION', session_token)
     resp = urlopen(req)
     return resp.read()
 
-def del_friendship(session_token, id_):
+
+def del_friendship(session_token, id_, host):
     import httplib
-    cl = httplib.HTTPConnection(HOST)
+    cl = httplib.HTTPConnection(host)
     headers = {'X-MI-SESSION': session_token}
     cl.request('DELETE', '/api/v1/users/{}/friendship.json'.format(id_), headers=headers)
     resp = cl.getresponse()
@@ -60,11 +56,12 @@ def del_friendship(session_token, id_):
 
 
 if __name__ == '__main__':
-    mt = get_main_token(username='nana@nana.na', password='na')
-    # mt = get_main_token(username='ak@aaysm.com', password='akka')
+    host = 'localvsevi'
+    address = 'http://{}'.format(host)
+    mt = get_main_token('xseoxruru@gmail.com', 'xs', address)
     print(mt)
-    st = get_session_token(mt)
+    st = get_session_token(mt, address)
     print(st)
-    resp = add_friendship(st, 3)
+    resp = add_friendship(st, 42, address)
     print(resp)
-    # del_friendship(st, 42)
+    del_friendship(st, 42, host)

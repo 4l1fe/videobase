@@ -1,6 +1,7 @@
 # coding: utf-8
 from apps.robots.models import Robots
 from sys import executable
+from videobase.settings import ROBOTS_LIST
 
 __author__ = 'vladimir'
 
@@ -34,6 +35,9 @@ def generate_config_file():
     for robot in Robots.objects.all():
         robo_command = create_queue_str(robot.name)
         f.write(generate_process_section_with_parameters(robot.name, robo_command, robot.name))
+    for robot in ROBOTS_LIST:
+        robo_command = create_queue_str(robot)
+        f.write(generate_process_section_with_parameters(robot, robo_command, robot))
     saver_command = create_queue_str('location_saver')
     f.write(generate_process_section_with_parameters('location_saver', saver_command, 'location_saver'))
     thor_command = create_queue_str('thor')

@@ -3,7 +3,8 @@ from apps.contents.models import Locations, Contents
 from apps.robots.models import Robots
 from crawler.core.exceptions import NoSuchFilm
 from crawler.locrobots.process_film_from_site import get_html_json_for_file_name
-from crawler.locrobots.process_films_tasks import process_one_film, load_and_save_film_page_from_site
+from crawler.locrobots.process_films_tasks import process_one_film
+from crawler.locrobots.save_util import load_and_save_film_page_from_site
 from crawler.tasks.locrobots_logging import send_message_for_all_recipients
 
 
@@ -35,7 +36,6 @@ class RobotsBanCheck():
             except NoSuchFilm:
                 failed_films += [film.id]
 
-        #print robot_name, "checks: ", checks, "and films:", len(films)
         RobotsBanCheck.analyze_checks(checks, robot_name, failed_films, films)
 
     @staticmethod
