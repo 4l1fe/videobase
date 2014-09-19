@@ -3,10 +3,10 @@
 import math
 
 from django.contrib.auth.models import User
-from django.forms.models import model_to_dict
 
 from videobase.celery import app
 
+from apps.casts.api.serializers import vbCast
 from apps.casts.models import Casts, CastsLocations
 from apps.casts.constants import APP_CASTS_MAIL_SUBJECT, APP_CASTS_MAIL_TEMPLATE
 
@@ -39,7 +39,7 @@ def cast_notification(cast, user):
 
     params = {
         'context': {
-            'cast': model_to_dict(o_cast, fields=[field.name for field in o_cast._meta.fields]),
+            'cast': vbCast(o_cast, many=False).data,
             'free': has_free,
             'min_price': min_price,
             'loc_cnt': loc_cnt,
