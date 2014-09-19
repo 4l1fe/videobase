@@ -22,11 +22,24 @@ BACKEND_HOST = {
 }
 
 
-def get_email(strategy, details, *args, **kwargs):
+def get_email(details, user, *args, **kwargs):
     email = details.get('email')
-    if not email:
-        email = "{0}@{1}".format(details.get('username'), BACKEND_HOST[strategy.backend.name])
+    if user and user.email:
+        email = user.email
     details.update({'email': email})
+
+
+def get_firstname(details, user=None, *args, **kwargs):
+    first_name = details.get('first_name')
+    last_name = details.get('last_name')
+    if first_name and last_name:
+        first_name = u"{0} {1}".format(first_name, last_name)
+    elif first_name is None and last_name:
+        first_name = last_name
+    if user and user.first_name:
+        first_name = user.first_name
+
+    details.update({'first_name': first_name})
 
 
 def load_avatar(strategy, response, user, *args, **kwargs):
