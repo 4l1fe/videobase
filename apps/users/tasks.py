@@ -15,12 +15,14 @@ from apps.users.constants import APP_NOTIFICATION_TEMPLATE,\
 
 
 @app.task(name="confirm_register", queue="send_mail")
-def send_template_mail(subject, tpl_name, context, to, jade_render=False, **kwargs):
-    tpl = "render_page" if jade_render else "render_to_string"
-    result = globals()[tpl](tpl_name, context)
+def send_template_mail(subject, tpl_name, context, to, jade_render=False):
+    if jade_render:
+        tpl = render_page(tpl_name, context, False)
+    else:
+        tpl = render_to_string(tpl_name, context)
 
     msg = EmailMultiAlternatives(subject=subject, to=to)
-    msg.attach_alternative(result, 'text/html')
+    msg.attach_alternative(tpl, 'text/html')
     msg.send()
 
 

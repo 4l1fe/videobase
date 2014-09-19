@@ -31,6 +31,7 @@ def best_of_the_best_this_week():
 
     # Основные параметры рассылки и контекст
     params_email = {
+        'jade_render': True,
         'subject': APP_FILMS_WEEK_SUB_EMAIL,
         'tpl_name': 'week_newsletter',
         'context': {
@@ -63,7 +64,7 @@ def best_of_the_best_this_week():
         params_email.update({'to': item.email})
 
         # Отправляем email в очередь
-        send_template_mail.s(kwargs=params_email).apply_async()
+        send_template_mail.s(**params_email).apply_async()
 
 
 @app.task(name="personal_newsletter", queue="personal_newsletter")
@@ -124,4 +125,4 @@ def personal_newsletter():
         }
 
         # Отправляем email в очередь
-        send_template_mail.s(kwargs=params_email).apply_async()
+        send_template_mail.s(**params_email).apply_async()
