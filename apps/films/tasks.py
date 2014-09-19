@@ -24,7 +24,7 @@ def best_of_the_best_this_week():
 
     # Выборка фильмов
     new_films = Films.get_newest_films(limit=10)
-    new_films = vbFilm(new_films, many=True).data
+    new_films = vbFilm(new_films, many=True, require_relation=False).data
 
     # Выборка сериалов
     serials = []
