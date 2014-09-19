@@ -49,4 +49,4 @@ def cast_notification(cast, user):
         'to': [o_user.email],
     }
 
-    send_template_mail.s(kwargs=params).apply_async()
+    send_template_mail.s(**params).apply_async()
