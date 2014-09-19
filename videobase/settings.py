@@ -392,6 +392,11 @@ CELERYBEAT_SCHEDULE = {
         'task': 'parse_news_from_stream_ru',
         'schedule': timedelta(hours=12)
     },
+    # News from tvzor.ru
+    'parse_news_from_tvzor_ru': {
+        'task': 'parse_news_from_tvzor_ru',
+        'schedule': timedelta(hours=12)
+    },
     'cast_sportbox_ru_schedule': {
         'task': 'cast_sportbox_robot',
         'schedule': timedelta(hours=24)
