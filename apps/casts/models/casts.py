@@ -39,9 +39,9 @@ class Casts(models.Model):
             SELECT casts.id, COUNT(users_casts.cast_id) AS casts_cnt
             FROM casts INNER JOIN users_casts ON casts.id = users_casts.cast_id
             WHERE casts.start > %s AND casts.start < %s AND users_casts.subscribed IS NOT NULL
-            GROUP BY users_casts.cast_id
+            GROUP BY users_casts.cast_id, casts.id
             LIMIT %s
-        ) AS cs LEFT JOIN casts.id = cs.cast_id
+        ) AS cs LEFT JOIN casts ON casts.id = cs.id
         ORDER BY cs.casts_cnt DESC
         """
 
@@ -57,9 +57,9 @@ class Casts(models.Model):
             SELECT casts.id, COUNT(users_casts.cast_id) AS casts_cnt
             FROM casts INNER JOIN users_casts ON casts.id = users_casts.cast_id
             WHERE casts.start >= %s AND casts.start <= %s AND users_casts.subscribed IS NOT NULL
-            GROUP BY users_casts.cast_id
+            GROUP BY users_casts.cast_id, casts.id
             LIMIT %s
-        ) AS cs LEFT JOIN casts.id = cs.cast_id
+        ) AS cs LEFT JOIN casts ON casts.id = cs.id
         ORDER BY cs.casts_cnt DESC
         """
 
