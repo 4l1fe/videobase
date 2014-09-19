@@ -2,6 +2,7 @@ import requests
 import json
 import re
 from crawler.locations_saver import save_location_to_locs_dict
+from crawler.tasks.locrobots_logging import fill_log_table_for_not_schema_corresponded_robots
 
 from crawler.utils.locations_utils import sane_dict, save_location
 from apps.contents.constants import APP_CONTENTS_PRICE_TYPE_FREE, APP_CONTENTS_PRICE_TYPE_PAY
@@ -73,4 +74,5 @@ def update_drugoe_kino_listing():
 
             save_location(**sd)
             save_location_to_locs_dict(locations, True, **sd)
+    fill_log_table_for_not_schema_corresponded_robots(locations)
     return locations

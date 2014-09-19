@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 from apps.contents.constants import APP_CONTENTS_PRICE_TYPE_PAY
 from apps.films.models import Films
 from crawler.locations_saver import save_location_to_locs_dict
+from crawler.tasks.locrobots_logging import fill_log_table_for_not_schema_corresponded_robots
 from crawler.tor import simple_tor_get_page
 from crawler.utils.locations_utils import sane_dict, save_location
 
@@ -40,6 +41,7 @@ class ItunesRobot(object):
                 film_dict['price_type'] = price_type
                 save_location(**film_dict)
                 save_location_to_locs_dict(locations, True, **film_dict)
+        fill_log_table_for_not_schema_corresponded_robots(locations)
         return locations
 
     def parse_film_page(self, content):

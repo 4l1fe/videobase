@@ -2,6 +2,7 @@
 from apps.films.models import Films
 from bs4 import BeautifulSoup
 from crawler.locations_saver import save_location_to_locs_dict
+from crawler.tasks.locrobots_logging import fill_log_table_for_not_schema_corresponded_robots
 from crawler.utils.locations_utils import save_location, sane_dict
 from apps.contents.constants import *
 from crawler.tor import simple_tor_get_page
@@ -32,6 +33,7 @@ class ViaplayRobot(object):
                         save_location(**d)
                         save_location_to_locs_dict(locations, True, **d)
                     break
+        fill_log_table_for_not_schema_corresponded_robots(locations)
         return locations
 
     def film_dict(self, film, film_link):

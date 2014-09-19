@@ -2,6 +2,7 @@
 import json
 import urllib
 from crawler.locations_saver import save_location_to_locs_dict
+from crawler.tasks.locrobots_logging import fill_log_table_for_not_schema_corresponded_robots
 
 HOST = 'www.ayyo.ru'
 URL_SEARCH = 'api/search/live/?{}'
@@ -41,6 +42,7 @@ class AyyoRobot(object):
             save_location_to_locs_dict(locations, True, **d)
         except Exception, e:
             pass
+        fill_log_table_for_not_schema_corresponded_robots(locations)
         return locations
 
     def film_dict(self, film, film_link, price):
