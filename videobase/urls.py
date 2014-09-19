@@ -13,9 +13,9 @@ urlpatterns = patterns('',
     # API
     url(r'^api/image/resize/', 'apps.films.views.resize_image'),
     url(r'^api/image/brco/', 'apps.films.views.bri_con'),
-    url(r'^api/', include('apps.films.urls')),
-    url(r'^api/', include('apps.users.urls')),
-    url(r'^api/', include('apps.casts.urls')),
+    url(r'^api/', include('apps.films.urls', namespace='films_api')),
+    url(r'^api/', include('apps.users.urls', namespace='users_api')),
+    url(r'^api/', include('apps.casts.urls', namespace='casts_api')),
     url(r'^robots/', include('apps.robots.urls')),
     url(r'^api/test', test_view),
 
@@ -23,8 +23,8 @@ urlpatterns = patterns('',
     url('', include('apps.films.view_url')),
     url('', include('apps.users.view_url')),
 
-    # Auth
-    url(r'', include('social_auth.urls')),
+    # OAuth
+    url(r'', include('social.apps.django_app.urls', namespace='social')),
 
     # Admin
     url(r'^admin_tools/', include('admin_tools.urls')),

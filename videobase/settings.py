@@ -29,7 +29,7 @@ BACKUP_PATH = os.path.join(BASE_PATH, '..', '.backup')
 SECRET_KEY = '7-dsc0--i_ej94w9as#-5p_5a)ql*9o80v1rs9krx!_-9%^b5$'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 TEMPLATE_DEBUG = DEBUG
 
@@ -66,10 +66,12 @@ DEFAULT_FROM_EMAIL = emailconf.get('email', 'DEFAULT_FROM_EMAIL')
 ###########################################################
 # Application definition
 INSTALLED_APPS = (
+    # Admin-tools
     'admin_tools',
     'admin_tools.theming',
     'admin_tools.menu',
     'admin_tools.dashboard',
+    # Django default apps
     'django.contrib.auth',
     'django.contrib.admin',
     'django.contrib.contenttypes',
@@ -80,10 +82,15 @@ INSTALLED_APPS = (
     'south',
     'django_nose',
     'treebeard',
+    # Rest api
     'rest_framework',
     'rest_framework.authtoken',
-    'social_auth',
+    # Social oauth
+    'social.apps.django_app.default',
+    # Celery for django
+    'djcelery',
     'csvimport',
+    # Apps
     'apps.users',
     'apps.films',
     'apps.contents',
@@ -92,8 +99,6 @@ INSTALLED_APPS = (
     'apps.git',
     'apps.casts',
     'crawler',
-    'social_auth',
-    'djcelery',
     'backup_system',
     'data',
 )
@@ -101,12 +106,12 @@ INSTALLED_APPS = (
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    #'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'utils.middlewares.ThreadLocals',
-    'utils.middlewares.ExceptionMiddleware'
+    'utils.middlewares.ExceptionMiddleware',
+    'utils.middlewares.AuthenticationMiddleware',
 )
 
 TEMPLATE_LOADERS = (
@@ -121,8 +126,9 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.media',
     'django.contrib.messages.context_processors.messages',
     'django.core.context_processors.request',
-    # Social
-    'social_auth.context_processors.social_auth_by_type_backends',
+    # Social OAuth
+    'social.apps.django_app.context_processors.backends',
+    'social.apps.django_app.context_processors.login_redirect',
 )
 
 TEMPLATE_DIRS = (
@@ -160,18 +166,12 @@ CACHES = {
 # Backends for social auth
 AUTHENTICATION_BACKENDS = (
     # OAuth
-    'social_auth.backends.twitter.TwitterBackend',
-    'social_auth.backends.facebook.FacebookBackend',
-    'social_auth.backends.contrib.vk.VKOAuth2Backend',
-    'social_auth.backends.google.GoogleOAuth2Backend',
+    'social.backends.vk.VKOAuth2',
+    'social.backends.google.GoogleOAuth2',
+    'social.backends.facebook.FacebookOAuth2',
+    'social.backends.twitter.TwitterOAuth',
     # Django
     'django.contrib.auth.backends.ModelBackend',
-)
-
-# Backends for template auth
-TEMPLATE_AUTHENTICATION_BACKENDS = (
-    # Auth
-    'apps.users.backends.CookiesSessionAuthentication',
 )
 
 ###########################################################
@@ -204,57 +204,65 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'apps.users.backends.SessionTokenAuthentication',
-        'apps.users.backends.UserTokenAuthentication',
     )
 }
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 
+USERNAME_IS_FULL_EMAIL = True
+
 LOGIN_URL = '/login'
-SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/tokenize/'
+LOGIN_REDIRECT_URL = '/tokenize'
 LOGIN_ERROR_URL = '/'
 
 ###########################################################
 # Ключи для OAuth2 авторизации
 # Vkontakte
-VK_APP_ID            = '4296663'
-VKONTAKTE_APP_ID     = VK_APP_ID
-VK_API_SECRET        = 'JAEQddzkBCm554iGXe6S'
-VKONTAKTE_APP_SECRET = VK_API_SECRET
+SOCIAL_AUTH_VK_OAUTH2_KEY = '4296663'
+SOCIAL_AUTH_VK_OAUTH2_SECRET = 'JAEQddzkBCm554iGXe6S'
+SOCIAL_AUTH_VK_OAUTH2_SCOPE = ['email', ]
+SOCIAL_AUTH_VK_OAUTH2_EXTRA_DATA = ['photo_max']
 
 # Facebook
-FACEBOOK_APP_ID     = '212532105624824'
-FACEBOOK_API_SECRET = 'a99fcef38b7054279d73beb4ebb7b6cc'
-FACEBOOK_EXTENDED_PERMISSIONS = ['email', ]
+SOCIAL_AUTH_FACEBOOK_KEY = '212532105624824'
+SOCIAL_AUTH_FACEBOOK_SECRET = 'a99fcef38b7054279d73beb4ebb7b6cc'
+SOCIAL_AUTH_FACEBOOK_SCOPE = ['email', ]
+SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {'locale': 'ru_RU'}
 
 # Twitter
-TWITTER_CONSUMER_KEY    = 'HACuJARrAXJyeHdeD5viHULZR'
-TWITTER_CONSUMER_SECRET = 'Ge0k2rKltyPq3ida76IjTbhesZVdIrvckcNPXzJaBU2ouzixut'
+SOCIAL_AUTH_TWITTER_KEY = 'HACuJARrAXJyeHdeD5viHULZR'
+SOCIAL_AUTH_TWITTER_SECRET = 'Ge0k2rKltyPq3ida76IjTbhesZVdIrvckcNPXzJaBU2ouzixut'
 
 # Google+
-GOOGLE_OAUTH2_CLIENT_ID     = '729866043170.apps.googleusercontent.com'
-GOOGLE_OAUTH2_CLIENT_SECRET = 'Ga91PMNEXi28egLsTUy5Wqhw'
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '729866043170.apps.googleusercontent.com'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'Ga91PMNEXi28egLsTUy5Wqhw'
 
-GOOGLE_OAUTH2_USE_UNIQUE_USER_ID = True
+SOCIAL_AUTH_GOOGLE_OAUTH2_USE_UNIQUE_USER_ID = True
+SOCIAL_AUTH_GOOGLE_OAUTH2_IGNORE_DEFAULT_SCOPE = True
+SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
+    'https://www.googleapis.com/auth/userinfo.email',
+    'https://www.googleapis.com/auth/userinfo.profile'
+]
 
 SOCIAL_AUTH_CREATE_USERS = True
 SOCIAL_AUTH_USERNAME_IS_FULL_EMAIL = True
 
+SOCIAL_AUTH_STORAGE = 'social.apps.django_app.default.models.DjangoStorage'
+
 # Перечислим pipeline, которые последовательно буду обрабатывать респонс
 SOCIAL_AUTH_PIPELINE = (
-    # Получает по backend и uid инстансы social_user и user
-    'social_auth.backends.pipeline.social.social_auth_user',
-    # Получает по user.email инстанс пользователя и заменяет собой тот, который получили выше.
-    # Кстати, email выдает только Facebook и GitHub, а Vkontakte и Twitter не выдают
-    'social_auth.backends.pipeline.associate.associate_by_email',
-    # Пытается собрать правильный username, на основе уже имеющихся данных
-    'social_auth.backends.pipeline.user.get_username',
-    # Создает нового пользователя, если такого еще нет
-    'social_auth.backends.pipeline.user.create_user',
-    # Пытается связать аккаунты
-    'social_auth.backends.pipeline.social.associate_user',
-    # Получает и обновляет social_user.extra_data
-    'social_auth.backends.pipeline.social.load_extra_data',
+    'social.pipeline.social_auth.social_details',
+    'social.pipeline.social_auth.social_uid',
+    'social.pipeline.social_auth.auth_allowed',
+    'social.pipeline.social_auth.social_user',
+    'utils.pipeline.get_firstname',
+    'utils.pipeline.get_email',
+    'social.pipeline.user.get_username',
+    'social.pipeline.user.create_user',
+    'social.pipeline.social_auth.associate_user',
+    'social.pipeline.social_auth.load_extra_data',
+    'social.pipeline.user.user_details',
+    'utils.pipeline.load_avatar',
 )
 
 # In minutes
@@ -436,6 +444,5 @@ if not DEBUG:
     RAVEN_CONFIG = {
         'dsn': 'http://8684bf8b497047d9ac170fd16aefc873:41e89f4666b24f998125370f3d1a1789@sentry.aaysm.com/2'
     }
-
 
 ROBOTS_LIST = ['amediateka_ru', 'ayyo_ru', 'drugoe_kino', 'itunes', 'viaplay_ru', 'youtube_com' ]
