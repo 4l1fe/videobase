@@ -2,8 +2,6 @@
 
 from datetime import datetime, timedelta
 
-from django.forms.models import model_to_dict
-
 from videobase.celery import app
 
 from apps.films.models import Films
@@ -17,6 +15,7 @@ from apps.users.constants import APP_USERPROFILE_NOTIFICATION_WEEK, APP_USERPROF
     FILM_RATE, FILM_SUBSCRIBE, FILM_COMMENT
 
 from apps.casts.models import Casts
+from apps.casts.api.serializers import vbCast
 
 
 @app.task(name="week_newsletter", queue="week_newsletter")
@@ -25,22 +24,22 @@ def best_of_the_best_this_week():
 
     # Выборка фильмов
     new_films = Films.get_newest_films(limit=10)
-    new_films = vbFilm(new_films).data
+    new_films = vbFilm(new_films, many=True).data
 
     # Выборка сериалов
     serials = []
 
-    # Выборка трансляций
-    streams = []
-
     # Основные параметры рассылки и контекст
     params_email = {
         'subject': APP_FILMS_WEEK_SUB_EMAIL,
-        'tpl_name': u'mail/newsletter.html',
+        'tpl_name': 'week_newsletter',
         'context': {
             'films': new_films,
             'serials': serials,
-            'streams': streams,
+            'casts': {
+                'old': [],
+                'future': [],
+            },
         },
     }
 
@@ -57,10 +56,8 @@ def best_of_the_best_this_week():
     end_dt.replace(hour=23, minute=59, second=59)
 
     # Вставка параметров трансляции
-    params_email['context']['casts'] = {
-        'best': model_to_dict(Casts.best_old_casts(start_dt=start_dt, end_dt=curr_dt)),
-        'future': model_to_dict(Casts.best_future_casts(start_dt=curr_dt, end_dt=end_dt)),
-    }
+    params_email['context']['casts']['old'] = vbCast(Casts.best_old_casts(start_dt=start_dt, end_dt=curr_dt), many=True).data,
+    params_email['context']['casts']['future'] = vbCast(Casts.best_future_casts(start_dt=curr_dt, end_dt=end_dt), many=True).data,
 
     for item in o_users:
         params_email.update({'to': item.email})

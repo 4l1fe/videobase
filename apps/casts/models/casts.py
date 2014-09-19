@@ -30,7 +30,7 @@ class Casts(models.Model):
         return u'[{0}] {1}'.format(self.pk, self.title)
 
     @classmethod
-    def best_old_casts(cls, start_dt=None, end_dt=None, limit=5):
+    def best_old_casts(cls, start_dt=None, end_dt=None, limit=4):
         if not (limit and start_dt and end_dt):
             return []
 
