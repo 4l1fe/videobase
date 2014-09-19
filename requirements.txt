@@ -31,7 +31,6 @@ raven
 selenium
 pytils
 pyvirtualdisplay
-jsonfield==0.9.20
 gdata
 zerorpc
 lxml
