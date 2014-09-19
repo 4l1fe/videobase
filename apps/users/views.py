@@ -19,7 +19,7 @@ from social.apps.django_app.default.models import UserSocialAuth
 from rest_framework.authtoken.models import Token
 
 from tasks import send_template_mail
-from apps.users.models import Feed
+from apps.users.models import Feed, SessionToken
 from apps.users.api.serializers import vbUser, vbFeedElement, vbUserProfile
 from apps.users.forms import CustomRegisterForm, UsersProfileForm
 from apps.users.api.utils import create_new_session
@@ -97,6 +97,13 @@ class LoginUserView(View):
 class UserLogoutView(View):
 
     def get(self, request, **kwargs):
+        x_session = request.COOKIES.get('x-session')
+        try:
+            session = SessionToken.objects.get(key=x_session)
+            session.is_active = False
+            session.save()
+        except:
+            pass
         response = HttpResponseRedirect(reverse('index_view'))
         response.delete_cookie("x-session")
         response.delete_cookie("x-token")
