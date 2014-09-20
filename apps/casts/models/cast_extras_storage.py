@@ -35,12 +35,10 @@ class CastExtrasStorage(PhotoClass):
 
         return result
 
-
     def __unicode__(self):
         return u'[{0}] {1}'.format(self.pk, self.name)
 
-
-    class  Meta(object):
+    class Meta(object):
         # Имя таблицы в БД
         db_table = 'casts_extras'
         app_label = 'casts'

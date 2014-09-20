@@ -9,7 +9,7 @@ from apps.casts.models import Casts, UsersCasts
 from django.utils import timezone
 
 
-#############################################################################################################
+################################################################################
 class CastsSubscribeView(APIView):
     """
     Cast info
