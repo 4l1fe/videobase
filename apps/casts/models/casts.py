@@ -1,5 +1,4 @@
 # coding: utf-8
-
 from django.db import models
 from djorm_pgfulltext.models import SearchManager
 from djorm_pgfulltext.fields import VectorField

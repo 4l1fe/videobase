@@ -8,6 +8,7 @@ from apps.casts.constants import APP_CAST_POSTER_DIR
 from utils.common import get_image_path
 import videobase.settings as settings
 
+
 # Модель Расширения фильмов/сериалов
 class CastExtrasStorage(PhotoClass):
     cast        = models.ForeignKey('Casts', verbose_name=u'Cast', related_name="ce_cast_rel")
@@ -16,9 +17,8 @@ class CastExtrasStorage(PhotoClass):
     photo       = models.ImageField(upload_to=get_image_path, blank=True, null=True, verbose_name=u'Постер')
 
     def __init__(self, *args, **kwargs):
-        super(CastsExtrasStorage, self).__init__(*args, **kwargs)
+        super(CastExtrasStorage, self).__init__(*args, **kwargs)
         self._original_type = self.type
-
 
     @property
     def get_upload_to(self):
