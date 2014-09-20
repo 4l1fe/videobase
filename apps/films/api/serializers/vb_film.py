@@ -18,6 +18,7 @@ from utils.middlewares.local_thread import get_current_request
 from vb_person import vbPerson
 
 
+
 #############################################################################################################
 class CountriesSerializer(serializers.ModelSerializer):
 
@@ -36,10 +37,14 @@ class GenresSerializer(serializers.ModelSerializer):
 
 #############################################################################################################
 class LocationsSerializer(serializers.ModelSerializer):
-
+    price = serializers.SerializerMethodField('calc_price')
     class Meta:
         model = Locations
+        
         fields = ('id','type', 'lang', 'quality', 'subtitles', 'price', 'price_type', 'url_view','value')
+
+    def calc_price(self,obj):
+        return float(obj.price)
 
 
 #############################################################################################################

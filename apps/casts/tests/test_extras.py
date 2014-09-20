@@ -14,7 +14,7 @@ class CastTestCase(APISimpleTestCase):
 
     def test_search(self):
         response = self.client.get(
-            reverse('cast_extras_view', kwargs={'cast_id': 1, 'format': 'json'}), data={}
+            reverse('casts_api:cast_extras_view', kwargs={'cast_id': 1, 'format': 'json'}), data={}
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)

@@ -10,13 +10,16 @@ from django.http import HttpResponseRedirect, HttpResponse,\
 from django.utils import timezone
 from django.contrib.auth.models import User, AnonymousUser
 from django.views.decorators.cache import never_cache
+from django.views.generic import View
 from django.shortcuts import redirect
 from django.contrib.auth.forms import AuthenticationForm
-from social_auth.models import UserSocialAuth
+
+from social.apps.django_app.default.models import UserSocialAuth
+
 from rest_framework.authtoken.models import Token
 
 from tasks import send_template_mail
-from apps.users.models import Feed
+from apps.users.models import Feed, SessionToken
 from apps.users.api.serializers import vbUser, vbFeedElement, vbUserProfile
 from apps.users.forms import CustomRegisterForm, UsersProfileForm
 from apps.users.api.utils import create_new_session
@@ -26,7 +29,6 @@ from apps.films.models import Films, Persons, UsersFilms, UsersPersons
 from apps.films.constants import APP_PERSON_DIRECTOR, APP_PERSON_ACTOR, APP_USERFILM_SUBS_TRUE
 from apps.films.api.serializers import vbFilm, vbPerson
 from utils.common import url_with_querystring
-from utils.auth.views import View
 from utils.noderender import render_page
 
 
@@ -76,7 +78,8 @@ class LoginUserView(View):
         return response
 
     def post(self, *args, **kwargs):
-        login_form = AuthenticationForm(data=self.request.POST)
+        data = self.request.POST
+        login_form = AuthenticationForm(data=data)
         if login_form.is_valid():
             user = login_form.get_user()
             kw = {
@@ -95,6 +98,13 @@ class LoginUserView(View):
 class UserLogoutView(View):
 
     def get(self, request, **kwargs):
+        x_session = request.COOKIES.get('x-session')
+        try:
+            session = SessionToken.objects.get(key=x_session)
+            session.is_active = False
+            session.save()
+        except:
+            pass
         response = HttpResponseRedirect(reverse('index_view'))
         response.delete_cookie("x-session")
         response.delete_cookie("x-token")
@@ -252,7 +262,8 @@ def calc_feed(user_id):
 
 
 class FeedView(View):
-    def get(self, *args, **kwargs):
+
+    def get(self, **kwargs):
         if self.request.user.is_authenticated():
             # Сериализуем
             try:
@@ -261,5 +272,4 @@ class FeedView(View):
                 raise Http404
 
             return HttpResponse(render_page('feed', {'feed': o_feed}))
-
         return redirect('login_view')

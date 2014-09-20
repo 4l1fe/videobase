@@ -2,6 +2,7 @@
 
 from django.conf.urls import patterns, url
 from apps.users import views
+from apps.users.views import FeedView
 
 urlpatterns = patterns('',
     url(r'^restore-password/$', views.RestorePasswordView.as_view()),
@@ -14,6 +15,6 @@ urlpatterns = patterns('',
     # Auth
     url(r'^login/$', views.LoginUserView.as_view(), name='login_view'),
     url(r'^logout/$', views.UserLogoutView.as_view(), name='logout_view'),
-    url('^tokenize/?$', views.TokenizeView.as_view(), name="tokenize"),
+    url(r'^tokenize/?$', views.TokenizeView.as_view(), name="tokenize"),
 )
 

@@ -1,3 +1,4 @@
 # coding: utf-8
 from exception_middleware import ExceptionMiddleware
 from local_thread import ThreadLocals
+from authentication_middleware import AuthenticationMiddleware
