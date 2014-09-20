@@ -14,13 +14,6 @@ GET_IMAGE_URLS = {
     'google-oauth2': lambda response: response.get('image'),
 }
 
-BACKEND_HOST = {
-    'vk-oauth2': 'vk.com',
-    'facebook': 'facebook.com',
-    'twitter': 'twitter.com',
-    'google-oauth2': 'google.com',
-}
-
 
 def get_email(details, user, *args, **kwargs):
     email = details.get('email')

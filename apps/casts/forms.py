@@ -1,5 +1,4 @@
 # coding: utf-8
-
 from django.forms import Form
 from django.forms import fields
 
@@ -32,11 +31,10 @@ class CastsListFormBase(Form):
     start_in   = fields.IntegerField(min_value=0, required=False)
     subscribed = fields.BooleanField(required=False)
 
-
     def __init__(self, *args, **kwargs):
         super(CastsListFormBase, self).__init__(*args, **kwargs)
 
-        for k,v in self.fields.items():
+        for k, v in self.fields.items():
             if k in kwargs['data'] and kwargs['data'][k]:
                 if self.fields[k].required == False:
                     self.fields[k].required = True
@@ -53,9 +51,8 @@ class CastsChatGetForm(Form):
     limit   = fields.IntegerField(min_value=0, required=False)
 
     def __init__(self, *args, **kwargs):
-        super(CastsListFormBase, self).__init__(*args, **kwargs)
-
-        for k,v in self.fields.items():
+        super(CastsChatGetForm, self).__init__(*args, **kwargs)
+        for k, v in self.fields.items():
             if k in kwargs['data'] and kwargs['data'][k]:
                 if self.fields[k].required == False:
                     self.fields[k].required = True
