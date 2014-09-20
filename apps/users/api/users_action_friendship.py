@@ -1,44 +1,20 @@
 # coding: utf-8
-
-from django.db import IntegrityError
-
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
-
 from django.db import IntegrityError
+from django.db.models import Q
 from videobase.settings import DEFAULT_REST_API_RESPONSE
-
-from apps.users.models import User, UsersRels, Feed, UsersPics
-from apps.users.constants import APP_USER_REL_TYPE_FRIENDS, APP_USER_REL_TYPE_NONE, \
-    USER_ASK, USER_FRIENDSHIP
+from apps.users.models import User, UsersRels, Feed
+from apps.users.constants import (APP_USER_REL_TYPE_NONE,
+                                  USER_ASK, USER_FRIENDSHIP,
+                                  APP_USER_REL_TYPE_SEND_NOT_RECEIVED)
 
 
 class UsersFriendshipView(APIView):
 
     permission_classes = (IsAuthenticated, )
-
-
-    def _get_avatar_url(self, u):
-        try:
-            a = UsersPics.objects.get(user=u).image
-            return a.storage.url(a.name)
-        except:
-            return ''
-
-
-    def _update_or_create_feed(self, type_, obj_val):
-        ffeeds = Feed.objects.filter(user=self.request.user, type=type_)
-        feeds = [f for f in ffeeds]
-        objs = [f.object for f in ffeeds]
-
-        try:
-            f = feeds[objs.index(obj_val)]
-            f.save()
-        except ValueError:
-            Feed.objects.create(user=self.request.user, type=type_, object=obj_val)
-
 
     def get(self, request, user_id, format=None, *args, **kwargs):
         try:
@@ -46,42 +22,26 @@ class UsersFriendshipView(APIView):
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-        ur_fields = {
-            'user': request.user,
-            'user_rel': user_friend
-        }
-
-        ur_fr_fields = {
-            'user': user_friend,
-            'user_rel': request.user,
-            'rel_type': APP_USER_REL_TYPE_FRIENDS
-        }
-
-        avatar_url = self._get_avatar_url(user_friend)
-        obj_val = {
-            'id': user_friend.id,
-            'name': user_friend.username,
-            'avatar': avatar_url
-        }
-
         try:
-            ur = UsersRels(**ur_fields)
-            ur.rel_type = APP_USER_REL_TYPE_FRIENDS
+            ur = UsersRels(user=request.user, user_rel=user_friend)
+            ur.rel_type = APP_USER_REL_TYPE_SEND_NOT_RECEIVED
             ur.save()
         except IntegrityError:
-            UsersRels.objects.filter(**ur_fields).update(rel_type=APP_USER_REL_TYPE_FRIENDS)
+            UsersRels.objects.filter(user=request.user, user_rel=user_friend).update(rel_type=APP_USER_REL_TYPE_SEND_NOT_RECEIVED)
 
-        if UsersRels.objects.filter(**ur_fr_fields).exists():
-            for f in Feed.objects.filter(user=request.user, type=USER_ASK).iterator():
-                if f.object == obj_val:
-                    f.delete()
-
-            self._update_or_create_feed(USER_FRIENDSHIP, obj_val)
+        if UsersRels.objects.filter(user_id=user_friend.id, user_rel_id=request.user.id,
+                                                rel_type=APP_USER_REL_TYPE_SEND_NOT_RECEIVED).exists():  # если есть встречная заявка
+            Feed.objects.filter(Q(user=request.user, type=USER_ASK, obj_id=user_friend.id)
+                                | Q(user=user_friend, type=USER_ASK, obj_id=request.user.id)).delete()
+            feed, created = Feed.objects.get_or_create(user=request.user, type=USER_FRIENDSHIP, obj_id=user_friend.id)
+            if not created: feed.save()
+            feed, created = Feed.objects.get_or_create(user=user_friend, type=USER_FRIENDSHIP, obj_id=request.user.id)
+            if not created: feed.save()
         else:
-            self._update_or_create_feed(USER_ASK, obj_val)
+            feed, created = Feed.objects.get_or_create(user=request.user, type=USER_ASK, obj_id=user_friend.id)
+            if not created: feed.save()
 
         return Response(status=status.HTTP_200_OK)
-
 
     def delete(self, request, user_id, format=None, *args, **kwargs):
         try:
@@ -89,19 +49,8 @@ class UsersFriendshipView(APIView):
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-        obj_val = {
-            'id': user_friend.id,
-            'name': user_friend.username
-        }
         UsersRels.objects.filter(user=request.user, user_rel=user_friend).update(rel_type=APP_USER_REL_TYPE_NONE)
+        Feed.objects.filter(user=request.user, type__in=[USER_FRIENDSHIP, USER_ASK], obj_id=user_friend.id).delete()
+        Feed.objects.filter(user=user_friend, type=USER_FRIENDSHIP, obj_id=request.user.id).update(type=USER_ASK)
 
-        for f in Feed.objects.filter(user=request.user, type=USER_FRIENDSHIP).iterator():
-            if all(item in f.object.items() for item in obj_val.items()):
-                f.delete()
-
-        for f in Feed.objects.filter(user=request.user, type=USER_ASK).iterator():
-            if all(item in f.object.items() for item in obj_val.items()):
-                f.delete()
         return Response(DEFAULT_REST_API_RESPONSE,status=status.HTTP_200_OK)
-        
-

@@ -22,7 +22,7 @@ class CastListTestCase(APISimpleTestCase):
 
     def test_list(self):
         response = self.client.get(
-            reverse('cast_list_view', kwargs={'format': 'json'}),
+            reverse('casts_api:cast_list_view', kwargs={'format': 'json'}),
             HTTP_X_MI_SESSION=self.headers, data={'text': 'Football'}
         )
 

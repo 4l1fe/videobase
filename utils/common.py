@@ -7,8 +7,6 @@ import string
 import urllib
 from PIL import Image
 
-from PIL import Image
-
 
 def get_image_path(instance, filename):
     """
@@ -154,3 +152,26 @@ def traceback_own(excpt, msg=None):
     print u'============================='
     print u'Traceback:\n{trace_msg}'.format(trace_msg=trace_msg)
     print u'============================='
+
+
+def isiterable(obj):
+    try:
+        iter(obj)
+        return True
+    except TypeError:
+        return False
+
+def dict_fetch_all(cursor):
+    """Returns generator row"""
+
+    desc = [col[0] for col in cursor.description]
+    for row in cursor.fetchall():
+        yield dict(zip(desc, row))
+
+
+def dict_fetch_all_without_gen(cursor):
+    """Returns all rows from a cursor as a dict"""
+
+    desc = [col[0] for col in cursor.description]
+    return [dict(zip(desc, row)) for row in cursor.fetchall()]
+
