@@ -39,13 +39,14 @@ class Films(models.Model):
     kinopoisk_lastupdate = models.DateTimeField(null=True, blank=True, verbose_name=u'Дата последнего обновления на кинопоиске')
     rating_kinopoisk     = models.FloatField(null=True, blank=True, verbose_name=u'Рейтинг фильма на сайте kinopoisk.ru')
     rating_kinopoisk_cnt = models.PositiveSmallIntegerField(null=True, blank=True, verbose_name=u'Количество пользователей kinopoisk.ru оценивших этот фильм')
-    seasons_cnt = models.PositiveSmallIntegerField(null=True, blank=True, verbose_name=u'Количество сезонов')
-    name_orig   = models.CharField(max_length=255, default='', blank=True, db_index=True, verbose_name=u'Оригинальное название фильма')
-    countries   = models.ManyToManyField('Countries', verbose_name=u'Страны производители', related_name='countries')
-    genres      = models.ManyToManyField('Genres', verbose_name=u'Жанры', related_name='genres')
-    persons     = models.ManyToManyField('Persons', through='PersonsFilms', verbose_name=u'Персоны', related_name='persons')
-    was_shown     = models.BooleanField(default=False, verbose_name=u'Фильм отображался в новинках')
-    search_index = VectorField()
+    seasons_cnt    = models.PositiveSmallIntegerField(null=True, blank=True, verbose_name=u'Количество сезонов')
+    name_orig      = models.CharField(max_length=255, default='', blank=True, db_index=True, verbose_name=u'Оригинальное название фильма')
+    countries      = models.ManyToManyField('Countries', verbose_name=u'Страны производители', related_name='countries')
+    genres         = models.ManyToManyField('Genres', verbose_name=u'Жанры', related_name='genres')
+    persons        = models.ManyToManyField('Persons', through='PersonsFilms', verbose_name=u'Персоны', related_name='persons')
+    was_shown      = models.BooleanField(default=False, verbose_name=u'Фильм отображался в новинках')
+    subscribed_cnt = models.PositiveIntegerField(default=0, db_index=True, null=True, blank=True, verbose_name=u'Кол-во подписчиков')
+    search_index   = VectorField()
 
 
     get_film_type = FilmManager()
@@ -242,15 +243,21 @@ class Films(models.Model):
         """
 
         sql = """
-        SELECT "films".*
-        FROM (SELECT DISTINCT ON ("locations"."content_id") "locations"."content_id", "locations"."id" FROM "locations") AS loc
+        SELECT f.* from (
+            SELECT DISTINCT ON (films.id) "films".*, loc.id as loc_id FROM (
+                SELECT DISTINCT ON ("locations"."content_id") "locations"."content_id", "locations"."id" FROM "locations"
+            ) AS loc
             INNER JOIN "content" ON ("loc"."content_id" = "content"."id")
-            INNER JOIN "films" ON ("content"."film_id" = "films"."id")
-        WHERE ("films"."rating_cons" >= %s AND "films"."rating_cons_cnt" > %s AND "films"."was_shown" = False)
-        ORDER BY "loc"."id" DESC LIMIT %s;
+            LEFT JOIN "films" ON ("content"."film_id" = "films"."id")
+            INNER JOIN "films_extras" ON ("films_extras"."film_id" = "films"."id" and "films_extras"."type" = %s)
+
+            WHERE ("films"."rating_cons" >= %s AND "films"."rating_cons_cnt" > %s AND "films"."was_shown" = False)
+        ) as f
+       ORDER BY "f"."loc_id"  DESC
+       LIMIT %s
         """
 
-        return cls.objects.raw(sql, params=[5.5, 5000, 4])
+        return cls.objects.raw(sql, params=['POSTER', 5.5, 5000, 4])
 
 
     class Meta(object):

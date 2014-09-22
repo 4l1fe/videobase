@@ -3,7 +3,8 @@
 from django.db import models
 from apps.casts.constants import APP_CASTS_PRICE_TYPE
 
-#############################################################################################################
+
+################################################################################
 # Модель Пользовательских трансляций
 class CastsLocations(models.Model):
     cast_service = models.ForeignKey('CastsServices', verbose_name=u'Сервис трансляций')
