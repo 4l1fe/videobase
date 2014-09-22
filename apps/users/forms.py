@@ -137,7 +137,7 @@ class CustomRegisterForm(forms.ModelForm):
         instance.save()
 
         # save hash
-        o_hash = UsersHash(user=instance.user, hash_type=APP_USER_HASH_REGISTR)
+        o_hash = UsersHash(user=instance, hash_type=APP_USER_HASH_REGISTR)
         o_hash.save()
 
         if send_email:
