@@ -8,6 +8,7 @@ from .models import User, UsersProfile
 class UsersProfileForm(forms.ModelForm):
     email = forms.EmailField(required=False)
     username = forms.CharField(required=True, max_length=30)
+    avatar = forms.ImageField(required=False)
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('instance')
