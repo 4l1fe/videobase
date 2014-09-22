@@ -1,7 +1,10 @@
 # coding: utf-8
 import json
 import urllib
+from crawler.locations_robot_corrector import LocationRobotsCorrector
 from crawler.locations_saver import save_location_to_locs_dict
+from crawler.tasks.locrobots_logging import fill_log_table_for_not_schema_corresponded_robots
+from crawler.tasks.test_robots_ban import MultiLocationRobotsBunCheck
 
 HOST = 'www.ayyo.ru'
 URL_SEARCH = 'api/search/live/?{}'
@@ -23,11 +26,11 @@ class AyyoRobot(object):
     def get_data(self):
         locations = {
         'info': [],
-        'type': 'amediateka_ru'
+        'type': 'www.ayyo.ru'
                 }
-        site_name = 'www.ayyo.ru'
         try:
             films = json.loads(self.response)['live_search']['search_movies_result']
+            print films
             for film in films:
                 if film['rus_title'].lower().strip().encode('utf-8').translate(None, string.punctuation) == self.film.name.lower().strip().encode('utf-8').translate(None, string.punctuation):
                     film_link = 'https://www.ayyo.ru/movies/%s/' % (film['slug'])
@@ -38,10 +41,14 @@ class AyyoRobot(object):
             price = float(json.loads(film_response)['movies']['data'][str(ayyo_film_id)]['streaming_price'])
             d = self.film_dict(self.film, film_link, price)
             save_location(**d)
-            save_location_to_locs_dict(locations, **d)
+            save_location_to_locs_dict(locations, True, **d)
         except Exception, e:
             pass
-        return site_name, locations
+        fill_log_table_for_not_schema_corresponded_robots(locations)
+        robot_is_banned = MultiLocationRobotsBunCheck.is_result_looks_like_robot_banned(locations)
+        if not robot_is_banned:
+            LocationRobotsCorrector.correct_locations(locations, 'ayyo')
+        return locations
 
     def film_dict(self, film, film_link, price):
         if price == 0:

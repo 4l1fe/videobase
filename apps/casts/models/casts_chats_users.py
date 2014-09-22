@@ -1,9 +1,9 @@
 # coding: utf-8
-
 from django.db import models
 from django.contrib.auth.models import User
 
-#############################################################################################################
+
+################################################################################
 # Модель Пользовательских чатов трансляций
 class CastsChatsUsers(models.Model):
     cast       = models.ForeignKey('Casts', verbose_name=u'Трансляция')

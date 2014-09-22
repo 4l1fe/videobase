@@ -24,17 +24,20 @@ def save_loaded_data_to_file(loaded_data, film_id, site):
     return site_dir + '/' + saved_file_name
 
 
-def load_and_save_film_page_from_site(site, film_id):
+def load_and_save_film_page_from_site(site, film_id, url=None):
     try:
         film = Films.objects.get(id=film_id)
     except Films.DoesNotExist:
         print "There is no film in db with such id"
         return None
     try:
-        loaded_data = sites_crawler[site]['loader'](film).load() #загрузка страницы
+        print "trying to load " + str(film_id) +" from:", site
+        loaded_data = sites_crawler[site]['loader'](film).load(url=url) #загрузка страницы
         saved_file_name = save_loaded_data_to_file(loaded_data, film.id, site)
         print "loaded ok"
     except NoSuchFilm:
-        print "page loading failed"
+        print "no such film"
+    except Exception, e:
+        print "page loading failed", e.message
         return None
     return saved_file_name

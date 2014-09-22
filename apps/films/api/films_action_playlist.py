@@ -1,5 +1,4 @@
 # coding: utf-8
-
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -10,7 +9,8 @@ from apps.films.constants import APP_FILM_SERIAL, APP_USERFILM_STATUS_PLAYLIST
 
 from videobase.settings import DEFAULT_REST_API_RESPONSE
 
-#############################################################################################################
+
+################################################################################
 class ActPlaylistFilmView(APIView):
     """
     Method get:
@@ -32,7 +32,6 @@ class ActPlaylistFilmView(APIView):
             result = Response(status=status.HTTP_404_NOT_FOUND)
 
         return result
-
 
     def get(self, request, film_id, format=None, *args, **kwargs):
         # Выбираем и проверяем, что фильм существует
