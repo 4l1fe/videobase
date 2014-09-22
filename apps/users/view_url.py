@@ -2,7 +2,7 @@
 
 from django.conf.urls import patterns, url
 from apps.users import views
-from apps.users.views import FeedView
+
 
 urlpatterns = patterns('',
     url(r'^restore-password/$', views.RestorePasswordView.as_view()),
