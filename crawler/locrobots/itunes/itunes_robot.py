@@ -1,8 +1,10 @@
 from bs4 import BeautifulSoup
 from apps.contents.constants import APP_CONTENTS_PRICE_TYPE_PAY
 from apps.films.models import Films
+from crawler.locations_robot_corrector import LocationRobotsCorrector
 from crawler.locations_saver import save_location_to_locs_dict
 from crawler.tasks.locrobots_logging import fill_log_table_for_not_schema_corresponded_robots
+from crawler.tasks.test_robots_ban import MultiLocationRobotsBunCheck
 from crawler.tor import simple_tor_get_page
 from crawler.utils.locations_utils import sane_dict, save_location
 
@@ -42,6 +44,9 @@ class ItunesRobot(object):
                 save_location(**film_dict)
                 save_location_to_locs_dict(locations, True, **film_dict)
         fill_log_table_for_not_schema_corresponded_robots(locations)
+        robot_is_banned = MultiLocationRobotsBunCheck.is_result_looks_like_robot_banned(locations)
+        if not robot_is_banned:
+            LocationRobotsCorrector.correct_locations(locations, 'itunes')
         return locations
 
     def parse_film_page(self, content):
