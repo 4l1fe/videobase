@@ -7,6 +7,7 @@ from videobase import settings
 
 from apps.films.views import test_view
 from apps.casts.views import cast_view
+from apps.casts.views import casts_list_view
 
 admin.autodiscover()
 
@@ -40,7 +41,8 @@ urlpatterns = patterns('',
     # GIT
     url(r'^git/', include('apps.git.urls')),
 
-    url(r'^casts/index', cast_view),
+    url(r'^casts/index$', casts_list_view),
+    url(r'^casts/', cast_view),
 )
 
 if settings.DEBUG:

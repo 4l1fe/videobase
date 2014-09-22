@@ -3,6 +3,8 @@ html
     include config
     include mixins
 
+    - console.log(cast)
+
     - film_name_meta = cast.title.replace(/"/g, " ")
     - film_descr_meta = cast.description ? cast.description.replace(/"/g, ' ').substr(0,256) : ''
     - film_url_meta = 'http://vsevi.ru/films/' + cast.id
@@ -34,7 +36,7 @@ html
                 - if (cast.locations && cast.locations.length) {
                     section.broun-block-playlist
                         .bg-noise
-                            .title-film
+                            .title-cast
                                 .container
                                     .row
                                         .col-md-8.col-sm-7
@@ -43,16 +45,14 @@ html
                                                 if cast.title_orig && cast.title_orig != cast.title
                                                     span=cast.title_orig
                                         .col-md-4.col-sm-5
-                                            ul.menu-soc
-                                                each soc_net in social_networks
-                                                    li
-                                                        a(href=soc_net.href, title=soc_net.title)
-                                                            img(src=soc_net.img, alt=soc_net.title)
+                                            .share-block.fright
+                                                script(src="http://yandex.st/share/share.js", charset="utf-8")
+                                                .yashare-auto-init(data-yasharetype="big", data-yashareL10n="ru", data-yashareQuickServices="vkontakte,odnoklassniki,moimir,facebook,twitter,gplus", data-yashareTheme="counter")
 
 
                             //-
-                               .title-film
-                            .film-area
+                               .title-cast
+                            .cast-area
                                 .container
                                     each el in cast.locations
                                         a(id=el.id)
@@ -62,200 +62,53 @@ html
                                             .frame-player#frame_player
                                     if cast.locations.length > 1
                                         ul.just-list.list-btns-film#locations
-                                            each el in film.locations
+                                            each el in cast.locations
                                                 mixin loc_thumb(el)
-                //-
-                   .film-area
-            //-
-               .broun-block
-            - } else {
-                section.section-about.brd-top
+                            //-
+                               .cast-area
+                    //-
+                        .broun-block
+                - }
+            section.brd-top
+                .container
+                    if cast.description
+                        .cast-description-block
+                            h2.blackh1=cast.title
+                            p!=cast.description
+
+            - cast_chat_items = [{user: {name: "Василий Пупкин", avatar:""}, text: "Довольно неплохая передача, если учесть, кто ее авторы", created: new Date(0,0,0, 12, 31, 0)}]
+            - cast_chat_items.push({user: {name: "Гоблин Вася", avatar:""}, text: "По-моему основная тема так и не была раскрыта, хотя вопрос очень важный", created: new Date(0,0,0, 14, 21, 0)})
+            - cast_chat_items.push({user: {name: "Владимир Владимирович", avatar:""}, text: "Общественное мнение по этому вопросу очень важно, поэтому необходимо продолжать подобные обсуждения", created: new Date(0,0,0, 1, 18, 0)})
+            - cast_chat_items.push({user: {name: "Афанасий Прокопьевич", avatar:""}, text: "Моральная сторона этого вопроса тоже должна обсуждаться, а не только правовая его часть!", created: new Date(0,0,0, 19, 08, 0)})
+            section.brd-top.cast-chat
+                .container
+                    h2.blackh1 Чат
+                    .cast-chat-item-list
+                        each chat_item in cast_chat_items
+                            .cast-chat-item
+                                span.cast-chat-user-avatar
+                                    - avatar_url = (chat_item.user.avatar && chat_item.user.avatar.length) ? chat_item.user.avatar : noavatar_url
+                                    img(src=avatar_url).img-circle
+                                .cast-chat-item-body
+                                    span.cast-chat-item-created
+                                        - msg_created_minutes = ( chat_item.created.getMinutes() < 10 ? '0' : '' ) + chat_item.created.getMinutes()
+                                        - chat_msg_created = '[' + chat_item.created.getHours() + ':' + msg_created_minutes + ']'
+                                        =chat_msg_created
+                                    | #{" "}
+                                    span.cast-chat-item-username=chat_item.user.name
+                                        | :
+                                    div.cast-chat-item-msg=chat_item.text
+                    textarea.cast-chat-text-area
+                    .cast-chat-btn-submit
+                        a(href="#") Отправить
+
+
+            if online_casts && online_casts.length
+                section.brd-top
                     .container
-                        .row.title-film-play
-                            .col-md-9
-                                .name-film1
-                                    h2.blackh1=cast.title
-                                    if cast.title_orig && cast.title_orig != cast.title
-                                        span=cast.title_orig
-                            .col-md-3
-                                .range-block-playlist.range-film.cf
-                                    .range-style2.fright
-                                        .rateit(data-rateit-max=10,data-rateit-step=1,data-rateit-resetable=1,data-rateit-value=(cast.relation && cast.relation.rating)?cast.relation.rating:0)#rateit
-                                    //-
-                                       .range-style2
-                                //-
-                                   .range-block-tape
-            - }
-            //section.section-about
-            //    .container
-            //        .row
-            //            .col-md-3.col-sm-4.col-xs-12
-            //                .img-person-playlist
-            //                    img(src=film.poster || noposter_url, alt=title_alt, title=title_alt)
-            //                    br
-            //                    img(src=img_url + 'shd-small.png', alt='')
-            //                //-
-            //                   .img-person
-            //            .col-md-6.col-sm-8.col-xs-12
-            //                ul.person-data-playlist
-            //                    if film.countries
-            //                        li
-            //                            span.th Страна
-            //                            - delim = false
-            //                            div
-            //                                each c in film.countries
-            //                                    =(delim?", ":"") + c.name
-            //                                    - delim = true
-            //                    if film.directors && film.directors.length
-            //                        li
-            //                            span.th Режиссер
-            //                            - delim = false
-            //                            div
-            //                                each c in film.directors
-            //                                    !=(delim?", ":"")+ '<a href="/persons/' + c.id + '/">' + c.name + "</a>"
-            //                                    - delim = true
-            //                    if film.scriptwriters && film.scriptwriters.length
-            //                        li
-            //                            span.th Сценарист
-            //                            - delim = false
-            //                            div
-            //                                each c in film.scriptwriters
-            //                                    !=(delim?", ":"") + '<a href="/persons/' + c.id + '/">' + c.name + "</a>"
-            //                                    - delim = true
-            //                    if film.genres && film.genres.length
-            //                        li
-            //                            span.th Жанр
-            //                            div
-            //                                - delim = false
-            //                                each c in film.genres
-            //                                    !=(delim?", ":"") + '<a href="/?genre=' + c.id + '">' + c.name + "</a>"
-            //                                    - delim = true
-            //                    li
-            //                        span.th Дата выхода
-            //                        div
-            //                            | #{date_text_str(film.releasedate)}
-            //                    if film.duration
-            //                        li
-            //                            span.th Время
-            //                            div
-            //                                | #{duration_text(film.duration)}
-            //                .share-block
-            //                    script(src="http://yandex.st/share/share.js", charset="utf-8")
-            //                    .yashare-auto-init(data-yasharetype="big", data-yashareL10n="ru", data-yashareQuickServices="vkontakte,odnoklassniki,moimir,facebook,twitter,gplus", data-yashareTheme="counter")
-            //                //-
-            //                   .share-block
-            //            .col-md-3.col-sm-12.col-xs-12
-            //                if film.ratings && (film.ratings.cons || film.ratings.kp || film.ratings.imdb)
-            //                    .block-rate.rel.zmin
-            //                        .title-rate.text-center
-            //                            h5 Сводный рейтинг
-            //                        //
-            //                           .title-rate
-            //                        .rel.zmin.blue-num.num
-            //                            i=film.ratings && film.ratings.cons[0]?film.ratings.cons[0]:"-"
-            //                        p.text-center!=(film.ratings && film.ratings.cons[1]?film.ratings.cons[1]:0).toString().replace(/(\d)(?=(\d\d\d)+([^\d]|$))/g, '$1&thinsp;') + " голосов"
-            //                        if (film.ratings.kp && film.ratings.kp[0]) || (film.ratings.imdb && film.ratings.imdb[0]) || (film.ratings.vsevi && film.ratings.vsevi[0])
-            //                            ul
-            //                                if film.ratings.vsevi && film.ratings.vsevi[0]
-            //                                    li
-            //                                        | Рейтинг
-            //                                        strong=" ВсеВи"
-            //                                        span=" " + film.ratings.vsevi[0]
-            //                                if film.ratings.kp && film.ratings.kp[0]
-            //                                    li
-            //                                        | Рейтинг
-            //                                        strong=" КП"
-            //                                        span=" " + film.ratings.kp[0]
-            //                                if film.ratings.imdb && film.ratings.imdb[0]
-            //                                    li
-            //                                        | Рейтинг
-            //                                        strong=" IMDB"
-            //                                        span=" " + film.ratings.imdb[0]
-            //                    //-
-            //                       .block-rate
-            //                    .brd-bottom-rate
-            //                - if (!film.locations || !film.locations.length)
-            //                    a.btn-green.btn-def.block.margin0a.btn-clear(href='#', title='')#subscribe_btn подписаться
-            //section.brd-top
-            //    .container
-            //        .actors-full#actors_full.hide
-            //            h2.blackh1 Актеры
-            //        .row
-            //            #toggle_col(class=film.actors && film.actors.length?'col-md-9':'')
-            //                if film.description
-            //                    .playlist-content
-            //                        h2.blackh1 Описание
-            //                        p!=film.description
-            //                if film.trailer
-            //                    .playlist-content
-            //                        h2.blackh1 Трейлер
-            //                        .trailer-area-wrapper
-            //                            .trailer-area-aspect
-            //                                .trailer-area
-            //                                    - res = /v=([a-z0-9_\-]+)/ig.exec(film.trailer)
-            //                                    - trailer_src = '//youtube.com/embed/' + res[1] + '?autoplay=0&vq=hd720&autohide=1&rel=0&showinfo=0&showsearch=0'
-            //                                    iframe(width='100%', height='100%', src=trailer_src, frameborder='0', allowfullscreen='allowfullscreen')
-            //                        //-
-            //                           .trailer-area
-            //                    //-
-            //                       .playlist-content
-            //                .add-comment#add_comment
-            //                    if auth_user
-            //                        h2.blackh1 Добавить комментарий
-            //                        form
-            //                            .form-group#comment_textarea_wrapper
-            //                                textarea(placeholder="Опишите, что именно вам понравилось или не понравилось в фильме", name="text", rows="5").form-control
-            //                                p
-            //                            .form-group
-            //                                input.btn-yellow3.rel.zmin(type="submit", value="Добавить")
-            //                    else
-            //                        p
-            //                            | Чтобы добавить комментарий, пожалуйста,&nbsp;
-            //                            a(href="/register", title="").register зарегистрируйтесь
-            //                            | &nbsp;или&nbsp;
-            //                            a(href="/login").login войдите
-            //                            | &nbsp;в систему.
-            //                - has_comments_cls = film.comments && film.comments.length ? "":"display-none"
-            //                .has-comments(class=has_comments_cls)#has_comments
-            //                    h2.blackh1 Комментарии
-            //                    .tape-list#comments
-            //                        if film.comments && film.comments.length
-            //                            each el in film.comments
-            //                                mixin comment_thumb(el)
-            //                    if film.comments && film.comments.length >= 5
-            //                        .add-filter#comments_more
-            //                            .add-content.style-panel-action.rel.zmin
-            //                                a(href='#', title='') показать еще
-            //                            //-
-            //                               .filter-content
-            //                            - tmp_url = img_url + "shd-big.png"
-            //                            img.img-responsive(src=tmp_url, alt='')
-            //                        //-
-            //                           .filter-block
-            //            if film.actors && film.actors.length
-            //                .col-md-3.hide-actors#actors_left
-            //                    .playlist-content
-            //                        h2.blackh1 Актеры
-            //                        ul.actor-list.cf#actors
-            //                            each el in film.actors
-            //                                mixin person_thumb(el)
-            //                    if film.actors.length >= 5
-            //                        .add-filter#actors_more
-            //                            .add-content.style-panel-action.rel.zmin
-            //                                a(href='#show-actors', title='') показать всех
-            //                            //-
-            //                               .filter-content
-            //                            img.img-responsive(src=img_url + 'shd-big.png', alt='')
-            //                        //-
-            //                           .filter-block
-            //if film.similar && film.similar.length
-            //    section.brd-top
-            //        .container
-            //            h1.dots2.blackh1.centerh1 рекомендуемое
-            //            .list-film
-            //                .row#films
-            //                    each el in film.similar
-            //                        mixin film_thumb(el)
+                        h1.dots2.blackh1.centerh1 Онлайн трансляции
+                        mixin casts_list(online_casts)
+
             include footer
             //- delete(film.similar); delete(film.description); delete(film.trailer);
             //- delete(film.comments);
