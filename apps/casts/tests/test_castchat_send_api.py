@@ -25,7 +25,7 @@ class CastChatMsgSendTestCase(APISimpleTestCase):
     def test_send(self):
         COMM_TEXT = 'Commentary text'
         response = self.client.post(
-            reverse('castchat_send_view', kwargs={'cast_id': self.cast_chat.id, 'format': 'json'}),
+            reverse('casts_api:castchat_send_view', kwargs={'cast_id': self.cast_chat.id, 'format': 'json'}),
             HTTP_X_MI_SESSION=self.headers, data={'text': COMM_TEXT}
         )
 

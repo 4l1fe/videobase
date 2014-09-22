@@ -1,12 +1,15 @@
 # coding: utf-8
 
 from datetime import datetime, timedelta
+from django.db import connection, transaction
 
 from videobase.celery import app
+from utils.common import dict_fetch_all
 
 from apps.films.models import Films
 from apps.films.api.serializers import vbFilm
-from apps.films.constants import APP_USERFILM_SUBS_TRUE, APP_FILMS_PERSON_SUB_EMAIL, APP_FILMS_WEEK_SUB_EMAIL
+from apps.films.constants import APP_USERFILM_SUBS_TRUE, APP_FILMS_PERSON_SUB_EMAIL, \
+    APP_FILMS_WEEK_SUB_EMAIL
 
 from apps.users.models import User, Feed, UsersRels
 from apps.users.tasks import send_template_mail
@@ -126,3 +129,27 @@ def personal_newsletter():
 
         # Отправляем email в очередь
         send_template_mail.s(**params_email).apply_async()
+
+
+@app.task(name="calc_amount_subscribed_to_movie")
+@transaction.commit_on_success
+def calc_amount_subscribed_to_movie(*args, **kwargs):
+    sql = """
+    SELECT "users_films"."film_id", COUNT("users_films"."film_id") AS "film_cnt"
+    FROM "users_films"
+    WHERE "users_films"."subscribed" = %s
+    GROUP BY "users_films"."film_id"
+    ORDER BY "users_films"."film_id" ASC
+    """
+
+    cursor = connection.cursor()
+    cursor.execute(sql, params=[APP_USERFILM_SUBS_TRUE])
+
+    for item in dict_fetch_all(cursor):
+        o_film = Films.objects.get(id=item['film_id'])
+
+        o_film.subscribed_cnt = item['film_cnt']
+        o_film.save()
+
+    # Закрытие курсора
+    cursor.close()

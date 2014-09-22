@@ -28,7 +28,6 @@ class ActCommentFilmView(APIView):
 
     permission_classes = (IsAuthenticated,)
 
-
     def __get_object(self, film_id):
         """
         Return object Contents or Response object with 404 error
@@ -55,7 +54,6 @@ class ActCommentFilmView(APIView):
         return o_content
 
     def post(self, request, film_id, format=None, *args, **kwargs):
-        print type(request)
         form = CommentForm(request.DATA)
         if form.is_valid():
             # Выбираем и проверяем, что фильм существует
@@ -66,7 +64,7 @@ class ActCommentFilmView(APIView):
             # Init data
             filter_ = {
                 'user': request.user,
-                'text': re.sub('\n+','<br>',escape(form.cleaned_data['text'])),
+                'text': re.sub('\n+', '<br>', escape(form.cleaned_data['text'])),
                 'content': o_content
             }
 
@@ -76,7 +74,6 @@ class ActCommentFilmView(APIView):
             return Response(DEFAULT_REST_API_RESPONSE, status=status.HTTP_200_OK)
 
         return Response({'error': form.errors}, status=status.HTTP_400_BAD_REQUEST)
-
 
     def put(self, request, film_id, format=None, *args, **kwargs):
         return self.post(request, film_id, format=None, *args, **kwargs)

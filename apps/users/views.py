@@ -15,20 +15,22 @@ from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 
+from django.views.decorators.cache import never_cache
+from django.views.generic import View
 from django.shortcuts import redirect
 
-from django.contrib.auth.views import *
+from django.contrib.auth.views import SetPasswordForm, PasswordResetForm 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.models import User, AnonymousUser
 
-from social_auth.models import UserSocialAuth
+from social.apps.django_app.default.models import UserSocialAuth
+
 from rest_framework.authtoken.models import Token
 
 from videobase.settings import HOST
 
-from apps.users.models import Feed, UsersHash
+from apps.users.models import Feed, SessionToken, UsersHash
 from apps.users.tasks import send_template_mail
 from apps.users.api.serializers import vbUser, vbFeedElement, vbUserProfile
 from apps.users.forms import CustomRegisterForm, UsersProfileForm
@@ -42,9 +44,7 @@ from apps.films.constants import APP_PERSON_DIRECTOR, APP_PERSON_ACTOR, APP_USER
 from apps.films.api.serializers import vbFilm, vbPerson
 
 from utils.common import url_with_querystring
-from utils.auth.views import View
 from utils.noderender import render_page
-
 
 
 class RegisterUserView(View):
@@ -94,7 +94,6 @@ class LoginUserView(View):
         response.delete_cookie("x-token")
         return response
 
-
     def post(self, *args, **kwargs):
         data = self.request.POST
         login_form = AuthenticationForm(data=data)
@@ -118,10 +117,19 @@ class LoginUserView(View):
 class UserLogoutView(View):
 
     def get(self, request, **kwargs):
+        x_session = request.COOKIES.get('x-session')
+        try:
+            session = SessionToken.objects.get(key=x_session)
+            session.is_active = False
+            session.save()
+        except Exception, e:
+            pass
+        
         response = HttpResponseRedirect(reverse('index_view'))
         response.delete_cookie("x-session")
         response.delete_cookie("x-token")
         response.delete_cookie("sessionid")
+        
         return response
 
 
@@ -232,7 +240,6 @@ class ResetPasswordView(View):
 
         raise Http404
 
-
     def post(self, request, *args, **kwargs):
         form = PasswordResetForm(request.POST)
         if form.is_valid():
@@ -277,7 +284,6 @@ class UserProfileView(View):
         }
 
         return HttpResponse(render_page('profile', resp_dict))
-
 
     @method_decorator(login_required)
     def post(self, request, **kwargs):
@@ -382,7 +388,7 @@ def calc_feed(user_id):
 
 class FeedView(View):
 
-    def get(self, *args, **kwargs):
+    def get(self, **kwargs):
         if self.request.user.is_authenticated():
             # Сериализуем
             try:
