@@ -171,7 +171,7 @@ mixin loc_thumb(item)
     -   price = Math.floor(item.price)
     li(data-mi-val=item.id).location-thumb
         - href = "#" + item.id
-        a.block.margin0a.btn-film(href=href, title='',class=btn_cls)=quality_texts[item.quality] || quality_texts["default"]
+        a.block.margin0a.btn-film(href=href, title='',class=btn_cls)!=quality_texts[item.quality] || quality_texts["default"]
         p
             |#{location_names[item.type] || location_names["default"]}
             br
@@ -473,68 +473,71 @@ mixin feed_thumb(item, for_tpl)
             //-
                .tape-list
 
+
+mixin casts_list(casts)
+    .list-cast
+        .row#casts
+            each item in casts
+                mixin cast_thumb(item)
+        .add-filter#casts_more
+            .add-content.style-panel-action.rel.zmin
+                - href = "/?page=" + (page?(page + 1):2)
+                a(href=href) мало, хочу еще фильмов
+            img.img-responsive(src=img_url + 'shd-big.png', alt='')
+
+
+
 mixin cast_thumb(item)
-    .col-md-3.col-sm-4.col-xs-6.film-thumb(data-mi-id="id",data-mi-val=item.id)
-        - year = item.releasedate?item.releasedate.substr(0,4):""
-        - url = "/films/" + item.id + "/"
-        - has_free = false
-        - min_price = false
-        - price_loc = ""
-        - btn_cls = ""
-        - price_loc_cnt = 0
-        - if (item.locations && item.locations.length>0) {
-        -   for (i = 0; i < item.locations.length; i++) {
-        -       obj = item.locations[i];
-        -       if (obj.price_type == 0) {
-        -            has_free = true;
-        -       } else {
-        -           price_loc_cnt++;
-        -           if (min_price === false || min_price > obj.price) {
-        -               min_price = obj.price;
-        -               price_loc = obj.id
-        -           }
-        -       }
-        -   }
-        -   if (min_price)
-        -       min_price = Math.floor(min_price)
-        -   url_loc = price_loc?(url+"#" + price_loc):""
-        -   url_btn = url
-        -   if (min_price && !has_free) {
-        -       btn_cls = "btn-price"
-        -       btn_text = "Смотреть<br><i>" + (price_loc_cnt > 1?"от ":"") + min_price + " р. без рекламы</i>"
-        -       url_btn = url_loc
-        -   } else {
-        -       btn_cls = "btn-free"
-        -       btn_text = "Смотреть<br/>бесплатно"
-        -       url_btn = url + "#player"
-        -   }
+    .col-md-3.col-sm-4.col-xs-6(data-mi-id="id",data-mi-val=item.id).cast-thumb
+        - start_date = item.start ? new Date(item.start) : null
+        - console.log(start_date)
+        - start_day = start_date.getDate()
+        - start_month_index = start_date.getMonth()
+        - start_month_str = months[start_month_index]
+        - start_hours = start_date.getHours()
+        - start_minutes = start_date.getMinutes()
+        - start_time_str = start_date ? ( start_hours + ':' + (start_minutes<10? '0':'') + start_minutes ) : null
+        - start_date_str = start_day + ' ' + start_month_str + ' в ' + start_time_str
+        - duration = item.duration
+        - generic_title = item.title //Тэг/ обобщенное название
+        - title = item.description ? item.description : '' //Конкретное название
+        - title_orig = item.title_orig
+        - pg_rating = item.pg_rating
+        - is_online = false
+        - poster_url = item.poster
+        - url = "/casts/" + item.id + "/"
+
+        - curr_date = new Date()
+        - end_date = new Date(start_date)
+        - end_date.setMinutes(start_date.getMinutes() + item.duration)
+        - is_online = curr_date <= start_date && start_date <= end_date
+        - start_date_class = is_online ? "label-success" : "label-primary"
+
+        - if ( start_date < curr_date ) {
+        -   btn_cls = "btn-free"
+        -   btn_text = "Смотреть"
+        -   url_btn = url + "#player"
         - } else {
         -   btn_cls = "btn-subscribe"
         -   btn_text = "Подписаться"
         - }
         a(href=url, title='',data-mi-athref="id").poster-place
-            - title_alt = item.name
-            - if (item.name_orig && item.name_orig != item.name) title_alt+= " (" +item.name_orig + ")"
-            - title_alt+= " " + year
-            img(src=item.poster || noposter_url,data-mi-atsrc="poster",data-mi-default=noposter_url,data-mi-id="poster",title=title_alt, alt=title_alt,data-mi-attitle="title_alt", data-mi-atalt="title_alt").img-poster
+            - title_alt = generic_title + '. ' + title
+            - if (title_orig && title_orig != title_orig) title_alt += " (" + title_orig + ")"
+            img(src=poster_url || noposter_url,data-mi-atsrc="poster",data-mi-default=noposter_url,data-mi-id="poster",title=title_alt, alt=title_alt,data-mi-attitle="title_alt", data-mi-atalt="title_alt").img-poster
         img(src=img_url + 'shd-small.png', alt='')
-        .rel.zmin.num
-            i(data-mi-name="ratings.cons.0")=(item.ratings && item.ratings.cons)?item.ratings.cons[0]:""
-        .caption-def
-            .name-film
+
+        .cast-item-def
+            .label.left(class=start_date_class).cast-item-start-date=start_date_str
+            .cast-item-header
                 a(href=url, title='',data-mi-athref="id")
-                    span(data-mi-name="name")=item.name
-                    | #{" ("}
-                    i(data-mi-name="releasedate",data-mi-id="releasedate",data-mi-val=item.releasedate)=year
-                    |)
-            .range-style.range-block
-                .rateit(data-mi-id="relation.rating",data-mi-val=(item.relation && item.relation.rating)?item.relation.rating:0,data-rateit-step=1,data-rateit-max=10,data-rateit-resetable=1,data-rateit-value=(item.relation && item.relation.rating)?item.relation.rating:0)
+                    span(data-mi-name="name").cast-item-generic-title=generic_title
+                    | #{". "}
+                    span.cast-item-title=title
+
+                    span(data-mi-name="pg_rating",data-mi-id="pg_rating",data-mi-val=pg_rating).cast-item-pg-rating
+                        | #{" ("}
+                        =pg_rating
+                        |)
             .btn-def.block.margin0a(class=btn_cls,data-mi-id="btn")
                 a(href=url_btn , title='',data-mi-id="btn_text",data-mi-athref="id")!=btn_text
-                a.btn-add.ab(href=url, title='Добавить в плейлист',data-mi-id="relation.playlist",data-mi-onclick="toggle_playlist",data-mi-val=item.relation && item.relation.playlist?1:0)
-            p(class=min_price && has_free?'':'display-none',data-mi-id="btn_price")
-                | или
-                br
-                a(href=url_loc, title='',data-mi-athref="id")
-                    - text = " " + (price_loc_cnt > 1?"от ":"") + min_price + " р. без рекламы"
-                    span(data-mi-id="price")=text
