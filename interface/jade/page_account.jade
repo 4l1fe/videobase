@@ -14,7 +14,7 @@ html
                             .row
                                 .col-md-3
                                     .person-img
-                                        img.img-circle(src=img_url + 'content/img16.png', alt='')
+                                        img.img-circle(src=auth_user.avatar || noavatar_url, alt='')
                                         .change-img
                                             input(type='file')
                                     //-
@@ -127,7 +127,7 @@ html
                                                             =url
                                                         a.block.i-close.sprite.sprite-i-close.fright(href='/logout/vk-oauth/')
                                                     else
-                                                        a(href='/login/vk-oauth/?next=/profile/', title='')
+                                                        a(href='/login/vk-oauth2/?next=/profile/', title='')
                                                             img(src=img_url + 'i-vk.png', alt='')
                                                             span Привязать
                                                 li

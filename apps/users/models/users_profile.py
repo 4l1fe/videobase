@@ -6,7 +6,7 @@ import random
 from django.db import models
 from django.contrib.auth.models import User
 
-from ..constants import *
+from apps.users.constants import *
 
 
 class UsersProfile(models.Model):
@@ -33,30 +33,24 @@ class UsersProfile(models.Model):
     # Confirmation email
     confirm_email  = models.BooleanField(verbose_name=u'Подтверждение email на рассылку и уведомления', default=False)
 
-
     def __unicode__(self):
         return u'[{0}] {1}'.format(self.id, self.user.username)
 
-
     def get_name(self):
         return self.user.first_name
-
 
     def generate_key(self):
         salt = '{0}_{1}'.format(sha.new(str(random.random())).hexdigest(), self.user.id)
         return sha.new(salt).hexdigest()
 
-
     def deactivation_email(self):
         self.confirm_email = False
-
 
     def save(self, *args, **kwargs):
         if self.id is None:
             self.deactivation_email()
 
         super(UsersProfile, self).save(*args, **kwargs)
-
 
     class Meta:
         db_table = 'users_profile'

@@ -23,7 +23,7 @@ class vbUserProfile(serializers.ModelSerializer):
         }
 
         for social in obj.user.social_auth.all():
-            if social.provider == 'vk-oauth':
+            if social.provider == 'vk-oauth2':
                 resp_dict['vk'] = social.uid
             elif social.provider == 'google-oauth2':
                 resp_dict['gplus'] = social.uid
