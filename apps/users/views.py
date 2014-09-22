@@ -67,7 +67,7 @@ class RegisterUserView(View):
         if register_form.is_valid():
             committed = False
             try:
-                user = register_form.save()
+                user = register_form.save(send_email=True)
                 url_redirect = url_with_querystring(
                     reverse('tokenize'),
                     **{
