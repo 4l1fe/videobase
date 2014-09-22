@@ -8,17 +8,12 @@ from apps.casts.constants import APP_CAST_POSTER_DIR
 from utils.common import get_image_path
 import videobase.settings as settings
 
-
 # Модель Расширения фильмов/сериалов
 class CastExtrasStorage(PhotoClass):
-    cast        = models.ForeignKey('Casts', verbose_name=u'Cast', related_name="ce_cast_rel")
-    name        = models.CharField(max_length=255, verbose_name=u'Название')
-    name_orig   = models.CharField(max_length=255, verbose_name=u'Оригинальное название')
-    photo       = models.ImageField(upload_to=get_image_path, blank=True, null=True, verbose_name=u'Постер')
-
-    def __init__(self, *args, **kwargs):
-        super(CastExtrasStorage, self).__init__(*args, **kwargs)
-        self._original_type = self.type
+    cast      = models.ForeignKey('Casts', verbose_name=u'Cast', related_name="ce_cast_rel")
+    name      = models.CharField(max_length=255, verbose_name=u'Название')
+    name_orig = models.CharField(max_length=255, verbose_name=u'Оригинальное название')
+    photo     = models.ImageField(upload_to=get_image_path, blank=True, null=True, verbose_name=u'Постер')
 
     @property
     def get_upload_to(self):
@@ -38,10 +33,9 @@ class CastExtrasStorage(PhotoClass):
     def __unicode__(self):
         return u'[{0}] {1}'.format(self.pk, self.name)
 
-    class Meta(object):
+    class Meta:
         # Имя таблицы в БД
         db_table = 'casts_extras'
         app_label = 'casts'
         verbose_name = u'Дополнительный материал к cast'
         verbose_name_plural = u'Дополнительные материалы к cast'
-

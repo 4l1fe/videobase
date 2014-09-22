@@ -8,6 +8,22 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
+        # Deleting model 'UsersApiSessions'
+        db.delete_table('users_api_sessions')
+
+        # Deleting field 'UsersProfile.userpic_type'
+        db.delete_column('users_profile', 'userpic_type')
+
+        # Adding field 'SessionToken.updated'
+        db.add_column('session_token', 'updated',
+                      self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True),
+                      keep_default=False)
+
+        # Adding field 'SessionToken.is_active'
+        db.add_column('session_token', 'is_active',
+                      self.gf('django.db.models.fields.BooleanField')(default=True),
+                      keep_default=False)
+
         # Deleting field 'UsersProfile.userpic_type'
         db.delete_column('users_profile', 'userpic_type')
 
@@ -15,6 +31,7 @@ class Migration(SchemaMigration):
         db.add_column('users_pics', 'type',
                       self.gf('django.db.models.fields.CharField')(default='local', max_length=255),
                       keep_default=False)
+
 
     def backwards(self, orm):
         # Adding model 'UsersApiSessions'
@@ -30,6 +47,12 @@ class Migration(SchemaMigration):
         db.add_column('users_profile', 'userpic_type',
                       self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True),
                       keep_default=False)
+
+        # Deleting field 'SessionToken.updated'
+        db.delete_column('session_token', 'updated')
+
+        # Deleting field 'SessionToken.is_active'
+        db.delete_column('session_token', 'is_active')
 
         # Deleting field 'UsersPics.type'
         db.delete_column('users_pics', 'type')
