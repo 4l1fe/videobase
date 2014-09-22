@@ -17,11 +17,8 @@ from django.shortcuts import redirect
 
 from django.contrib.auth.models import User, AnonymousUser
 from django.contrib.auth.forms import AuthenticationForm
-
 from social.apps.django_app.default.models import UserSocialAuth
-
 from rest_framework.authtoken.models import Token
-
 from apps.users.tasks import send_template_mail
 from apps.users.models import Feed, SessionToken
 from apps.users.api.serializers import vbUser, vbFeedElement, vbUserProfile
@@ -36,6 +33,8 @@ from apps.films.api.serializers import vbFilm, vbPerson
 
 from utils.common import url_with_querystring
 from utils.noderender import render_page
+from apps.users import UsersPics
+from django.core.files.uploadedfile import UploadedFile
 
 
 HOST = 'vsevi.ru'
@@ -233,6 +232,10 @@ class UserProfileView(View):
         if uprofile_form.is_valid():
             try:
                 uprofile_form.save()
+                avatar = request.FILES.get('avatar')
+                if avatar and isinstance(avatar, UploadedFile):
+                    up = UsersPics(user=request.user, image=avatar)
+                    up.save()
             except Exception as e:
                 return HttpResponse(render_page('profile', {'error': e}))
         return redirect('profile_view')
