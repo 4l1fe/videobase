@@ -16,7 +16,7 @@ class Migration(SchemaMigration):
 
         # Adding field 'SessionToken.updated'
         db.add_column('session_token', 'updated',
-                      self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, default='', blank=True),
+                      self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True),
                       keep_default=False)
 
         # Adding field 'SessionToken.is_active'
