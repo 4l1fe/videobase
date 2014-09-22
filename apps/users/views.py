@@ -235,7 +235,7 @@ class ConfirmEmailView(View):
 class ResetPasswordView(View):
 
     def get(self, request, *args, **kwargs):
-        if not request.user.is_authenticated():
+        if request.user.is_authenticated():
             return HttpResponse(render_page('reset_passwd', {}))
 
         raise Http404
