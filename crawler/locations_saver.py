@@ -11,6 +11,7 @@ def save_location_to_locs_dict(locations_dict, status, **film_dict):
         location = Locations.objects.get(type=film_dict['type'], content=content)
         one_loc_result = create_location_result(film_dict['type'], location.id, film.id, status)
         locations_dict['info'].append(one_loc_result)
-        print "locations dict", locations_dict
-    except:
-        print "locations dict saving failed"
+        #print "locations dict", locations_dict
+        print "Location dict saved"
+    except Exception, e:
+        print "Locations dict saving failed:", e.message

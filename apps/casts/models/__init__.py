@@ -8,6 +8,7 @@ from apps.casts.models.casts_chats_msgs import CastsChatsMsgs
 from apps.casts.models.casts_locations import CastsLocations
 from apps.casts.models.casts_services import CastsServices
 from apps.casts.models.extras_casts import CastsExtras
+from apps.casts.models.cast_extras_storage import CastExtrasStorage
 from apps.casts.models.users_casts import UsersCasts
 
 

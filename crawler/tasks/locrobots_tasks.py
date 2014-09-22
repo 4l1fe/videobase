@@ -13,6 +13,8 @@ from crawler.utils.films_statistics import film_at_least_years_old
 from videobase.celery import app
 from collections import defaultdict
 from crawler.locrobots.individual_tasks import process_individual_film_on_site
+from crawler.locrobots.now_or_stream_news import parse_news
+from crawler.locrobots.tvzor_news import parse_tvzor_news
 
 
 
@@ -46,11 +48,12 @@ def age_weighted_robot_launcher(years):
     msg = "Starting locations checks for every film at least {year} days old"
     print msg.format(year=years)
     delays = defaultdict(int)
-    for robot in Robots.objects.all():
-        for film in Films.objects.all():
+    for film in Films.objects.all():
+        #ПОМЕНЯТЬ МЕСТАМИ ЦИКЛЫ
+        for robot in Robots.objects.all():
             if film_at_least_years_old(film, years):
                 if robot.name in sites_crawler:
-                    process_individual_film_on_site.apply_async((robot.name, film.id), countdown=15*delays[robot.name])
+                    process_individual_film_on_site.apply_async((robot.name, film.id), countdown=15*delays[robot.name], queue=robot.name)
                     delays[robot.name] += 1
 
 
@@ -64,4 +67,24 @@ def parse_you_tube_movies_ru():
     return YoutubeChannelParser.process_channels_list()
 
 
+@app.task(name="parse_news_from_now_ru")
+def parse_news_from_now_ru():
+    robot = 'now_ru'
+    now_news = parse_news('robot')
+    for film in now_news:
+        process_individual_film_on_site.apply_async(args=(robot, film['film_id'], film['url']))
 
+
+@app.task(name="parse_news_from_stream_ru")
+def parse_news_from_stream_ru():
+    robot = 'stream_ru'
+    stream_news = parse_news('robot')
+    for film in stream_news:
+        process_individual_film_on_site.apply_async(args=(robot, film['film_id'], film['url']))
+
+@app.task(name="parse_news_from_tvzor_ru")
+def parse_news_from_tvzor_ru():
+    robot = 'tvzor_ru'
+    tvzor_news = parse_tvzor_news()
+    for film in tvzor_news:
+        process_individual_film_on_site.apply_async(args=(robot, film['film_id'], film['url']))

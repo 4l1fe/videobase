@@ -8,5 +8,5 @@ from videobase.celery import app
 
 
 @app.task(name='process_film_on_site', base=DebugTask)
-def process_individual_film_on_site(site, film_id):
-    return process_film_on_site(site, film_id)
+def process_individual_film_on_site(site, film_id, url=None):
+    return process_film_on_site(site, film_id, url)
