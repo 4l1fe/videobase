@@ -1,8 +1,10 @@
 # coding: utf-8
 import json
 import os
+from apps.contents.models import Locations
 from apps.films.models import Films
 from crawler.core.exceptions import NoSuchFilm
+from crawler.locations_robot_corrector import LocationCorrectorForOneFilmRobots
 from crawler.locations_saver import save_location_to_locs_dict
 from crawler.locrobots import sites_crawler
 from crawler.utils.locations_utils import sane_dict
@@ -27,6 +29,7 @@ def process_one_film(site, film_id, html_page_json):
         data['film'] = film
         try:
             if data['url_view'] == '':
+                LocationCorrectorForOneFilmRobots.corrrect_current_location_if_needed(data)
                 continue
             print u"Trying to put data from %s for %s to db" % (site, unicode(data['film']))
             save_location_from_robo_task.apply_async((data,))

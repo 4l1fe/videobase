@@ -90,3 +90,18 @@ class RobotsBanCheck():
         if len(locatios_dict['info']) > 0:
             return True
         return False
+
+
+class MultiLocationRobotsBunCheck():
+    def __init__(self):
+        pass
+
+    @staticmethod
+    def is_result_looks_like_robot_banned(locations_dict):
+        return not MultiLocationRobotsBunCheck.check_locs_dict_is_ok(locations_dict)
+
+    @staticmethod
+    def check_locs_dict_is_ok(locations_dict):
+        if len(locations_dict['info']) > 0:
+            return True
+        return False

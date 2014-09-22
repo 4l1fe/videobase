@@ -12,15 +12,20 @@ from django.http import HttpResponseRedirect, HttpResponse,\
     HttpResponseBadRequest, HttpResponseServerError, Http404
 
 from django.utils import timezone
+
 from django.utils.decorators import method_decorator
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+
 
 from django.views.decorators.cache import never_cache
 from django.views.generic import View
 from django.shortcuts import redirect
 
+
 from django.contrib.auth.views import SetPasswordForm, PasswordResetForm 
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User, AnonymousUser
+
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import User, AnonymousUser
 
@@ -28,16 +33,20 @@ from social.apps.django_app.default.models import UserSocialAuth
 
 from rest_framework.authtoken.models import Token
 
+
 from videobase.settings import HOST
 
 from apps.users.models import Feed, SessionToken, UsersHash
 from apps.users.tasks import send_template_mail
+
+
 from apps.users.api.serializers import vbUser, vbFeedElement, vbUserProfile
 from apps.users.forms import CustomRegisterForm, UsersProfileForm
 from apps.users.api.utils import create_new_session
 from apps.users.constants import APP_USERS_API_DEFAULT_PAGE, APP_USERS_API_DEFAULT_PER_PAGE,\
     APP_SUBJECT_TO_RESTORE_PASSWORD, APP_SUBJECT_TO_CONFIRM_REGISTER, APP_USER_ACTIVE_KEY, \
     APP_USER_HASH_EMAIL, APP_USER_HASH_REGISTR, APP_USER_HASH_PASSWD
+
 
 from apps.films.models import Films, Persons, UsersFilms, UsersPersons
 from apps.films.constants import APP_PERSON_DIRECTOR, APP_PERSON_ACTOR, APP_USERFILM_SUBS_TRUE
