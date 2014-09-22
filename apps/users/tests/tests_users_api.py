@@ -21,7 +21,7 @@ import random
 class APIUsersFriendShipActionTestCase(APISimpleTestCase):
     def setUp(self):
         self.user = UserFactory.create()
-        self.url_name = 'users_friendship_action'
+        self.url_name = 'users_api:users_friendship_action'
         self.kwargs = {'format': 'json', 'user_id': self.user.pk}
         s_token = SessionToken.objects.create(user=self.user)
         self.headers = s_token.key
@@ -111,7 +111,7 @@ class APIUsersGenresTestCase(APITestCase):
         for i in range(4):
             UserFilmsFactory.create(user=self.user, film=films[i])
 
-        self.url_name = 'users_genres'
+        self.url_name = 'users_api:users_genres'
         self.kwargs = {'format': 'json', 'user_id': self.user.pk}
 
     def test_api_users_genres_400_get(self):
@@ -157,7 +157,7 @@ class APIUsersTestCase(APITestCase):
         for i in range(4):
             UserFilmsFactory.create(user=self.user, film=films[i])
 
-        self.url_name = 'users'
+        self.url_name = 'users_api:users'
         self.kwargs = {'format': 'json', 'user_id': self.user.pk}
         s_token = SessionToken.objects.create(user=self.user)
         self.headers = s_token.key
@@ -340,7 +340,7 @@ class APIUsersTestCase(APITestCase):
 class APIUsersFriendsTestCase(APITestCase):
     def setUp(self):
         self.user = UserFactory.create()
-        self.url_name = 'users_friends'
+        self.url_name = 'users_api:users_friends'
         self.kwargs = {'format': 'json', 'user_id': self.user.pk}
         self.friends = []
         for i in range(20):
@@ -413,7 +413,7 @@ class APIUsersFriendsTestCase(APITestCase):
 class APIUsersPersonsTestCase(APITestCase):
     def setUp(self):
         self.user = UserFactory.create()
-        self.url_name = 'users_persons'
+        self.url_name = 'users_api:users_persons'
         self.kwargs = {'format': 'json', 'user_id': self.user.pk}
         for i in range(10):
             UserPersonsFatory.create(user=self.user)
@@ -471,7 +471,7 @@ class APIUsersPersonsTestCase(APITestCase):
 class APIUsersFilmsTestCase(APITestCase):
     def setUp(self):
         self.user = UserFactory.create()
-        self.url_name = 'users_films'
+        self.url_name = 'users_api:users_films'
         self.kwargs = {'format': 'json', 'user_id': self.user.pk}
         films = []
         for i in range(10):

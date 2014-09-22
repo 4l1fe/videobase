@@ -1924,9 +1924,7 @@
         rel: this.conf.relation,
         value: val,
         callback: (function(_this) {
-          return function(new_value) {
-            // return alert("done");
-          };
+          return function(new_value) {};
         })(this)
       });
     };
