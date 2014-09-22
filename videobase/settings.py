@@ -425,6 +425,10 @@ CELERYBEAT_SCHEDULE = {
         'task': 'itunes_robot_start',
         'schedule': timedelta(hours=24)
     },
+    'mail_movies_update': {
+        'task': 'mail_robot_start',
+        'schedule': timedelta(hours=24)
+    },
     #
     'calc_amount_subscribed_to_movie': {
         'task': 'calc_amount_subscribed_to_movie',
