@@ -1,14 +1,8 @@
 # coding: utf-8
-
 from django.db import models
-from django.contrib.auth.models import User
-from django.core.validators import MaxValueValidator, MinValueValidator
 
 
-
-
-
-#############################################################################################################
+################################################################################
 # Модель Пользовательских трансляций
 class CastsExtras(models.Model):
     cast  = models.ForeignKey('Casts', verbose_name=u'Идентификатор пользоваля')
