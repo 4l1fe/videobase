@@ -243,15 +243,22 @@ class Films(models.Model):
         """
 
         sql = """
-        SELECT "films".*
-        FROM (SELECT DISTINCT ON ("locations"."content_id") "locations"."content_id", "locations"."id" FROM "locations") AS loc
+        SELECT f.* from (
+            SELECT DISTINCT ON (films.id) "films".*, loc.id as loc_id FROM (
+                SELECT DISTINCT ON ("locations"."content_id") "locations"."content_id", "locations"."id" FROM "locations"
+            ) AS loc
             INNER JOIN "content" ON ("loc"."content_id" = "content"."id")
-            INNER JOIN "films" ON ("content"."film_id" = "films"."id")
-        WHERE ("films"."rating_cons" >= %s AND "films"."rating_cons_cnt" > %s AND "films"."was_shown" = False)
-        ORDER BY "loc"."id" DESC LIMIT %s;
+            LEFT JOIN "films" ON ("content"."film_id" = "films"."id")
+            INNER JOIN "films_extras" ON ("films_extras"."film_id" = "films"."id" and "films_extras"."type" = %s)
+
+            WHERE ("films"."rating_cons" >= %s AND "films"."rating_cons_cnt" > %s AND "films"."was_shown" = False)
+        ) as f
+       ORDER BY "f"."loc_id"  DESC
+       LIMIT %s
         """
 
-        return cls.objects.raw(sql, params=[6, 5000, limit])
+        return cls.objects.raw(sql, params=['POSTER', 5.5, 5000, 4])
+
 
 
     class Meta(object):
