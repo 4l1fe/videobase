@@ -31,9 +31,12 @@ def get_firstname(details, user=None, *args, **kwargs):
 
 def load_avatar(strategy, response, user, *args, **kwargs):
     if user and strategy.backend.name in GET_IMAGE_URLS:
-        get_image_url = GET_IMAGE_URLS[strategy.backend.name]
-        image_url = get_image_url(response)
-        avatar_load.apply_async(image_url=image_url, type_=strategy.backend.name, user_id=user.id)
+        try:
+            get_image_url = GET_IMAGE_URLS[strategy.backend.name]
+            image_url = get_image_url(response)
+            avatar_load.apply_async(kwargs=dict(image_url=image_url, type_=strategy.backend.name, user_id=user.id))
+        except Exception as e:
+            pass
 
 
 
