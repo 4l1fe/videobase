@@ -6,7 +6,6 @@ from users_pics import UsersPics
 from users_logs import UsersLogs
 from users_rels import UsersRels
 from users_feed import Feed
-from users_socials import UsersSocials
 from session_token import SessionToken
 
 from apps.users.signals import *
