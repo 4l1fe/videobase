@@ -14,7 +14,7 @@ pylibmc
 FeedParser
 hg+https://bitbucket.org/izi/django-admin-tools
 git+git://github.com/ronnix/fabtools.git
-python-social-auth
+python-social-auth==0.1.23
 pygraphviz
 pyparsing==1.5.7
 pydot
