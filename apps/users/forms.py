@@ -84,7 +84,7 @@ class UsersProfileForm(forms.ModelForm):
                     ),
                 },
                 'subject': APP_SUBJECT_TO_RESTORE_EMAIL,
-                'tpl_name': 'confirm_change_email.html',
+                'tpl_name': 'mail/confirm_change_email.html',
             }
 
             # Отправляем email
@@ -151,7 +151,7 @@ class CustomRegisterForm(forms.ModelForm):
                     )
                 },
                 'subject': APP_SUBJECT_TO_CONFIRM_REGISTER,
-                'tpl_name': 'confirmation_register.html',
+                'tpl_name': 'mail/confirmation_register.html',
             }
 
             send_template_mail.apply_async(kwargs=param_email)

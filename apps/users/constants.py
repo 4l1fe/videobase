@@ -78,8 +78,8 @@ APP_FEED_TYPE = (
 )
 
 APP_NOTIFICATION_TEMPLATE = {
-    FILM_O: "notification_film.html",
-    PERSON_O: "notification_person.html",
+    FILM_O: "mail/notification_film.html",
+    PERSON_O: "mail/notification_person.html",
 }
 
 APP_NOTIFICATION_EMAIL_SUBJECT = {
