@@ -1,7 +1,9 @@
 # coding: utf-8
 import json
+from crawler.locations_robot_corrector import LocationRobotsCorrector
 from crawler.locations_saver import save_location_to_locs_dict
 from crawler.tasks.locrobots_logging import fill_log_table_for_not_schema_corresponded_robots
+from crawler.tasks.test_robots_ban import MultiLocationRobotsBunCheck
 from crawler.tor import simple_tor_get_page
 from apps.films.constants import APP_FILM_SERIAL
 from crawler.utils.locations_utils import save_location, sane_dict
@@ -39,6 +41,9 @@ class Amediateka_robot(object):
                         save_location_to_locs_dict(locations, True, **d)
                     break
         fill_log_table_for_not_schema_corresponded_robots(locations)
+        robot_is_banned = MultiLocationRobotsBunCheck.is_result_looks_like_robot_banned(locations)
+        if not robot_is_banned:
+            LocationRobotsCorrector.correct_locations(locations, 'amediateka')
         return locations
 
     def get_serials_data(self):
