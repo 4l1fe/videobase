@@ -156,9 +156,11 @@ def parse_from_kinopoisk(kinopoisk_id, name=None, film=None):
         try:
             film = Films.objects.get(kinopoisk_id=kinopoisk_id)
         except Films.DoesNotExist:
+
             for word in dirty_words:
                 if word in name:
                     name = name.replace(word, '').strip()
+
             msg = u"Creating new film object with name {name} and kinopoisk_id: {id}"
             print msg.format(name=name, id=kinopoisk_id)
 
