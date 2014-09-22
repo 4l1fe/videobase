@@ -10,11 +10,8 @@ from django.utils import timezone
 def add_robot_if_not_exist(robot_name):
 
     try:
-
         robot = Robots.objects.get(name=robot_name)
-
     except Robots.DoesNotExist:
-
         print "Couldn't find record for {} adding one".format(robot_name)
         robot= Robots(name=robot_name,
                       delay=20,
@@ -25,16 +22,9 @@ def add_robot_if_not_exist(robot_name):
         robot.save()
 
 
-
 class Command(NoArgsCommand):
     def handle_noargs(self, **options):
-
-
         robot_list = sites_crawler.keys()
-
-        robot_list += ['kinopoisk_set_poster','kinopoisk_get_id']
-
-
+        robot_list += ['kinopoisk_set_poster', 'kinopoisk_get_id']
         for robot in robot_list:
-
             add_robot_if_not_exist(robot)

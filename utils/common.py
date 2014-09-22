@@ -160,3 +160,18 @@ def isiterable(obj):
         return True
     except TypeError:
         return False
+
+def dict_fetch_all(cursor):
+    """Returns generator row"""
+
+    desc = [col[0] for col in cursor.description]
+    for row in cursor.fetchall():
+        yield dict(zip(desc, row))
+
+
+def dict_fetch_all_without_gen(cursor):
+    """Returns all rows from a cursor as a dict"""
+
+    desc = [col[0] for col in cursor.description]
+    return [dict(zip(desc, row)) for row in cursor.fetchall()]
+

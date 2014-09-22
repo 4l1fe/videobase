@@ -36,7 +36,6 @@ class RobotsBanCheck():
             except NoSuchFilm:
                 failed_films += [film.id]
 
-        #print robot_name, "checks: ", checks, "and films:", len(films)
         RobotsBanCheck.analyze_checks(checks, robot_name, failed_films, films)
 
     @staticmethod

@@ -3,10 +3,11 @@ import os
 import datetime
 import binascii
 
+from django.utils import timezone
 from django.db import models
 
 from apps.users.models import User
-from videobase.settings import API_SESSION_EXPIRATION_TIME
+from videobase.settings import SESSION_EXPIRATION_TIME
 
 
 class SessionToken(models.Model):
@@ -25,7 +26,17 @@ class SessionToken(models.Model):
         return binascii.hexlify(os.urandom(20))
 
     def get_expiration_time(self):
-        return self.updated + datetime.timedelta(minutes=API_SESSION_EXPIRATION_TIME)
+        return self.updated + SESSION_EXPIRATION_TIME
+
+    @classmethod
+    def get_user(cls, key):
+        try:
+            session = cls.objects.get(key=key)
+        except cls.DoesNotExist:
+            return None
+        if session.get_expiration_time() <= timezone.now():
+            return session.user
+        return None
 
     def __unicode__(self):
         return u'[{0}]: {1}'.format(self.pk, self.key)

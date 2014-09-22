@@ -9,13 +9,13 @@ class BaseLoader(object):
     def __init__(self, film, host, url_load, params=None):
         # Хост откуда скачиваем
         self.host = host
-        # Наш фильм который ищим
+        # Наш фильм который ищем
         self.film = film
         # url для взятие фильма( шаблон)
         self.url_load = url_load
         self.params = {} if params is None else params
 
-    # получить url для загрузки страници с фильмом
+    # получить url для загрузки страницы с фильмом
     def get_url(self, load_function):
         raise NotImplementedError()
 

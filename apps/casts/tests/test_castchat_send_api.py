@@ -25,7 +25,7 @@ class CastChatMsgSendTestCase(APISimpleTestCase):
     def test_send(self):
         COMM_TEXT = 'Commentary text'
         response = self.client.post(
-            reverse('castchat_send_view', kwargs={'cast_id': self.cast_chat.id, 'format': 'json'}),
+            reverse('casts_api:castchat_send_view', kwargs={'cast_id': self.cast_chat.id, 'format': 'json'}),
             HTTP_X_MI_SESSION=self.headers, data={'text': COMM_TEXT}
         )
 
@@ -33,8 +33,3 @@ class CastChatMsgSendTestCase(APISimpleTestCase):
 
         ccm = CastsChatsMsgs.objects.filter(cast__id=self.cast_chat.cast.id, user=self.user)
         self.assertEqual(ccm[0].text, COMM_TEXT)
-
-    # def tearDown(self):
-    #     SessionToken.objects.all().delete()
-    #     Token.objects.all().delete()
-    #     CastsChatsMsgs.objects.all().delete()
