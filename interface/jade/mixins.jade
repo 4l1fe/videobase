@@ -514,7 +514,7 @@ mixin cast_thumb(item)
         - start_date_class = is_online ? "label-success" : "label-primary"
 
         - if ( start_date < curr_date ) {
-        -   btn_cls = "btn-free"
+        -   btn_cls = "btn-watch"
         -   btn_text = "Смотреть"
         -   url_btn = url + "#player"
         - } else {
@@ -539,5 +539,5 @@ mixin cast_thumb(item)
                         | #{" ("}
                         =pg_rating
                         |)
-            .btn-def.block.margin0a(class=btn_cls,data-mi-id="btn")
-                a(href=url_btn , title='',data-mi-id="btn_text",data-mi-athref="id")!=btn_text
+            .btn-def.block(class=btn_cls,data-mi-id="btn")
+                a(href=url_btn , title='',data-mi-id="btn_text",data-mi-athref="id", class=btn_cls)!=btn_text

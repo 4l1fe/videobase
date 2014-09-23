@@ -28,8 +28,8 @@ def get_casts(request):
         o_casts = CastsListView.as_view()(request).data
         o_casts = o_casts['items']
         for o_cast in o_casts:
-            o_cast['pg_rating'] = '+100500'
-            o_cast['description'] = """Крывая тронсляцыйа"""
+            o_cast['pg_rating'] = '+16'
+            o_cast['description'] = """Прямая трансляция"""
             o_cast['locations'] = [
                 {'type': "", 'quality': "", 'price': 0, 'price_type': 0, 'value': "/casts/0"},
                 {'type': "", 'quality': "hd", 'price': 9000, 'price_type': 0, 'value': "/casts/0"},
