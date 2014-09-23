@@ -1,8 +1,9 @@
 # coding: utf-8
 from apps.users.tasks import avatar_load
+from videobase.settings import SOCIAL_AUTH_VK_PHOTO_FIELD
 
 GET_IMAGE_URLS = {
-    'vk-oauth2': lambda response: response.get('photo_max'),
+    'vk-oauth2': lambda response: response.get(SOCIAL_AUTH_VK_PHOTO_FIELD),
     'facebook': lambda response: u'http://graph.facebook.com/{0}/picture?type=large'.format(response.get('id')),
     'twitter': lambda response: response['profile_image_url'].replace('_normal', '_bigger') if 'profile_image_url' in response and 'default_profile' in response['profile_image_url'] else None,
     'google-oauth2': lambda response: response.get('image'),
