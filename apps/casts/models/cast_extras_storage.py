@@ -39,4 +39,3 @@ class CastExtrasStorage(PhotoClass):
         app_label = 'casts'
         verbose_name = u'Дополнительный материал к cast'
         verbose_name_plural = u'Дополнительные материалы к cast'
-

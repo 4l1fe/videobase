@@ -1,5 +1,4 @@
 # coding: utf-8
-
 from apps.casts.models.abstract_casts_tags import AbstractCastsTags
 from apps.casts.models.casts import Casts
 from apps.casts.models.casts_chats import CastsChats

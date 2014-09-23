@@ -14,9 +14,9 @@ class Migration(SchemaMigration):
         # Rename table
         db.rename_table('users_api_session_tokens', 'session_token')
 
-        # Adding field 'SessionToken.updated'
+                # Adding field 'SessionToken.updated'
         db.add_column('session_token', 'updated',
-                      self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, default=datetime.datetime(2014, 9, 5, 0, 0), blank=True),
+                      self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True),
                       keep_default=False)
 
 
@@ -30,11 +30,11 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('users', ['UsersApiSessions'])
 
-        # Rename table
-        db.rename_table('session_token', 'users_api_session_tokens')
-
         # Deleting field 'SessionToken.updated'
         db.delete_column('session_token', 'updated')
+
+        # Rename table
+        db.rename_table('session_token', 'users_api_session_tokens')
 
 
     models = {

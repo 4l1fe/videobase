@@ -397,7 +397,7 @@ def calc_feed(user_id):
 
 class FeedView(View):
 
-    def get(self, **kwargs):
+    def get(self, *args, **kwargs):
         if self.request.user.is_authenticated():
             # Сериализуем
             try:

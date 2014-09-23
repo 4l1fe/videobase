@@ -1,8 +1,8 @@
 # coding: utf-8
-
 from django.db import models
 
-#############################################################################################################
+
+################################################################################
 # Модель Тегов Трансляций
 class AbstractCastsTags(models.Model):
     name        = models.CharField(max_length=255, default='', blank=True, db_index=True, verbose_name=u'название')

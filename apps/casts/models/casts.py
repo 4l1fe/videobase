@@ -1,11 +1,10 @@
 # coding: utf-8
-
 from django.db import models
 from djorm_pgfulltext.models import SearchManager
 from djorm_pgfulltext.fields import VectorField
 
 
-#############################################################################################################
+################################################################################
 # Модель Пользовательских фильмов
 class Casts(models.Model):
     title       = models.CharField(max_length=255, db_index=True, blank=False, verbose_name=u'Название трансляции')
