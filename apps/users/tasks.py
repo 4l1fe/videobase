@@ -14,6 +14,8 @@ from videobase.celery import app
 
 from apps.films.models import Films, Persons, UsersFilms, UsersPersons
 from apps.films.constants import APP_PERSONFILM_SUBS_TRUE, APP_USERFILM_SUBS_TRUE
+
+from apps.users.models import User, UsersPics
 from apps.users.constants import APP_NOTIFICATION_TEMPLATE,\
     APP_NOTIFICATION_EMAIL_SUBJECT, FILM_O, PERSON_O
 
