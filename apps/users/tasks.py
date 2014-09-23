@@ -1,8 +1,12 @@
 # coding: utf-8
 
-from django.core.mail import EmailMultiAlternatives
+import StringIO
+import requests
+from PIL import Image
 
+from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
+from django.core.files.uploadedfile import InMemoryUploadedFile
 
 from utils.noderender import render_page
 
@@ -70,3 +74,30 @@ def send_statistic_to_mail(subject, text, to):
     msg = EmailMultiAlternatives(subject=subject, to=to)
     msg.attach_alternative(text, 'text/html')
     msg.send()
+
+
+@app.task(name="get_avatar", queue="load")
+def avatar_load(image_url, type_, user_id=None):
+    response = requests.get(image_url)
+    if response.status_code == 200:
+        buff = StringIO.StringIO(response.content)
+        # Convert image from png to jpg
+        png_image = Image.open(buff)
+        im = Image.new("RGB", png_image.size, (255, 255, 255))
+        im.paste(png_image, (0, 0))
+        buff = StringIO.StringIO()
+        im.save(buff, "JPEG")
+
+        # Save image
+        memory_file_name = "users_pics.jpg"
+        memory_file = InMemoryUploadedFile(buff, None, memory_file_name, 'image/jpeg', buff.len, None)
+        user = User.objects.get(id=user_id)
+        users_pics = UsersPics(user=user, type=type_)
+        users_pics.save()
+        users_pics.image.save(memory_file_name, memory_file)
+        users_pics.save()
+        profile = user.profile
+        if not profile.userpic_id:
+            profile.userpic_type = type_
+            profile.userpic_id = users_pics.id
+            profile.save()

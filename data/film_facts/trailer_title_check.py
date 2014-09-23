@@ -1,7 +1,5 @@
 # coding: utf-8
 
-__author__ = 'vladimir'
-
 
 def is_correct_trailer_title(title, film):
     film_name = film.name.lower().encode("utf-8")
