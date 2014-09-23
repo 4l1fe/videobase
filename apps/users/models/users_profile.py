@@ -1,7 +1,6 @@
 # coding: utf-8
 from django.contrib.auth.models import User
 from django.db import models
-from users_pics import UsersPics
 
 from ..constants import *
 
@@ -9,7 +8,6 @@ from ..constants import *
 class UsersProfile(models.Model):
     user         = models.OneToOneField(User, verbose_name=u'Пользователь', related_name='profile')
     last_visited = models.DateTimeField(verbose_name=u'Песледний визит', auto_now_add=True, blank=True)
-    userpic_type = models.CharField(max_length=255, verbose_name=u'Тип', choices=APP_USER_PIC_TYPES, null=True, blank=True)
     userpic_id   = models.IntegerField(verbose_name=u'Id аватарки', null=True, blank=True)
 
     # Notification

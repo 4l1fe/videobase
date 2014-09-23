@@ -15,6 +15,7 @@ class Migration(DataMigration):
         db.execute("""update users_feed set child_obj_id = (object->'film'->'id')::text::int where type = 'film-c';""")
         db.execute("""update users_feed set child_obj_id = (object->'film'->'id')::text::int where type = 'pers-o';""")
         db.execute("""update users_feed set child_obj_id = (object->'location'->'id')::text::int where type = 'film-o';""")
+        db.execute("UPDATE social_auth_usersocialauth SET provider='vk-oauth2' WHERE provider='vk-oauth';")
 
     def backwards(self, orm):
         "Write your backwards methods here."
