@@ -15,7 +15,8 @@ html
                                 .row
                                     .col-md-3
                                         .person-img
-                                            img.img-circle(src=auth_user.avatar || noavatar_url, alt='')
+                                            - avatar_url = auth_user.avatar && auth_user.avatar.length ? auth_user.avatar : noavatar_url
+                                            img.img-circle(src=avatar_url, alt='')
                                             .change-img
                                                 input(type='file', name="avatar")
                                         //-
