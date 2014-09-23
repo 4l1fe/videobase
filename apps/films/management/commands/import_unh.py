@@ -20,7 +20,6 @@ class Command(BaseCommand):
         self.charset = ''
 
     def handle(self, *args, **options):
-
         filename = args[0]
         if os.path.exists(filename):
             self.stdout.write(u'Start: Import from UNH CSV from {0}'.format(filename))
@@ -32,6 +31,7 @@ class Command(BaseCommand):
     def html_parser(self):
         if not hasattr(self, 'h'):
             self.h = HTMLParser.HTMLParser()
+
         return self.h
 
     def escape_html(self, value):
@@ -49,8 +49,6 @@ class Command(BaseCommand):
             if ((counter % 100) == 0):
                 self.chunk_insert(rows, headers)
                 rows = []
-
-            #if self.insert_item(item):
 
             counter += 1
             if ((counter % 100) == 0):
@@ -95,7 +93,7 @@ class Command(BaseCommand):
             self.save_director(film, data)
 
             return True
-        except Exception as ex:
+        except Exception, ex:
             print u'====data==== #{0}=='.format(data["id"])
             print u'====ex====== {0} =='.format(data)
             print ex.message
@@ -119,7 +117,7 @@ class Command(BaseCommand):
         }
         try:
             film = Films.objects.get(name=attributes['name'])
-        except Exception as ex:
+        except Exception, ex:
             film = Films(**attributes)
             film.save()
 
@@ -137,10 +135,10 @@ class Command(BaseCommand):
         except:
             return 0
 
-
-    def null_to_none(self, value = None):
+    def null_to_none(self, value=None):
         if value is None:
             return None
+
         if value.lower() == 'null' or value.lower() == '\\n':
             return None
 
@@ -161,9 +159,10 @@ class Command(BaseCommand):
         lists = filter(lambda v: ((not v is None) and (v.lower() != '\\n')), list_names)
         return lists[0] if lists else ''
 
-    def save_trailer(self, film, data = None):
+    def save_trailer(self, film, data=None):
         if data is None:
             return True
+
         trailer_youtube_id = data['trailer_youtube']
         if (trailer_youtube_id is None) or (trailer_youtube_id.lower() == '\\n'):
             return True
@@ -173,17 +172,11 @@ class Command(BaseCommand):
             traler = FilmExtras.get(url=youtube_url,
                                     etype=APP_FILM_TYPE_ADDITIONAL_MATERIAL_TRAILER)
         except:
-            traler = FilmExtras(film=film,
-                                name=film.name,
-                                name_orig=film.name_orig,
-                                url=youtube_url,
-                                etype=APP_FILM_TYPE_ADDITIONAL_MATERIAL_TRAILER)
+            traler = FilmExtras(film=film, name=film.name, name_orig=film.name_orig,
+                                url=youtube_url, etype=APP_FILM_TYPE_ADDITIONAL_MATERIAL_TRAILER)
             traler.save()
         return True
 
-    # person_data[0] - ru name
-    # person_data[1] - eng name
-    #
     def get_person(self, person_name):
         try:
             person_model = Persons.objects.get(name=self.escape_html(person_name))
@@ -195,29 +188,31 @@ class Command(BaseCommand):
 
     def save_person_film(self, film, person, p_type):
         try:
-            person_film = PersonsFilms.objects.get_or_create(film=film,
-                                                             person=person,
-                                                             p_type=p_type)
+            person_film = PersonsFilms.objects.get_or_create(film=film, person=person, p_type=p_type)
             return person_film
-        except:
+        except Exception, e:
             return True
 
-    def save_actors(self, film, data = None):
+    def save_actors(self, film, data=None):
         actors_names = self.compact_list(self.escape_html(data['actors_eng']).split(','))
         for actor_name in actors_names:
             actor = self.get_person(actor_name)
             self.save_person_film(film, actor, APP_PERSON_ACTOR)
         return True
 
-    def save_director(self, film, data = None):
+    def save_director(self, film, data=None):
         directors_names = self.compact_list(data['director_eng'].split(','))
         for director_name in directors_names:
             director = self.get_person(director_name)
             self.save_person_film(film, director, APP_PERSON_DIRECTOR)
+
         return True
 
-    def compact_list(self, list=[]):
-        return [ el for el in list if (not el is None) and (el.lower() != '\\n')]
+    def compact_list(self, list=None):
+        if list is None:
+            list = []
+
+        return [el for el in list if (not el is None) and (el.lower() != '\\n')]
 
     def date_or_now(self, date=None):
         if date is None:
@@ -234,7 +229,7 @@ class Command(BaseCommand):
             return True
         return value.lower() == 'null' or value.lower() == '\\n'
 
-    def get_genres(self, genres = None):
+    def get_genres(self, genres=None):
         if genres is None:
             return []
 
@@ -249,16 +244,19 @@ class Command(BaseCommand):
         for genre_name in genre_names:
             try:
                 genre_model = self.genres[genre_name]
-            except:
+            except Exception, e:
                 genre_model = Genres(name=genre_name)
                 genre_model.save()
                 self.genres[genre_name] = genre_model
+
             genre_models.append(genre_model)
+
         return genre_models
 
-    def get_countries(self, countries = None):
+    def get_countries(self, countries=None):
         if countries is None:
             return []
+
         if not(hasattr(self, 'countries')):
             print(u'====ex====== load countries ==')
             self.countries = {}
@@ -270,7 +268,7 @@ class Command(BaseCommand):
         for country_name in country_names:
             try:
                 country_model = self.countries[country_name]
-            except:
+            except Exception, e:
                 country_model = Countries(name=country_name)
                 country_model.save()
                 self.countries[country_name] = country_model
