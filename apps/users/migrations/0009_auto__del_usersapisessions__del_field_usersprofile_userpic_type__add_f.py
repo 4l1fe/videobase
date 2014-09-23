@@ -8,22 +8,31 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Deleting model 'UsersSocials'
-        db.delete_table('users_socials')
+        # Deleting field 'UsersProfile.userpic_type'
+        db.delete_column('users_profile', 'userpic_type')
 
+        # Adding field 'UsersPics.type'
+        db.add_column('users_pics', 'type',
+                      self.gf('django.db.models.fields.CharField')(default='local', max_length=255),
+                      keep_default=False)
 
     def backwards(self, orm):
-        # Adding model 'UsersSocials'
-        db.create_table('users_socials', (
-            ('suserid', self.gf('django.db.models.fields.IntegerField')()),
-            ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('sphoto', self.gf('django.db.models.fields.IntegerField')()),
-            ('stoken', self.gf('django.db.models.fields.CharField')(max_length=255)),
+        # Adding model 'UsersApiSessions'
+        db.create_table('users_api_sessions', (
+            ('active', self.gf('django.db.models.fields.BooleanField')(default=True)),
+            ('token', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['users.SessionToken'])),
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('stype', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
+            ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
         ))
-        db.send_create_signal('users', ['UsersSocials'])
+        db.send_create_signal('users', ['UsersApiSessions'])
+
+        # Adding field 'UsersProfile.userpic_type'
+        db.add_column('users_profile', 'userpic_type',
+                      self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True),
+                      keep_default=False)
+
+        # Deleting field 'UsersPics.type'
+        db.delete_column('users_pics', 'type')
 
 
     models = {
@@ -65,9 +74,10 @@ class Migration(SchemaMigration):
         },
         'users.feed': {
             'Meta': {'object_name': 'Feed'},
+            'child_obj_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'object': ('jsonfield.fields.JSONField', [], {}),
+            'obj_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'text': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'type': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']", 'null': 'True', 'blank': 'True'})
@@ -93,6 +103,7 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'UsersPics', 'db_table': "'users_pics'"},
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'image': ('django.db.models.fields.files.ImageField', [], {'max_length': '100'}),
+            'type': ('django.db.models.fields.CharField', [], {'default': "'local'", 'max_length': '255'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'pics'", 'to': u"orm['auth.User']"})
         },
         'users.usersprofile': {
@@ -111,8 +122,7 @@ class Migration(SchemaMigration):
             'pvt_genres': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'pvt_subscribes': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'user': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'profile'", 'unique': 'True', 'to': u"orm['auth.User']"}),
-            'userpic_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'userpic_type': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'})
+            'userpic_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'})
         },
         'users.usersrels': {
             'Meta': {'unique_together': "(('user', 'user_rel'),)", 'object_name': 'UsersRels', 'db_table': "'users_rels'"},

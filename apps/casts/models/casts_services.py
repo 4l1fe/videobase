@@ -1,9 +1,8 @@
 # coding: utf-8
-
 from django.db import models
 
 
-#############################################################################################################
+################################################################################
 # Модель сервиса трансляции
 class CastsServices(models.Model):
     name        = models.CharField(max_length=255, unique =True, db_index=True, verbose_name=u'Название')

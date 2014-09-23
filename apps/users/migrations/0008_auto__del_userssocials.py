@@ -8,33 +8,22 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Deleting model 'UsersApiSessions'
-        db.delete_table('users_api_sessions')
-
-        # Rename table
-        db.rename_table('users_api_session_tokens', 'session_token')
-
-                # Adding field 'SessionToken.updated'
-        db.add_column('session_token', 'updated',
-                      self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True),
-                      keep_default=False)
+        # Deleting model 'UsersSocials'
+        db.delete_table('users_socials')
 
 
     def backwards(self, orm):
-        # Adding model 'UsersApiSessions'
-        db.create_table('users_api_sessions', (
-            ('active', self.gf('django.db.models.fields.BooleanField')(default=True)),
-            ('token', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['users.SessionToken'])),
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+        # Adding model 'UsersSocials'
+        db.create_table('users_socials', (
+            ('suserid', self.gf('django.db.models.fields.IntegerField')()),
             ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('sphoto', self.gf('django.db.models.fields.IntegerField')()),
+            ('stoken', self.gf('django.db.models.fields.CharField')(max_length=255)),
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('stype', self.gf('django.db.models.fields.CharField')(max_length=255)),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
         ))
-        db.send_create_signal('users', ['UsersApiSessions'])
-
-        # Deleting field 'SessionToken.updated'
-        db.delete_column('session_token', 'updated')
-
-        # Rename table
-        db.rename_table('session_token', 'users_api_session_tokens')
+        db.send_create_signal('users', ['UsersSocials'])
 
 
     models = {
@@ -76,19 +65,26 @@ class Migration(SchemaMigration):
         },
         'users.feed': {
             'Meta': {'object_name': 'Feed'},
+            'child_obj_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'object': ('jsonfield.fields.JSONField', [], {}),
+            'obj_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'text': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'type': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']", 'null': 'True', 'blank': 'True'})
         },
         'users.sessiontoken': {
-            'Meta': {'object_name': 'SessionToken', 'db_table': "'session_token'"},
+            'Meta': {'object_name': 'SessionToken', 'db_table': "'users_api_session_tokens'"},
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'key': ('django.db.models.fields.CharField', [], {'max_length': '40', 'primary_key': 'True'}),
-            'updated': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'session_token'", 'to': u"orm['auth.User']"})
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"})
+        },
+        'users.usersapisessions': {
+            'Meta': {'object_name': 'UsersApiSessions', 'db_table': "'users_api_sessions'"},
+            'active': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
+            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'token': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['users.SessionToken']"})
         },
         'users.userslogs': {
             'Meta': {'object_name': 'UsersLogs', 'db_table': "'users_logs'"},
@@ -131,16 +127,6 @@ class Migration(SchemaMigration):
             'updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'rels'", 'to': u"orm['auth.User']"}),
             'user_rel': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'user_rel'", 'to': u"orm['auth.User']"})
-        },
-        'users.userssocials': {
-            'Meta': {'object_name': 'UsersSocials', 'db_table': "'users_socials'"},
-            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'sphoto': ('django.db.models.fields.IntegerField', [], {}),
-            'stoken': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'stype': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'suserid': ('django.db.models.fields.IntegerField', [], {}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"})
         }
     }
 
