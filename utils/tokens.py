@@ -58,7 +58,9 @@ def del_friendship(session_token, id_, host):
 def upload_avatar(main_token, session_token,  address):
     import requests
     cookies = {'x-session': session_token, 'x-token': main_token}
-    requests.post(address+'/profile/', files={'avatar': open('avatar.jpg', 'rb')}, cookies=cookies)
+    data = {'username': 'from_post_method', }
+    resp = requests.post(address+'/profile/', files={'avatar': open('avatar.jpg', 'rb')}, cookies=cookies)
+    return resp
 
 
 if __name__ == '__main__':
@@ -71,4 +73,7 @@ if __name__ == '__main__':
     # resp = add_friendship(st, 42, address)
     # print(resp)
     # del_friendship(st, 42, host)
-    upload_avatar(mt, st, address)
+    mt = list(mt); mt[1] = 'z'
+    st = list(st); st[1] = 'z'
+    resp = upload_avatar(''.join(mt), ''.join(st), address)
+    print(resp)

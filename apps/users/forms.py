@@ -1,7 +1,5 @@
 # coding: utf-8
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
-
 from .models import User, UsersProfile
 
 
@@ -17,10 +15,11 @@ class UsersProfileForm(forms.ModelForm):
         self.fields['email'].initial = self.user.email
 
     def save(self, commit=True):
-        super(UsersProfileForm, self).save(commit)
+        instance = super(UsersProfileForm, self).save(commit)
         self.user.username = self.user.email = self.cleaned_data['email']
         self.user.first_name = self.cleaned_data['username']
         self.user.save()
+        return instance
 
     class Meta:
         model = UsersProfile
