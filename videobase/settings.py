@@ -1,9 +1,15 @@
 # coding: utf-8
+
+from __future__ import absolute_import
+
 import os
-import djcelery
 import logging
 from datetime import timedelta
 from ConfigParser import RawConfigParser
+
+import djcelery
+from celery.schedules import crontab
+
 
 ###########################################################
 # Celery settings
@@ -13,8 +19,12 @@ djcelery.setup_loader()
 AMQP_HOST = 'localhost'
 BROKER_HOST = 'localhost'
 BROKER_PORT = 5672
-###########################################################
 
+CELERY_TIMEZONE = 'UTC'
+CELERY_ACCEPT_CONTENT = ['pickle', 'json', 'msgpack', 'yaml']
+
+###########################################################
+# Base path for project
 BASE_PATH = os.path.dirname(__file__)
 BASE_DIR = os.path.dirname(BASE_PATH)
 
@@ -29,7 +39,7 @@ BACKUP_PATH = os.path.join(BASE_PATH, '..', '.backup')
 SECRET_KEY = '7-dsc0--i_ej94w9as#-5p_5a)ql*9o80v1rs9krx!_-9%^b5$'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 TEMPLATE_DEBUG = DEBUG
 
@@ -52,7 +62,10 @@ STANDART_HTTP_SESSION_TOKEN_HEADER = b'HTTP_{}'.format(HTTP_SESSION_TOKEN_TYPE.r
 STANDART_HTTP_USER_TOKEN_HEADER = b'HTTP_{}'.format(HTTP_USER_TOKEN_TYPE.replace('-', '_'))
 
 DEFAULT_REST_API_RESPONSE = {}
+PASSWORD_RESET_TIMEOUT_DAYS = 1
+
 ###########################################################
+# Email config
 emailconf = RawConfigParser()
 emailconf.read(CONFIGS_PATH + '/email.ini')
 EMAIL_HOST = emailconf.get('email', 'EMAIL_HOST')
@@ -106,6 +119,7 @@ INSTALLED_APPS = (
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
+    #'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -163,6 +177,7 @@ CACHES = {
     }
 }
 
+###########################################################
 # Backends for social auth
 AUTHENTICATION_BACKENDS = (
     # OAuth
@@ -187,7 +202,7 @@ USE_L10N = True
 
 USE_TZ = True
 
-
+###########################################################
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 MEDIA_ROOT = os.path.abspath(BASE_PATH + '/../static')
@@ -198,6 +213,8 @@ STATIC_ROOT = os.path.join('/var/www/')
 
 SITE_ID = 1
 
+###########################################################
+# Rest Framework configuration
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
@@ -211,9 +228,12 @@ SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 
 USERNAME_IS_FULL_EMAIL = True
 
+###########################################################
+# Default URL
 LOGIN_URL = '/login'
 LOGIN_REDIRECT_URL = '/tokenize'
 LOGIN_ERROR_URL = '/'
+HOST = 'vsevi.ru'
 
 ###########################################################
 # Ключи для OAuth2 авторизации
@@ -221,7 +241,8 @@ LOGIN_ERROR_URL = '/'
 SOCIAL_AUTH_VK_OAUTH2_KEY = '4296663'
 SOCIAL_AUTH_VK_OAUTH2_SECRET = 'JAEQddzkBCm554iGXe6S'
 SOCIAL_AUTH_VK_OAUTH2_SCOPE = ['email', ]
-SOCIAL_AUTH_VK_OAUTH2_EXTRA_DATA = ['photo_max']
+SOCIAL_AUTH_VK_PHOTO_FIELD = 'photo_max_orig'
+SOCIAL_AUTH_VK_OAUTH2_EXTRA_DATA = [SOCIAL_AUTH_VK_PHOTO_FIELD, ]
 
 # Facebook
 SOCIAL_AUTH_FACEBOOK_KEY = '212532105624824'
@@ -270,14 +291,8 @@ API_SESSION_EXPIRATION_TIME = 15
 SESSION_EXPIRATION_TIME = timedelta(minutes=API_SESSION_EXPIRATION_TIME)
 
 ###########################################################
+# Celery schedule
 CELERYBEAT_SCHEDULE = {
-
-    # Launching robots that are described in Robots table.
-    #'robot-launch': {
-    #    'task': 'robot_launch',
-    #    'schedule': timedelta(seconds=10),
-    #},
-
     # Updating ratings from IMDB DB via archive
     'imdb_rating_update_command': {
         'task': 'imdb_rating_update',
@@ -293,15 +308,16 @@ CELERYBEAT_SCHEDULE = {
         'task': 'viaplay_ru_robot_start',
         'schedule': timedelta(days=7),
     },
+    # Takes poster with kinopoisk
     'kinopoisk-set_poster': {
         'task': 'kinopoisk_set_poster',
         'schedule': timedelta(seconds=10),
     },
     # Updating information about persons using kinopoisk
-    'kinopoisk_persons': {
-        'task': 'kinopoisk_persons',
-        'schedule': timedelta(seconds=10),
-    },
+    #'kinopoisk_persons': {
+    #    'task': 'kinopoisk_persons',
+    #    'schedule': timedelta(seconds=10),
+    #},
     # Checking kinopoisk premiere page
     'kinopoisk_news': {
         'task': 'kinopoisk_news',
@@ -318,11 +334,13 @@ CELERYBEAT_SCHEDULE = {
         'schedule': timedelta(days=1),
         'args': (3,),
     },
+    #
     'kinopoisk_films_weekly': {
         'task': 'kinopoisk_films',
         'schedule': timedelta(days=7),
         'args': (10,),
     },
+    #
     'kinopoisk_films_monthly': {
         'task': 'kinopoisk_films',
         'schedule': timedelta(days=31),
@@ -366,6 +384,7 @@ CELERYBEAT_SCHEDULE = {
         'schedule': timedelta(days=31*6),
         'args': (120,)
     },
+    #
     'drugoe_kino_update_schedule': {
         'task': 'drugoe_kino_update',
         'schedule': timedelta(days=7)
@@ -425,21 +444,31 @@ CELERYBEAT_SCHEDULE = {
         'task': 'itunes_robot_start',
         'schedule': timedelta(hours=24)
     },
-    #
+    # Calculate amount subscribed to the films
     'calc_amount_subscribed_to_movie': {
         'task': 'calc_amount_subscribed_to_movie',
         'schedule': timedelta(hours=1)
     },
+    # Do weekly newsletter
+    'week_newsletter_schedule': {
+        'task': 'week_newsletter',
+        'schedule': crontab(minute=0, hour=16, day_of_week=6)
+    },
+    # Do every day personal newsletter
+    'personal_newsletter_schedule': {
+        'task': 'personal_newsletter',
+        'schedule': crontab(minute=0, hour=18)
+    },
 }
 
-CELERY_TIMEZONE = 'UTC'
-CELERY_ACCEPT_CONTENT = ['pickle', 'json', 'msgpack', 'yaml']
+###########################################################
+# Another configuration
 POSTER_URL_PREFIX = '_260x360'
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
-USE_THOR = False
+USE_THOR = True
 
-from local_settings import *
+from .local_settings import *
 
 if not DEBUG:
     INSTALLED_APPS += (
@@ -451,3 +480,4 @@ if not DEBUG:
     }
 
 ROBOTS_LIST = ['amediateka_ru', 'ayyo_ru', 'drugoe_kino', 'itunes', 'viaplay_ru', 'youtube_com' ]
+

@@ -1,12 +1,11 @@
 # coding: utf-8
-
-from django.db.models import Count, Max
+from django.db.models import Count
 from django.db.models import Q
 
 from rest_framework import serializers
 
 from apps.films.api.serializers import vbUserGenre
-from apps.films.models import Genres, UsersFilms, Films
+from apps.films.models import Genres, UsersFilms
 from apps.films.constants import APP_USERFILM_STATUS_NOT_WATCH, APP_USERFILM_STATUS_UNDEF, APP_USERFILM_STATUS_PLAYLIST
 
 from apps.users.models import User, UsersPics, UsersRels
@@ -14,6 +13,7 @@ from apps.users.constants import APP_USER_REL_TYPE_NONE, APP_USER_REL_TYPE_FRIEN
 
 #:TODO Нужно отрефакторить vbUser. Волосы дыбом стоия когда его читаешь.
 #:TODO Необходимо сделать замеры количества запросов, есть подозрение что можно сэкономить
+
 
 class vbUser(serializers.ModelSerializer):
     name = serializers.SerializerMethodField('get_name')
@@ -32,7 +32,6 @@ class vbUser(serializers.ModelSerializer):
 
     # Признак friends
     friends = serializers.SerializerMethodField('friends_list')
-
 
     def __init__(self, *args, **kwargs):
         self.cer_user = kwargs.pop('cer_user', None)
@@ -57,10 +56,8 @@ class vbUser(serializers.ModelSerializer):
             for field_name in del_fields:
                 self.fields.pop(field_name, None)
 
-
     def get_name(self, obj):
         return obj.profile.get_name()
-
 
     def get_genre_fav(self, obj):
         try:
@@ -68,8 +65,6 @@ class vbUser(serializers.ModelSerializer):
                 exclude(genres__uf_films_rel__status=APP_USERFILM_STATUS_NOT_WATCH).distinct().values("id", "name").\
                 annotate(count=Count("genres__id"))
             genre = max(genre, key=lambda g: g['count'])
-
-
         except Exception, e:
             return {}
 
@@ -78,26 +73,20 @@ class vbUser(serializers.ModelSerializer):
 
         return {}
 
-
     def path_to_avatar(self, obj):
         return UsersPics.get_picture(obj.profile)
-
 
     def get_regdate(self, obj):
         return obj.date_joined
 
-
     def get_friends_cnt(self, obj):
         return UsersRels.objects.filter(user=obj, rel_type=APP_USER_REL_TYPE_FRIENDS).count()
-
 
     def get_films_watched_cnt(self, obj):
         return UsersFilms.objects.filter(user=obj).exclude(status=APP_USERFILM_STATUS_NOT_WATCH).count()
 
-
     def get_comments_cnt(self, obj):
         return obj.comments.all().count()
-
 
     def get_relation(self, obj):
         rel = APP_USER_REL_TYPE_NONE
@@ -108,12 +97,9 @@ class vbUser(serializers.ModelSerializer):
 
         return rel
 
-
     def genres_list(self, obj):
         genres = Genres.objects.filter(genres__uf_films_rel__user=obj).filter(Q(genres__uf_films_rel__status=APP_USERFILM_STATUS_UNDEF)|Q(genres__uf_films_rel__status=APP_USERFILM_STATUS_PLAYLIST)).distinct()
-
         return sorted(vbUserGenre(genres, user=obj, many=True).data, key=lambda g: g['percent'], reverse=True)
-
 
     def friends_list(self, obj):
         friends = User.objects.extra(
@@ -121,7 +107,6 @@ class vbUser(serializers.ModelSerializer):
             params=[APP_USER_REL_TYPE_FRIENDS, obj.pk]).all()
 
         return vbUser(friends, cer_user=self.cer_user, many=True).data
-
 
     class Meta:
         model = User

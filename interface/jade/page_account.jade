@@ -27,10 +27,15 @@ html
                                                 label.col-sm-3.control-label(for='inputEmail3') Имя
                                                 .col-sm-9
                                                     input#inputEmail3.form-control(type='text',required,value=user.name,name='username')
-                                            .form-group
+
+                                            - error_cls = error && error.email?"has-error":""
+                                            .form-group(class=error_cls)
                                                 label.col-sm-3.control-label(for='inputPassword3') Email
                                                 .col-sm-9
                                                     input#inputPassword3.form-control(type='email',required,value=user.email,name='email')
+                                                    if error && error.email
+                                                        p=error.email
+
                                             h2 Настройки уведомлений
                                             ul.list-profile
                                                 li
@@ -120,7 +125,7 @@ html
                                                         a(href=url, title='', target='_blank')
                                                             img(src=img_url + 'i-vk.png', alt='')
                                                             =url
-                                                        a.block.i-close.sprite.sprite-i-close.fright(href='/logout/vk-oauth/')
+                                                        a.block.i-close.sprite.sprite-i-close.fright(href='/logout/vk-oauth2/')
                                                     else
                                                         a(href='/login/vk-oauth2/?next=/profile/', title='')
                                                             img(src=img_url + 'i-vk.png', alt='')
