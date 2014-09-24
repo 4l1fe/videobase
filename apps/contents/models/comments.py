@@ -2,8 +2,6 @@
 
 from django.db import models
 from django.contrib.auth.models import User
-
-from apps.users.models import UsersProfile
 from apps.contents.constants import APP_CONTENTS_COMMENT_STATUS
 
 

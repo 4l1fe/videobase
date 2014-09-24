@@ -1,20 +1,15 @@
 # coding: utf-8
-
 import datetime
 from pytils import numeral
-
 from django.db import transaction
 from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse
-
-from django.http import HttpResponseRedirect, HttpResponse,\
-    HttpResponseBadRequest, HttpResponseServerError, Http404
-
+from django.http import (HttpResponseRedirect, HttpResponse, HttpResponseForbidden,
+                         HttpResponseBadRequest, HttpResponseServerError, Http404)
 from django.utils import timezone
 from django.views.decorators.cache import never_cache
 from django.views.generic import View
 from django.shortcuts import redirect
-
 from django.contrib.auth.models import User, AnonymousUser
 from django.contrib.auth.forms import AuthenticationForm
 from social.apps.django_app.default.models import UserSocialAuth
@@ -24,9 +19,8 @@ from apps.users.models import Feed, SessionToken
 from apps.users.api.serializers import vbUser, vbFeedElement, vbUserProfile
 from apps.users.forms import CustomRegisterForm, UsersProfileForm
 from apps.users.api.utils import create_new_session
-from apps.users.constants import APP_USERS_API_DEFAULT_PAGE, APP_USERS_API_DEFAULT_PER_PAGE,\
-    APP_SUBJECT_TO_RESTORE_PASSWORD
-
+from apps.users.constants import (APP_USERS_API_DEFAULT_PAGE, APP_USERS_API_DEFAULT_PER_PAGE,
+                                  APP_SUBJECT_TO_RESTORE_PASSWORD, APP_USER_PIC_TYPE_LOCAL)
 from apps.films.models import Films, Persons, UsersFilms, UsersPersons
 from apps.films.constants import APP_PERSON_DIRECTOR, APP_PERSON_ACTOR, APP_USERFILM_SUBS_TRUE
 from apps.films.api.serializers import vbFilm, vbPerson
@@ -228,14 +222,17 @@ class UserProfileView(View):
         return HttpResponse(render_page('profile', resp_dict))
 
     def post(self, request, **kwargs):
-        uprofile_form = UsersProfileForm(data=request.POST, instance=request.user)
+        if isinstance(request.user, AnonymousUser):
+            return HttpResponseForbidden()
+        uprofile_form = UsersProfileForm(data=request.POST, files=request.FILES, instance=request.user)
         if uprofile_form.is_valid():
             try:
-                uprofile_form.save()
-                avatar = request.FILES.get('avatar')
-                if avatar and isinstance(avatar, UploadedFile):
-                    up = UsersPics(user=request.user, image=avatar)
-                    up.save()
+                up, created = UsersPics.objects.get_or_create(user=request.user, type=APP_USER_PIC_TYPE_LOCAL)
+                up.image=uprofile_form.cleaned_data['avatar']
+                up.save()
+                profile = uprofile_form.save(commit=False)
+                profile.userpic_id = up.pk
+                profile.save()
             except Exception as e:
                 return HttpResponse(render_page('profile', {'error': e}))
         return redirect('profile_view')

@@ -8,6 +8,7 @@ class vbUserProfile(serializers.ModelSerializer):
     name = serializers.SerializerMethodField('get_name')
     email = serializers.SerializerMethodField('get_email')
     social = serializers.SerializerMethodField('get_social')
+    avatar = serializers.SerializerMethodField('get_avatar')
 
     def get_name(self, obj):
         return obj.get_name()
@@ -29,6 +30,9 @@ class vbUserProfile(serializers.ModelSerializer):
     def get_email(self, obj):
         return obj.user.email
 
+    def get_avatar(self, obj):
+
+
     class Meta:
         model = UsersProfile
-        exclude = ('userpic_id', 'userpic_type', 'last_visited', 'user', 'id')
+        exclude = ('userpic_id', 'last_visited', 'user', 'id')
