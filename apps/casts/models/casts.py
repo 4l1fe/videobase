@@ -13,7 +13,7 @@ class Casts(models.Model):
     duration    = models.IntegerField(null=True, blank=True, verbose_name=u'Продолжительность')
     status      = models.CharField(max_length=255, db_index=True, blank=True, null=True, verbose_name=u'Статус')
     description = models.TextField(max_length=255, blank=True, null=True, verbose_name=u'Описание')
-    pg_rating   = models.CharField(max_length=255, blank=True, null = True, verbose_name=u'Возрастной рейтинг')
+    pg_rating   = models.CharField(max_length=255, blank=True, null=True, verbose_name=u'Возрастной рейтинг')
     tags        = models.ManyToManyField('AbstractCastsTags', verbose_name=u'Tags', related_name='casts')
     search_index = VectorField()
 
@@ -27,6 +27,42 @@ class Casts(models.Model):
 
     def __unicode__(self):
         return u'[{0}] {1}'.format(self.pk, self.title)
+
+    @classmethod
+    def best_old_casts(cls, start_dt=None, end_dt=None, limit=4):
+        if not (limit and start_dt and end_dt):
+            return []
+
+        sql = """
+        SELECT casts.* FROM (
+            SELECT casts.id, COUNT(users_casts.cast_id) AS casts_cnt
+            FROM casts INNER JOIN users_casts ON casts.id = users_casts.cast_id
+            WHERE casts.start > %s AND casts.start < %s AND users_casts.subscribed IS NOT NULL
+            GROUP BY users_casts.cast_id, casts.id
+            LIMIT %s
+        ) AS cs LEFT JOIN casts ON casts.id = cs.id
+        ORDER BY cs.casts_cnt DESC
+        """
+
+        return cls.objects.raw(sql, params=[start_dt, end_dt, limit])
+
+    @classmethod
+    def best_future_casts(cls, start_dt=None, end_dt=None, limit=4):
+        if not (limit and start_dt and end_dt):
+            return []
+
+        sql = """
+        SELECT casts.* FROM (
+            SELECT casts.id, COUNT(users_casts.cast_id) AS casts_cnt
+            FROM casts INNER JOIN users_casts ON casts.id = users_casts.cast_id
+            WHERE casts.start >= %s AND casts.start <= %s AND users_casts.subscribed IS NOT NULL
+            GROUP BY users_casts.cast_id, casts.id
+            LIMIT %s
+        ) AS cs LEFT JOIN casts ON casts.id = cs.id
+        ORDER BY cs.casts_cnt DESC
+        """
+
+        return cls.objects.raw(sql, params=[start_dt, end_dt, limit])
 
     class Meta:
         # Имя таблицы в БД

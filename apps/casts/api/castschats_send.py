@@ -32,4 +32,3 @@ class CastsChatSendView(APIView):
 
         else:
             return Response({'error': form.errors}, status=status.HTTP_400_BAD_REQUEST)
-

@@ -3,28 +3,26 @@
 import time
 import json
 from email import utils
-from StringIO import StringIO
-
-from rest_framework.parsers import JSONParser
 
 from django.shortcuts import render
 from django.utils.timezone import datetime
-
-from apps.contents.models import Contents, Locations
-from apps.films.models import Films, PersonsFilms, FilmExtras
-
-from apps.films.constants import APP_PERSON_ACTOR, APP_PERSON_DIRECTOR, APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER, \
-    APP_FILMS_EXTRAS_POSTER_HOST, APP_FILM_TYPE_ADDITIONAL_MATERIAL_TRAILER, APP_PERSON_SCRIPTWRITER
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.cache import cache
-from apps.films.api.serializers import vbFilm, vbComment, vbPerson
+
+from apps.contents.models import Contents, Locations
+
+from apps.films.models import Films, PersonsFilms, FilmExtras
+from apps.films.api.serializers import vbFilm
+from apps.films.constants import APP_PERSON_ACTOR, APP_PERSON_DIRECTOR, APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER, \
+    APP_FILMS_EXTRAS_POSTER_HOST, APP_FILM_TYPE_ADDITIONAL_MATERIAL_TRAILER, APP_PERSON_SCRIPTWRITER
+
 
 TWITTER_MESSAGE_TEMPLATE = u"Новый #{ftype} {f_name} {genres_string} {f_rating}/10, {f_year} http://vsevi.ru/films/{film_id}/"
+CONTENT_TYPE = 'application/rss+xml; charset=utf-8'
 
 
 def get_format_time():
     current_timestamp = time.mktime(datetime.now().timetuple())
-
     return utils.formatdate(current_timestamp)
 
 
@@ -39,20 +37,24 @@ def get_feed_tw(request):
             genres.remove(ftype)
 
         genres_string = u'#{0}'.format(u' #'.join(genres))
-        messages.append((film.name, film.id, TWITTER_MESSAGE_TEMPLATE.format(ftype=ftype,
-                                                         f_name=film.name,
-                                                         genres_string=genres_string,
-                                                         f_rating=film.rating_cons,
-                                                         f_year=film.release_date.year,
-                                                         film_id=film.id)))
+        messages.append((film.name, film.id,
+                         TWITTER_MESSAGE_TEMPLATE.format(
+                             ftype=ftype,
+                             f_name=film.name,
+                             genres_string=genres_string,
+                             f_rating=film.rating_cons,
+                             f_year=film.release_date.year,
+                             film_id=film.id
+                         )
+        ))
+
     result = {
         'messages': messages,
         'date': get_format_time(),
         'newdate': ''
     }
 
-    return render(request, 'tw_feed.html', result,
-                  content_type='application/rss+xml; charset=utf-8')
+    return render(request, 'rss/tw_feed.html', result, content_type=CONTENT_TYPE)
 
 
 def get_feed_vk(request):
@@ -62,8 +64,7 @@ def get_feed_vk(request):
         'date': get_format_time(),
     }
 
-    return render(request, 'vk_feed.html', result,
-                  content_type='application/rss+xml; charset=utf-8')
+    return render(request, 'rss/vk_feed.html', result, content_type=CONTENT_TYPE)
 
 
 def get_feed(request):
@@ -73,8 +74,7 @@ def get_feed(request):
         'date': get_format_time(),
     }
 
-    return render(request, 'feed.html', result,
-                  content_type='application/rss+xml; charset=utf-8')
+    return render(request, 'rss/feed.html', result, content_type=CONTENT_TYPE)
 
 
 def get_feed_fb(request):
@@ -84,14 +84,11 @@ def get_feed_fb(request):
         'date': get_format_time(),
     }
 
-    return render(request, 'fb_feed.html', result,
-                  content_type='application/rss+xml; charset=utf-8')
+    return render(request, 'rss/fb_feed.html', result, content_type=CONTENT_TYPE)
 
 
 def get_film_description(**kwargs):
-
     NEW_FILMS_CACHE_KEY = 'new_films'
-
     cached_films = cache.get(NEW_FILMS_CACHE_KEY)
 
     # Расчитываем новинки, если их нет в кеше
@@ -150,7 +147,7 @@ def get_price(film):
     cont_id_list = Contents.objects.filter(film=film.id).values_list('id', flat=True)
     locations = Locations.objects.filter(content__in=cont_id_list)
     price = -1
-    cost = u"бесплатно"
+    cost = u'бесплатно'
     min_price = locations[0].price
 
     for location in locations:
@@ -163,13 +160,14 @@ def get_price(film):
 
     elif min_price == 0 and price != -1:
         cost = u'бесплатно или от {0} рублей без рекламы'.format(price)
+
     return cost
 
 
 def get_extras(film, is_vk=False, big_poster=True):
-    film_extras = FilmExtras.objects.filter(film_id=film.id).all()
     poster = u''
     trailer = u'http://vsevi.ru/film/{0}/'.format(film.id)
+    film_extras = FilmExtras.objects.filter(film_id=film.id).all()
 
     for extras in film_extras:
         if is_vk:
