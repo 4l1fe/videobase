@@ -1,0 +1,385 @@
+mixin film_thumb_mail(item)
+    - host = "http://vsevi.ru"
+    - year = item.releasedate?item.releasedate.substr(0,4):""
+    - url = host + "/films/" + item.id + "/"
+    - has_free = false
+    - min_price = false
+    - price_loc = ""
+    - price_loc_cnt = 0
+    - if (item.locations && item.locations.length>0) {
+    -   for (i = 0; i < item.locations.length; i++) {
+    -       obj = item.locations[i];
+    -       if (obj.price_type == 0) {
+    -            has_free = true;
+    -       } else {
+    -           price_loc_cnt++;
+    -           if (min_price === false || min_price > obj.price) {
+    -               min_price = obj.price;
+    -               price_loc = obj.id
+    -           }
+    -       }
+    -   }
+    -   if (min_price) {
+    -       min_price = Math.floor(min_price)
+    -   }
+    - }
+    td(style="vertical-align: top;") &nbsp;
+    td(style="vertical-align: top;")
+        a(href=url style="color: inherit; text-decoration: inherit;")
+            - poster_url = host + ((item.poster && item.poster.length)?item.poster:"")
+            img(src=poster_url alt="" title="")
+        table(style="border: 0; border-collapse: collapse; border-spacing: 0; font-size: 1px;")
+            tr
+                td(colspan="3" style="vertical-align: top; font-size: 1px; height: 20px;").item-header_before &nbsp;
+            tr
+                td(rowspan="2" style="vertical-align: top; width: 235px; font-size: 18px;").wrapper-item-name
+                    a(href=url style="color: inherit; text-decoration: inherit;")
+                        span(style="color: #fff; font-size: 18px; font-weight: bold; text-decoration: underline;").label-film-name=item.name
+                        span(style="color: #85b6c7; font-size: 18px; font-weight: normal; text-decoration: none;").label-film-year="(" + year + ")"
+                td(style="vertical-align: top; width: 6px;").item-name-spacing &nbsp;
+                td(rowspan="1" style="vertical-align: middle; background: #007fc0; height: 30px; text-align: center; width: 40px;").box-item-rating ]
+                    span(class="label-item-rating" style="color: #fff; font-size: 18px; font-weight: bold;")=(item.ratings && item.ratings.cons)?item.ratings.cons[0]:""
+            tr
+                td(style="vertical-align: top;") &nbsp;
+            tr
+                td(colspan="3" style="vertical-align: top; font-size: 1px; height: 20px;").item-header_after &nbsp;
+        table(style="border: 0; border-collapse: collapse; border-spacing: 0; font-size: 1px;")
+            tr
+                - if (min_price && !has_free) {
+                    td(style="vertical-align: middle; width: 165px; background: #ffcd00; height: 50px; text-align: center;").btn-watch-free-small
+                        a(href=url style="color: #232323; text-decoration: inherit; font-size: 14px; font-weight: bold; text-transform: uppercase;").label-watch
+                            div Смотреть
+                            div бесплатно
+                    td(style="vertical-align: top; width: 6px;").btn-spacing &nbsp;
+                    - text = "или " + (price_loc_cnt > 1?"от ":"за ") + min_price + " р."
+                    td(style="vertical-align: middle; width: 110px; background: #ff9700; height: 50px; text-align: center;").btn-watch-small
+                        a(href=url style="color: #232323; text-decoration: inherit; font-size: 14px; font-weight: normal; text-transform: none;").label-price=text
+                - } else {
+                    td(style="vertical-align: middle; background: #ffcd00; width: 280px; height: 50px; text-align: center;").btn-watch-free = text
+                        a(href=url style="color: #232323; text-decoration: inherit; font-size: 14px; font-weight: bold; text-transform: uppercase;").label-watch
+                            div Смотреть
+                            div бесплатно
+                - }
+mixin casts_serials_thumb_mail(item)
+    - host = "http://vsevi.ru"
+    - has_free = false
+    - min_price = false
+    - price_loc = ""
+    - price_loc_cnt = 0
+    - if (item.locations && item.locations.length>0) {
+    -   for (i = 0; i < item.locations.length; i++) {
+    -       obj = item.locations[i];
+    -       if (obj.price_type == 0) {
+    -            has_free = true;
+    -       } else {
+    -           price_loc_cnt++;
+    -           if (min_price === false || min_price > obj.price) {
+    -               min_price = obj.price;
+    -               price_loc = obj.id
+    -           }
+    -       }
+    -   }
+    -   if (min_price) {
+    -       min_price = Math.floor(min_price)
+    -   }
+    - }
+    td(style="vertical-align: top;") &nbsp;
+    td(style="vertical-align: top;")
+        div(class="box-new-season" style="color: #fff; font-size: 14px; font-weight: bold; height: 30px; line-height: 30px; text-align: center; text-transform: uppercase; vertical-align: middle; background: #007fc0;")
+            | Новый сезон
+        a(href="#" style="color: inherit; text-decoration: inherit;")
+            - poster_url = host + ((item.poster && item.poster.length)?item.poster:"")
+            img(src=poster_url alt="" title="")
+        table(style="border: 0; border-collapse: collapse; border-spacing: 0; font-size: 1px;")
+            tr
+                td(colspan="3" class="item-header_before" style="vertical-align: top; font-size: 1px; height: 20px;") &nbsp;
+            tr
+                td(rowspan="2" class="wrapper-item-name" style="vertical-align: top; width: 235px; font-size: 18px;")
+                    a(href="#" style="color: inherit; text-decoration: inherit;")
+                        span(class="label-serial-name" style="font-size: 18px; color: #3168d1; font-weight: bold; text-decoration: underline;")
+                            | Теория Большого взрыва
+                        span(class="label-serial-year" style="font-size: 18px; color: #6d6d6d; text-decoration: none;")
+                            | (2007-...)
+                td(class="item-name-spacing" style="vertical-align: top; width: 6px;") &nbsp;
+                td(rowspan="1" class="box-item-rating" style="vertical-align: middle; background: #007fc0; height: 30px; text-align: center; width: 40px;")
+                    span(class="label-item-rating" style="color: #fff; font-size: 18px; font-weight: bold;") 8.2
+            tr
+                td(style="vertical-align: top;") &nbsp;
+            tr
+                td(colspan="3" class="item-header_after" style="vertical-align: top; font-size: 1px; height: 20px;") &nbsp;
+        table(style="border: 0; border-collapse: collapse; border-spacing: 0; font-size: 1px;")
+            tr
+                td(class="btn-watch-free" style="vertical-align: middle; background: #ffcd00; width: 280px; height: 50px; text-align: center;")
+                    a(href="#" class="label-watch" style="color: #232323; text-decoration: inherit; font-size: 14px; font-weight: bold; text-transform: uppercase;")
+                        div Смотреть
+                        div бесплатно
+                td(class="btn-watch" style="vertical-align: middle; width: 280px; background: #ff9700; height: 50px; text-align: center;")
+                    a(href="#" style="color: inherit; text-decoration: inherit;")
+                        div(class="label-watch" style="color: #232323; font-size: 14px; font-weight: bold; text-transform: uppercase;")
+                            | Смотреть
+                        div(class="label-price" style="color: #232323; font-size: 14px; font-weight: normal; text-transform: none;")
+                            | (price_loc_cnt > 1?"от ":"за ") + min_price + " р."
+mixin casts_old_thumb_mail(item)
+    - date = new Date(item.start)
+    - day = (date.getDay() != undefined)?date.getDay():''
+    - monthNames = ["Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", "Июля", "Августа", "Сентября", "Октября", "Ноября", "Декабря"]
+    - month = (monthNames[date.getMonth()] != undefined)?monthNames[date.getMonth()].toLowerCase():''
+    - tag = ""
+    - host = "http://vsevi.ru"
+    - url = host + "/casts/" + item.id + "/"
+    - has_free = false
+    - min_price = false
+    - price_loc = ""
+    - price_loc_cnt = 0
+    - if (item.locations && item.locations.length>0) {
+    -   for (i = 0; i < item.locations.length; i++) {
+    -       obj = item.locations[i];
+    -       if (obj.price_type == 0) {
+    -            has_free = true;
+    -       } else {
+    -           price_loc_cnt++;
+    -           if (min_price === false || min_price > obj.price) {
+    -               min_price = obj.price;
+    -               price_loc = obj.id
+    -           }
+    -       }
+    -   }
+    -   if (min_price) {
+    -       min_price = Math.floor(min_price)
+    -   }
+    - }
+    td(style="vertical-align: top;") &nbsp;
+        td(style="vertical-align: top;")
+            a(href="#" style="color: inherit; text-decoration: inherit;")
+                - poster_url = host + ((item.poster && item.poster.length)?item.poster:"")
+                img(src=poster_url alt="" title="")
+            table(style="border: 0; border-collapse: collapse; border-spacing: 0; font-size: 1px;")
+                tr
+                    td(colspan="3" style="vertical-align: top; font-size: 1px; height: 20px;").item-header_before &nbsp;
+                tr
+                    td(rowspan="2" class="wrapper-item-name is-trans" style="vertical-align: top; width: 210px; color: #ffcd00; font-weight: bold; font-size: 18px;")
+                        a(href="#" style="color: inherit; text-decoration: inherit;")
+                            span(style="font-size: 18px; text-decoration: underline; color: #fff;").label-trans-type=tag
+                            span(style="font-size: 18px; text-decoration: underline;").label-trans-name=item.title
+                    td(style="vertical-align: top; width: 6px;").item-name-spacing &nbsp;
+                    td(rowspan="1" style="vertical-align: middle; background: #007fc0; height: 46px; margin-left: 5px; text-align: center; width: 65px;")
+                        span(class="label-item-trans-time" style="color: #fff; font-size: 12px;").box-item-trans-time
+                            div(class="label-item-trans-time_first-line" style="font-size: 18px;")=day
+                            div=month
+                tr
+                    td(style="vertical-align: top;") &nbsp;
+                tr
+                    td(colspan="3" style="vertical-align: top; font-size: 1px; height: 20px;").item-header_after &nbsp;
+            - if (min_price && !has_free) {
+                table(style="border: 0; border-collapse: collapse; border-spacing: 0; font-size: 1px;")
+                    tr
+                        td(style="vertical-align: middle; background: #ffcd00; width: 280px; height: 50px; text-align: center;").btn-watch-free
+                            a(href=url style="color: #232323; text-decoration: inherit; font-size: 14px; font-weight: bold; text-transform: uppercase;").label-watch
+                                div Смотреть
+                                div бесплатно
+            - } else {
+                table(style="border: 0; border-collapse: collapse; border-spacing: 0; font-size: 1px;")
+                    tr
+                        td(style="vertical-align: middle; width: 165px; background: #ffcd00; height: 50px; text-align: center;").btn-watch-free-small
+                            a(href=url style="color: #232323; text-decoration: inherit; font-size: 14px; font-weight: bold; text-transform: uppercase;").label-watch
+                                div Смотреть
+                                div бесплатно
+                        td(style="vertical-align: top; width: 6px;").btn-spacing &nbsp;
+                        td(style="vertical-align: middle; width: 110px; background: #ff9700; height: 50px; text-align: center;").btn-watch-small
+                            - text = "или " + (price_loc_cnt > 1?"от ":"за ") + min_price + " р."
+                            a(href=url style="color: #232323; text-decoration: inherit; font-size: 14px; font-weight: normal; text-transform: none;").label-price=text
+            - }
+mixin casts_future_thumb_mail(item)
+    - host = "http://vsevi.ru"
+    - date = new Date(item.start)
+    - dayofweek = ["понедельник", "вторник", "среда", "четверг", "пятница", "суббота", "воскресенье"]
+    - dayofweek = (date.getDay() != undefined)?dayofweek[date.getDay() - 1]:""
+    - tm = (date.getHours() != undefined && date.getMinutes() != undefined)?date.getHours() + ":" + date.getMinutes():""
+    - tag = ""
+    td(style="vertical-align: top;") &nbsp;
+    td(style="vertical-align: top;")
+        a(href="#" style="color: inherit; text-decoration: inherit;")
+            - poster_url = host + ((item.poster && item.poster.length)?item.poster:"")
+            img(src=poster_url alt="" title="")
+        table(style="border: 0; border-collapse: collapse; border-spacing: 0; font-size: 1px;")
+            tr
+                td(colspan="3" class="item-header_before" style="vertical-align: top; font-size: 1px; height: 20px;") &nbsp;
+            tr
+                td(rowspan="2" class="wrapper-item-name is-trans" style="vertical-align: top; width: 210px; color: #ffcd00; font-weight: bold; font-size: 18px;")
+                    a(href="#" style="color: inherit; text-decoration: inherit;")
+                        -text = tag + ":"
+                        span(class="label-trans-type" style="font-size: 18px; text-decoration: underline; color: #fff;")=tag
+                        span(class="label-trans-name" style="font-size: 18px; text-decoration: underline;")=item.title
+                td(class="item-name-spacing" style="vertical-align: top; width: 6px;") &nbsp;
+                td(rowspan="1" class="box-item-trans-time" style="vertical-align: middle; background: #007fc0; height: 46px; margin-left: 5px; text-align: center; width: 65px;")
+                    span(class="label-item-trans-time" style="color: #fff; font-size: 12px;")
+                        div(class="label-item-trans-time_first-line" style="font-size: 18px;")=tm
+                        div=dayofweek
+            tr
+                td(style="vertical-align: top;") &nbsp;
+            tr
+                td(colspan="3" class="item-header_after" style="vertical-align: top; font-size: 1px; height: 20px;") &nbsp;
+        table(style="border: 0; border-collapse: collapse; border-spacing: 0; font-size: 1px;")
+            tr
+                td(class="btn-subscribe" style="vertical-align: middle; background: #57cb56; width: 280px; height: 50px; text-align: center;")
+                    - text = Подписаться
+                    a(href="#" class="label-watch" style="color: #232323; text-decoration: inherit; font-size: 14px; font-weight: bold; text-transform: uppercase;")=text
+mixin indent_header()
+    tr(style="height: 30px")
+        td(style="width: 110px; vertical-align: top;") &nbsp;
+        td(style="vertical-align: top;") &nbsp;
+        td(style="width: 20px; vertical-align: top;") &nbsp;
+        td(style="vertical-align: top;") &nbsp;
+        td(style="width: 110px; vertical-align: top;") &nbsp;
+
+doctype html
+html
+    head
+        meta(charset='utf-8')
+    body(style="background: #fff; font-family: Arial, sans-serif; font-size: 14px; line-height: 1; margin: 0; padding: 0;")
+        <!--- HEADER -->
+        table(style="width: 800px; border: 0; border-collapse: collapse; border-spacing: 0; font-size: 1px;" cellpadding="0" cellspacing="0")
+            tr(class="logo-block" style="background: #322a2a; height: 76px;")
+                td(style="padding-left: 20px; vertical-align: middle;")
+                    a(href="http://vsevi.ru" title="Все видео" style="color: inherit; text-decoration: inherit;")
+                        img(src="http://vsevi.ru/static/img/logo-header.png" alt="" title="")
+                td(style="text-align: right; padding-right: 20px; vertical-align: middle;")
+                    a(href="http://vk.com/vsevi" title="Страница ВсеВидео в Вконтакте" rel="nofollow" target="_new" style="color: inherit; text-decoration: inherit;")
+                        img(src="http://vsevi.ru/static/img/i-vk.png" style="height: 30px; width: 30px;" alt="" title="")
+                    span(class="social-icon-spacing" style="padding: 4px;") &nbsp;
+                    a(href="http://www.odnoklassniki.ru/group/53196730400877" rel="nofollow" target="_new" title="Страница ВсеВидео в Одноклассниках" style="color: inherit; text-decoration: inherit;")
+                        img(src="http://vsevi.ru/static/img/i-ok.png" style="height: 30px; width: 30px;" alt="" title="")
+                    span(class="social-icon-spacing" style="padding: 4px;") &nbsp;
+                    a(href="https://twitter.com/vseviru" rel="nofollow" target="_new" title="Страница ВсеВидео в Твиттере" style="color: inherit; text-decoration: inherit;")
+                        img(src="http://vsevi.ru/static/img/i-tw.png" style="height: 30px; width: 30px;" alt="" title="")
+                    span(class="social-icon-spacing" style="padding: 4px;") &nbsp;
+                    a(href="https://www.facebook.com/vseviru" title="Страница ВсеВидео на Фейсбуке" rel="nofollow" target="_new" style="color: inherit; text-decoration: inherit;")
+                        img(src="http://vsevi.ru/static/img/i-fb.png" style="height: 30px; width: 30px;" alt="" title="")
+                    span(class="social-icon-spacing" style="padding: 4px;") &nbsp;
+                    a(href="http://vsevi.ru/rss/feed" title="RSS новинок на ВсеВидео" rel="nofollow" target="_new" style="color: inherit; text-decoration: inherit;")
+                        img(src="http://vsevi.ru/static/img/i-rss.png" style="height: 30px; width: 30px;" alt="" title="")
+        <!--- ЛУЧШИЕ 10 ФИЛЬМОВ ЗА НЕДЕЛЮ -->
+        - if (films && films.length>0) {
+        table(style="width: 800px; background: #005685; border: 0; border-collapse: collapse; border-spacing: 0; font-size: 1px;" cellpadding="0" cellspacing="0")
+            tr(style="height: 45px;")
+                th(colspan="5" style="vertical-align: bottom;")
+                    h1(class="dots1 centerh1 whiteh1" style="color: #fff; font-size: 16px; font-weight: bold; text-transform: uppercase; margin: 0; padding: 0; text-shadow: 0px 2px 1px #444; text-align: center; background: url('http://vsevi.ru/static/img/mail/top-10-films_serials_casts/dots1.png') center center no-repeat;")
+                        | Лучшие 10 фильмов за неделю
+            mixin indent_header()
+            - collection_length = films.length
+            each item, index in films
+                if !(index % 2)
+                    | <tr>
+                mixin film_thumb_mail(item)
+                if (index % 2 && (index + 1) != collection_length)
+                    td(style="vertical-align: top;") &nbsp;
+                    | </tr>
+                    tr(style="height: 70px;").row-film-separator
+                        td(colspan="5" style="vertical-align: middle;")
+                            hr(style="border-style: none; height: 1px; background-image: url('http://vsevi.ru/static/img/mail/top-10-films_serials_casts/item-delim-blue.png');").hr-blue
+            if !(collection_length % 2)
+                td(style="vertical-align: top;") &nbsp;
+                | </tr>
+            tr(style="height: 35px;").row-sect-separator
+                td(colspan="5" style="vertical-align: top;")
+        - }
+        <!--- НОВИНКИ СЕРИАЛОВ -->
+        - if (serials && serials.length>0) {
+            table(style="width: 800px; background: #fff; border: 0; border-collapse: collapse; border-spacing: 0; font-size: 1px;" cellpadding="0" cellspacing="0")
+                tr(style="height: 45px")
+                    th(colspan="5" style="vertical-align: bottom;")
+                        h1(class="dots1 centerh1 blackh1" style="color: #000; font-size: 16px; font-weight: bold; text-transform: uppercase; margin: 0; padding: 0; text-align: center; background: url('http://vsevi.ru/static/img/mail/top-10-films_serials_casts/dots1.png') center center no-repeat;")
+                            | Новинки сериалов
+                mixin indent_header()
+                - collection_length = serials.length
+                each item, index in serials
+                    if !(index % 2)
+                        | <tr>
+                    mixin casts_serials_thumb_mail(item)
+                    if (index % 2 && (index + 1) != collection_length)
+                        td(style="vertical-align: top;") &nbsp;
+                        | </tr>
+                        tr(class="row-film-separator" style="height: 70px;")
+                            td(colspan="5" style="vertical-align: middle;")
+                                hr(class="hr-gray" style="border-style: none; height: 1px; background-image: url('http://vsevi.ru/static/img/mail/top-10-films_serials_casts/item-delim-gray.png');")
+                if !(collection_length % 2)
+                    td(style="vertical-align: top;") &nbsp;
+                    | </tr>
+                tr(style="height: 35px;").row-sect-separator
+                    td(colspan="5" style="vertical-align: top;")
+        - }
+        <!--- ЛУЧШИЕ ТРАНСЛЯЦИИ ПРОШЛОЙ НЕДЕЛИ -->
+        - if (casts && casts.old && casts.old.length>0) {
+        table(style="width: 800px; background: #392d2d; border: 0; border-collapse: collapse; border-spacing: 0; font-size: 1px;" cellpadding="0" cellspacing="0")
+            tr(style="height: 45px")
+                th(colspan="5" style="vertical-align: bottom;")
+                    h1(class="dots3 centerh1 whiteh1" style="color: #fff; font-size: 16px; font-weight: bold; text-transform: uppercase; margin: 0; padding: 0; background: url('http://vsevi.ru/static/img/mail/top-10-films_serials_casts/dots3.png') center center no-repeat; text-shadow: 0px 2px 1px #444; text-align: center;")
+                        | Лучшие трансляции прошлой недели
+            mixin indent_header()
+            - collection_length = casts.old.length
+            each item, index in casts.old
+                if !(index % 2)
+                    | <tr>
+                mixin casts_old_thumb_mail(item)
+                if (index % 2 && (index + 1) != collection_length)
+                    td(style="vertical-align: top;") &nbsp;
+                    | </tr>
+                    tr(style="height: 70px;").row-film-separator
+                        td(colspan="5" style="vertical-align: middle;")
+                            hr(class="hr-brown" style="border-style: none; height: 1px; background-image: url('http://vsevi.ru/static/img/mail/top-10-films_serials_casts/item-delim-brown.png');")
+            if !(collection_length % 2)
+                td(style="vertical-align: top;") &nbsp;
+                | </tr>
+            tr(style="height: 35px;").row-sect-separator
+                td(colspan="5" style="vertical-align: top;")
+        - }
+        <!--- НЕ ПРОПУСТИТЕ ТРАНСЛЯЦИИ -->
+        - if (casts && casts.future && casts.future.length>0) {
+        table(style="width: 800px; background: #392d2d; border: 0; border-collapse: collapse; border-spacing: 0; font-size: 1px;" cellpadding="0" cellspacing="0")
+            tr(style="height: 45px")
+                th(colspan="5" style="vertical-align: bottom;")
+                    h1(class="dots3 centerh1 whiteh1" style="color: #fff; font-size: 16px; font-weight: bold; text-transform: uppercase; margin: 0; padding: 0; background: url('http://vsevi.ru/static/img/mail/top-10-films_serials_casts/dots3.png') center center no-repeat; text-shadow: 0px 2px 1px #444; text-align: center;")
+                        | Не пропустите трансляции
+            mixin indent_header()
+            - collection_length = casts.future.length
+            each item, index in casts.future
+                if !(index % 2)
+                    | <tr>
+                mixin casts_future_thumb_mail(item)
+                if (index % 2 && (index + 1) != collection_length)
+                    td(style="vertical-align: top;") &nbsp;
+                    | </tr>
+                    tr(style="height: 70px;").row-film-separator
+                        td(colspan="5" style="vertical-align: middle;")
+                            hr(class="hr-brown" style="border-style: none; height: 1px; background-image: url('http://vsevi.ru/static/img/mail/top-10-films_serials_casts/item-delim-brown.png');")
+            if !(collection_length % 2)
+                td(style="vertical-align: top;") &nbsp;
+                | </tr>
+            tr(style="height: 35px;").row-sect-separator
+                td(colspan="5" style="vertical-align: top;")
+        - }
+        <!--- FOOTER -->
+        table(style="width: 800px; background: #fff; border: 0; border-collapse: collapse; border-spacing: 0; font-size: 1px;" cellpadding="0" cellspacing="0")
+            tr
+                td(colspan="7" style="height: 30px; vertical-align: top;") &nbsp;
+            tr
+                td(style="width: 20px; vertical-align: top;") &nbsp;
+                td(class="cell-footer-text" style="vertical-align: top; color: #7a7a7a; font-size: 12px;")
+                    | Вы получили это письмо, потому что прошли регистрацию в проекте
+                    | «Все Видео» и выразили согласие получать рассылку с новостями
+                    | на указанный при регистрации адрес электронной почты. Вы можете
+                    a(href="#" style="color: #7a7a7a; text-decoration: underline;") отписаться
+                    | от этой рассылки или настроить частоту и формат рассылок в
+                    a(href="#" style="color: #7a7a7a; text-decoration: underline;") личном кабинете
+                    | пользователя.
+                td(style="width: 30px; vertical-align: top;") &nbsp;
+                td(style="vertical-align: top;")
+                    a(href="http://vsevi.ru/" style="color: inherit; text-decoration: inherit;")
+                        img(src="http://vsevi.ru/static/img/logo-footer.png" alt="Лого Все Видео" title="Все Видео")
+                td(style="width: 30px; vertical-align: top;") &nbsp;
+                td(style="vertical-align: top;")
+                    a(href="http://solarispromo.com/" style="color: inherit; text-decoration: inherit;")
+                        img(src="http://vsevi.ru/static/img/solaris-logo.png" alt="Лого Solaris Promo" title="Solaris Promo")
+                td(style="width: 20px; vertical-align: top;") &nbsp;
+            tr
+                td(colspan="7" style="height: 30px; vertical-align: top;") &nbsp;

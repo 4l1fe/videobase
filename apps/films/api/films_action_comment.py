@@ -1,4 +1,8 @@
 # coding: utf-8
+
+import re
+from cgi import escape
+
 from django.core.exceptions import ObjectDoesNotExist
 
 from rest_framework.views import APIView
@@ -14,11 +18,8 @@ from apps.users.constants import FILM_COMMENT
 
 from videobase.settings import DEFAULT_REST_API_RESPONSE
 
-from cgi import escape
-import re
+
 #############################################################################################################
-
-
 class ActCommentFilmView(APIView):
     """
     Method post:

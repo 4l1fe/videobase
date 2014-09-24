@@ -27,9 +27,11 @@ class UsersFilms(models.Model):
     def check_subscribed(self):
         return False if self.subscribed == APP_USERFILM_SUBS_FALSE else True
 
+
     @property
     def get_name_status(self):
         return dict(APP_USERFILM_STATUS).get(self.status)
+
 
     @property
     def relation_for_vb_film(self):
@@ -39,6 +41,7 @@ class UsersFilms(models.Model):
             'rating': self.rating,
         }
 
+
     @classmethod
     def get_subscribed_films_by_user(self, user_id, flat=False, *args, **kwargs):
         result = self.objects.filter(user=user_id, subscribed=APP_USERFILM_SUBS_TRUE).order_by('created')
@@ -46,7 +49,6 @@ class UsersFilms(models.Model):
             result = result.values_list('film', flat=True)
 
         return result
-
 
 
     class  Meta(object):
