@@ -1,15 +1,17 @@
 # coding: utf-8
-from django.contrib.auth.models import User
-from django.db import models
-from users_pics import UsersPics
 
-from ..constants import *
+import sha
+import random
+
+from django.db import models
+from django.contrib.auth.models import User
+
+from apps.users.constants import *
 
 
 class UsersProfile(models.Model):
     user         = models.OneToOneField(User, verbose_name=u'Пользователь', related_name='profile')
     last_visited = models.DateTimeField(verbose_name=u'Песледний визит', auto_now_add=True, blank=True)
-    userpic_type = models.CharField(max_length=255, verbose_name=u'Тип', choices=APP_USER_PIC_TYPES, null=True, blank=True)
     userpic_id   = models.IntegerField(verbose_name=u'Id аватарки', null=True, blank=True)
 
     # Notification
@@ -27,11 +29,27 @@ class UsersProfile(models.Model):
     pvt_actors     = models.IntegerField(verbose_name=u'Любимые актеры пользователя', choices=APP_USERPROFILE_PRIVACY, default=APP_USERPROFILE_PRIVACY_ALL)
     pvt_directors  = models.IntegerField(verbose_name=u'Любимые режисеры пользователя', choices=APP_USERPROFILE_PRIVACY, default=APP_USERPROFILE_PRIVACY_ALL)
 
+    # Confirmation email
+    confirm_email  = models.BooleanField(verbose_name=u'Подтверждение email на рассылку и уведомления', default=False)
+
     def __unicode__(self):
-        return u'[%s] %s' % (self.id, self.user.username, )
+        return u'[{0}] {1}'.format(self.id, self.user.username)
 
     def get_name(self):
         return self.user.first_name
+
+    def generate_key(self):
+        salt = '{0}_{1}'.format(sha.new(str(random.random())).hexdigest(), self.user.id)
+        return sha.new(salt).hexdigest()
+
+    def deactivation_email(self):
+        self.confirm_email = False
+
+    def save(self, *args, **kwargs):
+        if self.id is None:
+            self.deactivation_email()
+
+        super(UsersProfile, self).save(*args, **kwargs)
 
     class Meta:
         db_table = 'users_profile'

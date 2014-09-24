@@ -42,6 +42,7 @@ APP_USER_PIC_TYPES = (
 )
 
 APP_SUBJECT_TO_RESTORE_PASSWORD = u'Востановление пароля'
+APP_SUBJECT_TO_RESTORE_EMAIL = u'Смена Email'
 APP_SUBJECT_TO_CONFIRM_REGISTER = u'Подтверждение регистрации'
 APP_SUBJECT_TO_NOTIFICATION_FILM = u'Появился фильм'
 APP_SUBJECT_TO_NOTIFICATION_PERSON = u'Новый фильм у персоны'
@@ -61,6 +62,8 @@ USER_ASK = 'user-a'
 USER_FRIENDSHIP = 'user-f'
 SYS_ALL = 'sys-a'
 
+FILM_NEWSLETTER = [FILM_RATE, FILM_SUBSCRIBE, FILM_COMMENT, FILM_O]
+
 APP_FEED_TYPE = (
     (FILM_RATE, u"Оценка фильма"),
     (FILM_SUBSCRIBE, u"Подписка на фильм"),
@@ -75,8 +78,8 @@ APP_FEED_TYPE = (
 )
 
 APP_NOTIFICATION_TEMPLATE = {
-    FILM_O: "notification_film.html",
-    PERSON_O: "notification_person.html",
+    FILM_O: "mail/notification_film.html",
+    PERSON_O: "mail/notification_person.html",
 }
 
 APP_NOTIFICATION_EMAIL_SUBJECT = {
@@ -103,4 +106,17 @@ APP_USERPROFILE_NOTIFICATION = (
     (APP_USERPROFILE_NOTIFICATION_DAY, u'Один раз в день'),
     (APP_USERPROFILE_NOTIFICATION_WEEK, u'Раз в неделю'),
     (APP_USERPROFILE_NOTIFICATION_NEVER, u'Никогда'),
+)
+
+APP_USER_ACTIVE_KEY = 'act_key'
+
+#############################################################################################################
+APP_USER_HASH_EMAIL = 1
+APP_USER_HASH_PASSWD = 2
+APP_USER_HASH_REGISTR = 3
+
+TYPE_PASSWD_HASH = (
+    (APP_USER_HASH_EMAIL, u'Смена email'),
+    (APP_USER_HASH_PASSWD, u'Смена пароля'),
+    (APP_USER_HASH_REGISTR, u'При регистрации'),
 )
