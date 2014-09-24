@@ -300,10 +300,6 @@ def calc_actors(o_film):
     except Exception, e:
         print "Caught exception {} in calc_actors".format(e)
 
-    for p in  result:
-        print p['name']
-    return result
-
 
 def calc_similar(o_film):
     result = []
