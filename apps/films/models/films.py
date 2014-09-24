@@ -237,7 +237,7 @@ class Films(models.Model):
 
 
     @classmethod
-    def get_newest_films(cls):
+    def get_newest_films(cls, limit=4):
         """
             Выбираем четыре последних новинки из фильмов
         """
@@ -258,6 +258,7 @@ class Films(models.Model):
         """
 
         return cls.objects.raw(sql, params=['POSTER', 5.5, 5000, 4])
+
 
 
     class Meta(object):
