@@ -1,4 +1,5 @@
 # coding: utf-8
+
 import os
 
 APP_CASTS_DEFAULT_PAGE = 1
@@ -15,5 +16,8 @@ APP_CASTS_PRICE_TYPE = (
 
 APP_CAST_POSTER_DIR = os.path.join('upload', 'castextras')
 
-APP_CASTS_MAIL_SUBJECT = ''
-APP_CASTS_MAIL_TEMPLATE = ''
+
+APP_CASTS_START_NOTIFY = 40
+APP_CASTS_MAIL_SUBJECT = u'Уведомление о старте трансляции'
+APP_CASTS_MAIL_TEMPLATE = 'mail/cast_notification.html'
+
