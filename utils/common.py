@@ -1,11 +1,11 @@
 # coding: utf-8
-
 import os
 import sys
 import traceback
 import random
 import string
 import urllib
+from PIL import Image
 
 
 def get_image_path(instance, filename):
