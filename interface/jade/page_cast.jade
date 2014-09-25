@@ -41,14 +41,12 @@ html
                                     .row
                                         .col-md-8.col-sm-7
                                             .name-playlist
-                                                h2=cast.title
-                                                if cast.title_orig && cast.title_orig != cast.title
+                                                h2=cast.generic_title
+                                                //if cast.title_orig && cast.title_orig != cast.title
                                                     span=cast.title_orig
                                         .col-md-4.col-sm-5
-                                            .share-block.fright
-                                                script(src="http://yandex.st/share/share.js", charset="utf-8")
-                                                .yashare-auto-init(data-yasharetype="big", data-yashareL10n="ru", data-yashareQuickServices="vkontakte,odnoklassniki,moimir,facebook,twitter,gplus", data-yashareTheme="counter")
-
+                                            .fright
+                                                h3 Чат
 
                             //-
                                .title-cast
@@ -95,17 +93,43 @@ html
                     //-
                         .broun-block
                 - }
-            section.brd-top
+            section.brd-top.cast-details
                 .container
-                    if cast.description
-                        .cast-description-block
-                            h2.blackh1=cast.title
-                            p!=cast.description
+                    .row
+                        .col-md-9
+                            .playlist-content
+                                .cast-share
+                                    script(src="http://yandex.st/share/share.js", charset="utf-8")
+                                    .yashare-auto-init(data-yasharetype="big", data-yashareL10n="ru", data-yashareQuickServices="vkontakte,odnoklassniki,moimir,facebook,twitter,gplus", data-yashareTheme="counter")
+                                if cast.title
+                                    h2.blackh1=cast.title
+                                    p!=cast.description
 
+                        - watching_users = [ {name:"Миранда Керр", avatar: ""}, {name:"Давид Луиз", avatar: ""}, {name:"Криштиану Роналду", avatar: ""}, {name:"Карвахал", avatar: ""}, {name:"Модрич", avatar: ""} ]
+                        if watching_users && watching_users.length
+                        .col-md-3.hide-watching-users#watching_users_left
+                            .playlist-content
+                                h2.blackh1 Сейчас смотрят
+                                ul.watching-users-list.cf#watching_users
+                                    each user in watching_users
+                                        mixin user_thumb2(user)
+                            if watching_users.length >= 5
+                                .add-filter#watching_users_more
+                                    .add-content.style-panel-action.rel.zmin
+                                        a(href='#show-watching-users', title='') Показать всех
+                                    //-
+                                       .filter-content
+                                    img.img-responsive(src=img_url + 'shd-big.png', alt='')
+                            .label.label-success
+                                | Количество гостей:
+                                | #{" "}
+                                span.label-guests-count
+                                    | 100500
 
-            section.brd-top.cast-chat
-                .container
+                    .row
+                        .col-md-9
 
+                        .col-md-3
 
 
             if online_casts && online_casts.length

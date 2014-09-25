@@ -1157,13 +1157,31 @@ a.toggle-playlist.active {
     background: url(../img/btn-green.png) left top no-repeat;
 }
 
-.cast-description-block p {
-    color: #484c4d;
-    font-size: 16px;
-    line-height: 20px;
-    padding-top: 10px;
-    padding-bottom: 30px;
+section.cast-details { padding-top: 10px; }
+.cast-share { padding-top: 5px; padding-bottom: 25px; }
+
+.hide-watching-users .playlist-content {padding-bottom: 0}
+
+.watching-users-list li {
+    padding-top: 20px;
+    width: 210px;
+    height: 80px;
+    overflow: hidden;
 }
+.watching-users-list {padding-top: 5px; padding-bottom: 20px;}
+
+.user img {
+    min-width: 61px;
+    max-height: 61px;
+    vertical-align: middle;
+    margin-right: 20px;
+}
+.user a {
+    color: #3168d1;
+    font-size: 14px;
+    text-decoration: underline;
+}
+.user a:hover {text-decoration: none;}
 
 section.cast-chat {padding-bottom: 40px;}
 
