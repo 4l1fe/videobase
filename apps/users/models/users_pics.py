@@ -1,10 +1,8 @@
 # coding: utf-8
 from django.db import models
 from django.contrib.auth.models import User
-
 from ..constants import APP_USER_PIC_DIR, APP_USER_PIC_TYPES, APP_USER_PIC_TYPE_LOCAL
 from utils.common import get_image_path
-
 import os
 
 

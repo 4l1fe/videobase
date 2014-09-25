@@ -227,11 +227,13 @@ class UserProfileView(View):
         uprofile_form = UsersProfileForm(data=request.POST, files=request.FILES, instance=request.user)
         if uprofile_form.is_valid():
             try:
-                up, created = UsersPics.objects.get_or_create(user=request.user, type=APP_USER_PIC_TYPE_LOCAL)
-                up.image=uprofile_form.cleaned_data['avatar']
-                up.save()
+                image = uprofile_form.cleaned_data['avatar']
                 profile = uprofile_form.save(commit=False)
-                profile.userpic_id = up.pk
+                if image:
+                    up = UsersPics.objects.create(user=request.user, type=APP_USER_PIC_TYPE_LOCAL)
+                    up.image = image
+                    up.save()
+                    profile.userpic_id = up.pk
                 profile.save()
             except Exception as e:
                 return HttpResponse(render_page('profile', {'error': e}))
