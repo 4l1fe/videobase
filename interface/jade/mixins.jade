@@ -193,6 +193,14 @@ mixin user_thumb(item)
                 img.img-circle(src=item.avatar || noavatar_url, alt='', data-mi-atsrc="avatar", data-mi-default=noavatar_url)
                 span(data-mi-name="name")=item.name
 
+mixin user_thumb2(item)
+    li(data-mi-id="id",data-mi-val=item.id)
+        .user
+            - user_url = "/users/" + item.id + "/"
+            a(href=user_url, title='', data-mi-athref="id")
+                img.img-circle(src=item.avatar || noavatar_url, alt='', data-mi-atsrc="avatar", data-mi-default=noavatar_url)
+                span(data-mi-name="name")=item.name
+
 mixin comment_thumb(item)
     .tape-item.cf(data-mi-id="id", data-mi-val=item.id).comment-thumb
         - if (item.user) {
@@ -499,8 +507,8 @@ mixin cast_thumb(item)
         - start_time_str = start_date ? ( start_hours + ':' + (start_minutes<10? '0':'') + start_minutes ) : null
         - start_date_str = start_day + ' ' + start_month_str + ' в ' + start_time_str
         - duration = item.duration
-        - generic_title = item.title //Тэг/ обобщенное название
-        - title = item.description ? item.description : '' //Конкретное название
+        - generic_title = item.generic_title //Тэг/ обобщенное название
+        - title = item.title //Конкретное название
         - title_orig = item.title_orig
         - pg_rating = item.pg_rating
         - is_online = false
