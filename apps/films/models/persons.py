@@ -44,15 +44,16 @@ class Persons(PhotoClass):
 
 
     @classmethod
-    def get_sorted_persons_by_name(self, filter={}, offset=None, limit=None, *args, **kwargs):
-        obj = self.objects.filter(**filter).order_by('name')[slice(offset, limit)]
+    def get_sorted_persons_by_name(cls, filter={}, offset=None, limit=None, *args, **kwargs):
+        obj = cls.objects.filter(**filter).order_by('name')[slice(offset, limit)]
 
         return obj
 
-        
+
     class Meta:
         # Имя таблицы в БД
         db_table = 'persons'
         app_label = 'films'
         verbose_name = u'Персона'
         verbose_name_plural = u'Персоны'
+
