@@ -1,6 +1,6 @@
 # coding: utf-8
-
 import os
+import re
 import time
 import logging
 import subprocess
@@ -50,7 +50,9 @@ class Command(BaseCommand):
             return None
 
         if filename is None:
-            times = map(lambda f: f.split('_')[2].split('.')[0], os.listdir(path))
+            search_string = "{0}_dump_".format(db_name) + "\d{4}(-\d{2}){4}.sql"
+            files = filter(lambda f: True if re.match(search_string, f) else False, os.listdir(path))
+            times = map(lambda f: f.split('_')[2].split('.')[0], files)
             s_times = sorted(times, key=lambda t: time.strptime(t, "%Y-%m-%d-%H-%M"))
             filename = APP_BACKUP_FILENAME_TEMPLATE.format(db_name=db_name, time=s_times[-1])
 
