@@ -54,16 +54,42 @@ html
                                .title-cast
                             .cast-area
                                 .container
-                                    each el in cast.locations
-                                        a(id=el.id)
-                                    a(id="player")
-                                    .frame-player-wrapper
-                                        .frame-player-aspect
-                                            .frame-player#frame_player
-                                    if cast.locations.length > 1
-                                        ul.just-list.list-btns-film#locations
+                                    .row
+                                        .col-md-8
                                             each el in cast.locations
-                                                mixin loc_thumb(el)
+                                                a(id=el.id)
+                                            a(id="player")
+                                            .frame-player-wrapper
+                                                .frame-player-aspect
+                                                    .frame-player#frame_player
+
+                                        .col-md-4
+                                            - cast_chat_items = [{user: {name: "Василий Пупкин", avatar:""}, text: "Довольно неплохая передача, если учесть, кто ее авторы", created: new Date(0,0,0, 12, 31, 0)}]
+                                            - cast_chat_items.push({user: {name: "Гоблин Вася", avatar:""}, text: "По-моему основная тема так и не была раскрыта, хотя вопрос очень важный", created: new Date(0,0,0, 14, 21, 0)})
+                                            - cast_chat_items.push({user: {name: "Владимир Владимирович", avatar:""}, text: "Общественное мнение по этому вопросу очень важно, поэтому необходимо продолжать подобные обсуждения", created: new Date(0,0,0, 1, 18, 0)})
+                                            - cast_chat_items.push({user: {name: "Афанасий Прокопьевич", avatar:""}, text: "Моральная сторона этого вопроса тоже должна обсуждаться, а не только правовая его часть!", created: new Date(0,0,0, 19, 08, 0)})
+                                            - cast_chat_items.push({user: {name: "Афанасий Прокопьевич", avatar:""}, text: "Моральная сторона этого вопроса тоже должна обсуждаться, а не только правовая его часть!", created: new Date(0,0,0, 19, 08, 0)})
+                                            - cast_chat_items.push({user: {name: "Афанасий Прокопьевич", avatar:""}, text: "Моральная сторона этого вопроса тоже должна обсуждаться, а не только правовая его часть!", created: new Date(0,0,0, 19, 08, 0)})
+                                            - cast_chat_items.push({user: {name: "Афанасий Прокопьевич", avatar:""}, text: "Моральная сторона этого вопроса тоже должна обсуждаться, а не только правовая его часть!", created: new Date(0,0,0, 19, 08, 0)})
+                                            - cast_chat_items.push({user: {name: "Афанасий Прокопьевич", avatar:""}, text: "Моральная сторона этого вопроса тоже должна обсуждаться, а не только правовая его часть!", created: new Date(0,0,0, 19, 08, 0)})
+
+                                            .cast-chat-block
+                                                .cast-chat-list-wrapper-out
+                                                    .cast-chat-list-wrapper-in
+                                                        .cast-chat-list
+                                                            each chat_item in cast_chat_items
+                                                                .cast-chat-item
+                                                                    .cast-chat-item-body
+                                                                        span.cast-chat-item-username=chat_item.user.name
+                                                                            | #{": "}
+                                                                        span.cast-chat-item-msg=chat_item.text
+                                                input(type="text", placeholder="Введите сообщение и нажмите Enter").cast-chat-text-area
+                                    .row
+                                        .col-md-12
+                                            if cast.locations.length > 1
+                                                ul.just-list.list-btns-film#locations
+                                                    each el in cast.locations
+                                                        mixin loc_thumb(el)
                             //-
                                .cast-area
                     //-
@@ -76,31 +102,10 @@ html
                             h2.blackh1=cast.title
                             p!=cast.description
 
-            - cast_chat_items = [{user: {name: "Василий Пупкин", avatar:""}, text: "Довольно неплохая передача, если учесть, кто ее авторы", created: new Date(0,0,0, 12, 31, 0)}]
-            - cast_chat_items.push({user: {name: "Гоблин Вася", avatar:""}, text: "По-моему основная тема так и не была раскрыта, хотя вопрос очень важный", created: new Date(0,0,0, 14, 21, 0)})
-            - cast_chat_items.push({user: {name: "Владимир Владимирович", avatar:""}, text: "Общественное мнение по этому вопросу очень важно, поэтому необходимо продолжать подобные обсуждения", created: new Date(0,0,0, 1, 18, 0)})
-            - cast_chat_items.push({user: {name: "Афанасий Прокопьевич", avatar:""}, text: "Моральная сторона этого вопроса тоже должна обсуждаться, а не только правовая его часть!", created: new Date(0,0,0, 19, 08, 0)})
+
             section.brd-top.cast-chat
                 .container
-                    h2.blackh1 Чат
-                    .cast-chat-item-list
-                        each chat_item in cast_chat_items
-                            .cast-chat-item
-                                span.cast-chat-user-avatar
-                                    - avatar_url = (chat_item.user.avatar && chat_item.user.avatar.length) ? chat_item.user.avatar : noavatar_url
-                                    img(src=avatar_url).img-circle
-                                .cast-chat-item-body
-                                    span.cast-chat-item-created
-                                        - msg_created_minutes = ( chat_item.created.getMinutes() < 10 ? '0' : '' ) + chat_item.created.getMinutes()
-                                        - chat_msg_created = '[' + chat_item.created.getHours() + ':' + msg_created_minutes + ']'
-                                        =chat_msg_created
-                                    | #{" "}
-                                    span.cast-chat-item-username=chat_item.user.name
-                                        | :
-                                    div.cast-chat-item-msg=chat_item.text
-                    textarea.cast-chat-text-area
-                    .cast-chat-btn-submit
-                        a(href="#") Отправить
+
 
 
             if online_casts && online_casts.length

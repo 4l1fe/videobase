@@ -1098,39 +1098,59 @@ a.toggle-playlist.active {
 
 .title-cast {padding: 25px 0 5px 0;}
 
-.cast-chat-item-list {background: #fff; margin-top: 30px; padding: 20px 20px 20px 30px;}
-.cast-chat-item-body {display: inline-block; margin-top: 20px; margin-left: 20px; padding-bottom: 25px;}
+.cast-chat-block {
+    background: #fff;
+    position: relative;
+    padding: 15px 15px 20px 15px;
+    height: 454px;
+}
+
+.cast-chat-list-wrapper-out {
+    height: 100%;
+    margin-bottom: -30px;
+}
+
+.cast-chat-list-wrapper-in {
+    height: 100%;
+    padding-bottom: 40px;
+}
+
+.cast-chat-list { height: 100%; overflow-y: scroll; }
+
+.cast-chat-item-body {
+    display: inline-block;
+    padding-bottom: 10px;
+    line-height: 20px;
+}
 .cast-chat-item-created {color: #3167d1;}
-.cast-chat-item-username {font-weight: bold;}
+.cast-chat-item-username, .cast-chat-item-msg {
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    font-style: normal;
+    text-decoration: none;
+
+}
+.cast-chat-item-username {
+    font-weight: bold;
+    color: #3168d1;
+}
 .cast-chat-item-msg {
-    display: block;
-    padding-top: 18px;
-    padding-left: 20px;
+    font-weight: normal;
+    color: #464b4c;
 }
 
 .cast-chat-text-area {
-    margin-top: 20px;
+    display: block;
+    top: 100%;
     width: 100%;
-    height: 120px;
-    border-radius: 5px;
-}
-
-.cast-chat-btn-submit {
-    margin-top: 20px;
-    height: 45px;
-    line-height: 45px;
-    width: 210px;
-    border-radius: 5px;
-    background: #d2e1e8; /*Уточни меня*/
-    text-align: center;
-}
-
-.cast-chat-btn-submit>a {
-    display: inline;
+    height: 30px;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 12px;
+    font-weight: normal;
+    padding-left: 10px;
     vertical-align: middle;
-    text-decoration: none;
-    text-transform: uppercase;
 }
+
 
 .cast-thumb .btn-watch {background: url(../img/btn-yellow-plain.png) left top no-repeat;}
 .cast-thumb .btn-subscribe {
