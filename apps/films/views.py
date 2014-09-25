@@ -297,8 +297,11 @@ def calc_actors(o_film):
         unenumerated_actors = film_model.PersonsFilms.objects.filter(film=o_film, p_type = APP_PERSON_ACTOR).filter(p_index=0)
         
         result = (serialize_actors(enumerated_actors) + serialize_actors(unenumerated_actors)) [slice(filter['offset'], filter['limit'])]
+
     except Exception, e:
         print "Caught exception {} in calc_actors".format(e)
+
+    return result
 
 
 def calc_similar(o_film):
