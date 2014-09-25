@@ -4,20 +4,18 @@ from django import forms
 from django.core.urlresolvers import reverse
 from django.forms.models import model_to_dict
 from django.db import transaction, IntegrityError
-
 from videobase.settings import HOST
-
 from apps.users.tasks import send_template_mail
 from apps.users.models import User, UsersProfile, UsersHash
-from apps.users.constants import APP_SUBJECT_TO_RESTORE_EMAIL, APP_USER_ACTIVE_KEY, \
-    APP_SUBJECT_TO_CONFIRM_REGISTER, APP_USER_HASH_EMAIL, APP_USER_HASH_REGISTR
-
+from apps.users.constants import (APP_SUBJECT_TO_RESTORE_EMAIL, APP_USER_ACTIVE_KEY,
+                                  APP_SUBJECT_TO_CONFIRM_REGISTER, APP_USER_HASH_EMAIL, APP_USER_HASH_REGISTR)
 from utils.common import url_with_querystring
 
 
 class UsersProfileForm(forms.ModelForm):
     email = forms.EmailField(required=False)
     username = forms.CharField(required=True, max_length=30)
+    avatar = forms.ImageField(required=False)
 
 
     def __init__(self, *args, **kwargs):
@@ -26,7 +24,6 @@ class UsersProfileForm(forms.ModelForm):
 
         super(UsersProfileForm, self).__init__(*args, **kwargs)
         self.fields['email'].initial = self.user.email
-
 
     @transaction.commit_manually
     def save(self, commit=True, send_email=False):
@@ -42,7 +39,7 @@ class UsersProfileForm(forms.ModelForm):
                 o_hash = UsersHash(user=self.user, hash_type=APP_USER_HASH_EMAIL)
                 o_hash.save()
 
-            instance = super(UsersProfileForm, self).save(commit=False)
+            instance = super(UsersProfileForm, self).save(commit=commit)
         except IntegrityError, e:
             transaction.rollback()
             return {'error': e.message}
@@ -92,10 +89,9 @@ class UsersProfileForm(forms.ModelForm):
 
         return instance
 
-
     class Meta:
         model = UsersProfile
-        exclude = ('userpic_id', 'userpic_type', 'last_visited', 'user')
+        exclude = ('userpic_id', 'last_visited', 'user')
 
 
 class CustomRegisterForm(forms.ModelForm):
