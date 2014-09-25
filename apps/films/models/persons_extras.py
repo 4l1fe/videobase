@@ -13,18 +13,10 @@ class PersonsExtras(models.Model):
     description = models.TextField(verbose_name=u'Описание')
     url         = models.CharField(max_length=255, verbose_name=u'Фото')
 
-
-    def as_vbExtra(self):
-
-        return {'url':self.url,
-                'type':self.etype,
-                'name':self.name,
-                'name_orig':self.name_orig,
-                'description':self.description
-                }
     
     def __unicode__(self):
         return u'[%s] %s' % (self.pk, self.person.get_full_name)
+
 
     class Meta:
         # Имя таблицы в БД
