@@ -442,11 +442,25 @@ CELERYBEAT_SCHEDULE = {
         'task': 'itunes_robot_start',
         'schedule': timedelta(hours=24)
     },
-    #
+    'mail_movies_update': {
+        'task': 'mail_robot_start',
+        'schedule': timedelta(hours=24)
+    },
+    # Calculate amount subscribed to the films
     'calc_amount_subscribed_to_movie': {
         'task': 'calc_amount_subscribed_to_movie',
         'schedule': timedelta(hours=1)
     },
+    # Do weekly newsletter
+    'week_newsletter_schedule': {
+        'task': 'week_newsletter',
+        'schedule': crontab(minute=0, hour=16, day_of_week=6)
+    },
+    # Do every day personal newsletter
+    'personal_newsletter_schedule': {
+        'task': 'personal_newsletter',
+        'schedule': crontab(minute=0, hour=18)
+    }
 }
 
 CELERY_TIMEZONE = 'UTC'
