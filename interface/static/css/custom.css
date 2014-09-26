@@ -1162,6 +1162,19 @@ section.cast-details { padding-top: 10px; }
 
 .hide-watching-users .playlist-content {padding-bottom: 0}
 
+.cast-label-guests-count {
+    display: block;
+    background: #5ecf5d;
+    padding: 10px;
+    color: #fff;
+    text-align: left;
+    font-size: 14px;
+    font-weight: normal;
+    border-radius: 4px;
+}
+
+.cast-label-guests-count > span { color: #232323; }
+
 .watching-users-list li {
     padding-top: 20px;
     width: 210px;
