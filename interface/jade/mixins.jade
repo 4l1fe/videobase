@@ -490,7 +490,7 @@ mixin casts_list(casts)
         .add-filter#casts_more
             .add-content.style-panel-action.rel.zmin
                 - href = "/?page=" + (page?(page + 1):2)
-                a(href=href) мало, хочу еще фильмов
+                a(href=href) покажите еще трансляций
             img.img-responsive(src=img_url + 'shd-big.png', alt='')
 
 
@@ -498,25 +498,57 @@ mixin casts_list(casts)
 mixin cast_thumb(item)
     .col-md-3.col-sm-4.col-xs-6(data-mi-id="id",data-mi-val=item.id).cast-thumb
         - //start_date = item.start ? new Date(item.start) : null
-        - start_date = new Date(2014, 7, 26, 18, 2, 1, 0)
+        - start_date = new Date(2014, 7, 26, 13, 2, 1, 0)
         - generic_title = item.generic_title //Тэг/ обобщенное название
         - title = item.title //Конкретное название
         - title_orig = item.title_orig
         - pg_rating = item.pg_rating
         - poster_url = item.poster
         - url = "/casts/" + item.id + "/"
+        - watching_users_count = 145
 
         - curr_date = new Date()
         - item.start_in = Math.floor(  ( start_date.getTime() - curr_date.getTime() )/1000  )
+        - item.duration = 1000
         - end_date = new Date(start_date)
         - end_date.setMinutes(start_date.getMinutes() + item.duration)
         - start_date_class = is_online ? "label-success" : "label-primary"
         - start_in_date = new Date(item.start_in*1000)
 
+        - has_free = false
+        - min_price = false
+        - price_loc = ""
+        - btn_cls = ""
+        - price_loc_cnt = 0
+
         - if ( start_date < curr_date ) {
-        -   btn_cls = "btn-watch"
-        -   btn_text = "Смотреть"
-        -   url_btn = url + "#player"
+        -   console.log( item.locations )
+        -   for (i = 0; i < item.locations.length; i++) {
+        -       obj = item.locations[i];
+        -       if (obj.price_type == 0) {
+        -            has_free = true;
+        -       } else {
+        -           price_loc_cnt++;
+        -           if (min_price === false || min_price > obj.price) {
+        -               min_price = obj.price;
+        -               price_loc = obj.id
+        -           }
+        -       }
+        -   }
+        -   if (min_price) {
+        -       min_price = Math.floor(min_price)
+        -   }
+        -   url_loc = price_loc?(url+"#" + price_loc):""
+        -   url_btn = url
+        -   if (min_price && !has_free) {
+        -       btn_cls = "btn-price"
+        -       btn_text = "Смотреть<br><i>" + (price_loc_cnt > 1?"от ":"") + min_price + " р. без рекламы</i>"
+        -       url_btn = url_loc
+        -   } else {
+        -       btn_cls = "btn-free"
+        -       btn_text = "Смотреть<br/>бесплатно"
+        -       url_btn = url + "#player"
+        -   }
         - } else {
         -   btn_cls = "btn-subscribe"
         -   btn_text = "Подписаться"
@@ -540,9 +572,18 @@ mixin cast_thumb(item)
                 -   }
                     div.label.label-primary=time_to_wait_str
                 - } else if( curr_date < end_date ) {
-                    span.label.label-success online
+                    div.fright.cast-watching-users-count смотрят:
+                        | #{" "}
+                        =watching_users_count
+                    div.label.label-success online
+
                 - } else {
-                    span.label.label-primary Архив
+                    - archive_date_text = start_date.getDate() + ' ' + months[start_date.getMonth()]
+                    - if (start_date.getFullYear() !== curr_date.getFullYear() ) {
+                    -   archive_date_text += " " + start_date.getFullYear()
+                    - }
+                    div.fright.cast-archive-date=archive_date_text
+                    div.label.label-primary Архив
                 - }
 
                 span.
@@ -560,3 +601,9 @@ mixin cast_thumb(item)
                         |)
             .btn-def.block(class=btn_cls,data-mi-id="btn")
                 a(href=url_btn , title='',data-mi-id="btn_text",data-mi-athref="id", class=btn_cls)!=btn_text
+            p(class=min_price && has_free?'':'display-none',data-mi-id="btn_price")
+                | или
+                br
+                a(href=url_loc, title='',data-mi-athref="id")
+                    - text = " " + (price_loc_cnt > 1?"от ":"") + min_price + " р. без рекламы"
+                    span(data-mi-id="price")=text

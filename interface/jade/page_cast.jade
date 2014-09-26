@@ -42,9 +42,14 @@ html
                                                 h2=cast.generic_title
                                                 //if cast.title_orig && cast.title_orig != cast.title
                                                     span=cast.title_orig
+
+                                    .row
+                                        .col-md-8.col-sm-7
+                                            span.cast-start-date=date_text(new Date(cast.start_date))
+
                                         .col-md-4.col-sm-5
                                             .fright
-                                                h3 Чат
+                                                h3.cast-chat-title Чат
 
                             //-
                                .title-cast
@@ -104,6 +109,7 @@ html
                                     p!=cast.description
 
                         - watching_users = [ {name:"Миранда Керр", avatar: ""}, {name:"Давид Луиз", avatar: ""}, {name:"Криштиану Роналду", avatar: ""}, {name:"Карвахал", avatar: ""}, {name:"Модрич", avatar: ""} ]
+                        - guests_count = 100500
                         if watching_users && watching_users.length
                         .col-md-3.hide-watching-users#watching_users_left
                             .playlist-content
@@ -122,12 +128,7 @@ html
                                 | Количество гостей:
                                 | #{" "}
                                 span
-                                    | 100500
-
-                    .row
-                        .col-md-9
-
-                        .col-md-3
+                                    =guests_count
 
 
             if online_casts && online_casts.length
