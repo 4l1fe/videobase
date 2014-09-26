@@ -15,7 +15,7 @@ def generic_task(parse_function, service_name):
 
         try:
             print u"Trying to save {} cast".format(cast_dict['title'])
-            save_cast_dict(service_name,cast_dict)
+            save_cast_dict(service_name, cast_dict)
 
         except Exception, e:
             traceback_own(e)
@@ -31,7 +31,7 @@ def liverussia_update():
 
 @app.task(name='cast_championat_robot', queue='championat_com')
 def championat_update():
-    generic_task(parse_translation_championat_com,'championat_com')
+    generic_task(parse_translation_championat_com, 'championat_com')
     
 
 @app.task(name='cast_khl_robot', queue='khl_ru')
