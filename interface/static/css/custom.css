@@ -1042,6 +1042,11 @@ a.toggle-playlist.active {
     .list-btns-film li {padding-left:10px;padding-right: 10px;}*/
 }
 
+
+.cast-thumb .btn-price {background: url(../img/btn-orange.png) left top no-repeat;}
+.cast-thumb .btn-price a {color: #232323;}
+.cast-thumb .btn-price i {color: #454545;}
+
 .cast-thumb .btn-watch, .btn-watch {
     padding: 0;
     color: #232323 !important;
@@ -1198,6 +1203,33 @@ section.cast-details { padding-top: 10px; }
 .user a:hover {text-decoration: none;}
 
 section.cast-chat {padding-bottom: 40px;}
+
+.cast-thumb .btn-def i {
+    font-size: 14px;
+    font-style: normal;
+    text-transform: lowercase;
+    font-weight: normal;
+}
+
+.cast-thumb .caption-def {line-height: 19px;padding-top: 13px;font-size: 14px;}
+.cast-thumb .caption-def a span {text-decoration: underline;font-weight: bold;color: #3168d1;}
+.cast-thumb .caption-def a:hover, .caption-def a:hover span {text-decoration: none;}
+.cast-thumb .caption-def p {text-align: center;margin-top: -7px;color: #757575;}
+.cast-thumb .caption-def a {color: #6d6d6d;}
+
+.cast-watching-users-count, .cast-archive-date { color: #7f7878; }
+
+.cast-item-status .label {
+    font-size: 14px;
+    font-weight: normal;
+    height: 20px;
+}
+
+.cast-item-status .label-success {background: #0beb00;}
+.cast-item-status .label-primary {background: #3168d1;}
+
+.title-cast .cast-start-date { color: #a08c8c;}
+.title-cast .cast-chat-title { color: #fff; text-transform: uppercase; font-weight: normal; }
 
 .num i {
     font-weight: bold;font-size: 22px;font-style: normal;text-align: center;line-height: 50px;
