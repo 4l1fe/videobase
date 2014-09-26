@@ -55,13 +55,25 @@ def del_friendship(session_token, id_, host):
     return resp.read()
 
 
+def upload_avatar(main_token, session_token,  address):
+    import requests
+    cookies = {'x-session': session_token, 'x-token': main_token}
+    data = {'username': 'from_post_method', }
+    resp = requests.post(address+'/profile/', files={'avatar': open('avatar.jpg', 'rb')}, cookies=cookies)
+    return resp
+
+
 if __name__ == '__main__':
     host = 'localvsevi'
     address = 'http://{}'.format(host)
-    mt = get_main_token('xseoxruru@gmail.com', 'xs', address)
+    mt = get_main_token('nana@nana.na', 'na', address)
     print(mt)
     st = get_session_token(mt, address)
     print(st)
-    resp = add_friendship(st, 42, address)
+    # resp = add_friendship(st, 42, address)
+    # print(resp)
+    # del_friendship(st, 42, host)
+    mt = list(mt); mt[1] = 'z'
+    st = list(st); st[1] = 'z'
+    resp = upload_avatar(''.join(mt), ''.join(st), address)
     print(resp)
-    del_friendship(st, 42, host)

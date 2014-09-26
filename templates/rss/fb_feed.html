@@ -1,0 +1,23 @@
+{% extends "rss/base_feed.html" %}
+
+{% block feeditems %}
+{% for film, actors, directors, poster, trailer, scriptwriters, cost, genres in films %}
+<item>
+  <title>{{ film.name }} ({{ film.release_date.year }})</title>
+  <link>{{ trailer }}</link>
+  <enclosure url="{{ poster }}" type="image/jpeg" />
+  <description><![CDATA[Новинка в кинотеатре "Все видео": Фильм "{{ film.name }}" ({% if film.name_orig %}{{ film.name_orig }}, {% endif %}год: {{film.release_date.year}})<br />
+    Сводный рейтинг: {{ film.rating_cons }}/10
+    Смотреть: http://vsevi.ru/films/{{ film.id }}/
+    Стоимость: {{ cost }}
+    {% if actors %}В ролях: {{ actors }}{% endif %}
+    {% if genres|length %}Жанр: #{{ genres|join:" #" }}{% endif %}
+    {% if directors %}Режиссер: {{ directors }}{% endif %}
+    {% if scriptwriters %}Сценарист: {{ scriptwriters }}{% endif %}
+    {{film.description}} http://vsevi.ru/films/{{ film.id }}/]]>
+  </description>
+  <pubDate>{{ date }}</pubDate>
+  <guid>{{ film.id }}</guid>
+</item>
+{% endfor %}
+{% endblock %}

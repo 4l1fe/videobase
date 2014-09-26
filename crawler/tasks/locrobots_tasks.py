@@ -4,6 +4,7 @@ from apps.robots.models import Robots
 from crawler.locrobots import sites_crawler
 from crawler.locrobots.itunes.itunes_robot import ItunesRobot
 from crawler.locrobots.amediateka_ru.loader import Amediateka_robot
+from crawler.locrobots.mail_ru.mail_robot import MailRobot
 from crawler.locrobots.viaplay_ru.robot import ViaplayRobot
 from crawler.locrobots.playfamily_dot_ru.playfamily_xml import process
 from crawler.locrobots.drugoe_kino.robot import update_drugoe_kino_listing
@@ -31,6 +32,10 @@ def amediateka_robot_start(*args, **kwargs):
 @app.task(name='itunes_robot_start', queue='itunes')
 def itunes_robot_start():
     ItunesRobot().get_film_data()
+
+@app.task(name='mail_robot_start', queue='mail')
+def mail_robot_start():
+    MailRobot.get_film_data()
 
 
 @app.task(name='playfamily_xml')

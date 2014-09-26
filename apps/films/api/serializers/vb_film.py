@@ -38,13 +38,14 @@ class GenresSerializer(serializers.ModelSerializer):
 #############################################################################################################
 class LocationsSerializer(serializers.ModelSerializer):
     price = serializers.SerializerMethodField('calc_price')
+
+    def calc_price(self,obj):
+        return float(obj.price)
+
     class Meta:
         model = Locations
         
         fields = ('id','type', 'lang', 'quality', 'subtitles', 'price', 'price_type', 'url_view','value')
-
-    def calc_price(self,obj):
-        return float(obj.price)
 
 
 #############################################################################################################

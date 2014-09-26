@@ -1,4 +1,5 @@
 # coding: utf-8
+
 import os
 import sys
 import traceback
@@ -132,6 +133,7 @@ def random_string(size=30, chars=string.ascii_letters+string.digits):
 def url_with_querystring(path, **kwargs):
     for key, value in kwargs.iteritems():
         kwargs[key] = unicode(value).encode('utf-8')
+    
     return path + u'?' + urllib.urlencode(kwargs)
 
 
@@ -161,6 +163,7 @@ def isiterable(obj):
     except TypeError:
         return False
 
+
 def dict_fetch_all(cursor):
     """Returns generator row"""
 
@@ -174,4 +177,3 @@ def dict_fetch_all_without_gen(cursor):
 
     desc = [col[0] for col in cursor.description]
     return [dict(zip(desc, row)) for row in cursor.fetchall()]
-
