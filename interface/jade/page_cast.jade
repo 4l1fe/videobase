@@ -3,8 +3,6 @@ html
     include config
     include mixins
 
-    - console.log(cast)
-
     - film_name_meta = cast.title.replace(/"/g, " ")
     - film_descr_meta = cast.description ? cast.description.replace(/"/g, ' ').substr(0,256) : ''
     - film_url_meta = 'http://vsevi.ru/films/' + cast.id
@@ -120,10 +118,10 @@ html
                                     //-
                                        .filter-content
                                     img.img-responsive(src=img_url + 'shd-big.png', alt='')
-                            .label.label-success
+                            .cast-label-guests-count
                                 | Количество гостей:
                                 | #{" "}
-                                span.label-guests-count
+                                span
                                     | 100500
 
                     .row
@@ -133,7 +131,7 @@ html
 
 
             if online_casts && online_casts.length
-                section.brd-top
+                section
                     .container
                         h1.dots2.blackh1.centerh1 Онлайн трансляции
                         mixin casts_list(online_casts)

@@ -497,29 +497,21 @@ mixin casts_list(casts)
 
 mixin cast_thumb(item)
     .col-md-3.col-sm-4.col-xs-6(data-mi-id="id",data-mi-val=item.id).cast-thumb
-        - start_date = item.start ? new Date(item.start) : null
-        - console.log(start_date)
-        - start_day = start_date.getDate()
-        - start_month_index = start_date.getMonth()
-        - start_month_str = months[start_month_index]
-        - start_hours = start_date.getHours()
-        - start_minutes = start_date.getMinutes()
-        - start_time_str = start_date ? ( start_hours + ':' + (start_minutes<10? '0':'') + start_minutes ) : null
-        - start_date_str = start_day + ' ' + start_month_str + ' в ' + start_time_str
-        - duration = item.duration
+        - //start_date = item.start ? new Date(item.start) : null
+        - start_date = new Date(2014, 7, 26, 18, 2, 1, 0)
         - generic_title = item.generic_title //Тэг/ обобщенное название
         - title = item.title //Конкретное название
         - title_orig = item.title_orig
         - pg_rating = item.pg_rating
-        - is_online = false
         - poster_url = item.poster
         - url = "/casts/" + item.id + "/"
 
         - curr_date = new Date()
+        - item.start_in = Math.floor(  ( start_date.getTime() - curr_date.getTime() )/1000  )
         - end_date = new Date(start_date)
         - end_date.setMinutes(start_date.getMinutes() + item.duration)
-        - is_online = curr_date <= start_date && start_date <= end_date
         - start_date_class = is_online ? "label-success" : "label-primary"
+        - start_in_date = new Date(item.start_in*1000)
 
         - if ( start_date < curr_date ) {
         -   btn_cls = "btn-watch"
@@ -536,7 +528,26 @@ mixin cast_thumb(item)
         img(src=img_url + 'shd-small.png', alt='')
 
         .cast-item-def
-            .label.left(class=start_date_class).cast-item-start-date=start_date_str
+            .cast-item-status
+                - time_to_wait_str = ''
+                - if ( curr_date < start_date ) {
+                -   if( item.start_in < 86400 ) {
+                -       start_in_minutes = Math.floor(item.start_in / 60)
+                -       time_to_wait_str = ( start_in_minutes < 60 ? 'примерно ' : '' ) + 'через ' + duration_text( start_in_minutes )
+                -   } else {
+                -       time_to_wait_str += start_date.getDate() + ' ' +  months[start_date.getMonth()]
+                -       time_to_wait_str += ' в ' + start_date.getHours() + ':' + ( start_date.getMinutes() < 10 ? '0' : '' ) + start_date.getMinutes()
+                -   }
+                    div.label.label-primary=time_to_wait_str
+                - } else if( curr_date < end_date ) {
+                    span.label.label-success online
+                - } else {
+                    span.label.label-primary Архив
+                - }
+
+                span.
+                .cast-
+            //.label.left(class=start_date_class).cast-item-start-date=start_date_str
             .cast-item-header
                 a(href=url, title='',data-mi-athref="id")
                     span(data-mi-name="name").cast-item-generic-title=generic_title
