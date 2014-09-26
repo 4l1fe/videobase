@@ -9,7 +9,6 @@ from apps.films.models import Persons, PersonsFilms, Films
 from apps.films.constants import APP_PERSON_ACTOR, APP_PERSON_DIRECTOR, APP_PERSON_PRODUCER, APP_PERSON_SCRIPTWRITER
 
 from crawler.constants import PAGE_ARCHIVE
-from crawler.tasks.person_task import update_kinopoisk_persone
 from crawler.tor import simple_tor_get_page
 
 from utils.common import traceback_own
@@ -23,7 +22,7 @@ class PersoneParser(object):
         pass
 
     @staticmethod
-    def acquire_page(page_id):
+    def acquire_page(page_id, force_reload=False):
         if not os.path.exists(PAGE_ARCHIVE):
             os.mkdir(PAGE_ARCHIVE)
 
@@ -33,7 +32,7 @@ class PersoneParser(object):
             with open(dump_path) as fd:
                 page_dump = fd.read().decode('utf-8')
 
-        if not page_dump:
+        if not page_dump or force_reload:
             url = u"http://www.kinopoisk.ru/film/%d/cast/" % page_id
             res = simple_tor_get_page(url, tor_flag=True)
             page_dump = res.decode('cp1251')
@@ -150,3 +149,45 @@ class PersoneParser(object):
 
         except Exception, e:
             traceback_own(e)
+
+
+def update_kinopoisk_persone(pid):
+    try:
+        response = simple_tor_get_page('http://www.kinopoisk.ru/name/{}/view_info/ok/#trivia'.format(pid), True)
+
+        soup = BeautifulSoup(response)
+        tag = soup.find('span', attrs={'itemprop': 'alternativeHeadline'})
+        orig_name = tag.text.strip()
+
+        p = Persons.objects.get(kinopoisk_id=pid)
+        tag_birthdate = soup.find('td', attrs={'class': 'birth'})
+
+        birthdate = ''
+        print "ID = ", p.id
+        if not (tag_birthdate is None):
+            birthdate = tag_birthdate.get('birthdate')
+        else:
+            print 'No data birthdate for this person id = {}'.format(pid)
+
+        bio = ''
+        tags_bio = soup.findAll('li', attrs={'class': 'trivia'})
+        if len(tags_bio):
+            for li in tags_bio:
+                bio = bio + ' ' + li.text
+        else:
+            print 'No biography for this person id = {}'.format(pid)
+
+        p.bio = bio
+        p.kinopoisk_id = pid
+        p.name_orig = orig_name
+        p.birthdate = birthdate
+
+        if p.photo == '' and p.kinopoisk_id != 0:
+            p.photo.save('profile.jpg', File(get_photo(p.kinopoisk_id)))
+
+        p.save()
+    except Exception, e:
+        traceback_own(e)
+
+
+        

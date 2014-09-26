@@ -7,7 +7,7 @@ from django.db import models
 # Модель Расширения персоны
 class PersonsExtras(models.Model):
     person      = models.ForeignKey('Persons', max_length=255, verbose_name=u'Персона')
-    etype       = models.CharField(max_length=255, db_index=True, verbose_name=u'')
+    type       = models.CharField(max_length=255, db_index=True, verbose_name=u'')
     name        = models.TextField(verbose_name=u'Имя')
     name_orig   = models.TextField(verbose_name=u'Оригинальное имя')
     description = models.TextField(verbose_name=u'Описание')

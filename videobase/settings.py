@@ -315,10 +315,10 @@ CELERYBEAT_SCHEDULE = {
         'schedule': timedelta(seconds=10),
     },
     # Updating information about persons using kinopoisk
-    'kinopoisk_persons': {
-        'task': 'kinopoisk_persons',
-        'schedule': timedelta(seconds=10),
-    },
+    #'kinopoisk_persons': {
+    #    'task': 'kinopoisk_persons',
+    #    'schedule': timedelta(seconds=10),
+    #},
     # Checking kinopoisk premiere page
     'kinopoisk_news': {
         'task': 'kinopoisk_news',
@@ -454,7 +454,7 @@ CELERY_ACCEPT_CONTENT = ['pickle', 'json', 'msgpack', 'yaml']
 POSTER_URL_PREFIX = '_260x360'
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
-USE_THOR = False
+USE_THOR = True
 
 from local_settings import *
 
@@ -468,3 +468,4 @@ if not DEBUG:
     }
 
 ROBOTS_LIST = ['amediateka_ru', 'ayyo_ru', 'drugoe_kino', 'itunes', 'viaplay_ru', 'youtube_com' ]
+
