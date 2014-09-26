@@ -1,10 +1,8 @@
 # coding: utf-8
 import os
 from django.db import models
-from django.core.exceptions import ValidationError
-from django.db.models.query import QuerySet
-from apps.films.models.photoclass import PhotoClass
 from apps.casts.constants import APP_CAST_POSTER_DIR
+from apps.films.models.photoclass import PhotoClass
 from utils.common import get_image_path
 import videobase.settings as settings
 
