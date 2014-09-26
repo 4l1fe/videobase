@@ -25,7 +25,8 @@ var renderers = {
     confirm_passwd: function(context) {return jade.renderFile(path.join(tmpl_path, 'page_confirm_pwd.jade'), context)},
     confirm_email: function(context) {return jade.renderFile(path.join(tmpl_path, 'page_confirm_email.jade'), context)},
     casts_list: function(context) {return jade.renderFile(path.join(tmpl_path, 'page_casts_list.jade'), context)},
-    cast: function(context) {return jade.renderFile(path.join(tmpl_path, 'page_cast.jade'), context)}
+    cast: function(context) {return jade.renderFile(path.join(tmpl_path, 'page_cast.jade'), context)},
+    week_newsletter: function(context) {return jade.renderFile(path.join(tmpl_path, 'mail/week_newsletter.jade'), context)}
 };
 
 var server = new zerorpc.Server({

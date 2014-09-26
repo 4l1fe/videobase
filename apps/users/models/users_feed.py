@@ -53,7 +53,10 @@ class Feed(models.Model):
         return result
 
     @classmethod
-    def get_feeds_by_user_friends(self, ur=[], count=False, offset=0, limit=APP_USERS_API_DEFAULT_PER_PAGE, *args, **kwargs):
+    def get_feeds_by_user_friends(self, ur=None, count=False, offset=0, limit=APP_USERS_API_DEFAULT_PER_PAGE, *args, **kwargs):
+        if ur is None:
+            ur = []
+
         o_feed = self.objects.extra(
             where=['"users_feed"."user_id"=ANY(%s::integer[])'],
             params=[self.list_to_str(ur)]
@@ -66,7 +69,17 @@ class Feed(models.Model):
         return result
 
     @classmethod
-    def get_feeds_by_user_all(self, user_id, uf=[], up=[], ur=[], count=False, offset=0, limit=APP_USERS_API_DEFAULT_PER_PAGE, *args, **kwargs):
+    def get_feeds_by_user_all(self, user_id, uf=None, up=None, ur=None,
+                              count=False, offset=0, limit=APP_USERS_API_DEFAULT_PER_PAGE, *args, **kwargs):
+        if uf is None:
+            uf = []
+
+        if up is None:
+            up = []
+
+        if ur is None:
+            ur = []
+
         sql = """("users_feed"."user_id"=ANY(%s::integer[]) OR "users_feed"."user_id" IS NULL) AND (CASE
             WHEN "users_feed"."user_id" IS NULL AND "users_feed"."type"=%s THEN
               CAST(coalesce(obj_id->>'id', '0') AS integer)=ANY(%s::integer[])

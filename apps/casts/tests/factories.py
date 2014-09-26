@@ -30,6 +30,7 @@ class CastsFactory(factory.DjangoModelFactory):
 
 class CastExtrasStorageFactory(factory.DjangoModelFactory):
     FACTORY_FOR = CastExtrasStorage
+    cast = factory.SubFactory(CastsFactory)
     name = factory.Sequence(lambda i: u"Название {0}".format(i))
     name_orig = factory.Sequence(lambda i: u"Оригинальное название {0}".format(i))
     photo = ImageField(color='red')

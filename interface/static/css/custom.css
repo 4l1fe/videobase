@@ -401,6 +401,7 @@ footer[role=contentinfo] {padding: 18px 0 0 0;}
     color: #d2e7ef;font-weight: normal;font-size: 14px;text-align: left !important;padding-bottom:8px;
 }
 .form-enter p {color: #fff;font-size: 18px;}
+.form-enter p+p {margin-top: 8px;}
 .btn-yellow1 {
     background-color: #ffd700;color: #232323;text-transform: uppercase;font-weight: bold;
     border-bottom: 3px solid #d9a300;margin-top: -5px;padding: 8px 15px;
@@ -1302,3 +1303,6 @@ section.cast-chat {padding-bottom: 40px;}
 
 .index-comments-block {margin: 0 auto; padding: 0}
 .index-comments-block .bg-noise {padding: 34px 0}
+
+.password-reset { padding-top: 0;  }
+.password-reset .container {padding-top: 37px}
