@@ -10,143 +10,145 @@ html
             .content(role='main')
                 section.blue-block
                     .bg-noise
-                        .container
-                            .row
-                                .col-md-3
-                                    .person-img
-                                        img.img-circle(src=img_url + 'content/img16.png', alt='')
-                                        .change-img
-                                            input(type='file')
-                                    //-
-                                       .person-img
-                                .col-md-6
-                                    .profile-column
-                                        h2 Профиль
-                                        form.form-horizontal(role='form',method="post",action="#")
-                                            .form-group
-                                                label.col-sm-3.control-label(for='inputEmail3') Имя
-                                                .col-sm-9
-                                                    input#inputEmail3.form-control(type='text',required,value=user.name,name='username')
-                                            .form-group
-                                                label.col-sm-3.control-label(for='inputPassword3') Email
-                                                .col-sm-9
-                                                    input#inputPassword3.form-control(type='email',required,value=user.email,name='email')
-                                            h2 Настройки уведомлений
-                                            ul.list-profile
-                                                li
-                                                    input.checkbox-default(type='checkbox',value=1,checked=user.ntf_vid_new,name='ntf_vid_new')#ntf_vid_new
-                                                    label(for="ntf_vid_new") Появление нового видео в списке подписок
-                                                li
-                                                    input.checkbox-default(type='checkbox',value=1,checked=user.ntf_vid_director,name='ntf_vid_director')#ntf_vid_director
-                                                    label(for="ntf_vid_director") Появление кино определённого режисёра<br/>или с определённым актёром
-                                                li
-                                                    input.checkbox-default(type='checkbox',value=1,checked=user.ntf_frnd_rate,name='ntf_frnd_rate')#ntf_frnd_rate
-                                                    label(for="ntf_frnd_rate") Новые оценки ваших друзей
-                                                li
-                                                    input.checkbox-default(type='checkbox',value=1,checked=user.ntf_frnd_comment,name='ntf_frnd_comment')#ntf_frnd_comment
-                                                    label(for="ntf_frnd_comment") Новые комментарии ваших друзей
-                                                li
-                                                    input.checkbox-default(type='checkbox',value=1,checked=user.ntf_frnd_subscribe,name='ntf_frnd_subscribe')#ntf_frnd_subscribe
-                                                    label(for="ntf_frnd_subscribe") Новые подписки ваших друзей
-                                                li
-                                                    - freq = user.ntf_frequency
-                                                    - if (freq != 0 && freq != 7) freq = 1
-                                                    | Присылать уведомление
-                                                    ul
-                                                        li
-                                                            input.radio-default(name='ntf_frequency', type='radio', value='1',checked=freq == 1)#ntf_frequency1
-                                                            label(for="ntf_frequency1") один раз в день
-                                                        li
-                                                            input.radio-default(name='ntf_frequency', type='radio', value='7',checked=freq == 7)#ntf_frequency7
-                                                            label(for="ntf_frequency7") один раз в неделю
-                                                        li
-                                                            input.radio-default(name='ntf_frequency', type='radio', value='0',checked=freq == 0)#ntf_frequency0
-                                                            label(for="ntf_frequency0") никогда
-                                            h2 Настройки приватности
-                                            - pvt_values = {0: "видны всем", 1: "видны только друзьям", 2: "видны только мне"}
-                                            ul#pvt_selector.display-none
-                                                each el,key in pvt_values
+                        form(role='form',method="post",action="#", enctype="multipart/form-data")
+                            .container
+                                .row
+                                    .col-md-3
+                                        .person-img
+                                            - avatar_url = auth_user.avatar && auth_user.avatar.length ? auth_user.avatar : noavatar_url
+                                            img.img-circle(src=avatar_url, alt='')
+                                            .change-img
+                                                input(type='file', name="avatar")
+                                        //-
+                                           .person-img
+                                    .col-md-6
+                                        .profile-column
+                                            h2 Профиль
+                                            .form-horizontal
+                                                .form-group
+                                                    label.col-sm-3.control-label(for='inputEmail3') Имя
+                                                    .col-sm-9
+                                                        input#inputEmail3.form-control(type='text',required,value=user.name,name='username')
+                                                .form-group
+                                                    label.col-sm-3.control-label(for='inputPassword3') Email
+                                                    .col-sm-9
+                                                        input#inputPassword3.form-control(type='email',required,value=user.email,name='email')
+                                                h2 Настройки уведомлений
+                                                ul.list-profile
                                                     li
-                                                        input.radio-default(name='pvt_group', type='radio', value=key,id="pvt_values" + key)
-                                                        label(for="pvt_values" + key,class="value" + key)=el
-                                            ul.list-profile#pvt_list
-                                                li
-                                                    | Мои подписки&nbsp;
-                                                    input(name="pvt_subscribes", value=user.pvt_subscribes || 0).value
-                                                    a(href='#', title='')=pvt_values[user.pvt_subscribes || 0]
-                                                li
-                                                    | Мои друзья&nbsp;
-                                                    input(name="pvt_friends", value=user.pvt_friends || 0).value
-                                                    a(href='#', title='')=pvt_values[user.pvt_friends || 0]
-                                                li
-                                                    | Мои любимые жанры&nbsp;
-                                                    input(name="pvt_genres", value=user.pvt_genres || 0).value
-                                                    a(href='#', title='')=pvt_values[user.pvt_genres || 0]
-                                                li
-                                                    | Мои любимые актеры&nbsp;
-                                                    input(name="pvt_actors", value=user.pvt_actors || 0).value
-                                                    a(href='#', title='')=pvt_values[user.pvt_actors || 0]
-                                                li
-                                                    | Мои любимые режиссёры&nbsp;
-                                                    input(name="pvt_directors", value=user.pvt_directors || 0).value
-                                                    a(href='#', title='')=pvt_values[user.pvt_directors || 0]
-                                            h2 Аккаунты в соц. сетях
-                                            ul.soc-acc
-                                                li
-                                                    if user.social.facebook
-                                                        - var url = 'http://www.facebook.com/profile.php?id=' + user.social.facebook
-                                                        a(href=url, title='',target='_blank')
-                                                            img(src=img_url+'i-fb.png', alt='')
-                                                            =url
-                                                        a.block.i-close.sprite.sprite-i-close.fright(href='/logout/facebook/')
-                                                    else
-                                                        a(href='/login/facebook/?next=/profile/', title='')
-                                                            img(src=img_url + 'i-fb.png', alt='')
-                                                            span Привязать
-                                                li
-                                                    if user.social.twitter
-                                                        -var url = 'https://twitter.com/account/redirect_by_id/' + user.social.twitter
-                                                        a(href=url, title='',target='_blank')
-                                                            img(src=img_url + 'i-tw.png', alt='')
-                                                            =url
-                                                        a.block.i-close.sprite.sprite-i-close.fright(href='/logout/twitter/')
-                                                    else
-                                                        a(href='/login/twitter/?next=/profile/', title='')
-                                                            img(src=img_url+'i-tw.png', alt='')
-                                                            span Привязать
-                                                li
-                                                    if user.social.vk
-                                                        - var url = 'http://vk.com/id' + user.social.vk
-                                                        a(href=url, title='', target='_blank')
-                                                            img(src=img_url + 'i-vk.png', alt='')
-                                                            =url
-                                                        a.block.i-close.sprite.sprite-i-close.fright(href='/logout/vk-oauth/')
-                                                    else
-                                                        a(href='/login/vk-oauth/?next=/profile/', title='')
-                                                            img(src=img_url + 'i-vk.png', alt='')
-                                                            span Привязать
-                                                li
-                                                    if user.social.gplus
-                                                        - var url = 'https://plus.google.com/' + user.social.gplus
-                                                        a(href=url, title='', target='_blank')
-                                                            img(src=img_url + 'i-go.png', alt='')
-                                                            =url
-                                                        a.block.i-close.sprite.sprite-i-close.fright(href='/logout/google-oauth2/')
-                                                    else
-                                                        a(href='/login/google-oauth2/?next=/profile/', title='')
-                                                            img(src=img_url + 'i-go.png', alt='')
-                                                            span Привязать
-                                            .form-group
-                                                .col-sm-10
-                                                    button.btn.btn-yellow2(type='submit') Сохранить
+                                                        input.checkbox-default(type='checkbox',value=1,checked=user.ntf_vid_new,name='ntf_vid_new')#ntf_vid_new
+                                                        label(for="ntf_vid_new") Появление нового видео в списке подписок
+                                                    li
+                                                        input.checkbox-default(type='checkbox',value=1,checked=user.ntf_vid_director,name='ntf_vid_director')#ntf_vid_director
+                                                        label(for="ntf_vid_director") Появление кино определённого режисёра<br/>или с определённым актёром
+                                                    li
+                                                        input.checkbox-default(type='checkbox',value=1,checked=user.ntf_frnd_rate,name='ntf_frnd_rate')#ntf_frnd_rate
+                                                        label(for="ntf_frnd_rate") Новые оценки ваших друзей
+                                                    li
+                                                        input.checkbox-default(type='checkbox',value=1,checked=user.ntf_frnd_comment,name='ntf_frnd_comment')#ntf_frnd_comment
+                                                        label(for="ntf_frnd_comment") Новые комментарии ваших друзей
+                                                    li
+                                                        input.checkbox-default(type='checkbox',value=1,checked=user.ntf_frnd_subscribe,name='ntf_frnd_subscribe')#ntf_frnd_subscribe
+                                                        label(for="ntf_frnd_subscribe") Новые подписки ваших друзей
+                                                    li
+                                                        - freq = user.ntf_frequency
+                                                        - if (freq != 0 && freq != 7) freq = 1
+                                                        | Присылать уведомление
+                                                        ul
+                                                            li
+                                                                input.radio-default(name='ntf_frequency', type='radio', value='1',checked=freq == 1)#ntf_frequency1
+                                                                label(for="ntf_frequency1") один раз в день
+                                                            li
+                                                                input.radio-default(name='ntf_frequency', type='radio', value='7',checked=freq == 7)#ntf_frequency7
+                                                                label(for="ntf_frequency7") один раз в неделю
+                                                            li
+                                                                input.radio-default(name='ntf_frequency', type='radio', value='0',checked=freq == 0)#ntf_frequency0
+                                                                label(for="ntf_frequency0") никогда
+                                                h2 Настройки приватности
+                                                - pvt_values = {0: "видны всем", 1: "видны только друзьям", 2: "видны только мне"}
+                                                ul#pvt_selector.display-none
+                                                    each el,key in pvt_values
+                                                        li
+                                                            input.radio-default(name='pvt_group', type='radio', value=key,id="pvt_values" + key)
+                                                            label(for="pvt_values" + key,class="value" + key)=el
+                                                ul.list-profile#pvt_list
+                                                    li
+                                                        | Мои подписки&nbsp;
+                                                        input(name="pvt_subscribes", value=user.pvt_subscribes || 0).value
+                                                        a(href='#', title='')=pvt_values[user.pvt_subscribes || 0]
+                                                    li
+                                                        | Мои друзья&nbsp;
+                                                        input(name="pvt_friends", value=user.pvt_friends || 0).value
+                                                        a(href='#', title='')=pvt_values[user.pvt_friends || 0]
+                                                    li
+                                                        | Мои любимые жанры&nbsp;
+                                                        input(name="pvt_genres", value=user.pvt_genres || 0).value
+                                                        a(href='#', title='')=pvt_values[user.pvt_genres || 0]
+                                                    li
+                                                        | Мои любимые актеры&nbsp;
+                                                        input(name="pvt_actors", value=user.pvt_actors || 0).value
+                                                        a(href='#', title='')=pvt_values[user.pvt_actors || 0]
+                                                    li
+                                                        | Мои любимые режиссёры&nbsp;
+                                                        input(name="pvt_directors", value=user.pvt_directors || 0).value
+                                                        a(href='#', title='')=pvt_values[user.pvt_directors || 0]
+                                                h2 Аккаунты в соц. сетях
+                                                ul.soc-acc
+                                                    li
+                                                        if user.social.facebook
+                                                            - var url = 'http://www.facebook.com/profile.php?id=' + user.social.facebook
+                                                            a(href=url, title='',target='_blank')
+                                                                img(src=img_url+'i-fb.png', alt='')
+                                                                =url
+                                                            a.block.i-close.sprite.sprite-i-close.fright(href='/logout/facebook/')
+                                                        else
+                                                            a(href='/login/facebook/?next=/profile/', title='')
+                                                                img(src=img_url + 'i-fb.png', alt='')
+                                                                span Привязать
+                                                    li
+                                                        if user.social.twitter
+                                                            -var url = 'https://twitter.com/account/redirect_by_id/' + user.social.twitter
+                                                            a(href=url, title='',target='_blank')
+                                                                img(src=img_url + 'i-tw.png', alt='')
+                                                                =url
+                                                            a.block.i-close.sprite.sprite-i-close.fright(href='/logout/twitter/')
+                                                        else
+                                                            a(href='/login/twitter/?next=/profile/', title='')
+                                                                img(src=img_url+'i-tw.png', alt='')
+                                                                span Привязать
+                                                    li
+                                                        if user.social.vk
+                                                            - var url = 'http://vk.com/id' + user.social.vk
+                                                            a(href=url, title='', target='_blank')
+                                                                img(src=img_url + 'i-vk.png', alt='')
+                                                                =url
+                                                            a.block.i-close.sprite.sprite-i-close.fright(href='/logout/vk-oauth/')
+                                                        else
+                                                            a(href='/login/vk-oauth2/?next=/profile/', title='')
+                                                                img(src=img_url + 'i-vk.png', alt='')
+                                                                span Привязать
+                                                    li
+                                                        if user.social.gplus
+                                                            - var url = 'https://plus.google.com/' + user.social.gplus
+                                                            a(href=url, title='', target='_blank')
+                                                                img(src=img_url + 'i-go.png', alt='')
+                                                                =url
+                                                            a.block.i-close.sprite.sprite-i-close.fright(href='/logout/google-oauth2/')
+                                                        else
+                                                            a(href='/login/google-oauth2/?next=/profile/', title='')
+                                                                img(src=img_url + 'i-go.png', alt='')
+                                                                span Привязать
+                                                .form-group
+                                                    .col-sm-10
+                                                        button.btn.btn-yellow2(type='submit') Сохранить
+                                        //-
+                                           .profile-column
+                                        //-
+                                           .enter-block
                                     //-
-                                       .profile-column
-                                    //-
-                                       .enter-block
+                                       .blue-block
                                 //-
-                                   .blue-block
-                            //-
-                               .content
+                                   .content
             include footer
         script(src=js_url + 'jquery.uniform.min.js')
         script.

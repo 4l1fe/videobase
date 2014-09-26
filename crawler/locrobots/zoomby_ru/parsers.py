@@ -21,11 +21,11 @@ def parse_search(response, film_name, year):
         year_text = tag_span.text
         film_year = re.search(ur'\d+', year_text).group()
         if year != int(film_year):
-            return None
+            return ''
         tag_a = tag.a
         film_link = tag_a.get('href')
     except:
-        film_link = None
+        film_link = ''
     return film_link
 
 

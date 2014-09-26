@@ -13,8 +13,8 @@ from django.core.files import File
 from django.core.cache import cache
 from django.core.context_processors import csrf
 from django.core.serializers.json import DjangoJSONEncoder
-
 from django.template import Context
+from django.views.generic import View
 from django.http import HttpResponse, Http404
 from django.shortcuts import render_to_response, redirect
 
@@ -22,14 +22,12 @@ from rest_framework import status
 
 import apps.films.models as film_model
 import apps.contents.models as content_model
-
 from apps.films.api.serializers import vbFilm, vbComment, vbPerson
-from apps.films.constants import APP_USERFILM_STATUS_PLAYLIST
+from apps.films.constants import APP_USERFILM_STATUS_PLAYLIST, APP_PERSON_ACTOR
 from apps.films.api import SearchFilmsView
 
 from utils.noderender import render_page
 from utils.common import reindex_by
-from utils.auth.views import View
 
 
 def get_new_namestring(namestring):
@@ -151,6 +149,7 @@ class IndexView(View):
             except:
                 genres_data = []
 
+        
         # Формируем ответ
         data = {
             'films_new': resp_dict_data,
@@ -278,7 +277,11 @@ def test_view(request):
 
     return render_to_response('api_test.html', c)
 
+def serialize_actors(actors_iterable):
 
+    return [{'id':pf.person.id, 'name':pf.person.name}
+            for pf in actors_iterable]
+    
 def calc_actors(o_film):
     filter = {
         'filter': {'pf_persons_rel__film': o_film.pk},
@@ -288,7 +291,13 @@ def calc_actors(o_film):
 
     result = []
     try:
-        result = list(film_model.Persons.get_sorted_persons_by_name(**filter).values('id', 'name'))
+        enumerated_actors = film_model.PersonsFilms.objects.filter(film=o_film, p_type = APP_PERSON_ACTOR
+        ).exclude(p_index=0).order_by('p_index')
+
+        unenumerated_actors = film_model.PersonsFilms.objects.filter(film=o_film, p_type = APP_PERSON_ACTOR).filter(p_index=0)
+        
+        result = (serialize_actors(enumerated_actors) + serialize_actors(unenumerated_actors)) [slice(filter['offset'], filter['limit'])]
+
     except Exception, e:
         print "Caught exception {} in calc_actors".format(e)
 

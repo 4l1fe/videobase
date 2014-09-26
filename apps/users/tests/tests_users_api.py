@@ -4,11 +4,11 @@ from django.core.paginator import Paginator
 from rest_framework import status
 from rest_framework.test import APITestCase, APISimpleTestCase
 from rest_framework.reverse import reverse
-
-from apps.films.constants import APP_FILM_SERIAL, APP_USERFILM_STATUS_PLAYLIST, \
-    APP_PERSON_DIRECTOR, APP_PERSON_ACTOR, APP_PERSON_SCRIPTWRITER, APP_PERSON_PRODUCER, APP_USERFILM_SUBS_TRUE
-from apps.users.constants import APP_USER_REL_TYPE_NONE,\
-    APP_USERS_API_DEFAULT_PER_PAGE, APP_USERS_API_DEFAULT_PAGE
+from apps.films.constants import (APP_FILM_SERIAL, APP_USERFILM_STATUS_PLAYLIST, APP_PERSON_DIRECTOR,
+                                  APP_PERSON_ACTOR, APP_PERSON_SCRIPTWRITER, APP_PERSON_PRODUCER,
+                                  APP_USERFILM_SUBS_TRUE)
+from apps.users.constants import (APP_USER_REL_TYPE_NONE, APP_USER_REL_TYPE_SEND_NOT_RECEIVED,
+                                  APP_USERS_API_DEFAULT_PER_PAGE, APP_USERS_API_DEFAULT_PAGE)
 from apps.users.models import SessionToken
 from apps.users.tests.factories_users_api import *
 from apps.users.api.users_persons import persons_type
@@ -21,7 +21,7 @@ import random
 class APIUsersFriendShipActionTestCase(APISimpleTestCase):
     def setUp(self):
         self.user = UserFactory.create()
-        self.url_name = 'users_friendship_action'
+        self.url_name = 'users_api:users_friendship_action'
         self.kwargs = {'format': 'json', 'user_id': self.user.pk}
         s_token = SessionToken.objects.create(user=self.user)
         self.headers = s_token.key
@@ -35,44 +35,38 @@ class APIUsersFriendShipActionTestCase(APISimpleTestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_api_user_friendship_200_get(self):
-        user = UserFactory.create()
+        user_friend = UserFactory.create()
         kw = self.kwargs.copy()
-        kw['user_id'] = user.pk
+        kw['user_id'] = user_friend.pk
         response = self.client.get(reverse(self.url_name, kwargs=kw),
                                    HTTP_X_MI_SESSION=self.headers)
-
-        flag = UsersRels.objects.filter(user=self.user, user_rel=user).exists()
+        flag = UsersRels.objects.filter(user=self.user, user_rel=user_friend).exists()
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(flag, True)
-
         feed = Feed.objects.last()
-        obj_val = dict(id=user.id, name=user.username, avatar='')
         self.assertEqual(feed.user, self.user)
         self.assertEqual(feed.type, USER_ASK)
-        self.assertDictEqual(feed.object, obj_val)
+        self.assertEqual(feed.obj_id, user_friend.id)
 
     def test_api_user_friendship_confirm_200_get(self):
-        user = UserFactory.create()
+        user_friend = UserFactory.create()
         kw = self.kwargs.copy()
-        kw['user_id'] = user.pk
-        obj_val = dict(id=user.id, name=user.username, avatar='')
-        UserRelsFactory.create(user=user, user_rel=self.user, rel_type=APP_USER_REL_TYPE_FRIENDS)
-        FeedFactory.create(user=self.user, type=USER_ASK, object=obj_val)
+        kw['user_id'] = user_friend.pk
+        UserRelsFactory.create(user=user_friend, user_rel=self.user, rel_type=APP_USER_REL_TYPE_SEND_NOT_RECEIVED)
+        FeedFactory.create(user=user_friend, obj_id=self.user.id, type=USER_ASK)
         response = self.client.get(reverse(self.url_name, kwargs=kw),
                                    HTTP_X_MI_SESSION=self.headers)
-        feed = Feed.objects.last()
+        feed = Feed.objects.order_by('-created')[1]
         self.assertEqual(feed.user, self.user)
         self.assertEqual(feed.type, USER_FRIENDSHIP)
-        self.assertDictEqual(feed.object, obj_val)
+        self.assertEqual(feed.obj_id, user_friend.id)
 
     def test_api_user_friendship_200_with_rel_delete(self):
-        user = UserFactory.create()
+        user_friend = UserFactory.create()
         kw = self.kwargs.copy()
-        kw['user_id'] = user.pk
-
-        obj_val = dict(id=user.id, name=user.username, avatar='')
-        UserRelsFactory.create(user=self.user, user_rel=user)
-        FeedFactory.create(user=self.user, type=USER_ASK, object=obj_val)
+        kw['user_id'] = user_friend.pk
+        UserRelsFactory.create(user=self.user, user_rel=user_friend)
+        FeedFactory.create(user=self.user, type=USER_ASK, obj_id=user_friend.id)
         response = self.client.delete(reverse(self.url_name, kwargs=kw),
                                    HTTP_X_MI_SESSION=self.headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -117,7 +111,7 @@ class APIUsersGenresTestCase(APITestCase):
         for i in range(4):
             UserFilmsFactory.create(user=self.user, film=films[i])
 
-        self.url_name = 'users_genres'
+        self.url_name = 'users_api:users_genres'
         self.kwargs = {'format': 'json', 'user_id': self.user.pk}
 
     def test_api_users_genres_400_get(self):
@@ -163,7 +157,7 @@ class APIUsersTestCase(APITestCase):
         for i in range(4):
             UserFilmsFactory.create(user=self.user, film=films[i])
 
-        self.url_name = 'users'
+        self.url_name = 'users_api:users'
         self.kwargs = {'format': 'json', 'user_id': self.user.pk}
         s_token = SessionToken.objects.create(user=self.user)
         self.headers = s_token.key
@@ -346,7 +340,7 @@ class APIUsersTestCase(APITestCase):
 class APIUsersFriendsTestCase(APITestCase):
     def setUp(self):
         self.user = UserFactory.create()
-        self.url_name = 'users_friends'
+        self.url_name = 'users_api:users_friends'
         self.kwargs = {'format': 'json', 'user_id': self.user.pk}
         self.friends = []
         for i in range(20):
@@ -419,7 +413,7 @@ class APIUsersFriendsTestCase(APITestCase):
 class APIUsersPersonsTestCase(APITestCase):
     def setUp(self):
         self.user = UserFactory.create()
-        self.url_name = 'users_persons'
+        self.url_name = 'users_api:users_persons'
         self.kwargs = {'format': 'json', 'user_id': self.user.pk}
         for i in range(10):
             UserPersonsFatory.create(user=self.user)
@@ -477,7 +471,7 @@ class APIUsersPersonsTestCase(APITestCase):
 class APIUsersFilmsTestCase(APITestCase):
     def setUp(self):
         self.user = UserFactory.create()
-        self.url_name = 'users_films'
+        self.url_name = 'users_api:users_films'
         self.kwargs = {'format': 'json', 'user_id': self.user.pk}
         films = []
         for i in range(10):
