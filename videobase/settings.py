@@ -1,6 +1,8 @@
 # coding: utf-8
+
+from __future__ import absolute_import
+
 import os
-import djcelery
 import logging
 from datetime import timedelta
 from ConfigParser import RawConfigParser
@@ -470,7 +472,7 @@ TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 USE_THOR = True
 
-from local_settings import *
+from .local_settings import *
 
 if not DEBUG:
     INSTALLED_APPS += (
