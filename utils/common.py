@@ -6,6 +6,7 @@ import traceback
 import random
 import string
 import urllib
+from PIL import Image
 
 
 def get_image_path(instance, filename):
@@ -162,6 +163,7 @@ def isiterable(obj):
     except TypeError:
         return False
 
+
 def dict_fetch_all(cursor):
     """Returns generator row"""
 
@@ -175,4 +177,3 @@ def dict_fetch_all_without_gen(cursor):
 
     desc = [col[0] for col in cursor.description]
     return [dict(zip(desc, row)) for row in cursor.fetchall()]
-

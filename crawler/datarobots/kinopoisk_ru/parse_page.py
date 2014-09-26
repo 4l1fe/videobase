@@ -158,8 +158,9 @@ get_photo = partial(get_image, YANDEX_KP_ACTORS_TEMPLATE)
 def extract_names(soup):
     nametag = soup.select('h1.moviename-big')[0]
     moviename = ('Films', {'name': nametag.text.strip()})
+    name_orig = soup.find('span', {'itemprop': 'alternativeHeadline'})
     orig_movie_name = ('Films', {
-        'name_orig': nametag.select('span')[0].text.strip() if len(nametag.select('span')) else ''
+        'name_orig': name_orig.text.strip() if not name_orig is None else ''
     })
 
     return moviename, orig_movie_name

@@ -16,10 +16,8 @@ class Migration(SchemaMigration):
 
                 # Adding field 'SessionToken.updated'
         db.add_column('session_token', 'updated',
-                      self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True, null=True),
+                      self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True),
                       keep_default=False)
-        orm.SessionToken.objects.update(updated = datetime.datetime.now())
-
 
     def backwards(self, orm):
         # Adding model 'UsersApiSessions'
