@@ -20,7 +20,7 @@ from crawler.datarobots.kinopoisk_ru.kinopoisk_premiere import kinopoisk_news
 from crawler.datarobots.youtube_com.youtube_trailers import find_youtube_trailer
 from crawler.tasks.kinopoisk_one_page import kinopoisk_parse_one_film
 from crawler.tor import simple_tor_get_page
-from crawler.tasks.utils import robot_task, update_robot_state_film_id
+from crawler.tasks.utils import update_robot_state_film_id
 from videobase.celery import app
 
 import data.film_facts.checker
@@ -128,32 +128,28 @@ def find_trailer(film_id):
     film = Films.objects.get(id=film_id)
     find_youtube_trailer(film)
 
-
 @app.task(name='youtube_trailers_all')
 def trailer_commands():
     for film in Films.objects.all():
         find_trailer.apply_async((film.id,))
-
 
 @app.task(name='check_one_film_by_id')
 def check_and_correct_one_film(film_id):
     film = Films.objects.get(id=film_id)
     data.film_facts.checker.film_checker.check_and_correct(film)
 
-
 @app.task(name='check_one_person_by_id')
 def check_and_correct_one_person(person_id):
     person = Persons.objects.get(id=person_id)
     data.person_facts.checker.person_checker.check_and_correct(person)
 
-    
 @app.task(name='film_info_check_and_correct')
 def check_and_correct_tasks():
     for film in Films.objects.all():
         check_and_correct_one_film.apply_async(film.id)
 
-
 @app.task(name='persons_check_and_correct')
 def person_check_and_correct_tasks():
     for person in Persons.objects.all():
         check_and_correct_one_person.apply_async(person.id)
+

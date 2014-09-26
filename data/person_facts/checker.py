@@ -25,6 +25,7 @@ def person_info_reload_corrector(person):
 
 @person_checker.add("Person name is not in Russian")
 def russian_name_check(person):
+    #TODO
     pass
 
 
