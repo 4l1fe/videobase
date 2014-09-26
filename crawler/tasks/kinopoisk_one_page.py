@@ -19,3 +19,4 @@ def kinopoisk_parse_one_film(kinopoisk_id_str, name):
     parse_from_kinopoisk(kinopoisk_id=kinopoisk_id, name=name)
 
     return result_dict
+
