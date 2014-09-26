@@ -468,4 +468,3 @@ if not DEBUG:
     }
 
 ROBOTS_LIST = ['amediateka_ru', 'ayyo_ru', 'drugoe_kino', 'itunes', 'viaplay_ru', 'youtube_com' ]
-
