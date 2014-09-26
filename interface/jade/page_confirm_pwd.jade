@@ -7,15 +7,19 @@ html
         .wrap-page.bg-noise
             include header
             .content(role='main')
-                section.blue-block
+                section.blue-block.password-reset
                     .bg-noise
                         .container
+                            h1.whiteh1.centerh1 Восстановление пароля
                             if error && error.token
-                                p Время действия токена истек или неверный пользователь
+                                .enter-block
+                                    .form-enter
+                                        p Время действия токена истекло или неверный пользователь
                             else if confirm
-                                p Пароль успешно заменен
+                                .enter-block
+                                    .form-enter
+                                        p Пароль успешно заменен
                             else
-                                h1.whiteh1 Восстановление пароля
                                 .enter-block.row
                                     .col-md-6
                                         .form-enter
@@ -38,6 +42,6 @@ html
                                                         if error && error.new_password2
                                                             p=error.new_password2
                                                 .form-group
-                                                    .col-sm-offset-2.col-sm-10
+                                                    .col-sm-offset-4.col-sm-8
                                                         button.btn.btn-yellow1(type='submit') Применить
             include footer
