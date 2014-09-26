@@ -1,6 +1,5 @@
 # coding: utf-8
 from rest_framework import serializers
-
 from apps.users.models import UsersProfile
 
 
@@ -39,4 +38,4 @@ class vbUserProfile(serializers.ModelSerializer):
 
     class Meta:
         model = UsersProfile
-        exclude = ('userpic_id', 'userpic_type', 'last_visited', 'user', 'id')
+        exclude = ('userpic_id', 'last_visited', 'user', 'id')
