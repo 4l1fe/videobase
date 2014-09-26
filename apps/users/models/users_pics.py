@@ -1,11 +1,11 @@
 # coding: utf-8
+import os
+
 from django.db import models
 from django.contrib.auth.models import User
 
-from ..constants import APP_USER_PIC_DIR, APP_USER_PIC_TYPES, APP_USER_PIC_TYPE_LOCAL
 from utils.common import get_image_path
-
-import os
+from ..constants import APP_USER_PIC_DIR, APP_USER_PIC_TYPES, APP_USER_PIC_TYPE_LOCAL
 
 
 ################################################################################
@@ -26,8 +26,14 @@ class UsersPics(models.Model):
     @classmethod
     def get_picture(cls, profile):
         path = u''
+
+        if hasattr(profile, 'userpic_id'):
+            userpic_id = getattr(profile, 'userpic_id')
+        else:
+            userpic_id = profile
+
         try:
-            image = cls.objects.get(id=profile.userpic_id).image
+            image = cls.objects.get(id=userpic_id).image
             path = image.storage.url(image.name)
         except Exception, e:
             pass
