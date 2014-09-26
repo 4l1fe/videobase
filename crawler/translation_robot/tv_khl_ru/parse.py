@@ -87,7 +87,7 @@ class TvKHLRuParser():
             'link': link,
             'meta': {},
             'embed_code': None,
-            'value': None,
+            'value': link,
             'player': None
         }
 
