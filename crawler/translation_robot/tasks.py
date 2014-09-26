@@ -9,7 +9,7 @@ from utils.common import traceback_own
 def generic_task(parse_function, service_name):
     parsed = parse_function()
 
-    print u'Got {} casts descriptions from {}'.format(len(parsed),service_name)
+    print u'Got {} casts descriptions from {}'.format(len(parsed), service_name)
 
     for cast_dict in parsed:
 
@@ -22,12 +22,11 @@ def generic_task(parse_function, service_name):
 
 @app.task(name='cast_sportbox_robot', queue='sportbox')
 def sportbox_update():
-    generic_task(parse_sportbox_ru,'sportbox_ru')
+    generic_task(parse_sportbox_ru, 'sportbox_ru')
     
 @app.task(name='cast_liverussia_robot', queue='liverussia_ru')
 def liverussia_update():
-    generic_task(parse_translation_live_russia_tv,'liverussia_ru')
-    
+    generic_task(parse_translation_live_russia_tv, 'liverussia_ru')
 
 @app.task(name='cast_championat_robot', queue='championat_com')
 def championat_update():
@@ -36,5 +35,5 @@ def championat_update():
 
 @app.task(name='cast_khl_robot', queue='khl_ru')
 def khl_update():
-    generic_task(parse_khl,'khl_ru')
+    generic_task(parse_khl, 'khl_ru')
 
