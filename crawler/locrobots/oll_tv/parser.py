@@ -33,7 +33,7 @@ class ParseOllFilm(object):
 
     def get_link(self, response, film):
         film_name = film.name
-        film_link = None
+        film_link = ''
         film_year = film .release_date.year
         try:
             soup = BeautifulSoup(response)
@@ -56,7 +56,7 @@ class ParseOllFilm(object):
                     link = tag_a.get('href')
                     return self.host + link
         except:
-            film_link = None
+            film_link = ''
         return film_link
 
     def get_price(self):

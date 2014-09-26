@@ -3,6 +3,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
+from apps.films.api.serializers import vbExtra
 from apps.films.models import Persons, PersonsExtras
 
 
@@ -21,7 +22,7 @@ class PersonsExtrasAPIView(APIView):
                 filter.update({'type': type})
 
             pes = PersonsExtras.objects.filter(**filter)
-            result = [pe.as_vbExtra() for pe in pes]
+            result = vbExtra(instance=pes, many=True).data
             return Response(result, status=status.HTTP_200_OK)
 
         except Exception, e:

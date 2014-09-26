@@ -11,7 +11,7 @@ def parse_search(content, filmName):
         link = tag.get('href')
         film_link = "http://%s%s" % (HOST, link, )
     except:
-        film_link = None
+        film_link = ''
     return film_link
 
 

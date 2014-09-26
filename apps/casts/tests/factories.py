@@ -1,10 +1,10 @@
 # coding: utf-8
-
 import factory
+from factory.django import ImageField
 from django.utils import timezone
 
 from apps.films.tests.factories import FilmsExtrasFactory, UserFactory
-from apps.casts.models import Casts, AbstractCastsTags, CastsExtras, UsersCasts, CastsChatsMsgs, CastsChats
+from apps.casts.models import Casts, AbstractCastsTags, CastsExtras, UsersCasts, CastsChatsMsgs, CastsChats, CastExtrasStorage
 
 
 class CastsFactory(factory.DjangoModelFactory):
@@ -28,6 +28,14 @@ class CastsFactory(factory.DjangoModelFactory):
                 self.tags.add(tag)
 
 
+class CastExtrasStorageFactory(factory.DjangoModelFactory):
+    FACTORY_FOR = CastExtrasStorage
+    cast = factory.SubFactory(CastsFactory)
+    name = factory.Sequence(lambda i: u"Название {0}".format(i))
+    name_orig = factory.Sequence(lambda i: u"Оригинальное название {0}".format(i))
+    photo = ImageField(color='red')
+
+
 class TagFactory(factory.DjangoModelFactory):
     FACTORY_FOR = AbstractCastsTags
     name        = 'Имя тега'
@@ -38,7 +46,7 @@ class TagFactory(factory.DjangoModelFactory):
 class CastsExtrasFactory(factory.DjangoModelFactory):
     FACTORY_FOR = CastsExtras
     cast        = factory.SubFactory(CastsFactory)
-    extra       = factory.SubFactory(FilmsExtrasFactory)
+    extra       = factory.SubFactory(CastExtrasStorageFactory)
 
 
 class UserCastsFactory(factory.DjangoModelFactory):

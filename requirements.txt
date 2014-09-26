@@ -14,7 +14,7 @@ pylibmc
 FeedParser
 hg+https://bitbucket.org/izi/django-admin-tools
 git+git://github.com/ronnix/fabtools.git
-django-social-auth
+python-social-auth==0.1.23
 pygraphviz
 pyparsing==1.5.7
 pydot
@@ -31,7 +31,6 @@ raven
 selenium
 pytils
 pyvirtualdisplay
-jsonfield==0.9.20
 gdata
 zerorpc
 lxml
@@ -41,6 +40,7 @@ djorm-ext-pgfulltext
 GitPython
 PySocks
 django-nose
+ipdb
 
-#sudo apt-get install -y mercurial memcached libmemcached-dev zlib1g-dev libssl-dev python-dev build-essential libjpeg-dev libfreetype6-dev zlib1g-dev libpng12-dev libpq-dev libgraphviz-dev graphviz nginx python-virtualenv python-pygraphviz pkg-config postgresql nodejs git-flow libxslt-dev libxml2-dev libcurl4-openssl-dev curl tor
+#sudo apt-get install -y mercurial memcached libmemcached-dev zlib1g-dev libssl-dev python-dev build-essential libjpeg-dev libfreetype6-dev zlib1g-dev libpng12-dev libpq-dev libgraphviz-dev graphviz nginx python-virtualenv python-pygraphviz pkg-config postgresql nodejs git-flow libxslt-dev libxml2-dev libcurl4-openssl-dev curl tor ipdb libzmq-dev
 #sudo npm install jade zerorpc

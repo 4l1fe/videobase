@@ -1,9 +1,15 @@
 # coding: utf-8
-import os
-import djcelery
 
+from __future__ import absolute_import
+
+import os
+import logging
 from datetime import timedelta
 from ConfigParser import RawConfigParser
+
+import djcelery
+from celery.schedules import crontab
+
 
 ###########################################################
 # Celery settings
@@ -13,8 +19,12 @@ djcelery.setup_loader()
 AMQP_HOST = 'localhost'
 BROKER_HOST = 'localhost'
 BROKER_PORT = 5672
-###########################################################
 
+CELERY_TIMEZONE = 'UTC'
+CELERY_ACCEPT_CONTENT = ['pickle', 'json', 'msgpack', 'yaml']
+
+###########################################################
+# Base path for project
 BASE_PATH = os.path.dirname(__file__)
 BASE_DIR = os.path.dirname(BASE_PATH)
 
@@ -29,9 +39,15 @@ BACKUP_PATH = os.path.join(BASE_PATH, '..', '.backup')
 SECRET_KEY = '7-dsc0--i_ej94w9as#-5p_5a)ql*9o80v1rs9krx!_-9%^b5$'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 TEMPLATE_DEBUG = DEBUG
+
+SOUTH_TESTS_MIGRATE = False
+
+logger = logging.getLogger('factory')  # switch off factory boy logging
+logger.addHandler(logging.NullHandler())
+logger.setLevel(logging.INFO)
 
 ALLOWED_HOSTS = ['*']
 
@@ -46,7 +62,10 @@ STANDART_HTTP_SESSION_TOKEN_HEADER = b'HTTP_{}'.format(HTTP_SESSION_TOKEN_TYPE.r
 STANDART_HTTP_USER_TOKEN_HEADER = b'HTTP_{}'.format(HTTP_USER_TOKEN_TYPE.replace('-', '_'))
 
 DEFAULT_REST_API_RESPONSE = {}
+PASSWORD_RESET_TIMEOUT_DAYS = 1
+
 ###########################################################
+# Email config
 emailconf = RawConfigParser()
 emailconf.read(CONFIGS_PATH + '/email.ini')
 EMAIL_HOST = emailconf.get('email', 'EMAIL_HOST')
@@ -60,10 +79,12 @@ DEFAULT_FROM_EMAIL = emailconf.get('email', 'DEFAULT_FROM_EMAIL')
 ###########################################################
 # Application definition
 INSTALLED_APPS = (
+    # Admin-tools
     'admin_tools',
     'admin_tools.theming',
     'admin_tools.menu',
     'admin_tools.dashboard',
+    # Django default apps
     'django.contrib.auth',
     'django.contrib.admin',
     'django.contrib.contenttypes',
@@ -74,10 +95,15 @@ INSTALLED_APPS = (
     'south',
     'django_nose',
     'treebeard',
+    # Rest api
     'rest_framework',
     'rest_framework.authtoken',
-    'social_auth',
+    # Social oauth
+    'social.apps.django_app.default',
+    # Celery for django
+    'djcelery',
     'csvimport',
+    # Apps
     'apps.users',
     'apps.films',
     'apps.contents',
@@ -86,8 +112,6 @@ INSTALLED_APPS = (
     'apps.git',
     'apps.casts',
     'crawler',
-    'social_auth',
-    'djcelery',
     'backup_system',
     'data',
 )
@@ -100,7 +124,8 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'utils.middlewares.ThreadLocals',
-    'utils.middlewares.ExceptionMiddleware'
+    'utils.middlewares.ExceptionMiddleware',
+    'utils.middlewares.AuthenticationMiddleware',
 )
 
 TEMPLATE_LOADERS = (
@@ -115,8 +140,9 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.media',
     'django.contrib.messages.context_processors.messages',
     'django.core.context_processors.request',
-    # Social
-    'social_auth.context_processors.social_auth_by_type_backends',
+    # Social OAuth
+    'social.apps.django_app.context_processors.backends',
+    'social.apps.django_app.context_processors.login_redirect',
 )
 
 TEMPLATE_DIRS = (
@@ -151,21 +177,16 @@ CACHES = {
     }
 }
 
+###########################################################
 # Backends for social auth
 AUTHENTICATION_BACKENDS = (
     # OAuth
-    'social_auth.backends.twitter.TwitterBackend',
-    'social_auth.backends.facebook.FacebookBackend',
-    'social_auth.backends.contrib.vk.VKOAuth2Backend',
-    'social_auth.backends.google.GoogleOAuth2Backend',
+    'social.backends.vk.VKOAuth2',
+    'social.backends.google.GoogleOAuth2',
+    'social.backends.facebook.FacebookOAuth2',
+    'social.backends.twitter.TwitterOAuth',
     # Django
     'django.contrib.auth.backends.ModelBackend',
-)
-
-# Backends for template auth
-TEMPLATE_AUTHENTICATION_BACKENDS = (
-    # Auth
-    'apps.users.backends.CookiesSessionAuthentication',
 )
 
 ###########################################################
@@ -181,7 +202,7 @@ USE_L10N = True
 
 USE_TZ = True
 
-
+###########################################################
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 MEDIA_ROOT = os.path.abspath(BASE_PATH + '/../static')
@@ -192,77 +213,86 @@ STATIC_ROOT = os.path.join('/var/www/')
 
 SITE_ID = 1
 
+###########################################################
+# Rest Framework configuration
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'apps.users.backends.SessionTokenAuthentication',
-        'apps.users.backends.UserTokenAuthentication',
     )
 }
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 
+USERNAME_IS_FULL_EMAIL = True
+
+###########################################################
+# Default URL
 LOGIN_URL = '/login'
-SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/tokenize/'
+LOGIN_REDIRECT_URL = '/tokenize'
 LOGIN_ERROR_URL = '/'
+HOST = 'vsevi.ru'
 
 ###########################################################
 # Ключи для OAuth2 авторизации
 # Vkontakte
-VK_APP_ID            = '4296663'
-VKONTAKTE_APP_ID     = VK_APP_ID
-VK_API_SECRET        = 'JAEQddzkBCm554iGXe6S'
-VKONTAKTE_APP_SECRET = VK_API_SECRET
+SOCIAL_AUTH_VK_OAUTH2_KEY = '4296663'
+SOCIAL_AUTH_VK_OAUTH2_SECRET = 'JAEQddzkBCm554iGXe6S'
+SOCIAL_AUTH_VK_OAUTH2_SCOPE = ['email', ]
+SOCIAL_AUTH_VK_PHOTO_FIELD = 'photo_max_orig'
+SOCIAL_AUTH_VK_OAUTH2_EXTRA_DATA = [SOCIAL_AUTH_VK_PHOTO_FIELD, ]
 
 # Facebook
-FACEBOOK_APP_ID     = '212532105624824'
-FACEBOOK_API_SECRET = 'a99fcef38b7054279d73beb4ebb7b6cc'
-FACEBOOK_EXTENDED_PERMISSIONS = ['email', ]
+SOCIAL_AUTH_FACEBOOK_KEY = '212532105624824'
+SOCIAL_AUTH_FACEBOOK_SECRET = 'a99fcef38b7054279d73beb4ebb7b6cc'
+SOCIAL_AUTH_FACEBOOK_SCOPE = ['email', ]
+SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {'locale': 'ru_RU'}
 
 # Twitter
-TWITTER_CONSUMER_KEY    = 'HACuJARrAXJyeHdeD5viHULZR'
-TWITTER_CONSUMER_SECRET = 'Ge0k2rKltyPq3ida76IjTbhesZVdIrvckcNPXzJaBU2ouzixut'
+SOCIAL_AUTH_TWITTER_KEY = 'HACuJARrAXJyeHdeD5viHULZR'
+SOCIAL_AUTH_TWITTER_SECRET = 'Ge0k2rKltyPq3ida76IjTbhesZVdIrvckcNPXzJaBU2ouzixut'
 
 # Google+
-GOOGLE_OAUTH2_CLIENT_ID     = '729866043170.apps.googleusercontent.com'
-GOOGLE_OAUTH2_CLIENT_SECRET = 'Ga91PMNEXi28egLsTUy5Wqhw'
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '729866043170.apps.googleusercontent.com'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'Ga91PMNEXi28egLsTUy5Wqhw'
 
-GOOGLE_OAUTH2_USE_UNIQUE_USER_ID = True
+SOCIAL_AUTH_GOOGLE_OAUTH2_USE_UNIQUE_USER_ID = True
+SOCIAL_AUTH_GOOGLE_OAUTH2_IGNORE_DEFAULT_SCOPE = True
+SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
+    'https://www.googleapis.com/auth/userinfo.email',
+    'https://www.googleapis.com/auth/userinfo.profile'
+]
 
 SOCIAL_AUTH_CREATE_USERS = True
 SOCIAL_AUTH_USERNAME_IS_FULL_EMAIL = True
 
+SOCIAL_AUTH_STORAGE = 'social.apps.django_app.default.models.DjangoStorage'
+
 # Перечислим pipeline, которые последовательно буду обрабатывать респонс
 SOCIAL_AUTH_PIPELINE = (
-    # Получает по backend и uid инстансы social_user и user
-    'social_auth.backends.pipeline.social.social_auth_user',
-    # Получает по user.email инстанс пользователя и заменяет собой тот, который получили выше.
-    # Кстати, email выдает только Facebook и GitHub, а Vkontakte и Twitter не выдают
-    'social_auth.backends.pipeline.associate.associate_by_email',
-    # Пытается собрать правильный username, на основе уже имеющихся данных
-    'social_auth.backends.pipeline.user.get_username',
-    # Создает нового пользователя, если такого еще нет
-    'social_auth.backends.pipeline.user.create_user',
-    # Пытается связать аккаунты
-    'social_auth.backends.pipeline.social.associate_user',
-    # Получает и обновляет social_user.extra_data
-    'social_auth.backends.pipeline.social.load_extra_data',
+    'social.pipeline.social_auth.social_details',
+    'social.pipeline.social_auth.social_uid',
+    'social.pipeline.social_auth.auth_allowed',
+    'social.pipeline.social_auth.social_user',
+    'utils.pipeline.get_firstname',
+    'utils.pipeline.get_email',
+    'social.pipeline.user.get_username',
+    'social.pipeline.user.create_user',
+    'social.pipeline.social_auth.associate_user',
+    'social.pipeline.social_auth.load_extra_data',
+    'social.pipeline.user.user_details',
+    'utils.pipeline.load_avatar',
 )
 
 # In minutes
 API_SESSION_EXPIRATION_TIME = 15
+SESSION_EXPIRATION_TIME = timedelta(minutes=API_SESSION_EXPIRATION_TIME)
 
 ###########################################################
+# Celery schedule
 CELERYBEAT_SCHEDULE = {
-
-    # Launching robots that are described in Robots table.
-    #'robot-launch': {
-    #    'task': 'robot_launch',
-    #    'schedule': timedelta(seconds=10),
-    #},
-
     # Updating ratings from IMDB DB via archive
     'imdb_rating_update_command': {
         'task': 'imdb_rating_update',
@@ -278,15 +308,16 @@ CELERYBEAT_SCHEDULE = {
         'task': 'viaplay_ru_robot_start',
         'schedule': timedelta(days=7),
     },
+    # Takes poster with kinopoisk
     'kinopoisk-set_poster': {
         'task': 'kinopoisk_set_poster',
         'schedule': timedelta(seconds=10),
     },
     # Updating information about persons using kinopoisk
-    'kinopoisk_persons': {
-        'task': 'kinopoisk_persons',
-        'schedule': timedelta(seconds=10),
-    },
+    #'kinopoisk_persons': {
+    #    'task': 'kinopoisk_persons',
+    #    'schedule': timedelta(seconds=10),
+    #},
     # Checking kinopoisk premiere page
     'kinopoisk_news': {
         'task': 'kinopoisk_news',
@@ -303,11 +334,13 @@ CELERYBEAT_SCHEDULE = {
         'schedule': timedelta(days=1),
         'args': (3,),
     },
+    #
     'kinopoisk_films_weekly': {
         'task': 'kinopoisk_films',
         'schedule': timedelta(days=7),
         'args': (10,),
     },
+    #
     'kinopoisk_films_monthly': {
         'task': 'kinopoisk_films',
         'schedule': timedelta(days=31),
@@ -351,6 +384,7 @@ CELERYBEAT_SCHEDULE = {
         'schedule': timedelta(days=31*6),
         'args': (120,)
     },
+    #
     'drugoe_kino_update_schedule': {
         'task': 'drugoe_kino_update',
         'schedule': timedelta(days=7)
@@ -385,6 +419,11 @@ CELERYBEAT_SCHEDULE = {
         'task': 'parse_news_from_stream_ru',
         'schedule': timedelta(hours=12)
     },
+    # News from tvzor.ru
+    'parse_news_from_tvzor_ru': {
+        'task': 'parse_news_from_tvzor_ru',
+        'schedule': timedelta(hours=12)
+    },
     'cast_sportbox_ru_schedule': {
         'task': 'cast_sportbox_robot',
         'schedule': timedelta(hours=24)
@@ -401,19 +440,35 @@ CELERYBEAT_SCHEDULE = {
         'task': 'cast_khl_robot',
         'schedule': timedelta(hours=24)
     },
-    #
+    'itunes_update': {
+        'task': 'itunes_robot_start',
+        'schedule': timedelta(hours=24)
+    },
+    # Calculate amount subscribed to the films
     'calc_amount_subscribed_to_movie': {
         'task': 'calc_amount_subscribed_to_movie',
         'schedule': timedelta(hours=1)
     },
+    # Do weekly newsletter
+    'week_newsletter_schedule': {
+        'task': 'week_newsletter',
+        'schedule': crontab(minute=0, hour=16, day_of_week=6)
+    },
+    # Do every day personal newsletter
+    'personal_newsletter_schedule': {
+        'task': 'personal_newsletter',
+        'schedule': crontab(minute=0, hour=18)
+    },
 }
 
-CELERY_TIMEZONE = 'UTC'
-CELERY_ACCEPT_CONTENT = ['pickle', 'json', 'msgpack', 'yaml']
+###########################################################
+# Another configuration
 POSTER_URL_PREFIX = '_260x360'
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
-from local_settings import *
+USE_THOR = True
+
+from .local_settings import *
 
 if not DEBUG:
     INSTALLED_APPS += (
@@ -423,3 +478,5 @@ if not DEBUG:
     RAVEN_CONFIG = {
         'dsn': 'http://8684bf8b497047d9ac170fd16aefc873:41e89f4666b24f998125370f3d1a1789@sentry.aaysm.com/2'
     }
+
+ROBOTS_LIST = ['amediateka_ru', 'ayyo_ru', 'drugoe_kino', 'itunes', 'viaplay_ru', 'youtube_com' ]

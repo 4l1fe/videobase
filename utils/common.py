@@ -1,12 +1,11 @@
 # coding: utf-8
+
 import os
 import sys
 import traceback
 import random
 import string
 import urllib
-from PIL import Image
-
 from PIL import Image
 
 
@@ -134,6 +133,7 @@ def random_string(size=30, chars=string.ascii_letters+string.digits):
 def url_with_querystring(path, **kwargs):
     for key, value in kwargs.iteritems():
         kwargs[key] = unicode(value).encode('utf-8')
+    
     return path + u'?' + urllib.urlencode(kwargs)
 
 
@@ -154,6 +154,14 @@ def traceback_own(excpt, msg=None):
     print u'============================='
     print u'Traceback:\n{trace_msg}'.format(trace_msg=trace_msg)
     print u'============================='
+
+
+def isiterable(obj):
+    try:
+        iter(obj)
+        return True
+    except TypeError:
+        return False
 
 
 def dict_fetch_all(cursor):

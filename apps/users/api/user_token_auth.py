@@ -9,7 +9,8 @@ from rest_framework.decorators import permission_classes
 
 from apps.users.models import SessionToken
 from apps.users.api.utils import create_new_session
-from videobase.settings import HTTP_USER_TOKEN_TYPE, DEFAULT_REST_API_RESPONSE
+from videobase.settings import HTTP_USER_TOKEN_TYPE,\
+    STANDART_HTTP_USER_TOKEN_HEADER, DEFAULT_REST_API_RESPONSE
 
 
 class ObtainAuthToken(views.ObtainAuthToken):
@@ -26,7 +27,8 @@ class ObtainSessionToken(APIView):
 
     def get(self, request, format=None, *args, **kwargs):
         try:
-            session = create_new_session(request.user)
+            user_token = Token.objects.get(key=request.META[STANDART_HTTP_USER_TOKEN_HEADER])
+            session = create_new_session(user=user_token.user)
             response_dict = {
                 'session': session.pk,
                 'expires': session.get_expiration_time(),

@@ -1,43 +1,42 @@
 # coding: utf-8
-from ipdb import set_trace
 from apps.contents.models import Locations, Contents
 from apps.robots.models import Robots
 from crawler.core.exceptions import NoSuchFilm
 from crawler.locrobots.process_film_from_site import get_html_json_for_file_name
-from crawler.locrobots.process_films_tasks import process_one_film, load_and_save_film_page_from_site
+from crawler.locrobots.process_films_tasks import process_one_film
+from crawler.locrobots.save_util import load_and_save_film_page_from_site
 from crawler.tasks.locrobots_logging import send_message_for_all_recipients
 
 
 __author__ = 'vladimir'
 
 
-class TestRobotsBan():
+class RobotsBanCheck():
     def __init__(self):
         pass
 
     @staticmethod
     def test_all_locrobots():
         for robot in Robots.objects.all():
-            TestRobotsBan.test_individual_locrobot(robot.name)
+            RobotsBanCheck.test_individual_locrobot(robot.name)
 
     @staticmethod
     def test_individual_locrobot(robot_name):
-        loc_type = TestRobotsBan.get_correct_location_type(robot_name)
-        films = TestRobotsBan.get_5_films_for_location_type(loc_type)
+        loc_type = RobotsBanCheck.get_correct_location_type(robot_name)
+        films = RobotsBanCheck.get_5_films_for_location_type(loc_type)
         checks = 0
         failed_films = []
         for film in films:
             try:
-                ret_locations_dict = TestRobotsBan.process_film_on_site(robot_name, film.id)
-                if TestRobotsBan.check_is_locations(ret_locations_dict):
+                ret_locations_dict = RobotsBanCheck.process_film_on_site(robot_name, film.id)
+                if RobotsBanCheck.check_is_locations(ret_locations_dict):
                     checks += 1
                 else:
                     failed_films += [film.id]
             except NoSuchFilm:
                 failed_films += [film.id]
 
-        #print robot_name, "checks: ", checks, "and films:", len(films)
-        TestRobotsBan.analyze_checks(checks, robot_name, failed_films, films)
+        RobotsBanCheck.analyze_checks(checks, robot_name, failed_films, films)
 
     @staticmethod
     def get_correct_location_type(robot_name):
@@ -50,9 +49,9 @@ class TestRobotsBan():
     @staticmethod
     def analyze_checks(checks, robot_name, failed_films, films):
         if checks<3 and checks >=1:
-            TestRobotsBan.send_warning_message(robot_name, failed_films)
+            RobotsBanCheck.send_warning_message(robot_name, failed_films)
         if checks == 0 and len(films) >0:
-            TestRobotsBan.send_ban_message(robot_name)
+            RobotsBanCheck.send_ban_message(robot_name)
 
     @staticmethod
     def get_5_films_for_location_type(location_type):
@@ -89,5 +88,20 @@ class TestRobotsBan():
     @staticmethod
     def check_is_locations(locatios_dict):
         if len(locatios_dict['info']) > 0:
+            return True
+        return False
+
+
+class MultiLocationRobotsBunCheck():
+    def __init__(self):
+        pass
+
+    @staticmethod
+    def is_result_looks_like_robot_banned(locations_dict):
+        return not MultiLocationRobotsBunCheck.check_locs_dict_is_ok(locations_dict)
+
+    @staticmethod
+    def check_locs_dict_is_ok(locations_dict):
+        if len(locations_dict['info']) > 0:
             return True
         return False

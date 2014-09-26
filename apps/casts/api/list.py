@@ -97,7 +97,7 @@ class CastsListView(APIView):
             'price_type': lambda o_s, arg: o_s.filter(price_type=arg),
             'price_low': lambda o_s, arg: o_s.filter(price__gte=arg),
             'price_high': lambda o_s, arg: o_s.filter(price__lte=arg),
-            'start_in': lambda o_s, arg: o_s.filter(start=datetime.datetime.now()+datetime.timedelta(minutes=arg)),
+            'start_in': lambda o_s, arg: o_s.filter(start=datetime.datetime.now()+datetime.timedelta(seconds=arg)),
             'tag': lambda o_s, arg: o_s.filter(tags__id=arg),
             'subscribed': subscribe_calc,
             'per_page': lambda o_s, arg: o_s,
@@ -120,7 +120,7 @@ class CastsListView(APIView):
         if form.is_valid():
             per_page = self.get_copy.get('per_page')
             page = self.get_copy.get('page')
-            
+
             filter = self.__validation_pagination(page, per_page, form.cleaned_data)
             per_page = filter['per_page']
             page = filter['page']
@@ -140,5 +140,5 @@ class CastsListView(APIView):
             }
 
             return Response(result, status=status.HTTP_200_OK)
-        
+
         return Response(form.errors, status=status.HTTP_400_BAD_REQUEST)

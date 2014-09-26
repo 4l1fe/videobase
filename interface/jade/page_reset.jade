@@ -1,0 +1,33 @@
+doctype html
+html
+    include config
+    - page_title = "Восстановление пароля"
+    include head
+    body
+        .wrap-page.bg-noise
+            include header
+            .content(role='main')
+                section.blue-block
+                    .bg-noise
+                        .container
+                            - if (send)
+                                p Мы отправили вам инструкцию по установке пароля на указанный адрес электронной почты. Вы должны получить ее в ближайшее время.
+                                p Если вы не получили письмо, пожалуйста, убедитесь, что вы ввели адрес с которым Вы зарегистрировались, и проверьте папку со спамом.
+                            - else
+                                h1.whiteh1 Восстановление пароля
+                                .enter-block.row
+                                    .col-md-5
+                                        .form-enter
+                                            form.form-horizontal(role='form', method='post')
+                                                input(type="hidden",name="csrfmiddlewaretoken",value=csrf_token)
+                                                - error_cls = error?"has-error":""
+                                                .form-group(class=error_cls)
+                                                    label.col-sm-2.control-label(for='inputEmail3') Email
+                                                    .col-sm-10
+                                                        input#inputEmail3.form-control(type='email', name='email',required)
+                                                .form-group
+                                                    .col-sm-offset-2.col-sm-10
+                                                        button.btn.btn-yellow1(type='submit') Востановить
+            include footer
+        //script.
+        //    $(document).ready(function () {window.InitApp({}, "Login")})
