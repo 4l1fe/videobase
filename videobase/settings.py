@@ -1,8 +1,6 @@
 # coding: utf-8
-
-from __future__ import absolute_import
-
 import os
+import djcelery
 import logging
 from datetime import timedelta
 from ConfigParser import RawConfigParser
@@ -19,6 +17,7 @@ djcelery.setup_loader()
 AMQP_HOST = 'localhost'
 BROKER_HOST = 'localhost'
 BROKER_PORT = 5672
+###########################################################
 
 CELERY_TIMEZONE = 'UTC'
 CELERY_ACCEPT_CONTENT = ['pickle', 'json', 'msgpack', 'yaml']
@@ -177,7 +176,6 @@ CACHES = {
     }
 }
 
-###########################################################
 # Backends for social auth
 AUTHENTICATION_BACKENDS = (
     # OAuth
@@ -213,8 +211,6 @@ STATIC_ROOT = os.path.join('/var/www/')
 
 SITE_ID = 1
 
-###########################################################
-# Rest Framework configuration
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
@@ -291,8 +287,14 @@ API_SESSION_EXPIRATION_TIME = 15
 SESSION_EXPIRATION_TIME = timedelta(minutes=API_SESSION_EXPIRATION_TIME)
 
 ###########################################################
-# Celery schedule
 CELERYBEAT_SCHEDULE = {
+
+    # Launching robots that are described in Robots table.
+    #'robot-launch': {
+    #    'task': 'robot_launch',
+    #    'schedule': timedelta(seconds=10),
+    #},
+
     # Updating ratings from IMDB DB via archive
     'imdb_rating_update_command': {
         'task': 'imdb_rating_update',
@@ -308,7 +310,6 @@ CELERYBEAT_SCHEDULE = {
         'task': 'viaplay_ru_robot_start',
         'schedule': timedelta(days=7),
     },
-    # Takes poster with kinopoisk
     'kinopoisk-set_poster': {
         'task': 'kinopoisk_set_poster',
         'schedule': timedelta(seconds=10),
@@ -334,13 +335,11 @@ CELERYBEAT_SCHEDULE = {
         'schedule': timedelta(days=1),
         'args': (3,),
     },
-    #
     'kinopoisk_films_weekly': {
         'task': 'kinopoisk_films',
         'schedule': timedelta(days=7),
         'args': (10,),
     },
-    #
     'kinopoisk_films_monthly': {
         'task': 'kinopoisk_films',
         'schedule': timedelta(days=31),
@@ -384,7 +383,6 @@ CELERYBEAT_SCHEDULE = {
         'schedule': timedelta(days=31*6),
         'args': (120,)
     },
-    #
     'drugoe_kino_update_schedule': {
         'task': 'drugoe_kino_update',
         'schedule': timedelta(days=7)
@@ -444,31 +442,21 @@ CELERYBEAT_SCHEDULE = {
         'task': 'itunes_robot_start',
         'schedule': timedelta(hours=24)
     },
-    # Calculate amount subscribed to the films
+    #
     'calc_amount_subscribed_to_movie': {
         'task': 'calc_amount_subscribed_to_movie',
         'schedule': timedelta(hours=1)
     },
-    # Do weekly newsletter
-    'week_newsletter_schedule': {
-        'task': 'week_newsletter',
-        'schedule': crontab(minute=0, hour=16, day_of_week=6)
-    },
-    # Do every day personal newsletter
-    'personal_newsletter_schedule': {
-        'task': 'personal_newsletter',
-        'schedule': crontab(minute=0, hour=18)
-    },
 }
 
-###########################################################
-# Another configuration
+CELERY_TIMEZONE = 'UTC'
+CELERY_ACCEPT_CONTENT = ['pickle', 'json', 'msgpack', 'yaml']
 POSTER_URL_PREFIX = '_260x360'
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 USE_THOR = True
 
-from .local_settings import *
+from local_settings import *
 
 if not DEBUG:
     INSTALLED_APPS += (

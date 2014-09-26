@@ -19,7 +19,6 @@ class Migration(SchemaMigration):
                       self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True),
                       keep_default=False)
 
-
     def backwards(self, orm):
         # Adding model 'UsersApiSessions'
         db.create_table('users_api_sessions', (

@@ -1,59 +1,39 @@
 # coding: utf-8
-
 import datetime
 from pytils import numeral
-
 from django.db import transaction
 from django.forms.models import model_to_dict
 from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse
-
-from django.http import HttpResponseRedirect, HttpResponse,\
-    HttpResponseBadRequest, HttpResponseServerError, Http404
-
+from django.http import (HttpResponseRedirect, HttpResponse, HttpResponseForbidden,
+                         HttpResponseBadRequest, HttpResponseServerError, Http404)
 from django.utils import timezone
-
 from django.utils.decorators import method_decorator
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
-
-
 from django.views.decorators.cache import never_cache
 from django.views.generic import View
 from django.shortcuts import redirect
-
-
-from django.contrib.auth.views import SetPasswordForm, PasswordResetForm 
+from django.contrib.auth.views import SetPasswordForm, PasswordResetForm
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User, AnonymousUser
-
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import User, AnonymousUser
-
 from social.apps.django_app.default.models import UserSocialAuth
-
 from rest_framework.authtoken.models import Token
-
-
 from videobase.settings import HOST
-
 from apps.users.models import Feed, SessionToken, UsersHash
 from apps.users.tasks import send_template_mail
-
-
 from apps.users.api.serializers import vbUser, vbFeedElement, vbUserProfile
 from apps.users.forms import CustomRegisterForm, UsersProfileForm
 from apps.users.api.utils import create_new_session
-from apps.users.constants import APP_USERS_API_DEFAULT_PAGE, APP_USERS_API_DEFAULT_PER_PAGE,\
-    APP_SUBJECT_TO_RESTORE_PASSWORD, APP_SUBJECT_TO_CONFIRM_REGISTER, APP_USER_ACTIVE_KEY, \
-    APP_USER_HASH_EMAIL, APP_USER_HASH_REGISTR, APP_USER_HASH_PASSWD
-
-
+from apps.users.constants import (APP_USERS_API_DEFAULT_PAGE, APP_USERS_API_DEFAULT_PER_PAGE,
+                                  APP_SUBJECT_TO_RESTORE_PASSWORD, APP_USER_ACTIVE_KEY, APP_USER_HASH_EMAIL,
+                                  APP_USER_HASH_REGISTR, APP_USER_HASH_PASSWD, APP_USER_PIC_TYPE_LOCAL)
 from apps.films.models import Films, Persons, UsersFilms, UsersPersons
 from apps.films.constants import APP_PERSON_DIRECTOR, APP_PERSON_ACTOR, APP_USERFILM_SUBS_TRUE
 from apps.films.api.serializers import vbFilm, vbPerson
-
 from utils.common import url_with_querystring
 from utils.noderender import render_page
+from apps.users import UsersPics
 
 
 class RegisterUserView(View):
@@ -296,16 +276,24 @@ class UserProfileView(View):
 
     @method_decorator(login_required)
     def post(self, request, **kwargs):
-        form = UsersProfileForm(data=request.POST, instance=request.user)
+        form = UsersProfileForm(data=request.POST, files=request.FILES, instance=request.user)
         if form.is_valid():
-            result = form.save(send_email=True)
+            profile = form.save(commit=False, send_email=True)
+            image = form.cleaned_data['avatar']
 
-            if isinstance(result, dict):
+            if isinstance(profile, dict):
                 t = vbUserProfile(request.user.profile).data
                 t.update(request.POST.dict())
-                return HttpResponse(render_page('profile', {'user': t, 'error': result}))
+                return HttpResponse(render_page('profile', {'user': t, 'error': profile}))
+            
+            if image:
+                up = UsersPics.objects.create(user=request.user, type=APP_USER_PIC_TYPE_LOCAL)
+                up.image = image  # чтобы в имени был id
+                up.save()
+                profile.userpic_id = up.pk
+            profile.save()
 
-            return HttpResponse(render_page('profile', {'user': vbUserProfile(result).data}))
+            return HttpResponse(render_page('profile', {'user': vbUserProfile(profile).data}))
 
         return redirect('profile_view')
 

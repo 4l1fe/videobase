@@ -3,6 +3,7 @@ from django.core.management.base import NoArgsCommand
 from crawler.datarobots.kinopoisk_ru.parse_actors import PersoneParser
 import ipdb
 
+
 class Command(NoArgsCommand):
     def handle_noargs(self, **options):
         page_dump = PersoneParser.acquire_page(301, True)
