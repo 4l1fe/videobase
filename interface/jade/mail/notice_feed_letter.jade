@@ -1,0 +1,74 @@
+include ../config
+
+- console.log(feeds)
+
+- socials = []
+- socials.push( { href: "http://vk.com/vsevi", title: "Страница ВсеВидео в Вконтакте", img_url: "http://vsevi.ru/static/img/i-vk.png" } )
+- socials.push( { href: "http://www.odnoklassniki.ru/group/53196730400877", title: "Страница ВсеВидео в Одноклассниках", img_url: "http://vsevi.ru/static/img/i-ok.png" } )
+- socials.push( { href: "https://twitter.com/vseviru", title: "Страница ВсеВидео в Твиттере", img_url: "http://vsevi.ru/static/img/i-tw.png" } )
+- socials.push( { href: "https://www.facebook.com/vseviru", title: "Страница ВсеВидео на Фейсбуке", img_url: "http://vsevi.ru/static/img/i-fb.png" } )
+- socials.push( { href: "http://vsevi.ru/rss/feed", title: "RSS новинок на ВсеВидео", img_url: "http://vsevi.ru/static/img/i-rss.png" } )
+
+- feed_type_texts = {}
+- feed_type_texts['film-r'] = "Оценил фильм"
+- feed_type_texts['film-s'] = "Подписался на фильм"
+- feed_type_texts['film-nw'] = "Не захотел смотреть фильм"
+- feed_type_texts['film-c'] = "Оставил комментарий к фильму"
+- feed_type_texts['film-o'] = "Доступен к просмотру новый фильм"
+- feed_type_texts['pers-s'] = "Подписался на персону"
+- feed_type_texts['pers-o'] = "Появился фильм с участием персоны"
+
+
+mixin social_btn(item)
+    | There are empty((
+
+
+doctype html
+html
+    head
+
+    body
+        table(style="width: 800px; background: #322a2a; ", border=0, cellpadding=0, cellspacing=0)
+            tr
+                td
+                    img(src="", alt="", title="")
+
+                td
+                    each social in socials
+                        a(href=social.href, title=social.title, rel="nofollow", target="_new", style="color: inherit; text-decoration: inherit;")
+                            img(src=social.img_url style="height: 30px; width: 30px;" alt="" title="")
+                        span(style="padding: 4px;") &nbsp;
+
+        table(style="width: 800px; background: #005685; ", border=0, cellpadding=0, cellspacing=0)
+            each feed in feeds
+                tr
+                    td(style="width: 53px; padding-left: 20px;")
+                        - avatar_url = ( feed.user.avatar && feed.user.avatar.length > 0 ? feed.user.avatar : noavatar_url );
+                        img(src=avatar_url, alt="", title="", style="border-radius: 50%; height: 40px; width: 40px;")
+                    td
+                        span(style="font-family: Arial, sans-serif; font-size: 16px; font-weight: normal; color: #fff;")=feed.user.name
+                            | #{" "}
+                        span(style="font-family: Arial, sans-serif; font-size: 14px; font-weight: normal; color: #85b6c7;")=feed_type_texts[feed.type]
+                tr
+                    td
+                        - if( feed.type === 'film-r' ) {
+                            h2=feed.object.name
+                            span.feed.object.rating
+
+                        - } else if( feed.type === 'film-s' ) {
+
+
+                        - } else if( feed.type === 'film-nw' ) {
+
+                        - } else if( feed.type === 'film-c' ) {
+
+                        - } else if( feed.type === 'film-o' ) {
+
+                        - } else if( feed.type === 'pers-s' ) {
+
+                        - } else if( feed.type === 'pers-o' ) {
+
+                        - }
+
+
+
