@@ -6,6 +6,7 @@ from django.contrib import admin
 from videobase import settings
 
 from apps.films.views import test_view
+from apps.users.views import feed_view
 
 admin.autodiscover()
 
@@ -38,6 +39,9 @@ urlpatterns = patterns('',
 
     # GIT
     url(r'^git/', include('apps.git.urls')),
+
+    # notice_feed_letter
+    url(r'^mail/notice_feed_letter/', feed_view),
 )
 
 if settings.DEBUG:
