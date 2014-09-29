@@ -600,10 +600,9 @@ mixin cast_thumb(item)
                         =pg_rating
                         |)
             .btn-def.block(class=btn_cls,data-mi-id="btn")
-                a(href=url_btn , title='',data-mi-id="btn_text",data-mi-athref="id", class=btn_cls)!=btn_text
+                a(href=url_btn , title='',data-mi-id="btn_text",data-mi-athref="id")!=btn_text
             p(class=min_price && has_free?'':'display-none',data-mi-id="btn_price")
                 | или
-                br
                 a(href=url_loc, title='',data-mi-athref="id")
                     - text = " " + (price_loc_cnt > 1?"от ":"") + min_price + " р. без рекламы"
                     span(data-mi-id="price")=text
