@@ -6,3 +6,4 @@ from crawler.tasks.datarobots_tasks import kinopoisk_films,\
     trailer_commands
 
 from crawler.tasks.save_location_task import save_location_from_robo_task
+from crawler.tasks.robot_logs_tasks import send_robots_statistic_to_email
