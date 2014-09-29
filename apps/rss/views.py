@@ -2,7 +2,6 @@
 
 import time
 import json
-import math
 from email import utils
 
 from django.shortcuts import render
@@ -157,10 +156,10 @@ def get_price(film):
             min_price = location.price
 
     if min_price != 0:
-        cost = u'от {cost} рублей без рекламы'.format(cost=math.floor(min_price))
+        cost = u'от {cost} рублей без рекламы'.format(cost=int(min_price))
 
     elif min_price == 0 and price != -1:
-        cost = u'бесплатно или от {cost} рублей без рекламы'.format(cost=math.floor(price))
+        cost = u'бесплатно или от {cost} рублей без рекламы'.format(cost=int(price))
 
     return cost
 
