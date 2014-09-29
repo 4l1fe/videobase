@@ -40,23 +40,23 @@ html
                                         .col-md-8.col-sm-7
                                             .name-playlist
                                                 h2=cast.generic_title
-                                                //if cast.title_orig && cast.title_orig != cast.title
-                                                    span=cast.title_orig
 
                                     .row
                                         .col-md-8.col-sm-7
-                                            span.cast-start-date=date_text(new Date(cast.start_date))
+                                            div.cast-start-date=date_text(new Date(cast.start_date))
 
                                         .col-md-4.col-sm-5
-                                            .fright
-                                                h3.cast-chat-title Чат
+                                            .cast-chat-header.fright
+                                                img(src="/static/img/cast-chat-icon.png", alt="", title="")
+                                                .fright
+                                                    h3.cast-chat-title Чат
 
                             //-
                                .title-cast
                             .cast-area
                                 .container
                                     .row
-                                        .col-md-8
+                                        .col-md-8.rpadding0
                                             each el in cast.locations
                                                 a(id=el.id)
                                             a(id="player")
@@ -64,7 +64,7 @@ html
                                                 .frame-player-aspect
                                                     .frame-player#frame_player
 
-                                        .col-md-4
+                                        .col-md-4.lpadding0
                                             - cast_chat_items = [{user: {name: "Василий Пупкин", avatar:""}, text: "Довольно неплохая передача, если учесть, кто ее авторы", created: new Date(0,0,0, 12, 31, 0)}]
                                             - cast_chat_items.push({user: {name: "Гоблин Вася", avatar:""}, text: "По-моему основная тема так и не была раскрыта, хотя вопрос очень важный", created: new Date(0,0,0, 14, 21, 0)})
                                             - cast_chat_items.push({user: {name: "Владимир Владимирович", avatar:""}, text: "Общественное мнение по этому вопросу очень важно, поэтому необходимо продолжать подобные обсуждения", created: new Date(0,0,0, 1, 18, 0)})
@@ -88,7 +88,7 @@ html
                                     .row
                                         .col-md-12
                                             if cast.locations.length > 1
-                                                ul.just-list.list-btns-film#locations
+                                                ul.just-list.list-btns-film.list-btns-cast#locations
                                                     each el in cast.locations
                                                         mixin loc_thumb(el)
                             //-
@@ -134,7 +134,7 @@ html
             if online_casts && online_casts.length
                 section
                     .container
-                        h1.dots2.blackh1.centerh1 Онлайн трансляции
+                        h1.dots2-casts.blackh1.centerh1 Онлайн трансляции
                         mixin casts_list(online_casts)
 
             include footer

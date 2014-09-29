@@ -1042,18 +1042,6 @@ a.toggle-playlist.active {
     .list-btns-film li {padding-left:10px;padding-right: 10px;}*/
 }
 
-
-.cast-thumb .btn-price {background: url(../img/btn-orange.png) left top no-repeat;}
-.cast-thumb .btn-price a {color: #232323;}
-.cast-thumb .btn-price i {color: #454545;}
-
-.cast-thumb .btn-watch, .btn-watch {
-    padding: 0;
-    color: #232323 !important;
-    line-height: 50px;
-    background: url(../img/btn-yellow-plain.png) left top no-repeat;
-}
-
 .cast-thumb {
     background: transparent;
     margin-bottom: 10px;
@@ -1102,7 +1090,7 @@ a.toggle-playlist.active {
     text-decoration: none;
 }
 
-.title-cast {padding: 25px 0 5px 0;}
+.title-cast {padding: 35px 0 5px 0;}
 
 .cast-chat-block {
     background: #fff;
@@ -1157,8 +1145,18 @@ a.toggle-playlist.active {
     vertical-align: middle;
 }
 
+.cast-thumb .btn-price {background: url(../img/btn-yellow-plain.png) left top no-repeat; padding-right: 0;}
+.cast-thumb .btn-price a {color: #232323;}
+.cast-thumb .btn-price i {color: #454545;}
 
-.cast-thumb .btn-watch {background: url(../img/btn-yellow-plain.png) left top no-repeat;}
+.cast-thumb .btn-free, .btn-free {
+    padding: 0;
+    color: #232323 !important;
+    line-height: 50px;
+    background: url(../img/btn-yellow-plain.png) left top no-repeat;
+}
+
+.cast-thumb .btn-free {background: url(../img/btn-yellow-plain.png) left top no-repeat;}
 .cast-thumb .btn-subscribe {
     background: url(../img/btn-green.png) left top no-repeat;
 }
@@ -1167,6 +1165,13 @@ section.cast-details { padding-top: 10px; }
 .cast-share { padding-top: 5px; padding-bottom: 25px; }
 
 .hide-watching-users .playlist-content {padding-bottom: 0}
+
+.cast-chat-header img {margin-right: 9px; }
+.cast-chat-header { margin-bottom: 15px; }
+.cast-chat-header h3 { font-size: 14px; padding-top: 8px; }
+
+.rpadding0 { padding-right: 0; }
+.lpadding0 { padding-left: 0; }
 
 .cast-label-guests-count {
     display: block;
@@ -1177,6 +1182,7 @@ section.cast-details { padding-top: 10px; }
     font-size: 14px;
     font-weight: normal;
     border-radius: 4px;
+    margin-top: -7px;
 }
 
 .cast-label-guests-count > span { color: #232323; }
@@ -1228,8 +1234,14 @@ section.cast-chat {padding-bottom: 40px;}
 .cast-item-status .label-success {background: #0beb00;}
 .cast-item-status .label-primary {background: #3168d1;}
 
-.title-cast .cast-start-date { color: #a08c8c;}
+.title-cast .cast-start-date { color: #a08c8c; padding-top: 8px; }
 .title-cast .cast-chat-title { color: #fff; text-transform: uppercase; font-weight: normal; }
+
+.list-btns-cast { margin-top: 24px; }
+
+.cast-area { padding-bottom: 20px; }
+
+.dots2-casts {background: url(../img/dots2-casts.png) center center no-repeat;}
 
 .num i {
     font-weight: bold;font-size: 22px;font-style: normal;text-align: center;line-height: 50px;
