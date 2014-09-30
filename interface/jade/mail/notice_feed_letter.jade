@@ -35,21 +35,31 @@
 -   return text;
 - }
 
+- get_poster_url = function(feed) {
+-   return feed.object.poster && feed.object.poster.length > 0 ? ( vsevi_url + feed.object.poster ) : noposter_url;
+- }
+
 
 
 mixin film_header(item)
+    - if( item.type === 'film-c' ) {
+    -   name = item.object.film.name
+    - } else {
+    -   name = item.object.name
+    - }
+    - year = "(" + 2014 + ")"
     h2(style="color: #fff; text-decoration: none; font-size: 18px; padding: 0 0 10px 0; margin: 0;")
-        span(style="text-decoration: underline; font-weight: bold;")=item.object.name
+        span(style="text-decoration: underline; font-weight: bold;")=name
         span(style="color: #85b6c7; font-weight: normal;")
             | #{" "}
-            |(2014)
+            =year
 
 
 doctype html
 html
     head
 
-    body(style="font-family: Arial, sans-serif; font-size: 14px; font-weight: normal; color: #fff;")
+    body(style="font-family: Arial, sans-serif; font-size: 14px; font-weight: normal; color: #fff; padding: 0; margin: 0;")
         table(style="width: 800px; background: #322a2a; ", border=0, cellpadding=0, cellspacing=0)
             tr
                 td
@@ -62,10 +72,24 @@ html
                         span(style="padding: 4px;") &nbsp;
 
         table(style="width: 800px; background: #005685; ", border=0, cellpadding=0, cellspacing=0)
+            - fake_user = {name: "Василий Йозефович Пупкин", avatar: "/static/upload/persons/10285/profile.jpg"}
+            - feed = {type: "film-o", user: fake_user }
+            - object = { id: 197232, name: "Бр0тва и кольцо", poster: "/static/upload/filmextras/197232/poster_260x360.jpg" }
+            - locations = []
+            - locations.push({})
+            - feed.object = object
+            - feeds.push(feed)
+
+            - feed = {type: "film-c", user: fake_user }
+            - comment_text = "Моя полагаеть, что это все ботва и ничего этого не надо показывать. Ну, что за бр0тва? Где они такой сюжет раскопали? Нет, такого мы не смотрим."
+            - object = { text: comment_text, film: { id: 197232, name: "Бр0тва и кольцо" } }
+            - feed.object = object
+            - feeds.push(feed)
+
             each feed in feeds
                 tr
                     td(style="width: 53px; padding-left: 20px;")
-                        - avatar_url = ( feed.user.avatar && feed.user.avatar.length > 0 ? feed.user.avatar : noavatar_url );
+                        - avatar_url = ( feed.user.avatar && feed.user.avatar.length > 0 ? ( vsevi_url +  feed.user.avatar ) : noavatar_url );
                         img(src=avatar_url, alt="", title="", style="border-radius: 50%; height: 40px; width: 40px;")
                     td
                         span(style="font-family: Arial, sans-serif; font-size: 16px; font-weight: normal; color: #fff;")=feed.user.name
@@ -75,7 +99,7 @@ html
                     td &nbsp;
                     td
                         - if( feed.type === 'film-r' ) {
-
+                            mixin film_header(feed)
 
                             - for( i = 1; i <= 10; i++ ) {
                             - star_img_url = img_url + "mail/star2-" + ( i <= feed.object.rating ? '' : 'un' ) + 'set.png';
@@ -88,7 +112,7 @@ html
                                         | #{" из 10"}
 
                         - } else if( feed.type === 'film-s' ) {
-                            - poster_url =  feed.object.poster && feed.object.poster.length > 0 ? ( vsevi_url + feed.object.poster ) : noposter_url;
+                            - poster_url = get_poster_url(feed)
                             img(src=poster_url, alt="", title="")
 
                             table
@@ -102,16 +126,54 @@ html
 
                         - } else if( feed.type === 'film-c' ) {
                             mixin film_header(feed)
-                            span=feed.object.comment
+                            span=feed.object.text
 
 
                         - } else if( feed.type === 'film-o' ) {
+                            - poster_url = get_poster_url(feed)
+                            img(src=poster_url, alt="", title="")
+
+                            mixin film_header(feed)
+                            table
+                                tr
+                                    td
+                                    td
 
                         - } else if( feed.type === 'pers-s' ) {
 
                         - } else if( feed.type === 'pers-o' ) {
-
+                            mixin film_header(feed)
+                            table
+                                tr
+                                    td
+                                    td
                         - }
+            tr(style="height: 30px;")
+                td(colspan=6) &nbsp;
 
 
-
+        <!--- FOOTER -->
+        table(style="width: 800px; background: #fff; border: 0; border-collapse: collapse; border-spacing: 0; font-size: 1px;" cellpadding="0" cellspacing="0")
+            tr
+                td(colspan="7" style="height: 30px; vertical-align: top;") &nbsp;
+            tr
+                td(style="width: 20px; vertical-align: top;") &nbsp;
+                td(class="cell-footer-text" style="vertical-align: top; color: #7a7a7a; font-size: 12px;")
+                    | Вы получили это письмо, потому что прошли регистрацию в проекте
+                    | «Все Видео» и выразили согласие получать рассылку с новостями
+                    | на указанный при регистрации адрес электронной почты. Вы можете
+                    a(href="#" style="color: #7a7a7a; text-decoration: underline;") отписаться
+                    | от этой рассылки или настроить частоту и формат рассылок в
+                    a(href="#" style="color: #7a7a7a; text-decoration: underline;") личном кабинете
+                    | пользователя.
+                td(style="width: 30px; vertical-align: top;") &nbsp;
+                td(style="vertical-align: top;")
+                    a(href="http://vsevi.ru/" style="color: inherit; text-decoration: inherit;")
+                        img(src="http://vsevi.ru/static/img/logo-footer.png" alt="Лого Все Видео" title="Все Видео")
+                td(style="width: 30px; vertical-align: top;") &nbsp;
+                td(style="vertical-align: top;")
+                    a(href="http://solarispromo.com/" style="color: inherit; text-decoration: inherit;")
+                        img(src="http://vsevi.ru/static/img/solaris-logo.png" alt="Лого Solaris Promo" title="Solaris Promo")
+                td(style="width: 20px; vertical-align: top;") &nbsp;
+            tr
+                td(colspan="7" style="height: 30px; vertical-align: top;") &nbsp;
