@@ -25,6 +25,7 @@ def save_loaded_data_to_file(loaded_data, film_id, site):
 
 
 def load_and_save_film_page_from_site(site, film_id, url=None):
+    saved_file_name = ''
     try:
         film = Films.objects.get(id=film_id)
     except Films.DoesNotExist:
