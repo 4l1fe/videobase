@@ -1,4 +1,9 @@
-include ../config
+- vsevi_url = "http://vsevi.ru"
+- static_url = vsevi_url + "/static/"
+- img_url = static_url + "img/"
+- noavatar_url = img_url + "noavatar.png"
+- nophoto_url = img_url + "nophoto.png"
+- noposter_url = img_url + "noposter.png"
 
 - console.log(feeds)
 
@@ -10,24 +15,41 @@ include ../config
 - socials.push( { href: "http://vsevi.ru/rss/feed", title: "RSS новинок на ВсеВидео", img_url: "http://vsevi.ru/static/img/i-rss.png" } )
 
 - feed_type_texts = {}
-- feed_type_texts['film-r'] = "Оценил фильм"
-- feed_type_texts['film-s'] = "Подписался на фильм"
-- feed_type_texts['film-nw'] = "Не захотел смотреть фильм"
-- feed_type_texts['film-c'] = "Оставил комментарий к фильму"
-- feed_type_texts['film-o'] = "Доступен к просмотру новый фильм"
-- feed_type_texts['pers-s'] = "Подписался на персону"
-- feed_type_texts['pers-o'] = "Появился фильм с участием персоны"
+- feed_type_texts['film-r'] = "оценил фильм"
+- feed_type_texts['film-s'] = "подписался на фильм"
+- feed_type_texts['film-nw'] = "сообщил, что не будет смотреть фильм"
+- feed_type_texts['film-c'] = "прокомментировал фильм"
+- feed_type_texts['film-o'] = "появился в наличии фильм, на который вы подписались"
+- feed_type_texts['pers-s'] = "подписался на персону"
+- feed_type_texts['pers-o'] = "появился фильм с участием персоны"
+- feed_type_texts['user-a'] = "появился фильм с участием персоны"
+- feed_type_texts['user-f'] = "появился фильм с участием персоны"
+- feed_type_texts['sys-a'] = "появился фильм с участием персоны"
+- get_feed_header_text = function(item) {
+-   var text = '';
+-   var friends_ev_type = ['film-r', 'film-s', 'film-nw', 'film-c', 'pers-s'];
+-   if( friends_ev_type.indexOf(item.type) !== -1 ) {
+-       text += 'ваш друг ';
+-   }
+-   text += feed_type_texts[item.type]
+-   return text;
+- }
 
 
-mixin social_btn(item)
-    | There are empty((
+
+mixin film_header(item)
+    h2(style="color: #fff; text-decoration: none; font-size: 18px; padding: 0 0 10px 0; margin: 0;")
+        span(style="text-decoration: underline; font-weight: bold;")=item.object.name
+        span(style="color: #85b6c7; font-weight: normal;")
+            | #{" "}
+            |(2014)
 
 
 doctype html
 html
     head
 
-    body
+    body(style="font-family: Arial, sans-serif; font-size: 14px; font-weight: normal; color: #fff;")
         table(style="width: 800px; background: #322a2a; ", border=0, cellpadding=0, cellspacing=0)
             tr
                 td
@@ -48,19 +70,40 @@ html
                     td
                         span(style="font-family: Arial, sans-serif; font-size: 16px; font-weight: normal; color: #fff;")=feed.user.name
                             | #{" "}
-                        span(style="font-family: Arial, sans-serif; font-size: 14px; font-weight: normal; color: #85b6c7;")=feed_type_texts[feed.type]
+                        span(style="font-family: Arial, sans-serif; font-size: 14px; font-weight: normal; color: #85b6c7;")=get_feed_header_text(feed)
                 tr
+                    td &nbsp;
                     td
                         - if( feed.type === 'film-r' ) {
-                            h2=feed.object.name
-                            span.feed.object.rating
+
+
+                            - for( i = 1; i <= 10; i++ ) {
+                            - star_img_url = img_url + "mail/star2-" + ( i <= feed.object.rating ? '' : 'un' ) + 'set.png';
+                                img(src=star_img_url, alt="", title="")
+                                span(style="padding-right: 4px;")
+                            - }
+                                span
+                                    span(style="font-family: Arial; font-size: 18px; padding-left: 10px;")
+                                        =feed.object.rating
+                                        | #{" из 10"}
 
                         - } else if( feed.type === 'film-s' ) {
+                            - poster_url =  feed.object.poster && feed.object.poster.length > 0 ? ( vsevi_url + feed.object.poster ) : noposter_url;
+                            img(src=poster_url, alt="", title="")
+
+                            table
+                                tr
+                                    td(style="height: 50px; width: 280px; vertical-align: middle; background: #57cb56; text-align: center; ")
+                                        span(style="text-transform: uppercase; font-weight: bold; color: #232323;")
+                                            | Подписаться
 
 
                         - } else if( feed.type === 'film-nw' ) {
 
                         - } else if( feed.type === 'film-c' ) {
+                            mixin film_header(feed)
+                            span=feed.object.comment
+
 
                         - } else if( feed.type === 'film-o' ) {
 
