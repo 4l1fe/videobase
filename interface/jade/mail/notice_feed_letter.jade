@@ -44,34 +44,153 @@
 mixin film_header(item)
     - if( item.type === 'film-c' ) {
     -   name = item.object.film.name
+    -   url = item.object.film.id
     - } else {
     -   name = item.object.name
+    -   url = item.object.id
     - }
     - year = "(" + 2014 + ")"
-    h2(style="color: #fff; text-decoration: none; font-size: 18px; padding: 0 0 10px 0; margin: 0;")
-        span(style="text-decoration: underline; font-weight: bold;")=name
-        span(style="color: #85b6c7; font-weight: normal;")
-            | #{" "}
-            =year
+    - general_name = "Трансляция"
+
+    - is_translation = false
+    - is_film = true
+
+    - if( is_translation ) {
+        - url = vsevi_url + "/casts/" + item.object.id
+        h2(style="text-decoration: none; font-size: 18px; padding: 0 0 10px 0; margin: 0; color: #ffcd00;")
+            a(href=url, style="text-decoration: none; color: inherit;")
+                span(style="text-decoration: underline; color: #fff;")=general_name
+                | #{": "}
+                span(style="text-decoration: underline;")=name
+    - } else if( is_film ) {
+        h2(style="text-decoration: none; font-size: 18px; padding: 0 0 10px 0; margin: 0; color: #fff;")
+            a(href=url, style="text-decoration: none; color: inherit;")
+                span(style="text-decoration: underline; font-weight: bold;")=name
+                span(style="color: #85b6c7; font-weight: normal;")
+                    | #{" "}
+                    =year
+    - }
+
+mixin film_def(item)
+    - rating = "8.2"
+    - is_translation = true
+    - is_film = false
+
+    - url_loc="#"
+    - url_btn="#"
+    - has_free = true
+    - min_price = false
+    - price_loc = ""
+    - price_loc_cnt = 0
+    - object = item.object
+    - if (object.locations && object.length>0) {
+    -   for (i = 0; i < object.locations.length; i++) {
+    -       loc = object.locations[i];
+    -       if (loc.price_type == 0) {
+    -            has_free = true;
+    -       } else {
+    -           price_loc_cnt++;
+    -           if (min_price === false || min_price > loc.price) {
+    -               min_price = loc.price;
+    -               price_loc = loc.id
+    -           }
+    -       }
+    -   }
+    -   url_loc = price_loc?(url+"#" + price_loc):""
+    -   url_btn = url
+    -   if (min_price && !has_free) {
+    -       url_btn = url_loc
+    -   } else {
+    -       url_btn = url + "#player"
+    -   }
+    -   if (min_price) {
+    -       min_price = Math.floor(min_price)
+    -   }
+    - }
+
+    - poster_url = get_poster_url(item)
+    img(src=poster_url, alt="", title="")
+
+    table(style="width: 280px; padding: 0; padding-top: 18px; margin: 0; border: 0;")
+        tr
+            td(rowspan=2)
+                mixin film_header(feed)
+            - if( is_translation ) {
+                - start_time = "19:15"
+                - start_day = "пятница"
+                td(style="width: 65px; height: 45px; background: #007fc0; color: #fff; vertical-align: middle; text-align: center; font-weight: normal; padding: 0;")
+                    span(style="font-size: 18px;")=start_time
+                    div(style="font-size: 12px;")=start_day
+            - } else if( is_film ) {
+                td(style="width: 40px; height: 30px; background: #007fc0; color: #fff; vertical-align: middle; text-align: center; font-size: 18px; font-weight: bold; padding: 0;")
+                    =rating
+            - }
+        tr
+            td(style="font-size: 0;") &nbsp;
+
+    - has_free = true
+    - has_price = false
+    table(style="padding: 0; padding-top: 20px; margin: 0; border: 0;")
+        tr
+            - if( is_subscribe ) {
+                td(style="height: 50px; width: 280px; vertical-align: middle; background: #57cb56; text-align: center; padding: 0;")
+                    a(href=url_btn, style="text-decoration: none; color: inherit;")
+                        span(style="text-transform: uppercase; font-weight: bold; color: #232323;")
+                            | Подписаться
+            - } else if( has_free && has_price) {
+                td(style="height: 50px; width: 163px; vertical-align: middle; background: #ffcd00; text-align: center; padding: 0;")
+                    a(href=url_btn, style="text-decoration: none; color: inherit;")
+                        span(style="text-transform: uppercase; font-weight: bold; color: #232323;")
+                            !="Смотреть<br>бесплатно"
+                td &nbsp;
+                td(style="height: 50px; width: 112px; vertical-align: middle; background: #ff9700; text-align: center; padding: 0;")
+                    a(href=url_loc, style="text-decoration: none; color: inherit;")
+                        span(style="color: #232323;")
+                            ="или от " + min_price + " р. без рекламы"
+            - } else if( has_free ) {
+                td(style="height: 50px; width: 280px; vertical-align: middle; background: #ffcd00; text-align: center; padding: 0;")
+                    a(href=url_btn, style="text-decoration: none; color: inherit;")
+                        span(style="text-transform: uppercase; font-weight: bold; color: #232323;")
+                            !="Смотреть<br>бесплатно"
+            - } else if( has_price ) {
+                td(style="height: 50px; width: 280px; vertical-align: middle; background: #ff9700; text-align: center; padding: 0;")
+                    a(href=url_loc, style="text-decoration: none; color: inherit;")
+                        span(style="text-transform: uppercase; color: #232323; font-weight: bold; line-height: ") смотреть
+                        div(style="color: #232323;")
+                            ="от " + min_price + " р. без рекламы"
+            - }
 
 
 doctype html
 html
     head
 
-    body(style="font-family: Arial, sans-serif; font-size: 14px; font-weight: normal; color: #fff; padding: 0; margin: 0;")
-        table(style="width: 800px; background: #322a2a; ", border=0, cellpadding=0, cellspacing=0)
+    body(style="font-family: Arial, sans-serif; font-size: 14px; font-weight: normal; color: #fff; padding: 0; margin: 0; border: 0;")
+        table(style="width: 800px; height: 76px; background: #322a2a; padding: 0; margin: 0; border: 0;", cellpadding=0, cellspacing=0)
             tr
-                td
-                    img(src="", alt="", title="")
+                td(style="padding-left: 20px; vertical-align: middle;")
+                    a(href="http://vsevi.ru" title="Все видео" style="color: inherit; text-decoration: inherit;")
+                        img(src="http://vsevi.ru/static/img/logo-header.png" alt="" title="")
 
-                td
+                td(style="text-align: right; padding-right: 20px;")
                     each social in socials
+                        span(style="padding: 4px;") &nbsp;
                         a(href=social.href, title=social.title, rel="nofollow", target="_new", style="color: inherit; text-decoration: inherit;")
                             img(src=social.img_url style="height: 30px; width: 30px;" alt="" title="")
-                        span(style="padding: 4px;") &nbsp;
 
-        table(style="width: 800px; background: #005685; ", border=0, cellpadding=0, cellspacing=0)
+        table(style="width: 800px; background: #005685; padding: 0; margin: 0; border: 0;", cellpadding=0, cellspacing=0)
+            tr
+                td(style="height: 30px;") &nbsp;
+            tr
+                td(style="width: 70px;") &nbsp;
+                td(style="text-align: center;")
+                    h1(style="text-transform: uppercase; font-size: 16px; font-weight: bold; background: url('http://vsevi.ru/static/img/mail/top-10-films_serials_casts/dots1.png') center center no-repeat;")
+                        | ваша лента уведомлений
+                td(style="width: 70px;") &nbsp;
+            tr
+                td(style="height: 16px;")
+
+        table(style="width: 800px; background: #005685; padding: 0; margin: 0; border: 0;", cellpadding=0, cellspacing=0)
             - fake_user = {name: "Василий Йозефович Пупкин", avatar: "/static/upload/persons/10285/profile.jpg"}
             - feed = {type: "film-o", user: fake_user }
             - object = { id: 197232, name: "Бр0тва и кольцо", poster: "/static/upload/filmextras/197232/poster_260x360.jpg" }
@@ -88,16 +207,22 @@ html
 
             each feed in feeds
                 tr
-                    td(style="width: 53px; padding-left: 20px;")
+                    td(style="width: 53px; padding-left: 20px;", rowspan=2)
                         - avatar_url = ( feed.user.avatar && feed.user.avatar.length > 0 ? ( vsevi_url +  feed.user.avatar ) : noavatar_url );
                         img(src=avatar_url, alt="", title="", style="border-radius: 50%; height: 40px; width: 40px;")
                     td
                         span(style="font-family: Arial, sans-serif; font-size: 16px; font-weight: normal; color: #fff;")=feed.user.name
                             | #{" "}
                         span(style="font-family: Arial, sans-serif; font-size: 14px; font-weight: normal; color: #85b6c7;")=get_feed_header_text(feed)
+                    td(style="width: 160px; text-align: right;")
+                        | 5 мин. назад
+
+                    td(style="width: 20px;") &nbsp;
+                tr
+                    td(style="border-top: solid #fff 1px;", colspan=2) &nbsp;
                 tr
                     td &nbsp;
-                    td
+                    td(colspan=2)
                         - if( feed.type === 'film-r' ) {
                             mixin film_header(feed)
 
@@ -112,44 +237,21 @@ html
                                         | #{" из 10"}
 
                         - } else if( feed.type === 'film-s' ) {
-                            - poster_url = get_poster_url(feed)
-                            img(src=poster_url, alt="", title="")
-
-                            table
-                                tr
-                                    td(style="height: 50px; width: 280px; vertical-align: middle; background: #57cb56; text-align: center; ")
-                                        span(style="text-transform: uppercase; font-weight: bold; color: #232323;")
-                                            | Подписаться
-
-
+                            mixin film_def(feed)
                         - } else if( feed.type === 'film-nw' ) {
 
                         - } else if( feed.type === 'film-c' ) {
                             mixin film_header(feed)
                             span=feed.object.text
-
-
                         - } else if( feed.type === 'film-o' ) {
-                            - poster_url = get_poster_url(feed)
-                            img(src=poster_url, alt="", title="")
-
-                            mixin film_header(feed)
-                            table
-                                tr
-                                    td
-                                    td
-
+                            mixin film_def(feed)
                         - } else if( feed.type === 'pers-s' ) {
 
                         - } else if( feed.type === 'pers-o' ) {
                             mixin film_header(feed)
-                            table
-                                tr
-                                    td
-                                    td
                         - }
-            tr(style="height: 30px;")
-                td(colspan=6) &nbsp;
+                tr(style="height: 30px;")
+                    td(colspan=6) &nbsp;
 
 
         <!--- FOOTER -->
@@ -162,9 +264,13 @@ html
                     | Вы получили это письмо, потому что прошли регистрацию в проекте
                     | «Все Видео» и выразили согласие получать рассылку с новостями
                     | на указанный при регистрации адрес электронной почты. Вы можете
+                    =" "
                     a(href="#" style="color: #7a7a7a; text-decoration: underline;") отписаться
+                    =" "
                     | от этой рассылки или настроить частоту и формат рассылок в
+                    =" "
                     a(href="#" style="color: #7a7a7a; text-decoration: underline;") личном кабинете
+                    =" "
                     | пользователя.
                 td(style="width: 30px; vertical-align: top;") &nbsp;
                 td(style="vertical-align: top;")
