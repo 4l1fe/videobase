@@ -42,6 +42,7 @@ class FilmExtrasAdmin(admin.ModelAdmin):
     form = FilmExtrasImageForm
     raw_id_fields = ('film',)
     search_fields = ('film__pk',)
+    list_filter = ('type', )
 
 
 #############################################################################################################
