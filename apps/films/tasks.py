@@ -76,9 +76,12 @@ def best_of_the_best_this_week():
 def personal_newsletter():
     # Основные параметры рассылки и контекст
     params_email = {
+        'jade_render': True,
         'subject': APP_FILMS_PERSON_SUB_EMAIL,
-        'tpl_name': u'mail/personal_newsletter.html',
-        'context': {},
+        'tpl_name': 'personal_newsletter',
+        'context': {
+            'serials': [],
+        },
     }
 
     # Все пользователи у которых есть email и выбрана недельная рассылка
