@@ -83,7 +83,7 @@ class vbUser(serializers.ModelSerializer):
         return UsersRels.objects.filter(user=obj, rel_type=APP_USER_REL_TYPE_FRIENDS).count()
 
     def get_films_watched_cnt(self, obj):
-        return UsersFilms.objects.filter(user=obj).exclude(status=APP_USERFILM_STATUS_NOT_WATCH).count()
+        return UsersFilms.objects.filter(user=obj, rating__gt=0).count()
 
     def get_comments_cnt(self, obj):
         return obj.comments.all().count()
