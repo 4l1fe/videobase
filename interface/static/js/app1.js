@@ -518,7 +518,9 @@
         })(this)
       });
       if (document.location.pathname.slice(0, 9) === "/playlist" && typeof (this._app.page().conf.film.id) === 'undefined') {
-        document.location.reload(true);
+        setTimeout(function() {
+          return document.location.reload(true);
+        }, 400);
       }
       return false;
     };
