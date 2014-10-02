@@ -1,5 +1,7 @@
 # coding: utf-8
 import json
+import os
+import urllib2
 from bs4 import BeautifulSoup
 from crawler.dom2_fizruk_robots.dom2.loader import Dom2Loader
 
@@ -55,8 +57,22 @@ class ParseDom2():
 
     @staticmethod
     def get_episode_quick_info(episode):
-        pass
+        quick_info = {
+            'label': '',
+            'video_link': '',
+            'poster': '',
+        }
 
+        a_tag = episode.find('a', {"class": "imgBox link no-select"})
+
+        quick_info['label'] = episode.find('div', {"class": "photo-list-title"}).find('a').contents[0]
+        quick_info['video_link'] = 'http://dom2.ru'+a_tag['href']
+        poster_link = a_tag.find('img')['src']
+        quick_info['poster'] = ParseDom2.save_poster_to_file(poster_link, quick_info['label'])
+        print '#', quick_info['label']
+        print quick_info['video_link']
+        print quick_info['poster']
+        return quick_info
 
     @staticmethod
     def get_all_videos_for_episode():
@@ -69,3 +85,21 @@ class ParseDom2():
     @staticmethod
     def parse_actors_for_episode(episode_date):
         pass
+
+    @staticmethod
+    def save_poster_to_file(link, name):
+        file_name = None
+        directory = 'static/upload/dom2'
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        try:
+            if 'dom2' not in link:
+                link = 'http://dom2.ru'+link
+            img = urllib2.urlopen(link)
+            with open(directory + '/' + name + '.jpg', 'wb') as localFile:
+                localFile.write(img.read())
+            file_name = name + '.jpg'
+        except Exception, e:
+            print e.message
+            print "Poster saving failed"
+        return file_name
