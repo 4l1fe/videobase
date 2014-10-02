@@ -370,19 +370,19 @@ CELERYBEAT_SCHEDULE = {
     # Checking locations for new films weekly
     'age_weighted_robot_launch_task_weekly': {
         'task': 'age_weighted_robot_launch',
-        'schedule': timedelta(days=7),
+        'schedule': timedelta(days=3),
         'args': (1,)
     },
     # Checking locations for aged films monthly
     'age_weighted_robot_launch_task_monthly': {
         'task': 'age_weighted_robot_launch',
-        'schedule': timedelta(days=31),
+        'schedule': timedelta(days=7),
         'args': (3,)
     },
     # Checking locations for aged films yearly
     'age_weighted_robot_launch_task_six_month': {
         'task': 'age_weighted_robot_launch',
-        'schedule': timedelta(days=31*6),
+        'schedule': timedelta(days=14),
         'args': (120,)
     },
     'drugoe_kino_update_schedule': {
