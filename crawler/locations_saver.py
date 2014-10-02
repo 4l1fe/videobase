@@ -14,4 +14,6 @@ def save_location_to_locs_dict(locations_dict, status, **film_dict):
         #print "locations dict", locations_dict
         print "Location dict saved"
     except Exception, e:
+        import traceback
+        traceback.print_exc()
         print "Locations dict saving failed:", e.message
