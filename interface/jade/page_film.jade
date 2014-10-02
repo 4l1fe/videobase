@@ -3,7 +3,7 @@ html
     include config
     include mixins
     - film_name_meta = film.name.replace(/"/g, " ")
-    - film_descr_meta = film.description.replace(/"/g, ' ').substr(0,256)
+    - film_descr_meta = film.description ? film.description.replace(/"/g, ' ').substr(0,256) : ""
     - film_url_meta = 'http://vsevi.ru/films/' + film.id
     - film_img_meta = film.poster || noposter_url
     - if (film_img_meta[0] == "/") film_img_meta = 'http://vsevi.ru' + film_img_meta
