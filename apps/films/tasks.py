@@ -73,7 +73,7 @@ def best_of_the_best_this_week():
 
 
 @app.task(name="personal_newsletter", queue="personal_newsletter")
-def personal_newsletter():
+def personal_newsletter(*args, **kwargs):
     curr_dt = datetime.now()
     start_dt = curr_dt - timedelta(days=1)
 
@@ -122,16 +122,17 @@ def personal_newsletter():
             filter(user__in=ids, type__in=[FILM_O], created__gte=start_dt, created__lt=curr_dt).\
             order_by('created')
 
-        feeds = vbFeedElement(feeds, many=True).data
+        if len(feeds):
+            feeds = vbFeedElement(feeds, many=True).data
 
-        # Update
-        params_email['to'] = item.email
-        params_email['context'] = {
-            'feeds': feeds,
-        }
+            # Update
+            params_email['to'] = item.email
+            params_email['context'] = {
+                'feeds': feeds,
+            }
 
-        # Отправляем email в очередь
-        send_template_mail.s(**params_email).apply_async()
+            # Отправляем email в очередь
+            send_template_mail.s(**params_email).apply_async()
 
 
 @app.task(name="calc_amount_subscribed_to_movie")

@@ -19,7 +19,6 @@ djcelery.setup_loader()
 AMQP_HOST = 'localhost'
 BROKER_HOST = 'localhost'
 BROKER_PORT = 5672
-###########################################################
 
 CELERY_TIMEZONE = 'UTC'
 CELERY_ACCEPT_CONTENT = ['pickle', 'json', 'msgpack', 'yaml']
