@@ -5,7 +5,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
 from apps.films.models import Films, UsersFilms
-from apps.films.constants import APP_FILM_SERIAL, APP_USERFILM_STATUS_PLAYLIST
+from apps.films.constants import APP_FILM_SERIAL, APP_USERFILM_STATUS_PLAYLIST, APP_USERFILM_STATUS_UNDEF
 
 from videobase.settings import DEFAULT_REST_API_RESPONSE
 
@@ -83,6 +83,9 @@ class ActPlaylistFilmView(APIView):
             'film': o_film.pk,
             'user': request.user.pk,
         }
-        UsersFilms.objects.filter(**filter).delete()
+
+        user_film = UsersFilms.objects.get(**filter)
+        user_film.status = APP_USERFILM_STATUS_UNDEF
+        user_film.save()
 
         return Response(DEFAULT_REST_API_RESPONSE, status=status.HTTP_200_OK)

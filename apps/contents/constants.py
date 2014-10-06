@@ -13,7 +13,7 @@ APP_CONTENTS_LOC_TYPE = (
     ('streamru','streamru'),
     ('tvzavr','tvzavr'),
     ('viaplay','viaplay'),
-    ('zabava','zabava'),
+    ('zabavaru','zabavaru'),
     ('playgoogle','playgoogle'),
     ('itunes','itunes'),
     ('ayyo','ayyo'),

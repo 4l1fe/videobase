@@ -517,6 +517,11 @@
           return function(new_state) {};
         })(this)
       });
+      if (document.location.pathname.slice(0, 9) === "/playlist" && typeof (this._app.page().conf.film.id) === 'undefined') {
+        setTimeout(function() {
+          return document.location.reload(true);
+        }, 400);
+      }
       return false;
     };
 
