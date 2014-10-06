@@ -26,6 +26,19 @@ html
     - social_networks.push({ img: "/static/img/i-tw.png", href: "https://twitter.com/vseviru", title:"Страница ВсеВидео в Твиттере" })
     - social_networks.push({ img: "/static/img/i-fb.png", href: "https://www.facebook.com/vseviru", title:"Страница ВсеВидео в Фейсбуке" })
 
+    - cast.chat_items = [{id: 1, user: {name: "Василий Пупкин", avatar:""}, text: "Довольно неплохая передача, если учесть, кто ее авторы"}]
+    - cast.chat_items.push({user: {id: 2, name: "Гоблин Вася", avatar:""}, text: "По-моему основная тема так и не была раскрыта, хотя вопрос очень важный"})
+    - cast.chat_items.push({user: {id: 3, name: "Владимир Владимирович", avatar:""}, text: "Общественное мнение по этому вопросу очень важно, поэтому необходимо продолжать подобные обсуждения"})
+    - cast.chat_items.push({user: {id: 4, name: "Афанасий Прокопьевич", avatar:""}, text: "Моральная сторона этого вопроса тоже должна обсуждаться, а не только правовая его часть!"})
+    - cast.chat_items.push({user: {id: 4, name: "Афанасий Прокопьевич", avatar:""}, text: "Моральная сторона этого вопроса тоже должна обсуждаться, а не только правовая его часть!"})
+    - cast.chat_items.push({user: {id: 4, name: "Афанасий Прокопьевич", avatar:""}, text: "Моральная сторона этого вопроса тоже должна обсуждаться, а не только правовая его часть!"})
+    - cast.chat_items.push({user: {id: 4, name: "Афанасий Прокопьевич", avatar:""}, text: "Моральная сторона этого вопроса тоже должна обсуждаться, а не только правовая его часть!"})
+    - cast.chat_items.push({user: {id: 4, name: "Афанасий Прокопьевич", avatar:""}, text: "Моральная сторона этого вопроса тоже должна обсуждаться, а не только правовая его часть!"})
+
+    - cast.start_date = "Mon, 06 Oct 2014 09:24:06 GMT";
+    - watching_users = [ {name:"Миранда Керр", avatar: ""}, {name:"Давид Луиз", avatar: ""}, {name:"Криштиану Роналду", avatar: ""}, {name:"Карвахал", avatar: ""}, {name:"Модрич", avatar: ""} ]
+    - guests_count = 100500
+
     include head
     body
         .wrap-page.bg-noise
@@ -65,20 +78,11 @@ html
                                                     .frame-player#frame_player
 
                                         .col-md-4.lpadding0
-                                            - cast_chat_items = [{user: {name: "Василий Пупкин", avatar:""}, text: "Довольно неплохая передача, если учесть, кто ее авторы", created: new Date(0,0,0, 12, 31, 0)}]
-                                            - cast_chat_items.push({user: {name: "Гоблин Вася", avatar:""}, text: "По-моему основная тема так и не была раскрыта, хотя вопрос очень важный", created: new Date(0,0,0, 14, 21, 0)})
-                                            - cast_chat_items.push({user: {name: "Владимир Владимирович", avatar:""}, text: "Общественное мнение по этому вопросу очень важно, поэтому необходимо продолжать подобные обсуждения", created: new Date(0,0,0, 1, 18, 0)})
-                                            - cast_chat_items.push({user: {name: "Афанасий Прокопьевич", avatar:""}, text: "Моральная сторона этого вопроса тоже должна обсуждаться, а не только правовая его часть!", created: new Date(0,0,0, 19, 08, 0)})
-                                            - cast_chat_items.push({user: {name: "Афанасий Прокопьевич", avatar:""}, text: "Моральная сторона этого вопроса тоже должна обсуждаться, а не только правовая его часть!", created: new Date(0,0,0, 19, 08, 0)})
-                                            - cast_chat_items.push({user: {name: "Афанасий Прокопьевич", avatar:""}, text: "Моральная сторона этого вопроса тоже должна обсуждаться, а не только правовая его часть!", created: new Date(0,0,0, 19, 08, 0)})
-                                            - cast_chat_items.push({user: {name: "Афанасий Прокопьевич", avatar:""}, text: "Моральная сторона этого вопроса тоже должна обсуждаться, а не только правовая его часть!", created: new Date(0,0,0, 19, 08, 0)})
-                                            - cast_chat_items.push({user: {name: "Афанасий Прокопьевич", avatar:""}, text: "Моральная сторона этого вопроса тоже должна обсуждаться, а не только правовая его часть!", created: new Date(0,0,0, 19, 08, 0)})
-
                                             .cast-chat-block
                                                 .cast-chat-list-wrapper-out
                                                     .cast-chat-list-wrapper-in
                                                         .cast-chat-list
-                                                            each chat_item in cast_chat_items
+                                                            each chat_item in cast.chat_items
                                                                 .cast-chat-item
                                                                     .cast-chat-item-body
                                                                         span.cast-chat-item-username=chat_item.user.name
@@ -108,8 +112,7 @@ html
                                     h2.blackh1=cast.title
                                     p!=cast.description
 
-                        - watching_users = [ {name:"Миранда Керр", avatar: ""}, {name:"Давид Луиз", avatar: ""}, {name:"Криштиану Роналду", avatar: ""}, {name:"Карвахал", avatar: ""}, {name:"Модрич", avatar: ""} ]
-                        - guests_count = 100500
+
                         if watching_users && watching_users.length
                         .col-md-3.hide-watching-users#watching_users_left
                             .playlist-content
@@ -129,7 +132,6 @@ html
                                 | #{" "}
                                 span
                                     =guests_count
-
 
             if online_casts && online_casts.length
                 section
