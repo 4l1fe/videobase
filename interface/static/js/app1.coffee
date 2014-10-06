@@ -326,6 +326,12 @@ class FilmThumb extends Item
       callback: (new_state) =>
         # alert("done")
     }
+    if document.location.pathname.slice(0, 9) == "/playlist" && typeof(@_app.page().conf.film.id) == 'undefined'
+      setTimeout(
+        ()->
+          document.location.reload(true)
+        400
+      )
     false
 
   toggle_notwatch: (status) ->
