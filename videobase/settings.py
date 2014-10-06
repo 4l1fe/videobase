@@ -19,6 +19,7 @@ djcelery.setup_loader()
 AMQP_HOST = 'localhost'
 BROKER_HOST = 'localhost'
 BROKER_PORT = 5672
+###########################################################
 
 CELERY_TIMEZONE = 'UTC'
 CELERY_ACCEPT_CONTENT = ['pickle', 'json', 'msgpack', 'yaml']
@@ -177,7 +178,6 @@ CACHES = {
     }
 }
 
-###########################################################
 # Backends for social auth
 AUTHENTICATION_BACKENDS = (
     # OAuth
@@ -213,8 +213,6 @@ STATIC_ROOT = os.path.join('/var/www/')
 
 SITE_ID = 1
 
-###########################################################
-# Rest Framework configuration
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
@@ -291,8 +289,14 @@ API_SESSION_EXPIRATION_TIME = 15
 SESSION_EXPIRATION_TIME = timedelta(minutes=API_SESSION_EXPIRATION_TIME)
 
 ###########################################################
-# Celery schedule
 CELERYBEAT_SCHEDULE = {
+
+    # Launching robots that are described in Robots table.
+    #'robot-launch': {
+    #    'task': 'robot_launch',
+    #    'schedule': timedelta(seconds=10),
+    #},
+
     # Updating ratings from IMDB DB via archive
     'imdb_rating_update_command': {
         'task': 'imdb_rating_update',
@@ -308,7 +312,6 @@ CELERYBEAT_SCHEDULE = {
         'task': 'viaplay_ru_robot_start',
         'schedule': timedelta(days=7),
     },
-    # Takes poster with kinopoisk
     'kinopoisk-set_poster': {
         'task': 'kinopoisk_set_poster',
         'schedule': timedelta(seconds=10),
@@ -334,13 +337,11 @@ CELERYBEAT_SCHEDULE = {
         'schedule': timedelta(days=1),
         'args': (3,),
     },
-    #
     'kinopoisk_films_weekly': {
         'task': 'kinopoisk_films',
         'schedule': timedelta(days=7),
         'args': (10,),
     },
-    #
     'kinopoisk_films_monthly': {
         'task': 'kinopoisk_films',
         'schedule': timedelta(days=31),
@@ -369,22 +370,21 @@ CELERYBEAT_SCHEDULE = {
     # Checking locations for new films weekly
     'age_weighted_robot_launch_task_weekly': {
         'task': 'age_weighted_robot_launch',
-        'schedule': timedelta(days=7),
+        'schedule': timedelta(days=3),
         'args': (1,)
     },
     # Checking locations for aged films monthly
     'age_weighted_robot_launch_task_monthly': {
         'task': 'age_weighted_robot_launch',
-        'schedule': timedelta(days=31),
+        'schedule': timedelta(days=7),
         'args': (3,)
     },
     # Checking locations for aged films yearly
     'age_weighted_robot_launch_task_six_month': {
         'task': 'age_weighted_robot_launch',
-        'schedule': timedelta(days=31*6),
+        'schedule': timedelta(days=14),
         'args': (120,)
     },
-    #
     'drugoe_kino_update_schedule': {
         'task': 'drugoe_kino_update',
         'schedule': timedelta(days=7)
@@ -444,6 +444,10 @@ CELERYBEAT_SCHEDULE = {
         'task': 'itunes_robot_start',
         'schedule': timedelta(hours=24)
     },
+    'mail_movies_update': {
+        'task': 'mail_robot_start',
+        'schedule': timedelta(hours=24)
+    },
     # Calculate amount subscribed to the films
     'calc_amount_subscribed_to_movie': {
         'task': 'calc_amount_subscribed_to_movie',
@@ -458,11 +462,11 @@ CELERYBEAT_SCHEDULE = {
     'personal_newsletter_schedule': {
         'task': 'personal_newsletter',
         'schedule': crontab(minute=0, hour=18)
-    },
+    }
 }
 
-###########################################################
-# Another configuration
+CELERY_TIMEZONE = 'UTC'
+CELERY_ACCEPT_CONTENT = ['pickle', 'json', 'msgpack', 'yaml']
 POSTER_URL_PREFIX = '_260x360'
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
@@ -480,4 +484,3 @@ if not DEBUG:
     }
 
 ROBOTS_LIST = ['amediateka_ru', 'ayyo_ru', 'drugoe_kino', 'itunes', 'viaplay_ru', 'youtube_com' ]
-
