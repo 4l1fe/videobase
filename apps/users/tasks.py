@@ -20,7 +20,7 @@ from apps.users.constants import APP_NOTIFICATION_TEMPLATE,\
     APP_NOTIFICATION_EMAIL_SUBJECT, FILM_O, PERSON_O
 
 
-@app.task(name="confirm_register", queue="send_mail")
+@app.task(name="send_template_mail", queue="send_mail")
 def send_template_mail(subject, tpl_name, context, to, jade_render=False):
     if jade_render:
         tpl = render_page(tpl_name, context, False)
