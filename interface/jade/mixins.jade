@@ -505,7 +505,7 @@ mixin cast_thumb(item)
         - pg_rating = item.pg_rating
         - poster_url = item.poster
         - url = "/casts/" + item.id + "/"
-        - watching_users_count = 145
+        - watching_users_count = item.watching_users_count
 
         - curr_date = new Date()
         - item.start_in = Math.floor(  ( start_date.getTime() - curr_date.getTime() )/1000  )
