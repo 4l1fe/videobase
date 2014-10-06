@@ -73,19 +73,17 @@ class SearchFilmsView(APIView):
         # Персонализация выборки
         if self.request.user.is_authenticated() and filter.get('recommend'):
             sql = """
-            NOT "films"."id" IN (
+            "films"."id" NOT IN (
                 SELECT "users_films"."film_id" FROM "users_films"
                 WHERE "users_films"."user_id" = %s AND
                       ("users_films"."status" = %s OR
                       "users_films"."rating" IS NOT NULL)
             )
             """
-
             o_search = o_search.extra(
                 where=[sql],
                 params=[self.request.user.pk, APP_USERFILM_STATUS_NOT_WATCH],
             )
-
         return o_search
 
 

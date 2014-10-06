@@ -26,8 +26,14 @@ class UsersPics(models.Model):
     @classmethod
     def get_picture(cls, profile):
         path = u''
+
+        if hasattr(profile, 'userpic_id'):
+            userpic_id = getattr(profile, 'userpic_id')
+        else:
+            userpic_id = profile
+
         try:
-            image = cls.objects.get(id=profile.userpic_id).image
+            image = cls.objects.get(id=userpic_id).image
             path = image.storage.url(image.name)
         except Exception, e:
             pass
