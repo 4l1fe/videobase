@@ -104,14 +104,14 @@ def send_statistic_to_email_for_each_robot():
 
 
 def send_message_for_all_recipients(message, subject):
+    print "Send messages"
     to = []
     for item in RobotsMailList.objects.all():
         to.append(item.email)
     if len(to) == 0:
         return
-    kwrg = {
-            'subject': subject,
-            'text': message,
-            'to': to,
-           }
-    send_statistic_to_mail.apply_async(kwargs=kwrg)
+
+    print "Generating task to send message to {}".format(to)
+    for t in to:
+        send_statistic_to_mail.apply_async((subject,message,[t]))
+    
