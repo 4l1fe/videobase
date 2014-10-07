@@ -9,32 +9,39 @@ class vbCast(serializers.ModelSerializer):
     tags = serializers.SerializerMethodField('tags_list')
     locations = serializers.SerializerMethodField('locations_list')
     relation = serializers.SerializerMethodField('calc_relation')
+    poster = serializers.SerializerMethodField('get_poster')
 
     def tags_list(self, obj):
         return [{
             'id': tag.type,
             'name': tag.name,
             'type': tag.type
-        } for tag in obj.tags]
+        } for tag in obj.tags.all()]
+
+    def get_poster(self, obj):
+        return obj.ce_cast_rel.first().get_photo_url()
 
     def locations_list(self, obj):
         return [{
             'id': l.id,
-            'service': l.cast_service.id,
+            'type': l.cast_service.name,
             'quality': l.quality,
             'price_type': l.price_type,
             'price': l.price,
             'url_view': l.url_view,
             'value': l.value
-        } for l in obj.cl_location_rel]
+        } for l in obj.cl_location_rel.all()]
 
     def relation_calc(self, obj):
         return {}
 
     class Meta:
         model = Casts
-        fields = (
+        fields = [
             'id', 'title', 'title_orig', 'description', 'status', 'pg_rating',
             'start', 'duration',
-#            'tags', 'poster', 'locations', 'relation'
-        )
+            'tags',
+            'poster',
+            'locations',
+#           'relation'
+        ]
