@@ -1487,16 +1487,22 @@ class Page_User extends Page
 
 class Page_Cast extends Page
   casts_deck = undefined
+  self = undefined
 
   constructor: () ->
+    self = @
     super
+    @_app.get_tpl("cast-thumb")
     casts_deck = new CastsDeck($("#casts"), {load_func: (deck) =>@load_more_casts(deck) })
+    casts_deck.load_more_bind($("#casts_more"))
 
   load_more_casts: (deck) ->
     deck.load_more_hide()
-    self._app.rest.casts.read("list", params)
+    current_counter = deck.load_counter
+
+    self._app.rest.casts.read("list")
     .done(
-      (data) =>
+      (data) ->
         return if current_counter != deck.load_counter
         if data.items
           deck.add_items(data.items)
