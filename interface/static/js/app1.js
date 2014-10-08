@@ -2387,14 +2387,18 @@
   })(Page);
 
   Page_Cast = (function(_super) {
-    var casts_deck;
+    var casts_deck, self;
 
     __extends(Page_Cast, _super);
 
     casts_deck = void 0;
 
+    self = void 0;
+
     function Page_Cast() {
+      self = this;
       Page_Cast.__super__.constructor.apply(this, arguments);
+      this._app.get_tpl("cast-thumb");
       casts_deck = new CastsDeck($("#casts"), {
         load_func: (function(_this) {
           return function(deck) {
@@ -2402,35 +2406,36 @@
           };
         })(this)
       });
+      casts_deck.load_more_bind($("#casts_more"));
     }
 
     Page_Cast.prototype.load_more_casts = function(deck) {
+      var current_counter;
       deck.load_more_hide();
-      return self._app.rest.casts.read("list", params).done((function(_this) {
-        return function(data) {
-          if (current_counter !== deck.load_counter) {
-            return;
-          }
-          if (data.items) {
-            deck.add_items(data.items);
-            if (data.items.length >= 12) {
-              deck.load_more_show();
-            } else {
-              deck.load_more_hide(false);
-            }
-            deck.page = data.page;
-            if (opts.clear_output) {
-              scroll_to_obj($("#filter_content"));
-            }
+      current_counter = deck.load_counter;
+      return self._app.rest.casts.read("list").done(function(data) {
+        if (current_counter !== deck.load_counter) {
+          return;
+        }
+        if (data.items) {
+          deck.add_items(data.items);
+          if (data.items.length >= 12) {
+            deck.load_more_show();
           } else {
             deck.load_more_hide(false);
           }
-          _this.update_filter_params();
-          if (opts.callback) {
-            return opts.callback();
+          deck.page = data.page;
+          if (opts.clear_output) {
+            scroll_to_obj($("#filter_content"));
           }
-        };
-      })(this)).fail((function(_this) {
+        } else {
+          deck.load_more_hide(false);
+        }
+        this.update_filter_params();
+        if (opts.callback) {
+          return opts.callback();
+        }
+      }).fail((function(_this) {
         return function(data) {
           return deck.load_more_hide(false);
         };
