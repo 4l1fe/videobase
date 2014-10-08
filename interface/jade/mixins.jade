@@ -490,7 +490,7 @@ mixin casts_list(casts)
                     mixin cast_thumb(item)
             .add-filter#casts_more
                 .add-content.style-panel-action.rel.zmin
-                    - href = "/?page=" + (page?(page + 1):2)
+                    - href = "/casts/?page=" + (page?(page + 1):2)
                     a(href=href) покажите еще трансляций
                 img.img-responsive(src=img_url + 'shd-big.png', alt='')
 

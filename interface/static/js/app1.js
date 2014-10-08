@@ -1115,6 +1115,8 @@
         isSingle: true
       });
       this.rest.persons.action.add("subscribe");
+      this.rest.add("casts");
+      this.rest.casts.add("list");
       this._e = {
         search: {
           frm: $("#frm_search")
@@ -2402,7 +2404,38 @@
       });
     }
 
-    Page_Cast.prototype.load_more_casts = function(deck) {};
+    Page_Cast.prototype.load_more_casts = function(deck) {
+      deck.load_more_hide();
+      return self._app.rest.casts.read("list", params).done((function(_this) {
+        return function(data) {
+          if (current_counter !== deck.load_counter) {
+            return;
+          }
+          if (data.items) {
+            deck.add_items(data.items);
+            if (data.items.length >= 12) {
+              deck.load_more_show();
+            } else {
+              deck.load_more_hide(false);
+            }
+            deck.page = data.page;
+            if (opts.clear_output) {
+              scroll_to_obj($("#filter_content"));
+            }
+          } else {
+            deck.load_more_hide(false);
+          }
+          _this.update_filter_params();
+          if (opts.callback) {
+            return opts.callback();
+          }
+        };
+      })(this)).fail((function(_this) {
+        return function(data) {
+          return deck.load_more_hide(false);
+        };
+      })(this));
+    };
 
     return Page_Cast;
 
