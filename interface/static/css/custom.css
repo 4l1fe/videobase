@@ -1284,7 +1284,7 @@ section.cast-chat {padding-bottom: 40px;}
 /* .film-thumb .name-film {min-height: 40px;}*/
 .film-thumb .name-film i {font-style: normal}
 
-.film-thumb .caption-def {line-height: 19px;padding-top: 13px;font-size: 14px;}
+.film-thumb .caption-def {line-height: 19px;padding-top: 13px;font-size: 14px; text-align: center;}
 .film-thumb .caption-def a span {text-decoration: underline;font-weight: bold;color: #3168d1;}
 .film-thumb .caption-def a:hover, .caption-def a:hover span {text-decoration: none;}
 .film-thumb .caption-def p {text-align: center;margin-top: -7px;color: #757575;}
