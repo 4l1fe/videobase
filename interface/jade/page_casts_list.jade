@@ -1,0 +1,71 @@
+doctype html
+html
+    - is_main = true
+    - filter_cast_type = {0: "Тип", 1: "этого года", 3: "самые свежие", 8: "свежие", 15: "новые", 20: "не старые"}
+    - filter_cast_topic = [["|", "Тематика трансляции"], ["|1", "в наличии"], ["0|1", "бесплатно"], ["50|1", "до 50 рублей"], ["100|1", "до 100 рублей"], ["200|1", "до 200 рублей"]]
+    - filter_cast_quality = [[0, "Качество"], [5, "включая плохие"], [6, "неплохие"], [6.5, "хорошие"], [7, "отличные"], [8, "самые лучшие"]]
+    - filter_cast_price = {"rating": "Стоимость", "subscribes": "по подписчикам", "popular": "по популярности"}
+    include config
+    include mixins
+    include head
+    body
+        .wrap-page.bg-noise
+            include header
+            .content(role='main')
+                section
+                    .container
+                        h1.dots2-casts.blackh1.centerh1 Онлайн трансляции
+                        .filter-block
+                            .filter-content.style-panel-action.rel.zmin#filter_content
+                                .row
+                                    .col-md-12
+                                        ul.sort-list
+                                            li#filter_cast_type
+                                                a.sprite.sprite-i-toggle-bottom(href='#', data-toggle='dropdown', title='')
+                                                    span Тип
+                                                ul.dropdown-menu
+                                                    each item, i in filter_cast_type
+                                                        li
+                                                            - url_tmp = "?year_old=" + i
+                                                            a(href=url_tmp, title='',data-mi-id=i)=item
+                                            li#filter_cast_topic
+                                                - url_tmp = '?price=' + filter_cast_topic[0][0]
+                                                a.sprite.sprite-i-toggle-bottom(href=url_tmp, data-toggle='dropdown', title='')
+                                                    span Тематика трансляции
+                                                ul.dropdown-menu
+                                                    each item in filter_cast_topic
+                                                        li
+                                                            - url_tmp = "?price=" + item[0]
+                                                            a(href=url_tmp, title='',data-mi-id=item[0])=item[1]
+                                            li#filter_cast_quality
+                                                a.sprite.sprite-i-toggle-bottom(href='#', data-toggle='dropdown', title='')
+                                                    span Качество
+                                                ul.dropdown-menu
+                                                    li
+                                                        a(href='?genres=0', title='',data-mi-id=0) все жанры
+                                                    if filter_genres
+                                                        each item in filter_cast_quality
+                                                            li
+                                                                - url_tmp = "?genres=" + i
+                                                                a(href=url_tmp, title='',data-mi-id=item.id)=item.name
+                                            li#filter_cast_price
+                                                a.sprite.sprite-i-toggle-bottom(href='#', data-toggle='dropdown', title='')
+                                                    span Стоимость
+                                                ul.dropdown-menu
+                                                    each item in filter_cast_price
+                                                        li
+                                                            - url_tmp = "?rating=" + item[0]
+                                                            a(href=url_tmp, title='',data-mi-id=item[0])=item[1]
+                            img.img-responsive(src=img_url + 'shd-big.png', alt='')
+                            //-
+                               .filter-content
+
+                        //-
+                        //   .filter-block
+                        mixin casts_list(casts)
+
+
+            include footer
+        script(src=js_url + 'responsiveCarousel.min.js')
+        script.
+            $(document).ready(function () {window.InitApp({}, "CastsList")})

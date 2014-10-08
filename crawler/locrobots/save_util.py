@@ -26,6 +26,7 @@ def save_loaded_data_to_file(loaded_json_data, file_name, sub_dir_name):
 
 
 def load_and_save_film_page_from_site(site, film_id, url=None):
+    saved_file_name = ''
     try:
         saved_file_name = None
         film = Films.objects.get(id=film_id)

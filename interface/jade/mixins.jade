@@ -1,4 +1,5 @@
-- location_names = {"drugoekino": "Другое Кино", "youtubemoviesru": "Youtube Movies", "ivi": "IVI.ru", "nowru": "Now.ru", "megogo": "Megogo", "tvigle": "TVigle", "zoomby": "Zoomby.ru", playfamily: "PlayFamily.ru", "olltv": "Oll.tv", amediateka: "Amediateka", molodejj: "Molodejj.tv", streamru: "Stream.ru", tvzavr: "TVzavr.ru", viaplay: "Viaplay.ru", zabava: "Zabava.ru", playgoogle: "Play Google", itunes: "Apple Itunes", ayyo: "Ayyo.ru", mosfilm: "Cinema.mosfilm.ru", "default": "Неизвестно"}
+- location_names = {"drugoekino": "Другое Кино", "youtubemoviesru": "Youtube Movies", "ivi": "IVI.ru", "nowru": "Now.ru", "megogo": "Megogo", "tvigle": "TVigle", "zoomby": "Zoomby.ru", playfamily: "PlayFamily.ru", "olltv": "Oll.tv", amediateka: "Amediateka", molodejj: "Molodejj.tv", streamru: "Stream.ru", tvzavr: "TVzavr.ru", viaplay: "Viaplay.ru", zabavaru: "Zabava.ru", playgoogle: "Play Google", itunes: "Apple Itunes", ayyo: "Ayyo.ru", mosfilm: "Cinema.mosfilm.ru", "tvzorru": "TVzor", "default": "Неизвестно"}
+
 - quality_texts = {"norm": "Отличное", "hd": "Хорошее", "fhd": "Full<strong>HD</strong>", "default": "Хорошее"}
 - months = ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"]
 - date_now = new Date()
@@ -171,11 +172,11 @@ mixin loc_thumb(item)
     -   price = Math.floor(item.price)
     li(data-mi-val=item.id).location-thumb
         - href = "#" + item.id
-        a.block.margin0a.btn-film(href=href, title='',class=btn_cls)=quality_texts[item.quality] || quality_texts["default"]
+        a.block.margin0a.btn-film(href=href, title='',class=btn_cls)!=quality_texts[item.quality] || quality_texts["default"]
         p
             |#{location_names[item.type] || location_names["default"]}
             br
-            span=item.price_type == 0 && item.price?"бесплатно":(price + " р.")
+            span=item.price_type == 0?"бесплатно":(price + " р.")
 
 mixin person_thumb(item)
     li(data-mi-id="id",data-mi-val=item.id)
@@ -188,6 +189,14 @@ mixin person_thumb(item)
 mixin user_thumb(item)
     li(data-mi-id="id",data-mi-val=item.id)
         .actor
+            - user_url = "/users/" + item.id + "/"
+            a(href=user_url, title='', data-mi-athref="id")
+                img.img-circle(src=item.avatar || noavatar_url, alt='', data-mi-atsrc="avatar", data-mi-default=noavatar_url)
+                span(data-mi-name="name")=item.name
+
+mixin user_thumb2(item)
+    li(data-mi-id="id",data-mi-val=item.id)
+        .user
             - user_url = "/users/" + item.id + "/"
             a(href=user_url, title='', data-mi-athref="id")
                 img.img-circle(src=item.avatar || noavatar_url, alt='', data-mi-atsrc="avatar", data-mi-default=noavatar_url)
@@ -472,3 +481,131 @@ mixin feed_thumb(item, for_tpl)
                .tape-item
             //-
                .tape-list
+
+
+mixin casts_list(casts)
+    .list-cast
+        .container
+            .row#casts
+                each item in casts
+                    mixin cast_thumb(item)
+            .add-filter#casts_more
+                .add-content.style-panel-action.rel.zmin
+                    - href = "/?page=" + (page?(page + 1):2)
+                    a(href=href) покажите еще трансляций
+                img.img-responsive(src=img_url + 'shd-big.png', alt='')
+
+
+
+mixin cast_thumb(item)
+    .col-md-3.col-sm-4.col-xs-6(data-mi-id="id",data-mi-val=item.id).cast-thumb
+        - start_date = item.start ? new Date(item.start) : null
+        - generic_title = item.generic_title //Тэг/ обобщенное название
+        - title = item.title //Конкретное название
+        - title_orig = item.title_orig
+        - pg_rating = item.pg_rating
+        - poster_url = item.poster
+        - url = "/casts/" + item.id + "/"
+        - watching_users_count = item.watching_users_count
+
+        - curr_date = new Date()
+        - item.start_in = Math.floor(  ( start_date.getTime() - curr_date.getTime() )/1000  )
+        - item.duration = 1000
+        - end_date = new Date(start_date)
+        - end_date.setMinutes(start_date.getMinutes() + item.duration)
+        - start_date_class = is_online ? "label-success" : "label-primary"
+        - start_in_date = new Date(item.start_in*1000)
+
+        - has_free = false
+        - min_price = false
+        - price_loc = ""
+        - btn_cls = ""
+        - price_loc_cnt = 0
+
+        - if ( start_date < curr_date ) {
+        -   console.log( item.locations )
+        -   for (i = 0; i < item.locations.length; i++) {
+        -       obj = item.locations[i];
+        -       if (obj.price_type == 0) {
+        -            has_free = true;
+        -       } else {
+        -           price_loc_cnt++;
+        -           if (min_price === false || min_price > obj.price) {
+        -               min_price = obj.price;
+        -               price_loc = obj.id
+        -           }
+        -       }
+        -   }
+        -   if (min_price) {
+        -       min_price = Math.floor(min_price)
+        -   }
+        -   url_loc = price_loc?(url+"#" + price_loc):""
+        -   url_btn = url
+        -   if (min_price && !has_free) {
+        -       btn_cls = "btn-price"
+        -       btn_text = "Смотреть<br><i>" + (price_loc_cnt > 1?"от ":"") + min_price + " р. без рекламы</i>"
+        -       url_btn = url_loc
+        -   } else {
+        -       btn_cls = "btn-free"
+        -       btn_text = "Смотреть<br/>бесплатно"
+        -       url_btn = url + "#player"
+        -   }
+        - } else {
+        -   btn_cls = "btn-subscribe"
+        -   btn_text = "Подписаться"
+        - }
+        a(href=url, title='',data-mi-athref="id").poster-place
+            - title_alt = ( generic_title ? generic_title + '. ' : '' ) + title
+            - if (title_orig && title_orig != title_orig) title_alt += " (" + title_orig + ")"
+            img(src=poster_url || noposter_url,data-mi-atsrc="poster",data-mi-default=noposter_url,data-mi-id="poster",title=title_alt, alt=title_alt,data-mi-attitle="title_alt", data-mi-atalt="title_alt").img-poster
+        img(src=img_url + 'shd-small.png', alt='')
+
+        .cast-item-def
+            .cast-item-status
+                - time_to_wait_str = ''
+                - if ( curr_date < start_date ) {
+                -   if( item.start_in < 86400 ) {
+                -       start_in_minutes = Math.floor(item.start_in / 60)
+                -       time_to_wait_str = ( start_in_minutes < 60 ? 'примерно ' : '' ) + 'через ' + duration_text( start_in_minutes )
+                -   } else {
+                -       time_to_wait_str += start_date.getDate() + ' ' +  months[start_date.getMonth()]
+                -       time_to_wait_str += ' в ' + start_date.getHours() + ':' + ( start_date.getMinutes() < 10 ? '0' : '' ) + start_date.getMinutes()
+                -   }
+                    div.label.label-primary=time_to_wait_str
+                - } else if( curr_date < end_date ) {
+                    - if( watching_users_count !== null && watching_users_count !== undefined )
+                        div.fright.cast-watching-users-count смотрят:
+                            | #{" "}
+                            =watching_users_count
+                    div.label.label-success online
+                - } else {
+                    - archive_date_text = start_date.getDate() + ' ' + months[start_date.getMonth()]
+                    - if (start_date.getFullYear() !== curr_date.getFullYear() ) {
+                    -   archive_date_text += " " + start_date.getFullYear()
+                    - }
+                    div.fright.cast-archive-date=archive_date_text
+                    div.label.label-primary Архив
+                - }
+
+            .cast-item-header
+                a(href=url, title='',data-mi-athref="id")
+                    span.cast-item-title=title
+
+                    span(data-mi-name="pg_rating",data-mi-id="pg_rating",data-mi-val=pg_rating).cast-item-pg-rating
+                        | #{" ("}
+                        =pg_rating
+                        |)
+            .btn-def.block(class=btn_cls,data-mi-id="btn")
+                a(href=url_btn , title='',data-mi-id="btn_text",data-mi-athref="id")!=btn_text
+            p(class=min_price && has_free?'':'display-none',data-mi-id="btn_price")
+                | или
+                a(href=url_loc, title='',data-mi-athref="id")
+                    - text = " " + (price_loc_cnt > 1?"от ":"") + min_price + " р. без рекламы"
+                    span(data-mi-id="price")=text
+
+mixin cast_player(loc)
+    if loc.type == 'liverussia_ru'
+        - frame_url = 'http://player.rutv.ru/iframe/live/id/' + loc.value + '/showZoomBtn/false?time_play=0&isPlay=true&showPopUpBtn=false&showZoomBtn=true';
+        iframe(src=frame_url, width="100%", height="100%", frameborder="0", allowfullscreen="")
+    else if loc.type == 'sportbox_ru'
+        !=loc.value
