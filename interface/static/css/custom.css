@@ -1048,6 +1048,7 @@ a.toggle-playlist.active {
     border: none;
     box-shadow: none;
     text-align: left;
+    font-size: 0;
 }
 
 .blue-block .list-film .col-md-3 {padding-top: 20px;}
@@ -1062,21 +1063,23 @@ a.toggle-playlist.active {
 }
 
 .cast-item-title {
-    color: black; /*Уточни меня*/
-    text-decoration: none;
+    color: #3168d1; /*Уточни меня*/
+    text-decoration: underline;
 }
 
-.cast-item-generic-title {
-    color: #2e63d3; /*Уточни меня*/
+a:hover .cast-item-title { text-decoration: none; }
+
+.cast-item-header a {
+    color: #3168d1;
 }
 
 .cast-item-pg-rating {
-    color: red; /*Уточни меня*/
+    color: #ff0000; /*Уточни меня*/
 }
 
 .cast-item-header {
     padding-top: 8px;
-    height: 70px;
+    padding-bottom: 30px;
     overflow: hidden;
     line-height: 20px;
 }
@@ -1151,8 +1154,6 @@ a.toggle-playlist.active {
 
 .cast-thumb .btn-free, .btn-free {
     padding: 0;
-    color: #232323 !important;
-    line-height: 50px;
     background: url(../img/btn-yellow-plain.png) left top no-repeat;
 }
 
@@ -1242,6 +1243,32 @@ section.cast-chat {padding-bottom: 40px;}
 .cast-area { padding-bottom: 20px; }
 
 .dots2-casts {background: url(../img/dots2-casts.png) center center no-repeat;}
+
+.list-cast .row hr {border: 0; margin: 0; padding: 0; width: 100%; height: 1px; clear: both; background: url("../img/films-delim.png") repeat-x}
+
+.cast-thumb .btn-def a {
+    color: #232323;
+}
+
+.cast-thumb .btn-def a:hover {
+    text-decoration: none;
+}
+
+.list-cast img {
+    width: 100%;
+    min-width: 100%;
+}
+
+.cast-thumb .caption-def p {
+    text-align: center;
+    margin-top: -7px;
+    color: #757575;
+}
+
+.cast-item-def p {
+    text-align: center;
+    margin-top: -7px;
+}
 
 .num i {
     font-weight: bold;font-size: 22px;font-style: normal;text-align: center;line-height: 50px;

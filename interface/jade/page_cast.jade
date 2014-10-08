@@ -44,7 +44,7 @@ html
                                     .row
                                         .col-md-8.col-sm-7
                                             .name-playlist
-                                                h2=cast.generic_title
+                                                h2=cast.title
 
                                     .row
                                         .col-md-8.col-sm-7
@@ -68,6 +68,7 @@ html
                                             .frame-player-wrapper
                                                 .frame-player-aspect
                                                     .frame-player#frame_player
+                                                        mixin cast_player(cast.locations[0])
 
                                         .col-md-4.lpadding0
                                             .cast-chat-block
@@ -83,7 +84,7 @@ html
                                                 input(type="text", placeholder="Введите сообщение и нажмите Enter").cast-chat-text-area
                                     .row
                                         .col-md-12
-                                            if cast.locations.length > 0
+                                            if cast.locations.length > 1
                                                 ul.just-list.list-btns-film.list-btns-cast#locations
                                                     each el in cast.locations
                                                         mixin loc_thumb(el)
@@ -135,4 +136,4 @@ html
             //- delete(film.similar); delete(film.description); delete(film.trailer);
             //- delete(film.comments);
             script.
-                $(document).ready(function () {window.InitApp({page_conf: !{JSON.stringify(film)}}, "Film")})
+                $(document).ready(function () {window.InitApp({page_conf: !{JSON.stringify(cast)}}, "Cast")})
