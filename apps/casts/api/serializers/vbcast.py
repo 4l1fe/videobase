@@ -19,7 +19,7 @@ class vbCast(serializers.ModelSerializer):
         } for tag in obj.tags.all()]
 
     def get_poster(self, obj):
-        return obj.ce_cast_rel.first().get_photo_url()
+        return obj.ce_cast_rel.first().get_photo_url() if obj.ce_cast_rel.first() else None
 
     def locations_list(self, obj):
         return [{

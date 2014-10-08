@@ -13,7 +13,7 @@ class CastsView(View):
     def get(self, *args, **kwargs):
         today = timezone.datetime.now()
         data = {}
-        casts = casts_models.Casts.objects.filter(start__gte=today.date()).order_by('start')
+        casts = casts_models.Casts.objects.filter(start__gte=today.date()).order_by('start')[:12]
         data['casts'] = vbCast(casts).data
         return HttpResponse(render_page('casts_list', data))
 
@@ -30,7 +30,7 @@ class CastInfoView(View):
         for item in chat_items:
             user = {'id': item.user.id, 'name': u' '.join([item.user.first_name, item.user.last_name]), 'avatar': ""}
             msgs_list.append({'user': user, 'text': item.text})
-        other_casts = casts_models.Casts.objects.filter(start__gte=today.date()).order_by('start').exclude(id=cast_id)
+        other_casts = casts_models.Casts.objects.filter(start__gte=today.date()).order_by('start').exclude(id=cast_id)[:12]
         data['cast'] = vbCast(cast).data
         data['cast']['chat_items'] = msgs_list
         data['online_casts'] = vbCast(other_casts).data
