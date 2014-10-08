@@ -326,6 +326,12 @@ class FilmThumb extends Item
       callback: (new_state) =>
         # alert("done")
     }
+    if document.location.pathname.slice(0, 9) == "/playlist" && typeof(@_app.page().conf.film.id) == 'undefined'
+      setTimeout(
+        ()->
+          document.location.reload(true)
+        400
+      )
     false
 
   toggle_notwatch: (status) ->
@@ -423,6 +429,11 @@ class FeedThumb extends Item
       catch
         return val
     super
+
+class CastThumb extends Item
+  constructor: (opts = {}, callback) ->
+    @_name = "cast-thumb"
+    super opts, callback
 
 class Deck
   constructor: (@_place, opts = {}) ->
@@ -560,6 +571,35 @@ class FilmsDeck extends Deck
   constructor: (place, opts = {}) ->
     @element_name = "film-thumb"
     @item_class = FilmThumb
+    super
+    $(window).resize(=> @onchange())
+
+  onchange: (global = false) ->
+    body_width = $("body").width()
+    # items_inrow = Math.floor($("body").width() / 250)
+    if body_width > 991
+      items_inrow = 4
+    else if body_width > 767
+      items_inrow = 3
+    else
+      items_inrow = 2
+
+    if @current_items_inrow != items_inrow
+      global = true
+    @current_items_inrow = items_inrow
+    if global == true
+      $("hr", @_place).remove();
+
+    for i in [0...@items.length-1]
+      if ((i + 1) % items_inrow == 0)
+        el = @items[i].place()
+        if !el.next().is("hr")
+          $("<hr />").insertAfter(el)
+
+class CastsDeck extends Deck
+  constructor: (place, opts = {}) ->
+    @element_name = "cast-thumb"
+    @item_class = CastThumb
     super
     $(window).resize(=> @onchange())
 
@@ -1442,6 +1482,26 @@ class Page_User extends Page
       (data) =>
         deck.load_more_hide(false)
     )
+
+class Page_Cast extends Page
+  casts_deck = undefined
+
+  constructor: () ->
+    super
+    casts_deck = new CastsDeck($("#casts"), {load_func: (deck) =>@load_more_casts(deck) })
+
+  load_more_casts: (deck) ->
+
+class Page_CastsList extends Page
+  casts_deck = undefined
+
+  constructor: () ->
+    super
+    casts_deck = new CastsDeck($("#casts"), {load_func: (deck) =>@load_more_casts(deck) })
+
+  load_more_casts: (deck) ->
+
+
 
 window.InitApp =  (opts = {}, page_name) ->
   new App(opts, page_name)
