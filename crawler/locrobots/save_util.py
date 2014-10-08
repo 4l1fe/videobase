@@ -19,7 +19,8 @@ def save_loaded_data_to_file(loaded_json_data, file_name, sub_dir_name):
         f = open(site_dir + '/' + saved_file_name, 'w')
         f.write(json.dumps(loaded_json_data))
         f.close()
-    except:
+    except Exception, e:
+        print "Saving failed with error:", e.message
         return None
     return site_dir + '/' + saved_file_name
 
