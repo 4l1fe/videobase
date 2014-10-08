@@ -1,12 +1,10 @@
 # coding: utf-8
-
 import json
 import zerorpc
-
 from django.core.serializers.json import DjangoJSONEncoder
-
 from apps.users.models import UsersPics
 from utils.middlewares.local_thread import get_current_request
+from videobase.settings import HAPROXY_ADDRESS
 
 
 def render_page(page_type, context, use_req=True):
@@ -16,7 +14,7 @@ def render_page(page_type, context, use_req=True):
     }
 
     client = zerorpc.Client()
-    client.connect("tcp://127.0.0.1:4242", False)
+    client.connect("tcp://{}".format(HAPROXY_ADDRESS), False)
 
     if use_req:
         request = get_current_request()
