@@ -679,6 +679,8 @@ class App
     @rest.persons.add("filmography", {isSingle: true})
     @rest.persons.add("action", {isSingle: true})
     @rest.persons.action.add("subscribe")
+    @rest.add("casts")
+    @rest.casts.add("list")
 
     @_e =
       search:
@@ -1491,6 +1493,29 @@ class Page_Cast extends Page
     casts_deck = new CastsDeck($("#casts"), {load_func: (deck) =>@load_more_casts(deck) })
 
   load_more_casts: (deck) ->
+    deck.load_more_hide()
+    self._app.rest.casts.read("list", params)
+    .done(
+      (data) =>
+        return if current_counter != deck.load_counter
+        if data.items
+          deck.add_items(data.items)
+          if data.items.length >= 12
+            deck.load_more_show()
+          else
+            deck.load_more_hide(false)
+          deck.page = data.page
+          if opts.clear_output
+            scroll_to_obj $("#filter_content")
+        else
+          deck.load_more_hide(false)
+        @update_filter_params()
+        opts.callback() if opts.callback
+    )
+    .fail(
+      (data) =>
+        deck.load_more_hide(false)
+    )
 
 class Page_CastsList extends Page
   casts_deck = undefined

@@ -1153,7 +1153,8 @@ a:hover .cast-item-title { text-decoration: none; }
 .cast-thumb .btn-price i {color: #454545;}
 
 .cast-thumb .btn-free, .btn-free {
-    padding: 0;
+    padding-top: 6px;
+    padding-right: 0;
     background: url(../img/btn-yellow-plain.png) left top no-repeat;
 }
 
@@ -1270,6 +1271,8 @@ section.cast-chat {padding-bottom: 40px;}
     margin-top: -7px;
 }
 
+.cast-thumb .caption-def {line-height: 19px;padding-top: 13px;font-size: 14px;}
+
 .num i {
     font-weight: bold;font-size: 22px;font-style: normal;text-align: center;line-height: 50px;
     position: absolute;z-index: 2;top: -42px;left: 50%;margin-left:-25px;display: block;width: 50px;height: 50px;
@@ -1284,7 +1287,7 @@ section.cast-chat {padding-bottom: 40px;}
 /* .film-thumb .name-film {min-height: 40px;}*/
 .film-thumb .name-film i {font-style: normal}
 
-.film-thumb .caption-def {line-height: 19px;padding-top: 13px;font-size: 14px;}
+.film-thumb .caption-def {line-height: 19px;padding-top: 13px;font-size: 14px; text-align: center;}
 .film-thumb .caption-def a span {text-decoration: underline;font-weight: bold;color: #3168d1;}
 .film-thumb .caption-def a:hover, .caption-def a:hover span {text-decoration: none;}
 .film-thumb .caption-def p {text-align: center;margin-top: -7px;color: #757575;}
