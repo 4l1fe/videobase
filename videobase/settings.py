@@ -288,6 +288,8 @@ SOCIAL_AUTH_PIPELINE = (
 API_SESSION_EXPIRATION_TIME = 15
 SESSION_EXPIRATION_TIME = timedelta(minutes=API_SESSION_EXPIRATION_TIME)
 
+HAPROXY_ADDRESS = '127.0.0.1:11800'
+
 ###########################################################
 CELERYBEAT_SCHEDULE = {
 
@@ -297,9 +299,8 @@ CELERYBEAT_SCHEDULE = {
     #    'schedule': timedelta(seconds=10),
     #},
 
-    # Updating ratings from IMDB DB via archive
-    'imdb_rating_update_command': {
-        'task': 'imdb_rating_update',
+    'update_rating_command': {
+        'task': 'update_ratings',
         'schedule': timedelta(days=7),
     },
     # Amediateka weekly run
