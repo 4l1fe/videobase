@@ -5,7 +5,7 @@
 import re
 from bs4 import BeautifulSoup
 from django.utils import timezone
-
+from pytz import timezone as pytz_timezone
 from crawler.tor import simple_tor_get_page
 
 TRANSLATION_URL = 'http://live.russia.tv'
@@ -24,6 +24,8 @@ MONTHS = {
     u'ноября': 11,
     u'декабря': 12,
 }
+
+TZ = pytz_timezone('Europe/Moscow')
 
 
 def parse_translation_live_russia_tv():
@@ -49,10 +51,11 @@ def parse_translation_live_russia_tv():
 
             if len(date_str) == 1:
                 if date_str[0] == u'сегодня':
-                    date = current_date.replace(hour=int(time[0]), minute=int(time[1]))
+                    date = timezone.datetime(year=current_date.year, month=current_date.month, day=current_date.day,
+                                         hour=int(time[0]), minute=int(time[1]), tzinfo=TZ)
             elif len(date_str) == 3:
                 date = timezone.datetime(year=int(date_str[2]), month=MONTHS[date_str[1]], day=int(date_str[0]),
-                                         hour=int(time[0]), minute=int(time[1]))
+                                         hour=int(time[0]), minute=int(time[1]), tzinfo=TZ)
             else:
                 continue
 
