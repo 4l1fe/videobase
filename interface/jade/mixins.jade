@@ -604,10 +604,27 @@ mixin cast_thumb(item)
                     span(data-mi-id="price")=text
 
 mixin cast_player(loc)
-    if loc.type == 'liverussia_ru'
-        - frame_url = 'http://player.rutv.ru/iframe/live/id/' + loc.value + '/showZoomBtn/false?time_play=0&isPlay=true&showPopUpBtn=false&showZoomBtn=true';
-        iframe(src=frame_url, width="100%", height="100%", frameborder="0", allowfullscreen="")
-    else if loc.type == 'sportbox_ru'
-        !=loc.value
-    else if loc.type == 'championat_ru'
-        !=loc.value
+    - console.log(loc)
+    if !loc.value || loc.value.length == 0
+        if loc.type == 'liverussia_ru'
+            - frame_url = 'http://player.rutv.ru/iframe/live/id/' + loc.value + '/showZoomBtn/false?time_play=0&isPlay=true&showPopUpBtn=false&showZoomBtn=true';
+            iframe(src=frame_url, width="100%", height="100%", frameborder="0", allowfullscreen="")
+        else if loc.type == 'sportbox_ru'
+            !=loc.value
+        else if loc.type == 'championat_ru'
+            !=loc.value
+    else
+        - location_names = { 'sportbox_ru': 'SportBox.ru', 'championat_com': 'Чемпионат.com', 'liverussia_ru': 'Live.Russia.tv', 'default': 'сайте' }
+        - price = Math.floor(cast.price);
+        - link_title = 'Ссылка на страницу фильма на ' + (location_names[loc.type] || location_names["default"]) + ' за ' + price + ' руб.';
+
+        .cast-noplayer-bg
+            .cast-noplayer-msg
+                = "Нам пока не удалось договориться с админстрацией "
+                = (location_names[cast.type] || location_names["default"])
+                = ' об отображении плеера с платными фильмами на нашем сайте, поэтому фильм доступен к просмотру только в новом окне. Нажмите на кнопку, чтобы открыть новое окно для просмотра фильма за '
+                = price
+                = ' руб.'
+        .cast-noplayer-inner
+            a(href=cast.view, target="_new", rel="nofollow")
+                img(src="/static/img/player_play.png" alt=link_title, title=link_title)

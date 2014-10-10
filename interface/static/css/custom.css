@@ -1273,6 +1273,12 @@ section.cast-chat {padding-bottom: 40px;}
 
 .cast-thumb .caption-def {line-height: 19px;padding-top: 13px;font-size: 14px;}
 
+
+#player {width: 100%; height: 100%}
+.cast-noplayer-inner {position: absolute; top: 50%; height: 6em;margin-top: -3em; text-align: center; width: 100%; color: white; font-size: 24px}
+
+.cast-noplayer-bg {font-size: 22px; color: #827272; position: absolute; top: 20px; left: 20px; background: #000; width: 70%; }
+
 .num i {
     font-weight: bold;font-size: 22px;font-style: normal;text-align: center;line-height: 50px;
     position: absolute;z-index: 2;top: -42px;left: 50%;margin-left:-25px;display: block;width: 50px;height: 50px;
