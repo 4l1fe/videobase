@@ -16,7 +16,6 @@ def save_cast_dict(cast_service_name, cast_dict):
                      description=cast_dict['meta'].get('description', None),
                      pg_rating=DEFAULT_PG_RATING)
         cast.save()
-
         cast_service = CastsServices.objects.get(name=cast_service_name)
 
 
