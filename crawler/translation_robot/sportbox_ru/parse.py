@@ -1,11 +1,9 @@
 # coding: utf-8
 from bs4 import BeautifulSoup
 from django.utils import timezone
-from pytz import timezone as pytz_timezone
 import requests
 
 HOST = 'http://news.sportbox.ru'
-TZ = pytz_timezone('Europe/Moscow')
 
 
 def parse_translation():
@@ -40,7 +38,7 @@ def parse_translation():
                     'meta': {},
                     'title': name_translation,
                     'date': timezone.datetime(year=date.year, month=date.month, day=date.day, hour=int(hour),
-                                              minute=int(minute), tzinfo=TZ),
+                                              minute=int(minute)),
                     'price': 0,
                     'link': translation_url,
                     'embed_code': share_link,
