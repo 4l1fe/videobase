@@ -62,8 +62,8 @@ def best_of_the_best_this_week():
     end_dt.replace(hour=23, minute=59, second=59)
 
     # Вставка параметров трансляции
-    params_email['context']['casts']['old'] = vbCast(Casts.best_old_casts(start_dt=start_dt, end_dt=curr_dt), many=True).data,
-    params_email['context']['casts']['future'] = vbCast(Casts.best_future_casts(start_dt=curr_dt, end_dt=end_dt), many=True).data,
+    params_email['context']['casts']['old'] = vbCast(Casts.best_old_casts(start_dt=start_dt, end_dt=curr_dt), many=True).data
+    params_email['context']['casts']['future'] = vbCast(Casts.best_future_casts(start_dt=curr_dt, end_dt=end_dt), many=True).data
 
     for item in o_users:
         params_email.update({'to': item.email})

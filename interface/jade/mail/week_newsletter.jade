@@ -55,7 +55,7 @@ mixin film_thumb_mail(item)
                     td(style="vertical-align: middle; width: 110px; background: #ff9700; height: 50px; text-align: center;").btn-watch-small
                         a(href=url style="color: #232323; text-decoration: inherit; font-size: 14px; font-weight: normal; text-transform: none;").label-price=text
                 - } else {
-                    td(style="vertical-align: middle; background: #ffcd00; width: 280px; height: 50px; text-align: center;").btn-watch-free = text
+                    td(style="vertical-align: middle; background: #ffcd00; width: 280px; height: 50px; text-align: center;").btn-watch-free Подписаться
                         a(href=url style="color: #232323; text-decoration: inherit; font-size: 14px; font-weight: bold; text-transform: uppercase;").label-watch
                             div Смотреть
                             div бесплатно
@@ -173,13 +173,6 @@ mixin casts_old_thumb_mail(item)
             - if (min_price && !has_free) {
                 table(style="border: 0; border-collapse: collapse; border-spacing: 0; font-size: 1px;")
                     tr
-                        td(style="vertical-align: middle; background: #ffcd00; width: 280px; height: 50px; text-align: center;").btn-watch-free
-                            a(href=url style="color: #232323; text-decoration: inherit; font-size: 14px; font-weight: bold; text-transform: uppercase;").label-watch
-                                div Смотреть
-                                div бесплатно
-            - } else {
-                table(style="border: 0; border-collapse: collapse; border-spacing: 0; font-size: 1px;")
-                    tr
                         td(style="vertical-align: middle; width: 165px; background: #ffcd00; height: 50px; text-align: center;").btn-watch-free-small
                             a(href=url style="color: #232323; text-decoration: inherit; font-size: 14px; font-weight: bold; text-transform: uppercase;").label-watch
                                 div Смотреть
@@ -188,6 +181,13 @@ mixin casts_old_thumb_mail(item)
                         td(style="vertical-align: middle; width: 110px; background: #ff9700; height: 50px; text-align: center;").btn-watch-small
                             - text = "или " + (price_loc_cnt > 1?"от ":"за ") + min_price + " р."
                             a(href=url style="color: #232323; text-decoration: inherit; font-size: 14px; font-weight: normal; text-transform: none;").label-price=text
+            - } else {
+                table(style="border: 0; border-collapse: collapse; border-spacing: 0; font-size: 1px;")
+                    tr
+                        td(style="vertical-align: middle; background: #ffcd00; width: 280px; height: 50px; text-align: center;").btn-watch-free
+                            a(href=url style="color: #232323; text-decoration: inherit; font-size: 14px; font-weight: bold; text-transform: uppercase;").label-watch
+                                div Смотреть
+                                div бесплатно
             - }
 mixin casts_future_thumb_mail(item)
     - host = "http://vsevi.ru"
@@ -222,7 +222,7 @@ mixin casts_future_thumb_mail(item)
         table(style="border: 0; border-collapse: collapse; border-spacing: 0; font-size: 1px;")
             tr
                 td(class="btn-subscribe" style="vertical-align: middle; background: #57cb56; width: 280px; height: 50px; text-align: center;")
-                    - text = Подписаться
+                    - text = "Подписаться"
                     a(href="#" class="label-watch" style="color: #232323; text-decoration: inherit; font-size: 14px; font-weight: bold; text-transform: uppercase;")=text
 mixin indent_header()
     tr(style="height: 30px")
@@ -231,6 +231,8 @@ mixin indent_header()
         td(style="width: 20px; vertical-align: top;") &nbsp;
         td(style="vertical-align: top;") &nbsp;
         td(style="width: 110px; vertical-align: top;") &nbsp;
+
+--console.log('films', films)
 
 doctype html
 html
