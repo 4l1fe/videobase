@@ -1,6 +1,7 @@
 # coding: utf-8
 from bs4 import BeautifulSoup
 from django.utils import timezone
+from pytz import timezone as pytz_timezone
 from raven.transport import requests
 
 HOST = 'http://www.ntvplus.ru'
@@ -18,6 +19,7 @@ MONTHS = {
     u'ноября': 11,
     u'декабря': 12,
 }
+TZ = pytz_timezone('Europe/Moscow')
 
 
 def parse_translation():
@@ -63,7 +65,7 @@ def parse_translation():
             minute = int(temp[1])
 
             date = timezone.datetime(year=timezone.now().year, month=month, day=day,
-                                         hour=hour, minute=minute)
+                                         hour=hour, minute=minute, tzinfo=TZ)
 
         name_translation = soup.findAll('h1')[1].text
         type = soup.find('span', {'class': 'caption'}).text

@@ -5,10 +5,11 @@
 import re
 from bs4 import BeautifulSoup
 from django.utils import timezone
-
+from pytz import timezone as pytz_timezone
 from crawler.tor import simple_tor_get_page
 
-TRANSLATION_URL = 'http://www.championat.com/broadcast'
+TRANSLATION_URL = 'http://www.championat.com'
+TZ = pytz_timezone('Europe/Moscow')
 
 
 def parse_translation_championat_com():
@@ -16,7 +17,7 @@ def parse_translation_championat_com():
     champ_dict = {}
 
     # Get page
-    translation_page = simple_tor_get_page(TRANSLATION_URL+'/')
+    translation_page = simple_tor_get_page(TRANSLATION_URL+'/broadcast/')
     soup = BeautifulSoup(translation_page)
 
     championship_bloc = soup.find('div', {'class': 'broadcast__menu'})
@@ -67,13 +68,12 @@ def parse_translation_championat_com():
                 translation_data = {
                     'title': title,
                     'date': timezone.datetime(year=current_year, month=int(date[1]), day=int(date[0]), hour=int(time[0]),
-                                              minute=int(time[1])),
+                                              minute=int(time[1]), tzinfo=TZ),
                     'price': float(price),
                     'link': link,
                     'meta': {'championship': championship if championship else None},
                     'value': '',
                 }
-
                 translation_list.append(translation_data)
             except Exception, e:
                 print e.message
