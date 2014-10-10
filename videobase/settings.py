@@ -299,9 +299,8 @@ CELERYBEAT_SCHEDULE = {
     #    'schedule': timedelta(seconds=10),
     #},
 
-    # Updating ratings from IMDB DB via archive
-    'imdb_rating_update_command': {
-        'task': 'imdb_rating_update',
+    'update_rating_command': {
+        'task': 'update_ratings',
         'schedule': timedelta(days=7),
     },
     # Amediateka weekly run
