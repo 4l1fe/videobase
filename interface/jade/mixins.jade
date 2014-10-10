@@ -498,7 +498,6 @@ mixin casts_list(casts)
 
 mixin cast_thumb(item)
     .col-md-3.col-sm-4.col-xs-6(data-mi-id="id",data-mi-val=item.id).cast-thumb
-        - console.log('item.start', item.start)
         - item.start
         - start_date = item.start ? new Date(item.start) : null
         - generic_title = item.generic_title //Тэг/ обобщенное название
@@ -511,11 +510,10 @@ mixin cast_thumb(item)
 
         - curr_date = new Date()
         - item.start_in = Math.floor(  ( start_date.getTime() - curr_date.getTime() )/1000  )
-        - item.duration = 1000
+        - item.duration = 90
         - end_date = new Date(start_date)
         - end_date.setMinutes(start_date.getMinutes() + item.duration)
         - start_date_class = is_online ? "label-success" : "label-primary"
-        - start_in_date = new Date(item.start_in*1000)
 
         - has_free = false
         - min_price = false
@@ -563,29 +561,35 @@ mixin cast_thumb(item)
         .cast-item-def
             .cast-item-status
                 - time_to_wait_str = ''
+                - status_details_text = ''
+                - status_label_text = ''
+                - status_label_class = ''
                 - if ( curr_date < start_date ) {
+                -   status_label_class = "label-primary"
                 -   if( item.start_in < 86400 ) {
                 -       start_in_minutes = Math.floor(item.start_in / 60)
-                -       time_to_wait_str = ( start_in_minutes < 60 ? 'примерно ' : '' ) + 'через ' + duration_text( start_in_minutes )
+                -       status_label_text = ( start_in_minutes < 60 ? 'примерно ' : '' ) + 'через ' + duration_text( start_in_minutes )
                 -   } else {
-                -       time_to_wait_str += start_date.getDate() + ' ' +  months[start_date.getMonth()]
-                -       time_to_wait_str += ' в ' + start_date.getHours() + ':' + ( start_date.getMinutes() < 10 ? '0' : '' ) + start_date.getMinutes()
+                -       status_label_text += start_date.getDate() + ' ' +  months[start_date.getMonth()]
+                -       status_label_text += ' в ' + start_date.getHours() + ':' + ( start_date.getMinutes() < 10 ? '0' : '' ) + start_date.getMinutes()
                 -   }
-                    div.label.label-primary=time_to_wait_str
                 - } else if( curr_date < end_date ) {
-                    - if( watching_users_count !== null && watching_users_count !== undefined )
-                        div.fright.cast-watching-users-count смотрят:
-                            | #{" "}
-                            =watching_users_count
-                    div.label.label-success online
-                - } else {
-                    - archive_date_text = start_date.getDate() + ' ' + months[start_date.getMonth()]
-                    - if (start_date.getFullYear() !== curr_date.getFullYear() ) {
-                    -   archive_date_text += " " + start_date.getFullYear()
+                    - status_label_class = "label-success"
+                    - if( watching_users_count !== null && watching_users_count !== undefined ) {
+                    -    status_details_text = 'смотрят: ' + watching_users_count
                     - }
-                    div.fright.cast-archive-date=archive_date_text
-                    div.label.label-primary Архив
+                    - status_label_text="online"
+                - } else {
+                    - status_label_class="label-primary"
+                    - status_details_text = start_date.getDate() + ' ' + months[start_date.getMonth()]
+                    - if (start_date.getFullYear() !== curr_date.getFullYear() ) {
+                    -   status_details_text += " " + start_date.getFullYear()
+                    - }
+                    - status_label_text="Архив"
                 - }
+
+                .fright(data-mi-id="cast_status_details").cast-status-details=status_details_text
+                .label(data-mi-id="cast_status_label", class=status_label_class)=status_label_text
 
             .cast-item-header
                 a(href=url, title='',data-mi-athref="id")

@@ -1225,7 +1225,7 @@ section.cast-chat {padding-bottom: 40px;}
 .cast-thumb .caption-def p {text-align: center;margin-top: -7px;color: #757575;}
 .cast-thumb .caption-def a {color: #6d6d6d;}
 
-.cast-watching-users-count, .cast-archive-date { color: #7f7878; }
+.cast-status-details { color: #7f7878; }
 
 .cast-item-status .label {
     font-size: 14px;

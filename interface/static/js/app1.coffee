@@ -431,9 +431,52 @@ class FeedThumb extends Item
     super
 
 class CastThumb extends Item
-  constructor: (opts = {}, callback) ->
-    @_name = "cast-thumb"
-    super opts, callback
+  constructor: (opts = {}, callback = undefined) ->
+    @_name = 'cast-thumb'
+    check_app_is_init(@)
+    if (!@_name)
+      error "It's wrong to use parent class", "crit"
+    @vals = {}
+    @defaults = {}
+    @elements = {}
+    @e_attrs = {}
+    @e_vals = {}
+
+    $.extend @defaults, opts.defaults if opts.defaults
+    if opts.place == undefined
+      @_place = $('<span class="preload-' + @_name + '"></span>')
+      if opts.parent
+        if opts.up
+          @_place.prependTo(opts.parent)
+        else
+          @_place.appendTo(opts.parent)
+      fn = window.mi_templates[@_name]
+      if fn
+        old_place = @_place
+        locals = { cast: opts.vals  }
+        @_place = $(fn(locals))
+        @set_elements()
+        @set_vals opts.vals, opts.do_not_set if opts.vals
+        @_place.insertAfter(old_place)
+        old_place.remove()
+        callback @ if callback
+      else
+        error 'Unable to load template for object "' + @_name + '"'
+    else
+      @_place = opts.place
+      @set_elements()
+      @set_vals opts.vals, opts.do_not_set if opts.vals
+      callback @ if callback
+
+  transform_attr: (attr, name, val) ->
+    if attr == "href" && name == "id"
+      return "/films/" + val + "/"
+    else
+      super
+
+  set_vals: (vals, do_not_set) ->
+    tpl = window.mi_templates['cast-thumb']
+
 
 class Deck
   constructor: (@_place, opts = {}) ->
@@ -1488,19 +1531,27 @@ class Page_User extends Page
 class Page_Cast extends Page
   casts_deck = undefined
   self = undefined
+  _filter_params = {}
+  _filter_counter = 0
 
   constructor: () ->
     self = @
     super
-    @_app.get_tpl("cast-thumb")
     casts_deck = new CastsDeck($("#casts"), {load_func: (deck) =>@load_more_casts(deck) })
     casts_deck.load_more_bind($("#casts_more"))
 
-  load_more_casts: (deck) ->
+  load_more_casts: (deck, opts = {}) ->
     deck.load_more_hide()
+
+    params = $.extend(_filter_params, opts.params || {})
+    if opts.clear_output
+      deck.clear(false)
+      params.page = 1
+    else
+      params.page = opts.page || (deck.page + 1)
     current_counter = deck.load_counter
 
-    self._app.rest.casts.read("list")
+    self._app.rest.casts.read("list", params)
     .done(
       (data) ->
         return if current_counter != deck.load_counter
@@ -1523,15 +1574,12 @@ class Page_Cast extends Page
         deck.load_more_hide(false)
     )
 
-class Page_CastsList extends Page
-  casts_deck = undefined
+  update_filter_params: (update_href = true) ->
 
+
+class Page_CastsList extends Page_Cast
   constructor: () ->
     super
-    casts_deck = new CastsDeck($("#casts"), {load_func: (deck) =>@load_more_casts(deck) })
-
-  load_more_casts: (deck) ->
-
 
 
 window.InitApp =  (opts = {}, page_name) ->
