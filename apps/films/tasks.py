@@ -66,7 +66,7 @@ def best_of_the_best_this_week():
     params_email['context']['casts']['future'] = vbCast(Casts.best_future_casts(start_dt=curr_dt, end_dt=end_dt), many=True).data,
 
     for item in o_users:
-        params_email.update({'to': item.email})
+        params_email.update({'to': [item.email,]})
 
         # Отправляем email в очередь
         send_template_mail.s(**params_email).apply_async()
