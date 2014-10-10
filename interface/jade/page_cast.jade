@@ -48,7 +48,7 @@ html
 
                                     .row
                                         .col-md-8.col-sm-7
-                                            div.cast-start-date=date_text(new Date(cast.start))
+                                            div.cast-start-date=date_text(new Date(cast.start*1000))
 
                                         .col-md-4.col-sm-5
                                             .cast-chat-header.fright
@@ -68,7 +68,8 @@ html
                                             .frame-player-wrapper
                                                 .frame-player-aspect
                                                     .frame-player#frame_player
-                                                        mixin cast_player(cast.locations[0])
+                                                        if cast.locations.length > 0
+                                                            mixin cast_player(cast.locations[0])
 
                                         .col-md-4.lpadding0
                                             .cast-chat-block
