@@ -4,6 +4,8 @@ from apps.robots.constants import APP_ROBOT_VALUE
 from django.core.validators import URLValidator
 from apps.contents.constants import APP_CONTENTS_PRICE_TYPE_FREE
 from django.utils import timezone
+from crawler.locations_saver import save_location_to_locs_dict
+
 
 def sane_dict(film=None):
     '''
@@ -118,6 +120,11 @@ def save_location(film, **kwargs):
     for given dictionary based on one produced by sane_dict
     '''
 
+    locations_d = {
+        'info': [],
+        'type': kwargs['type']
+                }
+
     if kwargs['type'] in APP_ROBOT_VALUE and kwargs['value'] == '':
         return
 
@@ -156,3 +163,5 @@ def save_location(film, **kwargs):
         prev_location.delete()
 
     print u"Saved location for film {}".format(film)
+    save_location_to_locs_dict(locations_d, True, film, kwargs['type'], location.id)
+    return  locations_d
