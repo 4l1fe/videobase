@@ -499,7 +499,7 @@ mixin casts_list(casts)
 
 mixin cast_thumb(item)
     .col-md-3.col-sm-4.col-xs-6(data-mi-id="id",data-mi-val=item.id).cast-thumb
-        - start_date = item.start ? new Date(item.start) : null
+        - start_date = item.start ? new Date(item.start*1000) : null
         - generic_title = item.generic_title //Тэг/ обобщенное название
         - title = item.title //Конкретное название
         - title_orig = item.title_orig
