@@ -498,7 +498,6 @@ mixin casts_list(casts)
 
 mixin cast_thumb(item)
     .col-md-3.col-sm-4.col-xs-6(data-mi-id="id",data-mi-val=item.id).cast-thumb
-        - item.start
         - start_date = item.start ? new Date(item.start) : null
         - generic_title = item.generic_title //Тэг/ обобщенное название
         - title = item.title //Конкретное название
@@ -510,6 +509,12 @@ mixin cast_thumb(item)
 
         - curr_date = new Date()
         - item.start_in = Math.floor(  ( start_date.getTime() - curr_date.getTime() )/1000  )
+        - start_in_minutes = Math.floor( item.start_in / 60 );
+        - console.log("curr_date", curr_date)
+        - console.log("start_date", start_date)
+        - console.log("start_in_minutes", start_in_minutes)
+        - console.log('item.start_in', item.start_in)
+        - console.log('item.start', item.start)
         - item.duration = 90
         - end_date = new Date(start_date)
         - end_date.setMinutes(start_date.getMinutes() + item.duration)
@@ -612,4 +617,6 @@ mixin cast_player(loc)
         - frame_url = 'http://player.rutv.ru/iframe/live/id/' + loc.value + '/showZoomBtn/false?time_play=0&isPlay=true&showPopUpBtn=false&showZoomBtn=true';
         iframe(src=frame_url, width="100%", height="100%", frameborder="0", allowfullscreen="")
     else if loc.type == 'sportbox_ru'
+        !=loc.value
+    else if loc.type == 'championat_ru'
         !=loc.value
