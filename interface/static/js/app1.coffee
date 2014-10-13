@@ -1538,7 +1538,10 @@ class Page_Cast extends Page
     self = @
     super
     casts_deck = new CastsDeck($("#casts"), {load_func: (deck) =>@load_more_casts(deck) })
+    casts_deck.page = 1
+    casts_deck.load_more_hide(false)
     casts_deck.load_more_bind($("#casts_more"))
+
 
   load_more_casts: (deck, opts = {}) ->
     deck.load_more_hide()

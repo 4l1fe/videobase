@@ -2475,6 +2475,8 @@
           };
         })(this)
       });
+      casts_deck.page = 1;
+      casts_deck.load_more_hide(false);
       casts_deck.load_more_bind($("#casts_more"));
     }
 
