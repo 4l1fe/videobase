@@ -1,8 +1,12 @@
 # coding: utf-8
 
+import json
+
 from datetime import datetime, timedelta
 from django.db import connection, transaction
+from django.core.serializers.json import DjangoJSONEncoder
 
+from videobase import settings
 from videobase.celery import app
 from utils.common import dict_fetch_all
 
@@ -64,6 +68,12 @@ def best_of_the_best_this_week():
     # Вставка параметров трансляции
     params_email['context']['casts']['old'] = vbCast(Casts.best_old_casts(start_dt=start_dt, end_dt=curr_dt), many=True).data
     params_email['context']['casts']['future'] = vbCast(Casts.best_future_casts(start_dt=curr_dt, end_dt=end_dt), many=True).data
+
+    if settings.DEBUG:
+        data_json = json.dumps(params_email, cls=DjangoJSONEncoder)
+        file = open('data.json', 'w')
+        file.write(data_json)
+        file.close()
 
     for item in o_users:
         params_email.update({'to': item.email})

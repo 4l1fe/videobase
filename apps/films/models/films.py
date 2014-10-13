@@ -257,7 +257,7 @@ class Films(models.Model):
        LIMIT %s
         """
 
-        return cls.objects.raw(sql, params=['POSTER', 5.5, 5000, 4])
+        return cls.objects.raw(sql, params=['POSTER', 5.5, 5000, limit])
 
 
 
