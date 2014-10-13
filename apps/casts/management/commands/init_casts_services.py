@@ -26,6 +26,11 @@ CAST_SERVICES = [
         'url' : 'http://tv.khl.ru/',
         'description': ''
     },
+    {
+        'name': 'ntv_plus',
+        'url' : 'http://www.ntvplus.ru',
+        'description': ''
+    },
 
 
 
