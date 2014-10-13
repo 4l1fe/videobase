@@ -35,7 +35,7 @@ mixin film_thumb_mail(item)
                 td(rowspan="2" style="vertical-align: top; width: 235px; font-size: 18px;").wrapper-item-name
                     a(href=url style="color: inherit; text-decoration: inherit;")
                         span(style="color: #fff; font-size: 18px; font-weight: bold; text-decoration: underline;").label-film-name=item.name
-                        span(style="color: #85b6c7; font-size: 18px; font-weight: normal; text-decoration: none;").label-film-year="(" + year + ")"
+                        span(style="color: #85b6c7; font-size: 18px; font-weight: normal; text-decoration: none;").label-film-year=" (" + year + ")"
                 td(style="vertical-align: top; width: 6px;").item-name-spacing &nbsp;
                 td(rowspan="1" style="vertical-align: middle; background: #007fc0; height: 30px; text-align: center; width: 40px;").box-item-rating ]
                     span(class="label-item-rating" style="color: #fff; font-size: 18px; font-weight: bold;")=(item.ratings && item.ratings.cons)?item.ratings.cons[0]:""
@@ -55,7 +55,7 @@ mixin film_thumb_mail(item)
                     td(style="vertical-align: middle; width: 110px; background: #ff9700; height: 50px; text-align: center;").btn-watch-small
                         a(href=url style="color: #232323; text-decoration: inherit; font-size: 14px; font-weight: normal; text-transform: none;").label-price=text
                 - } else {
-                    td(style="vertical-align: middle; background: #ffcd00; width: 280px; height: 50px; text-align: center;").btn-watch-free Подписаться
+                    td(style="vertical-align: middle; background: #ffcd00; width: 280px; height: 50px; text-align: center;").btn-watch-free
                         a(href=url style="color: #232323; text-decoration: inherit; font-size: 14px; font-weight: bold; text-transform: uppercase;").label-watch
                             div Смотреть
                             div бесплатно
@@ -232,8 +232,6 @@ mixin indent_header()
         td(style="vertical-align: top;") &nbsp;
         td(style="width: 110px; vertical-align: top;") &nbsp;
 
---console.log('films', films)
-
 doctype html
 html
     head
@@ -370,9 +368,13 @@ html
                     | Вы получили это письмо, потому что прошли регистрацию в проекте
                     | «Все Видео» и выразили согласие получать рассылку с новостями
                     | на указанный при регистрации адрес электронной почты. Вы можете
+                    =" "
                     a(href="#" style="color: #7a7a7a; text-decoration: underline;") отписаться
+                    =" "
                     | от этой рассылки или настроить частоту и формат рассылок в
+                    =" "
                     a(href="#" style="color: #7a7a7a; text-decoration: underline;") личном кабинете
+                    =" "
                     | пользователя.
                 td(style="width: 30px; vertical-align: top;") &nbsp;
                 td(style="vertical-align: top;")
