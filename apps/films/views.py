@@ -202,6 +202,17 @@ class FilmView(View):
 
         return HttpResponse(render_page('film', {'film': resp_dict}))
 
+    def post(self, *args, **kwargs):
+        resp_dict, o_film = film_to_view(kwargs['film_id'])
+        resp_dict['similar'] = calc_similar(o_film)
+        # Trailer
+        trailer = film_model.FilmExtras.get_trailer_by_film(kwargs['film_id'], first=True)
+        if not trailer is None:
+            resp_dict['trailer'] = trailer.url
+
+        return HttpResponse(render_page('film', {'film': resp_dict}))
+
+
 
 class PlayListView(View):
 
