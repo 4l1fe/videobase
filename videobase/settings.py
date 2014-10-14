@@ -288,6 +288,8 @@ SOCIAL_AUTH_PIPELINE = (
 API_SESSION_EXPIRATION_TIME = 15
 SESSION_EXPIRATION_TIME = timedelta(minutes=API_SESSION_EXPIRATION_TIME)
 
+HAPROXY_ADDRESS = '127.0.0.1:11800'
+
 ###########################################################
 CELERYBEAT_SCHEDULE = {
 
@@ -405,8 +407,8 @@ CELERYBEAT_SCHEDULE = {
         'schedule': timedelta(days=1)
     },
     # Send robots statistic to email
-    'send_robots_statistic_to_email': {
-        'task': 'send_robots_statistic_to_email',
+    'send_robots_statistic_to_email_schedule': {
+        'task': 'send_robots_logs_to_email',
         'schedule': timedelta(days=1)
     },
     # News from now.ru

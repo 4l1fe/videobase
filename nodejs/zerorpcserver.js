@@ -24,6 +24,8 @@ var renderers = {
     reset_passwd: function(context) {return jade.renderFile(path.join(tmpl_path, 'page_reset.jade'), context)},
     confirm_passwd: function(context) {return jade.renderFile(path.join(tmpl_path, 'page_confirm_pwd.jade'), context)},
     confirm_email: function(context) {return jade.renderFile(path.join(tmpl_path, 'page_confirm_email.jade'), context)},
+    casts_list: function(context) {return jade.renderFile(path.join(tmpl_path, 'page_casts_list.jade'), context)},
+    cast: function(context) {return jade.renderFile(path.join(tmpl_path, 'page_cast.jade'), context)},
     week_newsletter: function(context) {return jade.renderFile(path.join(tmpl_path, 'mail/week_newsletter.jade'), context)}
 };
 
@@ -46,7 +48,7 @@ server.on("error", function(error) {
    console.log(error);
 });
 
-var port = 4242;
+var port = process.argv[2] != undefined ? process.argv[2]: 4242;
 var tcp_path = util.format("tcp://*:%s", port);
 
 console.log(util.format("Render server started on %s port.", port));

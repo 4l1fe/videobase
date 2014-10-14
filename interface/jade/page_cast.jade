@@ -1,0 +1,139 @@
+doctype html
+html
+    include config
+    include mixins
+
+    - film_name_meta = cast.title.replace(/"/g, " ")
+    - film_descr_meta = cast.description ? cast.description.replace(/"/g, ' ').substr(0,256) : ''
+    - film_url_meta = 'http://vsevi.ru/films/' + cast.id
+    - film_img_meta = cast.poster || noposter_url
+    - if (film_img_meta[0] == "/") film_img_meta = 'http://vsevi.ru' + film_img_meta
+    - title_alt = cast.title
+    - if (cast.title_orig && cast.title_orig != cast.title) title_alt+= " (" + cast.title_orig + ")"
+    - page_title_full = title_alt + " &mdash; фильмы на Все видео"
+    - page_keywords = "фильм " + cast.title + (cast.title_orig?": " + cast.title_orig:"") + " онлайн-просмотр высокое качество смотреть онлайн рекомендации все видео dvdrip hd"
+    - page_description = "Онлайн просмотр без регистрации и информация о фильме " + cast.title + (cast.title_orig?" (" + cast.title_orig + ")":"") + " рецензии, комментарии, рейтинг, русский трейлер, рекомендации к просмотру."
+    - meta = ['property="og:title" content="' + film_name_meta + '"', 'property="og:url" content="' + film_url_meta + '"', 'property="og:description" content="' + film_descr_meta + '"', 'property="og:image" content="' + film_img_meta + '"']
+    - meta.push('name="twitter:card" content="summary"')
+    - meta.push('name="twitter:url" content="' + film_url_meta + '"')
+    - meta.push('name="twitter:title" content="' + film_name_meta + '"')
+    - meta.push('name="twitter:description" content="' + film_descr_meta + '"')
+    - meta.push('name="twitter:image" content="' + film_img_meta + '"')
+    - head_link = ['rel="canonical" href="http://vsevi.ru/films/' + cast.id + '/"']
+    - if (cast.releasedate) title_alt+= " " + cast.releasedate.substr(0,4)
+    - social_networks = [{ img: "/static/img/i-vk.png", href: "http://vk.com/vsevi", title:"Страница ВсеВидео в Вконтакте" }]
+    - social_networks.push({ img: "/static/img/i-ok.png", href: "http://www.odnoklassniki.ru/group/53196730400877", title:"Страница ВсеВидео в Одноклассниках" })
+    - social_networks.push({ img: "/static/img/i-tw.png", href: "https://twitter.com/vseviru", title:"Страница ВсеВидео в Твиттере" })
+    - social_networks.push({ img: "/static/img/i-fb.png", href: "https://www.facebook.com/vseviru", title:"Страница ВсеВидео в Фейсбуке" })
+
+
+
+    - watching_users = [ {name:"Миранда Керр", avatar: ""}, {name:"Давид Луиз", avatar: ""}, {name:"Криштиану Роналду", avatar: ""}, {name:"Карвахал", avatar: ""}, {name:"Модрич", avatar: ""} ]
+    - guests_count = 100500
+    - console.log(cast)
+    include head
+    body
+        .wrap-page.bg-noise
+            include header
+            .content(role='main')
+                - if (cast.locations && cast.locations.length) {
+                    section.broun-block-playlist
+                        .bg-noise
+                            .title-cast
+                                .container
+                                    .row
+                                        .col-md-8.col-sm-7
+                                            .name-playlist
+                                                h2=cast.title
+
+                                    .row
+                                        .col-md-8.col-sm-7
+                                            div.cast-start-date=date_text(new Date(cast.start))
+
+                                        .col-md-4.col-sm-5
+                                            .cast-chat-header.fright
+                                                img(src="/static/img/cast-chat-icon.png", alt="", title="")
+                                                .fright
+                                                    h3.cast-chat-title Чат
+
+                            //-
+                               .title-cast
+                            .cast-area
+                                .container
+                                    .row
+                                        .col-md-8.rpadding0
+                                            each el in cast.locations
+                                                a(id=el.id)
+                                            a(id="player")
+                                            .frame-player-wrapper
+                                                .frame-player-aspect
+                                                    .frame-player#frame_player
+                                                        mixin cast_player(cast.locations[0])
+
+                                        .col-md-4.lpadding0
+                                            .cast-chat-block
+                                                .cast-chat-list-wrapper-out
+                                                    .cast-chat-list-wrapper-in
+                                                        .cast-chat-list
+                                                            each chat_item in cast.chat_items
+                                                                .cast-chat-item
+                                                                    .cast-chat-item-body
+                                                                        span.cast-chat-item-username=chat_item.user.name
+                                                                            | #{": "}
+                                                                        span.cast-chat-item-msg=chat_item.text
+                                                input(type="text", placeholder="Введите сообщение и нажмите Enter").cast-chat-text-area
+                                    .row
+                                        .col-md-12
+                                            if cast.locations.length > 1
+                                                ul.just-list.list-btns-film.list-btns-cast#locations
+                                                    each el in cast.locations
+                                                        mixin loc_thumb(el)
+                            //-
+                               .cast-area
+                    //-
+                        .broun-block
+                - }
+            section.brd-top.cast-details
+                .container
+                    .row
+                        .col-md-9
+                            .playlist-content
+                                .cast-share
+                                    script(src="http://yandex.st/share/share.js", charset="utf-8")
+                                    .yashare-auto-init(data-yasharetype="big", data-yashareL10n="ru", data-yashareQuickServices="vkontakte,odnoklassniki,moimir,facebook,twitter,gplus", data-yashareTheme="counter")
+                                if cast.title
+                                    h2.blackh1=cast.title
+                                    p!=cast.description
+
+
+                        if watching_users && watching_users.length
+                        .col-md-3.hide-watching-users#watching_users_left
+                            .playlist-content
+                                h2.blackh1 Сейчас смотрят
+                                ul.watching-users-list.cf#watching_users
+                                    each user in watching_users
+                                        mixin user_thumb2(user)
+                            if watching_users.length >= 5
+                                .add-filter#watching_users_more
+                                    .add-content.style-panel-action.rel.zmin
+                                        a(href='#show-watching-users', title='') Показать всех
+                                    //-
+                                       .filter-content
+                                    img.img-responsive(src=img_url + 'shd-big.png', alt='')
+                            .cast-label-guests-count
+                                | Количество гостей:
+                                | #{" "}
+                                span
+                                    =guests_count
+
+            if online_casts && online_casts.length
+                section
+                    .container
+                        h1.dots2-casts.blackh1.centerh1 Онлайн трансляции
+                        mixin casts_list(online_casts)
+
+            include footer
+            //- delete(film.similar); delete(film.description); delete(film.trailer);
+            //- delete(film.comments);
+            script.
+                $(document).ready(function () {window.InitApp({page_conf: !{JSON.stringify(cast)}}, "Cast")})
