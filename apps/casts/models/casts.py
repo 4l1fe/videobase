@@ -9,7 +9,7 @@ from djorm_pgfulltext.fields import VectorField
 class Casts(models.Model):
     title       = models.CharField(max_length=255, db_index=True, blank=False, verbose_name=u'Название трансляции')
     title_orig  = models.CharField(max_length=255, db_index=True, blank=False, verbose_name=u'Название оригинала')
-    start       = models.DateTimeField(auto_now_add=True, verbose_name=u'Время начала трансляции')
+    start       = models.DateTimeField(verbose_name=u'Время начала трансляции')
     duration    = models.IntegerField(null=True, blank=True, verbose_name=u'Продолжительность')
     status      = models.CharField(max_length=255, db_index=True, blank=True, null=True, verbose_name=u'Статус')
     description = models.TextField(max_length=255, blank=True, null=True, verbose_name=u'Описание')

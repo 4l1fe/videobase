@@ -4,6 +4,8 @@ from apps.casts.constants import APP_CONTENTS_PRICE_TYPE_FREE, APP_CONTENTS_PRIC
 from crawler.translation_robot.save_image_for_translation import get_one_google_image_by_query
 from django.core.files import File
 
+DEFAULT_PG_RATING = u'16+'
+
 
 def save_cast_dict(cast_service_name, cast_dict):
 
@@ -12,8 +14,7 @@ def save_cast_dict(cast_service_name, cast_dict):
                  start=cast_dict['date'],
                  duration=cast_dict['meta'].get('duration', None),
                  description=cast_dict['meta'].get('description', None),
-                 pg_rating=cast_dict['meta'].get('description', None))
-
+                 pg_rating=DEFAULT_PG_RATING)
     cast.save()
 
     cast_service = CastsServices.objects.get(name=cast_service_name)
