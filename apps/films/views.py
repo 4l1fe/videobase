@@ -15,8 +15,9 @@ from django.core.context_processors import csrf
 from django.core.serializers.json import DjangoJSONEncoder
 from django.template import Context
 from django.views.generic import View
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, Http404, HttpResponseRedirect, HttpResponseBadRequest
 from django.shortcuts import render_to_response, redirect
+
 
 from rest_framework import status
 
@@ -203,6 +204,21 @@ class FilmView(View):
         return HttpResponse(render_page('film', {'film': resp_dict}))
 
 
+class FilmPoster(View):
+
+    def get(self, *args, **kwargs):
+        try:
+            film_id = self.kwargs['film_id']
+
+            if 'size' in self.kwargs:
+                size = self.kwargs['size']
+                return HttpResponseRedirect('/static/upload/filmextras/{}/poster_{}.jpg'.format(film_id, size))
+        except KeyError:
+            return HttpResponseBadRequest()
+
+        return HttpResponseRedirect('/static/upload/filmextras/{}/poster.jpg'.format(film_id))
+
+
 class PlayListView(View):
 
     def get(self, *args, **kwargs):
@@ -369,3 +385,18 @@ def get_recommend_film(request):
         o_recommend = []
 
     return o_recommend
+
+
+class PersonsPhoto(View):
+
+    def get(self, *args, **kwargs):
+        try:
+            person_id = self.kwargs['person_id']
+
+            if 'size' in self.kwargs:
+                size = self.kwargs['size']
+                return HttpResponseRedirect('/static/upload/persons/{}/profile_{}.jpg'.format(person_id, size))
+        except KeyError:
+            return HttpResponseBadRequest()
+
+        return HttpResponseRedirect('/static/upload/persons/{}/profile.jpg'.format(person_id))
