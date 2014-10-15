@@ -15,7 +15,6 @@ def save_cast_dict(cast_service_name, cast_dict):
                  duration=cast_dict['meta'].get('duration', None),
                  description=cast_dict['meta'].get('description', None),
                  pg_rating=DEFAULT_PG_RATING)
-    print cast_dict['date']
     cast.save()
 
     cast_service = CastsServices.objects.get(name=cast_service_name)

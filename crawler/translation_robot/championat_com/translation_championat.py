@@ -71,7 +71,7 @@ def parse_translation_championat_com():
                     'price': float(price),
                     'link': link,
                     'meta': {'championship': championship if championship else None},
-                    'embed_code': None,
+                    'value': '',
                 }
 
                 translation_list.append(translation_data)

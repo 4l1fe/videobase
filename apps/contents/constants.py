@@ -14,6 +14,7 @@ APP_CONTENTS_LOC_TYPE = (
     ('tvzavr','tvzavr'),
     ('viaplay','viaplay'),
     ('zabavaru','zabavaru'),
+    ('tvzorru','tvzorru'),
     ('playgoogle','playgoogle'),
     ('itunes','itunes'),
     ('ayyo','ayyo'),
