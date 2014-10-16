@@ -76,7 +76,7 @@ def best_of_the_best_this_week():
         file.close()
 
     for item in o_users:
-        params_email.update({'to': item.email})
+        params_email.update({'to': [item.email,]})
 
         # Отправляем email в очередь
         send_template_mail.s(**params_email).apply_async()

@@ -49,6 +49,7 @@ server.on("error", function(error) {
 });
 
 var port = process.argv[2] != undefined ? process.argv[2]: 11800;
+
 var tcp_path = util.format("tcp://*:%s", port);
 
 console.log(util.format("Render server started on %s port.", port));
