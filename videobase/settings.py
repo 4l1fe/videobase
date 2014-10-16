@@ -194,13 +194,13 @@ AUTHENTICATION_BACKENDS = (
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
 LANGUAGE_CODE = 'ru-RU'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Moscow'
 
 USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+USE_TZ = False
 
 ###########################################################
 # Static files (CSS, JavaScript, Images)
@@ -440,6 +440,10 @@ CELERYBEAT_SCHEDULE = {
     },
     'cast_khl_ru_schedule': {
         'task': 'cast_khl_robot',
+        'schedule': timedelta(hours=24)
+    },
+    'cast_ntv_plus_schedule': {
+        'task': 'cast_ntv_plus_robot',
         'schedule': timedelta(hours=24)
     },
     'itunes_update': {
