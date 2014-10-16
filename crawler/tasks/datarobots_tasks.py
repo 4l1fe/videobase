@@ -101,15 +101,15 @@ def film_checked_on_kp_at_least_days_ago(film, days):
 def create_due_refresh_tasks():
     for film in Films.objects.all():
         if film_at_least_years_old(film, years=2):
-            if film_checked_on_kp_at_least_days_ago(film, days=7):
+            if film_checked_on_kp_at_least_days_ago(film, days=3):
                 kinopoisk_parse_one_film.apply_async((film.kinopoisk_id, film.name))
 
         elif film_at_least_years_old(film, years=4):
-            if film_checked_on_kp_at_least_days_ago(film, days=30):
+            if film_checked_on_kp_at_least_days_ago(film, days=7):
                 kinopoisk_parse_one_film.apply_async((film.kinopoisk_id, film.name))
 
         else:
-            if film_checked_on_kp_at_least_days_ago(film, days=180):
+            if film_checked_on_kp_at_least_days_ago(film, days=14):
                 kinopoisk_parse_one_film.apply_async((film.kinopoisk_id, film.name))
 
 
