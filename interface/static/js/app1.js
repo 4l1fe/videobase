@@ -696,12 +696,78 @@
     __extends(CastThumb, _super);
 
     function CastThumb(opts, callback) {
+      var fn, locals, old_place;
       if (opts == null) {
         opts = {};
       }
-      this._name = "cast-thumb";
-      CastThumb.__super__.constructor.call(this, opts, callback);
+      if (callback == null) {
+        callback = void 0;
+      }
+      this._name = 'cast-thumb';
+      check_app_is_init(this);
+      if (!this._name) {
+        error("It's wrong to use parent class", "crit");
+      }
+      this.vals = {};
+      this.defaults = {};
+      this.elements = {};
+      this.e_attrs = {};
+      this.e_vals = {};
+      if (opts.defaults) {
+        $.extend(this.defaults, opts.defaults);
+      }
+      if (opts.place === void 0) {
+        this._place = $('<span class="preload-' + this._name + '"></span>');
+        if (opts.parent) {
+          if (opts.up) {
+            this._place.prependTo(opts.parent);
+          } else {
+            this._place.appendTo(opts.parent);
+          }
+        }
+        fn = window.mi_templates[this._name];
+        if (fn) {
+          old_place = this._place;
+          locals = {
+            cast: opts.vals
+          };
+          this._place = $(fn(locals));
+          this.set_elements();
+          if (opts.vals) {
+            this.set_vals(opts.vals, opts.do_not_set);
+          }
+          this._place.insertAfter(old_place);
+          old_place.remove();
+          if (callback) {
+            callback(this);
+          }
+        } else {
+          error('Unable to load template for object "' + this._name + '"');
+        }
+      } else {
+        this._place = opts.place;
+        this.set_elements();
+        if (opts.vals) {
+          this.set_vals(opts.vals, opts.do_not_set);
+        }
+        if (callback) {
+          callback(this);
+        }
+      }
     }
+
+    CastThumb.prototype.transform_attr = function(attr, name, val) {
+      if (attr === "href" && name === "id") {
+        return "/films/" + val + "/";
+      } else {
+        return CastThumb.__super__.transform_attr.apply(this, arguments);
+      }
+    };
+
+    CastThumb.prototype.set_vals = function(vals, do_not_set) {
+      var tpl;
+      return tpl = window.mi_templates['cast-thumb'];
+    };
 
     return CastThumb;
 
@@ -1115,6 +1181,8 @@
         isSingle: true
       });
       this.rest.persons.action.add("subscribe");
+      this.rest.add("casts");
+      this.rest.casts.add("list");
       this._e = {
         search: {
           frm: $("#frm_search")
@@ -2385,13 +2453,20 @@
   })(Page);
 
   Page_Cast = (function(_super) {
-    var casts_deck;
+    var casts_deck, self, _filter_counter, _filter_params;
 
     __extends(Page_Cast, _super);
 
     casts_deck = void 0;
 
+    self = void 0;
+
+    _filter_params = {};
+
+    _filter_counter = 0;
+
     function Page_Cast() {
+      self = this;
       Page_Cast.__super__.constructor.apply(this, arguments);
       casts_deck = new CastsDeck($("#casts"), {
         load_func: (function(_this) {
@@ -2400,37 +2475,74 @@
           };
         })(this)
       });
+      casts_deck.page = 1;
+      casts_deck.load_more_hide(false);
+      casts_deck.load_more_bind($("#casts_more"));
     }
 
-    Page_Cast.prototype.load_more_casts = function(deck) {};
+    Page_Cast.prototype.load_more_casts = function(deck, opts) {
+      var current_counter, params;
+      if (opts == null) {
+        opts = {};
+      }
+      deck.load_more_hide();
+      params = $.extend(_filter_params, opts.params || {});
+      if (opts.clear_output) {
+        deck.clear(false);
+        params.page = 1;
+      } else {
+        params.page = opts.page || (deck.page + 1);
+      }
+      current_counter = deck.load_counter;
+      return self._app.rest.casts.read("list", params).done(function(data) {
+        if (current_counter !== deck.load_counter) {
+          return;
+        }
+        if (data.items) {
+          deck.add_items(data.items);
+          if (data.items.length >= 12) {
+            deck.load_more_show();
+          } else {
+            deck.load_more_hide(false);
+          }
+          deck.page = data.page;
+          if (opts.clear_output) {
+            scroll_to_obj($("#filter_content"));
+          }
+        } else {
+          deck.load_more_hide(false);
+        }
+        this.update_filter_params();
+        if (opts.callback) {
+          return opts.callback();
+        }
+      }).fail((function(_this) {
+        return function(data) {
+          return deck.load_more_hide(false);
+        };
+      })(this));
+    };
+
+    Page_Cast.prototype.update_filter_params = function(update_href) {
+      if (update_href == null) {
+        update_href = true;
+      }
+    };
 
     return Page_Cast;
 
   })(Page);
 
   Page_CastsList = (function(_super) {
-    var casts_deck;
-
     __extends(Page_CastsList, _super);
-
-    casts_deck = void 0;
 
     function Page_CastsList() {
       Page_CastsList.__super__.constructor.apply(this, arguments);
-      casts_deck = new CastsDeck($("#casts"), {
-        load_func: (function(_this) {
-          return function(deck) {
-            return _this.load_more_casts(deck);
-          };
-        })(this)
-      });
     }
-
-    Page_CastsList.prototype.load_more_casts = function(deck) {};
 
     return Page_CastsList;
 
-  })(Page);
+  })(Page_Cast);
 
   window.InitApp = function(opts, page_name) {
     if (opts == null) {

@@ -1,6 +1,6 @@
 # coding: utf-8
 
-from crawler.translation_robot import parse_sportbox_ru, parse_translation_live_russia_tv, parse_khl, parse_translation_championat_com
+from crawler.translation_robot import parse_sportbox_ru, parse_translation_live_russia_tv, parse_khl, parse_translation_championat_com, parse_ntv_plus_translation
 from crawler.translation_robot.cast_utils import save_cast_dict
 from videobase.celery import app
 from utils.common import traceback_own
@@ -36,4 +36,8 @@ def championat_update():
 @app.task(name='cast_khl_robot', queue='khl_ru')
 def khl_update():
     generic_task(parse_khl, 'khl_ru')
+
+@app.task(name='cast_ntv_plus_robot', queue='ntv_plus')
+def ntv_plus_update():
+    generic_task(parse_ntv_plus_translation, 'ntv_plus')
 
