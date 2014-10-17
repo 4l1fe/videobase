@@ -22,7 +22,6 @@ def process_one_film(site, film_id, html_page_json):
     except Films.DoesNotExist:
         print "There is no film in db with such id"
         return
-    i = 0
     for data in sites_crawler[site]['parser'].parse(html_page_json['html'], sane_dict, film, url=html_page_json['url']): # здесь уже по готовому результату парсим
         data['film'] = film
         try:
