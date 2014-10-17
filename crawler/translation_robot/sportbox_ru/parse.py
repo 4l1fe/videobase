@@ -1,8 +1,7 @@
 # coding: utf-8
 from bs4 import BeautifulSoup
-
 from django.utils import timezone
-from raven.transport import requests
+import requests
 
 HOST = 'http://news.sportbox.ru'
 

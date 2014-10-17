@@ -1,7 +1,7 @@
 # coding: utf-8
 from bs4 import BeautifulSoup
 from django.utils import timezone
-from raven.transport import requests
+import requests
 
 HOST = 'http://www.ntvplus.ru'
 MONTHS = {
@@ -20,7 +20,7 @@ MONTHS = {
 }
 
 
-def parse_translation():
+def parse_ntv_plus_translation():
     url = HOST + '/online/'
     content = requests.get(url).content
     soup = BeautifulSoup(content)
@@ -89,8 +89,8 @@ def parse_translation():
                 'price': price,
                 'link': translation_url,
                 'meta': meta,
-                'embed_code': None,
-                'value': None,
+                'embed_code': ' ',
+                'value': '',
                 'player': None
         }
 

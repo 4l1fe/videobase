@@ -3,7 +3,7 @@ html
     include config
     include mixins
     - film_name_meta = film.name.replace(/"/g, " ")
-    - film_descr_meta = film.description.replace(/"/g, ' ').substr(0,256)
+    - film_descr_meta = film.description ? film.description.replace(/"/g, ' ').substr(0,256) : ""
     - film_url_meta = 'http://vsevi.ru/films/' + film.id
     - film_img_meta = film.poster || noposter_url
     - if (film_img_meta[0] == "/") film_img_meta = 'http://vsevi.ru' + film_img_meta
@@ -204,7 +204,7 @@ html
                             .add-comment#add_comment
                                 if auth_user
                                     h2.blackh1 Добавить комментарий
-                                    form
+                                    form(name="comment", method="post")
                                         .form-group#comment_textarea_wrapper
                                             textarea(placeholder="Опишите, что именно вам понравилось или не понравилось в фильме", name="text", rows="5").form-control
                                             p
