@@ -9,6 +9,7 @@ from random import randrange
 from cStringIO import StringIO
 from PIL import Image, ImageEnhance
 
+from django.db import connection
 from django.core.files import File
 from django.core.cache import cache
 from django.core.context_processors import csrf
@@ -20,14 +21,17 @@ from django.shortcuts import render_to_response, redirect
 
 from rest_framework import status
 
-import apps.films.models as film_model
 import apps.contents.models as content_model
+
+import apps.films.models as film_model
 from apps.films.api.serializers import vbFilm, vbComment, vbPerson
-from apps.films.constants import APP_USERFILM_STATUS_PLAYLIST, APP_PERSON_ACTOR
+from apps.films.constants import APP_USERFILM_STATUS_PLAYLIST, APP_PERSON_ACTOR, \
+    APP_PERSON_DIRECTOR, APP_PERSON_SCRIPTWRITER, APP_FILM_FULL_FILM, APP_USERFILM_STATUS_NOT_WATCH
 from apps.films.api import SearchFilmsView
 
-from utils.noderender import render_page
 from utils.common import reindex_by
+from utils.noderender import render_page
+from utils.middlewares.local_thread import get_current_request
 
 
 def get_new_namestring(namestring):
@@ -149,13 +153,11 @@ class IndexView(View):
             except:
                 genres_data = []
 
-        
         # Формируем ответ
         data = {
             'films_new': resp_dict_data,
             'filter_genres': genres_data,
             'comments': comments,
-             # Список рекомендуемых фильмов
             'films': get_recommend_film(self.request),
         }
 
@@ -170,9 +172,10 @@ class PersonView(View):
         except film_model.Persons.DoesNotExist:
             raise Http404
 
-        vbp = vbPerson(person, extend=True)
-        crutch = vbp.data  # костыль, до починки парсинга этих данных роботом.
-        if not vbp.data['birthdate']:
+        crutch = vbPerson(person, extend=True).data
+
+        # костыль, до починки парсинга этих данных роботом.
+        if not crutch.get('birthdate', False):
             d1 = date(1960, 1, 1)
             d2 = date(1980, 12, 12)
             delta = d2 - d1
@@ -182,9 +185,9 @@ class PersonView(View):
             crutch['birthdate'] = birthdate.strftime('%d %B %Y')
             crutch['years_old'] = date.today().year - birthdate.year
 
-        pfs = film_model.PersonsFilms.objects.filter(person=person)[:12]  # почему-то 12 первых фильмов. Был пагинатор
-        vbf = vbFilm([pf.film for pf in pfs], many=True)
-        crutch['filmography'] = vbf.data
+        # Выбираем фильмографию
+        pfs = film_model.PersonsFilms.objects.filter(person=person)[:12]
+        crutch['filmography'] = vbFilm([pf.film for pf in pfs], many=True).data
 
         return HttpResponse(render_page('person', {'person': crutch}))
 
@@ -192,8 +195,7 @@ class PersonView(View):
 class FilmView(View):
 
     def get(self, *args, **kwargs):
-        resp_dict, o_film = film_to_view(kwargs['film_id'])
-        resp_dict['similar'] = calc_similar(o_film)
+        resp_dict = film_to_view(kwargs['film_id'], similar=True)
 
         # Trailer
         trailer = film_model.FilmExtras.get_trailer_by_film(kwargs['film_id'], first=True)
@@ -234,7 +236,7 @@ class PlayListView(View):
                     playlist['previous'] = arrow_data(playlist_data[film_id-2], film_id-1)
 
                 film = playlist_data[film_id-1]
-                film_data, o_film = film_to_view(film.id)
+                film_data = film_to_view(film.id)
 
             # Update playlist
             playlist.update({
@@ -270,32 +272,33 @@ class SearchView(View):
         return HttpResponse(render_page('search', resp_dict))
 
 
-
 def test_view(request):
     c = Context({})
     c.update(csrf(request))
 
     return render_to_response('api_test.html', c)
 
-def serialize_actors(actors_iterable):
 
-    return [{'id':pf.person.id, 'name':pf.person.name}
-            for pf in actors_iterable]
-    
 def calc_actors(o_film):
+    def serialize_actors(actors_iterable):
+        return [{'id': pf.person.id, 'name': pf.person.name} for pf in actors_iterable]
+
+    result = []
     filter = {
-        'filter': {'pf_persons_rel__film': o_film.pk},
+        'filter': {'pf_persons_rel__film': o_film.id},
         'offset': 0,
         'limit': 5,
     }
 
-    result = []
     try:
-        enumerated_actors = film_model.PersonsFilms.objects.filter(film=o_film, p_type = APP_PERSON_ACTOR
-        ).exclude(p_index=0).order_by('p_index')
+        enumerated_actors = film_model.PersonsFilms.objects.\
+            filter(film=o_film, p_type=APP_PERSON_ACTOR).\
+            exclude(p_index=0).\
+            order_by('p_index')
 
-        unenumerated_actors = film_model.PersonsFilms.objects.filter(film=o_film, p_type = APP_PERSON_ACTOR).filter(p_index=0)
-        
+        unenumerated_actors = film_model.PersonsFilms.objects.\
+            filter(film=o_film, p_type=APP_PERSON_ACTOR, p_index=0)
+
         result = (serialize_actors(enumerated_actors) + serialize_actors(unenumerated_actors)) [slice(filter['offset'], filter['limit'])]
 
     except Exception, e:
@@ -306,6 +309,7 @@ def calc_actors(o_film):
 
 def calc_similar(o_film):
     result = []
+
     try:
         result = vbFilm(film_model.Films.similar_api(o_film), many=True).data
     except Exception, e:
@@ -329,7 +333,7 @@ def calc_comments(o_film):
     return result_list
 
 
-def film_to_view(film_id):
+def film_to_view(film_id, similar=False):
     o_film = film_model.Films.objects.filter(pk=film_id).prefetch_related('genres', 'countries')
 
     if not len(o_film):
@@ -346,11 +350,123 @@ def film_to_view(film_id):
     resp_dict['actors'] = calc_actors(o_film)
     resp_dict['comments'] = calc_comments(o_film)
 
-    return resp_dict, o_film
+    # Выбираем рекомендуемые фильмы
+    if similar:
+        list_films = []
+        exclude_films = []
+        cursor = connection.cursor()
+
+        ############################################################################
+        # Если авторизован, то список исключающих фильмов
+        request = get_current_request()
+        if request.user.is_authenticated():
+            sql = """
+            "films"."id" NOT IN (SELECT "users_films"."film_id" FROM "users_films"
+            WHERE "users_films"."user_id" = %s AND ("users_films"."status" = %s OR
+            "users_films"."rating" IS NOT NULL))
+            """
+
+            exclude_films = film_model.Films.objects.extra(
+                where=[sql],
+                params=[request.user.id, APP_USERFILM_STATUS_NOT_WATCH],
+            ).values_list('id', flat=True)
+
+            exclude_films = list(exclude_films)
+
+        # Исключаем текущий фильм
+        exclude_films.append(film_id)
+
+        ############################################################################
+        # 4 фильма по рейтингу от режисера и сценариста
+        directors = list(set(item['id'] for item in resp_dict['directors'] + resp_dict['scriptwriters']))
+
+        if len(directors):
+            list_films = film_model.Films.objects.\
+                filter(
+                    pf_films_rel__person__in=directors,
+                    pf_films_rel__p_type__in=[APP_PERSON_DIRECTOR, APP_PERSON_SCRIPTWRITER],
+                    type=APP_FILM_FULL_FILM
+                ).exclude(id__in=exclude_films).\
+                order_by('-rating_sort').\
+                values_list('id', flat=True)[:4]
+
+            list_films = list(list_films)
+
+        ############################################################################
+        # 4 фильма по рейтингу от актера
+        if len(resp_dict['actors']):
+            sql = """
+            SELECT t1.film_id FROM films AS t0 JOIN first_3_actor AS t1 ON t0.id=t1.film_id
+            WHERE t0.type='{}' AND t1.person_id IN ({}) AND NOT (t0.id IN ({}))
+            ORDER BY t0.rating_sort DESC LIMIT 4;
+            """.format(APP_FILM_FULL_FILM,
+                u','.join([str(i['id']) for i in resp_dict['actors'][:3]]),
+                u','.join([str(i) for i in set(list_films + exclude_films)])
+            )
+
+            # Исполнение запроса
+            cursor.execute(sql)
+
+            for row in cursor.fetchall():
+                list_films.append(row[0])
+
+        ############################################################################
+        # 4 фильма по рейтингу от жанров
+        if len(resp_dict['genres']):
+            sql = ""
+            g = [i['id'] for i in resp_dict['genres'][:3]]
+            template = "SELECT films_id FROM films_genres where genres_id={}"
+
+            for k, v in enumerate(g, 1):
+                sql += template.format(v)
+                if k != len(g):
+                    sql += " AND films_id IN ("
+
+            if len(g) > 1:
+                sql += ')' * (len(g) - 1)
+
+            sql = """
+            SELECT films.id FROM films WHERE films.id IN ({}) AND  NOT (films.id IN ({}))
+            ORDER BY films.rating_sort DESC LIMIT {};
+            """.format(
+                sql,
+                ','.join([str(i) for i in set(list_films + exclude_films)]),
+                12 - len(list_films)
+            )
+
+            cursor.execute(sql)
+
+            for row in cursor.fetchall():
+                list_films.append(row[0])
+
+        ############################################################################
+        # Финальная обработка
+
+        # Закрытие курсора
+        cursor.close()
+
+        required_films = 12 - len(list_films)
+        films_to_str = ','.join([str(i) for i in list_films])
+
+        sql = "SELECT * FROM films WHERE films.id IN ({})".format(films_to_str)
+
+        # Добираем фильмы, если необходимо
+        if required_films:
+            sql += """ UNION (SELECT * FROM films WHERE films.id NOT IN ({})
+             ORDER BY films.rating_sort DESC LIMIT {})
+            """.format(films_to_str, required_films)
+
+        try:
+            resp_dict['similar'] = vbFilm(film_model.Films.objects.raw(sql), many=True).data
+        except Exception, e:
+            resp_dict['similar'] = []
+            print "Caught exception {} in calc_similar".format(e)
+
+    return resp_dict
 
 
 def kinopoisk_view(request, film_id, *args, **kwargs):
-    # Проверяем, есть ли иакой film_id в нашей базе данных
+    # Проверяем, есть ли такой film_id в нашей базе данных
     # и что эта запись уникальна
     try:
         o_film = film_model.Films.objects.get(kinopoisk_id=film_id)
