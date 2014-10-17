@@ -176,43 +176,15 @@ class ParseDom2():
         profile_link = nik['href']
         div = actor_div.find('div', {"class": "txt"})
         nobrs = div.findAll('nobr')
-        actor_info['start_date'] = ParseDom2.get_valid_date_for_str(nobrs[0].text)
+        actor_info['start_date'] = get_valid_date_for_str(nobrs[0].text)
         if len(nobrs) > 1:
-            actor_info['finish_date'] = ParseDom2.get_valid_date_for_str(nobrs[1].text)
+            actor_info['finish_date'] = get_valid_date_for_str(nobrs[1].text)
 
         actor_info['name'] = name
         actor_info['profile_link'] = 'http://dom2.ru' + profile_link
 
         return actor_info
 
-    @staticmethod
-    def get_valid_date_for_str(date_str):
-        locale.setlocale(locale.LC_ALL, ('RU', 'UTF8'))
-        res_date = None
-        res_date_text = ''
-        dates_parts = date_str.split(' ')
-        if len(dates_parts) == 3:
-            year = dates_parts[2]
-        else:
-            year = u'2014'
-        if len(dates_parts) == 1:
-            if date_str == u'Сегодня':
-                day = datetime.datetime.now().day
-            elif date_str == u'Вчера':
-                day = datetime.date.fromordinal(datetime.date.today().toordinal()-1).day
-            res_date_text = str(day) + ' ' + str(datetime.datetime.now().month) + ' ' + year
-            res_date = datetime.datetime.strptime(res_date_text.encode("utf-8"), "%d %m %Y").date()
-        else:
-            try:
-                res_date_text = dates_parts[0] + ' ' + convert_orig_month_name_to_lib(dates_parts[1]) + ' ' + year
-                res_date = datetime.datetime.strptime(res_date_text.encode("utf-8"), "%d %B %Y").date()
-            except ValueError, e:
-                res_date_text = u'1' + ' ' + convert_orig_month_name_to_lib(dates_parts[1]) + ' ' + year
-                res_date = datetime.datetime.strptime(res_date_text.encode("utf-8"), "%d %B %Y").date()
-                print "Datetime converting error: ", dates_parts[0], convert_orig_month_name_to_lib(dates_parts[1]), year
-            except Exception, e:
-                print e.message
-        return res_date
 
     @staticmethod
     def save_poster_to_file(link, name):
@@ -239,7 +211,7 @@ class ParseDom2():
         div_green_box = div_calendar.find('div', {"class": "greenBox"})
         span_green_box_date = div_green_box.find('span', {"class": "greenBoxDate"})
         a_link = span_green_box_date.find('a', {"class": "link no-select"})
-        e_date = ParseDom2.get_valid_date_for_str(a_link.find('nobr').text)
+        e_date = get_valid_date_for_str(a_link.find('nobr').text)
         return e_date
 
     @staticmethod
@@ -284,3 +256,30 @@ class ParseDom2():
         return div_big_panel_content
 
 
+def get_valid_date_for_str(date_str):
+    locale.setlocale(locale.LC_ALL, ('RU', 'UTF8'))
+    res_date = None
+    res_date_text = ''
+    dates_parts = date_str.split(' ')
+    if len(dates_parts) == 3:
+        year = dates_parts[2]
+    else:
+        year = u'2014'
+    if len(dates_parts) == 1:
+        if date_str == u'Сегодня':
+            day = datetime.datetime.now().day
+        elif date_str == u'Вчера':
+            day = datetime.date.fromordinal(datetime.date.today().toordinal()-1).day
+        res_date_text = str(day) + ' ' + str(datetime.datetime.now().month) + ' ' + year
+        res_date = datetime.datetime.strptime(res_date_text.encode("utf-8"), "%d %m %Y").date()
+    else:
+        try:
+            res_date_text = dates_parts[0] + ' ' + convert_orig_month_name_to_lib(dates_parts[1]) + ' ' + year
+            res_date = datetime.datetime.strptime(res_date_text.encode("utf-8"), "%d %B %Y").date()
+        except ValueError, e:
+            res_date_text = u'1' + ' ' + convert_orig_month_name_to_lib(dates_parts[1]) + ' ' + year
+            res_date = datetime.datetime.strptime(res_date_text.encode("utf-8"), "%d %B %Y").date()
+            print "Datetime converting error: ", dates_parts[0], convert_orig_month_name_to_lib(dates_parts[1]), year
+        except Exception, e:
+            print e.message
+    return res_date
