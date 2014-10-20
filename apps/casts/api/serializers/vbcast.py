@@ -10,7 +10,7 @@ class vbCast(serializers.ModelSerializer):
     locations = serializers.SerializerMethodField('locations_list')
     relation = serializers.SerializerMethodField('calc_relation')
     poster = serializers.SerializerMethodField('get_poster')
-    start = serializers.SerializerMethodField('get_start')
+    #start = serializers.SerializerMethodField('get_start')
 
     def tags_list(self, obj):
         return [{
@@ -22,8 +22,8 @@ class vbCast(serializers.ModelSerializer):
     def get_poster(self, obj):
         return obj.ce_cast_rel.first().get_photo_url() if obj.ce_cast_rel.first() else None
 
-    def get_start(self, obj):
-        return int(time.mktime(obj.start.utctimetuple()))
+    #def get_start(self, obj):
+    #    return int(time.mktime(obj.start.utctimetuple()))
 
     def locations_list(self, obj):
         return [{
