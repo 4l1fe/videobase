@@ -307,11 +307,110 @@ def calc_actors(o_film):
     return result
 
 
-def calc_similar(o_film):
+def calc_similar(film_id, actors, directors, genres, **kwargs):
     result = []
+    list_films = []
+    exclude_films = []
+    cursor = connection.cursor()
+
+    ############################################################################
+    # Если авторизован, то список исключающих фильмов
+    request = get_current_request()
+    if request.user.is_authenticated():
+        sql = """
+        "films"."id" NOT IN (SELECT "users_films"."film_id" FROM "users_films"
+        WHERE "users_films"."user_id" = %s AND ("users_films"."status" = %s OR
+        "users_films"."rating" IS NOT NULL))
+        """
+
+        exclude_films = film_model.Films.objects.extra(
+            where=[sql],
+            params=[request.user.id, APP_USERFILM_STATUS_NOT_WATCH],
+        ).values_list('id', flat=True)
+
+        exclude_films = list(exclude_films)
+
+    # Исключаем текущий фильм
+    exclude_films.append(film_id)
+
+    ############################################################################
+    # 4 фильма по рейтингу от режисера и сценариста
+    if len(directors):
+        list_films = film_model.Films.objects.\
+            filter(
+                pf_films_rel__person__in=directors,
+                pf_films_rel__p_type__in=[APP_PERSON_DIRECTOR, APP_PERSON_SCRIPTWRITER],
+                type=APP_FILM_FULL_FILM
+            ).exclude(id__in=exclude_films).\
+            order_by('-rating_sort').\
+            values_list('id', flat=True)[:4]
+
+        list_films = list(list_films)
+
+    ############################################################################
+    # 4 фильма по рейтингу от актера
+    if len(actors):
+        sql = """
+        SELECT t1.film_id FROM films AS t0 JOIN first_3_actor AS t1 ON t0.id=t1.film_id
+        WHERE t0.type='{}' AND t1.person_id IN ({}) AND NOT (t0.id IN ({}))
+        ORDER BY t0.rating_sort DESC LIMIT 4;
+        """.format(APP_FILM_FULL_FILM,
+            u','.join([str(i['id']) for i in actors]),
+            u','.join([str(i) for i in set(list_films + exclude_films)])
+        )
+
+        # Исполнение запроса
+        cursor.execute(sql)
+
+        list_films += [row[0] for row in cursor.fetchall()]
+
+    ############################################################################
+    # 4 фильма по рейтингу от жанров
+    if len(genres):
+        sql = ""
+        g = [i['id'] for i in genres]
+        template = "SELECT films_id FROM films_genres where genres_id={}"
+
+        for k, v in enumerate(g, 1):
+            sql += template.format(v)
+            if k != len(g):
+                sql += " AND films_id IN ("
+
+        if len(g) > 1:
+            sql += ')' * (len(g) - 1)
+
+        sql = """
+        SELECT films.id FROM films WHERE films.id IN ({}) AND NOT (films.id IN ({}))
+        ORDER BY films.rating_sort DESC LIMIT {};
+        """.format(
+            sql,
+            ','.join([str(i) for i in set(list_films + exclude_films)]),
+            12 - len(list_films)
+        )
+
+        cursor.execute(sql)
+
+        list_films += [row[0] for row in cursor.fetchall()]
+
+    ############################################################################
+    # Финальная обработка
+
+    # Закрытие курсора
+    cursor.close()
+
+    required_films = 12 - len(list_films)
+    films_to_str = ','.join([str(i) for i in list_films])
+
+    sql = "SELECT * FROM films WHERE films.id IN ({})".format(films_to_str)
+
+    # Добираем фильмы, если необходимо
+    if required_films:
+        sql += """ UNION (SELECT * FROM films WHERE films.id NOT IN ({})
+         ORDER BY films.rating_sort DESC LIMIT {})
+        """.format(films_to_str, required_films)
 
     try:
-        result = vbFilm(film_model.Films.similar_api(o_film), many=True).data
+        result = vbFilm(film_model.Films.objects.raw(sql), many=True).data
     except Exception, e:
         print "Caught exception {} in calc_similar".format(e)
 
@@ -352,115 +451,11 @@ def film_to_view(film_id, similar=False):
 
     # Выбираем рекомендуемые фильмы
     if similar:
-        list_films = []
-        exclude_films = []
-        cursor = connection.cursor()
-
-        ############################################################################
-        # Если авторизован, то список исключающих фильмов
-        request = get_current_request()
-        if request.user.is_authenticated():
-            sql = """
-            "films"."id" NOT IN (SELECT "users_films"."film_id" FROM "users_films"
-            WHERE "users_films"."user_id" = %s AND ("users_films"."status" = %s OR
-            "users_films"."rating" IS NOT NULL))
-            """
-
-            exclude_films = film_model.Films.objects.extra(
-                where=[sql],
-                params=[request.user.id, APP_USERFILM_STATUS_NOT_WATCH],
-            ).values_list('id', flat=True)
-
-            exclude_films = list(exclude_films)
-
-        # Исключаем текущий фильм
-        exclude_films.append(film_id)
-
-        ############################################################################
-        # 4 фильма по рейтингу от режисера и сценариста
-        directors = list(set(item['id'] for item in resp_dict['directors'] + resp_dict['scriptwriters']))
-
-        if len(directors):
-            list_films = film_model.Films.objects.\
-                filter(
-                    pf_films_rel__person__in=directors,
-                    pf_films_rel__p_type__in=[APP_PERSON_DIRECTOR, APP_PERSON_SCRIPTWRITER],
-                    type=APP_FILM_FULL_FILM
-                ).exclude(id__in=exclude_films).\
-                order_by('-rating_sort').\
-                values_list('id', flat=True)[:4]
-
-            list_films = list(list_films)
-
-        ############################################################################
-        # 4 фильма по рейтингу от актера
-        if len(resp_dict['actors']):
-            sql = """
-            SELECT t1.film_id FROM films AS t0 JOIN first_3_actor AS t1 ON t0.id=t1.film_id
-            WHERE t0.type='{}' AND t1.person_id IN ({}) AND NOT (t0.id IN ({}))
-            ORDER BY t0.rating_sort DESC LIMIT 4;
-            """.format(APP_FILM_FULL_FILM,
-                u','.join([str(i['id']) for i in resp_dict['actors'][:3]]),
-                u','.join([str(i) for i in set(list_films + exclude_films)])
-            )
-
-            # Исполнение запроса
-            cursor.execute(sql)
-
-            for row in cursor.fetchall():
-                list_films.append(row[0])
-
-        ############################################################################
-        # 4 фильма по рейтингу от жанров
-        if len(resp_dict['genres']):
-            sql = ""
-            g = [i['id'] for i in resp_dict['genres'][:3]]
-            template = "SELECT films_id FROM films_genres where genres_id={}"
-
-            for k, v in enumerate(g, 1):
-                sql += template.format(v)
-                if k != len(g):
-                    sql += " AND films_id IN ("
-
-            if len(g) > 1:
-                sql += ')' * (len(g) - 1)
-
-            sql = """
-            SELECT films.id FROM films WHERE films.id IN ({}) AND  NOT (films.id IN ({}))
-            ORDER BY films.rating_sort DESC LIMIT {};
-            """.format(
-                sql,
-                ','.join([str(i) for i in set(list_films + exclude_films)]),
-                12 - len(list_films)
-            )
-
-            cursor.execute(sql)
-
-            for row in cursor.fetchall():
-                list_films.append(row[0])
-
-        ############################################################################
-        # Финальная обработка
-
-        # Закрытие курсора
-        cursor.close()
-
-        required_films = 12 - len(list_films)
-        films_to_str = ','.join([str(i) for i in list_films])
-
-        sql = "SELECT * FROM films WHERE films.id IN ({})".format(films_to_str)
-
-        # Добираем фильмы, если необходимо
-        if required_films:
-            sql += """ UNION (SELECT * FROM films WHERE films.id NOT IN ({})
-             ORDER BY films.rating_sort DESC LIMIT {})
-            """.format(films_to_str, required_films)
-
-        try:
-            resp_dict['similar'] = vbFilm(film_model.Films.objects.raw(sql), many=True).data
-        except Exception, e:
-            resp_dict['similar'] = []
-            print "Caught exception {} in calc_similar".format(e)
+        resp_dict['similar'] = calc_similar(film_id,
+            actors=resp_dict['actors'][:3],
+            genres=resp_dict['genres'][:3],
+            directors=list(set(item['id'] for item in resp_dict['directors'] + resp_dict['scriptwriters'])),
+        )
 
     return resp_dict
 
