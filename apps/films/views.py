@@ -19,7 +19,7 @@ from django.core.context_processors import csrf
 from django.core.serializers.json import DjangoJSONEncoder
 from django.template import Context
 from django.views.generic import View
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import render_to_response, redirect
 
 from rest_framework import status
@@ -212,16 +212,6 @@ class FilmView(View):
 
         return HttpResponse(render_page('film', {'film': resp_dict}))
 
-    def post(self, *args, **kwargs):
-        resp_dict, o_film = film_to_view(kwargs['film_id'])
-        resp_dict['similar'] = calc_similar(o_film)
-        # Trailer
-        trailer = film_model.FilmExtras.get_trailer_by_film(kwargs['film_id'], first=True)
-        if not trailer is None:
-            resp_dict['trailer'] = trailer.url
-
-        return HttpResponse(render_page('film', {'film': resp_dict}))
-
 
 class CommentFilmView(View):
 
@@ -252,14 +242,9 @@ class CommentFilmView(View):
 
     def post(self, request, film_id, format=None, *args, **kwargs):
         form = CommentForm(request.REQUEST)
-        resp_dict, o_film = film_to_view(kwargs['film_id'])
-        resp_dict['similar'] = calc_similar(o_film)
-
         if form.is_valid():
             # Выбираем и проверяем, что фильм существует
-            o_content = self.__get_object(film_id)
-            if isinstance(o_content):
-                return o_content
+            o_content = self.__get_object(int(film_id))
             user = SessionToken.objects.get(key=request.COOKIES['x-session']).user
 
             # Init data
@@ -272,7 +257,7 @@ class CommentFilmView(View):
             o_com = Comments.objects.create(**filter_)
             Feed.objects.create(user=SessionToken.objects.get(key=request.COOKIES['x-session']).user, type=FILM_COMMENT, obj_id=o_com.id, child_obj_id=o_content.film_id)
 
-            return HttpResponse(render_page('film', {'film': resp_dict}))
+            return HttpResponseRedirect('/films/{}'.format(film_id))
 
         return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
 
