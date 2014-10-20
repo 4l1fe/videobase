@@ -9,7 +9,7 @@ URL_LOAD = 'http://dom2.ru/videos/page/{}'
 URL_OLD_ACTRORS_LOAD = 'http://dom2.ru/heroes/old/page/{}'
 
 
-# Загрузка страници с dom2.ru
+# Загрузка страницы с dom2.ru
 class Dom2Loader():
     def __init__(self):
         pass
