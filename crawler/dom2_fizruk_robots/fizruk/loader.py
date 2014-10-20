@@ -44,12 +44,10 @@ class FizrukLoader():
         uploads_path = 'static/upload/Fizruk/'
         json_path = 'saved_pages/fizruk/'
         files = os.listdir(json_path)
-        print files
         for file_name in files:
             trimmed_fname = file_name.split('.')[0]
             if not os.path.exists(uploads_path + trimmed_fname + ".flv"):
                 print 'File', trimmed_fname, 'will be downloaded'
-                print file_name
                 with open(json_path + file_name) as current_file:
                     json_page = json.load(current_file)
                     beatiful_soup = BeautifulSoup(json_page['html'])
@@ -66,14 +64,12 @@ class FizrukLoader():
     @staticmethod
     def download_video_by_id(id, file_name):
         BASE_PATH = os.path.join('static/upload/', 'Fizruk/')
-        print BASE_PATH
         if not os.path.exists(BASE_PATH):
             os.makedirs(BASE_PATH)
         manifest_root_link = 'http://rutube.ru/api/play/options/{}/?format=xml'.format(id)
         manifest_txt = requests.get(manifest_root_link)
         f4link =  FizrukLoader.get_manifest_f4_link(manifest_txt.content)
         bashCommand = "php ../AdobeHDS.php --manifest \"{}\" --outfile \"{}.mp4\"".format(f4link, BASE_PATH + file_name)
-        print bashCommand
         process = subprocess.Popen(bashCommand, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         out, err = process.communicate()
         print out
@@ -83,7 +79,6 @@ class FizrukLoader():
         dom = parseString(xml_root_file)
         video_manifest_default_link = dom.getElementsByTagName('default')
         element_lnk = video_manifest_default_link.item(0).firstChild.nodeValue
-        print element_lnk
         return element_lnk
 
     @staticmethod
