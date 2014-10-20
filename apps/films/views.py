@@ -4,6 +4,10 @@ import os
 import json
 import warnings
 
+from cgi import escape
+
+from django.core.exceptions import ObjectDoesNotExist
+
 from datetime import date, timedelta
 from random import randrange
 from cStringIO import StringIO
@@ -25,9 +29,15 @@ import apps.contents.models as content_model
 from apps.films.api.serializers import vbFilm, vbComment, vbPerson
 from apps.films.constants import APP_USERFILM_STATUS_PLAYLIST, APP_PERSON_ACTOR
 from apps.films.api import SearchFilmsView
+from apps.contents.models import Comments, Contents
+from apps.films.forms import CommentForm
+from apps.films.models import Films
+from apps.users import Feed, SessionToken
+from apps.users.constants import FILM_COMMENT
 
 from utils.noderender import render_page
 from utils.common import reindex_by
+
 
 
 def get_new_namestring(namestring):
@@ -212,6 +222,59 @@ class FilmView(View):
 
         return HttpResponse(render_page('film', {'film': resp_dict}))
 
+
+class CommentFilmView(View):
+
+    def __get_object(self, film_id):
+        """
+        Return object Contents or Response object with 404 error
+        """
+
+        try:
+            o_film = Films.objects.get(id=film_id)
+        except ObjectDoesNotExist:
+            return HttpResponse(status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            o_content = Contents.objects.get(film=o_film.id)
+        except Exception, e:
+            try:
+                o_content = Contents(
+                    film=o_film, name=o_film.name, name_orig=o_film.name_orig,
+                    description=o_film.description, release_date=o_film.release_date,
+                    viewer_cnt=0, viewer_lastweek_cnt=0, viewer_lastmonth_cnt=0
+                )
+                o_content.save()
+            except Exception, e:
+                return HttpResponse(status=status.HTTP_404_NOT_FOUND)
+
+        return o_content
+
+    def post(self, request, film_id, format=None, *args, **kwargs):
+        form = CommentForm(request.REQUEST)
+        resp_dict, o_film = film_to_view(kwargs['film_id'])
+        resp_dict['similar'] = calc_similar(o_film)
+
+        if form.is_valid():
+            # Выбираем и проверяем, что фильм существует
+            o_content = self.__get_object(film_id)
+            if isinstance(o_content):
+                return o_content
+            user = SessionToken.objects.get(key=request.COOKIES['x-session']).user
+
+            # Init data
+            filter_ = {
+                'user': user,
+                'text': re.sub('\n+', '<br>', escape(form.cleaned_data['text'])),
+                'content': o_content
+            }
+
+            o_com = Comments.objects.create(**filter_)
+            Feed.objects.create(user=SessionToken.objects.get(key=request.COOKIES['x-session']).user, type=FILM_COMMENT, obj_id=o_com.id, child_obj_id=o_content.film_id)
+
+            return HttpResponse(render_page('film', {'film': resp_dict}))
+
+        return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
 
 
 class PlayListView(View):

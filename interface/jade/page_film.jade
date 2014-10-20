@@ -204,7 +204,7 @@ html
                             .add-comment#add_comment
                                 if auth_user
                                     h2.blackh1 Добавить комментарий
-                                    form(name="comment", method="post")
+                                    form(name="comment", method="post", action="action/comment")
                                         .form-group#comment_textarea_wrapper
                                             textarea(placeholder="Опишите, что именно вам понравилось или не понравилось в фильме", name="text", rows="5").form-control
                                             p
