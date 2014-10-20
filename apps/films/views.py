@@ -368,16 +368,16 @@ def calc_similar(film_id, actors, directors, genres, **kwargs):
     # 4 фильма по рейтингу от жанров
     if len(genres):
         sql = ""
-        g = [i['id'] for i in genres]
+        len_genres = len(genres)
         template = "SELECT films_id FROM films_genres where genres_id={}"
 
-        for k, v in enumerate(g, 1):
+        for k, v in enumerate((i['id'] for i in genres), 1):
             sql += template.format(v)
-            if k != len(g):
+            if k != len_genres:
                 sql += " AND films_id IN ("
 
-        if len(g) > 1:
-            sql += ')' * (len(g) - 1)
+        if len_genres > 1:
+            sql += ')' * (len_genres - 1)
 
         sql = """
         SELECT films.id FROM films WHERE films.id IN ({}) AND NOT (films.id IN ({}))
@@ -409,6 +409,8 @@ def calc_similar(film_id, actors, directors, genres, **kwargs):
          ORDER BY films.rating_sort DESC LIMIT {})
         """.format(films_to_str, required_films)
 
+    ############################################################################
+    # Преобразование данных
     try:
         result = vbFilm(film_model.Films.objects.raw(sql), many=True).data
     except Exception, e:
