@@ -4,6 +4,7 @@ from crawler.translation_robot.sportbox_ru.parse import parse_translation as par
 from crawler.translation_robot.live_russia_tv.translation_live_russia_tv import parse_translation_live_russia_tv
 from crawler.translation_robot.championat_com.translation_championat import parse_translation_championat_com
 from crawler.translation_robot.tv_khl_ru.parse import parse_khl
+from crawler.translation_robot.ntvplus_ru.parse import parse_ntv_plus_translation
 
 
 
