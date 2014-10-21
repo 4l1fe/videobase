@@ -401,13 +401,19 @@ def calc_similar(film_id, actors, directors, genres, **kwargs):
     required_films = 12 - len(list_films)
     films_to_str = ','.join([str(i) for i in list_films])
 
-    sql = "SELECT * FROM films WHERE films.id IN ({})".format(films_to_str)
+    sql = ""
+    if len(films_to_str):
+        sql = "SELECT * FROM films WHERE films.id IN ({})".format(films_to_str)
 
     # Добираем фильмы, если необходимо
     if required_films:
-        sql += """ UNION (SELECT * FROM films WHERE films.id NOT IN ({})
-         ORDER BY films.rating_sort DESC LIMIT {})
-        """.format(films_to_str, required_films)
+        if len(films_to_str):
+            sql += """ UNION (SELECT * FROM films WHERE films.id NOT IN ({})
+             ORDER BY films.rating_sort DESC LIMIT {})
+            """.format(films_to_str, required_films)
+        else:
+            sql = """SELECT * FROM films
+            ORDER BY films.rating_sort DESC LIMIT {}""".format(required_films)
 
     ############################################################################
     # Преобразование данных
