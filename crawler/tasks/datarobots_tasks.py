@@ -15,8 +15,9 @@ from apps.films.models import Films
 from crawler.datarobots.kinopoisk_ru.parse_actors import PersoneParser
 from crawler.datarobots.kinopoisk_ru.parse_page import get_photo
 from crawler.datarobots.kinopoisk_ru.kinopoisk_poster import poster_robot_wrapper
-from crawler.datarobots.imdbratings import process_all
 from crawler.datarobots.kinopoisk_ru.kinopoisk_premiere import kinopoisk_news
+from crawler.datarobots.kinopoisk_ru.rating_robot import get_ratings
+
 from crawler.datarobots.youtube_com.youtube_trailers import find_youtube_trailer
 from crawler.tasks.kinopoisk_one_page import kinopoisk_parse_one_film
 from crawler.tor import simple_tor_get_page
@@ -35,7 +36,22 @@ def persons_films_update_with_indexes(kinopoisk_film_id):
     page_dump = PersoneParser.acquire_page(kinopoisk_film_id)
     PersoneParser.update_persons_films_with_indexes(page_dump, kinopoisk_film_id)
 
-
+@app.task(name='update_film_rating')
+def update_film_rating_task(kinopoisk_id):
+    
+    f = Films.objects.get(kinopoisk_id=kinopoisk_id)
+    r = get_ratings(kinopoisk_id)
+    f.rating_imdb = r['imbd']['rating']
+    f.rating_imdb_cnt = r['imbd']['votes']
+    f.rating_kinpoisk = r['kp']['rating']
+    f.rating_kinpoisk_cnt = r['kp']['votes']
+    f.save()
+    
+@app.task(name="update_ratings")
+def update_ratings_task():
+    for f in Films.objects.all():
+        update_film_ratings_task.apply_async((f.kinopoisk_id,))
+    
 @app.task(name='kinopoisk_films')
 def kinopoisk_films(pages):
     try:
@@ -101,15 +117,15 @@ def film_checked_on_kp_at_least_days_ago(film, days):
 def create_due_refresh_tasks():
     for film in Films.objects.all():
         if film_at_least_years_old(film, years=2):
-            if film_checked_on_kp_at_least_days_ago(film, days=7):
+            if film_checked_on_kp_at_least_days_ago(film, days=3):
                 kinopoisk_parse_one_film.apply_async((film.kinopoisk_id, film.name))
 
         elif film_at_least_years_old(film, years=4):
-            if film_checked_on_kp_at_least_days_ago(film, days=30):
+            if film_checked_on_kp_at_least_days_ago(film, days=7):
                 kinopoisk_parse_one_film.apply_async((film.kinopoisk_id, film.name))
 
         else:
-            if film_checked_on_kp_at_least_days_ago(film, days=180):
+            if film_checked_on_kp_at_least_days_ago(film, days=14):
                 kinopoisk_parse_one_film.apply_async((film.kinopoisk_id, film.name))
 
 

@@ -4,6 +4,10 @@ import os
 import json
 import warnings
 
+from cgi import escape
+
+from django.core.exceptions import ObjectDoesNotExist
+
 from datetime import date, timedelta
 from random import randrange
 from cStringIO import StringIO
@@ -16,7 +20,7 @@ from django.core.context_processors import csrf
 from django.core.serializers.json import DjangoJSONEncoder
 from django.template import Context
 from django.views.generic import View
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, Http404, HttpResponseRedirect, HttpResponseBadRequest
 from django.shortcuts import render_to_response, redirect
 
 from rest_framework import status
@@ -28,10 +32,16 @@ from apps.films.api.serializers import vbFilm, vbComment, vbPerson
 from apps.films.constants import APP_USERFILM_STATUS_PLAYLIST, APP_PERSON_ACTOR, \
     APP_PERSON_DIRECTOR, APP_PERSON_SCRIPTWRITER, APP_FILM_FULL_FILM, APP_USERFILM_STATUS_NOT_WATCH
 from apps.films.api import SearchFilmsView
+from apps.contents.models import Comments, Contents
+from apps.films.forms import CommentForm
+from apps.films.models import Films
+from apps.users import Feed, SessionToken
+from apps.users.constants import FILM_COMMENT
 
 from utils.common import reindex_by
 from utils.noderender import render_page
 from utils.middlewares.local_thread import get_current_request
+
 
 
 def get_new_namestring(namestring):
@@ -203,6 +213,70 @@ class FilmView(View):
             resp_dict['trailer'] = trailer.url
 
         return HttpResponse(render_page('film', {'film': resp_dict}))
+
+
+class CommentFilmView(View):
+
+    def __get_object(self, film_id):
+        """
+        Return object Contents or Response object with 404 error
+        """
+
+        try:
+            o_film = Films.objects.get(id=film_id)
+        except ObjectDoesNotExist:
+            return HttpResponse(status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            o_content = Contents.objects.get(film=o_film.id)
+        except Exception, e:
+            try:
+                o_content = Contents(
+                    film=o_film, name=o_film.name, name_orig=o_film.name_orig,
+                    description=o_film.description, release_date=o_film.release_date,
+                    viewer_cnt=0, viewer_lastweek_cnt=0, viewer_lastmonth_cnt=0
+                )
+                o_content.save()
+            except Exception, e:
+                return HttpResponse(status=status.HTTP_404_NOT_FOUND)
+
+        return o_content
+
+    def post(self, request, film_id, format=None, *args, **kwargs):
+        form = CommentForm(request.REQUEST)
+        if form.is_valid():
+            # Выбираем и проверяем, что фильм существует
+            o_content = self.__get_object(int(film_id))
+            user = SessionToken.objects.get(key=request.COOKIES['x-session']).user
+
+            # Init data
+            filter_ = {
+                'user': user,
+                'text': re.sub('\n+', '<br>', escape(form.cleaned_data['text'])),
+                'content': o_content
+            }
+
+            o_com = Comments.objects.create(**filter_)
+            Feed.objects.create(user=SessionToken.objects.get(key=request.COOKIES['x-session']).user, type=FILM_COMMENT, obj_id=o_com.id, child_obj_id=o_content.film_id)
+
+            return HttpResponseRedirect('/films/{}'.format(film_id))
+
+        return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
+
+
+class FilmPoster(View):
+
+    def get(self, *args, **kwargs):
+        try:
+            film_id = self.kwargs['film_id']
+
+            if 'size' in self.kwargs:
+                size = self.kwargs['size']
+                return HttpResponseRedirect('/static/upload/filmextras/{}/poster_{}.jpg'.format(film_id, size))
+        except KeyError:
+            return HttpResponseBadRequest()
+
+        return HttpResponseRedirect('/static/upload/filmextras/{}/poster.jpg'.format(film_id))
 
 
 class PlayListView(View):
@@ -488,3 +562,18 @@ def get_recommend_film(request):
         o_recommend = []
 
     return o_recommend
+
+
+class PersonsPhoto(View):
+
+    def get(self, *args, **kwargs):
+        try:
+            person_id = self.kwargs['person_id']
+
+            if 'size' in self.kwargs:
+                size = self.kwargs['size']
+                return HttpResponseRedirect('/static/upload/persons/{}/profile_{}.jpg'.format(person_id, size))
+        except KeyError:
+            return HttpResponseBadRequest()
+
+        return HttpResponseRedirect('/static/upload/persons/{}/profile.jpg'.format(person_id))
