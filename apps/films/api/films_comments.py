@@ -52,7 +52,6 @@ class CommentsFilmView(APIView):
         filter.update({'per_page': per_page, 'page': page})
         return filter
 
-
     def get(self, request, film_id, format=None, *args, **kwargs):
         content = self.__get_object(film_id)
         if type(content) == Response:
