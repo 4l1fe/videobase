@@ -41,8 +41,8 @@ def update_film_rating_task(kinopoisk_id):
     
     f = Films.objects.get(kinopoisk_id=kinopoisk_id)
     r = get_ratings(kinopoisk_id)
-    f.rating_imdb = r['imbd']['rating']
-    f.rating_imdb_cnt = r['imbd']['votes']
+    f.rating_imdb = r['imdb']['rating']
+    f.rating_imdb_cnt = r['imdb']['votes']
     f.rating_kinpoisk = r['kp']['rating']
     f.rating_kinpoisk_cnt = r['kp']['votes']
     f.save()

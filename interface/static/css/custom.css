@@ -1169,7 +1169,7 @@ section.cast-details { padding-top: 10px; }
 .hide-watching-users .playlist-content {padding-bottom: 0}
 
 .cast-chat-header img {margin-right: 9px; }
-.cast-chat-header { margin-bottom: 15px; }
+.cast-chat-header { margin-bottom: 15px; cursor: pointer}
 .cast-chat-header h3 { font-size: 14px; padding-top: 8px; }
 
 .rpadding0 { padding-right: 0; }
@@ -1386,3 +1386,9 @@ section.cast-chat {padding-bottom: 40px;}
 
 .password-reset { padding-top: 0;  }
 .password-reset .container {padding-top: 37px}
+
+.cast-offline {text-align: center; padding-top:80px; min-height: 300px;}
+.cast-offline h4 {color: #848587; font-size: 24px}
+.cast-offline h4 span {color: #fff}
+.cast-offline .btn-def {margin: 35px auto 0 auto; cursor: pointer}
+.cast-item-def .btn-def {cursor: pointer}

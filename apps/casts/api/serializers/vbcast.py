@@ -2,7 +2,9 @@
 
 from rest_framework import serializers
 import time
+import pytz
 from apps.casts.models import Casts, UsersCasts
+from videobase.settings import TIME_ZONE
 
 class vbCast(serializers.ModelSerializer):
 
@@ -23,7 +25,7 @@ class vbCast(serializers.ModelSerializer):
         return obj.ce_cast_rel.first().get_photo_url() if obj.ce_cast_rel.first() else None
 
     def get_start(self, obj):
-        return int(time.mktime(obj.start.utctimetuple()))
+        return pytz.timezone(TIME_ZONE).localize(obj.start, is_dst=None)
 
     def locations_list(self, obj):
         return [{
