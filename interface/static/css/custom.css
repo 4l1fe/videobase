@@ -369,7 +369,7 @@ footer[role=contentinfo] {padding: 18px 0 0 0;}
     background: url(../img/brd1-right.png) left center no-repeat;
 }
 .menu-footer li:first-child {background: none;}
-.menu-soc {padding-top: 7px;padding-bottom: 15px;}
+.menu-soc {padding-bottom: 15px;}
 .menu-soc li {
     display: inline-block;padding: 0 3px;
     *display: inline;
@@ -1034,6 +1034,7 @@ a.toggle-playlist.active {
         padding-top: 21px;
     }
     #films_new .film-thumb:nth-child(3) {display: none}
+    .menu-soc {text-align: left; margin-top: 16px;}
 }
 
 

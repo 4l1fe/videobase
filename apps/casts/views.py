@@ -15,6 +15,7 @@ class CastsView(View):
         data = {}
         casts = casts_models.Casts.objects.filter(start__gte=today.date()).order_by('start')[:12]
         data['casts'] = vbCast(casts).data
+        data['casts_tags'] = []
         return HttpResponse(render_page('casts_list', data))
 
 
