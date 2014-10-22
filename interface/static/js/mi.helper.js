@@ -9,6 +9,16 @@ function cardinal(val, form1, form2, form3) {
    return form2;
 }
 
+function duration_text(min) {
+    var ho, mi, da, res;
+    ho = Math.floor(min / 60); mi = min - ho*60;
+    da = Math.floor(ho / 24); ho = ho % 24
+    res = da?da + cardinal(da, " день", " дня", " дней"):"";
+    res+= (res?" ":"") + (ho?ho + cardinal(ho, " час", " часа", " часов"):"");
+    if (mi) res+= (res?" ":"") + mi + cardinal(mi, " минута", " минуты", " минут")
+    return res || "0 минут";
+ }
+
 function time_text(dt) {
     var date_now = new Date()
     var diff, curday, curtime, ho, min;
