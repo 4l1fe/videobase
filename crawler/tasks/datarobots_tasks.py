@@ -38,7 +38,7 @@ def persons_films_update_with_indexes(kinopoisk_film_id):
 
 @app.task(name='update_film_rating')
 def update_film_rating_task(kinopoisk_id):
-    
+
     f = Films.objects.get(kinopoisk_id=kinopoisk_id)
     r = get_ratings(kinopoisk_id)
     f.rating_imdb = r['imdb']['rating']
@@ -46,12 +46,12 @@ def update_film_rating_task(kinopoisk_id):
     f.rating_kinopoisk = r['kp']['rating']
     f.rating_kinopoisk_cnt = r['kp']['votes']
     f.save()
-    
+
 @app.task(name="update_ratings")
 def update_ratings_task():
     for f in Films.objects.all():
         update_film_rating_task.apply_async((f.kinopoisk_id,))
-    
+
 @app.task(name='kinopoisk_films')
 def kinopoisk_films(pages):
     try:
