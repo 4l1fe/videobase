@@ -75,6 +75,8 @@ html
                     html = '<object type="application/x-shockwave-flash" id="WebPlayer" name="WebPlayer" align="middle" data="http://tvzor.ru/flash/WebPlayer.swf" width="100%" height="100%"><param name="wmode" value="transparent"><param name="quality" value="high"><param name="bgcolor" value="#000000"><param name="allowscriptaccess" value="sameDomain"><param name="allowfullscreen" value="true"><param name="flashvars" value="assetId=' + value + '&amp;title=&amp;subTitle=&amp;preview=http://v-cache.tvzor.ru/IMAGE/' + value + '/IMAGE_16_9_XL.jpg&amp;hd=true&amp;time=0&amp;logged=false&amp;liked=false&amp;checked=false&amp;trailer=false&amp;currentLang=ru_RU&amp;vodStr=&amp;isMovie=true&amp;parentalRating=16&amp;brand=tvzor&amp;autoPlay=true&amp;lastLocationUpdateInterval=300000&amp;isAdult=false"></object>'
                 }
             }
-            if (!html)
-                html = '<div class="inner">Произошла ошибка.</div>';
+            if (!html) {
+                link_title = 'Ссылка на страницу фильма на ' + (location_names[vals.type] || location_names["default"]) + '.';
+                html = '<div class="black_body"><div class="pay_film">Нам пока не удалось договориться с админстрацией ' + (location_names[vals.type] || location_names["default"]) + ' об отображении плеера с бесплатными фильмами на нашем сайте, поэтому фильм доступен к просмотру только в новом окне. Нажмите на кнопку, чтобы открыть новое окно для просмотра фильма.</div><div class="inner"><a href="' + vals.view + '" target=_new rel="nofollow"><img src="/static/img/player_play.png" alt="' + link_title + '" title="' + link_title + '"/></a></div></div>';
+            }
             document.getElementById("player").innerHTML = html
