@@ -79,19 +79,21 @@
 -   var diff, curday, curtime, ho;
 -   curtime = dt.getTime();
 -   diff = (date_now.getTime() - curtime) / 1000;
--   if (diff < 60) return "сейчас";
--   if (diff < 3600) {
--       min = Math.floor(diff / 60)
--       return min + cardinal(min, " минуту", " минуты", " минут") + " назад"
+-   if (diff > 0) {
+-       if (diff < 60) return "сейчас";
+-       if (diff < 3600) {
+-           min = Math.floor(diff / 60)
+-           return min + cardinal(min, " минуту", " минуты", " минут") + " назад"
+-       }
+-       curday = Math.floor(date_now.getTime() / 86400) * 86400;
+-       if (curday < curtime) {
+-        ho = Math.floor(diff / 3600);
+-           if (ho <= 6) {
+-               return ho + cardinal(ho, " час", " часа", " часов") + " назад";
+-           } else return "сегодня";
+-       }
+-       if ((curday - 86400) < curtime) return "вчера";
 -   }
--   curday = Math.floor(date_now.getTime() / 86400) * 86400;
--   if (curday < curtime) {
--       ho = Math.floor(diff / 3600);
--       if (ho <= 6) {
--           return ho + cardinal(ho, " час", " часа", " часов") + " назад";
--       } else return "сегодня";
--   }
--   if ((curday - 86400) < curtime) return "вчера";
 -   if (dt.getFullYear() == date_now.getFullYear()) return dt.getDate() + " " + months[dt.getMonth()];
 -   return dt.getDate() + " " + months[dt.getMonth()] + " " + dt.getFullYear();
 - }
@@ -565,7 +567,7 @@ mixin cast_thumb(item)
                     -   if( min_vs_start > -1440 ) {
                     -       label_prim_str = ( min_vs_start > -60 ? 'примерно ' : '' ) + 'через ' + duration_text( -min_vs_start )
                     -   } else {
-                    -       label_prim_str = time_text(-start_date)
+                    -       label_prim_str = time_text(start_date)
                     -   }
                     - } else if( min_vs_start < duration ) {
                     -   if( watching_users_count !== null && watching_users_count !== undefined ) {
