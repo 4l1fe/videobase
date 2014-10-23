@@ -506,7 +506,7 @@ mixin cast_thumb(item)
         - poster_url = item.poster || noposter_url
         - url = "/casts/" + item.id + "/"
         - watching_users_count = item.watching_users_count
-        - min_vs_start = Math.floor((new Date() - new Date(start_date)) / 60 / 1000)
+        - min_vs_start = start_date ? Math.floor((new Date() - new Date(start_date)) / 60 / 1000) : ''
         - duration = duration || 180
         - is_online = min_vs_start >= 0 && min_vs_start < duration
         - start_date_class = is_online ? "label-success" : "label-primary"
@@ -565,7 +565,7 @@ mixin cast_thumb(item)
                     -   if( min_vs_start > -1440 ) {
                     -       label_prim_str = ( min_vs_start > -60 ? 'примерно ' : '' ) + 'через ' + duration_text( -min_vs_start )
                     -   } else {
-                    -       label_prim_str = time_text(start_date)
+                    -       label_prim_str = time_text(-start_date)
                     -   }
                     - } else if( min_vs_start < duration ) {
                     -   if( watching_users_count !== null && watching_users_count !== undefined ) {
