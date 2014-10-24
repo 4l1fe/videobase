@@ -36,9 +36,9 @@ def persons_films_update_with_indexes(kinopoisk_film_id):
     page_dump = PersoneParser.acquire_page(kinopoisk_film_id)
     PersoneParser.update_persons_films_with_indexes(page_dump, kinopoisk_film_id)
 
+
 @app.task(name='update_film_rating')
 def update_film_rating_task(kinopoisk_id):
-
     f = Films.objects.get(kinopoisk_id=kinopoisk_id)
     r = get_ratings(kinopoisk_id)
     f.rating_imdb = r['imdb']['rating']
@@ -47,10 +47,12 @@ def update_film_rating_task(kinopoisk_id):
     f.rating_kinopoisk_cnt = r['kp']['votes']
     f.save()
 
+
 @app.task(name="update_ratings")
 def update_ratings_task():
     for f in Films.objects.all():
-        update_film_rating_task.apply_async((f.kinopoisk_id,))
+        update_film_ratings_task.apply_async((f.kinopoisk_id,))
+
 
 @app.task(name='kinopoisk_films')
 def kinopoisk_films(pages):
@@ -149,23 +151,26 @@ def trailer_commands():
     for film in Films.objects.all():
         find_trailer.apply_async((film.id,))
 
+
 @app.task(name='check_one_film_by_id')
 def check_and_correct_one_film(film_id):
     film = Films.objects.get(id=film_id)
     data.film_facts.checker.film_checker.check_and_correct(film)
+
 
 @app.task(name='check_one_person_by_id')
 def check_and_correct_one_person(person_id):
     person = Persons.objects.get(id=person_id)
     data.person_facts.checker.person_checker.check_and_correct(person)
 
+
 @app.task(name='film_info_check_and_correct')
 def check_and_correct_tasks():
     for film in Films.objects.all():
         check_and_correct_one_film.apply_async(film.id)
 
+
 @app.task(name='persons_check_and_correct')
 def person_check_and_correct_tasks():
     for person in Persons.objects.all():
         check_and_correct_one_person.apply_async(person.id)
-
