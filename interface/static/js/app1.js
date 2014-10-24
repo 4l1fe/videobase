@@ -2771,7 +2771,7 @@
       local_counter = this.chat.counter;
       limit = limit || 20;
       return this._app.rest.castschats.msgs.read(this.conf.id, {
-        id_low: this.chat.last_id,
+        id_low: (this.chat.last_id || -1) + 1,
         limit: limit
       }).done((function(_this) {
         return function(data) {
