@@ -18,52 +18,53 @@ programs={}'''.format(group_name, process_list)
     return template
 
 
-def generate_program(program_name, command):
+def generate_program(program_name, command, directory, user):
     template = '''
 [program:{}]
 command={}
 process_name=%(program_name)s ;
-directory=/var/www/videobase/ ;
+directory={} ;
 umask=022 ;
 startretries=1 ;
-user=www-data ;
-redirect_stderr=true'''.format(program_name, command)
+user={} ;
+redirect_stderr=true'''.format(program_name, command, directory, user)
     return template
 
 
-def generate_robots_config(file_name='robots_config.conf'):
+def generate_robots_config(directory, user, file_name='robots_config.conf'):
     rtc = RobotsTypeChecker()
     lr_list = rtc.get_locrobots_list()
     dr_list = rtc.get_datarobots_list()
     sr_list = rtc.get_support_robots()
     cr_list = rtc.get_casts_robot()
+    d, u = directory, user
 
     with open(file_name, 'w') as file:
         for robot in lr_list:
             command = queue_command(robot)
-            file.write(generate_program(robot, command))
+            file.write(generate_program(robot, command, d, u))
             file.write("\n")
 
         for robot in dr_list:
             command = queue_command(robot)
-            file.write(generate_program(robot, command))
+            file.write(generate_program(robot, command, d, u))
             file.write("\n")
 
         for robot in cr_list:
             command = queue_command(robot)
-            file.write(generate_program(robot, command))
+            file.write(generate_program(robot, command, d, u))
             file.write("\n")
 
         command = queue_command('location_saver')
-        file.write(generate_program('location_saver', command))
+        file.write(generate_program('location_saver', command, d, u))
         file.write("\n")
 
         command = queue_command('thor')
-        file.write(generate_program('thor', command))
+        file.write(generate_program('thor', command, d, u))
         file.write("\n")
 
         command = main_queue_command()
-        file.write(generate_program('main_worker', command))
+        file.write(generate_program('main_worker', command, d, u))
         file.write("\n")
 
         file.write(generate_group('locrobots', ','.join(lr_list)))
