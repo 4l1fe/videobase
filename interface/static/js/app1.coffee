@@ -1752,7 +1752,7 @@ class Page_Cast extends Page
     @chat.counter++
     local_counter = @chat.counter
     limit = limit || 20
-    @_app.rest.castschats.msgs.read @conf.id, {id_low: @chat.last_id, limit: limit}
+    @_app.rest.castschats.msgs.read @conf.id, {id_low: (@chat.last_id|| -1) + 1, limit: limit}
       .done(
         (data)=>
           if local_counter == @chat.counter
