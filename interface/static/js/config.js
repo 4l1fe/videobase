@@ -18,7 +18,7 @@
 
   conf.noperson_url = conf.images_url + "noperson.jpg";
 
-  conf.player_url = "/player.html";
+  conf.player_url = "/static/player.html";
 
   conf.player_cast_url = "static/playercast.html";
 
