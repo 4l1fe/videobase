@@ -36,8 +36,8 @@ class RobotsInfoLogging(models.Model):
         # Имя таблицы в БД
         db_table = 'robots_logging_info'
         app_label = 'robots'
-        verbose_name = u'Логирование информации о работе робота'
-        verbose_name_plural = u'Логирование информации о работе роботов'
+        verbose_name = u'meta Лог робота'
+        verbose_name_plural = u'meta Лог роботов'
 
 
 class LocationsCorrectorLogging(models.Model):
@@ -52,5 +52,5 @@ class LocationsCorrectorLogging(models.Model):
         # Имя таблицы в БД
         db_table = 'locations_corrector_logging'
         app_label = 'robots'
-        verbose_name = u'Логирование информации о работе корректоре неактуальных локаций'
-        verbose_name_plural = u'Логирование информации о работе роботов'
+        verbose_name = u'Лог корректора'
+        verbose_name_plural = u'Логи корректора'
