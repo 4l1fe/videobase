@@ -458,3 +458,15 @@ class PersonsPhoto(View):
             return HttpResponseBadRequest()
 
         return HttpResponseRedirect('/static/upload/persons/{}/profile.jpg'.format(person_id))
+
+
+def commented_films(request):
+    cf_html = cache.get('cf_html')
+    if cf_html:
+        return HttpResponse(cf_html)
+    else:
+        Films
+        cf_html = 'Фильмы с коментариями меньше трёх:\n'
+        for f in Films.get_commented_films(greater=3)
+            cf_html += '{}, {}, {}'
+
