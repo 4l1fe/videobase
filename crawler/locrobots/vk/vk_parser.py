@@ -5,9 +5,9 @@ from bs4 import BeautifulSoup
 import re
 import requests
 from selenium import webdriver
-from selenium.webdriver import ActionChains
-from selenium.webdriver.common.keys import Keys
+from crawler.tasks.save_location_task import *
 from apps.films.models import Films
+from crawler.utils.locations_utils import sane_dict
 
 
 __author__ = 'vladimir'
@@ -25,14 +25,25 @@ class VKParser():
     def start_vk_parsing(self):
         self.auth()
         i = 0
-        for film in Films.objects.all():
-            if i > 10:
-                break
-            founded_video = self.find_video_by_name(film.name)
-            if founded_video:
-                print founded_video['title'], founded_video['duration'], founded_video['link']
-            i += 1
-        self.disconnect()
+        try:
+            for film in Films.objects.all():
+                if i > 25:
+                    break
+                founded_video = self.find_video_by_name(film.name)
+                if founded_video:
+                    data = self.film_dict(film, founded_video)
+                    save_location_from_robo_task.apply_async((data,))
+                    print founded_video['title'], founded_video['duration'], founded_video['link']
+                i += 1
+        finally:
+            self.disconnect()
+
+    def film_dict(self, film, founded_video):
+        resp_dict = sane_dict(film)
+        resp_dict['url_view'] = founded_video['link']
+        resp_dict['price'] = 0
+        resp_dict['type'] = 'vk'
+        return resp_dict
 
     def update_access_token(self):
         ''' Обновление токена по id  и секретному ключу '''
@@ -97,7 +108,7 @@ class VKParser():
 
     def get_one_appropriate_video(self, videos):
         for video in videos:
-            if int(video['duration'].replace(':', '')) > 3000:
+            if int(video['duration'].replace(':', '')) > 5500:
                 return video
         return None
 
