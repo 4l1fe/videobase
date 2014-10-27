@@ -1,5 +1,6 @@
 # coding: utf-8
 from apps.contents.models import Locations
+from apps.robots.models.robots_logs import LocationsCorrectorLogging
 from crawler.utils.locations_utils import get_content
 
 __author__ = 'vladimir'
@@ -11,6 +12,7 @@ class LocationRobotsCorrector():
 
     @staticmethod
     def correct_locations(found_locations_dict, loc_type):
+        print "Locations will be corrected"
         db_locations = Locations.objects.filter(type=loc_type)
         db_locs_ids_list = LocationRobotsCorrector.get_locs_ids_list(db_locations)
         robot_result_locs_ids_list = LocationRobotsCorrector.get_locs_ids_list_from_robot_result(found_locations_dict['info'])
@@ -62,6 +64,7 @@ class LocationRobotsCorrector():
             print "All locations are in actual state."
         for loc_id in removal_candidates:
             l = Locations.objects.get(id=loc_id)
+            LocationCorrectorLogger.write_log_for_robot(l.type, l.content.film_id)
             l.delete()
 
 
@@ -77,8 +80,19 @@ class LocationCorrectorForOneFilmRobots():
         if len(l_list) > 0:
             print "Deliting not actual locations: ", l_list
             for loc in l_list:
+                LocationCorrectorLogger.write_log_for_robot(loc.type, loc.content.film_id)
                 loc.delete()
         else:
             print "All locations are actual "
             print content
         #Если найдется в базе локейшн с таким типом  и таким контентом то его можно удалить, т.к на сайте его нет
+
+
+class LocationCorrectorLogger():
+    def __init__(self):
+        pass
+
+    @staticmethod
+    def write_log_for_robot(robot_name, film):
+        LocationsCorrectorLogging.objects.create(robot_name=robot_name, films=film)
+
