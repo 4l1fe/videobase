@@ -96,7 +96,7 @@ class CastsListView(APIView):
             'service': lambda o_s, arg: o_s.filter(service=arg),
             'price_type': lambda o_s, arg: o_s.filter(price_type=arg),
             'price_low': lambda o_s, arg: o_s.filter(price__gte=arg),
-            'price_high': lambda o_s, arg: o_s.filter(price__lte=arg),
+            'price_high': lambda o_s, arg: o_s.filter(cl_location_rel__price__lte=arg),
             'start_in': lambda o_s, arg: o_s.filter(start=datetime.datetime.now()+datetime.timedelta(seconds=arg)),
             'tag': lambda o_s, arg: o_s.filter(tags__id=arg),
             'subscribed': subscribe_calc,
