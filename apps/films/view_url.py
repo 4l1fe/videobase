@@ -17,4 +17,5 @@ urlpatterns = patterns('apps.films.views',
     url(r'^kinopoisk/(?P<film_id>\d+)/$', 'kinopoisk_view', name='kinopoisk_view'),
     url(r'^films/(?P<film_id>\d+)/poster_(?P<size>\d+x\d+)/$', views.FilmPoster.as_view()),
     url(r'^films/(?P<film_id>\d+)/poster/$', views.FilmPoster.as_view()),
+    url(r'^films/commented_films/$', views.commented_films, name='commented_films')
 )

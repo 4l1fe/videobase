@@ -3,16 +3,12 @@ import re
 import os
 import json
 import warnings
-
 from cgi import escape
-
 from django.core.exceptions import ObjectDoesNotExist
-
 from datetime import date, timedelta
 from random import randrange
 from cStringIO import StringIO
 from PIL import Image, ImageEnhance
-
 from django.core.files import File
 from django.core.cache import cache
 from django.core.context_processors import csrf
@@ -21,9 +17,9 @@ from django.template import Context
 from django.views.generic import View
 from django.http import HttpResponse, Http404, HttpResponseRedirect, HttpResponseBadRequest
 from django.shortcuts import render_to_response, redirect
-
+from django.core.urlresolvers import reverse
+from django.views.decorators.cache import cache_page
 from rest_framework import status
-
 import apps.films.models as film_model
 import apps.contents.models as content_model
 from apps.films.api.serializers import vbFilm, vbComment, vbPerson
@@ -34,7 +30,6 @@ from apps.films.forms import CommentForm
 from apps.films.models import Films
 from apps.users import Feed, SessionToken
 from apps.users.constants import FILM_COMMENT
-
 from utils.noderender import render_page
 from utils.common import reindex_by
 
@@ -460,13 +455,30 @@ class PersonsPhoto(View):
         return HttpResponseRedirect('/static/upload/persons/{}/profile.jpg'.format(person_id))
 
 
+@cache_page(60 * 5)
 def commented_films(request):
-    cf_html = cache.get('cf_html')
-    if cf_html:
-        return HttpResponse(cf_html)
-    else:
-        Films
-        cf_html = 'Фильмы с коментариями меньше трёх:\n'
-        for f in Films.get_commented_films(greater=3)
-            cf_html += '{}, {}, {}'
+    ids = (f.id for f in Films.get_commented_films(less=3))
+    less = Films.objects.filter(id__in=ids).order_by('-rating_sort').iterator()
+    ids = (f.id for f in Films.get_commented_films(greater=2))
+    greater = Films.objects.filter(id__in=ids).order_by('-rating_sort').iterator()
+
+    cf_html = u'Фильмы с коментариями меньше трёх:'
+    cf_html += u'<br><br>'
+    for f in less:
+        link = reverse('film_view', args=[f.id])
+        year = f.release_date.year if f.release_date else ''
+        cf_html += u'<a href="{}">{}</a>, {}<br>\n'.format(link, f.name, year)
+
+    cf_html += u'<br><br>'
+    cf_html += u'Фильмы с коментариями больше двух:'
+    cf_html += u'<br><br>'
+    for f in greater:
+        link = reverse('film_view', args=[f.id])
+        year = f.release_date.year if f.release_date else ''
+        cf_html += u'<a href="{}">{}</a>, {}<br>\n'.format(link, f.name, year)
+
+    cache.set('cf_html', cf_html, 300)
+    return HttpResponse(cf_html)
+
+
 
