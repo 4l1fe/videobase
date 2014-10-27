@@ -3,9 +3,10 @@
 import os
 import time
 import fabtools
+from StringIO import StringIO
 
 from string import Template
-from fabric.api import env, roles, run, settings, sudo, cd, local, require
+from fabric.api import env, roles, run, settings, sudo, cd, local, require, get
 
 # env.roledefs = {
 #     'production': ['developers@5.9.17.109'],
@@ -30,14 +31,20 @@ def localhost_env():
     env.project_name = 'videobase2'
     env.path = '/home/%(user)s/workspace/%(project_name)s' % env
     env.env = '/home/%(user)s/venv' % env
-    env.virtualhost_path = env.path
+    env.pip = '%(env)s/bin/pip' % env
+    env.python = '%(env)s/bin/python' % env
+    env.shell = '/bin/bash -c'
 
 def production_env():
     "Use the actual webserver"
     env.hosts = ['www.example.com']
     env.user = 'username'
+    env.project_name = 'videobase2'
     env.path = '/var/www/%(project_name)s' % env
-    env.virtualhost_path = env.path
+    env.env = '/home/%(user)s/venv' % env
+    env.pip = '%(env)s/bin/pip' % env
+    env.python = '%(env)s/bin/python' % env
+    env.shell = '/bin/bash -c'
 
 # def production_env():
 #     """Окружение для продакшена"""
@@ -119,21 +126,24 @@ def deploy(git_stash=True, **kwargs):
             run('git pull')
 
         # Require some Debian/Ubuntu packages
-        sys_packages = []
-        with open('system.txt', 'r') as package:
-            sys_packages.append(package)
+        fd = StringIO()
+        get(os.path.join(env.path, "system.txt"), fd)
+        content = fd.getvalue()
+        fd.close()
 
-        print sys_packages
+        sys_packages = content.split("\n")
         if len(sys_packages):
             fabtools.deb.install(sys_packages)
 
         # Require Node packages
-        sys_packages = []
-        with open('node.txt', 'r') as package:
-            sys_packages.append(package)
+        fd = StringIO()
+        get(os.path.join(env.path, "node.txt"), fd)
+        content = fd.getvalue()
+        fd.close()
 
-        if len(sys_packages):
-            fabtools.nodejs.install_package()
+        sys_packages = content.split("\n")
+        # if len(sys_packages):
+        #     fabtools.nodejs.install_package(' '.join(sys_packages))
 
         if init_proj:
             # Init Postgres User
@@ -151,9 +161,9 @@ def deploy(git_stash=True, **kwargs):
 
         # Require a Python package
         with fabtools.python.virtualenv(env.env):
-            run('{pip} install --upgrade -r {filepath}'.format(
+            run('{pip} install -r {filepath}'.format(
                 pip=env.pip,
-                filepath=os.path.join(env.project_root, 'requirements.txt')
+                filepath=os.path.join(env.path, 'requirements.txt')
             ))
 
             # Сбор статики
@@ -164,10 +174,10 @@ def deploy(git_stash=True, **kwargs):
             if init_proj:
                 run('{python} manage.py migrate syncdb'.format(python=env.python))
 
-            # Миграции
-            run('{python} manage.py migrate --no-initial-data'.format(
-                python=env.python
-            ))
+            # # Миграции
+            # run('{python} manage.py migrate --no-initial-data'.format(
+            #     python=env.python
+            # ))
 
             # Restart сервисов
             restart_services()
