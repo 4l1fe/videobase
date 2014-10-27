@@ -123,6 +123,7 @@ def deploy(git_stash=True, **kwargs):
         with open('system.txt', 'r') as package:
             sys_packages.append(package)
 
+        print sys_packages
         if len(sys_packages):
             fabtools.deb.install(sys_packages)
 
