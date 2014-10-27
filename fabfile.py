@@ -116,20 +116,22 @@ def deploy(git_stash=True, **kwargs):
                     time=env.release
                 ))
 
-            run('git pull origin master')
+            run('git pull')
 
         # Require some Debian/Ubuntu packages
         sys_packages = []
+        sys_packages = sys_packages.append
         with open('system.txt', 'r') as package:
-            sys_packages.append(package)
+            sys_packages(package)
 
         if len(sys_packages):
             fabtools.deb.install(sys_packages)
 
         # Require Node packages
         sys_packages = []
+        sys_packages = sys_packages.append
         with open('node.txt', 'r') as package:
-            sys_packages.append(package)
+            sys_packages(package)
 
         if len(sys_packages):
             fabtools.nodejs.install_package()
