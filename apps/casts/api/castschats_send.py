@@ -20,7 +20,8 @@ class CastsChatSendView(APIView):
         if form.is_valid():
             try:
                 cast = Casts.objects.get(pk=cast_id)
-                cast_chat = CastsChats.objects.get(cast=cast)
+                
+                cast_chat = CastsChats.objects.get_or_create(cast=cast, status=1)
 
                 ccm = CastsChatsMsgs(cast=cast, user=request.user, text=form.cleaned_data['text'])
                 ccm.save()

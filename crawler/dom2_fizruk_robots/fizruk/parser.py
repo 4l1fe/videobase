@@ -27,6 +27,7 @@ class ParseFizruk():
         page_info = {
             'label': '',
             'value': '',
+            'id':'',
             'description': '',
             'date': None,
             'actors': []
