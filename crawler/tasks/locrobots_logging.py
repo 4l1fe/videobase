@@ -33,6 +33,7 @@ def create_structures_string(robot_name, location_ids):
 
 def write_logs_to_table(robot_name, location_ids):
     RobotsInfoLogging.objects.create(robot_name=robot_name, locations=location_ids, log_time=datetime.date.today())
+    print "Logged ", location_ids
 
 
 def get_locations_list_from_locations_dict_list(locations_dict_list):
@@ -49,7 +50,7 @@ def fill_robots_locations_logs_to_table(locations_dict):
         print create_structures_string(locations_dict['type'], get_locations_list_from_locations_dict_list(locations_dict['info']))
         write_logs_to_table(locations_dict['type'], get_locations_list_from_locations_dict_list(locations_dict['info']))
     except Exception, e:
-        pass
+        print "Failded logging because ", e.message
 
 
 #Ф-я для заполнения лога по роботам которые не в стандартной схеме
@@ -62,6 +63,7 @@ class DebugTask(Task):
     abstract = True
 
     def after_return(self, *args, **kwargs):
+        print "after return"
         if not args[1]:
             return
         locations_dict = args[1]
