@@ -28,17 +28,23 @@ def ids_tranform(o_search, filter):
 
     return o_search
 
+
+def online():
+    return {'start__lte': datetime.datetime.now(), 'start__gte': datetime.datetime.now() - datetime.timedelta(hours=3)}
+
+
+def future():
+    return {'start__gt': datetime.datetime.now()}
+
+
+def passed():
+    return {'start__lt': datetime.datetime.now() - datetime.timedelta(hours=3)}
+
+
 STATUS = {
-    'online': {
-        'start__lte': datetime.datetime.now(),
-        'start__gte': datetime.datetime.now() - datetime.timedelta(hours=3)
-    },
-    'future': {
-        'start__gt': datetime.datetime.now()
-    },
-    'passed': {
-        'start__lt': datetime.datetime.now() - datetime.timedelta(hours=3)
-    },
+    'online': online,
+    'future': future,
+    'passed': passed,
 }
 
 #############################################################################################################
@@ -103,7 +109,7 @@ class CastsListView(APIView):
         transform_map = {
             'id': ids_tranform,
             'text': lambda o_s, arg: o_s.search(arg),
-            'status': lambda o_s, arg: o_s.filter(**STATUS[arg]),
+            'status': lambda o_s, arg: o_s.filter(**STATUS[arg]()),
             'pg_rating': lambda o_s, arg: o_s.filter(pg_rating_lte=arg),
             'service': lambda o_s, arg: o_s.filter(cl_location_rel__service=arg),
             'price_type': lambda o_s, arg: o_s.filter(cl_location_rel__price_type=arg),
