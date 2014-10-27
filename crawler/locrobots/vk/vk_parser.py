@@ -2,7 +2,6 @@
 import json
 from time import sleep, time
 from bs4 import BeautifulSoup
-import re
 import requests
 from selenium import webdriver
 from crawler.tasks.save_location_task import *
@@ -23,18 +22,14 @@ class VKParser():
         self.driver = None
 
     def start_vk_parsing(self):
-        self.auth()
-        i = 0
         try:
+            self.auth()
             for film in Films.objects.all():
-                if i > 25:
-                    break
                 founded_video = self.find_video_by_name(film.name)
                 if founded_video:
                     data = self.film_dict(film, founded_video)
                     save_location_from_robo_task.apply_async((data,))
                     print founded_video['title'], founded_video['duration'], founded_video['link']
-                i += 1
         finally:
             self.disconnect()
 
