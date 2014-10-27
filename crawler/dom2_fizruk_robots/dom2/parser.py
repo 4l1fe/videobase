@@ -64,6 +64,7 @@ class ParseDom2():
         beatiful_soup = BeautifulSoup(json_page['html'])
         episod_info = ParseDom2.parse_video_page(beatiful_soup)
         episod_info['actors'] = ParseDom2.get_actors_for_episode(episod_info['date'], all_actors)
+        print "Parsed ", episod_quick_info['label']
         return episod_info
 
     @staticmethod
@@ -226,8 +227,9 @@ class ParseDom2():
 
     @staticmethod
     def get_video_embedded_code(photo_panel_class):
-        div_movie_container = photo_panel_class.findAll('div', {"id": "movieContainer"})
-        #print '#', div_movie_container
+        #div_movie_container = photo_panel_class.findAll('div', {"id": "movieContainer"})
+        #if not div_movie_container:
+        #    return ''
         #code = div_movie_container.find('embed', {"id": "player"})
         #print "code", code
         return ''#code
