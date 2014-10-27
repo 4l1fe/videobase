@@ -32,12 +32,12 @@ class BaseParse(object):
         obj = cls(response)
         resp_list = []
         type_robot = obj.get_type()
-        link = obj.get_link(**kwargs)
+        links = obj.get_link(**kwargs)
         price, price_type = obj.get_price(**kwargs)
         seasons = obj.get_seasons(**kwargs)
         value = obj.get_value(**kwargs)
         if seasons:
-            for season in seasons:
+            for season, link in zip(seasons, links):
                 resp_dict = dict_gen(film)
                 resp_dict['type'] = type_robot
                 resp_dict['number'] = season
