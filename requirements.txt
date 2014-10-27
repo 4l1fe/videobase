@@ -7,7 +7,7 @@ microdata==0.4.1
 fabric
 uwsgi
 django_extensions
-django-csvimport
+#django-csvimport
 easy_thumbnails
 pillow
 pylibmc
