@@ -120,18 +120,18 @@ def deploy(git_stash=True, **kwargs):
 
         # Require some Debian/Ubuntu packages
         sys_packages = []
-        sys_packages = sys_packages.append
+        append = sys_packages.append
         with open('system.txt', 'r') as package:
-            sys_packages(package)
+            append(package)
 
         if len(sys_packages):
             fabtools.deb.install(sys_packages)
 
         # Require Node packages
         sys_packages = []
-        sys_packages = sys_packages.append
+        append = sys_packages.append
         with open('node.txt', 'r') as package:
-            sys_packages(package)
+            append(package)
 
         if len(sys_packages):
             fabtools.nodejs.install_package()
