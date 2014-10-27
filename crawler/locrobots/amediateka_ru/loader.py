@@ -1,7 +1,7 @@
 # coding: utf-8
 import json
 from crawler.locations_robot_corrector import LocationRobotsCorrector
-from crawler.locations_saver import save_location_to_locs_dict
+from crawler.locations_saver import save_location_to_locs_dict, save_existed_location_to_locs_dict
 from crawler.tasks.locrobots_logging import fill_log_table_for_not_schema_corresponded_robots
 from crawler.tasks.test_robots_ban import MultiLocationRobotsBunCheck
 from crawler.tor import simple_tor_get_page
@@ -37,9 +37,14 @@ class Amediateka_robot(object):
                     film_data = Films.objects.filter(id=film['id'])
                     for dict_film in film_data:
                         d = self.film_dict(dict_film, f)
-                        save_location(**d)
-                        save_location_to_locs_dict(locations, True, **d)
+                        one_loc_res = save_location(**d)
+                        save_existed_location_to_locs_dict(locations, one_loc_res)
                     break
+
+        del locations['info'][2]
+        del locations['info'][3]
+        del locations['info'][4]
+
         fill_log_table_for_not_schema_corresponded_robots(locations)
         robot_is_banned = MultiLocationRobotsBunCheck.is_result_looks_like_robot_banned(locations)
         if not robot_is_banned:
