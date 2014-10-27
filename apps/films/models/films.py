@@ -262,22 +262,18 @@ class Films(models.Model):
 
     @classmethod
     def get_commented_films(cls, greater=None, less=None):
-        sql = """SELECT films.id as film_id, count(*) as comments_count
+        sql = """SELECT films.id
                  FROM films
-                 INNER JOIN content ON film_id = content.film_id
+                 INNER JOIN content ON films.id = content.film_id
                  INNER JOIN comments ON content.id = comments.content_id
-                 GROUP BY film_id ORDER BY comments_count DESC;"""
-        commented_films = cls.objects.raw(sql)
-
-        if greater:
-            commented_films = [cf for cf in commented_films if cf.comments_count > greater]
-
-        if less:
-            commented_films = [cf for cf in commented_films if cf.comments_count < less]
+                 GROUP BY films.id
+                 HAVING CASE
+                        WHEN %s IS NOT NULL THEN count(films.id) > %s
+                        WHEN %s IS NOT NULL THEN count(films.id) < %s
+                        END"""
+        commented_films = cls.objects.raw(sql, (greater, greater, less, less))
 
         return commented_films
-
-
 
     class Meta(object):
         # Имя таблицы в БД
