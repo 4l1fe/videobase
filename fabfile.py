@@ -321,37 +321,6 @@ def rollback():
 #             sudo('/home/virtualenv/videobase_test/bin/pip install -r requirements.txt')
 #
 #
-# def status():
-#     for k in fabric.state.output:
-#         fabric.state.output[k] = False
-#
-#     fabric.state.output['user'] = True
-#
-#     with settings(warn_only=True):
-#         print('SUPERVISOR \n')
-#         print(run("supervisorctl status"))
-#         print("\n NGINX \n")
-#         print(run("ps aux | grep nginx"))
-#
-#         print("\nIs login page is shown on videobase.test.aaysm.com/admin?")
-#         print(bool(run('''wget -qO- --header="Host: videobase.test.aaysm.com" localhost:80/admin/ | grep Password | wc -l''')))
-#
-#     for k in fabric.state.output:
-#         fabric.state.output[k] = True
-#
-#     fabric.state.output['debug'] = False
-#
-#
-# def db_migrate_test(appname=""):
-#     """
-#     Выполняет миграцию базы данных для приложения (app в терминах Django) если указано, или просто m
-#     """
-#
-#     with settings(sudo_user="www-data"):
-#         with cd('/var/www/videobase_test/'):
-#             sudo('/home/virtualenv/videobase_test/bin/python manage.py migrate %s --no-initial-data' % appname)
-#
-#
 # def collect_static():
 #     """
 #     build/update static files
