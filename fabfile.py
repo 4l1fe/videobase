@@ -143,6 +143,8 @@ def update_env(install_node_pkg=False):
                 'path': os.path.join(env.current_release, env.req_dir, 'requirements.txt'),
             })
 
+            run('%(python)s manage.py generate_robots_config' % env)
+
 
 def symlink():
     """
@@ -184,6 +186,32 @@ def setup():
     #     )
 
 
+def migrate(app_name=''):
+    """
+    Исполнение миграций
+    """
+
+    if not 'current_release' in env:
+        releases()
+
+    with cd(env.current_release):
+        run('%(python)s manage.py migrate %(app_name)s --no-initial-data --delete-ghost-migrations' % {
+            'app_name': app_name,
+            'current_release': env.current_release,
+        })
+
+
+def supervisor_config():
+    """
+    Генерируем конфиг для supervisor
+    """
+
+    if not 'current_release' in env:
+        releases()
+
+    run('%(python)s manage.py generate_robots_config' % {
+        'python': env.python,
+    })
 
 
 def deploy(branch=None, install_node_pkg=False):
@@ -191,63 +219,30 @@ def deploy(branch=None, install_node_pkg=False):
     require('path')
 
     setup()
-
     checkout(branch)
     update_env(install_node_pkg)
-
     symlink()
+    migrate()
+    restart_services()
+
+
+def deploy_version(version):
+    """
+    Развертывание специальной версии
+    """
+
+    require('hosts', provided_by=[localhost_env, production_env])
+    require('path')
+
+    env.version = version
+    with cd(env.path):
+        pass
+
     restart_services()
 
 
 def rollback():
     pass
-
-
-def generate_robots_conf(python_interpreter=None, videobase_dir=None, user=None):
-    if python_interpreter is None:
-        python_interpreter = local("which python", capture=True)
-
-    if videobase_dir is None:
-        videobase_dir = os.path.abspath('.')
-
-    if user is None:
-        user = local('whoami', capture=True)
-
-    robots_list = local('python manage.py list_robots', capture=True).split()
-    print robots_list
-
-    template = Template("""[program:$name]
-command=$interpreter manage.py robot_start --site $name
-process_name=%(program_name)s ; process_name expr (default %(program_name)s)
-numprocs=1 ; number of processes copies to start (def 1)
-directory=$workdir ; directory to cwd to before exec (def no cwd)
-umask=022 ; umask for process (default None)
-autostart=false ; start at supervisord start (default: true)
-autorestart=false ; retstart at unexpected quit (default: true)
-startretries=1 ; max # of serial start failures (default 3)
-user=$user ; setuid to this UNIX account to run the program
-redirect_stderr=true ; redirect proc stderr to stdout (default false)
-stdout_logfile=/var/log/$name.log""")
-
-    config = '\n'.join(template.substitute({
-        'interpreter': python_interpreter,
-        'user': user,
-        'workdir': videobase_dir,
-        'name': robot_name
-    }) for robot_name in robots_list)
-
-    return config
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -367,30 +362,6 @@ stdout_logfile=/var/log/$name.log""")
 #             sudo('/home/virtualenv/videobase_test/bin/python manage.py collectstatic --dry-run --noinput')
 #
 #
-# # def deploy():
-# #     """
-# #     Обновить код и перезапустить процессы
-# #     """
-# #
-# #     deploy_test_code()
-# #     restart_all()
-# #     status()
-#
-#
-# def project_deploy():
-#     """
-#     Обновить весь код
-#     """
-#
-#     setup()
-#     deploy_test_code()
-#     refresh_test_requirements()
-#     db_migrate_test()
-#     collect_static()
-#     restart_all()
-#     status()
-#
-#
 # # def db_flush_test():
 # #     """
 # #     Перезаписать тестовую базу данных из дампа
@@ -408,43 +379,6 @@ stdout_logfile=/var/log/$name.log""")
 # def show_scheme():
 #     scheme()
 #     local('feh current.png')
-#
-#
-# def generate_robots_conf(python_interpreter=None, videobase_dir=None, user=None):
-#     if python_interpreter is None:
-#         python_interpreter = local("which python", capture=True)
-#
-#     if videobase_dir is None:
-#         videobase_dir = os.path.abspath('.')
-#
-#     if user is None:
-#         user = local('whoami', capture=True)
-#
-#     robots_list = local('python manage.py list_robots', capture=True).split()
-#     print robots_list
-#
-#     template = Template("""[program:$name]
-# command=$interpreter manage.py robot_start --site $name
-# process_name=%(program_name)s ; process_name expr (default %(program_name)s)
-# numprocs=1 ; number of processes copies to start (def 1)
-# directory=$workdir ; directory to cwd to before exec (def no cwd)
-# umask=022 ; umask for process (default None)
-# autostart=false ; start at supervisord start (default: true)
-# autorestart=false ; retstart at unexpected quit (default: true)
-# startretries=1 ; max # of serial start failures (default 3)
-# user=$user ; setuid to this UNIX account to run the program
-# redirect_stderr=true ; redirect proc stderr to stdout (default false)
-# stdout_logfile=/var/log/$name.log""")
-#
-#     config = '\n'.join(template.substitute({
-#         'interpreter': python_interpreter,
-#         'user': user,
-#         'workdir': videobase_dir,
-#         'name': robot_name
-#     }) for robot_name in robots_list)
-#
-#     return config
-#
 #
 # def set_local_robot_config():
 #     with open('configs/robots.conf', 'w') as fw:
