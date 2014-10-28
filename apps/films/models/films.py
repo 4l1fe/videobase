@@ -222,16 +222,21 @@ class Films(models.Model):
             - если rating_cons_cnt больше 15 000, но меньше 30 000, sort_cnt = 5 000 + (rating_cons_cnt - 15000) / 50 + 10 000 / 20
             - если rating_cons_cnt больше 5 000, но меньше 15 000, то sort_cnt = 5 000 + (rating_cons_cnt - 5000) / 20
             - если rating_cons меньше или равно 5 000, то sort_cnt = rating_cons_cnt
+            алгоритм изменен
         """
 
-        if rating_cons_cnt > 30000:
-            sort_cnt = 5000 + (rating_cons_cnt - 30000) / 150 + 15000 / 50 + 10000 / 20
+        if rating_cons_cnt > 100000:
+            sort_cnt = 20000 + (rating_cons_cnt - 100000) / 300
+        elif 30000 < rating_cons_cnt <= 100000:
+            sort_cnt = 18000 + (rating_cons_cnt - 30000) / 35
         elif 15000 < rating_cons_cnt <= 30000:
-            sort_cnt = 5000 + (rating_cons_cnt - 15000) / 50 + 10000 / 20
-        elif 5000 < rating_cons_cnt <= 15000:
-            sort_cnt = 5000 + (rating_cons_cnt - 5000) / 20
+            sort_cnt = 15000 + (rating_cons_cnt - 15000) / 5
+        elif 3000 < rating_cons_cnt <= 15000:
+            sort_cnt = 10000 + (rating_cons_cnt - 3000) / 2
+        elif 500 < rating_cons_cnt <= 3000:
+            sort_cnt = 8000 + (rating_cons_cnt - 500) / 1.25
         else:
-            sort_cnt = rating_cons_cnt
+            sort_cnt = 8000
 
         return sort_cnt
 
@@ -260,6 +265,20 @@ class Films(models.Model):
         return cls.objects.raw(sql, params=['POSTER', 5.5, 5000, limit])
 
 
+    @classmethod
+    def get_commented_films(cls, greater=None, less=None):
+        sql = """SELECT films.id
+                 FROM films
+                 INNER JOIN content ON films.id = content.film_id
+                 INNER JOIN comments ON content.id = comments.content_id
+                 GROUP BY films.id
+                 HAVING CASE
+                        WHEN %s IS NOT NULL THEN count(films.id) > %s
+                        WHEN %s IS NOT NULL THEN count(films.id) < %s
+                        END"""
+        commented_films = cls.objects.raw(sql, (greater, greater, less, less))
+
+        return commented_films
 
     class Meta(object):
         # Имя таблицы в БД
