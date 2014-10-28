@@ -268,7 +268,7 @@ mixin feed_thumb(item, for_tpl)
                             .row
                                 .col-md-10.col-sm-9.col-xs-9
                                     a(href=user_url, title='', data-mi-name="user.name", data-mi-athref="user.id")=user_name
-                                    |&nbsp;оставил комментарий к фильму
+                                    |&nbsp;оставил комментарий к фильму&nbsp;
                                 .col-md-2.col-sm-3.col-xs-3
                                     .time-tape(data-mi-id="created", data-mi-name="created", data-mi-val=item.created)=created
                         //-
@@ -276,7 +276,7 @@ mixin feed_thumb(item, for_tpl)
                         .content-item-tape
                             .short-text-tape
                                 h4
-                                    a(href=film_url, title='', data-mi-athref="object.id", data-mi-name="object.name")=item.object.name
+                                    a(href=film_url, title='', data-mi-athref="object.id", data-mi-name="object.name")=item.object.film.name
                                 - text = (item.object.text || "").replace(/\n+/gm, "<br/>")
                                 p(data-mi-name="object.text")=item.object.text
                             //-
@@ -596,7 +596,6 @@ mixin cast_thumb(item)
                         span(data-mi-id="price")=text
 
 mixin cast_player(loc)
-    - console.log(loc)
     if !loc.value || loc.value.length == 0
         if loc.type == 'liverussia_ru'
             - frame_url = 'http://player.rutv.ru/iframe/live/id/' + loc.value + '/showZoomBtn/false?time_play=0&isPlay=true&showPopUpBtn=false&showZoomBtn=true';
