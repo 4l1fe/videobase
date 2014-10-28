@@ -30,15 +30,15 @@ class Films(models.Model):
     rating_local_cnt = models.IntegerField(null=True, blank=True, db_index=True, default=0, verbose_name=u'Количество пользователей нашего сайта оценивших фильм')
     imdb_id          = models.IntegerField(null=True, blank=True, verbose_name=u'Порядковый номер на IMDB')
     rating_imdb      = models.FloatField(null=True, blank=True, default=0, verbose_name=u'Рейтинг фильма на сайте imdb.com')
-    rating_imdb_cnt  = models.IntegerField(null=True, blank=True, default=0, verbose_name=u'Количество пользователей imdb.com оценивших этот фильм')
+    rating_imdb_cnt  = models.PositiveIntegerField(null=True, blank=True, default=0, verbose_name=u'Количество пользователей imdb.com оценивших этот фильм')
     rating_cons      = models.FloatField(null=True, blank=True, default=0, verbose_name=u'Консолидированный рейтинг')
-    rating_cons_cnt  = models.IntegerField(null=True, blank=True, db_index=True, default=0, verbose_name=u'Количество голосов консолидированного рейтинга')
+    rating_cons_cnt  = models.PositiveIntegerField(null=True, blank=True, db_index=True, default=0, verbose_name=u'Количество голосов консолидированного рейтинга')
     rating_sort      = models.IntegerField(null=True, blank=True, db_index=True, default=0, verbose_name=u'Условный рейтинг для сортировки')
     kinopoisk_id     = models.IntegerField(unique=True, db_index=True, verbose_name=u'Порядковый номер на кинопоиске')
     age_limit        = models.PositiveSmallIntegerField(null=True, blank=True, db_index=True, verbose_name=u'Ограничение по возрасту')
     kinopoisk_lastupdate = models.DateTimeField(null=True, blank=True, verbose_name=u'Дата последнего обновления на кинопоиске')
     rating_kinopoisk     = models.FloatField(null=True, blank=True, verbose_name=u'Рейтинг фильма на сайте kinopoisk.ru')
-    rating_kinopoisk_cnt = models.PositiveSmallIntegerField(null=True, blank=True, verbose_name=u'Количество пользователей kinopoisk.ru оценивших этот фильм')
+    rating_kinopoisk_cnt = models.PositiveIntegerField(null=True, blank=True, verbose_name=u'Количество пользователей kinopoisk.ru оценивших этот фильм')
     seasons_cnt    = models.PositiveSmallIntegerField(null=True, blank=True, verbose_name=u'Количество сезонов')
     name_orig      = models.CharField(max_length=255, default='', blank=True, db_index=True, verbose_name=u'Оригинальное название фильма')
     countries      = models.ManyToManyField('Countries', verbose_name=u'Страны производители', related_name='countries')
@@ -222,16 +222,21 @@ class Films(models.Model):
             - если rating_cons_cnt больше 15 000, но меньше 30 000, sort_cnt = 5 000 + (rating_cons_cnt - 15000) / 50 + 10 000 / 20
             - если rating_cons_cnt больше 5 000, но меньше 15 000, то sort_cnt = 5 000 + (rating_cons_cnt - 5000) / 20
             - если rating_cons меньше или равно 5 000, то sort_cnt = rating_cons_cnt
+            алгоритм изменен
         """
 
-        if rating_cons_cnt > 30000:
-            sort_cnt = 5000 + (rating_cons_cnt - 30000) / 150 + 15000 / 50 + 10000 / 20
+        if rating_cons_cnt > 100000:
+            sort_cnt = 20000 + (rating_cons_cnt - 100000) / 300
+        elif 30000 < rating_cons_cnt <= 100000:
+            sort_cnt = 18000 + (rating_cons_cnt - 30000) / 35
         elif 15000 < rating_cons_cnt <= 30000:
-            sort_cnt = 5000 + (rating_cons_cnt - 15000) / 50 + 10000 / 20
-        elif 5000 < rating_cons_cnt <= 15000:
-            sort_cnt = 5000 + (rating_cons_cnt - 5000) / 20
+            sort_cnt = 15000 + (rating_cons_cnt - 15000) / 5
+        elif 3000 < rating_cons_cnt <= 15000:
+            sort_cnt = 10000 + (rating_cons_cnt - 3000) / 2
+        elif 500 < rating_cons_cnt <= 3000:
+            sort_cnt = 8000 + (rating_cons_cnt - 500) / 1.25
         else:
-            sort_cnt = rating_cons_cnt
+            sort_cnt = 8000
 
         return sort_cnt
 
@@ -260,6 +265,20 @@ class Films(models.Model):
         return cls.objects.raw(sql, params=['POSTER', 5.5, 5000, limit])
 
 
+    @classmethod
+    def get_commented_films(cls, greater=None, less=None):
+        sql = """SELECT films.id
+                 FROM films
+                 INNER JOIN content ON films.id = content.film_id
+                 INNER JOIN comments ON content.id = comments.content_id
+                 GROUP BY films.id
+                 HAVING CASE
+                        WHEN %s IS NOT NULL THEN count(films.id) > %s
+                        WHEN %s IS NOT NULL THEN count(films.id) < %s
+                        END"""
+        commented_films = cls.objects.raw(sql, (greater, greater, less, less))
+
+        return commented_films
 
     class Meta(object):
         # Имя таблицы в БД

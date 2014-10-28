@@ -301,7 +301,7 @@ CELERYBEAT_SCHEDULE = {
 
     'update_rating_command': {
         'task': 'update_ratings',
-        'schedule': timedelta(days=7),
+        'schedule': timedelta(days=3),
     },
     # Amediateka weekly run
     'amediateka_ru_update': {

@@ -2,7 +2,7 @@
 from apps.films.models import Films
 from bs4 import BeautifulSoup
 from crawler.locations_robot_corrector import LocationRobotsCorrector
-from crawler.locations_saver import save_location_to_locs_dict
+from crawler.locations_saver import save_location_to_locs_dict, save_existed_location_to_locs_dict
 from crawler.tasks.locrobots_logging import fill_log_table_for_not_schema_corresponded_robots
 from crawler.tasks.test_robots_ban import MultiLocationRobotsBunCheck
 from crawler.utils.locations_utils import save_location, sane_dict
@@ -32,8 +32,9 @@ class ViaplayRobot(object):
                     film_query_set = Films.objects.filter(id=film['id'])
                     for obj in film_query_set:
                         d = self.film_dict(obj, link)
-                        save_location(**d)
-                        save_location_to_locs_dict(locations, True, **d)
+
+                        one_loc_res = save_location(**d)
+                        save_existed_location_to_locs_dict(locations, one_loc_res)
                     break
         fill_log_table_for_not_schema_corresponded_robots(locations)
         robot_is_banned = MultiLocationRobotsBunCheck.is_result_looks_like_robot_banned(locations)
