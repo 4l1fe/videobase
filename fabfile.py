@@ -52,88 +52,6 @@ def production_env():
     env.shell = '/bin/bash -c'
 
 
-# ####################################################################
-# def deploy(git_stash=True, **kwargs):
-#     require('hosts', provided_by=[localhost_env, production_env])
-#     require('path')
-#
-#     env.release = time.strftime('%Y%m%d%H%M%S')
-#
-#     # Install common packages
-#     fabtools.deb.install(globals()['common_packages'])
-#
-#     # Проверка окружения
-#     if not fabtools.python.virtualenv_exists(env.env):
-#         fabtools.python.create_virtualenv(env.env)
-#
-#     # Проверка директории проекта
-#     init_proj = False
-#     if not fabtools.files.is_dir(env.path):
-#         init_proj = True
-#         run('/bin/mkdir {dir}'.format(dir=env.path))
-#
-#         # Clone project by git
-#         fabtools.git.clone(env.git, path=env.path)
-#
-#     with cd(env.path):
-#         # Update project
-#         if not init_proj:
-#             if git_stash:
-#                 run('git stash save "Uncommitted changes before update operation at {time}"'.format(
-#                     time=env.release
-#                 ))
-#
-#             run('git pull')
-#
-#         # Require some Debian/Ubuntu packages
-#         run('cat %(sys_file)s | xargs sudo apt-get install -y ' % {
-#             'sys_file': os.path.join(env.path, env.req_dir, 'node.txt')
-#         })
-#
-#         # Require Node packages
-#         run('cat %(sys_file)s | xargs sudo npm install ' % {
-#             'sys_file': os.path.join(env.path, env.req_dir, 'node.txt')
-#         })
-#
-#         if init_proj:
-#             # Init Postgres User
-#             if not fabtools.postgres.user_exists():
-#                 fabtools.postgres.create_user(
-#                     name='pgadmin', password='qwerty',
-#                     createdb=True, createrole=True,
-#                 )
-#
-#             # Init Postgres DB
-#             if not fabtools.postgres.database_exists('videobase'):
-#                 fabtools.postgres.create_database(
-#                     name='videobase', owner='pgadmin'
-#                 )
-#
-#         # Require a Python package
-#         with fabtools.python.virtualenv(env.env):
-#             run('{pip} install -r {filepath}'.format(
-#                 pip=env.pip,
-#                 filepath=os.path.join(env.path, 'requirements.txt')
-#             ))
-#
-#             # Сбор статики
-#             run('{python} manage.py collectstatic --dry-run --noinput'.format(
-#                 python=env.python
-#             ))
-#
-#             if init_proj:
-#                 run('{python} manage.py migrate syncdb'.format(python=env.python))
-#
-#             # # Миграции
-#             # run('{python} manage.py migrate --no-initial-data'.format(
-#             #     python=env.python
-#             # ))
-#
-#             # Restart сервисов
-#             restart_services()
-
-
-
 def install_common_packages():
     """
     Установка основных общих системных пакетов
@@ -177,12 +95,13 @@ def releases():
     if len(env.releases) >= 1:
         env.current_revision = env.releases[-1]
         env.current_release = "%(releases_path)s/%(current_revision)s" % env
+
     if len(env.releases) > 1:
         env.previous_revision = env.releases[-2]
         env.previous_release = "%(releases_path)s/%(previous_revision)s" % env
 
 
-def checkout():
+def checkout(branch=None):
     """
     """
 
@@ -190,16 +109,27 @@ def checkout():
     env.current_release = "%(releases_path)s/%(time).0f" % {'releases_path': env.releases_path, 'time': time()}
 
     with cd(env.releases_path):
-        run("git clone -q -o deploy --depth 1 %(git_clone)s %(current_release)s" % env)
+        env.git_branch = 'master'
+        if not branch is None:
+            env.git_branch = branch
+
+        run("git clone -b %(git_branch)s %(git_clone)s %(current_release)s" % env)
 
 
-def update_env():
+def update_env(install_node_pkg=False):
     """
     Обновление python окружения
     """
 
     if not 'current_release' in env:
         releases()
+
+    # Установка остальных системных пакетов
+    install_all_sys_packages()
+
+    # Установка NodeJS пакетов
+    if install_node_pkg:
+        install_npm_packages()
 
     # Проверка окружения
     if not fabtools.python.virtualenv_exists(env.env):
@@ -208,7 +138,10 @@ def update_env():
     with cd(env.current_release):
         # Установка python пакетов
         with fabtools.python.virtualenv(env.env):
-            run('{pip} install -r %(current_release)s/%(req_file)s' % env)
+            run('%(pip)s install -r %(path)s' % {
+                'pip': env.pip,
+                'path': os.path.join(env.current_release, env.req_dir, 'requirements.txt'),
+            })
 
 
 def symlink():
@@ -235,16 +168,33 @@ def setup():
     if not fabtools.files.is_dir(env.path):
         run('/bin/mkdir {dir}'.format(dir=env.path))
 
-    run("mkdir -p %(path)s/{releases,current}" % env)
+    run('mkdir -p %(path)s/{releases,current}' % env)
+
+    # # Init Postgres User
+    # if not fabtools.postgres.user_exists():
+    #     fabtools.postgres.create_user(
+    #         name='pgadmin', password='qwerty',
+    #         createdb=True, createrole=True,
+    #     )
+    #
+    # # Init Postgres DB
+    # if not fabtools.postgres.database_exists('videobase'):
+    #     fabtools.postgres.create_database(
+    #         name='videobase', owner='pgadmin'
+    #     )
 
 
-def deploy():
+
+
+def deploy(branch=None, install_node_pkg=False):
     require('hosts', provided_by=[localhost_env, production_env])
     require('path')
 
     setup()
-    checkout()
-    update_env()
+
+    checkout(branch)
+    update_env(install_node_pkg)
+
     symlink()
     restart_services()
 
@@ -253,6 +203,40 @@ def rollback():
     pass
 
 
+def generate_robots_conf(python_interpreter=None, videobase_dir=None, user=None):
+    if python_interpreter is None:
+        python_interpreter = local("which python", capture=True)
+
+    if videobase_dir is None:
+        videobase_dir = os.path.abspath('.')
+
+    if user is None:
+        user = local('whoami', capture=True)
+
+    robots_list = local('python manage.py list_robots', capture=True).split()
+    print robots_list
+
+    template = Template("""[program:$name]
+command=$interpreter manage.py robot_start --site $name
+process_name=%(program_name)s ; process_name expr (default %(program_name)s)
+numprocs=1 ; number of processes copies to start (def 1)
+directory=$workdir ; directory to cwd to before exec (def no cwd)
+umask=022 ; umask for process (default None)
+autostart=false ; start at supervisord start (default: true)
+autorestart=false ; retstart at unexpected quit (default: true)
+startretries=1 ; max # of serial start failures (default 3)
+user=$user ; setuid to this UNIX account to run the program
+redirect_stderr=true ; redirect proc stderr to stdout (default false)
+stdout_logfile=/var/log/$name.log""")
+
+    config = '\n'.join(template.substitute({
+        'interpreter': python_interpreter,
+        'user': user,
+        'workdir': videobase_dir,
+        'name': robot_name
+    }) for robot_name in robots_list)
+
+    return config
 
 
 
