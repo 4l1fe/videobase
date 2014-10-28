@@ -248,7 +248,9 @@ mixin feed_thumb(item, for_tpl)
     -   }
     - }
     - created = time_text_str(item.created)
-    - if (item.type.substr(0,4) == "film") {
+    - if( item.type == "film-c" ) {
+    -   film_url = "/films/" + item.object.film.id + "/"
+    - } else if (item.type.substr(0,4) == "film") {
     -   film_url = "/films/" + item.object.id + "/"
     - } else if (item.type.substr(0,4) == "pers") {
     -   person_url = "/persons/" + item.object.id + "/"
