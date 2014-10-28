@@ -10,7 +10,7 @@ from PIL import Image
 from collections import defaultdict
 from functools import partial
 
-from apps.films.constants import APP_PERSON_ACTOR, APP_PERSON_DIRECTOR, APP_PERSON_PRODUCER, APP_PERSON_SCRIPTWRITER
+from apps.films.constants import APP_PERSON_ACTOR, APP_PERSON_DIRECTOR, APP_PERSON_PRODUCER, APP_PERSON_SCRIPTWRITER, APP_FILM_DIRTY_WORDS
 
 from crawler.constants import PAGE_ARCHIVE
 from crawler.tor import simple_tor_get_page
@@ -101,7 +101,7 @@ def cut_triple_dots(datastringlist):
 
 def transform_data_dict(ddict):
     transforms = {
-        #u'roд': lambda d: ('Films',{'freleasedate': datetime.datetime.strptime(d.text.strip(),"%Y%m%d")}),
+        u'год': lambda d: [('Films',{'year': datetime.datetime.strptime(d.text.strip(),"%Y")})],
         u'страна': lambda d: [('Countries', {'name': c}) for c in extract_countries(d)],
         u'жанр': lambda d: [('Genres', {'name': c}) for c in cut_triple_dots(commatlst(d))],
         u'режиссер': lambda d: [('Persons', {'name':name,'kinopoisk_id':kid, 'p_type': APP_PERSON_DIRECTOR}) for kid,name in extract_names_and_ids(d)],
@@ -157,7 +157,13 @@ get_photo = partial(get_image, YANDEX_KP_ACTORS_TEMPLATE)
 
 def extract_names(soup):
     nametag = soup.select('h1.moviename-big')[0]
-    moviename = ('Films', {'name': nametag.text.strip()})
+    name = nametag.text.strip()
+
+    for word in APP_FILM_DIRTY_WORDS:
+                if word in name:
+                    name = name.replace(word, '').strip()
+
+    moviename = ('Films', {'name': name})
     name_orig = soup.find('span', {'itemprop': 'alternativeHeadline'})
     orig_movie_name = ('Films', {
         'name_orig': name_orig.text.strip() if not name_orig is None else ''
