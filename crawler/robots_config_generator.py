@@ -3,43 +3,34 @@ from sys import executable
 from crawler.robots_type_checker import RobotsTypeChecker
 
 
-def queue_command(robot_name):
-    return executable + " manage.py celery worker -Q {}".format(robot_name)
+def generate_robots_config(directory='.', user='www-data', file_name='robots_config.conf'):
+    d, u, fn = directory, user, file_name  # сокращение
+    queue_command = lambda robot_name: executable + " manage.py celery worker -Q {}".format(robot_name)
+    main_queue_command = lambda: executable + " manage.py celery worker"
 
-
-def main_queue_command():
-    return executable + " manage.py celery worker"
-
-
-def generate_group(group_name, process_list):
     template = '''
-[group:{}]
-programs={}'''.format(group_name, process_list)
-    return template
+    [group:{}]
+    programs={}'''
+    generate_group = lambda group_name, process_list: template.format(group_name, process_list)
 
-
-def generate_program(program_name, command, directory, user):
     template = '''
-[program:{}]
-command={}
-process_name=%(program_name)s ;
-directory={} ;
-umask=022 ;
-startretries=1 ;
-user={} ;
-redirect_stderr=true'''.format(program_name, command, directory, user)
-    return template
+    [program:{}]
+    command={}
+    process_name=%(program_name)s ;
+    directory={} ;
+    umask=022 ;
+    startretries=1 ;
+    user={} ;
+    redirect_stderr=true'''
+    generate_program = lambda program_name, command, dir_, u: template.format(program_name, command, dir_, u)
 
-
-def generate_robots_config(directory, user, file_name='robots_config.conf'):
-    rtc = RobotsTypeChecker()
+    rtc = RobotsTypeChecker()  # отсюда берутся списки роботов
     lr_list = rtc.get_locrobots_list()
     dr_list = rtc.get_datarobots_list()
     sr_list = rtc.get_support_robots()
     cr_list = rtc.get_casts_robot()
-    d, u = directory, user
 
-    with open(file_name, 'w') as file:
+    with open(fn, 'w') as file:
         for robot in lr_list:
             command = queue_command(robot)
             file.write(generate_program(robot, command, d, u))
@@ -79,4 +70,4 @@ def generate_robots_config(directory, user, file_name='robots_config.conf'):
         file.write(generate_group('supportrobots', ','.join(sr_list)))
         file.write("\n")
 
-    return file_name
+    return fn
