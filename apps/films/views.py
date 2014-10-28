@@ -18,7 +18,6 @@ from django.views.generic import View
 from django.http import HttpResponse, Http404, HttpResponseRedirect, HttpResponseBadRequest
 from django.shortcuts import render_to_response, redirect
 from django.core.urlresolvers import reverse
-from django.views.decorators.cache import cache_page
 from rest_framework import status
 import apps.films.models as film_model
 import apps.contents.models as content_model
@@ -32,7 +31,6 @@ from apps.users import Feed, SessionToken
 from apps.users.constants import FILM_COMMENT
 from utils.noderender import render_page
 from utils.common import reindex_by
-
 
 
 def get_new_namestring(namestring):
@@ -339,18 +337,19 @@ class SearchView(View):
         return HttpResponse(render_page('search', resp_dict))
 
 
-
 def test_view(request):
     c = Context({})
     c.update(csrf(request))
 
     return render_to_response('api_test.html', c)
 
+
 def serialize_actors(actors_iterable):
 
     return [{'id':pf.person.id, 'name':pf.person.name}
             for pf in actors_iterable]
-    
+
+
 def calc_actors(o_film):
     filter = {
         'filter': {'pf_persons_rel__film': o_film.pk},
@@ -455,30 +454,32 @@ class PersonsPhoto(View):
         return HttpResponseRedirect('/static/upload/persons/{}/profile.jpg'.format(person_id))
 
 
-@cache_page(60 * 5)
-def commented_films(request):
-    ids = (f.id for f in Films.get_commented_films(less=3))
-    less = Films.objects.filter(id__in=ids).order_by('-rating_sort').iterator()
-    ids = (f.id for f in Films.get_commented_films(greater=2))
-    greater = Films.objects.filter(id__in=ids).order_by('-rating_sort').iterator()
+class CommentedFilms(View):
 
-    cf_html = u'Фильмы с коментариями меньше трёх:'
-    cf_html += u'<br><br>'
-    for f in less:
-        link = reverse('film_view', args=[f.id])
-        year = f.release_date.year if f.release_date else ''
-        cf_html += u'<a href="{}">{}</a>, {}<br>\n'.format(link, f.name, year)
+    def get(self, *args, **kwargs):
+        cf_html = cache.get('cf_html')
+        if cf_html:
+            return HttpResponse(cf_html)
+        else:
+            ids = (f.id for f in Films.get_commented_films(less=3))
+            less = Films.objects.filter(id__in=ids).order_by('-rating_sort').iterator()
+            ids = (f.id for f in Films.get_commented_films(greater=2))
+            greater = Films.objects.filter(id__in=ids).order_by('-rating_sort').iterator()
 
-    cf_html += u'<br><br>'
-    cf_html += u'Фильмы с коментариями больше двух:'
-    cf_html += u'<br><br>'
-    for f in greater:
-        link = reverse('film_view', args=[f.id])
-        year = f.release_date.year if f.release_date else ''
-        cf_html += u'<a href="{}">{}</a>, {}<br>\n'.format(link, f.name, year)
+            cf_html = u'Фильмы с коментариями меньше трёх:'
+            cf_html += u'<br><br>'
+            for f in less:
+                link = reverse('film_view', args=[f.id])
+                year = f.release_date.year if f.release_date else ''
+                cf_html += u'<a href="{}">{}</a>, {}<br>\n'.format(link, f.name, year)
 
-    cache.set('cf_html', cf_html, 300)
-    return HttpResponse(cf_html)
+            cf_html += u'<br><br>'
+            cf_html += u'Фильмы с коментариями больше двух:'
+            cf_html += u'<br><br>'
+            for f in greater:
+                link = reverse('film_view', args=[f.id])
+                year = f.release_date.year if f.release_date else ''
+                cf_html += u'<a href="{}">{}</a>, {}<br>\n'.format(link, f.name, year)
 
-
-
+            cache.set('cf_html', cf_html, 60 * 5)
+            return HttpResponse(cf_html)
