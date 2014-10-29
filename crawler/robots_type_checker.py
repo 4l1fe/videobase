@@ -9,7 +9,7 @@ class RobotsTypeChecker():
                      'stream_ru', 'tvigle_ru', 'tvzavr_ru', 'tvzor_ru', 'viaplay_ru', 'videomax_org', 'youtube_com', 'zabava_ru', 'zoomby_ru']
         self.datarobots = ['kinopoisk_ru', 'youtube_com']
         self.supportrobots = ['location_saver', 'thor', 'main_worker']
-        self.castsrobots = ['cast_sportbox_robot', 'cast_liverussia_robot', 'cast_championat_robot', 'cast_khl_robot', 'cast_ntv_plus_robot']
+
 
     def check_robots_type(self, robot_name):
 
@@ -28,6 +28,3 @@ class RobotsTypeChecker():
 
     def get_support_robots(self):
         return self.supportrobots
-
-    def get_casts_robot(self):
-        return self.castsrobots
