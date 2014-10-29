@@ -91,6 +91,7 @@ def releases():
     """
 
     env.releases = sorted(run('ls -x %(releases_path)s' % env).split())
+
     if len(env.releases) >= 1:
         env.current_revision = env.releases[-1]
         env.current_release = "%(releases_path)s/%(current_revision)s" % env
@@ -147,7 +148,8 @@ def update_env(install_node_pkg=False):
                 'path': os.path.join(env.current_release, env.req_dir, 'requirements.txt'),
             })
 
-            run('%(python)s manage.py generate_robots_config' % env)
+            # Создаем конфиг для supervisor
+            # create_supervisor_config()
 
 
 def symlink():
@@ -209,8 +211,8 @@ def migrate(app_name=''):
 
     with cd(env.current_release):
         run('%(python)s manage.py migrate %(app_name)s --no-initial-data --delete-ghost-migrations' % {
+            'python': env.python,
             'app_name': app_name,
-            'current_release': env.current_release,
         })
 
 
@@ -229,7 +231,7 @@ def create_supervisor_config():
     })
 
 
-def deploy(branch=None, install_node_pkg=False):
+def deploy(branch=None, install_node_pkg=False, use_migrate=True):
     require('hosts', provided_by=[localhost_env, production_env])
     require('path')
 
@@ -237,7 +239,10 @@ def deploy(branch=None, install_node_pkg=False):
     checkout(branch)
     update_env(install_node_pkg)
     symlink()
-    migrate()
+
+    if use_migrate:
+        migrate()
+
     restart_services()
 
 
@@ -249,11 +254,18 @@ def deploy_version(version):
     require('hosts', provided_by=[localhost_env, production_env])
     require('path')
 
-    env.version = version
-    with cd(env.path):
-        pass
+    if not 'current_release' in env:
+        releases()
 
-    restart_services()
+    if version in env.releases:
+        pass
+        # with cd(env.path):
+        #     env.current_release = "%(releases_path)s/%(version)s" % {
+        #         'releases_path': env.releases_path,
+        #         'version': version
+        #     }
+        #
+        # restart_services()
 
 
 def rollback():
@@ -266,4 +278,41 @@ def rollback():
     if not 'current_release' in env:
         releases()
 
-    pass
+    if len(env.releases) >= 2:
+        env.current_release = env.releases[-1]
+        env.previous_revision = env.releases[-2]
+
+        env.current_release = "%(releases_path)s/%(current_revision)s" % {
+            'releases_path': env.releases_path,
+            'current_revision': env.current_revision
+        }
+        env.previous_release = "%(releases_path)s/%(previous_revision)s" % {
+            'releases_path': env.releases_path,
+            'previous_revision': env.previous_revision
+        }
+
+        run("rm %(current_path)s; ln -s %(previous_release)s %(current_path)s && rm -rf %(current_release)s" % {
+            'current_release': env.current_release,
+            'previous_release': env.previous_release,
+            'current_path': env.current_path
+        })
+
+    restart_services()
+
+
+def delete_old_releases():
+    """
+    Удаляем старые релизы
+    """
+
+    require('hosts', provided_by=[localhost_env, production_env])
+
+    if not 'current_release' in env:
+        releases()
+
+    if len(env.releases) > 3:
+        directories = env.releases
+        directories.reverse()
+        del directories[4:]
+
+        releases()
