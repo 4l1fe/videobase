@@ -1,10 +1,9 @@
 # coding: utf-8
 
 import os
-import time
 import fabtools
 
-from string import Template
+from time import time
 from fabric.api import env, roles, run, settings, sudo, cd, local, require, get, put
 
 
@@ -103,10 +102,13 @@ def releases():
 
 def checkout(branch=None):
     """
+    Клонирование проекта
     """
 
-    from time import time
-    env.current_release = "%(releases_path)s/%(time).0f" % {'releases_path': env.releases_path, 'time': time()}
+    env.current_release = "%(releases_path)s/%(time).0f" % {
+        'releases_path': env.releases_path,
+        'time': time()
+    }
 
     with cd(env.releases_path):
         env.git_branch = 'master'
@@ -120,6 +122,8 @@ def update_env(install_node_pkg=False):
     """
     Обновление python окружения
     """
+
+    require('hosts', provided_by=[localhost_env, production_env])
 
     if not 'current_release' in env:
         releases()
@@ -151,6 +155,8 @@ def symlink():
     Устанавливаем символические ссылки
     """
 
+    require('hosts', provided_by=[localhost_env, production_env])
+
     if not 'current_release' in env:
         releases()
 
@@ -167,6 +173,11 @@ def restart_services():
 
 
 def setup():
+    """
+    """
+
+    require('hosts', provided_by=[localhost_env, production_env])
+
     if not fabtools.files.is_dir(env.path):
         run('/bin/mkdir {dir}'.format(dir=env.path))
 
@@ -191,6 +202,8 @@ def migrate(app_name=''):
     Исполнение миграций
     """
 
+    require('hosts', provided_by=[localhost_env, production_env])
+
     if not 'current_release' in env:
         releases()
 
@@ -205,6 +218,8 @@ def supervisor_config():
     """
     Генерируем конфиг для supervisor
     """
+
+    require('hosts', provided_by=[localhost_env, production_env])
 
     if not 'current_release' in env:
         releases()
@@ -311,8 +326,7 @@ def rollback():
 #     """
 #
 #     with cd('/var/lib/postgresql'):
-#         with settings(sudo_user="postgres"):
-#             sudo('''echo "DROP DATABASE videobase_test;" | psql''')
+#         fabtools.postgres.drop_database('videobase_test')
 #
 #
 # def refresh_test_requirements():
@@ -331,14 +345,14 @@ def rollback():
 #             sudo('/home/virtualenv/videobase_test/bin/python manage.py collectstatic --dry-run --noinput')
 #
 #
-# # def db_flush_test():
-# #     """
-# #     Перезаписать тестовую базу данных из дампа
-# #     """
-# #
-# #     delete_test_db()
-# #     init_test_db()
-# #     populate_test_db()
+# def db_flush_test():
+#     """
+#     Перезаписать тестовую базу данных из дампа
+#     """
+#
+#     delete_test_db()
+#     init_test_db()
+#     populate_test_db()
 #
 #
 # def scheme():
@@ -348,6 +362,7 @@ def rollback():
 # def show_scheme():
 #     scheme()
 #     local('feh current.png')
+#
 #
 # def set_local_robot_config():
 #     with open('configs/robots.conf', 'w') as fw:
