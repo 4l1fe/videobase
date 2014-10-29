@@ -26,6 +26,7 @@ def process_one_film(site, film_id, html_page_json):
         data['film'] = film
         try:
             if data['url_view'] == '':
+                print "  "
                 LocationCorrectorForOneFilmRobots.corrrect_current_location_if_needed(data)
                 continue
             print u"Trying to put data from %s for %s to db" % (site, unicode(data['film']))

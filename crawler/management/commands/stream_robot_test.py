@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from crawler.translation_robot.live_russia_tv.translation_live_russia_tv import parse_translation_live_russia_tv
+from crawler.casts_robot.live_russia_tv.translation_live_russia_tv import parse_translation_live_russia_tv
 
 
 class Command(BaseCommand):

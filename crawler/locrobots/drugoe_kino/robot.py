@@ -2,7 +2,7 @@ import requests
 import json
 import re
 from crawler.locations_robot_corrector import LocationRobotsCorrector
-from crawler.locations_saver import save_location_to_locs_dict
+from crawler.locations_saver import save_location_to_locs_dict, save_existed_location_to_locs_dict
 from crawler.tasks.locrobots_logging import fill_log_table_for_not_schema_corresponded_robots
 from crawler.tasks.test_robots_ban import MultiLocationRobotsBunCheck
 
@@ -74,8 +74,8 @@ def update_drugoe_kino_listing():
                 import traceback
                 traceback.print_exc()
 
-            save_location(**sd)
-            save_location_to_locs_dict(locations, True, **sd)
+            one_loc_res = save_location(**sd)
+            save_existed_location_to_locs_dict(locations, one_loc_res)
     fill_log_table_for_not_schema_corresponded_robots(locations)
     robot_is_banned = MultiLocationRobotsBunCheck.is_result_looks_like_robot_banned(locations)
     if not robot_is_banned:

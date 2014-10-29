@@ -10,6 +10,7 @@ class RobotsTypeChecker():
         self.datarobots = ['kinopoisk_ru', 'youtube_com']
         self.supportrobots = ['location_saver', 'thor', 'main_worker']
 
+
     def check_robots_type(self, robot_name):
 
         if robot_name in self.locrobots:
