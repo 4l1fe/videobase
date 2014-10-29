@@ -1,8 +1,10 @@
 # coding: utf-8
+from data.unicode_convertor import convert_to_unicode
 
 
 def is_correct_trailer_title(title, film):
-    film_name = film.name.lower().encode("utf-8")
+    title = convert_to_unicode(title).lower()
+    film_name = film.name.lower()
     film_year = film.release_date.year
     try:
         trailers_ru_mask = [u'официальный русский трейлер фильма hd',u'русский трейлер фильма hd', u'русский трейлер HD',
@@ -31,11 +33,10 @@ def is_correct_trailer_title(title, film):
             if title.find(phrase) != -1:
                 check_block = True
 
-        tr_t_for_comparison = title.lower().encode("utf-8")
-        if tr_t_for_comparison.find(film_name) != -1:
+        if title.find(film_name) != -1:
             check_fname = True
 
-        if tr_t_for_comparison.find(str(film_year)) != -1:
+        if title.find(str(film_year)) != -1:
             check_fyear = True
 
         if trailers_ru_mask or trailers_en_mask and not check_block: #проверяем много ли лишних слов помимо шаблонных
@@ -49,6 +50,7 @@ def is_correct_trailer_title(title, film):
             return True
         else:
             return False
-    except Exception, ex:
+    except ValueError, ex:
+        print "Trailer checking failed ", ex.message
         return True
 
