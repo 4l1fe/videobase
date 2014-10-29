@@ -1,7 +1,6 @@
 # coding: utf-8
-
-from crawler.translation_robot import parse_sportbox_ru, parse_translation_live_russia_tv, parse_khl, parse_translation_championat_com, parse_ntv_plus_translation
-from crawler.translation_robot.cast_utils import save_cast_dict
+from crawler.casts_robot import parse_sportbox_ru, parse_translation_live_russia_tv, parse_khl, parse_translation_championat_com, parse_ntv_plus_translation
+from crawler.casts_robot.cast_utils import save_cast_dict
 from videobase.celery import app
 from utils.common import traceback_own
 
@@ -20,24 +19,23 @@ def generic_task(parse_function, service_name):
         except Exception, e:
             traceback_own(e)
 
-@app.task(name='cast_sportbox_robot', queue='sportbox')
+@app.task(name='cast_sportbox_robot', queue='cast_sportbox_robot')
 def sportbox_update():
     generic_task(parse_sportbox_ru, 'sportbox_ru')
     
-@app.task(name='cast_liverussia_robot', queue='liverussia_ru')
+@app.task(name='cast_liverussia_robot', queue='cast_liverussia_robot')
 def liverussia_update():
     generic_task(parse_translation_live_russia_tv, 'liverussia_ru')
 
-@app.task(name='cast_championat_robot', queue='championat_com')
+@app.task(name='cast_championat_robot', queue='cast_championat_robot')
 def championat_update():
     generic_task(parse_translation_championat_com, 'championat_com')
-    
 
-@app.task(name='cast_khl_robot', queue='khl_ru')
+@app.task(name='cast_khl_robot', queue='cast_khl_robot')
 def khl_update():
     generic_task(parse_khl, 'khl_ru')
 
-@app.task(name='cast_ntv_plus_robot', queue='ntv_plus')
+@app.task(name='cast_ntv_plus_robot', queue='cast_ntv_plus_robot')
 def ntv_plus_update():
     generic_task(parse_ntv_plus_translation, 'ntv_plus')
 
