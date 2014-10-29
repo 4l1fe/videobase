@@ -1,5 +1,5 @@
 # coding: utf-8
-from crawler.translation_robot.tv_khl_ru.parse import TvKHLRuParser
+from crawler.casts_robot.tv_khl_ru.parse import TvKHLRuParser
 
 __author__ = 'vladimir'
 

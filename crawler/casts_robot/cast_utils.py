@@ -1,7 +1,7 @@
 # coding: utf-8
 from apps.casts.models import Casts, CastsLocations, CastsServices, CastExtrasStorage
 from apps.casts.constants import APP_CONTENTS_PRICE_TYPE_FREE, APP_CONTENTS_PRICE_TYPE_PAY
-from crawler.translation_robot.save_image_for_translation import get_one_google_image_by_query
+from crawler.casts_robot.save_image_for_translation import get_one_google_image_by_query
 from django.core.files import File
 
 DEFAULT_PG_RATING = u'16+'
