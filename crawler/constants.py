@@ -9,7 +9,7 @@ USE_TOR = True
 # This option is void if USE_TOR is True
 USE_SOCKS5_PROXY = False
 SOCKS5_PROXY_ADDRESS = 'socks5://127.0.0.1:5555'
-TOR_RECONNECTS = 30
+TOR_RECONNECTS = 100
 BROWSER_STRINGS_FILE = os.path.join(os.path.dirname(__file__), 'browsers.txt')
 
 browser_freq = {

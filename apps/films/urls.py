@@ -5,8 +5,6 @@ from rest_framework.urlpatterns import format_suffix_patterns
 
 from apps.films.api import *
 
-
-# Api patterns
 v1_api_patterns = patterns('',
     # Films API
     url(r'^v1/films/search$', SearchFilmsView.as_view(), name='film_search_view'),

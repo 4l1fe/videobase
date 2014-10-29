@@ -6,7 +6,7 @@ import requests
 from apps.films.models import Films
 from apps.robots.models import Robots
 from crawler.locations_robot_corrector import LocationRobotsCorrector
-from crawler.locations_saver import save_location_to_locs_dict
+from crawler.locations_saver import save_location_to_locs_dict, save_existed_location_to_locs_dict
 from crawler.tasks.locrobots_logging import fill_log_table_for_not_schema_corresponded_robots
 from crawler.tasks.test_robots_ban import MultiLocationRobotsBunCheck
 from crawler.utils.locations_utils import sane_dict, save_location
@@ -87,8 +87,9 @@ class YoutubeChannelParser():
             resp_dict['url_view'] = link
             resp_dict['value'] = link
             resp_dict['type'] = u'YouTubeMoviesRU'
-            save_location(**resp_dict)
-            save_location_to_locs_dict(locations, True, **resp_dict)
+
+            one_loc_res = save_location(**resp_dict)
+            save_existed_location_to_locs_dict(locations, one_loc_res)
 
         except Exception, e:
             print e.message

@@ -2,7 +2,7 @@
 import json
 import urllib
 from crawler.locations_robot_corrector import LocationRobotsCorrector
-from crawler.locations_saver import save_location_to_locs_dict
+from crawler.locations_saver import save_location_to_locs_dict, save_existed_location_to_locs_dict
 from crawler.tasks.locrobots_logging import fill_log_table_for_not_schema_corresponded_robots
 from crawler.tasks.test_robots_ban import MultiLocationRobotsBunCheck
 
@@ -40,8 +40,8 @@ class AyyoRobot(object):
             film_response = simple_tor_get_page(film_url)
             price = float(json.loads(film_response)['movies']['data'][str(ayyo_film_id)]['streaming_price'])
             d = self.film_dict(self.film, film_link, price)
-            save_location(**d)
-            save_location_to_locs_dict(locations, True, **d)
+            one_loc_res = save_location(**d)
+            save_existed_location_to_locs_dict(locations, one_loc_res)
         except Exception, e:
             pass
         fill_log_table_for_not_schema_corresponded_robots(locations)

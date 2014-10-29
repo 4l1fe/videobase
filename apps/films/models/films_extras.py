@@ -63,7 +63,7 @@ class FilmExtras(PhotoClass):
         if not isinstance(ids, list):
             ids = [ids]
 
-        return cls.objects.filter(film__in=ids, type=APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER)
+        return cls.objects.filter(film__in=ids, type=APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER).order_by('-id')
 
 
     @classmethod
