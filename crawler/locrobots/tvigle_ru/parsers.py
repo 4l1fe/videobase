@@ -17,6 +17,10 @@ class ParseTvigleFilm(object):
         cls.list_url = []
         film_link = ''
         film_name = film_name.lower().strip().encode('utf-8').translate(None, string.punctuation)
+        season_url = {
+            'season': '',
+            'url': ''
+        }
         try:
             soup = BeautifulSoup(response)
             if serial:
@@ -28,12 +32,17 @@ class ParseTvigleFilm(object):
                         serial_url = cls.url_film + link
                         response = load_function(serial_url)
                         soup = BeautifulSoup(response)
-                        tag_season = soup.find('div', {'class': 'category-filter-menu left'}).findAll('li')
+
+                        try:
+                            tag_season = soup.find('div', {'class': 'category-filter-menu left'}).findAll('li')
+                        except Exception:
+                            season_url['url'] = serial_url
+                            season_url['season'] = 1
+                            cls.list_url.append(season_url)
+                            cls.seasons.append(1)
+                            return serial_url
+
                         for tag_li in tag_season:
-                            season_url = {
-                                'season': '',
-                                'url': ''
-                            }
                             link = tag_li.a.get('href')
                             season_url['url'] = cls.url_film + link
                             season_url['season'] = int(tag_li.a.text.split()[1])
