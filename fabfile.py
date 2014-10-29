@@ -149,7 +149,7 @@ def update_env(install_node_pkg=False):
             })
 
             # Создаем конфиг для supervisor
-            # create_supervisor_config()
+            create_supervisor_config()
 
 
 def symlink():
