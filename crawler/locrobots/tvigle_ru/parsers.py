@@ -1,7 +1,9 @@
 # coding: utf-8
+import copy
 import string
 from bs4 import BeautifulSoup
 import re
+from apps.films.constants import APP_FILM_SERIAL
 
 
 class ParseTvigleFilm(object):
@@ -9,37 +11,43 @@ class ParseTvigleFilm(object):
         pass
 
     @classmethod
-    def parse_search(cls, response, film_name, serial):
+    def parse_search(cls, response, film_name, serial, load_function):
         cls.url_film = 'http://www.tvigle.ru'
         cls.seasons = [0, ]
-        s = u'Сезон'
+        cls.list_url = []
         film_link = ''
         film_name = film_name.lower().strip().encode('utf-8').translate(None, string.punctuation)
-        reg = re.compile('(?P<season>'+s+')[ ](?P<number>\d+)')
         try:
             soup = BeautifulSoup(response)
-            url_seasons = None
             if serial:
-                tag_seasons = soup.findAll('a', attrs={'class': 'search-content-title'})
-                for tag in tag_seasons:
-                    if film_name in tag.text.lower().strip().encode('utf-8').translate(None, string.punctuation):
-                        if len(cls.seasons) == 0:
-                            cls.seasons.append(1)
-                        url_seasons = tag.get('href')
-                        season_name = tag.text.lower().strip().encode('utf-8').translate(None, string.punctuation)
-                        if 'сезон' in season_name:
-                            search = reg.search(season_name)
-                            if int(search.group('number')) in cls.seasons:
-                                continue
-                            cls.seasons.append(int(search.group('number')))
+                cls.seasons = []
+                tag_a = soup.findAll('div', {'class':'category-filter-content left auto-upload'})[0].findAll('a')
+                for a in tag_a:
+                    if film_name in a.text.lower().strip().encode('utf-8').translate(None, string.punctuation):
+                        link = a.get('href')
+                        serial_url = cls.url_film + link
+                        response = load_function(serial_url)
+                        soup = BeautifulSoup(response)
+                        tag_season = soup.find('div', {'class': 'category-filter-menu left'}).findAll('li')
+                        for tag_li in tag_season:
+                            season_url = {
+                                'season': '',
+                                'url': ''
+                            }
+                            link = tag_li.a.get('href')
+                            season_url['url'] = cls.url_film + link
+                            season_url['season'] = int(tag_li.a.text.split()[1])
+                            cls.list_url.append(copy.deepcopy(season_url))
+                            cls.seasons.append(int(season_url['season']))
+                        return cls.url_film + link
 
-                film_link = cls.url_film + url_seasons
-            if url_seasons is None:
+            else:
                 tag_a = soup.findAll('a', attrs={'class': 'search-content-title'})
                 for tag in tag_a:
                     if film_name == tag.text.lower().strip().encode('utf-8').translate(None, string.punctuation):
                         link = tag.get('href')
                         film_link = cls.url_film + link
+                        cls.list_url.append(film_link)
                         return film_link
         except:
             film_link = ''
@@ -47,22 +55,34 @@ class ParseTvigleFilm(object):
 
     def parse(self, response, dict_gen, film, url):
         resp_list = []
-        link = url
+        links = self.get_link()
+
         price = self.get_price()
         seasons = self.get_seasons()
+        seasons.sort()
+
         try:
             value = url.split('video=')[1]
         except:
             value = ''
-        if seasons:
-            for season in seasons:
+
+        if film.type == APP_FILM_SERIAL:
+            for season in self.list_url:
                 resp_dict = dict_gen(film)
                 resp_dict['type'] = 'tvigle'
-                resp_dict['number'] = season
+                resp_dict['number'] = season['season']
                 resp_dict['value'] = value
-                resp_dict['url_view'] = link
+                resp_dict['url_view'] = season['url']
                 resp_dict['price'] = price
                 resp_list.append(resp_dict)
+        else:
+            resp_dict = dict_gen(film)
+            resp_dict['type'] = 'tvigle'
+            resp_dict['number'] = 0
+            resp_dict['value'] = value
+            resp_dict['url_view'] = links[0]
+            resp_dict['price'] = price
+            resp_list.append(resp_dict)
 
         return resp_list
 
@@ -74,7 +94,7 @@ class ParseTvigleFilm(object):
         return cls.seasons
 
     def get_link(self):
-        pass
+        return self.list_url
 
 
 
