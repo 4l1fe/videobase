@@ -1,10 +1,9 @@
 doctype html
 html
     - is_main = true
-    - filter_cast_type = {0: "Тип", 1: "этого года", 3: "самые свежие", 8: "свежие", 15: "новые", 20: "не старые"}
-    - filter_cast_topic = [["|", "Тематика трансляции"], ["|1", "в наличии"], ["0|1", "бесплатно"], ["50|1", "до 50 рублей"], ["100|1", "до 100 рублей"], ["200|1", "до 200 рублей"]]
-    - filter_cast_quality = [[0, "Качество"], [5, "включая плохие"], [6, "неплохие"], [6.5, "хорошие"], [7, "отличные"], [8, "самые лучшие"]]
-    - filter_cast_price = {"rating": "Стоимость", "subscribes": "по подписчикам", "popular": "по популярности"}
+    - filter_cast_status = {0: "все трансляции", "online": "онлайн", "future": "не начавшиеся", "passed": "архив"}
+    - filter_cast_quality = [["", "любое качество"], ["sd", "обычное качество"], ["hd", "HD качество"]]
+    - filter_cast_price = {0: "бесплатно", 50: "до 50 рублей", 100: "до 100 рублей", 200: "до 200 рублей"}
     include config
     include mixins
     include head
@@ -20,51 +19,58 @@ html
                                 .row
                                     .col-md-12
                                         ul.sort-list
-                                            li#filter_cast_type
+                                            li#filter_cast_status
                                                 a.sprite.sprite-i-toggle-bottom(href='#', data-toggle='dropdown', title='')
-                                                    span Тип
+                                                    span=filter_cast_status[0]
                                                 ul.dropdown-menu
-                                                    each item, i in filter_cast_type
+                                                    each item, i in filter_cast_status
                                                         li
-                                                            - url_tmp = "?year_old=" + i
+                                                            - url_tmp = "?status=" + i
                                                             a(href=url_tmp, title='',data-mi-id=i)=item
-                                            li#filter_cast_topic
-                                                - url_tmp = '?price=' + filter_cast_topic[0][0]
-                                                a.sprite.sprite-i-toggle-bottom(href=url_tmp, data-toggle='dropdown', title='')
-                                                    span Тематика трансляции
-                                                ul.dropdown-menu
-                                                    each item in filter_cast_topic
-                                                        li
-                                                            - url_tmp = "?price=" + item[0]
-                                                            a(href=url_tmp, title='',data-mi-id=item[0])=item[1]
-                                            li#filter_cast_quality
-                                                a.sprite.sprite-i-toggle-bottom(href='#', data-toggle='dropdown', title='')
-                                                    span Качество
+                                            li#filter_cast_tag
+                                                a.sprite.sprite-i-toggle-bottom(href="#", data-toggle='dropdown', title='')
+                                                    span любая тематика
                                                 ul.dropdown-menu
                                                     li
-                                                        a(href='?genres=0', title='',data-mi-id=0) все жанры
-                                                    if filter_genres
-                                                        each item in filter_cast_quality
-                                                            li
-                                                                - url_tmp = "?genres=" + i
-                                                                a(href=url_tmp, title='',data-mi-id=item.id)=item.name
+                                                        a(href="?tag=", title='',data-mi-id="") любая тематика
+                                                    each item in casts_tags
+                                                        li
+                                                            - url_tmp = "?tag=" + item.id
+                                                            a(href=url_tmp, title='',data-mi-id=item.id)=item.name
+                                            li#filter_cast_quality
+                                                a.sprite.sprite-i-toggle-bottom(href='?quality=', data-toggle='dropdown', title='')
+                                                    span=filter_cast_quality[0][1]
+                                                ul.dropdown-menu
+                                                    each item in filter_cast_quality
+                                                        li
+                                                            - url_tmp = "?quality=" + item[0]
+                                                            a(href=url_tmp, title='',data-mi-id=item[0])=item[1]
+                                                            e
                                             li#filter_cast_price
                                                 a.sprite.sprite-i-toggle-bottom(href='#', data-toggle='dropdown', title='')
-                                                    span Стоимость
+                                                    span=filter_cast_price[0]
                                                 ul.dropdown-menu
-                                                    each item in filter_cast_price
+                                                    each item, i in filter_cast_price
                                                         li
-                                                            - url_tmp = "?rating=" + item[0]
-                                                            a(href=url_tmp, title='',data-mi-id=item[0])=item[1]
+                                                            - url_tmp = "?price_high=" + i
+                                                            a(href=url_tmp, title='',data-mi-id=i)=item
                             img.img-responsive(src=img_url + 'shd-big.png', alt='')
                             //-
                                .filter-content
 
                         //-
                         //   .filter-block
-                        mixin casts_list(casts)
-
-
+                        if casts && casts.length
+                            .list-cast
+                                .container
+                                    .row#casts
+                                        each item in casts
+                                            mixin cast_thumb(item)
+                                    .add-filter#casts_more
+                                        .add-content.style-panel-action.rel.zmin
+                                            - href = "/?page=" + (page?(page + 1):2)
+                                            a(href=href) покажите еще трансляций
+                                        img.img-responsive(src=img_url + 'shd-big.png', alt='')
             include footer
         script(src=js_url + 'responsiveCarousel.min.js')
         script.

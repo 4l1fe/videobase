@@ -14,7 +14,6 @@ from apps.casts.models import Casts, UsersCasts
 from apps.casts.constants import APP_CASTS_START_NOTIFY
 
 
-
 ################################################################################
 class CastsSubscribeView(APIView):
     """
@@ -35,7 +34,7 @@ class CastsSubscribeView(APIView):
     def post(self, request, cast_id, *args, **kwargs):
         try:
             cast = Casts.objects.get(pk=cast_id)
-            user_cast = UsersCasts.objects.get_or_create(user__id=request.user.id, cast=cast)
+            user_cast, create = UsersCasts.objects.get_or_create(user=request.user, cast=cast)
 
             # Проверка, что еще не подписан
             if user_cast.subscribed is None:

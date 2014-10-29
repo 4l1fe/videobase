@@ -163,5 +163,9 @@ def save_location(film, **kwargs):
         prev_location.delete()
 
     print u"Saved location for film {}".format(film)
-    save_location_to_locs_dict(locations_d, True, film, kwargs['type'], location.id)
+    if prev_location:
+        is_new = False
+    else:
+        is_new = True
+    save_location_to_locs_dict(locations_d, True, film, kwargs['type'], location.id, is_new)
     return  locations_d
