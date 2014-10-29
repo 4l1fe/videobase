@@ -214,7 +214,7 @@ def migrate(app_name=''):
         })
 
 
-def supervisor_config():
+def create_supervisor_config():
     """
     Генерируем конфиг для supervisor
     """
@@ -257,116 +257,13 @@ def deploy_version(version):
 
 
 def rollback():
+    """
+    Откат релиза до предыдушего
+    """
+
+    require('hosts', provided_by=[localhost_env, production_env])
+
+    if not 'current_release' in env:
+        releases()
+
     pass
-
-
-
-
-
-
-
-
-
-# def init_db():
-#     """
-#     Создает базу данных и пользователя для основного сайта
-#     """
-#
-#     with settings(sudo_user="postgres"):
-#         sudo("""echo "CREATE USER pgadmin WITH PASSWORD 'qwerty'; CREATE DATABASE videobase; GRANT ALL PRIVILEGES ON DATABASE videobase to pgadmin;" | psql""")
-#
-#
-# def populate_test_db():
-#     """
-#     Заполняет тестовую базу данных из sql_dump который идет с кодом
-#     """
-#
-#     with cd('/var/www/videobase_test/sql_dump'):
-#         with settings(sudo_user="postgres"):
-#             sudo("""psql -d videobase_test -f $(ls -1 *.sql | head -1)""")
-#
-#
-# def local_db_reset():
-#     """
-#     Перезаписать локальную базу из репозитория
-#     """
-#
-#     local("""echo "DROP DATABASE videobase;" | sudo -u postgres psql""")
-#     local("""echo "CREATE USER pgadmin WITH PASSWORD 'qwerty'; CREATE DATABASE videobase; GRANT ALL PRIVILEGES ON DATABASE videobase to pgadmin;" | sudo -u postgres psql""")
-#     local("""cd sql_dump && sudo -u postgres psql -d videobase -f $(ls -1 *.sql | head -1)""")
-#     local("""echo "DROP DATABASE test_base;" | sudo -u postgres psql """)
-#     local("""echo "CREATE DATABASE test_base; ALTER DATABASE test_base OWNER TO pgadmin;" | sudo -u postgres psql""")
-#
-#
-# def deploy_test_code():
-#     """
-#     Обновляет или создает код для тестового сайта
-#     ВНИМАНИЕ Скрипт редактирует db.ini для того чтобы ссылаться на тестовую базу данных
-#     """
-#
-#     with settings(sudo_user="www-data"):
-#         with cd('/var/www'):
-#             result = str(sudo('ls -1')).strip()
-#             filtered_array = [s for s in result.split('\r\n') if s == 'test_base']
-#
-#             if len(filtered_array):
-#                 #sudo("cd videobase_test; git checkout configs/db.ini")
-#                 #sudo("cd videobase_test; cat configs/db.ini")
-#                 sudo('cd test_base;git pull')
-#                 #sudo("cd videobase_test/configs/ && sed -i 's/videobase/videobase_test/g' db.ini")
-#                 #sudo("cd videobase_test; cat configs/db.ini")
-#             else:
-#                 sudo('git clone git@git.aaysm.com:developers/videobase.git test_base')
-#                 sudo("cd test_base/configs/ && cp db.ini.example db.ini && sed -i 's/videobase/test_base/g' db.ini")
-#
-#
-# def delete_test_db():
-#     """
-#     Удалить тестовую базу данных
-#     """
-#
-#     with cd('/var/lib/postgresql'):
-#         fabtools.postgres.drop_database('videobase_test')
-#
-#
-# def refresh_test_requirements():
-#     with settings(sudo_user="www-data"):
-#         with cd('/var/www/videobase_test/'):
-#             sudo('/home/virtualenv/videobase_test/bin/pip install -r requirements.txt')
-#
-#
-# def collect_static():
-#     """
-#     build/update static files
-#     """
-#
-#     with settings(sudo_user="www-data"):
-#         with cd('/var/www/videobase_test/'):
-#             sudo('/home/virtualenv/videobase_test/bin/python manage.py collectstatic --dry-run --noinput')
-#
-#
-# def db_flush_test():
-#     """
-#     Перезаписать тестовую базу данных из дампа
-#     """
-#
-#     delete_test_db()
-#     init_test_db()
-#     populate_test_db()
-#
-#
-# def scheme():
-#     local('python ./manage.py graph_models -a -g -o current.png')
-#
-#
-# def show_scheme():
-#     scheme()
-#     local('feh current.png')
-#
-#
-# def set_local_robot_config():
-#     with open('configs/robots.conf', 'w') as fw:
-#         fw.write(generate_robots_conf())
-#
-#     local('sudo cp configs/robots.conf /etc/supervisor/conf.d/robots.conf')
-#     local('sudo service supervisor restart')
