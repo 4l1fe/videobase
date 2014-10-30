@@ -28,6 +28,7 @@ def localhost_env():
     env.releases_path = '%(path)s/releases' % env
     env.req_dir = 'deploy'
     env.services = ['supervisor', 'nginx']
+    env.configs = '/home/tumani1/configs'
 
     env.pip = '%(env)s/bin/pip' % env
     env.python = '%(env)s/bin/python' % env
@@ -117,6 +118,12 @@ def checkout(branch=None):
             env.git_branch = branch
 
         run("git clone -b %(git_branch)s %(git_clone)s %(current_release)s" % env)
+
+        with cd(env.current_release):
+            run("mv configs configs_from_repo")
+            run("ln -s %(configs)s" % {
+                'configs': env.configs
+            })
 
 
 def update_env(install_node_pkg=False):
