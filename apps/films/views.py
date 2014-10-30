@@ -22,7 +22,7 @@ from rest_framework import status
 import apps.films.models as film_model
 import apps.contents.models as content_model
 from apps.films.api.serializers import vbFilm, vbComment, vbPerson
-from apps.films.constants import APP_USERFILM_STATUS_PLAYLIST, APP_PERSON_ACTOR
+from apps.films.constants import APP_USERFILM_STATUS_PLAYLIST, APP_PERSON_ACTOR, APP_FILM_FULL_FILM
 from apps.films.api import SearchFilmsView
 from apps.contents.models import Comments, Contents
 from apps.films.forms import CommentForm
@@ -220,7 +220,7 @@ class CommentFilmView(View):
 
         try:
             o_content = Contents.objects.get(film=o_film.id)
-        except Exception, e:
+        except Contents.DoesNotExist, e:
             try:
                 o_content = Contents(
                     film=o_film, name=o_film.name, name_orig=o_film.name_orig,
@@ -231,6 +231,21 @@ class CommentFilmView(View):
             except Exception, e:
                 return HttpResponse(status=status.HTTP_404_NOT_FOUND)
 
+        except Contents.MultipleObjectsReturned, e:
+
+            if o_film.type == APP_FILM_FULL_FILM:
+                print "Found multiple contents for film id={}"
+                first_content = Contents.objects.filter(film=o_film).order_by("id")[0]
+
+                for comm in Comments.objects.filter(content__film=o_film).exclude(content__pk=first_content.id):
+                    print comm.content.id
+                    invalid_content = comm.content
+                    comm.content = first_content
+                    invalid_content.delete()
+                    comm.save()
+            else:
+                o_content = Contents.objects.filter(film=o_film.id).all()[0]
+            
         return o_content
 
     def post(self, request, film_id, format=None, *args, **kwargs):
