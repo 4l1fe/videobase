@@ -346,8 +346,7 @@ def test_view(request):
 
 def serialize_actors(actors_iterable):
 
-    return [{'id':pf.person.id, 'name':pf.person.name}
-            for pf in actors_iterable]
+    return [{'id': pf.person.id, 'name': pf.person.name, 'photo': pf.person.get_path_to_photo} for pf in actors_iterable]
 
 
 def calc_actors(o_film):
@@ -359,12 +358,12 @@ def calc_actors(o_film):
 
     result = []
     try:
-        enumerated_actors = film_model.PersonsFilms.objects.filter(film=o_film, p_type = APP_PERSON_ACTOR
+        enumerated_actors = film_model.PersonsFilms.objects.filter(film=o_film, p_type=APP_PERSON_ACTOR
         ).exclude(p_index=0).order_by('p_index')
 
-        unenumerated_actors = film_model.PersonsFilms.objects.filter(film=o_film, p_type = APP_PERSON_ACTOR).filter(p_index=0)
+        unenumerated_actors = film_model.PersonsFilms.objects.filter(film=o_film, p_type=APP_PERSON_ACTOR).filter(p_index=0)
         
-        result = (serialize_actors(enumerated_actors) + serialize_actors(unenumerated_actors)) [slice(filter['offset'], filter['limit'])]
+        result = (serialize_actors(enumerated_actors) + serialize_actors(unenumerated_actors))[slice(filter['offset'], filter['limit'])]
 
     except Exception, e:
         print "Caught exception {} in calc_actors".format(e)
