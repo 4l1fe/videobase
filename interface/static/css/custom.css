@@ -566,8 +566,25 @@ footer[role=contentinfo] {padding: 18px 0 0 0;}
 
 .actor {padding-top: 10px;padding-left: 3px;}
 .actor img {
-    min-width: 61px; max-height: 61px;vertical-align: middle;margin-right: 10px;
+    max-height: 60px;
+    min-height: 60px;
+    height: 60px;
+    vertical-align: middle;
+    margin: 0 auto;
 }
+
+.person-img-wrapper {
+    display: inline-block;
+    border-radius: 50%;
+    height: 60px;
+    width: 60px;
+    overflow: hidden;
+    text-align: center;
+    background: #d2d6dc;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+
 .actor a {
     color: #3168d1;font-size: 18px;
 }
