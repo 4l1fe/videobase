@@ -28,8 +28,7 @@ def localhost_env():
     env.releases_path = '%(path)s/releases' % env
     env.req_dir = 'deploy'
     env.services = ['supervisor', 'nginx']
-    env.configs = '/home/tumani1/configs'
-
+    env.configs = '/home/%(user)s/configs' % env
     env.pip = '%(env)s/bin/pip' % env
     env.python = '%(env)s/bin/python' % env
     env.shell = '/bin/bash -c'
@@ -46,7 +45,7 @@ def production_env():
     env.releases_path = '%(path)s/releases' % env
     env.req_dir = 'deploy'
     env.services = ['supervisor', 'nginx']
-
+    env.configs = '/home/%(user)s/configs' % env
     env.pip = '%(env)s/bin/pip' % env
     env.python = '%(env)s/bin/python' % env
     env.shell = '/bin/bash -c'
