@@ -186,7 +186,8 @@ mixin person_thumb(item)
         - person_url = '/persons/' + item.id + '/'
         .actor
             a(href=person_url, title='', data-mi-athref="id")
-                img.img-circle(src=item.photo || nophoto_url, alt='', data-mi-atsrc="photo", data-mi-default=nophoto_url)
+                span.person-img-wrapper
+                    img(src=item.photo || nophoto_url, alt='', data-mi-atsrc="photo", data-mi-default=nophoto_url)
                 span(data-mi-name="name")=item.name
 
 mixin user_thumb(item)
