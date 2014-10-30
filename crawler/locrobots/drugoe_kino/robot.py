@@ -47,11 +47,11 @@ def update_drugoe_kino_listing():
                 }
     for fdict in films_data():
         try:
-            film = Films.objects.get(name = fdict['Title_Rus'])
+            film = Films.objects.get(name = fdict['Title_Rus'], release_date__year=fdict['Year'])
         except Films.DoesNotExist:
             try:
                 if fdict['Title_Orig']:
-                    film = Films.objects.get(name_orig = fdict['Title_Orig'])
+                    film = Films.objects.get(name_orig = fdict['Title_Orig'], release_date__year=fdict['Year'])
                 else:
                     film = None
             except Films.DoesNotExist:

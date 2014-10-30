@@ -19,7 +19,7 @@ class ZABAVAR_RU_Loader(BaseLoader):
         url = "http://%s/%s" % (self.host, self.search_url, )
         url = url_with_querystring(url, **self.params)
         response = load_function(url)
-        film_url = parsers.parse_search(response, self.film.name)
+        film_url = parsers.parse_search(response, self.film.name, self.film.release_date)
         if film_url is None:
             raise NoSuchFilm(self.film)
         self.url_load = film_url
