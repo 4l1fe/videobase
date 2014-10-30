@@ -32,7 +32,7 @@ class Comments(models.Model):
         INNER JOIN users_films ON users_films.film_id = content.film_id AND comments.user_id = users_films.user_id
         LEFT JOIN films ON users_films.film_id = films.id
         LEFT JOIN auth_user ON comments.user_id = auth_user.id
-        LEFT JOIN users_profile ON comments.user_id = users_profile.userpic_id
+        LEFT JOIN users_profile ON comments.user_id = users_profile.user_id
 
         WHERE users_films.rating IS NOT NULL AND users_films.rating > 0 and NOT auth_user.first_name = ''
         ORDER BY comments.created DESC LIMIT %s;
