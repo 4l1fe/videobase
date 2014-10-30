@@ -471,26 +471,17 @@ class PersonsPhoto(View):
 class CommentedFilms(View):
 
     def get(self, *args, **kwargs):
+        import pdb;pdb.set_trace()
         cf_html = cache.get('cf_html')
         if cf_html:
             return HttpResponse(cf_html)
         else:
-            ids = (f.id for f in Films.get_commented_films(less=3))
-            less = Films.objects.filter(id__in=ids).order_by('-rating_sort').iterator()
+            cf_html = ''
             ids = (f.id for f in Films.get_commented_films(greater=2))
-            greater = Films.objects.filter(id__in=ids).order_by('-rating_sort').iterator()
+            films = Films.objects.exclude(id__in=ids).order_by('-rating_sort').iterator()
 
-            cf_html = u'Фильмы с коментариями меньше трёх:'
-            cf_html += u'<br><br>'
-            for f in less:
-                link = reverse('film_view', args=[f.id])
-                year = f.release_date.year if f.release_date else ''
-                cf_html += u'<a href="{}">{}</a>, {}<br>\n'.format(link, f.name, year)
-
-            cf_html += u'<br><br>'
-            cf_html += u'Фильмы с коментариями больше двух:'
-            cf_html += u'<br><br>'
-            for f in greater:
+            for i, f in enumerate(films):
+                if i > 1000: break
                 link = reverse('film_view', args=[f.id])
                 year = f.release_date.year if f.release_date else ''
                 cf_html += u'<a href="{}">{}</a>, {}<br>\n'.format(link, f.name, year)
