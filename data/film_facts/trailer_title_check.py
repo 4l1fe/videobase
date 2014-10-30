@@ -59,6 +59,6 @@ def is_correct_trailer_title(title, film):
     except ValueError, ex:
         #print ex.message
         import traceback
-        traceback.print_stack()
+        traceback.print_exc()
         return True
 
