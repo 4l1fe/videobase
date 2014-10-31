@@ -25,17 +25,19 @@ from django.shortcuts import render_to_response, redirect
 
 from rest_framework import status
 
+
 import apps.contents.models as content_model
+from apps.contents.models import Comments, Contents
 
 import apps.films.models as film_model
 from apps.films.api.serializers import vbFilm, vbComment, vbPerson
 from apps.films.constants import APP_USERFILM_STATUS_PLAYLIST, APP_PERSON_ACTOR, \
     APP_PERSON_DIRECTOR, APP_PERSON_SCRIPTWRITER, APP_FILM_FULL_FILM, APP_USERFILM_STATUS_NOT_WATCH
 from apps.films.api import SearchFilmsView
-from apps.contents.models import Comments, Contents
 from apps.films.forms import CommentForm
 from apps.films.models import Films
-from apps.users import Feed, SessionToken
+
+from apps.users.models import Feed, SessionToken
 from apps.users.constants import FILM_COMMENT
 
 from utils.common import reindex_by

@@ -12,8 +12,8 @@ from djorm_pgfulltext.fields import VectorField
 #############################################################################################################
 #
 class FilmManager(models.Manager):
-    def get_query_set(self):
-        return super(FilmManager, self).get_query_set().filter(type=APP_FILM_FULL_FILM)
+    def get_queryset(self):
+        return super(FilmManager, self).get_queryset().filter(type=APP_FILM_FULL_FILM)
 
 
 #############################################################################################################
