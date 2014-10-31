@@ -1,6 +1,8 @@
 # coding: utf-8
+
 import datetime
 from pytils import numeral
+
 from django.db import transaction
 from django.forms.models import model_to_dict
 from django.core.paginator import Paginator
@@ -20,7 +22,8 @@ from django.contrib.auth.models import User, AnonymousUser
 from social.apps.django_app.default.models import UserSocialAuth
 from rest_framework.authtoken.models import Token
 from videobase.settings import HOST
-from apps.users.models import Feed, SessionToken, UsersHash
+
+from apps.users.models import Feed, SessionToken, UsersHash, UsersPics
 from apps.users.tasks import send_template_mail
 from apps.users.api.serializers import vbUser, vbFeedElement, vbUserProfile
 from apps.users.forms import CustomRegisterForm, UsersProfileForm
@@ -28,12 +31,12 @@ from apps.users.api.utils import create_new_session
 from apps.users.constants import (APP_USERS_API_DEFAULT_PAGE, APP_USERS_API_DEFAULT_PER_PAGE,
                                   APP_SUBJECT_TO_RESTORE_PASSWORD, APP_USER_ACTIVE_KEY, APP_USER_HASH_EMAIL,
                                   APP_USER_HASH_REGISTR, APP_USER_HASH_PASSWD, APP_USER_PIC_TYPE_LOCAL)
+
 from apps.films.models import Films, Persons, UsersFilms, UsersPersons
 from apps.films.constants import APP_PERSON_DIRECTOR, APP_PERSON_ACTOR, APP_USERFILM_SUBS_TRUE
 from apps.films.api.serializers import vbFilm, vbPerson
 from utils.common import url_with_querystring
 from utils.noderender import render_page
-from apps.users import UsersPics
 
 
 class RegisterUserView(View):
