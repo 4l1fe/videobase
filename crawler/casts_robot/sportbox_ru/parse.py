@@ -26,7 +26,7 @@ def parse_translation():
                 soup = BeautifulSoup(content)
 
                 #Получаем код вставки плеера
-                share_link = soup.find('textarea', attrs={'class': 'share_link_content'}).next.prettify()
+                share_link = soup.find('textarea', attrs={'class': 'share_link_content'}).next
 
                 name_translation = soup.find('h1', attrs={'itemprop': 'name'}).text
 
@@ -41,8 +41,8 @@ def parse_translation():
                                               minute=int(minute)),
                     'price': 0,
                     'link': translation_url,
-                    'embed_code': share_link,
-                    'value': share_link
+                    'embed_code': share_link.prettify(),
+                    'value': share_link.get('src')
 
                 }
                 translations_list.append(translation_data)

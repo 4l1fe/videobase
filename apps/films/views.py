@@ -3,17 +3,16 @@ import re
 import os
 import json
 import warnings
-
 from cgi import escape
-
 from django.core.exceptions import ObjectDoesNotExist
-
 from datetime import date, timedelta
 from random import randrange
 from cStringIO import StringIO
 from PIL import Image, ImageEnhance
 
+
 from django.db import connection
+
 from django.core.files import File
 from django.core.cache import cache
 from django.core.context_processors import csrf
@@ -22,15 +21,19 @@ from django.template import Context
 from django.views.generic import View
 from django.http import HttpResponse, Http404, HttpResponseRedirect, HttpResponseBadRequest
 from django.shortcuts import render_to_response, redirect
-
+from django.core.urlresolvers import reverse
 from rest_framework import status
 
+
+import apps.films.models as film_model
 import apps.contents.models as content_model
 
 import apps.films.models as film_model
 from apps.films.api.serializers import vbFilm, vbComment, vbPerson
+
 from apps.films.constants import APP_USERFILM_STATUS_PLAYLIST, APP_PERSON_ACTOR, \
     APP_PERSON_DIRECTOR, APP_PERSON_SCRIPTWRITER, APP_FILM_FULL_FILM, APP_USERFILM_STATUS_NOT_WATCH
+
 from apps.films.api import SearchFilmsView
 from apps.contents.models import Comments, Contents
 from apps.films.forms import CommentForm
@@ -38,10 +41,10 @@ from apps.films.models import Films
 from apps.users import Feed, SessionToken
 from apps.users.constants import FILM_COMMENT
 
+from utils.noderender import render_page
 from utils.common import reindex_by
 from utils.noderender import render_page
 from utils.middlewares.local_thread import get_current_request
-
 
 
 def get_new_namestring(namestring):
@@ -229,7 +232,7 @@ class CommentFilmView(View):
 
         try:
             o_content = Contents.objects.get(film=o_film.id)
-        except Exception, e:
+        except Contents.DoesNotExist, e:
             try:
                 o_content = Contents(
                     film=o_film, name=o_film.name, name_orig=o_film.name_orig,
@@ -240,6 +243,21 @@ class CommentFilmView(View):
             except Exception, e:
                 return HttpResponse(status=status.HTTP_404_NOT_FOUND)
 
+        except Contents.MultipleObjectsReturned, e:
+
+            if o_film.type == APP_FILM_FULL_FILM:
+                print "Found multiple contents for film id={}"
+                first_content = Contents.objects.filter(film=o_film).order_by("id")[0]
+
+                for comm in Comments.objects.filter(content__film=o_film).exclude(content__pk=first_content.id):
+                    print comm.content.id
+                    invalid_content = comm.content
+                    comm.content = first_content
+                    invalid_content.delete()
+                    comm.save()
+            else:
+                o_content = Contents.objects.filter(film=o_film.id).all()[0]
+            
         return o_content
 
     def post(self, request, film_id, format=None, *args, **kwargs):
@@ -353,6 +371,12 @@ def test_view(request):
     return render_to_response('api_test.html', c)
 
 
+def serialize_actors(actors_iterable):
+
+    return [{'id': pf.person.id, 'name': pf.person.name, 'photo': pf.person.get_path_to_photo} for pf in actors_iterable]
+
+
+
 def calc_actors(o_film):
     def serialize_actors(actors_iterable):
         return [{'id': pf.person.id, 'name': pf.person.name} for pf in actors_iterable]
@@ -365,15 +389,12 @@ def calc_actors(o_film):
     }
 
     try:
-        enumerated_actors = film_model.PersonsFilms.objects.\
-            filter(film=o_film, p_type=APP_PERSON_ACTOR).\
-            exclude(p_index=0).\
-            order_by('p_index')
+        enumerated_actors = film_model.PersonsFilms.objects.filter(film=o_film, p_type=APP_PERSON_ACTOR
+        ).exclude(p_index=0).order_by('p_index')
 
-        unenumerated_actors = film_model.PersonsFilms.objects.\
-            filter(film=o_film, p_type=APP_PERSON_ACTOR, p_index=0)
-
-        result = (serialize_actors(enumerated_actors) + serialize_actors(unenumerated_actors)) [slice(filter['offset'], filter['limit'])]
+        unenumerated_actors = film_model.PersonsFilms.objects.filter(film=o_film, p_type=APP_PERSON_ACTOR).filter(p_index=0)
+        
+        result = (serialize_actors(enumerated_actors) + serialize_actors(unenumerated_actors))[slice(filter['offset'], filter['limit'])]
 
     except Exception, e:
         print "Caught exception {} in calc_actors".format(e)
@@ -577,3 +598,25 @@ class PersonsPhoto(View):
             return HttpResponseBadRequest()
 
         return HttpResponseRedirect('/static/upload/persons/{}/profile.jpg'.format(person_id))
+
+
+class CommentedFilms(View):
+
+    def get(self, *args, **kwargs):
+        import pdb;pdb.set_trace()
+        cf_html = cache.get('cf_html')
+        if cf_html:
+            return HttpResponse(cf_html)
+        else:
+            cf_html = ''
+            ids = (f.id for f in Films.get_commented_films(greater=2))
+            films = Films.objects.exclude(id__in=ids).order_by('-rating_sort').iterator()
+
+            for i, f in enumerate(films):
+                if i > 1000: break
+                link = reverse('film_view', args=[f.id])
+                year = f.release_date.year if f.release_date else ''
+                cf_html += u'<a href="{}">{}</a>, {}<br>\n'.format(link, f.name, year)
+
+            cache.set('cf_html', cf_html, 60 * 5)
+            return HttpResponse(cf_html)

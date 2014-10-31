@@ -4,7 +4,7 @@ from datetime import datetime
 import gdata.youtube
 import gdata.youtube.service
 
-from apps.films.models import Films, FilmExtras
+from apps.films.models import Films, FilmExtras, YoutubeTrailerCheck
 from apps.films.models import PersonsFilms
 from apps.films.models import Countries
 from data.checker import FactChecker
@@ -48,6 +48,7 @@ def youtube_trailer_corrector(film):
             if not is_trailer_contains_film_name(film, film_extra) or not is_trailer_exists(film_extra)\
                     or not is_trailer_match_key_words(film, film_extra) or not is_trailer_duration_ok(film_extra):
                 film_extra.delete()
+                YoutubeTrailerCheck.objects.get(film=film).delete()
             print u"Corrector deleted bad trailer successfully"
         except:
             print u"Can't delete trailer"
