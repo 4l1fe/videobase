@@ -28,7 +28,9 @@ def sane_dict(film=None):
             'subtitles': '',
             'url_source': '',
             'value': '',
-            'type': ''
+            'type': '',
+            'episode': '',
+            'content_type': ''
             }
 
 
