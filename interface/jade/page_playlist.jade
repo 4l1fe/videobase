@@ -128,7 +128,7 @@ html
                                     ul.person-data-playlist
                                         if film.countries
                                             li
-                                                span Страна
+                                                span.th Страна
                                                 - delim = false
                                                 div
                                                     each c in film.countries
@@ -136,7 +136,7 @@ html
                                                         - delim = true
                                         if film.directors && film.directors.length
                                             li
-                                                span Режиссер
+                                                span.th Режиссер
                                                 - delim = false
                                                 div
                                                     each c in film.directors
@@ -144,7 +144,7 @@ html
                                                         - delim = true
                                         if film.scriptwriters && film.scriptwriters.length
                                             li
-                                                span Сценарист
+                                                span.th Сценарист
                                                 - delim = false
                                                 div
                                                     each c in film.scriptwriters
@@ -152,19 +152,19 @@ html
                                                         - delim = true
                                         if film.genres && film.genres.length
                                             li
-                                                span Жанр
+                                                span.th Жанр
                                                 div
                                                     - delim = false
                                                     each c in film.genres
                                                         !=(delim?", ":"") + '<a href="/?genre=' + c.id + '">' + c.name + "</a>"
                                                         - delim = true
                                         li
-                                            span Дата выхода
+                                            span.th Дата выхода
                                             div
                                                 | #{date_text_str(film.releasedate)}
                                         if film.duration
                                             li
-                                                span Время
+                                                span.th Время
                                                 div
                                                     | #{duration_text(film.duration)}
                                     //-
