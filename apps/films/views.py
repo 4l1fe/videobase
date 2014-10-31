@@ -603,7 +603,6 @@ class PersonsPhoto(View):
 class CommentedFilms(View):
 
     def get(self, *args, **kwargs):
-        import pdb;pdb.set_trace()
         cf_html = cache.get('cf_html')
         if cf_html:
             return HttpResponse(cf_html)
