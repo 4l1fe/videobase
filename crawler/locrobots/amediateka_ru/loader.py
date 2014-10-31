@@ -41,10 +41,6 @@ class Amediateka_robot(object):
                         save_existed_location_to_locs_dict(locations, one_loc_res)
                     break
 
-        del locations['info'][2]
-        del locations['info'][3]
-        del locations['info'][4]
-
         fill_log_table_for_not_schema_corresponded_robots(locations)
         robot_is_banned = MultiLocationRobotsBunCheck.is_result_looks_like_robot_banned(locations)
         if not robot_is_banned:
