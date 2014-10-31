@@ -34,6 +34,7 @@ def create_structures_string(robot_name, location_ids):
 
 def write_one_log_to_table(robot_name, location_ids, film_id, is_new_added):
     RobotsInfoLogging.objects.create(robot_name=robot_name, locations=location_ids, films=film_id, is_new_location=is_new_added, log_time=datetime.date.today())
+    print "Logged ", location_ids
 
 
 def get_locations_list_from_locations_dict_list(locations_dict_list):
@@ -57,7 +58,7 @@ def fill_robots_locations_logs_to_table(locations_dict):
         #print create_structures_string(locations_dict['type'], get_fields_from_locations_dict_list(locations_dict['info']))
         write_all_logs_to_table(locations_dict['type'], get_fields_from_locations_dict_list(locations_dict['info']))
     except Exception, e:
-        pass
+        print "Failded logging because ", e.message
 
 
 def write_all_logs_to_table(robot_name, locs_inormation):
@@ -89,7 +90,7 @@ def clear_log_table():
 
 
 def clear_corrector_log_table():
-    LocationsCorrectorLogging.all().delete()
+    LocationsCorrectorLogging.objects.all().delete()
 
 
 def collect_logs(date=datetime.datetime.now().date()):
