@@ -338,6 +338,17 @@ section {padding:37px 0 6px 0;}
     font-size: 13px;color: #797373;font-family: Georgia;
 }
 
+.user-img-wrapper {
+    display: inline-block;
+    height: 60px;
+    width: 60px;
+    overflow: hidden;
+    background: #d2d6dc;
+}
+
+.user-img-wrapper img {
+    height: 61px;
+}
 
 .btns-slider {text-align: center;}
 .btns-slider a {
@@ -383,9 +394,6 @@ footer[role=contentinfo] {padding: 18px 0 0 0;}
     border-top:1px dashed #b0b0b0;margin-top: 2px;
     padding: 20px 0;
 }
-
-
-
 
 .form-enter, .more-enter {padding-top: 60px;}
 .form-enter {margin-bottom: -20px;}
