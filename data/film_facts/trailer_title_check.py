@@ -1,10 +1,13 @@
 # coding: utf-8
+import re
 from data.unicode_convertor import convert_to_unicode
 
 
 def is_correct_trailer_title(title, film):
     title = convert_to_unicode(title).lower()
     film_name = film.name.lower()
+    #print "title:", title
+    #print "film_name", film_name
     film_year = film.release_date.year
     try:
         trailers_ru_mask = [u'официальный русский трейлер фильма hd',u'русский трейлер фильма hd', u'русский трейлер HD',
@@ -16,13 +19,18 @@ def is_correct_trailer_title(title, film):
         check_block = False
         check_fname = False
         check_fyear = False
-        for phrase in trailers_ru_mask:
+        check_has_many_useless_words = False
+        ru_match = u''
+        en_match = u''
+        for index, phrase in enumerate(trailers_ru_mask):
             if title.find(phrase) != -1:
                 check_ru = True
+                ru_match = trailers_ru_mask[index]
 
-        for phrase in trailers_en_mask:
+        for index, phrase in enumerate(trailers_en_mask):
             if title.find(phrase) != -1:
                 check_en = True
+                en_match = trailers_en_mask[index]
 
         for phrase in trailers_block:
             if title.find(phrase) != -1:
@@ -33,11 +41,24 @@ def is_correct_trailer_title(title, film):
 
         if title.find(str(film_year)) != -1:
             check_fyear = True
-        if (check_ru or check_en) and check_fname and check_fyear and not check_block:
+
+        if trailers_ru_mask or trailers_en_mask and not check_block: #проверяем много ли лишних слов помимо шаблонных
+            cutted_title = title.replace(en_match, '').replace(ru_match, '').replace(film_name, '').replace(str(film_year), '')
+            cutted_title = re.sub(' +',' ',cutted_title)
+            #print cutted_title
+            #print len(cutted_title.split(' '))
+            if len(cutted_title.split(' ')) > 5:
+                check_has_many_useless_words = True
+            else:
+                check_has_many_useless_words = False
+        print "ru:", check_ru, "en:", check_en, "name:", check_fname, "year:", check_fyear, "block:", check_block, "useless_words:", check_has_many_useless_words
+        if (check_ru or check_en) and check_fname and check_fyear and not check_block and not check_has_many_useless_words:
             return True
         else:
             return False
     except ValueError, ex:
-        print "Trailer checking failed ", ex.message
+        #print ex.message
+        import traceback
+        traceback.print_exc()
         return True
 
