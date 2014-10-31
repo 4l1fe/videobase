@@ -446,7 +446,7 @@ def calc_similar(film_id, actors, directors, genres, **kwargs):
     # 4 фильма по рейтингу от актера
     if len(actors):
         sql = """
-        SELECT t1.film_id FROM films AS t0 JOIN first_3_actor AS t1 ON t0.id=t1.film_id
+        SELECT t1.film_id FROM films AS t0 JOIN first_3_actor_by_film AS t1 ON t0.id=t1.film_id
         WHERE t0.type='{}' AND t1.person_id IN ({}) AND NOT (t0.id IN ({}))
         ORDER BY t0.rating_sort DESC LIMIT 4;
         """.format(APP_FILM_FULL_FILM,
