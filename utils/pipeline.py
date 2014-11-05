@@ -1,5 +1,6 @@
 # coding: utf-8
 from apps.users.tasks import avatar_load
+from apps.users.models import User
 from videobase.settings import SOCIAL_AUTH_VK_PHOTO_FIELD
 
 GET_IMAGE_URLS = {
@@ -12,9 +13,11 @@ GET_IMAGE_URLS = {
 
 def get_email(details, user, response, *args, **kwargs):
     email = details.get('email') or response.get('email')
-    if user and user.email:
-        email = user.email
-    details.update({'email': email})
+    unique_email = User.objects.filter(email=email).exists()
+    if unique_email:
+        if user and user.email:
+            email = user.email
+        details.update({'email': email, 'username': email})
 
 
 def get_firstname(details, user=None, *args, **kwargs):
