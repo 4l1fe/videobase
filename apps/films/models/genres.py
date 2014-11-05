@@ -45,6 +45,32 @@ class Genres(NS_Node):
 
         return list_genres
 
+    @classmethod
+    def get_full_genres_by_films(cls, pk, order=False):
+        if not isinstance(pk, list):
+            pk = [pk]
+
+        list_ids = ','.join([str(i) for i in pk])
+
+        sql = """SELECT "t".* FROM ((SELECT "t".films_id, "b".* FROM (
+SELECT "films_genres"."films_id", "genres"."id", "genres"."lft", "genres"."rgt", "genres"."tree_id" FROM "genres"
+INNER JOIN "films_genres" ON ("genres"."id" = "films_genres"."genres_id")
+WHERE "films_genres"."films_id" = ANY('{%s}'::integer[])
+AND "genres"."hidden" = false AND "genres"."lft" != 1
+) AS "t" LEFT JOIN "genres" AS "b" ON "b"."tree_id" = "t"."tree_id" AND "b"."lft" = 1
+) UNION (
+SELECT "films_genres"."films_id", "genres".*
+FROM "genres" INNER JOIN "films_genres" ON ("genres"."id" = "films_genres"."genres_id")
+WHERE "films_genres"."films_id" = ANY('{%s}'::integer[]) AND "genres"."lft" = 1 AND "genres"."hidden" = false
+)) AS "t"
+""" % (list_ids, list_ids)
+
+        if order:
+            sql += ' ORDER BY "t"."films_id" ASC, "t"."tree_id" ASC'
+
+        return cls.objects.raw(sql)
+
+
     class Meta(object):
         # Имя таблицы в БД
         db_table = 'genres'
