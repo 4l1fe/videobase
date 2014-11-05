@@ -4,14 +4,14 @@ from videobase.settings import SOCIAL_AUTH_VK_PHOTO_FIELD
 
 GET_IMAGE_URLS = {
     'vk-oauth2': lambda response: response.get(SOCIAL_AUTH_VK_PHOTO_FIELD),
-    'facebook': lambda response: u'http://graph.facebook.com/{0}/picture?type=large'.format(response.get('id')),
+    'facebook': lambda response: u'http://graph.facebook.com/{0}/picture?type=large&height=500&width=500'.format(response.get('id')),
     'twitter': lambda response: response['profile_image_url'].replace('_normal', '_bigger') if 'profile_image_url' in response and 'default_profile' in response['profile_image_url'] else None,
     'google-oauth2': lambda response: response.get('image'),
 }
 
 
-def get_email(details, user, *args, **kwargs):
-    email = details.get('email')
+def get_email(details, user, response, *args, **kwargs):
+    email = details.get('email') or response.get('email')
     if user and user.email:
         email = user.email
     details.update({'email': email})

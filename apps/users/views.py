@@ -203,6 +203,21 @@ class UserView(View):
             return HttpResponseServerError(e)
 
 
+class UserAvatar(View):
+    def get(self, *args, **kwargs):
+        try:
+            user_id = self.kwargs['user_id']
+            user_pics = UsersPics.objects.filter(user_id=user_id).first()
+            pics_id = user_pics.id
+            if 'size' in self.kwargs:
+                size = self.kwargs['size']
+                return HttpResponseRedirect('/static/upload/users/user_pic/{}/users_pics_{}.jpg'.format(pics_id, size))
+        except KeyError:
+            return HttpResponseBadRequest()
+
+        return HttpResponseRedirect('/static/upload/users/user_pic/{}/users_pics.jpg'.format(pics_id))
+
+
 class ConfirmEmailView(View):
 
     def get(self, request, *args, **kwargs):

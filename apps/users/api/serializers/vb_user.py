@@ -59,19 +59,25 @@ class vbUser(serializers.ModelSerializer):
     def get_name(self, obj):
         return obj.profile.get_name()
 
-    def get_genre_fav(self, obj):
-        try:
-            genre = Genres.objects.filter(genres__uf_films_rel__user=obj).\
-                exclude(genres__uf_films_rel__status=APP_USERFILM_STATUS_NOT_WATCH).distinct().values("id", "name").\
-                annotate(count=Count("genres__id"))
-            genre = max(genre, key=lambda g: g['count'])
-        except Exception, e:
-            return {}
+    def get_genre_fav(self, obj):  # TODO: пока что алгоритма для любимого жанра нету, берём первый из любимых.
+        genre_list = self.genres_list(obj)
+        if genre_list:
+            return genre_list[0]
 
-        if 'id' in genre and 'name' in genre:
-            return {'id': genre['id'], 'name': genre['name']}
+        return []
 
-        return {}
+        # try:
+        #     genre = Genres.objects.filter(genres__uf_films_rel__user=obj).\
+        #         exclude(genres__uf_films_rel__status=APP_USERFILM_STATUS_NOT_WATCH).distinct().values("id", "name").\
+        #         annotate(count=Count("genres__id"))
+        #     genre = max(genre, key=lambda g: g['count'])
+        # except Exception, e:
+        #     return {}
+        #
+        # if 'id' in genre and 'name' in genre:
+        #     return {'id': genre['id'], 'name': genre['name']}
+        #
+        # return {}
 
     def path_to_avatar(self, obj):
         return UsersPics.get_picture(obj.profile)
@@ -83,7 +89,7 @@ class vbUser(serializers.ModelSerializer):
         return UsersRels.objects.filter(user=obj, rel_type=APP_USER_REL_TYPE_FRIENDS).count()
 
     def get_films_watched_cnt(self, obj):
-        return UsersFilms.objects.filter(user=obj).exclude(status=APP_USERFILM_STATUS_NOT_WATCH).count()
+        return UsersFilms.objects.filter(user=obj, rating__gt=0).count()
 
     def get_comments_cnt(self, obj):
         return obj.comments.all().count()

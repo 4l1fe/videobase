@@ -58,6 +58,31 @@ class Player
     @place.empty().height("auto")
     @current = undefined
 
+class PlayerCast
+  constructor: (@place, opts = {}) ->
+    @current = undefined
+
+  load: (loc, scroll = true, autoplay = true) ->
+    if @current != undefined
+      @clear()
+    if (loc.price_type != 0 && false)
+      value = "&price=" + loc.price + "&view=" + encodeURI(loc.url_view)
+    else
+      value = ""
+      if loc.value
+        value = "&value=" + encodeURIComponent(loc.value || "")
+      if loc.url_view
+        value+= "&view=" + encodeURIComponent(loc.url_view)
+    value+= "&autoplay=" + autoplay
+    @place.empty().html('<iframe src="' + window.mi_conf.player_cast_url + '?type=' + loc.type + value + '"></iframe>')
+    if (scroll)
+      scroll_to_obj @place
+
+  clear: ->
+    @place.addClass("player-empty")
+    @place.empty().height("auto")
+    @current = undefined
+
 # a basic Page class
 class Page
   constructor: () ->
@@ -254,7 +279,10 @@ class FilmThumb extends Item
 
   transform_val: (name, val) ->
     if name == "releasedate"
-      return val.substr(0, 4)
+      if val && typeof(val) == "string"
+        return val.substr(0, 4)
+      else
+        return ''
     else
       super
 
@@ -263,7 +291,7 @@ class FilmThumb extends Item
       vals.title_alt = vals.name
       if vals.name_orig && vals.name != vals.name_orig
         vals.title_alt+= " (" + vals.name_orig + ")"
-      if vals.releasedate
+      if vals.releasedate && typeof(val) == "string"
         vals.title_alt+= " " + vals.releasedate.substr(0,4)
 
     @elements["btn_price"].self.hide()
@@ -326,6 +354,12 @@ class FilmThumb extends Item
       callback: (new_state) =>
         # alert("done")
     }
+    if document.location.pathname.slice(0, 9) == "/playlist" && typeof(@_app.page().conf.film.id) == 'undefined'
+      setTimeout(
+        ()->
+          document.location.reload(true)
+        400
+      )
     false
 
   toggle_notwatch: (status) ->
@@ -422,6 +456,54 @@ class FeedThumb extends Item
         return time_text(new Date(val))
       catch
         return val
+    super
+
+class CastThumb extends Item
+  constructor: (opts = {}, callback) ->
+    @_name = "cast-thumb"
+    if opts.vals
+      @_type = opts.vals.type
+      @vals_orig = opts.vals
+      opts.vals.start_date = new Date(opts.vals.start)
+      opts.vals.min_vs_start = opts.vals.min_vs_start = Math.floor((new Date() - opts.vals.start_date) / 60 / 1000)
+      opts.vals.duration = opts.vals.duration || 180
+      opts.vals.is_online = opts.vals.min_vs_start >=0 && opts.vals.min_vs_start < opts.vals.duration
+
+    super opts, =>
+      if (!opts.place)
+        label_prim_str = ''
+        label_prim_cls = 'label-primary'
+        label_fright_str = ''
+        label_fright_cls = ''
+        if @vals.is_online
+          label_prim_str = "Онлайн"
+          label_prim_cls = 'label-success'
+          @elements["btn"].self.show().addClass("btn-free").html("Смотреть<br/>бесплатно")
+        else if @vals.min_vs_start < 0
+          if @vals.min_vs_start < -1440
+            label_prim_str = ''
+            if @vals.min_vs_start > -60
+              label_prim_str = "примерно "
+            label_prim_str+= 'через ' + duration_text( -@vals.min_vs_start )
+          else
+            label_prim_str = time_text(@vals.start_date)
+          @elements["btn"].self.show().addClass("btn-subscribe").text("Подписаться")
+        else
+          label_fright_str = time_text(@vals.start_date)
+          label_fright_cls = 'cast-archive-date'
+          label_prim_str = 'Архив'
+        @elements["label_prim"].self.removeClass("label-primary").addClass(label_prim_cls).text(label_prim_str)
+        @elements["label_fright"].self.addClass(label_fright_cls).text(label_fright_str)
+
+  transform_attr: (attr, name, val) ->
+    if attr == "href" && name == "id"
+      return "/casts/" + val + "/"
+    else
+      super
+
+  transform_val: (name,val) ->
+    if name == "pg_rating"
+      return val?" (" + val + ")":""
     super
 
 class Deck
@@ -525,6 +607,9 @@ class CommentsDeck extends Deck
           return
       $this.text(time_text($this._datetime))
 
+  onchange: ->
+    @time_update()
+
 class FeedDeck extends Deck
   constructor: (place, opts = {}) ->
     @element_name = "feed-thumb"
@@ -560,6 +645,35 @@ class FilmsDeck extends Deck
   constructor: (place, opts = {}) ->
     @element_name = "film-thumb"
     @item_class = FilmThumb
+    super
+    $(window).resize(=> @onchange())
+
+  onchange: (global = false) ->
+    body_width = $("body").width()
+    # items_inrow = Math.floor($("body").width() / 250)
+    if body_width > 991
+      items_inrow = 4
+    else if body_width > 767
+      items_inrow = 3
+    else
+      items_inrow = 2
+
+    if @current_items_inrow != items_inrow
+      global = true
+    @current_items_inrow = items_inrow
+    if global == true
+      $("hr", @_place).remove();
+
+    for i in [0...@items.length-1]
+      if ((i + 1) % items_inrow == 0)
+        el = @items[i].place()
+        if !el.next().is("hr")
+          $("<hr />").insertAfter(el)
+
+class CastsDeck extends Deck
+  constructor: (place, opts = {}) ->
+    @element_name = "cast-thumb"
+    @item_class = CastThumb
     super
     $(window).resize(=> @onchange())
 
@@ -639,6 +753,11 @@ class App
     @rest.persons.add("filmography", {isSingle: true})
     @rest.persons.add("action", {isSingle: true})
     @rest.persons.action.add("subscribe")
+    @rest.add("casts")
+    @rest.add("castschats")
+    @rest.castschats.add("msgs")
+    @rest.castschats.add("send")
+    @rest.casts.add("list")
 
     @_e =
       search:
@@ -872,7 +991,9 @@ class Page_Search extends Page
         if data.items
           deck.add_items(data.items)
           if data.items.length >= 12
-            deck.load_more_show()
+            deck.load_more_show(false)
+          else
+            deck.load_more_hide(false)
           deck.page = data.page
         opts.callback() if opts.callback
     )
@@ -987,17 +1108,15 @@ class Page_Main extends Page
 
     page = films_deck.page || 1
     _filter_params.page = page
-    query_string+= "&" if query_string
+    #query_string+= "&" if query_string
     more_btn_href = "/?" + query_string + "page=" + (page+1)
-    query_string+= "page=" + films_deck.page
+    #query_string+= "page=" + films_deck.page
 
     query_string = "?" + query_string if query_string
     if update_href
       if history && history.pushState
         history.pushState null, null, query_string
-
       $("a", $("#films_more")).attr("href", more_btn_href)
-
 
   load_more_films: (deck, opts = {}) ->
     deck.load_more_hide()
@@ -1132,11 +1251,12 @@ class Page_Film extends Page
 
   load_more_comments: ->
     comments_deck.load_more_hide()
-    @_app.rest.films.comments.read(@conf.id, {page: comments_deck.page + 1})
+    @_app.rest.films.comments.read(@conf.id, {page: (comments_deck.page || 1) + 1})
     .done(
       (data) ->
         if data && data.items
           comments_deck.add_items(data.items)
+          comments_deck.time_update()
           comments_deck.page = data.page
           if data.items.length >= 10
             comments_deck.load_more_show()
@@ -1442,6 +1562,262 @@ class Page_User extends Page
       (data) =>
         deck.load_more_hide(false)
     )
+
+class Page_CastsList extends Page
+  casts_deck = undefined
+  self = undefined
+  _filter_params = {}
+  _filter_counter = 0
+
+  constructor: () ->
+    self = @
+    super
+    casts_deck = new CastsDeck($("#casts"), {load_func: (deck) =>@load_more_casts(deck) })
+    casts_deck.page = 1
+    casts_deck.load_more_hide(false)
+    casts_deck.load_more_bind($("#casts_more"))
+
+    @_e.filter =
+      status: $("#filter_cast_status")
+      tag: $("#filter_cast_tag")
+      quality: $("#filter_cast_quality")
+      price_high: $("#filter_cast_price")
+
+    params = @_app.query_params()
+
+    $.each(@_e.filter, (index) ->
+      el = this
+      el._title = $(".sprite > span", el)
+      el._selected = undefined
+      el._options = []
+      $(".dropdown-menu a", el).each( ->
+        $this = $(this)
+        $this._val = $this.data("miId")
+        $this._text = $this.text()
+        el._options.push($this)
+        $this.click( ->
+          if el._selected != $this
+            el._selected = $this
+            el._title.text($this._text)
+            self.filter_changed()
+          el.removeClass("open")
+          return false
+        )
+        if params[index] && ($this._val == undefined || (params[index].toString() == $this._val.toString()))
+          el._selected = $this
+          el._title.text($this._text)
+      )
+      if el._selected == undefined
+        el._selected = el._options[0]
+        el._title.text(el._options[0]._text)
+    )
+    @update_filter_params(false)
+
+  filter_changed: () ->
+    _filter_counter++
+    current_filter_counter = _filter_counter
+    setTimeout(
+      =>
+        if _filter_counter == current_filter_counter
+          @update_filter_params()
+          opts =
+            clear_output: true
+            page_loading: false
+            params: _filter_params
+          @load_more_casts(casts_deck, opts)
+      @_app.config("filter_delay")
+    )
+
+  load_more_casts: (deck, opts = {}) ->
+    deck.load_more_hide()
+    params = $.extend(_filter_params, opts.params || {})
+    if opts.clear_output
+      deck.clear(true)
+      params.page = 1
+    else
+      params.page = opts.page || (deck.page + 1)
+    current_counter = deck.load_counter
+
+    self._app.rest.casts.read("list", params)
+    .done(
+      (data) =>
+        return if current_counter != deck.load_counter
+        if data.items
+          deck.add_items(data.items)
+          if data.items.length >= 12
+            deck.load_more_show()
+          else
+            deck.load_more_hide(false)
+          deck.page = data.page
+          if opts.clear_output
+            scroll_to_obj $("#filter_content")
+        else
+          deck.load_more_hide(false)
+        @update_filter_params()
+        opts.callback() if opts.callback
+    )
+    .fail(
+      (data) =>
+        deck.load_more_hide(false)
+    )
+
+  update_filter_params: (update_href = true) ->
+    query_string=""
+    for key, el of @_e.filter
+      val = el._selected._val
+      if val && val != "0"
+        _filter_params[key] = val
+        query_string+= "&" if query_string
+        query_string+= key + "=" + val
+      else
+        _filter_params[key] = null
+
+    page = casts_deck.page || 1
+    _filter_params.page = page
+    more_btn_href = "/?" + query_string + "page=" + (page+1)
+
+    query_string = "?" + query_string if query_string
+    if update_href
+      if history && history.pushState
+        history.pushState null, null, query_string
+      $("a", $("#casts_more")).attr("href", more_btn_href)
+
+class Page_Cast extends Page
+  constructor: (@conf) ->
+    super
+    @chat =
+      active: true
+      last_id: 0
+      guests: 0
+      counter: 0
+      attempts: [0,0,0]
+      timeout: [2, 5, 10]
+      attempts_pos: 0
+
+    @_e =
+      player:
+        wrapper: $("#player_wrapper")
+        frame: $("#player_frame")
+      chat:
+        wrapper: $("#chat_wrapper")
+        list: $("#chat_list")
+        input: $("#chat_input")
+        ico: $("#chat_ico")
+      time_counter: $("#time_counter")
+      guests_cnt: $("#guests_cnt")
+    @conf.start_date = new Date(@conf.start)
+    @conf.duration = @conf.duration || 180
+    @conf.min_vs_start = Math.floor((new Date() - @conf.start_date) / 60 / 1000)
+    @conf.is_online = @conf.min_vs_start >=0 && @conf.min_vs_start < @conf.duration
+    self = @
+    if @conf.is_online
+      @player = new PlayerCast(@_e.player.frame)
+      if @conf.locations && @conf.locations.length
+        @player.load(@conf.locations[0])
+      @_e.chat.ico.click(-> self.toggle_chat())
+      @_e.chat.input
+        .keypress((e) -> self.sendmsg_chat() if e.which == 13)
+        .focus( -> return false if false && !self.user_is_auth())
+      @update_chat()
+    else if @conf.min_vs_start < 0 && @_e.time_counter.length
+      @timer_tick()
+
+    casts_deck = new CastsDeck($("#casts"))
+
+  timer_tick: () ->
+    min_left = Math.floor((new Date() - @conf.start_date) / 60 / 1000)
+    console.log @conf.min_vs_start, min_left
+    console.log min_left >=0 || (@conf.min_vs_start < -40 && min_left >= -40)
+    if min_left >=0 || (@conf.min_vs_start < -40 && min_left >= -40)
+      location.reload()
+    else
+      @_e.time_counter.text(duration_text(-min_left))
+      func = => @timer_tick()
+      setTimeout func, 10000
+
+  sendmsg_chat: () ->
+    if @_app.user_is_auth()
+      text = @_e.chat.input.val()
+      if text.length < 2
+        return
+      @_e.chat.input.prop('disabled', true);
+      @_app.rest.castschats.send.create(@conf.id, {text: text})
+        .done(
+          =>
+            @update_chat()
+            @_e.chat.input.prop('disabled', false);
+        )
+        .fail(
+
+        )
+
+  update_chat: (limit) ->
+    if !@conf.is_online
+      return
+    @chat.counter++
+    local_counter = @chat.counter
+    limit = limit || 20
+    @_app.rest.castschats.msgs.read @conf.id, {id_low: @chat.last_id, limit: limit}
+      .done(
+        (data)=>
+          if local_counter == @chat.counter
+            if data && data.length
+              i = data.length - 1
+              while i >= 0
+                name = "пользователь"
+                if data[i].user
+                  name = data[i].user.name
+                text = data[i].text || "&nbsp;"
+                e = $('<div class="cast-chat-item"><div class="cast-chat-item-body"><span class="cast-chat-item-username">' + name + '</span>: <span class="cast-chat-item-msg">' + text + '</span></div></div>').appendTo(@_e.chat.list)
+                i--
+              @_e.chat.list.animate({ scrollTop: e.position().top}, "slow");
+              if data.length >= limit
+                @chat.attempts = [0,0,0]
+                @chat.attempts_pos = 0
+              else
+                if @chat.attempts_pos == 0
+                  @chat.attempts[0]++
+                  if @chat.attempts[0] > 10
+                    @chat.attempts_pos = 1
+                    @chat.attempts[0] = 0
+              @chat.last_id = data[data.length-1].id || @chat.last_id
+            else
+              if @chat.attempts_pos < 2
+                @chat.attempts[@chat.attempts_pos]++
+                if @chat.attempts[@chat.attempts_pos] > 10
+                  @chat.attempts[@chat.attempts_pos] = 0
+                  @chat.attempts_pos++
+            if !@chat.active
+              @chat.attempts_pos = 2
+              @chat.attempts = [0,0,0]
+            @update_chat_set(@chat.attempts_pos)
+      )
+      .fail(
+        =>
+          if local_counter == @chat.counter
+            @chat.attempts = [0,0,0]
+            @chat.attempts_pos = 0
+            @update_chat_set(2)
+      )
+
+  update_chat_set: (timeout_id) ->
+    func = => @update_chat()
+    setTimeout func, (@chat.timeout[timeout_id] || @chat.timeout[2])*1000
+
+
+  toggle_chat: (active) ->
+    active = !@chat.active if active == undefined
+    return if @chat.active == active
+    if active
+      @chat.active = true
+      @update_chat()
+      @_e.player.wrapper.addClass("col-md-8")
+      @_e.chat.wrapper.show()
+    else
+      @chat.active = false
+      @_e.chat.wrapper.hide()
+      @_e.player.wrapper.removeClass("col-md-8")
+    false
 
 window.InitApp =  (opts = {}, page_name) ->
   new App(opts, page_name)
