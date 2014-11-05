@@ -17,7 +17,9 @@ def get_email(details, user, response, *args, **kwargs):
     if unique_email:
         if user and user.email:
             email = user.email
-        details.update({'email': email, 'username': email})
+        details.update({'email': email})
+        if email:
+            details.update({'username': email})
 
 
 def get_firstname(details, user=None, *args, **kwargs):
