@@ -991,7 +991,9 @@ class Page_Search extends Page
         if data.items
           deck.add_items(data.items)
           if data.items.length >= 12
-            deck.load_more_show()
+            deck.load_more_show(false)
+          else
+            deck.load_more_hide(false)
           deck.page = data.page
         opts.callback() if opts.callback
     )
