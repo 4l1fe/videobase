@@ -19,27 +19,45 @@ function duration_text(min) {
     return res || "0 минут";
  }
 
-function time_text(dt) {
-    var date_now = new Date()
-    var diff, curday, curtime, ho, min;
-    curtime = dt.getTime();
-    diff = (date_now.getTime() - curtime) / 1000;
-    if (diff < 60) return "сейчас";
-    if (diff < 3600) {
-        min = Math.floor(diff / 60)
-        return min + cardinal(min, " минуту", " минуты", " минут") + " назад"
+function time_text(dt, date_now) {
+    var diff, curday, curtime, ho, text, min, input_day, now_day, at_time, tz_offset;
+    diff = (date_now.getTime() - dt.getTime()) / 1000;
+
+    if (Math.abs(diff) < 60) return "сейчас";
+    if (Math.abs(diff) < 3600) {
+        min = Math.floor( Math.abs(diff) / 60);
+        text = min + cardinal(min, " минуту", " минуты", " минут");
+        if (diff < 0) {
+            return "через " + text;
+        } else {
+            return text + " назад";
+        }
     }
-    curday = Math.floor(date_now.getTime() / 86400000) * 86400000;
-    if (curday < curtime) {
-        ho = Math.floor(diff / 3600);
-        if (ho <= 6) {
-            return ho + cardinal(ho, " час", " часа", " часов") + " назад";
-        } else return "сегодня";
+
+    ho = Math.floor( Math.abs(diff) / 3600);
+    if (ho <= 6) {
+        text = ho + cardinal(ho, " час", " часа", " часов");
+        if( diff < 0 ) {
+            return "через " + text;
+        } else {
+            return text + " назад";
+        }
     }
-    if ((curday - 86400000) < curtime) return "вчера";
+
+    tz_offset = date_now.getTimezoneOffset() * 60 * 1000;
+    input_day = Math.floor( (dt.getTime() - tz_offset)  / 86400000 );
+    now_day = Math.floor( (date_now.getTime() - tz_offset) / 86400000 );
+    at_time = dt.getHours() + ":" + ( dt.getMinutes() < 10 ? "0"  : "" ) + dt.getMinutes();
+
+    if ( now_day == input_day ) {
+        return "сегодня в " + at_time;
+    } else if ( now_day == input_day+1 )  {
+        return "вчера в " + at_time;
+    }
+
     if (dt.getFullYear() == date_now.getFullYear()) return dt.getDate() + " " + months[dt.getMonth()];
     return dt.getDate() + " " + months[dt.getMonth()] + " " + dt.getFullYear();
- }
+}
 // Add a Visibility option to jQuery objects
 
 jQuery.fn.background_image = function (url) {

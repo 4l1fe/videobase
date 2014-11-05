@@ -480,11 +480,11 @@ class CastThumb extends Item
           label_prim_cls = 'label-success'
           @elements["btn"].self.show().addClass("btn-free").html("Смотреть<br/>бесплатно")
         else if @vals.min_vs_start < 0
-          if @vals.min_vs_start < -1440
+          if @vals.min_vs_start > -1440
             label_prim_str = ''
             if @vals.min_vs_start > -60
               label_prim_str = "примерно "
-            label_prim_str+= 'через ' + duration_text( -@vals.min_vs_start )
+            label_prim_str += 'через ' + duration_text( -@vals.min_vs_start )
           else
             label_prim_str = time_text(@vals.start_date)
           @elements["btn"].self.show().addClass("btn-subscribe").text("Подписаться")

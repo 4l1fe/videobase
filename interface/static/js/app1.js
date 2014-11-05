@@ -773,7 +773,7 @@
               label_prim_cls = 'label-success';
               _this.elements["btn"].self.show().addClass("btn-free").html("Смотреть<br/>бесплатно");
             } else if (_this.vals.min_vs_start < 0) {
-              if (_this.vals.min_vs_start < -1440) {
+              if (_this.vals.min_vs_start > -1440) {
                 label_prim_str = '';
                 if (_this.vals.min_vs_start > -60) {
                   label_prim_str = "примерно ";
