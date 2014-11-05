@@ -1,7 +1,7 @@
-Django==1.6.3
+Django==1.7.1
 South==0.8.4
 argparse
-psycopg2==2.5.2
+psycopg2
 wsgiref==0.1.2
 microdata==0.4.1
 fabric
@@ -20,7 +20,7 @@ pyparsing==1.5.7
 pydot
 BeautifulSoup4
 html5lib
-djangorestframework==2.3.13
+djangorestframework
 requests
 requesocks
 factory_boy
