@@ -4,7 +4,7 @@ from crawler.locrobots.individual_tasks import process_individual_film_on_site
 
 class Command(NoArgsCommand):
     def handle_noargs(self, **options):
-        process_individual_film_on_site.run('zoomby_ru', 7597)
+        process_individual_film_on_site.run('zoomby_ru', 35421)
 
 
 
