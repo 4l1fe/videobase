@@ -14,12 +14,12 @@ GET_IMAGE_URLS = {
 def get_email(details, user, response, *args, **kwargs):
     email = details.get('email') or response.get('email')
     unique_email = User.objects.filter(email=email).exists()
-    if unique_email:
+    if not unique_email:
         if user and user.email:
             email = user.email
         details.update({'email': email})
-        if email:
-            details.update({'username': email})
+    else:
+        details.pop('email')
 
 
 def get_firstname(details, user=None, *args, **kwargs):

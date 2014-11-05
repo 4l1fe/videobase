@@ -309,6 +309,9 @@ class UserProfileView(View):
             profile.save()
 
             return HttpResponse(render_page('profile', {'user': vbUserProfile(profile).data}))
+        else:
+            error = form.errors.as_text().split("*")[-1]
+            return redirect(url_with_querystring('/profile/', e=error))
 
         return redirect('profile_view')
 

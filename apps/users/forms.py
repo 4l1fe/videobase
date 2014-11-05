@@ -17,7 +17,6 @@ class UsersProfileForm(forms.ModelForm):
     username = forms.CharField(required=True, max_length=30)
     avatar = forms.ImageField(required=False)
 
-
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('instance')
         kwargs['instance'] = self.user.profile
@@ -25,11 +24,18 @@ class UsersProfileForm(forms.ModelForm):
         super(UsersProfileForm, self).__init__(*args, **kwargs)
         self.fields['email'].initial = self.user.email
 
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if email:
+            exists = User.objects.filter(email=email).exists()
+            if exists:
+                raise forms.ValidationError(u'Ведёный email уже занят')
+
     @transaction.commit_manually
     def save(self, commit=True, send_email=False):
         try:
             email = self.cleaned_data['email']
-            email_flag = True if self.user.username != email or self.user.email != email else False
+            email_flag = self.user.username != email or self.user.email != email
 
             if email_flag:
                 # Save confirm email
