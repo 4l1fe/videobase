@@ -465,7 +465,11 @@
 
     FilmThumb.prototype.transform_val = function(name, val) {
       if (name === "releasedate") {
-        return val.substr(0, 4);
+        if (val && typeof val === "string") {
+          return val.substr(0, 4);
+        } else {
+          return '';
+        }
       } else {
         return FilmThumb.__super__.transform_val.apply(this, arguments);
       }
@@ -478,7 +482,7 @@
         if (vals.name_orig && vals.name !== vals.name_orig) {
           vals.title_alt += " (" + vals.name_orig + ")";
         }
-        if (vals.releasedate) {
+        if (vals.releasedate && typeof val === "string") {
           vals.title_alt += " " + vals.releasedate.substr(0, 4);
         }
       }
@@ -1577,7 +1581,9 @@
           if (data.items) {
             deck.add_items(data.items);
             if (data.items.length >= 12) {
-              deck.load_more_show();
+              deck.load_more_show(false);
+            } else {
+              deck.load_more_hide(false);
             }
             deck.page = data.page;
           }
