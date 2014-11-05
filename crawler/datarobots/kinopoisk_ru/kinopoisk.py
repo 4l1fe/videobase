@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 
 from django.utils.timezone import now, datetime
 
-from apps.films.constants import APP_FILM_FULL_FILM
+from apps.films.constants import APP_FILM_FULL_FILM, APP_FILM_DIRTY_WORDS
 from apps.films.models import Films, PersonsFilms, Persons, Genres, Countries
 
 from crawler.tor import simple_tor_get_page as simple_get
@@ -16,12 +16,11 @@ from utils.common import traceback_own
 
 LIMIT = 10
 KINOPOISK = 'www.kinopoisk.ru'
-dirty_words = (u'(ТВ)', u'(видео)')
 
 
 def get_link_from_html(html):
     soup = BeautifulSoup(html)
-    return soup.find('div', {'class': ['most_wanted']}).\
+    return soup.find('div', {'class': ['most_wanted']}). \
         find('div', {'class': 'info'}).find('a')['href']
 
 
@@ -128,7 +127,18 @@ def process_film_facts(film, facts):
     for data_entry in facts['Films']:
         film_array.extend(data_entry.items())
 
-    for key, value in dict(film_array).items():
+    film_dict = dict(film_array)
+
+    if ('world_release_date' or 'release_date') not in film_dict:
+        if film_dict.has_key('year'):
+            film_dict['release_date'] = film_dict.pop('year')
+        else:
+            print u'Film does not have a date!'
+    else:
+        if film_dict.has_key('year'):
+            del film_dict['year']
+
+    for key, value in film_dict.items():
         setattr(film, key, value)
 
     film.kinopoisk_lastupdate = now()
@@ -157,7 +167,7 @@ def parse_from_kinopoisk(kinopoisk_id, name=None, film=None):
             film = Films.objects.get(kinopoisk_id=kinopoisk_id)
         except Films.DoesNotExist:
 
-            for word in dirty_words:
+            for word in APP_FILM_DIRTY_WORDS:
                 if word in name:
                     name = name.replace(word, '').strip()
 

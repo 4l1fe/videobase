@@ -14,33 +14,25 @@ saved_pages_directory = 'saved_pages'
 
 
 def process_one_film(site, film_id, html_page_json):
-    locations = {
-        'info': [],
-        'type': site
-                }
+
     if not html_page_json:
-        return locations
+        return
     try:
         film = Films.objects.get(id=film_id)
     except Films.DoesNotExist:
         print "There is no film in db with such id"
-        return locations
+        return
     for data in sites_crawler[site]['parser'].parse(html_page_json['html'], sane_dict, film, url=html_page_json['url']): # здесь уже по готовому результату парсим
         data['film'] = film
         try:
             if data['url_view'] == '':
+                print "  "
                 LocationCorrectorForOneFilmRobots.corrrect_current_location_if_needed(data)
                 continue
             print u"Trying to put data from %s for %s to db" % (site, unicode(data['film']))
             save_location_from_robo_task.apply_async((data,))
-            status = True
-            save_location_to_locs_dict(locations, status, **data)
         except NoSuchFilm:
             print "page parsing failed"
-            status = False
-            save_location_to_locs_dict(locations, status, **data)
-            return locations
-    return locations
 
 
 

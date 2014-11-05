@@ -52,7 +52,6 @@ class CommentsFilmView(APIView):
         filter.update({'per_page': per_page, 'page': page})
         return filter
 
-
     def get(self, request, film_id, format=None, *args, **kwargs):
         content = self.__get_object(film_id)
         if type(content) == Response:
@@ -77,6 +76,11 @@ class CommentsFilmView(APIView):
             }
 
         except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({
+                'total_cnt': len(o_comments),
+                'ipp': 0,
+                'page': filter['page'],
+                'items': [],
+            }, status=status.HTTP_200_OK)
 
         return Response(result, status=status.HTTP_200_OK)

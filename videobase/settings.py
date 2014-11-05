@@ -193,13 +193,13 @@ AUTHENTICATION_BACKENDS = (
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
 LANGUAGE_CODE = 'ru-RU'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Moscow'
 
 USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+USE_TZ = False
 
 ###########################################################
 # Static files (CSS, JavaScript, Images)
@@ -287,6 +287,8 @@ SOCIAL_AUTH_PIPELINE = (
 API_SESSION_EXPIRATION_TIME = 15
 SESSION_EXPIRATION_TIME = timedelta(minutes=API_SESSION_EXPIRATION_TIME)
 
+HAPROXY_ADDRESS = '127.0.0.1:11800'
+
 ###########################################################
 CELERYBEAT_SCHEDULE = {
 
@@ -296,10 +298,9 @@ CELERYBEAT_SCHEDULE = {
     #    'schedule': timedelta(seconds=10),
     #},
 
-    # Updating ratings from IMDB DB via archive
-    'imdb_rating_update_command': {
-        'task': 'imdb_rating_update',
-        'schedule': timedelta(days=7),
+    'update_rating_command': {
+        'task': 'update_ratings',
+        'schedule': timedelta(days=3),
     },
     # Amediateka weekly run
     'amediateka_ru_update': {
@@ -404,8 +405,8 @@ CELERYBEAT_SCHEDULE = {
         'schedule': timedelta(days=1)
     },
     # Send robots statistic to email
-    'send_robots_statistic_to_email': {
-        'task': 'send_robots_statistic_to_email',
+    'send_robots_statistic_to_email_schedule': {
+        'task': 'send_robots_logs_to_email',
         'schedule': timedelta(days=1)
     },
     # News from now.ru
@@ -439,6 +440,10 @@ CELERYBEAT_SCHEDULE = {
         'task': 'cast_khl_robot',
         'schedule': timedelta(hours=24)
     },
+    'cast_ntv_plus_schedule': {
+        'task': 'cast_ntv_plus_robot',
+        'schedule': timedelta(hours=24)
+    },
     'itunes_update': {
         'task': 'itunes_robot_start',
         'schedule': timedelta(hours=24)
@@ -464,8 +469,6 @@ CELERYBEAT_SCHEDULE = {
     }
 }
 
-CELERY_TIMEZONE = 'UTC'
-CELERY_ACCEPT_CONTENT = ['pickle', 'json', 'msgpack', 'yaml']
 POSTER_URL_PREFIX = '_260x360'
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 

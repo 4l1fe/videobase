@@ -23,6 +23,7 @@ urlpatterns = patterns('',
     # Interface
     url('', include('apps.films.view_url')),
     url('', include('apps.users.view_url')),
+    url('', include('apps.casts.view_url')),
 
     # OAuth
     url(r'', include('social.apps.django_app.urls', namespace='social')),
@@ -42,9 +43,15 @@ urlpatterns = patterns('',
 
     # notice_feed_letter
     url(r'^mail/notice_feed_letter/', feed_view),
+
+    # url(r'^casts/index$', casts_list_view),
+    # url(r'^casts/', cast_view),
 )
 
 if settings.DEBUG:
     urlpatterns += patterns('',
         (r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT}),
     )
+
+
+

@@ -97,7 +97,7 @@ APP_FILMS_API_DEFAULT_PER_PAGE = 12
 
 #############################################################################################################
 APP_COMMENTS_API_DEFAULT_PAGE = 1
-APP_COMMENTS_API_DEFAULT_PER_PAGE = 10
+APP_COMMENTS_API_DEFAULT_PER_PAGE = 5
 
 #############################################################################################################
 APP_FILMS_EXTRAS_POSTER_HOST = 'http://vsevi.ru/static/'
@@ -105,3 +105,6 @@ APP_FILMS_EXTRAS_POSTER_HOST = 'http://vsevi.ru/static/'
 
 APP_FILMS_WEEK_SUB_EMAIL = u'Eженедельная рассылка ВсеВи'
 APP_FILMS_PERSON_SUB_EMAIL = u'Персональная рассылка ВсеВи'
+#############################################################################################################
+
+APP_FILM_DIRTY_WORDS = (u'(ТВ)', u'(видео)')

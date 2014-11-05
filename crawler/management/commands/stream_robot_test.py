@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
-from crawler.locrobots.tvzor_news import parse_tvzor_news
+from crawler.casts_robot.live_russia_tv.translation_live_russia_tv import parse_translation_live_russia_tv
 
 
 class Command(BaseCommand):
     def handle(self, *args, **kwargs):
-        parse_tvzor_news()
+        parse_translation_live_russia_tv()
