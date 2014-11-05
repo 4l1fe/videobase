@@ -419,3 +419,12 @@ def password_reset_done(request):
 
 def password_reset_confirm(request):
     return HttpResponse(render_page('confirm_passwd', {'confirm': True}))
+
+def feed_view(request):
+    feeds = vbFeedElement(calc_feed(request.user.id), many=True).data
+
+    data = {
+        'feeds': feeds,
+    }
+    return HttpResponse(render_page('notice_feed_letter', data))
+
