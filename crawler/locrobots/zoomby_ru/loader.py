@@ -24,4 +24,4 @@ class ZOOMBY_Loader(BaseLoader):
         if filmLink is None:
             raise NoSuchFilm(self.film)
         self.url_load = filmLink
-        return "http://%s%s" % (self.host, self.url_load)
+        return filmLink

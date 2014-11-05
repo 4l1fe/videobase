@@ -43,7 +43,7 @@ class ParseFilm(object):
 
                 for serial in data_dict['catalog']:
                     name = serial['title'].lower().strip().encode('utf-8').translate(None, string.punctuation)
-                    if film_name == name and year==int(serial['year']):
+                    if film_name == name and year == int(serial['year']):
                         cls.season_url = HOST + serial['url']
                         season_dict['season_url'] = cls.season_url
                         if ser:
