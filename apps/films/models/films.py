@@ -222,7 +222,9 @@ class Films(models.Model):
             - если rating_cons_cnt больше 15 000, но меньше 30 000, sort_cnt = 5 000 + (rating_cons_cnt - 15000) / 50 + 10 000 / 20
             - если rating_cons_cnt больше 5 000, но меньше 15 000, то sort_cnt = 5 000 + (rating_cons_cnt - 5000) / 20
             - если rating_cons меньше или равно 5 000, то sort_cnt = rating_cons_cnt
-            алгоритм изменен
+
+        алгоритм был слегка изменен
+
         """
 
         if rating_cons_cnt > 100000:
