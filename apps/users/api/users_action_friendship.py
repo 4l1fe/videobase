@@ -41,7 +41,7 @@ class UsersFriendshipView(APIView):
             feed, created = Feed.objects.get_or_create(user=request.user, type=USER_ASK, obj_id=user_friend.id)
             if not created: feed.save()
 
-        return Response(status=status.HTTP_200_OK)
+        return Response(DEFAULT_REST_API_RESPONSE, status=status.HTTP_200_OK)
 
     def delete(self, request, user_id, format=None, *args, **kwargs):
         try:
