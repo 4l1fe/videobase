@@ -15,10 +15,10 @@ def parse_translation_championat_com():
     champ_dict = {}
 
     # Get page
-    translation_page = simple_tor_get_page(TRANSLATION_URL+'/broadcast/')
-    soup = BeautifulSoup(translation_page)
+    list_translations_page = simple_tor_get_page(TRANSLATION_URL+'/broadcast/')
+    list_translations_soup = BeautifulSoup(list_translations_page)
 
-    championship_bloc = soup.find('div', {'class': 'broadcast__menu'})
+    championship_bloc = list_translations_soup.find('div', {'class': 'broadcast__menu'})
 
     #Create championship map
     for champ in championship_bloc.find_all('div', {'class': 'broadcast__menu__i'}):
@@ -29,7 +29,7 @@ def parse_translation_championat_com():
         except Exception, e:
             print e.message
 
-    translation_tables = soup.find_all('table', {'class': 'table broadcast__table'})
+    translation_tables = list_translations_soup.find_all('table', {'class': 'table broadcast__table'})
 
     for table in translation_tables:
         for trans in table.find_all('tr', {'class': 'broadcast__table__i'}):
@@ -62,6 +62,12 @@ def parse_translation_championat_com():
                 championship_img = trans.find('td', {'class': '_icon'}).div.get('class')
                 championship = champ_dict[championship_img[-1]]
 
+                #Get value from translation page
+                trans_page = simple_tor_get_page(link)
+                trans_soup = BeautifulSoup(trans_page)
+                value_div = trans_soup.find('div', {'class': 'broadcast'})
+                value = value_div.iframe.get('src')
+
                 #Create dict with information about translation
                 translation_data = {
                     'title': title,
@@ -70,7 +76,7 @@ def parse_translation_championat_com():
                     'price': float(price),
                     'link': link,
                     'meta': {'championship': championship if championship else None},
-                    'value': '',
+                    'value': value,
                 }
                 translation_list.append(translation_data)
             except Exception, e:
