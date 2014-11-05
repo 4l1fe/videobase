@@ -19,7 +19,6 @@ djcelery.setup_loader()
 AMQP_HOST = 'localhost'
 BROKER_HOST = 'localhost'
 BROKER_PORT = 5672
-###########################################################
 
 CELERY_TIMEZONE = 'UTC'
 CELERY_ACCEPT_CONTENT = ['pickle', 'json', 'msgpack', 'yaml']
@@ -470,8 +469,6 @@ CELERYBEAT_SCHEDULE = {
     }
 }
 
-CELERY_TIMEZONE = 'UTC'
-CELERY_ACCEPT_CONTENT = ['pickle', 'json', 'msgpack', 'yaml']
 POSTER_URL_PREFIX = '_260x360'
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 

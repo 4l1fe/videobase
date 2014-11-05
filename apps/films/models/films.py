@@ -223,7 +223,8 @@ class Films(models.Model):
             - если rating_cons_cnt больше 5 000, но меньше 15 000, то sort_cnt = 5 000 + (rating_cons_cnt - 5000) / 20
             - если rating_cons меньше или равно 5 000, то sort_cnt = rating_cons_cnt
 
-            алгоритм был слегка изменен
+        алгоритм был слегка изменен
+
         """
 
         if rating_cons_cnt > 100000:
@@ -266,6 +267,20 @@ class Films(models.Model):
         return cls.objects.raw(sql, params=['POSTER', 5.5, 5000, limit])
 
 
+    @classmethod
+    def get_commented_films(cls, greater=None, less=None):
+        sql = """SELECT films.id
+                 FROM films
+                 INNER JOIN content ON films.id = content.film_id
+                 INNER JOIN comments ON content.id = comments.content_id
+                 GROUP BY films.id
+                 HAVING CASE
+                        WHEN %s IS NOT NULL THEN count(films.id) > %s
+                        WHEN %s IS NOT NULL THEN count(films.id) < %s
+                        END"""
+        commented_films = cls.objects.raw(sql, (greater, greater, less, less))
+
+        return commented_films
 
     class Meta(object):
         # Имя таблицы в БД
