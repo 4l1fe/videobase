@@ -1252,11 +1252,12 @@ class Page_Film extends Page
     @_app.rest.films.comments.read(@conf.id, {page: (comments_deck.page || 1) + 1})
     .done(
       (data) ->
+        total_page_count = Math.ceil(data.total_cnt/data.ipp)
         if data && data.items
           comments_deck.add_items(data.items)
           comments_deck.time_update()
           comments_deck.page = data.page
-          if data.items.length >= 10
+          if data.page < total_page_count
             comments_deck.load_more_show()
           else
             comments_deck.load_more_hide(false)
