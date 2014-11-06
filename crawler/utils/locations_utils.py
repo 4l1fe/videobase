@@ -2,7 +2,7 @@ from apps.contents.models import Contents, Locations
 from apps.films.models import Seasons
 from apps.robots.constants import APP_ROBOT_VALUE
 from django.core.validators import URLValidator
-from apps.contents.constants import APP_CONTENTS_PRICE_TYPE_FREE
+from apps.contents.constants import APP_CONTENTS_PRICE_TYPE_FREE, APP_LOCATION_TYPE_ADDITIONAL_MATERIAL_SEASON
 from django.utils import timezone
 from crawler.locations_saver import save_location_to_locs_dict
 
@@ -61,6 +61,12 @@ def get_content(film, kwargs):
     else:
         description = None
 
+    if 'content_type' in kwargs:
+        content_type = kwargs['content_type']
+    else:
+        content_type = None
+
+
     if len(contents) == 0:
         #If there is no such content just creating one with meaningful defaults
 
@@ -76,7 +82,34 @@ def get_content(film, kwargs):
 
             return content
         else:
-            raise NameError(u"Variant with new series currently not in db is not implemented")
+            if content_type == APP_LOCATION_TYPE_ADDITIONAL_MATERIAL_SEASON:
+                season = Seasons(film=film, number=season_num)
+                season.save()
+                content = Contents(film=film, name=film.name, name_orig=film.name_orig,
+                               description=description,
+                               release_date=film.release_date,
+                               viewer_cnt=0,
+                               viewer_lastweek_cnt=0,
+                               viewer_lastmonth_cnt=0,
+                               season=season)
+                content.save()
+                return content
+            else:
+                content = Contents.objects.filter(film=film, season=season_num)
+                if len(content) == 0:
+                    season = Seasons(film=film, number=season_num)
+                    season.save()
+                    content = Contents(film=film, name=film.name, name_orig=film.name_orig,
+                                   description=description,
+                                   release_date=film.release_date,
+                                   viewer_cnt=0,
+                                   viewer_lastweek_cnt=0,
+                                   viewer_lastmonth_cnt=0,
+                                   season=season)
+                    content.save()
+                    return content
+                else:
+                    return Contents.objects.filter(film=film, season=season_num)
 
     else:
         print season_num
