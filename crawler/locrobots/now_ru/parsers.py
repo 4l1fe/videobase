@@ -1,6 +1,7 @@
 # coding: utf-8
 from crawler.core import BaseParse
 from apps.contents.constants import *
+from crawler.tor import simple_tor_get_page
 import re
 import string
 from bs4 import BeautifulSoup
@@ -53,16 +54,59 @@ def parse_search(response, film, year):
 
 # Парсер для страници фильма
 class ParseNowFilmPage(BaseParse):
-    def __init__(self, html):
-        super(ParseNowFilmPage, self).__init__(html)
+    def __init__(self, html, film):
+        super(ParseNowFilmPage, self).__init__(html, film)
         self.soup = BeautifulSoup(html, "html")
+        self.host = 'http://www.now.ru'
 
     def get_link(self, **kwargs):
-        link = self.soup.find(attrs={'property': 'og:url'}).get('content')
-        if link:
-            return link
+        # Проверка на тип
+        if self.film_type == u'SERIAL':
+            serial_list = []
+            seasons_tag_list = self.soup.find_all('div', {'class':'balloontab'})
+
+            # Собираем инфо о сезонах
+            for season in seasons_tag_list:
+                try:
+                    season_info = season.a
+                    season_url = self.host + season_info.get('href')
+                    season_num = int(re.search(ur'\d+', season_info.text).group())
+                    serial_list.append({'season': season_num, 'season_url': season_url})
+                except Exception, e:
+                    print e.message
+
+            # Если сезонов на странице нет, но есть серии, то сезон первый
+            if not seasons_tag_list and self.soup.find('div', {'class': 'short-scroll-content-item'}):
+                season_url = self.soup.find(attrs={'property': 'og:url'}).get('content')
+                season_num = 1
+                serial_list.append({'season': season_num, 'season_url': season_url})
+
+            # Собираем инфо о сериях по сезонам
+            for season in serial_list:
+                ep_info_list = []
+                season_page = simple_tor_get_page(season['season_url'])
+                season_soup = BeautifulSoup(season_page)
+                episode_list = season_soup.find_all('div', {'class': 'short-scroll-content-item'})
+                if episode_list:
+                    for episode in episode_list:
+                        try:
+                            episode_url = self.host + episode.a.get('href')
+                            episode_div = episode.find('div', text=re.compile(ur'\d+'))
+                            episode_num = int(re.search(ur'\d+', episode_div.text).group())
+                            ep_info_list.append({'number': episode_num, 'url': episode_url})
+                        except Exception, e:
+                            print e.message
+
+                season['episode_list'] = ep_info_list
+            return serial_list
+
+        # Если это просто фильм
         else:
-            return ''
+            link = self.soup.find(attrs={'property': 'og:url'}).get('content')
+            if link:
+                return link
+            else:
+                return ''
 
     def get_price(self, **kwargs):
         price = 0
