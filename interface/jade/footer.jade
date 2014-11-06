@@ -2,18 +2,18 @@ footer(role='contentinfo')
     .container
         .top-footer
             .row
-                .col-md-3.block-footer
+                .col-md-6.col-sm-6.col-xs-12.block-footer
                     a(href='/', title='')
                         img(src=img_url + 'logo-footer.png', alt='')
                     a(href='http://solarispromo.com', title='', rel="nofollow").solaris-logo
                         img(src=img_url + 'solaris-logo.png', alt='Solaris Promo Production')
-                .col-md-5.block-footer
-                    //-ul.menu-footer
+                //.col-md-5.block-footer
+                    ul.menu-footer
                         li
                             a(href='/legal', title='Правовая информация') Правовая информация
                         li
                             a(href='/about', title='О сервисе') О сервисе
-                .col-md-4.block-footer
+                .col-md-6.col-sm-6.col-xs-12.block-footer
                     ul.menu-soc
                         li
                             a(href='http://vk.com/vsevi', title='Страница ВсеВидео в Вконтакте', rel="nofollow", target="_new")
@@ -129,7 +129,5 @@ script(src=js_url + 'config.js')
 script(src=js_url + 'mi.helper.js')
 script(src=js_url + 'mi.rest.js')
 script(src=js_url + 'app1.js')
-script(src=js_url + 'jade_runtime.js')
-script(src=js_url + 'templates.js')
 if IN_PRODUCTION
     |<!-- Yandex.Metrika counter --><script type="text/javascript">(function (d, w, c) { (w[c] = w[c] || []).push(function() { try { w.yaCounter25453334 = new Ya.Metrika({id:25453334, trackLinks:true, accurateTrackBounce:true, trackHash:true}); } catch(e) { } }); var n = d.getElementsByTagName("script")[0], s = d.createElement("script"), f = function () { n.parentNode.insertBefore(s, n); }; s.type = "text/javascript"; s.async = true; s.src = (d.location.protocol == "https:" ? "https:" : "http:") + "//mc.yandex.ru/metrika/watch.js"; if (w.opera == "[object Opera]") { d.addEventListener("DOMContentLoaded", f, false); } else { f(); } })(document, window, "yandex_metrika_callbacks");</script><noscript><div><img src="//mc.yandex.ru/watch/25453334" style="position:absolute; left:-9999px;" alt="" /></div></noscript><!-- /Yandex.Metrika counter -->

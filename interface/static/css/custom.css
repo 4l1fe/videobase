@@ -338,6 +338,17 @@ section {padding:37px 0 6px 0;}
     font-size: 13px;color: #797373;font-family: Georgia;
 }
 
+.user-img-wrapper {
+    display: inline-block;
+    height: 60px;
+    width: 60px;
+    overflow: hidden;
+    background: #d2d6dc;
+}
+
+.user-img-wrapper img {
+    height: 61px;
+}
 
 .btns-slider {text-align: center;}
 .btns-slider a {
@@ -369,7 +380,7 @@ footer[role=contentinfo] {padding: 18px 0 0 0;}
     background: url(../img/brd1-right.png) left center no-repeat;
 }
 .menu-footer li:first-child {background: none;}
-.menu-soc {padding-top: 7px;padding-bottom: 15px;}
+.menu-soc {padding-bottom: 15px;}
 .menu-soc li {
     display: inline-block;padding: 0 3px;
     *display: inline;
@@ -383,9 +394,6 @@ footer[role=contentinfo] {padding: 18px 0 0 0;}
     border-top:1px dashed #b0b0b0;margin-top: 2px;
     padding: 20px 0;
 }
-
-
-
 
 .form-enter, .more-enter {padding-top: 60px;}
 .form-enter {margin-bottom: -20px;}
@@ -566,8 +574,25 @@ footer[role=contentinfo] {padding: 18px 0 0 0;}
 
 .actor {padding-top: 10px;padding-left: 3px;}
 .actor img {
-    min-width: 61px; max-height: 61px;vertical-align: middle;margin-right: 10px;
+    max-height: 60px;
+    min-height: 60px;
+    height: 60px;
+    vertical-align: middle;
+    margin: 0 auto;
 }
+
+.person-img-wrapper {
+    display: inline-block;
+    border-radius: 50%;
+    height: 60px;
+    width: 60px;
+    overflow: hidden;
+    text-align: center;
+    background: #d2d6dc;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+
 .actor a {
     color: #3168d1;font-size: 18px;
 }
@@ -1034,6 +1059,7 @@ a.toggle-playlist.active {
         padding-top: 21px;
     }
     #films_new .film-thumb:nth-child(3) {display: none}
+    .menu-soc {text-align: left; margin-top: 16px;}
 }
 
 
@@ -1169,7 +1195,7 @@ section.cast-details { padding-top: 10px; }
 .hide-watching-users .playlist-content {padding-bottom: 0}
 
 .cast-chat-header img {margin-right: 9px; }
-.cast-chat-header { margin-bottom: 15px; }
+.cast-chat-header { margin-bottom: 15px; cursor: pointer}
 .cast-chat-header h3 { font-size: 14px; padding-top: 8px; }
 
 .rpadding0 { padding-right: 0; }
@@ -1386,3 +1412,9 @@ section.cast-chat {padding-bottom: 40px;}
 
 .password-reset { padding-top: 0;  }
 .password-reset .container {padding-top: 37px}
+
+.cast-offline {text-align: center; padding-top:80px; min-height: 300px;}
+.cast-offline h4 {color: #848587; font-size: 24px}
+.cast-offline h4 span {color: #fff}
+.cast-offline .btn-def {margin: 35px auto 0 auto; cursor: pointer}
+.cast-item-def .btn-def {cursor: pointer}

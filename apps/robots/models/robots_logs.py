@@ -24,8 +24,10 @@ class RobotsLog(models.Model):
 
 class RobotsInfoLogging(models.Model):
     robot_name = models.CharField(max_length=255, verbose_name=u'Имя робота')
-    locations  = models.CharField(max_length=255, verbose_name=u'Локации')
-    log_time   = models.DateTimeField(auto_now_add=True, editable=False, verbose_name=u'Дата лога')
+    locations = models.CharField(max_length=255, verbose_name=u'Локации')
+    films = models.CharField(max_length=255, verbose_name=u'Фильмы ', null=True )
+    is_new_location = models.BooleanField(verbose_name=u'Новая локация', default=False)
+    log_time = models.DateTimeField(auto_now_add=True, editable=False, verbose_name=u'Дата лога')
 
     def __unicode__(self):
         return u'[{0}] {1}'.format(self.pk, self.name,)
@@ -34,5 +36,21 @@ class RobotsInfoLogging(models.Model):
         # Имя таблицы в БД
         db_table = 'robots_logging_info'
         app_label = 'robots'
-        verbose_name = u'Логирование информации о работе робота'
-        verbose_name_plural = u'Логирование информации о работе роботов'
+        verbose_name = u'meta Лог робота'
+        verbose_name_plural = u'meta Лог роботов'
+
+
+class LocationsCorrectorLogging(models.Model):
+    robot_name = models.CharField(max_length=255, verbose_name=u'Имя робота')
+    films = models.CharField(max_length=255, verbose_name=u'Фильм ', null=True )
+    log_time = models.DateTimeField(auto_now_add=True, editable=False, verbose_name=u'Дата лога')
+
+    def __unicode__(self):
+        return u'[{0}] {1}'.format(self.pk, self.name,)
+
+    class Meta:
+        # Имя таблицы в БД
+        db_table = 'locations_corrector_logging'
+        app_label = 'robots'
+        verbose_name = u'Лог корректора'
+        verbose_name_plural = u'Логи корректора'

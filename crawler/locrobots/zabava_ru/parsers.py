@@ -1,5 +1,6 @@
 # coding: utf-8
 import json
+from crawler.tor import simple_tor_get_page
 from apps.contents.constants import *
 from bs4 import BeautifulSoup
 from crawler.core import BaseParse
@@ -7,7 +8,7 @@ import re
 import string
 
 
-def parse_search(response, film_name):
+def parse_search(response, film_name, film_year):
     film_link = None
     try:
         flag = False
@@ -39,6 +40,24 @@ def parse_search(response, film_name):
                 return None
         else:
             return None
+        if film_link:
+            film_page = simple_tor_get_page(film_link)
+            film_soup = BeautifulSoup(film_page)
+            year_bloc = film_soup.find('div', {'class': 'mbottom10'})
+            reg = re.compile(ur'Год издания')
+            year_tag = None
+            for e in year_bloc.find_all('em'):
+                if reg.match(e.text):
+                    year_tag = e.parent
+                    break
+            if year_tag:
+                year = re.search(ur'\d+', year_tag.text)
+                year = int(year.group())
+                if film_year.year != year:
+                    film_link = None
+            else:
+                return None
+
     except:
         film_link = None
     return film_link
