@@ -1,412 +1,279 @@
 # -*- coding: utf-8 -*-
-from south.utils import datetime_utils as datetime
-from south.db import db
-from south.v2 import SchemaMigration
-from django.db import models
+from __future__ import unicode_literals
+
+from django.db import models, migrations
+import utils.common
+import djorm_pgfulltext.fields
+from django.conf import settings
 
 
-class Migration(SchemaMigration):
+class Migration(migrations.Migration):
 
-    def forwards(self, orm):
-        # Adding model 'Cities'
-        db.create_table('cities', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('country', self.gf('django.db.models.fields.related.ForeignKey')(related_name='cities', to=orm['films.Countries'])),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=255, db_index=True)),
-            ('name_orig', self.gf('django.db.models.fields.CharField')(max_length=255)),
-        ))
-        db.send_create_signal('films', ['Cities'])
+    dependencies = [
+        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+    ]
 
-        # Adding model 'Countries'
-        db.create_table('countries', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=255, db_index=True)),
-            ('name_orig', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('description', self.gf('django.db.models.fields.TextField')()),
-        ))
-        db.send_create_signal('films', ['Countries'])
-
-        # Adding model 'Genres'
-        db.create_table('genres', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('lft', self.gf('django.db.models.fields.PositiveIntegerField')(db_index=True)),
-            ('rgt', self.gf('django.db.models.fields.PositiveIntegerField')(db_index=True)),
-            ('tree_id', self.gf('django.db.models.fields.PositiveIntegerField')(db_index=True)),
-            ('depth', self.gf('django.db.models.fields.PositiveIntegerField')(db_index=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=255, db_index=True)),
-            ('description', self.gf('django.db.models.fields.TextField')()),
-            ('rating_sort', self.gf('django.db.models.fields.SmallIntegerField')(db_index=True, null=True, blank=True)),
-        ))
-        db.send_create_signal('films', ['Genres'])
-
-        # Adding model 'Seasons'
-        db.create_table('seasons', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('film', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['films.Films'])),
-            ('release_date', self.gf('django.db.models.fields.DateTimeField')()),
-            ('series_cnt', self.gf('django.db.models.fields.PositiveSmallIntegerField')()),
-            ('description', self.gf('django.db.models.fields.TextField')()),
-            ('number', self.gf('django.db.models.fields.PositiveSmallIntegerField')()),
-        ))
-        db.send_create_signal('films', ['Seasons'])
-
-        # Adding unique constraint on 'Seasons', fields ['film', 'number']
-        db.create_unique('seasons', ['film_id', 'number'])
-
-        # Adding model 'Films'
-        db.create_table('films', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=255, db_index=True)),
-            ('type', self.gf('django.db.models.fields.CharField')(max_length=255, db_index=True)),
-            ('release_date', self.gf('django.db.models.fields.DateField')(db_index=True, null=True, blank=True)),
-            ('duration', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
-            ('budget', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
-            ('description', self.gf('django.db.models.fields.TextField')(default='', blank=True)),
-            ('rating_local', self.gf('django.db.models.fields.FloatField')(default=0, null=True, blank=True)),
-            ('rating_local_cnt', self.gf('django.db.models.fields.IntegerField')(default=0, null=True, blank=True)),
-            ('imdb_id', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
-            ('rating_imdb', self.gf('django.db.models.fields.FloatField')(default=0, null=True, blank=True)),
-            ('rating_imdb_cnt', self.gf('django.db.models.fields.IntegerField')(default=0, null=True, blank=True)),
-            ('rating_cons', self.gf('django.db.models.fields.FloatField')(default=0, null=True, blank=True)),
-            ('rating_cons_cnt', self.gf('django.db.models.fields.IntegerField')(default=0, null=True, blank=True)),
-            ('rating_sort', self.gf('django.db.models.fields.IntegerField')(default=0, null=True, db_index=True, blank=True)),
-            ('kinopoisk_id', self.gf('django.db.models.fields.IntegerField')(unique=True, db_index=True)),
-            ('age_limit', self.gf('django.db.models.fields.PositiveSmallIntegerField')(db_index=True, null=True, blank=True)),
-            ('kinopoisk_lastupdate', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True)),
-            ('rating_kinopoisk', self.gf('django.db.models.fields.FloatField')(null=True, blank=True)),
-            ('rating_kinopoisk_cnt', self.gf('django.db.models.fields.PositiveSmallIntegerField')(null=True, blank=True)),
-            ('seasons_cnt', self.gf('django.db.models.fields.PositiveSmallIntegerField')(null=True, blank=True)),
-            ('name_orig', self.gf('django.db.models.fields.CharField')(default='', max_length=255, db_index=True, blank=True)),
-            ('search_index', self.gf('djorm_pgfulltext.fields.VectorField')(default='', null=True, db_index=True)),
-        ))
-        db.send_create_signal('films', ['Films'])
-
-        # Adding M2M table for field countries on 'Films'
-        m2m_table_name = db.shorten_name('films_countries')
-        db.create_table(m2m_table_name, (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('films', models.ForeignKey(orm['films.films'], null=False)),
-            ('countries', models.ForeignKey(orm['films.countries'], null=False))
-        ))
-        db.create_unique(m2m_table_name, ['films_id', 'countries_id'])
-
-        # Adding M2M table for field genres on 'Films'
-        m2m_table_name = db.shorten_name('films_genres')
-        db.create_table(m2m_table_name, (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('films', models.ForeignKey(orm['films.films'], null=False)),
-            ('genres', models.ForeignKey(orm['films.genres'], null=False))
-        ))
-        db.create_unique(m2m_table_name, ['films_id', 'genres_id'])
-
-        # Adding model 'FilmExtras'
-        db.create_table('films_extras', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('film', self.gf('django.db.models.fields.related.ForeignKey')(related_name='fe_film_rel', to=orm['films.Films'])),
-            ('type', self.gf('django.db.models.fields.CharField')(max_length=255, db_index=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('name_orig', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('description', self.gf('django.db.models.fields.TextField')()),
-            ('url', self.gf('django.db.models.fields.URLField')(max_length=255, null=True, blank=True)),
-            ('photo', self.gf('django.db.models.fields.files.ImageField')(max_length=100, null=True, blank=True)),
-        ))
-        db.send_create_signal('films', ['FilmExtras'])
-
-        # Adding model 'Persons'
-        db.create_table('persons', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('city', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='persons', null=True, to=orm['films.Cities'])),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=255, db_index=True)),
-            ('name_orig', self.gf('django.db.models.fields.CharField')(max_length=255, db_index=True)),
-            ('bio', self.gf('django.db.models.fields.TextField')()),
-            ('photo', self.gf('django.db.models.fields.files.ImageField')(max_length=100, null=True, blank=True)),
-            ('birthdate', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
-            ('kinopoisk_id', self.gf('django.db.models.fields.IntegerField')(unique=True)),
-        ))
-        db.send_create_signal('films', ['Persons'])
-
-        # Adding model 'PersonsExtras'
-        db.create_table('persons_extras', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('person', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['films.Persons'], max_length=255)),
-            ('etype', self.gf('django.db.models.fields.CharField')(max_length=255, db_index=True)),
-            ('name', self.gf('django.db.models.fields.TextField')()),
-            ('name_orig', self.gf('django.db.models.fields.TextField')()),
-            ('description', self.gf('django.db.models.fields.TextField')()),
-            ('url', self.gf('django.db.models.fields.CharField')(max_length=255)),
-        ))
-        db.send_create_signal('films', ['PersonsExtras'])
-
-        # Adding model 'PersonsFilms'
-        db.create_table('persons_films', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('film', self.gf('django.db.models.fields.related.ForeignKey')(related_name='pf_films_rel', to=orm['films.Films'])),
-            ('person', self.gf('django.db.models.fields.related.ForeignKey')(related_name='pf_persons_rel', to=orm['films.Persons'])),
-            ('p_type', self.gf('django.db.models.fields.CharField')(max_length=255, db_index=True)),
-            ('p_character', self.gf('django.db.models.fields.CharField')(default='', max_length=255)),
-            ('description', self.gf('django.db.models.fields.CharField')(default='', max_length=255)),
-        ))
-        db.send_create_signal('films', ['PersonsFilms'])
-
-        # Adding unique constraint on 'PersonsFilms', fields ['film', 'person', 'p_type']
-        db.create_unique('persons_films', ['film_id', 'person_id', 'p_type'])
-
-        # Adding model 'UsersFilms'
-        db.create_table('users_films', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(related_name='uf_users_rel', to=orm['auth.User'])),
-            ('film', self.gf('django.db.models.fields.related.ForeignKey')(related_name='uf_films_rel', to=orm['films.Films'])),
-            ('status', self.gf('django.db.models.fields.PositiveSmallIntegerField')(default=0, null=True, db_index=True, blank=True)),
-            ('rating', self.gf('django.db.models.fields.PositiveSmallIntegerField')(db_index=True, null=True, blank=True)),
-            ('subscribed', self.gf('django.db.models.fields.PositiveSmallIntegerField')(default=0, null=True, blank=True)),
-            ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-        ))
-        db.send_create_signal('films', ['UsersFilms'])
-
-        # Adding unique constraint on 'UsersFilms', fields ['user', 'film']
-        db.create_unique('users_films', ['user_id', 'film_id'])
-
-        # Adding model 'UsersPersons'
-        db.create_table('users_persons', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(related_name='up_users_rel', max_length=255, to=orm['auth.User'])),
-            ('person', self.gf('django.db.models.fields.related.ForeignKey')(related_name='up_persons_rel', max_length=255, to=orm['films.Persons'])),
-            ('upstatus', self.gf('django.db.models.fields.IntegerField')(default=0)),
-            ('subscribed', self.gf('django.db.models.fields.IntegerField')(default=0)),
-            ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-        ))
-        db.send_create_signal('films', ['UsersPersons'])
-
-        # Adding model 'YoutubeTrailerCheck'
-        db.create_table('youtube_trailer_check', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('film', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['films.Films'])),
-            ('last_check', self.gf('django.db.models.fields.DateTimeField')()),
-            ('was_successfull', self.gf('django.db.models.fields.BooleanField')()),
-        ))
-        db.send_create_signal('films', ['YoutubeTrailerCheck'])
-
-
-    def backwards(self, orm):
-        # Removing unique constraint on 'UsersFilms', fields ['user', 'film']
-        db.delete_unique('users_films', ['user_id', 'film_id'])
-
-        # Removing unique constraint on 'PersonsFilms', fields ['film', 'person', 'p_type']
-        db.delete_unique('persons_films', ['film_id', 'person_id', 'p_type'])
-
-        # Removing unique constraint on 'Seasons', fields ['film', 'number']
-        db.delete_unique('seasons', ['film_id', 'number'])
-
-        # Deleting model 'Cities'
-        db.delete_table('cities')
-
-        # Deleting model 'Countries'
-        db.delete_table('countries')
-
-        # Deleting model 'Genres'
-        db.delete_table('genres')
-
-        # Deleting model 'Seasons'
-        db.delete_table('seasons')
-
-        # Deleting model 'Films'
-        db.delete_table('films')
-
-        # Removing M2M table for field countries on 'Films'
-        db.delete_table(db.shorten_name('films_countries'))
-
-        # Removing M2M table for field genres on 'Films'
-        db.delete_table(db.shorten_name('films_genres'))
-
-        # Deleting model 'FilmExtras'
-        db.delete_table('films_extras')
-
-        # Deleting model 'Persons'
-        db.delete_table('persons')
-
-        # Deleting model 'PersonsExtras'
-        db.delete_table('persons_extras')
-
-        # Deleting model 'PersonsFilms'
-        db.delete_table('persons_films')
-
-        # Deleting model 'UsersFilms'
-        db.delete_table('users_films')
-
-        # Deleting model 'UsersPersons'
-        db.delete_table('users_persons')
-
-        # Deleting model 'YoutubeTrailerCheck'
-        db.delete_table('youtube_trailer_check')
-
-
-    models = {
-        u'auth.group': {
-            'Meta': {'object_name': 'Group'},
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '80'}),
-            'permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': u"orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'})
-        },
-        u'auth.permission': {
-            'Meta': {'ordering': "(u'content_type__app_label', u'content_type__model', u'codename')", 'unique_together': "((u'content_type', u'codename'),)", 'object_name': 'Permission'},
-            'codename': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['contenttypes.ContentType']"}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '50'})
-        },
-        u'auth.user': {
-            'Meta': {'object_name': 'User'},
-            'date_joined': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
-            'email': ('django.db.models.fields.EmailField', [], {'max_length': '75', 'blank': 'True'}),
-            'first_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
-            'groups': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "u'user_set'", 'blank': 'True', 'to': u"orm['auth.Group']"}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'is_active': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'is_staff': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'is_superuser': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'last_login': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
-            'last_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
-            'password': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
-            'user_permissions': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "u'user_set'", 'blank': 'True', 'to': u"orm['auth.Permission']"}),
-            'username': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'})
-        },
-        u'contenttypes.contenttype': {
-            'Meta': {'ordering': "('name',)", 'unique_together': "(('app_label', 'model'),)", 'object_name': 'ContentType', 'db_table': "'django_content_type'"},
-            'app_label': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
-        },
-        'films.cities': {
-            'Meta': {'object_name': 'Cities', 'db_table': "'cities'"},
-            'country': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'cities'", 'to': "orm['films.Countries']"}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
-            'name_orig': ('django.db.models.fields.CharField', [], {'max_length': '255'})
-        },
-        'films.countries': {
-            'Meta': {'object_name': 'Countries', 'db_table': "'countries'"},
-            'description': ('django.db.models.fields.TextField', [], {}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
-            'name_orig': ('django.db.models.fields.CharField', [], {'max_length': '255'})
-        },
-        'films.filmextras': {
-            'Meta': {'object_name': 'FilmExtras', 'db_table': "'films_extras'"},
-            'description': ('django.db.models.fields.TextField', [], {}),
-            'film': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'fe_film_rel'", 'to': "orm['films.Films']"}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'name_orig': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'photo': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
-            'type': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
-            'url': ('django.db.models.fields.URLField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'})
-        },
-        'films.films': {
-            'Meta': {'object_name': 'Films', 'db_table': "'films'"},
-            'age_limit': ('django.db.models.fields.PositiveSmallIntegerField', [], {'db_index': 'True', 'null': 'True', 'blank': 'True'}),
-            'budget': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'countries': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'countries'", 'symmetrical': 'False', 'to': "orm['films.Countries']"}),
-            'description': ('django.db.models.fields.TextField', [], {'default': "''", 'blank': 'True'}),
-            'duration': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'genres': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'genres'", 'symmetrical': 'False', 'to': "orm['films.Genres']"}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'imdb_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'kinopoisk_id': ('django.db.models.fields.IntegerField', [], {'unique': 'True', 'db_index': 'True'}),
-            'kinopoisk_lastupdate': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
-            'name_orig': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '255', 'db_index': 'True', 'blank': 'True'}),
-            'persons': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'persons'", 'symmetrical': 'False', 'through': "orm['films.PersonsFilms']", 'to': "orm['films.Persons']"}),
-            'rating_cons': ('django.db.models.fields.FloatField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
-            'rating_cons_cnt': ('django.db.models.fields.IntegerField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
-            'rating_imdb': ('django.db.models.fields.FloatField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
-            'rating_imdb_cnt': ('django.db.models.fields.IntegerField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
-            'rating_kinopoisk': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
-            'rating_kinopoisk_cnt': ('django.db.models.fields.PositiveSmallIntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'rating_local': ('django.db.models.fields.FloatField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
-            'rating_local_cnt': ('django.db.models.fields.IntegerField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
-            'rating_sort': ('django.db.models.fields.IntegerField', [], {'default': '0', 'null': 'True', 'db_index': 'True', 'blank': 'True'}),
-            'release_date': ('django.db.models.fields.DateField', [], {'db_index': 'True', 'null': 'True', 'blank': 'True'}),
-            'search_index': ('djorm_pgfulltext.fields.VectorField', [], {'default': "''", 'null': 'True', 'db_index': 'True'}),
-            'seasons_cnt': ('django.db.models.fields.PositiveSmallIntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'type': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'})
-        },
-        'films.genres': {
-            'Meta': {'object_name': 'Genres', 'db_table': "'genres'"},
-            'depth': ('django.db.models.fields.PositiveIntegerField', [], {'db_index': 'True'}),
-            'description': ('django.db.models.fields.TextField', [], {}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'lft': ('django.db.models.fields.PositiveIntegerField', [], {'db_index': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
-            'rating_sort': ('django.db.models.fields.SmallIntegerField', [], {'db_index': 'True', 'null': 'True', 'blank': 'True'}),
-            'rgt': ('django.db.models.fields.PositiveIntegerField', [], {'db_index': 'True'}),
-            'tree_id': ('django.db.models.fields.PositiveIntegerField', [], {'db_index': 'True'})
-        },
-        'films.persons': {
-            'Meta': {'object_name': 'Persons', 'db_table': "'persons'"},
-            'bio': ('django.db.models.fields.TextField', [], {}),
-            'birthdate': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
-            'city': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'persons'", 'null': 'True', 'to': "orm['films.Cities']"}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'kinopoisk_id': ('django.db.models.fields.IntegerField', [], {'unique': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
-            'name_orig': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
-            'photo': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'})
-        },
-        'films.personsextras': {
-            'Meta': {'object_name': 'PersonsExtras', 'db_table': "'persons_extras'"},
-            'description': ('django.db.models.fields.TextField', [], {}),
-            'etype': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.TextField', [], {}),
-            'name_orig': ('django.db.models.fields.TextField', [], {}),
-            'person': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['films.Persons']", 'max_length': '255'}),
-            'url': ('django.db.models.fields.CharField', [], {'max_length': '255'})
-        },
-        'films.personsfilms': {
-            'Meta': {'unique_together': "(('film', 'person', 'p_type'),)", 'object_name': 'PersonsFilms', 'db_table': "'persons_films'"},
-            'description': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '255'}),
-            'film': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'pf_films_rel'", 'to': "orm['films.Films']"}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'p_character': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '255'}),
-            'p_type': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
-            'person': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'pf_persons_rel'", 'to': "orm['films.Persons']"})
-        },
-        'films.seasons': {
-            'Meta': {'unique_together': "(('film', 'number'),)", 'object_name': 'Seasons', 'db_table': "'seasons'"},
-            'description': ('django.db.models.fields.TextField', [], {}),
-            'film': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['films.Films']"}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'number': ('django.db.models.fields.PositiveSmallIntegerField', [], {}),
-            'release_date': ('django.db.models.fields.DateTimeField', [], {}),
-            'series_cnt': ('django.db.models.fields.PositiveSmallIntegerField', [], {})
-        },
-        'films.usersfilms': {
-            'Meta': {'unique_together': "(('user', 'film'),)", 'object_name': 'UsersFilms', 'db_table': "'users_films'"},
-            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'film': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'uf_films_rel'", 'to': "orm['films.Films']"}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'rating': ('django.db.models.fields.PositiveSmallIntegerField', [], {'db_index': 'True', 'null': 'True', 'blank': 'True'}),
-            'status': ('django.db.models.fields.PositiveSmallIntegerField', [], {'default': '0', 'null': 'True', 'db_index': 'True', 'blank': 'True'}),
-            'subscribed': ('django.db.models.fields.PositiveSmallIntegerField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'uf_users_rel'", 'to': u"orm['auth.User']"})
-        },
-        'films.userspersons': {
-            'Meta': {'object_name': 'UsersPersons', 'db_table': "'users_persons'"},
-            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'person': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'up_persons_rel'", 'max_length': '255', 'to': "orm['films.Persons']"}),
-            'subscribed': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
-            'upstatus': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'up_users_rel'", 'max_length': '255', 'to': u"orm['auth.User']"})
-        },
-        'films.youtubetrailercheck': {
-            'Meta': {'object_name': 'YoutubeTrailerCheck', 'db_table': "'youtube_trailer_check'"},
-            'film': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['films.Films']"}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'last_check': ('django.db.models.fields.DateTimeField', [], {}),
-            'was_successfull': ('django.db.models.fields.BooleanField', [], {})
-        }
-    }
-
-    complete_apps = ['films']
+    operations = [
+        migrations.CreateModel(
+            name='Cities',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(max_length=255, verbose_name='\u041d\u0430\u0437\u0432\u0430\u043d\u0438\u0435 \u0433\u043e\u0440\u043e\u0434\u0430', db_index=True)),
+                ('name_orig', models.CharField(max_length=255, verbose_name='\u041e\u0440\u0438\u0433\u0438\u043d\u0430\u043b\u044c\u043d\u043e\u0435 \u043d\u0430\u0437\u0432\u0430\u043d\u0438\u0435 \u0433\u043e\u0440\u043e\u0434\u0430')),
+            ],
+            options={
+                'db_table': 'cities',
+                'verbose_name': '\u0413\u043e\u0440\u043e\u0434',
+                'verbose_name_plural': '\u0413\u043e\u0440\u043e\u0434\u0430',
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Countries',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(max_length=255, verbose_name='\u0420\u0443\u0441\u0441\u043a\u043e\u0435 \u043d\u0430\u0437\u0432\u0430\u043d\u0438\u0435 \u0441\u0442\u0440\u0430\u043d\u044b', db_index=True)),
+                ('name_orig', models.CharField(max_length=255, verbose_name='\u041d\u0430\u0437\u0432\u0430\u043d\u0438\u0435 \u0441\u0442\u0440\u0430\u043d\u044b \u043d\u0430 \u0435\u0435 \u044f\u0437\u044b\u043a\u0435')),
+                ('description', models.TextField(verbose_name='\u041e\u043f\u0438\u0441\u0430\u043d\u0438\u0435')),
+            ],
+            options={
+                'db_table': 'countries',
+                'verbose_name': '\u0421\u0442\u0440\u0430\u043d\u0430',
+                'verbose_name_plural': '\u0421\u0442\u0440\u0430\u043d\u044b',
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='FilmExtras',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('type', models.CharField(db_index=True, max_length=255, verbose_name='\u0422\u0438\u043f \u0434\u043e\u043f\u043e\u043b\u043d\u0438\u0442\u0435\u043b\u044c\u043d\u043e\u0433\u043e \u043c\u0430\u0442\u0435\u0440\u0438\u0430\u043b\u0430', choices=[(b'POSTER', '\u041f\u043e\u0441\u0442\u0435\u0440'), (b'TRAILER', '\u0422\u0440\u0435\u0439\u043b\u0435\u0440')])),
+                ('name', models.CharField(max_length=255, verbose_name='\u041d\u0430\u0437\u0432\u0430\u043d\u0438\u0435')),
+                ('name_orig', models.CharField(max_length=255, verbose_name='\u041e\u0440\u0438\u0433\u0438\u043d\u0430\u043b\u044c\u043d\u043e\u0435 \u043d\u0430\u0437\u0432\u0430\u043d\u0438\u0435')),
+                ('description', models.TextField(verbose_name='\u041e\u043f\u0438\u0441\u0430\u043d\u0438\u0435')),
+                ('url', models.URLField(max_length=255, null=True, verbose_name='\u0421\u0441\u044b\u043b\u043a\u0430 \u043d\u0430 \u0434\u043e\u043f\u043e\u043b\u043d\u0438\u0442\u0435\u043b\u044c\u043d\u044b\u0439 \u043c\u0430\u0442\u0435\u0440\u0438\u0430\u043b', blank=True)),
+                ('photo', models.ImageField(upload_to=utils.common.get_image_path, null=True, verbose_name='\u041f\u043e\u0441\u0442\u0435\u0440', blank=True)),
+            ],
+            options={
+                'db_table': 'films_extras',
+                'verbose_name': '\u0414\u043e\u043f\u043e\u043b\u043d\u0438\u0442\u0435\u043b\u044c\u043d\u044b\u0439 \u043c\u0430\u0442\u0435\u0440\u0438\u0430\u043b \u043a \u0444\u0438\u043b\u044c\u043c\u0443',
+                'verbose_name_plural': '\u0414\u043e\u043f\u043e\u043b\u043d\u0438\u0442\u0435\u043b\u044c\u043d\u044b\u0435 \u043c\u0430\u0442\u0435\u0440\u0438\u0430\u043b\u044b \u043a \u0444\u0438\u043b\u044c\u043c\u0430\u043c',
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Films',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(max_length=255, verbose_name='\u041d\u0430\u0437\u0432\u0430\u043d\u0438\u0435 \u0444\u0438\u043b\u044c\u043c\u0430', db_index=True)),
+                ('type', models.CharField(db_index=True, max_length=255, verbose_name='\u0422\u0438\u043f \u0444\u0438\u043b\u044c\u043c\u0430', choices=[('FULL_FILM', '\u041f\u043e\u043b\u043d\u043e\u043c\u0435\u0442\u0440\u0430\u0436\u043d\u044b\u0439 \u0444\u0438\u043b\u044c\u043c'), ('SERIAL', '\u0421\u0435\u0440\u0438\u0430\u043b')])),
+                ('world_release_date', models.DateField(db_index=True, null=True, verbose_name='\u041c\u0438\u0440\u043e\u0432\u0430\u044f \u0434\u0430\u0442\u0430 \u0432\u044b\u0445\u043e\u0434\u0430', blank=True)),
+                ('release_date', models.DateField(db_index=True, null=True, verbose_name='\u0414\u0430\u0442\u0430 \u0432\u044b\u0445\u043e\u0434\u0430', blank=True)),
+                ('duration', models.IntegerField(null=True, verbose_name='\u041f\u0440\u043e\u0434\u043e\u043b\u0436\u0438\u0442\u0435\u043b\u044c\u043d\u043e\u0441\u0442\u044c \u0444\u0438\u043b\u044c\u043c\u0430', blank=True)),
+                ('budget', models.IntegerField(null=True, verbose_name='\u0411\u044e\u0434\u0436\u0435\u0442 \u0444\u0438\u043b\u044c\u043c\u0430', blank=True)),
+                ('description', models.TextField(default=b'', verbose_name='\u041e\u043f\u0438\u0441\u0430\u043d\u0438\u0435 \u0444\u0438\u043b\u044c\u043c\u0430', blank=True)),
+                ('rating_local', models.FloatField(default=0, null=True, verbose_name='\u0420\u0435\u0439\u0442\u0438\u043d\u0433 \u0444\u0438\u043b\u044c\u043c\u0430 \u043f\u043e \u043c\u043d\u0435\u043d\u0438\u044e \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u0435\u0439 \u043d\u0430\u0448\u0435\u0433\u043e \u0441\u0430\u0439\u0442\u0430', db_index=True, blank=True)),
+                ('rating_local_cnt', models.IntegerField(default=0, null=True, verbose_name='\u041a\u043e\u043b\u0438\u0447\u0435\u0441\u0442\u0432\u043e \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u0435\u0439 \u043d\u0430\u0448\u0435\u0433\u043e \u0441\u0430\u0439\u0442\u0430 \u043e\u0446\u0435\u043d\u0438\u0432\u0448\u0438\u0445 \u0444\u0438\u043b\u044c\u043c', db_index=True, blank=True)),
+                ('imdb_id', models.IntegerField(null=True, verbose_name='\u041f\u043e\u0440\u044f\u0434\u043a\u043e\u0432\u044b\u0439 \u043d\u043e\u043c\u0435\u0440 \u043d\u0430 IMDB', blank=True)),
+                ('rating_imdb', models.FloatField(default=0, null=True, verbose_name='\u0420\u0435\u0439\u0442\u0438\u043d\u0433 \u0444\u0438\u043b\u044c\u043c\u0430 \u043d\u0430 \u0441\u0430\u0439\u0442\u0435 imdb.com', blank=True)),
+                ('rating_imdb_cnt', models.PositiveIntegerField(default=0, null=True, verbose_name='\u041a\u043e\u043b\u0438\u0447\u0435\u0441\u0442\u0432\u043e \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u0435\u0439 imdb.com \u043e\u0446\u0435\u043d\u0438\u0432\u0448\u0438\u0445 \u044d\u0442\u043e\u0442 \u0444\u0438\u043b\u044c\u043c', blank=True)),
+                ('rating_cons', models.FloatField(default=0, null=True, verbose_name='\u041a\u043e\u043d\u0441\u043e\u043b\u0438\u0434\u0438\u0440\u043e\u0432\u0430\u043d\u043d\u044b\u0439 \u0440\u0435\u0439\u0442\u0438\u043d\u0433', blank=True)),
+                ('rating_cons_cnt', models.PositiveIntegerField(default=0, null=True, verbose_name='\u041a\u043e\u043b\u0438\u0447\u0435\u0441\u0442\u0432\u043e \u0433\u043e\u043b\u043e\u0441\u043e\u0432 \u043a\u043e\u043d\u0441\u043e\u043b\u0438\u0434\u0438\u0440\u043e\u0432\u0430\u043d\u043d\u043e\u0433\u043e \u0440\u0435\u0439\u0442\u0438\u043d\u0433\u0430', db_index=True, blank=True)),
+                ('rating_sort', models.IntegerField(default=0, null=True, verbose_name='\u0423\u0441\u043b\u043e\u0432\u043d\u044b\u0439 \u0440\u0435\u0439\u0442\u0438\u043d\u0433 \u0434\u043b\u044f \u0441\u043e\u0440\u0442\u0438\u0440\u043e\u0432\u043a\u0438', db_index=True, blank=True)),
+                ('kinopoisk_id', models.IntegerField(unique=True, verbose_name='\u041f\u043e\u0440\u044f\u0434\u043a\u043e\u0432\u044b\u0439 \u043d\u043e\u043c\u0435\u0440 \u043d\u0430 \u043a\u0438\u043d\u043e\u043f\u043e\u0438\u0441\u043a\u0435', db_index=True)),
+                ('age_limit', models.PositiveSmallIntegerField(db_index=True, null=True, verbose_name='\u041e\u0433\u0440\u0430\u043d\u0438\u0447\u0435\u043d\u0438\u0435 \u043f\u043e \u0432\u043e\u0437\u0440\u0430\u0441\u0442\u0443', blank=True)),
+                ('kinopoisk_lastupdate', models.DateTimeField(null=True, verbose_name='\u0414\u0430\u0442\u0430 \u043f\u043e\u0441\u043b\u0435\u0434\u043d\u0435\u0433\u043e \u043e\u0431\u043d\u043e\u0432\u043b\u0435\u043d\u0438\u044f \u043d\u0430 \u043a\u0438\u043d\u043e\u043f\u043e\u0438\u0441\u043a\u0435', blank=True)),
+                ('rating_kinopoisk', models.FloatField(null=True, verbose_name='\u0420\u0435\u0439\u0442\u0438\u043d\u0433 \u0444\u0438\u043b\u044c\u043c\u0430 \u043d\u0430 \u0441\u0430\u0439\u0442\u0435 kinopoisk.ru', blank=True)),
+                ('rating_kinopoisk_cnt', models.PositiveIntegerField(null=True, verbose_name='\u041a\u043e\u043b\u0438\u0447\u0435\u0441\u0442\u0432\u043e \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u0435\u0439 kinopoisk.ru \u043e\u0446\u0435\u043d\u0438\u0432\u0448\u0438\u0445 \u044d\u0442\u043e\u0442 \u0444\u0438\u043b\u044c\u043c', blank=True)),
+                ('seasons_cnt', models.PositiveSmallIntegerField(null=True, verbose_name='\u041a\u043e\u043b\u0438\u0447\u0435\u0441\u0442\u0432\u043e \u0441\u0435\u0437\u043e\u043d\u043e\u0432', blank=True)),
+                ('name_orig', models.CharField(default=b'', max_length=255, verbose_name='\u041e\u0440\u0438\u0433\u0438\u043d\u0430\u043b\u044c\u043d\u043e\u0435 \u043d\u0430\u0437\u0432\u0430\u043d\u0438\u0435 \u0444\u0438\u043b\u044c\u043c\u0430', db_index=True, blank=True)),
+                ('was_shown', models.BooleanField(default=False, verbose_name='\u0424\u0438\u043b\u044c\u043c \u043e\u0442\u043e\u0431\u0440\u0430\u0436\u0430\u043b\u0441\u044f \u0432 \u043d\u043e\u0432\u0438\u043d\u043a\u0430\u0445')),
+                ('subscribed_cnt', models.PositiveIntegerField(default=0, null=True, verbose_name='\u041a\u043e\u043b-\u0432\u043e \u043f\u043e\u0434\u043f\u0438\u0441\u0447\u0438\u043a\u043e\u0432', db_index=True, blank=True)),
+                ('search_index', djorm_pgfulltext.fields.VectorField(default=b'', serialize=False, null=True, editable=False, db_index=True)),
+                ('countries', models.ManyToManyField(related_name='countries', verbose_name='\u0421\u0442\u0440\u0430\u043d\u044b \u043f\u0440\u043e\u0438\u0437\u0432\u043e\u0434\u0438\u0442\u0435\u043b\u0438', to='films.Countries')),
+            ],
+            options={
+                'db_table': 'films',
+                'verbose_name': '\u0424\u0438\u043b\u044c\u043c',
+                'verbose_name_plural': '\u0424\u0438\u043b\u044c\u043c\u044b',
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Genres',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('lft', models.PositiveIntegerField(db_index=True)),
+                ('rgt', models.PositiveIntegerField(db_index=True)),
+                ('tree_id', models.PositiveIntegerField(db_index=True)),
+                ('depth', models.PositiveIntegerField(db_index=True)),
+                ('name', models.CharField(max_length=255, verbose_name='\u041d\u0430\u0437\u0432\u0430\u043d\u0438\u0435 \u0436\u0430\u043d\u0440\u0430', db_index=True)),
+                ('description', models.TextField(verbose_name='\u041e\u043f\u0438\u0441\u0430\u043d\u0438\u0435 \u0436\u0430\u043d\u0440\u0430')),
+                ('hidden', models.NullBooleanField(default=False, verbose_name='\u0421\u043a\u0440\u044b\u0442\u044b\u0439', db_index=True)),
+            ],
+            options={
+                'db_table': 'genres',
+                'verbose_name': '\u0416\u0430\u043d\u0440',
+                'verbose_name_plural': '\u0416\u0430\u043d\u0440\u044b',
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Persons',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(max_length=255, verbose_name='\u0418\u043c\u044f', db_index=True)),
+                ('name_orig', models.CharField(max_length=255, verbose_name='\u041e\u0440\u0438\u0433\u0438\u043d\u0430\u043b\u044c\u043d\u043e\u0435 \u0438\u043c\u044f', db_index=True)),
+                ('bio', models.TextField(verbose_name='\u0411\u0438\u043e\u0433\u0440\u0430\u0444\u0438\u044f')),
+                ('photo', models.ImageField(upload_to=utils.common.get_image_path, null=True, verbose_name='\u0424\u043e\u0442\u043e', blank=True)),
+                ('birthdate', models.DateField(null=True, verbose_name='\u0414\u0430\u0442\u0430 \u0434\u043d\u044f \u0440\u043e\u0436\u0434\u0435\u043d\u0438\u044f', blank=True)),
+                ('kinopoisk_id', models.IntegerField(unique=True)),
+                ('city', models.ForeignKey(related_name='persons', verbose_name='\u0413\u043e\u0440\u043e\u0434', blank=True, to='films.Cities', null=True)),
+            ],
+            options={
+                'db_table': 'persons',
+                'verbose_name': '\u041f\u0435\u0440\u0441\u043e\u043d\u0430',
+                'verbose_name_plural': '\u041f\u0435\u0440\u0441\u043e\u043d\u044b',
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='PersonsExtras',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('type', models.CharField(max_length=255, verbose_name='', db_index=True)),
+                ('name', models.TextField(verbose_name='\u0418\u043c\u044f')),
+                ('name_orig', models.TextField(verbose_name='\u041e\u0440\u0438\u0433\u0438\u043d\u0430\u043b\u044c\u043d\u043e\u0435 \u0438\u043c\u044f')),
+                ('description', models.TextField(verbose_name='\u041e\u043f\u0438\u0441\u0430\u043d\u0438\u0435')),
+                ('url', models.CharField(max_length=255, verbose_name='\u0424\u043e\u0442\u043e')),
+                ('person', models.ForeignKey(verbose_name='\u041f\u0435\u0440\u0441\u043e\u043d\u0430', to='films.Persons', max_length=255)),
+            ],
+            options={
+                'db_table': 'persons_extras',
+                'verbose_name': '\u0420\u0430\u0441\u0448\u0438\u0440\u0435\u043d\u0438\u044f \u043f\u0435\u0440\u0441\u043e\u043d\u044b',
+                'verbose_name_plural': '\u0420\u0430\u0441\u0448\u0438\u0440\u0435\u043d\u0438\u044f \u043f\u0435\u0440\u0441\u043e\u043d',
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='PersonsFilms',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('p_type', models.CharField(db_index=True, max_length=255, verbose_name='\u0422\u0438\u043f \u043f\u0435\u0440\u0441\u043e\u043d\u044b', choices=[(b'actor', '\u0410\u043a\u0442\u0435\u0440'), (b'producer', '\u041f\u0440\u043e\u0434\u044e\u0441\u0435\u0440'), (b'director', '\u0420\u0435\u0436\u0438\u0441\u0441\u0435\u0440'), (b'scriptwriter', '\u0421\u0446\u0435\u043d\u0430\u0440\u0438\u0441\u0442')])),
+                ('p_index', models.IntegerField(default=0, verbose_name='\u041f\u043e\u0440\u044f\u0434\u043e\u043a \u043d\u0430 \u043a\u0438\u043d\u043e\u043f\u043e\u0438\u0441\u043a\u0435', db_index=True)),
+                ('p_character', models.CharField(default=b'', max_length=255)),
+                ('description', models.CharField(default=b'', max_length=255)),
+                ('film', models.ForeignKey(related_name='pf_films_rel', verbose_name='\u0424\u0438\u043b\u044c\u043c', to='films.Films')),
+                ('person', models.ForeignKey(related_name='pf_persons_rel', verbose_name='\u041f\u0435\u0440\u0441\u043e\u043d\u0430', to='films.Persons')),
+            ],
+            options={
+                'db_table': 'persons_films',
+                'verbose_name': '\u0420\u043e\u043b\u044c \u043f\u0435\u0440\u0441\u043e\u043d\u044b \u0432 \u043f\u0440\u043e\u0438\u0437\u0432\u043e\u0434\u0441\u0442\u0432\u0435 \u0444\u0438\u043b\u044c\u043c\u0430',
+                'verbose_name_plural': '\u0420\u043e\u043b\u0438 \u043f\u0435\u0440\u0441\u043e\u043d \u0432 \u043f\u0440\u043e\u0438\u0437\u0432\u043e\u0434\u0441\u0442\u0432\u0435 \u0444\u0438\u043b\u044c\u043c\u043e\u0432',
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Seasons',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('release_date', models.DateTimeField(verbose_name='\u0414\u0430\u0442\u0430 \u0432\u044b\u0445\u043e\u0434\u0430 \u0441\u0435\u0437\u043e\u043d\u0430')),
+                ('series_cnt', models.PositiveSmallIntegerField(verbose_name='\u041a\u043e\u043b\u0438\u0447\u0435\u0441\u0442\u0432\u043e \u0441\u0435\u0440\u0438\u0439 \u0432 \u0441\u0435\u0437\u043e\u043d\u0435')),
+                ('description', models.TextField(verbose_name='\u041e\u043f\u0438\u0441\u0430\u043d\u0438\u0435 \u0441\u0435\u0437\u043e\u043d\u0430')),
+                ('number', models.PositiveSmallIntegerField(verbose_name='\u041f\u043e\u0440\u044f\u0434\u043a\u043e\u0432\u044b\u0439 \u043d\u043e\u043c\u0435\u0440 \u0441\u0435\u0437\u043e\u043d\u0430')),
+                ('film', models.ForeignKey(verbose_name='\u0424\u0438\u043b\u044c\u043c', to='films.Films')),
+            ],
+            options={
+                'db_table': 'seasons',
+                'verbose_name': '\u0421\u0435\u0437\u043e\u043d',
+                'verbose_name_plural': '\u0421\u0435\u0437\u043e\u043d\u044b',
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='UsersFilms',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('status', models.PositiveSmallIntegerField(default=0, choices=[(0, '\u041d\u0435 \u043e\u043f\u0440\u0435\u0434\u0435\u043b\u0435\u043d\u043e'), (1, '\u041d\u0435 \u0431\u0443\u0434\u0443 \u0441\u043c\u043e\u0442\u0440\u0435\u0442\u044c'), (2, '\u0412 \u043f\u043b\u0435\u0439\u043b\u0438\u0441\u0442\u0435')], blank=True, null=True, verbose_name='\u0421\u0442\u0430\u0442\u0443\u0441 \u0444\u0438\u043b\u044c\u043c\u0430 \u0441 \u0442.\u0437. \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044f', db_index=True)),
+                ('rating', models.PositiveSmallIntegerField(db_index=True, null=True, verbose_name='\u0420\u0435\u0439\u0442\u0438\u043d\u0433 \u0444\u0438\u043b\u044c\u043c\u0430 \u043f\u043e\u0441\u0442\u0430\u0432\u043b\u0435\u043d\u043d\u044b\u0439 \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u0435\u043c', blank=True)),
+                ('subscribed', models.PositiveSmallIntegerField(default=0, null=True, verbose_name='\u0421\u0442\u0430\u0442\u0443\u0441 \u043f\u043e\u0434\u043f\u0438\u0441\u043a\u0438', blank=True, choices=[(0, '\u041d\u0435 \u043f\u043e\u0434\u043f\u0438\u0441\u0430\u043d'), (1, '\u041f\u043e\u0434\u043f\u0438\u0441\u0430\u043d')])),
+                ('created', models.DateTimeField(auto_now_add=True, verbose_name='\u0414\u0430\u0442\u0430 \u0441\u043e\u0437\u0434\u0430\u043d\u0438\u044f')),
+                ('film', models.ForeignKey(related_name='uf_films_rel', verbose_name='\u0424\u0438\u043b\u044c\u043c', to='films.Films')),
+                ('user', models.ForeignKey(related_name='uf_users_rel', verbose_name='\u0418\u0434\u0435\u043d\u0442\u0438\u0444\u0438\u043a\u0430\u0442\u043e\u0440 \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u043b\u044f', to=settings.AUTH_USER_MODEL)),
+            ],
+            options={
+                'db_table': 'users_films',
+                'verbose_name': '\u0424\u0438\u043b\u044c\u043c\u044b \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044f',
+                'verbose_name_plural': '\u0424\u0438\u043b\u044c\u043c\u044b \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u0435\u0439',
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='UsersPersons',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('upstatus', models.IntegerField(default=0, verbose_name='\u0421\u0442\u0430\u0442\u0443\u0441')),
+                ('subscribed', models.IntegerField(default=0, verbose_name='\u041f\u043e\u0434\u043f\u0438\u0441\u043a\u0430', choices=[(0, '\u041d\u0435 \u043f\u043e\u0434\u043f\u0438\u0441\u0430\u043d'), (1, '\u041f\u043e\u0434\u043f\u0438\u0441\u0430\u043d')])),
+                ('created', models.DateTimeField(auto_now_add=True, verbose_name='\u0414\u0430\u0442\u0430 \u0441\u043e\u0437\u0434\u0430\u043d\u0438\u044f')),
+                ('person', models.ForeignKey(related_name='up_persons_rel', verbose_name='\u041f\u0435\u0440\u0441\u043e\u043d\u0430', to='films.Persons', max_length=255)),
+                ('user', models.ForeignKey(related_name='up_users_rel', verbose_name='\u041f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044c', to=settings.AUTH_USER_MODEL, max_length=255)),
+            ],
+            options={
+                'db_table': 'users_persons',
+                'verbose_name': '\u041f\u0435\u0440\u0441\u043e\u043d\u044b \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044f',
+                'verbose_name_plural': '\u041f\u0435\u0440\u0441\u043e\u043d\u044b \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u0435\u0439',
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='YoutubeTrailerCheck',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('last_check', models.DateTimeField(verbose_name='Last try datetime')),
+                ('was_successfull', models.BooleanField(default=False, verbose_name='Was finding a trailer succesfull')),
+                ('film', models.ForeignKey(verbose_name='Film', to='films.Films')),
+            ],
+            options={
+                'db_table': 'youtube_trailer_check',
+                'verbose_name': 'Youtube try',
+                'verbose_name_plural': 'Youtube tries',
+            },
+            bases=(models.Model,),
+        ),
+        migrations.AlterUniqueTogether(
+            name='usersfilms',
+            unique_together=set([('user', 'film')]),
+        ),
+        migrations.AlterUniqueTogether(
+            name='seasons',
+            unique_together=set([('film', 'number')]),
+        ),
+        migrations.AlterUniqueTogether(
+            name='personsfilms',
+            unique_together=set([('film', 'person', 'p_type')]),
+        ),
+        migrations.AddField(
+            model_name='films',
+            name='genres',
+            field=models.ManyToManyField(related_name='genres', verbose_name='\u0416\u0430\u043d\u0440\u044b', to='films.Genres'),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='films',
+            name='persons',
+            field=models.ManyToManyField(related_name='persons', verbose_name='\u041f\u0435\u0440\u0441\u043e\u043d\u044b', through='films.PersonsFilms', to='films.Persons'),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='filmextras',
+            name='film',
+            field=models.ForeignKey(related_name='fe_film_rel', verbose_name='\u0424\u0438\u043b\u044c\u043c', to='films.Films'),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='cities',
+            name='country',
+            field=models.ForeignKey(related_name='cities', verbose_name='\u041d\u0430\u0437\u0432\u0430\u043d\u0438\u0435 \u0441\u0442\u0440\u0430\u043d\u044b', to='films.Countries'),
+            preserve_default=True,
+        ),
+    ]

@@ -1,4 +1,7 @@
 # coding: utf-8
+
+from collections import defaultdict
+
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
 
@@ -56,12 +59,9 @@ class vbPerson(serializers.ModelSerializer):
             distinct('person', 'p_type').\
             values_list('person', 'p_type')
 
-        prep_person_roles = {}
-        for p, r in person_roles:
-            if p not in prep_person_roles:
-                prep_person_roles[p] = [r]
-            else:
-                prep_person_roles[p].append(r)
+        prep_person_roles = defaultdict(list)
+        for p,r in person_roles:
+            prep_person_roles[p].append(r)
 
         return prep_person_roles
 

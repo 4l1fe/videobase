@@ -1,15 +1,20 @@
 # coding: utf-8
+
+from django.db.models.query import QuerySet
 from django.contrib.auth.models import User
+
 from rest_framework import serializers
+
 from apps.contents.models import Comments, Locations
 from apps.films.models import FilmExtras, PersonsFilms, Films, UsersFilms
-from apps.users import UsersPics
+
+from apps.users.models import UsersPics
 from apps.users.models.users_feed import Feed
 from apps.users.api.serializers import vbUser
 from apps.users.constants import (FILM_RATE, FILM_SUBSCRIBE, FILM_NOTWATCH,
                                   FILM_COMMENT, FILM_O, PERSON_SUBSCRIBE,
                                   PERSON_O, USER_ASK, USER_FRIENDSHIP, SYS_ALL)
-from django.db.models.query import QuerySet
+
 from utils.common import isiterable
 
 
