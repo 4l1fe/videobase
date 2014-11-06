@@ -1,47 +1,43 @@
 # coding: utf-8
+
 import re
 import os
 import json
 import warnings
+
 from cgi import escape
-from django.core.exceptions import ObjectDoesNotExist
-from datetime import date, timedelta
 from random import randrange
 from cStringIO import StringIO
 from PIL import Image, ImageEnhance
-
+from datetime import date, timedelta
 
 from django.db import connection
-
 from django.core.files import File
 from django.core.cache import cache
+from django.core.urlresolvers import reverse
 from django.core.context_processors import csrf
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.serializers.json import DjangoJSONEncoder
+
 from django.template import Context
 from django.views.generic import View
 from django.http import HttpResponse, Http404, HttpResponseRedirect, HttpResponseBadRequest
 from django.shortcuts import render_to_response, redirect
-from django.core.urlresolvers import reverse
+
 from rest_framework import status
 
-
-import apps.films.models as film_model
 import apps.contents.models as content_model
 
 import apps.films.models as film_model
+from apps.films.forms import CommentForm
+from apps.films.api import SearchFilmsView
 from apps.films.api.serializers import vbFilm, vbComment, vbPerson
-
 from apps.films.constants import APP_USERFILM_STATUS_PLAYLIST, APP_PERSON_ACTOR, \
     APP_PERSON_DIRECTOR, APP_PERSON_SCRIPTWRITER, APP_FILM_FULL_FILM, APP_USERFILM_STATUS_NOT_WATCH
 
-from apps.films.api import SearchFilmsView
-from apps.contents.models import Comments, Contents
-from apps.films.forms import CommentForm
-from apps.films.models import Films
-from apps.users import Feed, SessionToken
+from apps.users.models import Feed, SessionToken
 from apps.users.constants import FILM_COMMENT
 
-from utils.noderender import render_page
 from utils.common import reindex_by
 from utils.noderender import render_page
 from utils.middlewares.local_thread import get_current_request
@@ -120,6 +116,7 @@ class IndexView(View):
 
     def get(self, *args, **kwargs):
         # Выбираем 4 новых фильма, у которых есть локации
+        resp_dict_data = []
         NEW_FILMS_CACHE_KEY = 'new_films'
         resp_dict_serialized = cache.get(NEW_FILMS_CACHE_KEY)
         # Расчитываем новинки, если их нет в кеше
@@ -226,15 +223,15 @@ class CommentFilmView(View):
         """
 
         try:
-            o_film = Films.objects.get(id=film_id)
+            o_film = film_model.Films.objects.get(id=film_id)
         except ObjectDoesNotExist:
             return HttpResponse(status=status.HTTP_404_NOT_FOUND)
 
         try:
-            o_content = Contents.objects.get(film=o_film.id)
-        except Contents.DoesNotExist, e:
+            o_content = content_model.Contents.objects.get(film=o_film.id)
+        except content_model.Contents.DoesNotExist, e:
             try:
-                o_content = Contents(
+                o_content = content_model.Contents(
                     film=o_film, name=o_film.name, name_orig=o_film.name_orig,
                     description=o_film.description, release_date=o_film.release_date,
                     viewer_cnt=0, viewer_lastweek_cnt=0, viewer_lastmonth_cnt=0
@@ -243,20 +240,16 @@ class CommentFilmView(View):
             except Exception, e:
                 return HttpResponse(status=status.HTTP_404_NOT_FOUND)
 
-        except Contents.MultipleObjectsReturned, e:
-
+        except content_model.Contents.MultipleObjectsReturned, e:
             if o_film.type == APP_FILM_FULL_FILM:
-                print "Found multiple contents for film id={}"
-                first_content = Contents.objects.filter(film=o_film).order_by("id")[0]
-
-                for comm in Comments.objects.filter(content__film=o_film).exclude(content__pk=first_content.id):
-                    print comm.content.id
+                first_content = content_model.Contents.objects.filter(film=o_film).order_by("id")[0]
+                for comm in content_model.Comments.objects.filter(content__film=o_film).exclude(content__pk=first_content.id):
                     invalid_content = comm.content
                     comm.content = first_content
                     invalid_content.delete()
                     comm.save()
             else:
-                o_content = Contents.objects.filter(film=o_film.id).all()[0]
+                o_content = content_model.Contents.objects.filter(film=o_film.id).all()[0]
             
         return o_content
 
@@ -274,7 +267,7 @@ class CommentFilmView(View):
                 'content': o_content
             }
 
-            o_com = Comments.objects.create(**filter_)
+            o_com = content_model.Comments.objects.create(**filter_)
             Feed.objects.create(user=SessionToken.objects.get(key=request.COOKIES['x-session']).user, type=FILM_COMMENT, obj_id=o_com.id, child_obj_id=o_content.film_id)
 
             return HttpResponseRedirect('/films/{}'.format(film_id))
@@ -372,9 +365,7 @@ def test_view(request):
 
 
 def serialize_actors(actors_iterable):
-
     return [{'id': pf.person.id, 'name': pf.person.name, 'photo': pf.person.get_path_to_photo} for pf in actors_iterable]
-
 
 
 def calc_actors(o_film):
@@ -389,13 +380,14 @@ def calc_actors(o_film):
     }
 
     try:
-        enumerated_actors = film_model.PersonsFilms.objects.filter(film=o_film, p_type=APP_PERSON_ACTOR
-        ).exclude(p_index=0).order_by('p_index')
+        enumerated_actors = film_model.PersonsFilms.objects.\
+            filter(film=o_film, p_type=APP_PERSON_ACTOR).\
+            exclude(p_index=0).order_by('p_index')
 
-        unenumerated_actors = film_model.PersonsFilms.objects.filter(film=o_film, p_type=APP_PERSON_ACTOR).filter(p_index=0)
+        unenumerated_actors = film_model.PersonsFilms.objects.\
+            filter(film=o_film, p_type=APP_PERSON_ACTOR, p_index=0)
         
         result = (serialize_actors(enumerated_actors) + serialize_actors(unenumerated_actors))[slice(filter['offset'], filter['limit'])]
-
     except Exception, e:
         print "Caught exception {} in calc_actors".format(e)
 
@@ -536,7 +528,7 @@ def calc_comments(o_film):
 
 
 def film_to_view(film_id, similar=False):
-    o_film = film_model.Films.objects.filter(pk=film_id).prefetch_related('genres', 'countries')
+    o_film = film_model.Films.objects.filter(pk=film_id).prefetch_related('countries')
 
     if not len(o_film):
         raise Http404
@@ -606,13 +598,16 @@ class CommentedFilms(View):
         cf_html = cache.get('cf_html')
         if cf_html:
             return HttpResponse(cf_html)
+        
         else:
             cf_html = ''
-            ids = (f.id for f in Films.get_commented_films(greater=2))
-            films = Films.objects.exclude(id__in=ids).order_by('-rating_sort').iterator()
+            ids = (f.id for f in film_model.Films.get_commented_films(greater=2))
+            films = film_model.Films.objects.exclude(id__in=ids).order_by('-rating_sort').iterator()
 
             for i, f in enumerate(films):
-                if i > 1000: break
+                if i > 1000: 
+                    break
+                
                 link = reverse('film_view', args=[f.id])
                 year = f.release_date.year if f.release_date else ''
                 cf_html += u'<a href="{}">{}</a>, {}<br>\n'.format(link, f.name, year)

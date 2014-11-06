@@ -7,11 +7,10 @@ from rest_framework.permissions import IsAuthenticated
 from apps.films.forms import RatingForm
 from apps.films.models import Films, UsersFilms
 
-#############################################################################################################
+from apps.users.models import Feed
+from apps.users.constants import FILM_RATE
 
 from videobase.settings import DEFAULT_REST_API_RESPONSE
-from apps.users import Feed
-from apps.users.constants import FILM_RATE
 
 
 #############################################################################################################
