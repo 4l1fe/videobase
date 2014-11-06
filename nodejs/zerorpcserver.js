@@ -24,7 +24,7 @@ var renderers = {
     reset_passwd: function(context) {return jade.renderFile(path.join(tmpl_path, 'page_reset.jade'), context)},
     confirm_passwd: function(context) {return jade.renderFile(path.join(tmpl_path, 'page_confirm_pwd.jade'), context)},
     confirm_email: function(context) {return jade.renderFile(path.join(tmpl_path, 'page_confirm_email.jade'), context)},
-    personal_newsletter: function(context) {return jade.renderFile(path.join(tmpl_path, 'mail/notice_feed_letter.jade'), context)}
+    personal_newsletter: function(context) {return jade.renderFile(path.join(tmpl_path, 'mail/notice_feed_letter.jade'), context)},
     casts_list: function(context) {return jade.renderFile(path.join(tmpl_path, 'page_casts_list.jade'), context)},
     cast: function(context) {return jade.renderFile(path.join(tmpl_path, 'page_cast.jade'), context)},
     week_newsletter: function(context) {return jade.renderFile(path.join(tmpl_path, 'mail/week_newsletter.jade'), context)}
