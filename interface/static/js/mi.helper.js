@@ -19,8 +19,9 @@ function duration_text(min) {
     return res || "0 минут";
  }
 
-function time_text(dt, date_now) {
-    var diff, curday, curtime, ho, text, min, input_day, now_day, at_time, tz_offset;
+function time_text(dt) {
+    var diff, curday, curtime, ho, text, min, input_day, now_day, at_time, tz_offset, date_now;
+    date_now = new Date();
     diff = (date_now.getTime() - dt.getTime()) / 1000;
 
     if (Math.abs(diff) < 60) return "сейчас";
