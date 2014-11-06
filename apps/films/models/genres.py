@@ -47,6 +47,10 @@ class Genres(NS_Node):
 
     @classmethod
     def get_full_genres_by_films(cls, pk, order=False):
+        """
+        Выбираем все жанры первого уровня для списка фильмов
+        """
+
         if not isinstance(pk, list):
             pk = [pk]
 
