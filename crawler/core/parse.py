@@ -8,8 +8,9 @@ from apps.films.constants import APP_FILM_SERIAL
 
 
 class BaseParse(object):
-    def __init__(self, html):
+    def __init__(self, html, film):
         self.html = html
+        self.film_type = film.type
 
     # Стоимость и варианты оплаты (подписка/просмотр/бесплатно)
     def get_price(self, **kwargs):
@@ -34,7 +35,7 @@ class BaseParse(object):
     # а не одну ссылку как было раньше
     @classmethod
     def parse(cls, response, dict_gen, film, **kwargs):
-        obj = cls(response)
+        obj = cls(response, film)
         resp_list = []
         type_robot = obj.get_type()
         films_list = obj.get_link(**kwargs)
@@ -51,7 +52,7 @@ class BaseParse(object):
                 resp_dict['url_view'] = serial_season['season_url']
                 resp_dict['price'] = price
                 resp_list.append(resp_dict)
-                for episode in serial_season['episode_dict']:
+                for episode in serial_season['episode_list']:
                     resp_dict['content_type'] = APP_LOCATION_TYPE_ADDITIONAL_MATERIAL_EPISODE
                     resp_dict['type'] = type_robot
                     resp_dict['number'] = serial_season['season']
