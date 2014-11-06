@@ -16,6 +16,7 @@ html
                                     .list-film
                                         .row#films
                                             each item in films.items
+                                                - console.log(item)
                                                 mixin film_thumb(item)
                                     //-
                                        .list-film

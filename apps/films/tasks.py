@@ -19,7 +19,7 @@ from apps.users.models import User, Feed, UsersRels
 from apps.users.tasks import send_template_mail
 from apps.users.api.serializers import vbFeedElement
 from apps.users.constants import APP_USERPROFILE_NOTIFICATION_WEEK, APP_USERPROFILE_NOTIFICATION_DAY, \
-    FILM_RATE, FILM_SUBSCRIBE, FILM_COMMENT
+    FILM_RATE, FILM_SUBSCRIBE, FILM_COMMENT, FILM_O
 
 from apps.casts.models import Casts
 from apps.casts.api.serializers import vbCast
@@ -83,12 +83,18 @@ def best_of_the_best_this_week():
 
 
 @app.task(name="personal_newsletter", queue="personal_newsletter")
-def personal_newsletter():
+def personal_newsletter(*args, **kwargs):
+    curr_dt = datetime.now()
+    start_dt = curr_dt - timedelta(days=1)
+
     # Основные параметры рассылки и контекст
     params_email = {
+        'jade_render': True,
         'subject': APP_FILMS_PERSON_SUB_EMAIL,
-        'tpl_name': u'mail/personal_newsletter.html',
-        'context': {},
+        'tpl_name': 'personal_newsletter',
+        'context': {
+            'serials': [],
+        },
     }
 
     # Все пользователи у которых есть email и выбрана недельная рассылка
@@ -101,17 +107,14 @@ def personal_newsletter():
     # ).prefetch_related('profile__user')
 
     for item in o_users:
-        # Init data
-        feeds = []
-
         # Выборка ленты друзей
         user_friends = UsersRels.get_all_friends_user(user_id=item.id, flat=True)
 
+        # Собираем типы фидов из профиля
+        type_film_feed = [FILM_O]
+
         # Проверка длинны
         if len(user_friends):
-            # Собираем типы фидов из профиля
-            type_film_feed = []
-
             if item.profile.ntf_frnd_rate:
                 type_film_feed.append(FILM_RATE)
 
@@ -121,28 +124,25 @@ def personal_newsletter():
             if item.profile.ntf_frnd_subscribe:
                 type_film_feed.append(FILM_SUBSCRIBE)
 
-            if len(type_film_feed):
-                feeds = Feed.objects.filter(user__in=user_friends, type__in=type_film_feed)
-                feeds = vbFeedElement(feeds, many=True).data
+        #
+        ids = [item.id] + list(user_friends)
 
         # Выборка фильмов
-        films = Films.objects.filter(uf_films_rel__user=item.id, uf_films_rel__subscribed=APP_USERFILM_SUBS_TRUE)
+        feeds = Feed.objects.\
+            filter(user__in=ids, type__in=[FILM_O], created__gte=start_dt, created__lt=curr_dt).\
+            order_by('created')
 
-        # Проверка длинны
-        if len(films):
-            films = vbFilm(films, many=True).data
-        else:
-            films = []
+        if len(feeds):
+            feeds = vbFeedElement(feeds, many=True).data
 
-        # Update
-        params_email['to'] = item.email
-        params_email['context'] = {
-            'feeds': feeds,
-            'films': films,
-        }
+            # Update
+            params_email['to'] = item.email
+            params_email['context'] = {
+                'feeds': feeds,
+            }
 
-        # Отправляем email в очередь
-        send_template_mail.s(**params_email).apply_async()
+            # Отправляем email в очередь
+            send_template_mail.s(**params_email).apply_async()
 
 
 @app.task(name="calc_amount_subscribed_to_movie")

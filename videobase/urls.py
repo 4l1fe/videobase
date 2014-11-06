@@ -6,8 +6,7 @@ from django.contrib import admin
 from videobase import settings
 
 from apps.films.views import test_view
-# from apps.casts.views import cast_view
-# from apps.casts.views import casts_list_view
+from apps.users.views import feed_view
 
 admin.autodiscover()
 
@@ -42,6 +41,9 @@ urlpatterns = patterns('',
     # GIT
     url(r'^git/', include('apps.git.urls')),
 
+    # notice_feed_letter
+    url(r'^mail/notice_feed_letter/', feed_view),
+
     # url(r'^casts/index$', casts_list_view),
     # url(r'^casts/', cast_view),
 )
@@ -50,3 +52,6 @@ if settings.DEBUG:
     urlpatterns += patterns('',
         (r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT}),
     )
+
+
+

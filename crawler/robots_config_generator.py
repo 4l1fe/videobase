@@ -1,73 +1,77 @@
 # coding: utf-8
-from apps.robots.models import Robots
 from sys import executable
+from os.path import abspath
 from crawler.robots_type_checker import RobotsTypeChecker
-from videobase.settings import ROBOTS_LIST
-
-__author__ = 'vladimir'
 
 
-def create_queue_str(robot_name):
-    return executable + " manage.py celery worker -Q {}".format(robot_name)
+def generate_robots_config(directory='.', user='developers', file_name='robots_config.conf', hostname='vsevi.ru'):
+    d = abspath(directory)
+    u, fn, hn = user, file_name, hostname  # сокращение
+    worker_command = lambda robot_name: executable + " manage.py celery worker -c 1 -Q {0} -n {0}.%h ".format(robot_name)
+    main_worker_command = executable + " manage.py celery worker -c 1"
+    beat_worker_command = executable + " manage.py celery beat --pidfile=/tmp/celerybeat.pid"
 
 
-def create_main_queue_str():
-    return executable + " manage.py celery worker"
-
-
-def generate_group_name(group_name, process_list):
-    template = '''
+    template_gr = '''
 [group:{}]
-programs={}'''.format(group_name, process_list)
-    return template
+programs={}'''
+    generate_group = lambda group_name, processes: template_gr.format(group_name, processes)
 
-
-def generate_process_section_with_parameters(programm_name, command, log_file_name):
-    template = '''
+    template_pr = '''
 [program:{}]
 command={}
-process_name=%(program_name)s ; process_name expr (default %(program_name)s)
-numprocs=1 ; number of processes copies to start (def 1)
-directory=/var/www/videobase/ ; directory to cwd to before exec (def no cwd)
-umask=022 ; umask for process (default None)
-startretries=1 ; max # of serial start failures (default 3)
-user=www-data ; setuid to this UNIX account to run the program
-redirect_stderr=true ; redirect proc stderr to stdout (default false)
-stdout_logfile=/var/log/{}.log'''.format(programm_name, command, log_file_name)
-    return template
+process_name=%(program_name)s ;
+directory={} ;
+umask=022 ;
+startretries=1 ;
+user={} ;
+redirect_stderr=true'''
+    generate_program = lambda program_name, command, dir_, u: template_pr.format(program_name, command, dir_, u)
 
+    rtc = RobotsTypeChecker()
+    lr_list = rtc.get_locrobots_list()
+    dr_list = rtc.get_datarobots_list()
+    cr_list = ['cast_sportbox_robot', 'cast_liverussia_robot', 'cast_championat_robot', 'cast_khl_robot', 'cast_ntv_plus_robot']
+    adr_list = ['robot_beat', 'robot_statistics_email', 'robot_notification_email', 'robot_newsletter_email',
+                'robot_avatar', 'location_saver', 'thor']
 
-def generate_config_file():
-    robots_type_checker = RobotsTypeChecker()
-    result_file_name = ''
-    locrobots_group_list = robots_type_checker.get_locrobots_list()
-    datarobots_group_list = robots_type_checker.get_datarobots_list()
-    supportrobots_group_list = robots_type_checker.get_support_robots()
-    f = open('robots_config.conf', 'w')
-    for robot in locrobots_group_list: #Robots.objects.all()
-        robo_command = create_queue_str(robot)
-        f.write(generate_process_section_with_parameters(robot, robo_command, robot))
-    for robot in datarobots_group_list: #ROBOTS_LIST
-        robo_command = create_queue_str(robot)
-        f.write(generate_process_section_with_parameters(robot, robo_command, robot))
-    saver_command = create_queue_str('location_saver')
-    f.write(generate_process_section_with_parameters('location_saver', saver_command, 'location_saver'))
-    thor_command = create_queue_str('thor')
-    f.write(generate_process_section_with_parameters('thor', thor_command, 'thor'))
-    main_command = create_main_queue_str()
-    f.write("\n")
-    f.write(generate_process_section_with_parameters('main_worker', main_command, 'main_worker'))
-    f.write("\n")
-    f.write(generate_group_name('locrobots_group', get_regular_str_from_list(locrobots_group_list)))
-    f.write(generate_group_name('datarobots_group', get_regular_str_from_list(datarobots_group_list)))
-    f.write(generate_group_name('supportrobots_group', get_regular_str_from_list(supportrobots_group_list)))
+    with open(fn, 'w') as file:
+        for robot in lr_list:
+            command = worker_command(robot)
+            file.write(generate_program(robot, command, d, u))
+            file.write("\n")
 
-    result_file_name = 'robots_config.conf'
-    return result_file_name
+        for robot in dr_list:
+            command = worker_command(robot)
+            file.write(generate_program(robot, command, d, u))
+            file.write("\n")
 
+        for robot in cr_list:
+            command = worker_command(robot)
+            file.write(generate_program(robot, command, d, u))
+            file.write("\n")
 
-def get_regular_str_from_list(list):
-    res = str(list).replace('[', '')
-    res = res.replace(']', '')
-    res = res.replace("'", '')
-    return res
+        for robot in adr_list:
+            command = worker_command(robot)
+            file.write(generate_program(robot, command, d, u))
+            file.write("\n")
+
+        file.write(generate_program('main_worker', main_worker_command, d, u))
+        file.write("\n")
+
+        file.write(generate_program('beat_worker', beat_worker_command, d, u))
+        file.write("\n")
+
+        file.write(generate_group('locrobots', ','.join(lr_list)))
+        file.write("\n")
+
+        file.write(generate_group('datarobots', ','.join(dr_list)))
+        file.write("\n")
+
+        file.write(generate_group('castrobots', ','.join(cr_list)))
+        file.write("\n")
+
+        file.write(generate_group('additionalrobots', ','.join(['main_worker']+adr_list)))
+        file.write("\n")
+
+    return fn

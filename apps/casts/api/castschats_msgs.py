@@ -24,7 +24,7 @@ class CastsChatsMsgsView(APIView):
 
     def get(self, request, castchat_id, *args, **kwargs):
         try:
-            form = CastsChatGetForm(request.GET)
+            form = CastsChatGetForm(data = request.GET)
             if form.is_valid():
                 query = CastsChatsMsgs.objects.all()
 
