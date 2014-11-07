@@ -106,6 +106,7 @@ mixin film_thumb(item)
         - price_loc = ""
         - btn_cls = ""
         - price_loc_cnt = 0
+        - btn_click_handler = ''
         - if (item.locations && item.locations.length>0) {
         -   for (i = 0; i < item.locations.length; i++) {
         -       obj = item.locations[i];
@@ -135,6 +136,8 @@ mixin film_thumb(item)
         - } else {
         -   btn_cls = "btn-subscribe"
         -   btn_text = "Подписаться"
+        -   btn_click_handler = "toggle_subscribe"
+        -   url_btn = url
         - }
         a(href=url, title='',data-mi-athref="id").poster-place
             - title_alt = item.name
@@ -153,7 +156,8 @@ mixin film_thumb(item)
                     |)
             .range-style.range-block
                 .rateit(data-mi-id="relation.rating",data-mi-val=(item.relation && item.relation.rating)?item.relation.rating:0,data-rateit-step=1,data-rateit-max=10,data-rateit-resetable=1,data-rateit-value=(item.relation && item.relation.rating)?item.relation.rating:0)
-            .btn-def.block.margin0a(class=btn_cls,data-mi-id="btn")
+
+            .btn-def.block.margin0a(class=btn_cls,data-mi-id="btn", data-mi-onclick=btn_click_handler)
                 a(href=url_btn , title='',data-mi-id="btn_text",data-mi-athref="id")!=btn_text
                 a.btn-add.ab(href=url, title='Добавить в плейлист',data-mi-id="relation.playlist",data-mi-onclick="toggle_playlist",data-mi-val=item.relation && item.relation.playlist?1:0)
             p(class=min_price && has_free?'':'display-none',data-mi-id="btn_price")
@@ -186,7 +190,8 @@ mixin person_thumb(item)
         - person_url = '/persons/' + item.id + '/'
         .actor
             a(href=person_url, title='', data-mi-athref="id")
-                img.img-circle(src=item.photo || nophoto_url, alt='', data-mi-atsrc="photo", data-mi-default=nophoto_url)
+                span.person-img-wrapper
+                    img(src=item.photo || nophoto_url, alt='', data-mi-atsrc="photo", data-mi-default=nophoto_url)
                 span(data-mi-name="name")=item.name
 
 mixin user_thumb(item)
@@ -248,7 +253,9 @@ mixin feed_thumb(item, for_tpl)
     -   }
     - }
     - created = time_text_str(item.created)
-    - if (item.type.substr(0,4) == "film") {
+    - if( item.type == "film-c" ) {
+    -   film_url = "/films/" + item.object.film.id + "/"
+    - } else if (item.type.substr(0,4) == "film") {
     -   film_url = "/films/" + item.object.id + "/"
     - } else if (item.type.substr(0,4) == "pers") {
     -   person_url = "/persons/" + item.object.id + "/"
@@ -268,7 +275,7 @@ mixin feed_thumb(item, for_tpl)
                             .row
                                 .col-md-10.col-sm-9.col-xs-9
                                     a(href=user_url, title='', data-mi-name="user.name", data-mi-athref="user.id")=user_name
-                                    |&nbsp;оставил комментарий к фильму
+                                    |&nbsp;оставил комментарий к фильму&nbsp;
                                 .col-md-2.col-sm-3.col-xs-3
                                     .time-tape(data-mi-id="created", data-mi-name="created", data-mi-val=item.created)=created
                         //-
@@ -276,7 +283,7 @@ mixin feed_thumb(item, for_tpl)
                         .content-item-tape
                             .short-text-tape
                                 h4
-                                    a(href=film_url, title='', data-mi-athref="object.id", data-mi-name="object.name")=item.object.name
+                                    a(href=film_url, title='', data-mi-athref="object.id", data-mi-name="object.name")=item.object.film.name
                                 - text = (item.object.text || "").replace(/\n+/gm, "<br/>")
                                 p(data-mi-name="object.text")=item.object.text
                             //-
@@ -596,7 +603,6 @@ mixin cast_thumb(item)
                         span(data-mi-id="price")=text
 
 mixin cast_player(loc)
-    - console.log(loc)
     if !loc.value || loc.value.length == 0
         if loc.type == 'liverussia_ru'
             - frame_url = 'http://player.rutv.ru/iframe/live/id/' + loc.value + '/showZoomBtn/false?time_play=0&isPlay=true&showPopUpBtn=false&showZoomBtn=true';
