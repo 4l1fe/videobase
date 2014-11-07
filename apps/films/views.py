@@ -378,9 +378,6 @@ def serialize_actors(actors_iterable):
 
 
 def calc_actors(o_film):
-    def serialize_actors(actors_iterable):
-        return [{'id': pf.person.id, 'name': pf.person.name} for pf in actors_iterable]
-
     result = []
     filter = {
         'filter': {'pf_persons_rel__film': o_film.id},
