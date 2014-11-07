@@ -9,7 +9,7 @@ from fabric.api import env, roles, run, settings, sudo, cd, local, require, get,
 
 common_packages = [
     'python', 'build-essential', 'python-dev',
-    'python-setuptools', 'python-pip'
+    'python-setuptools', 'python-pip', 'git', 'python-virtualenv'
 ]
 
 env.git_clone = 'git@git.aaysm.com:developers/videobase.git'
@@ -29,6 +29,23 @@ def localhost_env():
     env.req_dir = 'deploy'
     env.services = ['supervisor', 'nginx']
     env.configs = '/home/%(user)s/configs' % env
+    env.pip = '%(env)s/bin/pip' % env
+    env.python = '%(env)s/bin/python' % env
+    env.shell = '/bin/bash -c'
+
+def docker_env():
+    "Use the docker"
+    env.hosts = ['localhost:49153']
+    env.passwords = {'root@host1:49153': 'screencast'}
+    env.user = 'root'
+    env.project_name = 'videobase2'
+    env.path = '/var/www/%(project_name)s' % env
+    env.env = '/root/venv' % env
+    env.current_path = '%(path)s/current' % env
+    env.releases_path = '%(path)s/releases' % env
+    env.req_dir = 'deploy'
+    env.services = ['supervisor', 'nginx']
+    env.configs = '/root/configs' % env
     env.pip = '%(env)s/bin/pip' % env
     env.python = '%(env)s/bin/python' % env
     env.shell = '/bin/bash -c'
@@ -116,7 +133,7 @@ def checkout(branch=None):
         if not branch is None:
             env.git_branch = branch
 
-        run("git clone -b %(git_branch)s %(git_clone)s %(current_release)s" % env)
+        run("git clone --depth=1 -b %(git_branch)s %(git_clone)s %(current_release)s" % env)
 
         with cd(env.current_release):
             run("mv configs configs_from_repo")
@@ -191,6 +208,8 @@ def setup():
 
     run('mkdir -p %(path)s/{releases,current}' % env)
 
+    install_common_packages()
+
     # # Init Postgres User
     # if not fabtools.postgres.user_exists():
     #     fabtools.postgres.create_user(
@@ -216,7 +235,7 @@ def migrate(app_name=''):
         releases()
 
     with cd(env.current_release):
-        run('%(python)s manage.py migrate %(app_name)s --no-initial-data --delete-ghost-migrations' % {
+        run('%(python)s manage.py migrate %(app_name)s' % {
             'python': env.python,
             'app_name': app_name,
         })
