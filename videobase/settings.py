@@ -19,7 +19,6 @@ djcelery.setup_loader()
 AMQP_HOST = 'localhost'
 BROKER_HOST = 'localhost'
 BROKER_PORT = 5672
-###########################################################
 
 CELERY_TIMEZONE = 'UTC'
 CELERY_ACCEPT_CONTENT = ['pickle', 'json', 'msgpack', 'yaml']
@@ -93,7 +92,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_extensions',
-    'south',
+    # 'south',
     'django_nose',
     'treebeard',
     # Rest api
@@ -103,6 +102,7 @@ INSTALLED_APPS = (
     'social.apps.django_app.default',
     # Celery for django
     'djcelery',
+    # 'csvimport',
     # Apps
     'apps.users',
     'apps.films',
@@ -469,8 +469,6 @@ CELERYBEAT_SCHEDULE = {
     }
 }
 
-CELERY_TIMEZONE = 'UTC'
-CELERY_ACCEPT_CONTENT = ['pickle', 'json', 'msgpack', 'yaml']
 POSTER_URL_PREFIX = '_260x360'
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 

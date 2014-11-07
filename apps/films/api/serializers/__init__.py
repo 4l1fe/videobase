@@ -7,5 +7,6 @@ from vb_person import vbPerson
 from vb_film import vbFilm
 from vb_user_genre import vbUserGenre
 
-__all__ = ['vbExtra', 'vbLocation', 'vbComment', 'vbPerson' 'vbFilm',
-           'vbUserGenre']
+__all__ = [
+    'vbExtra', 'vbLocation', 'vbComment', 'vbPerson', 'vbFilm', 'vbUserGenre'
+]

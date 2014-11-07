@@ -97,7 +97,7 @@ APP_FILMS_API_DEFAULT_PER_PAGE = 12
 
 #############################################################################################################
 APP_COMMENTS_API_DEFAULT_PAGE = 1
-APP_COMMENTS_API_DEFAULT_PER_PAGE = 10
+APP_COMMENTS_API_DEFAULT_PER_PAGE = 5
 
 #############################################################################################################
 APP_FILMS_EXTRAS_POSTER_HOST = 'http://vsevi.ru/static/'
