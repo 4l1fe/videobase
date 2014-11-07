@@ -18,6 +18,7 @@ python-virtualenv
 python-pygraphviz
 pkg-config
 postgresql
+postgresql-contrib
 nodejs
 libxslt1-dev
 libxml2-dev
