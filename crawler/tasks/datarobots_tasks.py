@@ -51,7 +51,7 @@ def update_film_rating_task(kinopoisk_id):
 @app.task(name="update_ratings")
 def update_ratings_task():
     for f in Films.objects.all():
-        update_film_ratings_task.apply_async((f.kinopoisk_id,))
+        update_film_rating_task.apply_async((f.kinopoisk_id,))
 
 
 @app.task(name='kinopoisk_films')
@@ -91,11 +91,6 @@ def kinopoisk_set_paster(*args, **kwargs):
 
     else:
         print u'Skipping robot {name}'.format(name=robot.name)
-
-
-@app.task(name='imdb_rating_update')
-def imdb_robot_start(*args, **kwargs):
-    process_all()
 
 
 def film_at_least_years_old(film, years):
