@@ -204,7 +204,7 @@ USE_TZ = False
 ###########################################################
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
-MEDIA_ROOT = os.path.abspath(BASE_PATH + '/../static')
+MEDIA_ROOT = '/var/www/static/'
 MEDIA_URL = '/static/'
 
 STATIC_URL = '/production/static/'
