@@ -1,7 +1,7 @@
 # coding: utf-8
+from apps.films.constants import APP_FILM_SERIAL
 from crawler.core.exceptions import NoSuchFilm
-import requests
-import parsers
+from crawler.locrobots.zoomby_ru.parsers import ParseFilm
 from crawler.core import BaseLoader
 import urllib
 
@@ -15,10 +15,13 @@ class ZOOMBY_Loader(BaseLoader):
         self.search_url = 'search?{}'.format(urllib.urlencode({'type':'','q': self.film}))
 
     def get_url(self, load_function):
-        url = "http://%s/%s" % (self.host, self.search_url, )
-        response = load_function(url)
-        filmLink = parsers.parse_search(response, self.film.name, self.film.release_date.year)
+        serial = False
+        if self.film.type == APP_FILM_SERIAL:
+            serial = True
+
+        filmLink = ParseFilm.parse_search(self.film.name, self.film.release_date.year, load_function, serial)
+
         if filmLink is None:
             raise NoSuchFilm(self.film)
         self.url_load = filmLink
-        return "http://%s%s" % (self.host, self.url_load)
+        return filmLink

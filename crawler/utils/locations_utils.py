@@ -28,7 +28,9 @@ def sane_dict(film=None):
             'subtitles': '',
             'url_source': '',
             'value': '',
-            'type': ''
+            'type': '',
+            'episode': '',
+            'content_type': ''
             }
 
 
@@ -154,6 +156,9 @@ def save_location(film, **kwargs):
                          subtitles=kwargs['subtitles'],
                          price=kwargs['price'],
                          price_type=kwargs['price_type'],
+                         episode=kwargs['episode'],
+                         content_type=kwargs['content_type']
+
                          
     )
     print "Saving location"
