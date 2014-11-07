@@ -1,7 +1,7 @@
 # coding: utf-8
 
 from crawler.tasks.datarobots_tasks import kinopoisk_films,\
-    kinopoisk_set_paster, imdb_robot_start,\
+    kinopoisk_set_paster,\
     create_due_refresh_tasks, parse_kinopoisk_news, find_trailer,\
     trailer_commands
 
