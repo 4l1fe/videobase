@@ -92,7 +92,6 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_extensions',
-    # 'south',
     'django_nose',
     'treebeard',
     # Rest api
@@ -102,7 +101,6 @@ INSTALLED_APPS = (
     'social.apps.django_app.default',
     # Celery for django
     'djcelery',
-    # 'csvimport',
     # Apps
     'apps.users',
     'apps.films',

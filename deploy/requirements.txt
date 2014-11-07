@@ -1,5 +1,4 @@
 Django==1.7.1
-South==0.8.4
 argparse
 psycopg2
 wsgiref==0.1.2
@@ -36,7 +35,7 @@ zerorpc
 lxml
 pycurl
 django-treebeard
-djorm-ext-pgfulltext
+git+git://github.com/djangonauts/djorm-ext-pgfulltext.git
 GitPython
 PySocks
 django-nose
