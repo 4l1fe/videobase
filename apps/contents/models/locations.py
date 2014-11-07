@@ -3,7 +3,8 @@
 from django.db import models
 
 from utils.fields.currency_field import CurrencyField
-from apps.contents.constants import APP_CONTENTS_LOC_TYPE, APP_CONTENTS_PRICE_TYPE
+from apps.contents.constants import APP_CONTENTS_LOC_TYPE, APP_CONTENTS_PRICE_TYPE, \
+    APP_LOCATION_TYPE_ADDITIONAL_MATERIAL
 
 
 #############################################################################################################
@@ -11,6 +12,7 @@ from apps.contents.constants import APP_CONTENTS_LOC_TYPE, APP_CONTENTS_PRICE_TY
 class Locations(models.Model):
     content    = models.ForeignKey('Contents', verbose_name=u'Контент', related_name='location')
     type       = models.CharField(choices=APP_CONTENTS_LOC_TYPE, db_index=True, verbose_name=u'Тип', max_length=40)
+    content_type = models.CharField(null=True, choices=APP_LOCATION_TYPE_ADDITIONAL_MATERIAL, db_index=True, verbose_name=u'Тип объекта', max_length=40)
     lang       = models.CharField(max_length=40, verbose_name=u'Язык')
     quality    = models.CharField(max_length=40, verbose_name=u'Качество')
     subtitles  = models.CharField(max_length=40, verbose_name=u'Субтитры')
@@ -19,6 +21,8 @@ class Locations(models.Model):
     url_view   = models.URLField(max_length=255, verbose_name=u'Ссылка для просмотра')
     value      = models.TextField(verbose_name=u"Код встраивания", blank=True, null=True)
     created    = models.DateTimeField(auto_now_add=True, verbose_name=u'Создан')
+    episode    = models.IntegerField(null=True, blank=True, verbose_name=u'Номер серии')
+
 
     def as_vbLocation(self):
 
