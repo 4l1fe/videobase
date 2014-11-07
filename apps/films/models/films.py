@@ -53,7 +53,7 @@ class Films(models.Model):
     objects = models.Manager()
     search_manager = SearchManager(
         fields=('name', 'name_orig'),
-        config='pg_catalog.english',
+        config='film_names',
         search_field='search_index',
         auto_update_search_field=True
     )
