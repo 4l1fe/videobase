@@ -76,7 +76,7 @@ def get_content(film, kwargs):
 
             return content
         else:
-            season = Seasons(film=film, number=season_num, release_date=release_date)
+            season = Seasons(film=film, number=season_num, release_date='1999-12-12', series_cnt=0, description='')
             season.save()
             content = Contents(film=film, name=film.name, name_orig=film.name_orig,
                            description=description,
@@ -84,7 +84,8 @@ def get_content(film, kwargs):
                            viewer_cnt=0,
                            viewer_lastweek_cnt=0,
                            viewer_lastmonth_cnt=0,
-                           season=season)
+                           season=season,
+                           number=season_num)
             content.save()
             return content
 
@@ -92,14 +93,15 @@ def get_content(film, kwargs):
         print season_num
         #According to contract we agreed if there are no seasons there should be return 0, buy some code may return None
         if (season_num is None) or (season_num == 0):
-            content = Contents.get_content_by_film_and_number(film, 0)[0]
+            content = Contents.get_content_by_film(film)[0]
         else:
             content = Contents.get_content_by_film_and_number(film, season_num)
             if len(content) == 0:
-                new_season = Seasons(film=film, number=season_num)
+                new_season = Seasons(film=film, number=season_num, release_date='1999-12-12', series_cnt=0, description='')
                 new_season.save()
                 content = Contents.get_content_by_film(film)
                 content.season = new_season
+                content.number = season_num
                 content.save()
                 return content
             else:
@@ -121,8 +123,8 @@ def save_location(film, **kwargs):
         'type': kwargs['type']
                 }
 
-    if kwargs['type'] in APP_ROBOT_VALUE and kwargs['value'] == '':
-        return
+    # if kwargs['type'] in APP_ROBOT_VALUE and kwargs['value'] == '':
+    #     return
 
     content = get_content(film, kwargs)
     val = URLValidator()
