@@ -2,7 +2,6 @@
 import copy
 import string
 from bs4 import BeautifulSoup
-import re
 from apps.contents.constants import APP_LOCATION_TYPE_ADDITIONAL_MATERIAL_SEASON, \
     APP_LOCATION_TYPE_ADDITIONAL_MATERIAL_EPISODE, APP_LOCATION_TYPE_ADDITIONAL_MATERIAL_FILM
 from apps.films.constants import APP_FILM_SERIAL
@@ -93,14 +92,16 @@ class ParseTvigleFilm(object):
 
         if film.type == APP_FILM_SERIAL:
             for serial_season in self.list_url:
+                resp_dict = dict_gen(film)
                 resp_dict['content_type'] = APP_LOCATION_TYPE_ADDITIONAL_MATERIAL_SEASON
                 resp_dict['type'] = 'tvigle'
                 resp_dict['number'] = serial_season['season']
                 resp_dict['value'] = value
                 resp_dict['url_view'] = serial_season['season_url']
                 resp_dict['price'] = self.get_price()
-                resp_list.append(copy.deepcopy(resp_dict))
+                resp_list.append(resp_dict)
                 for episode in serial_season['episode_list']:
+                    resp_dict = dict_gen(film)
                     resp_dict['content_type'] = APP_LOCATION_TYPE_ADDITIONAL_MATERIAL_EPISODE
                     resp_dict['type'] = 'tvigle'
                     resp_dict['number'] = serial_season['season']
@@ -108,15 +109,16 @@ class ParseTvigleFilm(object):
                     resp_dict['url_view'] = episode['url']
                     resp_dict['price'] = self.get_price()
                     resp_dict['episode'] = episode['number']
-                    resp_list.append(copy.deepcopy(resp_dict))
+                    resp_list.append(resp_dict)
         else:
+            resp_dict = dict_gen(film)
             resp_dict['type'] = 'tvigle'
             resp_dict['number'] = 0
             resp_dict['value'] = value
             resp_dict['url_view'] = url
             resp_dict['price'] = self.get_price()
             resp_dict['content_type'] = APP_LOCATION_TYPE_ADDITIONAL_MATERIAL_FILM
-            resp_list.append(copy.deepcopy(resp_dict))
+            resp_list.append(resp_dict)
 
         return resp_list
 
