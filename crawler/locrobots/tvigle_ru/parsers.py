@@ -17,8 +17,14 @@ class ParseTvigleFilm(object):
         cls.list_url = []
         film_link = ''
         film_name = film_name.lower().strip().encode('utf-8').translate(None, string.punctuation)
-        season_url = {
+        cls.serial_list = []
+        season_list = {
             'season': '',
+            'season_url': '',
+            'episode_list': []
+        }
+        episode_dict = {
+            'number': '',
             'url': ''
         }
         try:
@@ -36,18 +42,28 @@ class ParseTvigleFilm(object):
                         try:
                             tag_season = soup.find('div', {'class': 'category-filter-menu left'}).findAll('li')
                         except Exception:
-                            season_url['url'] = serial_url
-                            season_url['season'] = 1
-                            cls.list_url.append(season_url)
-                            cls.seasons.append(1)
+                            season_list['season_url'] = serial_url
+                            season_list['season'] = 1
+                            season_list['episode_list'].append(episode_dict)
+                            cls.list_url.append(season_list)
                             return serial_url
 
                         for tag_li in tag_season:
                             link = tag_li.a.get('href')
-                            season_url['url'] = cls.url_film + link
-                            season_url['season'] = int(tag_li.a.text.split()[1])
-                            cls.list_url.append(copy.deepcopy(season_url))
-                            cls.seasons.append(int(season_url['season']))
+                            season_list['season_url'] = cls.url_film + link
+                            season_list['season'] = int(tag_li.a.text.split()[1])
+                            response = load_function(season_list['season_url'])
+                            soup = BeautifulSoup(response)
+
+                            tags_a = soup.find('div', {'class': 'category-filter-content left'}).findAll('a')
+
+                            for tag_a in tags_a:
+                                text = tag_a.text
+                                if u'Серия' in text:
+                                    episode_dict['number'] = int(text.split(u'Серия')[1])
+                                    episode_dict['url'] = cls.url_film + tag_a.get('href')
+                                    season_list['episode_list'].append(copy.deepcopy(episode_dict))
+                            cls.list_url.append(copy.deepcopy(season_list))
                         return cls.url_film + link
 
             else:
