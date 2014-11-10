@@ -1,9 +1,7 @@
 from apps.contents.models import Contents, Locations
 from apps.films.models import Seasons
-from apps.robots.constants import APP_ROBOT_VALUE
 from django.core.validators import URLValidator
-from apps.contents.constants import APP_CONTENTS_PRICE_TYPE_FREE, APP_LOCATION_TYPE_ADDITIONAL_MATERIAL_SEASON
-from django.utils import timezone
+from apps.contents.constants import APP_CONTENTS_PRICE_TYPE_FREE
 from crawler.locations_saver import save_location_to_locs_dict
 
 
