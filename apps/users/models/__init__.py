@@ -8,5 +8,3 @@ from users_rels import UsersRels
 from users_feed import Feed
 from users_hash import UsersHash
 from session_token import SessionToken
-
-from apps.users.signals import *

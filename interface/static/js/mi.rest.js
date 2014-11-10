@@ -259,8 +259,12 @@
                 } else {
                   _this.token = void 0;
                   _this.session_token = void 0;
-                  $.cookie("x-session", "", -1);
-                  $.cookie("x-token", "", -1);
+                  $.cookie("x-session", "", {
+                    expires: -1
+                  });
+                  $.cookie("x-token", "", {
+                    expires: -1
+                  });
                   if (_this.opts.auth_error) {
                     _this.opts.auth_error(xhr);
                   }

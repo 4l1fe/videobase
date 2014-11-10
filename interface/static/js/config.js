@@ -20,7 +20,7 @@
 
   conf.player_url = "/static/player.html";
 
-  conf.player_cast_url = "static/playercast.html";
+  conf.player_cast_url = "/static/playercast.html";
 
   conf.filter_delay = 1000;
 

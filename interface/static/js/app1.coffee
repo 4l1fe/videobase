@@ -279,7 +279,10 @@ class FilmThumb extends Item
 
   transform_val: (name, val) ->
     if name == "releasedate"
-      return val.substr(0, 4)
+      if val && typeof(val) == "string"
+        return val.substr(0, 4)
+      else
+        return ''
     else
       super
 
@@ -288,7 +291,7 @@ class FilmThumb extends Item
       vals.title_alt = vals.name
       if vals.name_orig && vals.name != vals.name_orig
         vals.title_alt+= " (" + vals.name_orig + ")"
-      if vals.releasedate
+      if vals.releasedate && typeof(val) == "string"
         vals.title_alt+= " " + vals.releasedate.substr(0,4)
 
     @elements["btn_price"].self.hide()
@@ -988,7 +991,9 @@ class Page_Search extends Page
         if data.items
           deck.add_items(data.items)
           if data.items.length >= 12
-            deck.load_more_show()
+            deck.load_more_show(false)
+          else
+            deck.load_more_hide(false)
           deck.page = data.page
         opts.callback() if opts.callback
     )
@@ -1249,11 +1254,12 @@ class Page_Film extends Page
     @_app.rest.films.comments.read(@conf.id, {page: (comments_deck.page || 1) + 1})
     .done(
       (data) ->
+        total_page_count = Math.ceil(data.total_cnt/data.ipp)
         if data && data.items
           comments_deck.add_items(data.items)
           comments_deck.time_update()
           comments_deck.page = data.page
-          if data.items.length >= 10
+          if data.page < total_page_count
             comments_deck.load_more_show()
           else
             comments_deck.load_more_hide(false)
@@ -1752,7 +1758,7 @@ class Page_Cast extends Page
     @chat.counter++
     local_counter = @chat.counter
     limit = limit || 20
-    @_app.rest.castschats.msgs.read @conf.id, {id_low: @chat.last_id, limit: limit}
+    @_app.rest.castschats.msgs.read @conf.id, {id_low: (@chat.last_id|| -1) + 1, limit: limit}
       .done(
         (data)=>
           if local_counter == @chat.counter

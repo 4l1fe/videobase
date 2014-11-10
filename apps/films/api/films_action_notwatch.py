@@ -1,4 +1,5 @@
 # coding: utf-8
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -6,8 +7,10 @@ from rest_framework.permissions import IsAuthenticated
 from apps.films.models import Films, UsersFilms
 from apps.films.constants import (APP_USERFILM_STATUS_NOT_WATCH, APP_USERFILM_STATUS_UNDEF,
                                   APP_USERFILM_SUBS_FALSE)
-from apps.users import Feed
+
+from apps.users.models import Feed
 from apps.users.constants import FILM_NOTWATCH, FILM_SUBSCRIBE, FILM_RATE
+
 from videobase.settings import DEFAULT_REST_API_RESPONSE
 
 

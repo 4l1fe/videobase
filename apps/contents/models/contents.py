@@ -19,10 +19,17 @@ class Contents(models.Model):
     viewer_lastweek_cnt  = models.IntegerField(verbose_name=u'Количество посмотревших за последнюю неделю')
     viewer_lastmonth_cnt = models.IntegerField(verbose_name=u'Количество посмотревших за последний месяцo')
 
-
     def __unicode__(self):
 
         return u'[{0}] {1}'.format(self.pk, self.film.name,)
+
+    @classmethod
+    def get_content_by_film_and_number(cls, film, number):
+        return cls.objects.filter(film=film, number=number)
+
+    @classmethod
+    def get_content_by_film(cls, film):
+        return cls.objects.filter(film=film)
 
 
     class Meta:

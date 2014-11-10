@@ -124,7 +124,8 @@ html
                                                                .block-text
                                                             .person-text.rel
                                                                 - avatar = item.user.avatar || noavatar_url
-                                                                img(src=avatar, alt='').img-circle
+                                                                .user-img-wrapper.img-circle
+                                                                    img(src=avatar, alt='')
                                                                 - url_tmp = '/users/' + item.user.id + '/'
                                                                 a(href=url_tmp, title='')=item.user.name
                                                                 i=item.user.city || ""

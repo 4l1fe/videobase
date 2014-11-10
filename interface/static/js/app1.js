@@ -465,7 +465,11 @@
 
     FilmThumb.prototype.transform_val = function(name, val) {
       if (name === "releasedate") {
-        return val.substr(0, 4);
+        if (val && typeof val === "string") {
+          return val.substr(0, 4);
+        } else {
+          return '';
+        }
       } else {
         return FilmThumb.__super__.transform_val.apply(this, arguments);
       }
@@ -478,7 +482,7 @@
         if (vals.name_orig && vals.name !== vals.name_orig) {
           vals.title_alt += " (" + vals.name_orig + ")";
         }
-        if (vals.releasedate) {
+        if (vals.releasedate && typeof val === "string") {
           vals.title_alt += " " + vals.releasedate.substr(0, 4);
         }
       }
@@ -1577,7 +1581,9 @@
           if (data.items) {
             deck.add_items(data.items);
             if (data.items.length >= 12) {
-              deck.load_more_show();
+              deck.load_more_show(false);
+            } else {
+              deck.load_more_hide(false);
             }
             deck.page = data.page;
           }
@@ -2012,11 +2018,13 @@
       return this._app.rest.films.comments.read(this.conf.id, {
         page: (comments_deck.page || 1) + 1
       }).done(function(data) {
+        var total_page_count;
+        total_page_count = Math.ceil(data.total_cnt / data.ipp);
         if (data && data.items) {
           comments_deck.add_items(data.items);
           comments_deck.time_update();
           comments_deck.page = data.page;
-          if (data.items.length >= 10) {
+          if (data.page < total_page_count) {
             return comments_deck.load_more_show();
           } else {
             return comments_deck.load_more_hide(false);
@@ -2771,7 +2779,7 @@
       local_counter = this.chat.counter;
       limit = limit || 20;
       return this._app.rest.castschats.msgs.read(this.conf.id, {
-        id_low: this.chat.last_id,
+        id_low: (this.chat.last_id || -1) + 1,
         limit: limit
       }).done((function(_this) {
         return function(data) {
