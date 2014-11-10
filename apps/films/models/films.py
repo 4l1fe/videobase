@@ -92,16 +92,6 @@ class Films(models.Model):
         return []
 
 
-    @classmethod
-    def similar_default(cls, limit=True):
-        o_similar = cls.objects.order_by('-rating_sort')
-
-        if limit:
-            o_similar = o_similar[:APP_FILMS_API_DEFAULT_PER_PAGE]
-
-        return o_similar
-
-
     @property
     def get_rating_for_vb_film(self):
         return {
@@ -249,17 +239,18 @@ class Films(models.Model):
         """
 
         sql = """
-        SELECT f.* from (
-            SELECT DISTINCT ON (films.id) "films".*, loc.id as loc_id FROM (
-                SELECT DISTINCT ON ("locations"."content_id") "locations"."content_id", "locations"."id" FROM "locations"
-            ) AS loc
-            INNER JOIN "content" ON ("loc"."content_id" = "content"."id")
-            LEFT JOIN "films" ON ("content"."film_id" = "films"."id")
-            INNER JOIN "films_extras" ON ("films_extras"."film_id" = "films"."id" and "films_extras"."type" = %s)
-            WHERE ("films"."rating_cons" >= %s AND "films"."rating_cons_cnt" > %s AND "films"."was_shown" = False)
-        ) as f
-        ORDER BY "f"."loc_id" DESC LIMIT %s
-        """
+SELECT f.* from (
+    SELECT DISTINCT ON (films.id) "films".*, loc.id as loc_id FROM (
+        SELECT DISTINCT ON ("locations"."content_id") "locations"."content_id", "locations"."id" FROM "locations"
+    ) AS loc
+    INNER JOIN "content" ON ("loc"."content_id" = "content"."id")
+    LEFT JOIN "films" ON ("content"."film_id" = "films"."id")
+    INNER JOIN "films_extras" ON ("films_extras"."film_id" = "films"."id" and "films_extras"."type" = %s)
+    WHERE ("films"."was_shown" = False AND "films"."rating_cons" >= %s AND "films"."rating_cons_cnt" > %s
+     AND EXTRACT(year FROM AGE(current_date, "films"."release_date")) < 10)
+) as f
+ORDER BY "f"."loc_id" DESC LIMIT %s
+"""
 
         return cls.objects.raw(sql, params=['POSTER', 5.5, 5000, limit])
 
