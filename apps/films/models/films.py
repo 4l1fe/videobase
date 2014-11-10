@@ -92,16 +92,6 @@ class Films(models.Model):
         return []
 
 
-    @classmethod
-    def similar_default(cls, limit=True):
-        o_similar = cls.objects.order_by('-rating_sort')
-
-        if limit:
-            o_similar = o_similar[:APP_FILMS_API_DEFAULT_PER_PAGE]
-
-        return o_similar
-
-
     @property
     def get_rating_for_vb_film(self):
         return {
@@ -178,21 +168,25 @@ class Films(models.Model):
     @property
     def get_time_factor(self):
         """
-        - если release_date - текущая дата >= 700 дней, то time_factor = 1
-        - если release_date - текущая дата < 700 дней, но больше 1, то time_factor = 1.5 - 0.5 * (release_date - текущая дата дней) / 700
-        - если release_date - текущая дата <= 1, то time_factor = 1.5
+        - если release_date - текущая дата >= 60 лет, то time_factor = 0.5
+        - если release_date - текущая дата >= 700 дней, но < 60 лет, то time_factor = 1 - 0.5 * (release_date - текущая дата дней) / 21900
+        - если release_date - текущая дата >= 1 дня, но < 700 дней, то time_factor = 1.5 - 0.5 * (release_date - текущая дата дней) / 700
+        - если release_date - текущая дата < 1, то time_factor = 1.5
+        - если не указана release_date, то time_factor = 0.5
         """
 
-        days = 0
+        time_factor = 0.5
         if not self.release_date is None:
             days = (datetime.date.today() - self.release_date).days
 
-        if days >= 700:
-            time_factor = 1
-        elif 1 < days < 700:
-            time_factor = 1.5 - 0.5 * (-days) / 700
-        else:
-            time_factor = 1.5
+            if days >= 21900:
+                time_factor = 0.5
+            elif 700 <= days < 21900:
+                time_factor = 1 - 0.5 * days / 21900
+            elif 1 <= days < 700:
+                time_factor = 1.5 - 0.5 * days / 700
+            else:
+                time_factor = 1.5
 
         return time_factor
 
@@ -249,17 +243,18 @@ class Films(models.Model):
         """
 
         sql = """
-        SELECT f.* from (
-            SELECT DISTINCT ON (films.id) "films".*, loc.id as loc_id FROM (
-                SELECT DISTINCT ON ("locations"."content_id") "locations"."content_id", "locations"."id" FROM "locations"
-            ) AS loc
-            INNER JOIN "content" ON ("loc"."content_id" = "content"."id")
-            LEFT JOIN "films" ON ("content"."film_id" = "films"."id")
-            INNER JOIN "films_extras" ON ("films_extras"."film_id" = "films"."id" and "films_extras"."type" = %s)
-            WHERE ("films"."rating_cons" >= %s AND "films"."rating_cons_cnt" > %s AND "films"."was_shown" = False)
-        ) as f
-        ORDER BY "f"."loc_id" DESC LIMIT %s
-        """
+SELECT f.* from (
+    SELECT DISTINCT ON (films.id) "films".*, loc.id as loc_id FROM (
+        SELECT DISTINCT ON ("locations"."content_id") "locations"."content_id", "locations"."id" FROM "locations"
+    ) AS loc
+    INNER JOIN "content" ON ("loc"."content_id" = "content"."id")
+    LEFT JOIN "films" ON ("content"."film_id" = "films"."id")
+    INNER JOIN "films_extras" ON ("films_extras"."film_id" = "films"."id" and "films_extras"."type" = %s)
+    WHERE ("films"."was_shown" = False AND "films"."rating_cons" >= %s AND "films"."rating_cons_cnt" > %s
+     AND EXTRACT(year FROM AGE(current_date, "films"."release_date")) < 10)
+) as f
+ORDER BY "f"."loc_id" DESC LIMIT %s
+"""
 
         return cls.objects.raw(sql, params=['POSTER', 5.5, 5000, limit])
 
