@@ -3,6 +3,8 @@ import copy
 import string
 from bs4 import BeautifulSoup
 import re
+from apps.contents.constants import APP_LOCATION_TYPE_ADDITIONAL_MATERIAL_SEASON, \
+    APP_LOCATION_TYPE_ADDITIONAL_MATERIAL_EPISODE, APP_LOCATION_TYPE_ADDITIONAL_MATERIAL_FILM
 from apps.films.constants import APP_FILM_SERIAL
 
 
@@ -49,6 +51,7 @@ class ParseTvigleFilm(object):
                             return serial_url
 
                         for tag_li in tag_season:
+                            season_list['episode_list'] = []
                             link = tag_li.a.get('href')
                             season_list['season_url'] = cls.url_film + link
                             season_list['season'] = int(tag_li.a.text.split()[1])
@@ -60,9 +63,10 @@ class ParseTvigleFilm(object):
                             for tag_a in tags_a:
                                 text = tag_a.text
                                 if u'Серия' in text:
-                                    episode_dict['number'] = int(text.split(u'Серия')[1])
-                                    episode_dict['url'] = cls.url_film + tag_a.get('href')
-                                    season_list['episode_list'].append(copy.deepcopy(episode_dict))
+                                    if episode_dict['url'] != cls.url_film + tag_a.get('href'):
+                                        episode_dict['number'] = int(text.split(u'Серия')[1])
+                                        episode_dict['url'] = cls.url_film + tag_a.get('href')
+                                        season_list['episode_list'].append(copy.deepcopy(episode_dict))
                             cls.list_url.append(copy.deepcopy(season_list))
                         return cls.url_film + link
 
@@ -80,33 +84,38 @@ class ParseTvigleFilm(object):
 
     def parse(self, response, dict_gen, film, url):
         resp_list = []
-        links = self.get_link()
-
-        price = self.get_price()
-        seasons = self.get_seasons()
-        seasons.sort()
-
         try:
             value = url.split('video=')[1]
         except:
             value = ''
 
+        resp_dict = dict_gen(film)
+
         if film.type == APP_FILM_SERIAL:
-            for season in self.list_url:
-                resp_dict = dict_gen(film)
+            for serial_season in self.list_url:
+                resp_dict['content_type'] = APP_LOCATION_TYPE_ADDITIONAL_MATERIAL_SEASON
                 resp_dict['type'] = 'tvigle'
-                resp_dict['number'] = season['season']
+                resp_dict['number'] = serial_season['season']
                 resp_dict['value'] = value
-                resp_dict['url_view'] = season['url']
-                resp_dict['price'] = price
+                resp_dict['url_view'] = serial_season['season_url']
+                resp_dict['price'] = self.get_price()
                 resp_list.append(resp_dict)
+                for episode in serial_season['episode_list']:
+                    resp_dict['content_type'] = APP_LOCATION_TYPE_ADDITIONAL_MATERIAL_EPISODE
+                    resp_dict['type'] = 'tvigle'
+                    resp_dict['number'] = serial_season['season']
+                    resp_dict['value'] = value
+                    resp_dict['url_view'] = episode['url']
+                    resp_dict['price'] = self.get_price()
+                    resp_dict['episode'] = episode['number']
+                    resp_list.append(resp_dict)
         else:
-            resp_dict = dict_gen(film)
             resp_dict['type'] = 'tvigle'
             resp_dict['number'] = 0
             resp_dict['value'] = value
-            resp_dict['url_view'] = links[0]
-            resp_dict['price'] = price
+            resp_dict['url_view'] = url
+            resp_dict['price'] = self.get_price()
+            resp_dict['content_type'] = APP_LOCATION_TYPE_ADDITIONAL_MATERIAL_FILM
             resp_list.append(resp_dict)
 
         return resp_list
