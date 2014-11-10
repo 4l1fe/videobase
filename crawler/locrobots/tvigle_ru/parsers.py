@@ -25,7 +25,7 @@ class ParseTvigleFilm(object):
             soup = BeautifulSoup(response)
             if serial:
                 cls.seasons = []
-                tag_a = soup.findAll('div', {'class':'category-filter-content left auto-upload'})[0].findAll('a')
+                tag_a = soup.findAll('div', {'class': 'category-filter-content left auto-upload'})[0].findAll('a')
                 for a in tag_a:
                     if film_name in a.text.lower().strip().encode('utf-8').translate(None, string.punctuation):
                         link = a.get('href')
