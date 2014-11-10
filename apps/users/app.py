@@ -3,7 +3,7 @@
 from django.apps import AppConfig
 
 
-class MyAppConfig(AppConfig):
+class UserConfig(AppConfig):
     name = 'apps.users'
 
     def ready(self):

@@ -3,7 +3,7 @@
 from django.apps import AppConfig
 
 
-class MyAppConfig(AppConfig):
+class FilmConfig(AppConfig):
     name = 'apps.films'
 
     def ready(self):
