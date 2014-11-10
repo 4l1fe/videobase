@@ -168,21 +168,25 @@ class Films(models.Model):
     @property
     def get_time_factor(self):
         """
-        - если release_date - текущая дата >= 700 дней, то time_factor = 1
-        - если release_date - текущая дата < 700 дней, но больше 1, то time_factor = 1.5 - 0.5 * (release_date - текущая дата дней) / 700
-        - если release_date - текущая дата <= 1, то time_factor = 1.5
+        - если release_date - текущая дата >= 60 лет, то time_factor = 0.5
+        - если release_date - текущая дата >= 700 дней, но < 60 лет, то time_factor = 1 - 0.5 * (release_date - текущая дата дней) / 21900
+        - если release_date - текущая дата >= 1 дня, но < 700 дней, то time_factor = 1.5 - 0.5 * (release_date - текущая дата дней) / 700
+        - если release_date - текущая дата < 1, то time_factor = 1.5
+        - если не указана release_date, то time_factor = 0.5
         """
 
-        days = 0
+        time_factor = 0.5
         if not self.release_date is None:
             days = (datetime.date.today() - self.release_date).days
 
-        if days >= 700:
-            time_factor = 1
-        elif 1 < days < 700:
-            time_factor = 1.5 - 0.5 * (-days) / 700
-        else:
-            time_factor = 1.5
+            if days >= 21900:
+                time_factor = 0.5
+            elif 700 <= days < 21900:
+                time_factor = 1 - 0.5 * days / 21900
+            elif 1 <= days < 700:
+                time_factor = 1.5 - 0.5 * days / 700
+            else:
+                time_factor = 1.5
 
         return time_factor
 
