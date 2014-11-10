@@ -2018,11 +2018,13 @@
       return this._app.rest.films.comments.read(this.conf.id, {
         page: (comments_deck.page || 1) + 1
       }).done(function(data) {
+        var total_page_count;
+        total_page_count = Math.ceil(data.total_cnt / data.ipp);
         if (data && data.items) {
           comments_deck.add_items(data.items);
           comments_deck.time_update();
           comments_deck.page = data.page;
-          if (data.items.length >= 10) {
+          if (data.page < total_page_count) {
             return comments_deck.load_more_show();
           } else {
             return comments_deck.load_more_hide(false);
@@ -2777,7 +2779,7 @@
       local_counter = this.chat.counter;
       limit = limit || 20;
       return this._app.rest.castschats.msgs.read(this.conf.id, {
-        id_low: this.chat.last_id,
+        id_low: (this.chat.last_id || -1) + 1,
         limit: limit
       }).done((function(_this) {
         return function(data) {

@@ -8,15 +8,84 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding field 'Locations.content_type'
-        db.add_column('locations', 'content_type',
-                      self.gf('django.db.models.fields.CharField')(max_length=40, null=True, db_index=True),
-                      keep_default=False)
+        # Adding model 'Comments'
+        db.create_table('comments', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(related_name='comments', to=orm['auth.User'])),
+            ('content', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['contents.Contents'])),
+            ('text', self.gf('django.db.models.fields.TextField')()),
+            ('parent_id', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
+            ('status', self.gf('django.db.models.fields.PositiveIntegerField')(null=True, blank=True)),
+            ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+        ))
+        db.send_create_signal('contents', ['Comments'])
+
+        # Adding model 'Contents'
+        db.create_table('content', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('film', self.gf('django.db.models.fields.related.ForeignKey')(related_name='contents', to=orm['films.Films'])),
+            ('name', self.gf('django.db.models.fields.CharField')(max_length=255)),
+            ('name_orig', self.gf('django.db.models.fields.CharField')(max_length=255)),
+            ('number', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
+            ('description', self.gf('django.db.models.fields.TextField')()),
+            ('release_date', self.gf('django.db.models.fields.DateTimeField')()),
+            ('season', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['films.Seasons'], null=True, blank=True)),
+            ('viewer_cnt', self.gf('django.db.models.fields.IntegerField')()),
+            ('viewer_lastweek_cnt', self.gf('django.db.models.fields.IntegerField')()),
+            ('viewer_lastmonth_cnt', self.gf('django.db.models.fields.IntegerField')()),
+        ))
+        db.send_create_signal('contents', ['Contents'])
+
+        # Adding model 'Locations'
+        db.create_table('locations', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('content', self.gf('django.db.models.fields.related.ForeignKey')(related_name='location', to=orm['contents.Contents'])),
+            ('type', self.gf('django.db.models.fields.CharField')(max_length=40, db_index=True)),
+            ('lang', self.gf('django.db.models.fields.CharField')(max_length=40)),
+            ('quality', self.gf('django.db.models.fields.CharField')(max_length=40)),
+            ('subtitles', self.gf('django.db.models.fields.CharField')(max_length=40)),
+            ('price', self.gf('django.db.models.fields.DecimalField')(default='0.0', max_digits=30, decimal_places=2, db_index=True)),
+            ('price_type', self.gf('django.db.models.fields.SmallIntegerField')(db_index=True)),
+            ('url_view', self.gf('django.db.models.fields.URLField')(max_length=255)),
+            ('value', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
+            ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+        ))
+        db.send_create_signal('contents', ['Locations'])
+
+        # Adding model 'About'
+        db.create_table('about', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('text', self.gf('django.db.models.fields.TextField')()),
+            ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('updated', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
+        ))
+        db.send_create_signal('contents', ['About'])
+
+        # Adding model 'Legal'
+        db.create_table('legal', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('text', self.gf('django.db.models.fields.TextField')()),
+            ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('updated', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
+        ))
+        db.send_create_signal('contents', ['Legal'])
 
 
     def backwards(self, orm):
-        # Deleting field 'Locations.content_type'
-        db.delete_column('locations', 'content_type')
+        # Deleting model 'Comments'
+        db.delete_table('comments')
+
+        # Deleting model 'Contents'
+        db.delete_table('content')
+
+        # Deleting model 'Locations'
+        db.delete_table('locations')
+
+        # Deleting model 'About'
+        db.delete_table('about')
+
+        # Deleting model 'Legal'
+        db.delete_table('legal')
 
 
     models = {
@@ -59,7 +128,7 @@ class Migration(SchemaMigration):
         'contents.comments': {
             'Meta': {'object_name': 'Comments', 'db_table': "'comments'"},
             'content': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contents.Contents']"}),
-            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'db_index': 'True', 'blank': 'True'}),
+            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'parent_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'status': ('django.db.models.fields.PositiveIntegerField', [], {'null': 'True', 'blank': 'True'}),
@@ -90,9 +159,7 @@ class Migration(SchemaMigration):
         'contents.locations': {
             'Meta': {'object_name': 'Locations', 'db_table': "'locations'"},
             'content': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'location'", 'to': "orm['contents.Contents']"}),
-            'content_type': ('django.db.models.fields.CharField', [], {'max_length': '40', 'null': 'True', 'db_index': 'True'}),
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'episode': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'lang': ('django.db.models.fields.CharField', [], {'max_length': '40'}),
             'price': ('django.db.models.fields.DecimalField', [], {'default': "'0.0'", 'max_digits': '30', 'decimal_places': '2', 'db_index': 'True'}),
@@ -140,30 +207,27 @@ class Migration(SchemaMigration):
             'name_orig': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '255', 'db_index': 'True', 'blank': 'True'}),
             'persons': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'persons'", 'symmetrical': 'False', 'through': "orm['films.PersonsFilms']", 'to': "orm['films.Persons']"}),
             'rating_cons': ('django.db.models.fields.FloatField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
-            'rating_cons_cnt': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0', 'null': 'True', 'db_index': 'True', 'blank': 'True'}),
+            'rating_cons_cnt': ('django.db.models.fields.IntegerField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
             'rating_imdb': ('django.db.models.fields.FloatField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
-            'rating_imdb_cnt': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
+            'rating_imdb_cnt': ('django.db.models.fields.IntegerField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
             'rating_kinopoisk': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
-            'rating_kinopoisk_cnt': ('django.db.models.fields.PositiveIntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'rating_local': ('django.db.models.fields.FloatField', [], {'default': '0', 'null': 'True', 'db_index': 'True', 'blank': 'True'}),
-            'rating_local_cnt': ('django.db.models.fields.IntegerField', [], {'default': '0', 'null': 'True', 'db_index': 'True', 'blank': 'True'}),
+            'rating_kinopoisk_cnt': ('django.db.models.fields.PositiveSmallIntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'rating_local': ('django.db.models.fields.FloatField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
+            'rating_local_cnt': ('django.db.models.fields.IntegerField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
             'rating_sort': ('django.db.models.fields.IntegerField', [], {'default': '0', 'null': 'True', 'db_index': 'True', 'blank': 'True'}),
             'release_date': ('django.db.models.fields.DateField', [], {'db_index': 'True', 'null': 'True', 'blank': 'True'}),
             'search_index': ('djorm_pgfulltext.fields.VectorField', [], {'default': "''", 'null': 'True', 'db_index': 'True'}),
             'seasons_cnt': ('django.db.models.fields.PositiveSmallIntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'subscribed_cnt': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0', 'null': 'True', 'db_index': 'True', 'blank': 'True'}),
-            'type': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
-            'was_shown': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'world_release_date': ('django.db.models.fields.DateField', [], {'db_index': 'True', 'null': 'True', 'blank': 'True'})
+            'type': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'})
         },
         'films.genres': {
             'Meta': {'object_name': 'Genres', 'db_table': "'genres'"},
             'depth': ('django.db.models.fields.PositiveIntegerField', [], {'db_index': 'True'}),
             'description': ('django.db.models.fields.TextField', [], {}),
-            'hidden': ('django.db.models.fields.NullBooleanField', [], {'default': 'False', 'null': 'True', 'db_index': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'lft': ('django.db.models.fields.PositiveIntegerField', [], {'db_index': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
+            'rating_sort': ('django.db.models.fields.SmallIntegerField', [], {'db_index': 'True', 'null': 'True', 'blank': 'True'}),
             'rgt': ('django.db.models.fields.PositiveIntegerField', [], {'db_index': 'True'}),
             'tree_id': ('django.db.models.fields.PositiveIntegerField', [], {'db_index': 'True'})
         },
@@ -184,7 +248,6 @@ class Migration(SchemaMigration):
             'film': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'pf_films_rel'", 'to': "orm['films.Films']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'p_character': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '255'}),
-            'p_index': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'p_type': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
             'person': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'pf_persons_rel'", 'to': "orm['films.Persons']"})
         },

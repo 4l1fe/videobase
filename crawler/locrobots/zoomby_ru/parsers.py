@@ -21,7 +21,7 @@ class ParseFilm(object):
         season_dict = {
             'season': '',
             'season_url': '',
-            'episode_dict': ''
+            'episode_list': ''
         }
         episode_dict = {
             'number': '',
@@ -56,7 +56,7 @@ class ParseFilm(object):
                                     episode_dict['number'] = int(serial_text.split('-')[0])
                                     episode_dict['url'] = HOST + '/' + li.a.get('href')
                                     season_dict['season'] = 1
-                                    season_dict['episode_dict'] = season_dict
+                                    season_dict['episode_list'] = season_dict
                                     cls.serial_list.append(season_dict)
                             return cls.season_url
                         else:
@@ -93,7 +93,7 @@ class ParseFilm(object):
                 resp_dict['url_view'] = serial_season['season_url']
                 resp_dict['price'] = self.get_price()
                 resp_list.append(resp_dict)
-                for episode in serial_season['episode_dict']:
+                for episode in serial_season['episode_list']:
                     resp_dict['content_type'] = APP_LOCATION_TYPE_ADDITIONAL_MATERIAL_EPISODE
                     resp_dict['type'] = 'zoomby'
                     resp_dict['number'] = serial_season['season']

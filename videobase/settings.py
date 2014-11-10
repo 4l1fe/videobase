@@ -92,7 +92,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_extensions',
-    'south',
+    # 'south',
     'django_nose',
     'treebeard',
     # Rest api
@@ -102,7 +102,7 @@ INSTALLED_APPS = (
     'social.apps.django_app.default',
     # Celery for django
     'djcelery',
-    'csvimport',
+    # 'csvimport',
     # Apps
     'apps.users',
     'apps.films',
@@ -204,7 +204,7 @@ USE_TZ = False
 ###########################################################
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
-MEDIA_ROOT = os.path.abspath(BASE_PATH + '/../static')
+MEDIA_ROOT = '/var/www/static/'
 MEDIA_URL = '/static/'
 
 STATIC_URL = '/production/static/'
