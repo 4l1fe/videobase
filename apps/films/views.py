@@ -18,6 +18,7 @@ from django.core.urlresolvers import reverse
 from django.core.context_processors import csrf
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.serializers.json import DjangoJSONEncoder
+from django.db.models import Q
 
 from django.template import Context
 from django.views.generic import View
@@ -599,7 +600,8 @@ class CommentedFilms(View):
         else:
             cf_html = ''
             ids = (f.id for f in film_model.Films.get_commented_films(greater=2))
-            films = film_model.Films.objects.exclude(id__in=ids).order_by('-rating_sort').iterator()
+            films = film_model.Films.objects.exclude(id__in=ids).order_by('-rating_sort')
+            films = films.filter(Q(release_date__gt=date(1990,1,1)) & ~Q(release_date=None)).iterator()
 
             for i, f in enumerate(films):
                 if i > 1000: 

@@ -43,8 +43,6 @@ DEBUG = False
 
 TEMPLATE_DEBUG = DEBUG
 
-SOUTH_TESTS_MIGRATE = False
-
 logger = logging.getLogger('factory')  # switch off factory boy logging
 logger.addHandler(logging.NullHandler())
 logger.setLevel(logging.INFO)
@@ -92,7 +90,6 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_extensions',
-    # 'south',
     'django_nose',
     'treebeard',
     # Rest api
