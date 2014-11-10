@@ -2,6 +2,7 @@
 
 
 # Базовый класс парсера для страници
+import copy
 from apps.contents.constants import APP_LOCATION_TYPE_ADDITIONAL_MATERIAL_FILM, \
     APP_LOCATION_TYPE_ADDITIONAL_MATERIAL_EPISODE, APP_LOCATION_TYPE_ADDITIONAL_MATERIAL_SEASON
 from apps.films.constants import APP_FILM_SERIAL
@@ -51,7 +52,7 @@ class BaseParse(object):
                 resp_dict['value'] = value
                 resp_dict['url_view'] = serial_season['season_url']
                 resp_dict['price'] = price
-                resp_list.append(resp_dict)
+                resp_list.append(copy.deepcopy(resp_dict))
                 for episode in serial_season['episode_list']:
                     resp_dict['content_type'] = APP_LOCATION_TYPE_ADDITIONAL_MATERIAL_EPISODE
                     resp_dict['type'] = type_robot
@@ -60,7 +61,7 @@ class BaseParse(object):
                     resp_dict['url_view'] = episode['url']
                     resp_dict['price'] = price
                     resp_dict['episode'] = episode['number']
-                    resp_list.append(resp_dict)
+                    resp_list.append(copy.deepcopy(resp_dict))
         else:
             resp_dict['type'] = type_robot
             resp_dict['number'] = 0
@@ -68,6 +69,6 @@ class BaseParse(object):
             resp_dict['url_view'] = films_list
             resp_dict['price'] = price
             resp_dict['content_type'] = APP_LOCATION_TYPE_ADDITIONAL_MATERIAL_FILM
-            resp_list.append(resp_dict)
+            resp_list.append(copy.deepcopy(resp_dict))
 
         return resp_list

@@ -11,7 +11,6 @@ def parse_source(source, film_name, hosts):
         if film_name in text_h:
             tag_a = tag.a
             ref = tag_a.get('href')
-
         film_link = hosts + ref
     except:
         film_link = ''
