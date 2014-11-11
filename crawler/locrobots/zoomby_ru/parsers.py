@@ -1,9 +1,11 @@
 # coding: utf-8
+import copy
 import string
 from apps.contents.constants import APP_LOCATION_TYPE_ADDITIONAL_MATERIAL_EPISODE, \
     APP_LOCATION_TYPE_ADDITIONAL_MATERIAL_SEASON, APP_LOCATION_TYPE_ADDITIONAL_MATERIAL_FILM
 from apps.films.constants import APP_FILM_FULL_FILM, APP_FILM_SERIAL
 from bs4 import BeautifulSoup
+from crawler.core.exceptions import NoSuchFilm
 from crawler.tor import simple_tor_get_page
 import requests
 
@@ -14,10 +16,9 @@ class ParseFilm(object):
     def __init__(self):
         self.parse_value = 'http://www.zoomby.ru/v/'
 
-    @classmethod
-    def parse_search(cls, film_name, year, load_function, ser):
+    def data_parse(self, film_name, year, load_function, ser):
         film_name = film_name.lower().strip().encode('utf-8').translate(None, string.punctuation)
-        cls.serial_list = []
+        serial_list = []
         season_dict = {
             'season': '',
             'season_url': '',
@@ -44,30 +45,47 @@ class ParseFilm(object):
                 for serial in data_dict['catalog']:
                     name = serial['title'].lower().strip().encode('utf-8').translate(None, string.punctuation)
                     if film_name == name and year == int(serial['year']):
-                        cls.season_url = HOST + serial['url']
-                        season_dict['season_url'] = cls.season_url
+                        season_url = HOST + serial['url']
+                        season_dict['season_url'] = season_url
                         if ser:
-                            response = load_function(cls.season_url)
+                            response = load_function(season_url)
                             soup = BeautifulSoup(response)
                             tags_li = soup.find('ul', {'class': 'panel01ul'}).findAll('li')
+                            episode_list = []
                             for li in tags_li:
+                                season_dict['season'] = 1
                                 serial_text = li.find('strong', {'class': 'row1long'}).text
                                 if u'серия' in serial_text:
                                     episode_dict['number'] = int(serial_text.split('-')[0])
-                                    episode_dict['url'] = HOST + '/' + li.a.get('href')
-                                    season_dict['season'] = 1
-                                    season_dict['episode_list'] = season_dict
-                                    cls.serial_list.append(season_dict)
-                            return cls.season_url
+                                    episode_dict['url'] = HOST + '/watch/' + li.a.get('href')
+                                    episode_list.append(copy.deepcopy(episode_dict))
+                            season_dict['episode_list'] = episode_list
+                            serial_list.append(season_dict)
+                            return serial_list
                         else:
-                            return cls.season_url
+                            return season_url
                 i += 1
         except Exception:
             film_link = None
         return film_link
 
     def parse(self, response, dict_gen, film, url):
-        content = simple_tor_get_page(url)
+        serial = False
+
+        if film.type == APP_FILM_SERIAL:
+            serial = True
+
+
+        serial_list = self.data_parse(film.name, film.release_date.year, simple_tor_get_page, serial)
+
+        if serial:
+            content = simple_tor_get_page(serial_list[0]['season_url'])
+        else:
+            content = simple_tor_get_page(serial_list)
+
+        if serial_list is None:
+            raise NoSuchFilm(film)
+
         value = ''
         resp_list = []
         try:
@@ -82,10 +100,8 @@ class ParseFilm(object):
         except Exception:
             pass
 
-        resp_dict = dict_gen(film)
-
         if film.type == APP_FILM_SERIAL:
-            for serial_season in self.serial_list:
+            for serial_season in serial_list:
                 resp_dict = dict_gen(film)
                 resp_dict['content_type'] = APP_LOCATION_TYPE_ADDITIONAL_MATERIAL_SEASON
                 resp_dict['type'] = 'zoomby'
@@ -109,7 +125,7 @@ class ParseFilm(object):
             resp_dict['type'] = 'tvigle'
             resp_dict['number'] = 0
             resp_dict['value'] = value
-            resp_dict['url_view'] = url
+            resp_dict['url_view'] = serial_list
             resp_dict['price'] = self.get_price()
             resp_dict['content_type'] = APP_LOCATION_TYPE_ADDITIONAL_MATERIAL_FILM
             resp_list.append(resp_dict)
