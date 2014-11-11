@@ -1412,6 +1412,13 @@ section.cast-chat {padding-bottom: 40px;}
 .index-comments-block {margin: 0 auto; padding: 0}
 .index-comments-block .bg-noise {padding: 34px 0}
 
+.index-comments-block .crsl-nav {/*fix issue #505*/
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
 .password-reset { padding-top: 0;  }
 .password-reset .container {padding-top: 37px}
 
