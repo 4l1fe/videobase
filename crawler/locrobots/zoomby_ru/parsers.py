@@ -86,6 +86,7 @@ class ParseFilm(object):
 
         if film.type == APP_FILM_SERIAL:
             for serial_season in self.serial_list:
+                resp_dict = dict_gen(film)
                 resp_dict['content_type'] = APP_LOCATION_TYPE_ADDITIONAL_MATERIAL_SEASON
                 resp_dict['type'] = 'zoomby'
                 resp_dict['number'] = serial_season['season']
@@ -94,6 +95,7 @@ class ParseFilm(object):
                 resp_dict['price'] = self.get_price()
                 resp_list.append(resp_dict)
                 for episode in serial_season['episode_list']:
+                    resp_dict = dict_gen(film)
                     resp_dict['content_type'] = APP_LOCATION_TYPE_ADDITIONAL_MATERIAL_EPISODE
                     resp_dict['type'] = 'zoomby'
                     resp_dict['number'] = serial_season['season']
@@ -103,6 +105,7 @@ class ParseFilm(object):
                     resp_dict['episode'] = episode['number']
                     resp_list.append(resp_dict)
         else:
+            resp_dict = dict_gen(film)
             resp_dict['type'] = 'tvigle'
             resp_dict['number'] = 0
             resp_dict['value'] = value
