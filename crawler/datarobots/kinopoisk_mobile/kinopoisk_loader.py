@@ -57,28 +57,28 @@ class KinopoiskMobile():
         json_path = 'saved_pages/kinopoisk_mobile/'
         files = os.listdir(json_path)
         for f in Films.objects.all():
-            max_date_film_fname = KinopoiskMobile.get_max_date_file_name(KinopoiskMobile.load_film_page_to_file, f, files, 3, 5)
-            max_date_persons_for_film_fname = KinopoiskMobile.get_max_date_file_name(KinopoiskMobile.load_persons_page_to_file, f, files, 5, 7)
+            max_date_film_fname = KinopoiskMobile.get_max_date_file_name(KinopoiskMobile.load_film_page_to_file, f.kinopoisk_id, files, 3, 5)
+            max_date_persons_for_film_fname = KinopoiskMobile.get_max_date_file_name(KinopoiskMobile.load_persons_page_to_file, f.kinopoisk_id, files, 5, 7)
             KinopoiskMobile.process_film_file_page(max_date_film_fname)
             KinopoiskMobile.process_persons_page(max_date_persons_for_film_fname)
 
     @staticmethod
-    def get_max_date_file_name(load_func, film, files, k_id_index, date_index):
+    def get_max_date_file_name(load_func, f_kinopoisk_id, files, k_id_index, date_index):
         max_date_fname = ''
         max_date = None
         for file_name in files:
             attrs = file_name.split('_')
-            if attrs[k_id_index] == str(film.kinopoisk_id):
+            if attrs[k_id_index] == str(f_kinopoisk_id):
                 file_date = datetime.datetime.strptime(attrs[date_index].split('.')[0], '%Y-%m-%d')
                 if not max_date or file_date >max_date:
                     max_date = file_date
                     max_date_fname = file_name
         if max_date_fname == '':
-            max_date_fname = load_func(film.kinopoisk_id)
-            print "Page(pesr page) for film {} will be downloaded".format(film.kinopoisk_id)
+            max_date_fname = load_func(f_kinopoisk_id)
+            print "Page(pesr page) for film {} will be downloaded".format(f_kinopoisk_id)
         else:
             max_date_fname = 'saved_pages/kinopoisk_mobile/' + max_date_fname
-            print "Found local page for film {}".format(film.kinopoisk_id)
+            print "Found local page for film {}".format(f_kinopoisk_id)
         return  max_date_fname
 
     @staticmethod
