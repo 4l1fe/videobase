@@ -51,6 +51,7 @@ class BaseParse(object):
                 resp_dict['value'] = value
                 resp_dict['url_view'] = serial_season['season_url']
                 resp_dict['price'] = price
+                resp_dict['episode'] = 0
                 resp_list.append(resp_dict)
                 for episode in serial_season['episode_list']:
                     resp_dict = dict_gen(film)
@@ -70,6 +71,7 @@ class BaseParse(object):
             resp_dict['url_view'] = films_list
             resp_dict['price'] = price
             resp_dict['content_type'] = APP_LOCATION_TYPE_ADDITIONAL_MATERIAL_FILM
+            resp_dict['episode'] = 0
             resp_list.append(resp_dict)
 
         return resp_list

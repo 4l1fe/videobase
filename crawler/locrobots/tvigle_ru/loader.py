@@ -16,14 +16,8 @@ class TVIGLE_Loader(BaseLoader):
         self.search_url = 'search/?q=' + search_film
 
     def get_url(self, load_function):
-        serial = False
         if self.film.type == APP_FILM_SERIAL:
             url = "http://%s/%s" % (self.host, "catalog/filmy-i-serialy/serialy/")
-            serial = True
         else:
-            url = "http://%s/%s" % (self.host, self.search_url, )
-        response = load_function(url)
-        film_link = ParseTvigleFilm.parse_search(response, self.film.name, serial, load_function)
-        if film_link is None:
-            raise NoSuchFilm(self.film)
-        return film_link
+            url = 'http://www.tvigle.ru/catalog/filmy-i-serialy/filmy/'
+        return url
