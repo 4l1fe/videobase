@@ -4,6 +4,8 @@ from apps.films.models import Seasons
 from django.core.validators import URLValidator
 from apps.contents.constants import APP_CONTENTS_PRICE_TYPE_FREE
 from apps.robots.constants import APP_ROBOT_VALUE
+
+
 from crawler.locations_saver import save_location_to_locs_dict
 
 
@@ -107,6 +109,9 @@ def get_content(film, kwargs):
                     viewer_lastmonth_cnt=0,
                     season=new_season,
                     number=season_num)
+                content = Contents.get_content_by_film(film)
+                content.season = new_season
+                content.number = season_num
                 content.save()
                 return content
             else:
@@ -128,8 +133,8 @@ def save_location(film, **kwargs):
         'type': kwargs['type']
                 }
 
-    if kwargs['type'] in APP_ROBOT_VALUE and kwargs['value'] == '':
-        return
+    # if kwargs['type'] in APP_ROBOT_VALUE and kwargs['value'] == '':
+    #     return
 
     content = get_content(film, kwargs)
     val = URLValidator()
@@ -181,3 +186,4 @@ def save_location(film, **kwargs):
         is_new = True
     save_location_to_locs_dict(locations_d, True, film, kwargs['type'], location.id, is_new)
     return  locations_d
+    
