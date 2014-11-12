@@ -12,8 +12,8 @@ from djorm_pgfulltext.fields import VectorField
 #############################################################################################################
 #
 class FilmManager(models.Manager):
-    def get_query_set(self):
-        return super(FilmManager, self).get_query_set().filter(type=APP_FILM_FULL_FILM)
+    def get_queryset(self):
+        return super(FilmManager, self).get_queryset().filter(type=APP_FILM_FULL_FILM)
 
 
 #############################################################################################################
@@ -53,7 +53,7 @@ class Films(models.Model):
     objects = models.Manager()
     search_manager = SearchManager(
         fields=('name', 'name_orig'),
-        config='pg_catalog.english',
+        config='film_names',
         search_field='search_index',
         auto_update_search_field=True
     )
@@ -70,7 +70,7 @@ class Films(models.Model):
     @classmethod
     def similar_api(cls, film):
         """
-            Выборка похожих фильмов
+        Выборка похожих фильмов
         """
 
         params = [','.join([str(i.pk) for i in film.genres.all()]), film.id, APP_FILMS_API_DEFAULT_PER_PAGE]
@@ -90,16 +90,6 @@ class Films(models.Model):
             return cls.objects.raw(sql)
 
         return []
-
-
-    @classmethod
-    def similar_default(cls, limit=True):
-        o_similar = cls.objects.order_by('-rating_sort')
-
-        if limit:
-            o_similar = o_similar[:APP_FILMS_API_DEFAULT_PER_PAGE]
-
-        return o_similar
 
 
     @property
@@ -143,7 +133,7 @@ class Films(models.Model):
     def get_rating_cons(self):
         rating = self.rating_cons
         if not rating is None:
-            return int(rating) if rating.is_integer() else round(rating, 1)
+            rating = int(rating) if rating.is_integer() else round(rating, 1)
 
         return rating
 
@@ -169,7 +159,7 @@ class Films(models.Model):
     @property
     def get_calc_rating_cons_cnt(self):
         """
-            Высчитывается как сумма значений rating_local_cnt, rating_imdb_cnt, rating_kinopoisk_imdb
+        Высчитывается как сумма значений rating_local_cnt, rating_imdb_cnt, rating_kinopoisk_imdb
         """
 
         return self.get_rating_local_cnt + self.get_rating_imdb_cnt + self.get_rating_kinopoisk_cnt
@@ -178,21 +168,25 @@ class Films(models.Model):
     @property
     def get_time_factor(self):
         """
-            - если release_date - текущая дата >= 700 дней, то time_factor = 1
-            - если release_date - текущая дата < 700 дней, но больше 1, то time_factor = 1.5 - 0.5 * (release_date - текущая дата дней) / 700
-            - если release_date - текущая дата <= 1, то time_factor = 1.5
+        - если release_date - текущая дата >= 60 лет, то time_factor = 0.5
+        - если release_date - текущая дата >= 700 дней, но < 60 лет, то time_factor = 1 - 0.5 * (release_date - текущая дата дней) / 21900
+        - если release_date - текущая дата >= 1 дня, но < 700 дней, то time_factor = 1.5 - 0.5 * (release_date - текущая дата дней) / 700
+        - если release_date - текущая дата < 1, то time_factor = 1.5
+        - если не указана release_date, то time_factor = 0.5
         """
 
-        days = 0
+        time_factor = 0.5
         if not self.release_date is None:
             days = (datetime.date.today() - self.release_date).days
 
-        if days >= 700:
-            time_factor = 1
-        elif 1 < days < 700:
-            time_factor = 1.5 - 0.5 * (-days) / 700
-        else:
-            time_factor = 1.5
+            if days >= 21900:
+                time_factor = 0.5
+            elif 700 <= days < 21900:
+                time_factor = 1 - 0.5 * days / 21900
+            elif 1 <= days < 700:
+                time_factor = 1.5 - 0.5 * days / 700
+            else:
+                time_factor = 1.5
 
         return time_factor
 
@@ -200,13 +194,13 @@ class Films(models.Model):
     @property
     def get_calc_rating_cons(self):
         """
-            Высчисление rating_cons по следующей формуле: 60% rating_kinopoisk + 30% rating_imdb + 10% rating_local.
-            причём, если какое-то значение отсутствует или нулевое,
-            то его доля распределяется между остальными значениями, например:
-                - если rating_imdb не установлен, то формула становится 85.7% rating_kinpoisk + 14.3% rating_local
-                - если rating_kinopoisk не установлен, то формула становится 75% rating_imdb + 25% rating_local
-                - если rating_local не установлен, то формула становится 66.7% rating_kinopoisk + 33.3% rating_imdb
-                - если rating_imdb и rating_kinopoisk не установлены, то формула становится 100% rating_local
+        Высчисление rating_cons по следующей формуле: 60% rating_kinopoisk + 30% rating_imdb + 10% rating_local.
+        причём, если какое-то значение отсутствует или нулевое,
+        то его доля распределяется между остальными значениями, например:
+            - если rating_imdb не установлен, то формула становится 85.7% rating_kinpoisk + 14.3% rating_local
+            - если rating_kinopoisk не установлен, то формула становится 75% rating_imdb + 25% rating_local
+            - если rating_local не установлен, то формула становится 66.7% rating_kinopoisk + 33.3% rating_imdb
+            - если rating_imdb и rating_kinopoisk не установлены, то формула становится 100% rating_local
         """
 
         values = ((6, self.rating_kinopoisk), (3, self.rating_imdb), (1, self.rating_local),)
@@ -218,11 +212,12 @@ class Films(models.Model):
 
     def get_sort_cnt(self, rating_cons_cnt):
         """
-            - если rating_cons_cnt больше 30 000, то sort_cnt = 5 000 + (sort_cnt - 30 000) / 150 + 15 000 / 50 + 10 000 / 20
-            - если rating_cons_cnt больше 15 000, но меньше 30 000, sort_cnt = 5 000 + (rating_cons_cnt - 15000) / 50 + 10 000 / 20
-            - если rating_cons_cnt больше 5 000, но меньше 15 000, то sort_cnt = 5 000 + (rating_cons_cnt - 5000) / 20
-            - если rating_cons меньше или равно 5 000, то sort_cnt = rating_cons_cnt
-            алгоритм изменен
+        - если rating_cons_cnt больше 30 000, то sort_cnt = 5 000 + (sort_cnt - 30 000) / 150 + 15 000 / 50 + 10 000 / 20
+        - если rating_cons_cnt больше 15 000, но меньше 30 000, sort_cnt = 5 000 + (rating_cons_cnt - 15000) / 50 + 10 000 / 20
+        - если rating_cons_cnt больше 5 000, но меньше 15 000, то sort_cnt = 5 000 + (rating_cons_cnt - 5000) / 20
+        - если rating_cons меньше или равно 5 000, то sort_cnt = rating_cons_cnt
+
+        алгоритм был слегка изменен
         """
 
         if rating_cons_cnt > 100000:
@@ -244,41 +239,43 @@ class Films(models.Model):
     @classmethod
     def get_newest_films(cls, limit=4):
         """
-            Выбираем четыре последних новинки из фильмов
+        Выбираем четыре последних новинки из фильмов
         """
 
         sql = """
-        SELECT f.* from (
-            SELECT DISTINCT ON (films.id) "films".*, loc.id as loc_id FROM (
-                SELECT DISTINCT ON ("locations"."content_id") "locations"."content_id", "locations"."id" FROM "locations"
-            ) AS loc
-            INNER JOIN "content" ON ("loc"."content_id" = "content"."id")
-            LEFT JOIN "films" ON ("content"."film_id" = "films"."id")
-            INNER JOIN "films_extras" ON ("films_extras"."film_id" = "films"."id" and "films_extras"."type" = %s)
-
-            WHERE ("films"."rating_cons" >= %s AND "films"."rating_cons_cnt" > %s AND "films"."was_shown" = False)
-        ) as f
-       ORDER BY "f"."loc_id"  DESC
-       LIMIT %s
-        """
+SELECT f.* from (
+    SELECT DISTINCT ON (films.id) "films".*, loc.id as loc_id FROM (
+        SELECT DISTINCT ON ("locations"."content_id") "locations"."content_id", "locations"."id" FROM "locations"
+    ) AS loc
+    INNER JOIN "content" ON ("loc"."content_id" = "content"."id")
+    LEFT JOIN "films" ON ("content"."film_id" = "films"."id")
+    INNER JOIN "films_extras" ON ("films_extras"."film_id" = "films"."id" and "films_extras"."type" = %s)
+    WHERE ("films"."was_shown" = False AND "films"."rating_cons" >= %s AND "films"."rating_cons_cnt" > %s
+     AND EXTRACT(year FROM AGE(current_date, "films"."release_date")) < 10)
+) as f
+ORDER BY "f"."loc_id" DESC LIMIT %s
+"""
 
         return cls.objects.raw(sql, params=['POSTER', 5.5, 5000, limit])
 
 
     @classmethod
     def get_commented_films(cls, greater=None, less=None):
-        sql = """SELECT films.id
-                 FROM films
-                 INNER JOIN content ON films.id = content.film_id
-                 INNER JOIN comments ON content.id = comments.content_id
-                 GROUP BY films.id
-                 HAVING CASE
-                        WHEN %s IS NOT NULL THEN count(films.id) > %s
-                        WHEN %s IS NOT NULL THEN count(films.id) < %s
-                        END"""
-        commented_films = cls.objects.raw(sql, (greater, greater, less, less))
+        """
+        """
 
-        return commented_films
+        sql = """
+        SELECT films.id FROM films
+        INNER JOIN content ON films.id = content.film_id
+        INNER JOIN comments ON content.id = comments.content_id
+        GROUP BY films.id
+        HAVING CASE
+            WHEN %s IS NOT NULL THEN count(films.id) > %s
+            WHEN %s IS NOT NULL THEN count(films.id) < %s
+        END"""
+        
+        return cls.objects.raw(sql, (greater, greater, less, less))
+
 
     class Meta(object):
         # Имя таблицы в БД
