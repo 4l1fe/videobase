@@ -14,7 +14,7 @@ from django.core.management.base import BaseCommand
 from rest_framework.authtoken.models import Token
 
 from apps.films.models import Films
-from apps.users.models import SessionToken, UsersApiSessions, User
+from apps.users.models import SessionToken, User
 
 
 class Command(BaseCommand):
@@ -70,7 +70,6 @@ class Command(BaseCommand):
         # Create Session
         token = Token.objects.get(user=o_user.id)
         s_token = SessionToken.objects.create(user=o_user)
-        UsersApiSessions.objects.create(token=s_token)
 
         # Init Request
         request = Client(HTTP_X_MI_SESSION=s_token.key, HTTP_USER_AGENT='Mozilla/5.0')
