@@ -20,17 +20,17 @@ from apps.users.models import SessionToken, UsersApiSessions, User
 class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
         make_option('-f', '--filename',
-            action  = 'store',
-            dest    = 'filename',
-            default = False,
-            help    = 'Full path for file',
-        ),
+                    action='store',
+                    dest='filename',
+                    default=False,
+                    help='Full path for file',
+                    ),
         make_option('-u', '--user',
-            action  = 'store',
-            dest    = 'user',
-            default = False,
-            help    = 'ID for user',
-        ),
+                    action='store',
+                    dest='user',
+                    default=False,
+                    help='ID for user',
+                    ),
     )
 
     help = u"Импортирование оценок фильма из файла"
