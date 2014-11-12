@@ -488,6 +488,7 @@ class CastThumb extends Item
           else
             label_prim_str = time_text(@vals.start_date)
           @elements["btn"].self.show().addClass("btn-subscribe").text("Подписаться")
+          @elements["btn"].self.click @action_subscribe
         else
           label_fright_str = time_text(@vals.start_date)
           label_fright_cls = 'cast-archive-date'
@@ -505,6 +506,10 @@ class CastThumb extends Item
     if name == "pg_rating"
       return val?" (" + val + ")":""
     super
+
+  action_subscribe: =>
+    @_app.rest.casts.subscribe.create(@vals.id)
+    return false
 
 class Deck
   constructor: (@_place, opts = {}) ->
@@ -758,6 +763,7 @@ class App
     @rest.castschats.add("msgs")
     @rest.castschats.add("send")
     @rest.casts.add("list")
+    @rest.casts.add("subscribe")
 
     @_e =
       search:

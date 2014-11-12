@@ -556,6 +556,7 @@ mixin cast_thumb(item)
         - } else if (min_vs_start < 0) {
         -   btn_cls = "btn-subscribe"
         -   btn_text = "Подписаться"
+        -   btn_click_handler = "action_subscribe"
         - } else {
         -   btn_cls = "display-none"
         - }
@@ -595,7 +596,7 @@ mixin cast_thumb(item)
                         span.cast-item-title(data-mi-name="title")=title
                     span(data-mi-name="pg_rating",data-mi-id="pg_rating",data-mi-val=pg_rating).cast-item-pg-rating=(item.pg_rating?" (" + item.pg_rating + ")":"")
                 .btn-def.block(class=btn_cls,data-mi-id="btn")
-                    a(href=url_btn , title='',data-mi-id="btn_text",data-mi-athref="id")!=btn_text
+                    a(href=url_btn , title='',data-mi-id="btn_text",data-mi-athref="id", data-mi-onclick=btn_click_handler)!=btn_text
                 p(class=is_online && min_price && has_free?'':'display-none',data-mi-id="btn_price")
                     | или
                     a(href=url_loc, title='',data-mi-athref="id")

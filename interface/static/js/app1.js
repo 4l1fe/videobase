@@ -3,7 +3,8 @@
   'use strict';
   var App, CastThumb, CastsDeck, CommentThumb, CommentsDeck, Deck, FeedDeck, FeedThumb, FilmThumb, FilmsDeck, Item, Page, Page_Account, Page_Cast, Page_CastsList, Page_Feed, Page_Film, Page_Login, Page_Main, Page_Person, Page_Playlist, Page_Register, Page_Search, Page_Simple, Page_User, PersonThumb, PersonsDeck, Player, PlayerCast, check_app_is_init, error, scroll_to_obj, stars_tootltips, state_toggle,
     __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   window.mi_app = void 0;
 
@@ -751,6 +752,7 @@
       if (opts == null) {
         opts = {};
       }
+      this.action_subscribe = __bind(this.action_subscribe, this);
       this._name = "cast-thumb";
       if (opts.vals) {
         this._type = opts.vals.type;
@@ -783,6 +785,7 @@
                 label_prim_str = time_text(_this.vals.start_date);
               }
               _this.elements["btn"].self.show().addClass("btn-subscribe").text("Подписаться");
+              _this.elements["btn"].self.click(_this.action_subscribe);
             } else {
               label_fright_str = time_text(_this.vals.start_date);
               label_fright_cls = 'cast-archive-date';
@@ -810,6 +813,11 @@
         }) : void 0;
       }
       return CastThumb.__super__.transform_val.apply(this, arguments);
+    };
+
+    CastThumb.prototype.action_subscribe = function() {
+      this._app.rest.casts.subscribe.create(this.vals.id);
+      return false;
     };
 
     return CastThumb;
@@ -1233,6 +1241,7 @@
       this.rest.castschats.add("msgs");
       this.rest.castschats.add("send");
       this.rest.casts.add("list");
+      this.rest.casts.add("subscribe");
       this._e = {
         search: {
           frm: $("#frm_search")
