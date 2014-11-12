@@ -10,9 +10,18 @@ from apps.users.models import User, UsersRels, Feed
 from apps.users.constants import (APP_USER_REL_TYPE_NONE,
                                   USER_ASK, USER_FRIENDSHIP,
                                   APP_USER_REL_TYPE_SEND_NOT_RECEIVED,
-                                  APP_USER_REL_TYPE_FRIENDS
+                                  APP_USER_REL_TYPE_FRIENDS,
+                                  APP_USER_REL_TYPE_ACCEPTED_NOT_ADOPTED,
+                                  APP_USER_REL_TYPE_NONE
+                                  
 )
 
+RELATIONS_MAP = {
+            (True,True) :  APP_USER_REL_TYPE_FRIENDS,
+            (True,False):  APP_USER_REL_TYPE_SEND_NOT_RECEIVED,
+            (False,True):  APP_USER_REL_TYPE_ACCEPTED_NOT_ADOPTED,
+            (False,False): APP_USER_REL_TYPE_NONE,
+        }
 
 class UsersFriendshipView(APIView):
 
@@ -29,15 +38,12 @@ class UsersFriendshipView(APIView):
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-        if UsersRels.objects.filter(user_id=user_friend.id, user_rel_id=request.user.id,
-                                                rel_type=APP_USER_REL_TYPE_SEND_NOT_RECEIVED).exists():  # если есть встречная заявка
-            if UsersRels.objects.filter(user_rel_id=user_friend.id, user_id=request.user.id,
-                                                rel_type=APP_USER_REL_TYPE_SEND_NOT_RECEIVED).exists():
-                return Response(dict(relation=APP_USER_REL_TYPE_FRIENDS,
-                                 **response_template),
-                          status=status.HTTP_200_OK)
-            else:
-                return Response(dict(relation=APP_USER_REL_TYPE_SEND_NOT_RECEIVED,
+        to_rel = UsersRels.objects.filter(user_id=user_friend.id, user_rel_id=request.user.id,
+                                                rel_type=APP_USER_REL_TYPE_SEND_NOT_RECEIVED).exists() 
+        from_rel = UsersRels.objects.filter(user_rel_id=user_friend.id, user_id=request.user.id,
+                                                rel_type=APP_USER_REL_TYPE_SEND_NOT_RECEIVED).exists()
+
+        return Response(dict(relation=RELATIONS_MAP[(to_rel,from_rel)],
                                  **response_template),
                           status=status.HTTP_200_OK)
             
