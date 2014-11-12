@@ -1,7 +1,9 @@
 # coding: utf-8
-from crawler.robots_config_generator import generate_robots_config
+from optparse import make_option
+
 from django.core.management import BaseCommand
-from optparse import make_option, OptionError
+
+from crawler.robots_config_generator import generate_robots_config
 
 
 class Command(BaseCommand):
@@ -24,12 +26,16 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         gen_kwargs = {}
         d = kwargs.get('directory')
-        if d: gen_kwargs.update(dict(directory=d))
+        if d:
+            gen_kwargs.update(dict(directory=d))
         u = kwargs.get('user')
-        if u: gen_kwargs.update(dict(user=u))
+        if u:
+            gen_kwargs.update(dict(user=u))
         fn = kwargs.get('filename')
-        if fn: gen_kwargs.update(dict(filename=fn))
+        if fn:
+            gen_kwargs.update(dict(filename=fn))
         hn = kwargs.get('hostname')
-        if fn: gen_kwargs.update(dict(hostname=hn))
+        if fn:
+            gen_kwargs.update(dict(hostname=hn))
 
         generate_robots_config(**gen_kwargs)

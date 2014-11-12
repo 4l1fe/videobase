@@ -1,3 +1,4 @@
+# coding: utf-8
 from django.core.management.base import BaseCommand
 from crawler.robot_start import launch_next_robot_try
 

@@ -1,8 +1,8 @@
 # coding: utf-8
 
-from apps.casts.models import CastsServices
 from django.core.management.base import NoArgsCommand
-from django.utils import timezone
+
+from apps.casts.models import CastsServices
 
 CAST_SERVICES = [
 
@@ -31,18 +31,11 @@ CAST_SERVICES = [
         'url' : 'http://www.ntvplus.ru',
         'description': ''
     },
-
-
-
-
 ]
-TRANSLATION_URL = 'http://video.championat.com'
-TRANSLATION_URL = 'http://live.russia.tv'
-HOST = 'http://news.sportbox.ru'
-site_link = 'http://tv.khl.ru/'
+
 
 class Command(NoArgsCommand):
-    def handle_noargs(self,**options):
+    def handle_noargs(self, **options):
         for cs in CAST_SERVICES:
             try:
                 CastsServices.objects.get_or_create(**cs)

@@ -1,6 +1,6 @@
-from crawler.tor import simple_tor_get_page 
+# coding: utf-8
 from django.core.management.base import NoArgsCommand
-from apps.robots.models import  RobotsTries, Robots
+from apps.robots.models import Robots
 from crawler.locrobots import sites_crawler
 
 import datetime
@@ -13,12 +13,11 @@ def add_robot_if_not_exist(robot_name):
         robot = Robots.objects.get(name=robot_name)
     except Robots.DoesNotExist:
         print "Couldn't find record for {} adding one".format(robot_name)
-        robot= Robots(name=robot_name,
-                      delay=20,
-                      last_start = timezone.now() - datetime.timedelta(days=7),
-                      state='{}',
-                      description=' ',
-        )
+        robot = Robots(name=robot_name,
+                       delay=20,
+                       last_start=timezone.now() - datetime.timedelta(days=7),
+                       state='{}',
+                       description=' ')
         robot.save()
 
 
