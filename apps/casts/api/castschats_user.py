@@ -10,7 +10,7 @@ from apps.casts.models import CastsChatsUsers
 from apps.users.api.serializers import vbUser
 
 
-#############################################################################################################
+################################################################################
 class CastsChatsUsersView(APIView):
     """
     Cast info

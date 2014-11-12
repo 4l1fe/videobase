@@ -8,7 +8,7 @@ from apps.casts.models import Casts, CastsExtras
 from apps.films.api.serializers import vbExtra
 
 
-#############################################################################################################
+################################################################################
 class CastsExtraView(APIView):
     """
     Cast info
@@ -22,4 +22,3 @@ class CastsExtraView(APIView):
 
         except Casts.DoesNotExist:
             return Response({}, status=status.HTTP_404_NOT_FOUND)
-            

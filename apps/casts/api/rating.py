@@ -9,7 +9,7 @@ from apps.casts.models import Casts, UsersCasts
 from apps.casts.forms import CastRatingForm
 
 
-#############################################################################################################
+################################################################################
 class CastsRatingView(APIView):
     """
     Cast info
