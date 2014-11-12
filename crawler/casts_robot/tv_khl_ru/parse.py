@@ -88,7 +88,8 @@ class TvKHLRuParser():
             'meta': {},
             'embed_code': None,
             'value': link,
-            'player': None
+            'player': None,
+            'tag': 'hokey'
         }
 
         streams.append(one_stream)
