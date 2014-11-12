@@ -110,14 +110,26 @@ class UserLogoutView(View):
 
     def get(self, request, **kwargs):
         x_session = request.COOKIES.get('x-session')
+        require_auth_pages = ('stream', 'playlist', 'profile')
         try:
             session = SessionToken.objects.get(key=x_session)
             session.is_active = False
             session.save()
         except Exception, e:
             pass
-        
-        response = HttpResponseRedirect(reverse('index_view'))
+
+        back_url = reverse('index_view')
+
+        if 'HTTP_REFERER' in self.request.META:
+            index_view_flag = False
+            for page in require_auth_pages:
+                if page in self.request.META['HTTP_REFERER'] and 'vsevi' in self.request.META['HTTP_REFERER']:
+                    index_view_flag = True
+                    break
+            if not index_view_flag and 'vsevi' in self.request.META['HTTP_REFERER']:
+                back_url = self.request.META['HTTP_REFERER']
+
+        response = HttpResponseRedirect(back_url)
         response.delete_cookie("x-session")
         response.delete_cookie("x-token")
         response.delete_cookie("sessionid")
