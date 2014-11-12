@@ -63,6 +63,16 @@ def upload_avatar(main_token, session_token,  address):
     return resp
 
 
+def casts_chats_msgs(session_token, id_, **kwargs):
+    url = 'api/v1/castschats/{}/msgs.json'.format(id_)
+    if kwargs:
+        url = url + '?' + urlencode(kwargs)
+    req = Request(urljoin(address, url))
+    req.add_header('X-MI-SESSION', session_token)
+    resp = urlopen(req)
+    return resp.read()
+
+
 if __name__ == '__main__':
     host = 'localvsevi'
     address = 'http://{}'.format(host)
@@ -70,10 +80,7 @@ if __name__ == '__main__':
     print(mt)
     st = get_session_token(mt, address)
     print(st)
-    # resp = add_friendship(st, 42, address)
-    # print(resp)
-    # del_friendship(st, 42, host)
-    mt = list(mt); mt[1] = 'z'
-    st = list(st); st[1] = 'z'
-    resp = upload_avatar(''.join(mt), ''.join(st), address)
-    print(resp)
+    from pprint import pprint as pp
+    import json
+    resp = casts_chats_msgs(st, 329, limit=1)
+    pp(json.loads(resp))
