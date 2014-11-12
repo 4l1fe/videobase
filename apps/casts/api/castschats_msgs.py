@@ -4,9 +4,9 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from apps.casts.models import Casts, CastsChatsMsgs
+from apps.casts.models import CastsChatsMsgs
 from apps.casts.forms import CastsChatGetForm
-from apps.casts.api.serializers import vbCast, vbCastChatMsg
+from apps.casts.api.serializers import vbCastChatMsg
 
 
 #############################################################################################################
@@ -24,7 +24,7 @@ class CastsChatsMsgsView(APIView):
 
     def get(self, request, castchat_id, *args, **kwargs):
         try:
-            form = CastsChatGetForm(data = request.GET)
+            form = CastsChatGetForm(data=request.GET)
             if form.is_valid():
                 query = CastsChatsMsgs.objects.all()
 
