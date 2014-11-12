@@ -42,10 +42,11 @@ sites_crawler = {
         'loader': ZOOMBY_Loader,
         'parser': ParseFilm()
     },
-    'megogo_net': {
-        'loader': MEGOGO_Loader,
-        'parser': ParseMegogoFilm
-    },
+
+    # 'megogo_net': {
+    #     'loader': MEGOGO_Loader,
+    #     'parser': ParseMegogoFilm
+    # },
     'now_ru': {
         'loader': NOW_Loader,
         'parser': ParseNowFilmPage
