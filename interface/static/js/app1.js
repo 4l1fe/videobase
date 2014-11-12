@@ -816,7 +816,7 @@
     };
 
     CastThumb.prototype.action_subscribe = function() {
-      this._app.rest.casts.subscribe.create(this.vals.id);
+      this._app.cast_action(this.vals.id, "subscribe");
       return false;
     };
 
@@ -1426,6 +1426,17 @@
             return opts.callback(new_state);
           }
         });
+      }
+    };
+
+    App.prototype.cast_action = function(id, action, opts) {
+      if (opts == null) {
+        opts = {};
+      }
+      if (this.user_is_auth()) {
+        if (action === "subscribe") {
+          return this.rest.casts.subscribe.create(id);
+        }
       }
     };
 
@@ -2689,6 +2700,7 @@
     function Page_Cast(conf) {
       var casts_deck, self;
       this.conf = conf;
+      this.action_cast_subscribe = __bind(this.action_cast_subscribe, this);
       Page_Cast.__super__.constructor.apply(this, arguments);
       this.chat = {
         active: true,
@@ -2700,6 +2712,7 @@
         attempts_pos: 0
       };
       this._e = {
+        cast_subscribe_btn: $('#cast_subscribe_btn'),
         player: {
           wrapper: $("#player_wrapper"),
           frame: $("#player_frame")
@@ -2718,6 +2731,7 @@
       this.conf.min_vs_start = Math.floor((new Date() - this.conf.start_date) / 60 / 1000);
       this.conf.is_online = this.conf.min_vs_start >= 0 && this.conf.min_vs_start < this.conf.duration;
       self = this;
+      this._e.cast_subscribe_btn.click(this.action_cast_subscribe);
       if (this.conf.is_online) {
         this.player = new PlayerCast(this._e.player.frame);
         if (this.conf.locations && this.conf.locations.length) {
@@ -2875,6 +2889,11 @@
         this._e.chat.wrapper.hide();
         this._e.player.wrapper.removeClass("col-md-8");
       }
+      return false;
+    };
+
+    Page_Cast.prototype.action_cast_subscribe = function() {
+      this._app.cast_action(this._app.page().conf.id, "subscribe");
       return false;
     };
 
