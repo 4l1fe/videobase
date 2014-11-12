@@ -1,7 +1,6 @@
 # coding: utf-8
 from django.core.management.base import NoArgsCommand
 from crawler.datarobots.kinopoisk_ru.parse_actors import PersoneParser
-import ipdb
 
 
 class Command(NoArgsCommand):
