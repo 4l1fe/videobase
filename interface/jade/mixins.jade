@@ -255,6 +255,7 @@ mixin feed_thumb(item, for_tpl)
     - created = time_text_str(item.created)
     - if( item.type == "film-c" ) {
     -   film_url = "/films/" + item.object.film.id + "/"
+    -   film_name = item.object.film.name
     - } else if (item.type.substr(0,4) == "film") {
     -   film_url = "/films/" + item.object.id + "/"
     - } else if (item.type.substr(0,4) == "pers") {
@@ -278,20 +279,12 @@ mixin feed_thumb(item, for_tpl)
                                     |&nbsp;оставил комментарий к фильму&nbsp;
                                 .col-md-2.col-sm-3.col-xs-3
                                     .time-tape(data-mi-id="created", data-mi-name="created", data-mi-val=item.created)=created
-                        //-
-                           .title-item-tape
                         .content-item-tape
                             .short-text-tape
                                 h4
-                                    a(href=film_url, title='', data-mi-athref="object.id", data-mi-name="object.name")=item.object.film.name
+                                    a(href=film_url, title='', data-mi-athref="object.film.id", data-mi-name="object.film.name")=film_name
                                 - text = (item.object.text || "").replace(/\n+/gm, "<br/>")
                                 p(data-mi-name="object.text")=item.object.text
-                            //-
-                               .short-text-tape
-                        //-
-                           .content-item-tape
-            //-
-               .tape-item
         if item.type == "film-r" || for_tpl
             .tape-item.cf.tape-thumb(class="tape-film-r")
                 .row

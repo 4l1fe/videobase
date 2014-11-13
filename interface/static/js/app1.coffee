@@ -439,7 +439,7 @@ class FeedThumb extends Item
   transform_attr: (attr, name, val) ->
     type = @_type
     if type.substr(0,4) == "film"
-      if name == "object.id" && attr="href"
+      if name == "object.id" || name == 'object.film.id' && attr="href"
         return "/films/" + val + "/"
       if name == "object.name"
         return val + " (" + @vals_orig.object.releasedate.substr(0,4) + ")"
