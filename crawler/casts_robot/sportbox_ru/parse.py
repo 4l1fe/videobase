@@ -10,7 +10,7 @@ def parse_translation():
     date = timezone.now().date() + timezone.timedelta(days=1)
     translations_list = []
 
-    for i in range(1, 4):
+    for i in range(1, 2):
         url = HOST + '/video?date={}'.format(date)
         content = requests.get(url).content
         soup = BeautifulSoup(content)

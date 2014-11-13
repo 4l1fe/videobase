@@ -12,22 +12,23 @@ def save_cast_dict(cast_service_name, cast_dict):
     cast = Casts.objects.filter(title=cast_dict['title'], start=cast_dict['date']).first()
     if not cast:
 
-        tags = AbstractCastsTags.objects.filter(name=cast_dict['tag']).first()
+        tag = AbstractCastsTags.objects.filter(name=cast_dict['tag']).first()
 
-        if not tags:
-            tags = AbstractCastsTags(name=cast_dict['tag'],
+        if not tag:
+            tag = AbstractCastsTags(name=cast_dict['tag'],
                                      name_orig='',
                                      description='',
                                      type='')
-            tags.save()
+            tag.save()
 
         cast = Casts(title=cast_dict['title'],
                      title_orig=cast_dict['title'],
                      start=cast_dict['date'],
                      duration=cast_dict['meta'].get('duration', None),
                      description=cast_dict['meta'].get('description', None),
-                     pg_rating=DEFAULT_PG_RATING,
-                     tags=tags.id)
+                     pg_rating=DEFAULT_PG_RATING)
+        cast.save()
+        cast.tags.add(tag)
         cast.save()
 
         image_path = get_one_google_image_by_query(cast_dict['title'])
