@@ -6,6 +6,9 @@
 # Pycharm conf
 .idea
 
+# Local settings
+videobase/local_settings.py
+
 # C extensions
 *.so
 
