@@ -462,6 +462,11 @@ CELERYBEAT_SCHEDULE = {
     'personal_newsletter_schedule': {
         'task': 'personal_newsletter',
         'schedule': crontab(minute=0, hour=18)
+    },
+    # VKRobot weekly run
+    'vk_robot': {
+        'task': 'vk_robot_start',
+        'schedule': timedelta(days=7),
     }
 }
 

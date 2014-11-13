@@ -103,7 +103,7 @@ class VKParser():
 
     def get_one_appropriate_video(self, videos):
         for video in videos:
-            if int(video['duration'].replace(':', '')) > 5500:
+            if video['duration'] != '' and int(video['duration'].replace(':', '')) > 5500:
                 return video
         return None
 
