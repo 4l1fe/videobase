@@ -10,7 +10,7 @@ def parse_translation():
     date = timezone.now().date() + timezone.timedelta(days=1)
     translations_list = []
 
-    for i in range(1, 4):
+    for i in range(1, 2):
         url = HOST + '/video?date={}'.format(date)
         content = requests.get(url).content
         soup = BeautifulSoup(content)
@@ -42,7 +42,8 @@ def parse_translation():
                     'price': 0,
                     'link': translation_url,
                     'embed_code': share_link.prettify(),
-                    'value': share_link.get('src')
+                    'value': share_link.get('src'),
+                    'tag': 'sport'
 
                 }
                 translations_list.append(translation_data)
