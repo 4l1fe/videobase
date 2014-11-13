@@ -1,13 +1,10 @@
 # coding: utf-8
-
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-
 from apps.casts.forms import CastChatSendForm
 from apps.casts.models import Casts, CastsChats, CastsChatsMsgs
-
 from videobase.settings import DEFAULT_REST_API_RESPONSE
 
 
