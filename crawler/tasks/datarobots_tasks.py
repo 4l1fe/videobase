@@ -77,7 +77,7 @@ def kinopoisk_films(pages):
                 print u"Film: {0} {1}".format(film.name, film.kinopoisk_id)
 
                 #kinopoisk_parse_one_film.apply_async((film.kinopoisk_id, film.name))
-                persons_films_update_with_indexes.apply_async((film.kinopoisk_id,))
+                #persons_films_update_with_indexes.apply_async((film.kinopoisk_id,))
                 kinopoisk_mobile_parse.apply_async((film.kinopoisk_id, files))
     except Exception, e:
         traceback_own(e)

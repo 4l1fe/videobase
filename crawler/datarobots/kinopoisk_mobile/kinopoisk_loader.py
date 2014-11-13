@@ -124,7 +124,8 @@ class KinopoiskMobile():
             for key, value in persons.iteritems():
                 for actor in value:
                     persn = ParseFilmActors.get_person(actor['name'], actor['link'].split('/')[4])
-                    pers_films = ParseFilmActors.save_persons_films(films[0], persn, actor['type'])
+                    ParseFilmActors.save_persons_films(films[0], persn, actor['type'], actor['index'])
+                    print u"{} {} {}".format(actor['name'], actor['type'], actor['index'])
 
 
     @staticmethod
@@ -371,16 +372,16 @@ class ParseFilmActors():
         return persons
 
     @staticmethod
-    def save_persons_films(film, person, pers_type): #p_index
+    def save_persons_films(film, person, pers_type, p_index):
         person_films = PersonsFilms.objects.filter(film=film, person=person, p_type=pers_type)
         if person_films.count() == 0:
             msg = u"Adding link for film {film} and person {person}"
             print msg.format(film=film, person=person)
-            person_film = PersonsFilms(person=person, film=film, p_type=pers_type)
+            person_film = PersonsFilms(person=person, film=film, p_type=pers_type, p_index=p_index)
             person_film.save()
-        # else:
-        #     person_films[0].p_index = p_index
-        #     person_films[0].save()
+        else:
+            person_films[0].p_index = p_index
+            person_films[0].save()
 
 
     @staticmethod
