@@ -42,8 +42,8 @@ class BaseParse(object):
         price, price_type = obj.get_price(**kwargs)
         seasons = obj.get_seasons(**kwargs)
         value = obj.get_value(**kwargs)
-        resp_dict = dict_gen(film)
         if film.type == APP_FILM_SERIAL:
+            resp_dict = dict_gen(film)
             for serial_season in films_list:
                 resp_dict['content_type'] = APP_LOCATION_TYPE_ADDITIONAL_MATERIAL_SEASON
                 resp_dict['type'] = type_robot
@@ -51,8 +51,10 @@ class BaseParse(object):
                 resp_dict['value'] = value
                 resp_dict['url_view'] = serial_season['season_url']
                 resp_dict['price'] = price
+                resp_dict['episode'] = 0
                 resp_list.append(resp_dict)
                 for episode in serial_season['episode_list']:
+                    resp_dict = dict_gen(film)
                     resp_dict['content_type'] = APP_LOCATION_TYPE_ADDITIONAL_MATERIAL_EPISODE
                     resp_dict['type'] = type_robot
                     resp_dict['number'] = serial_season['season']
@@ -62,12 +64,14 @@ class BaseParse(object):
                     resp_dict['episode'] = episode['number']
                     resp_list.append(resp_dict)
         else:
+            resp_dict = dict_gen(film)
             resp_dict['type'] = type_robot
             resp_dict['number'] = 0
             resp_dict['value'] = value
             resp_dict['url_view'] = films_list
             resp_dict['price'] = price
             resp_dict['content_type'] = APP_LOCATION_TYPE_ADDITIONAL_MATERIAL_FILM
+            resp_dict['episode'] = 0
             resp_list.append(resp_dict)
 
         return resp_list

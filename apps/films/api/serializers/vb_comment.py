@@ -6,7 +6,8 @@ from apps.users.models import UsersPics
 import pytz
 from videobase.settings import TIME_ZONE
 
-#############################################################################################################
+
+################################################################################
 class vbComment(serializers.ModelSerializer):
     film = serializers.SerializerMethodField('calc_film')
     user = serializers.SerializerMethodField('calc_user')

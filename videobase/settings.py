@@ -99,7 +99,6 @@ INSTALLED_APPS = (
     'social.apps.django_app.default',
     # Celery for django
     'djcelery',
-    # 'csvimport',
     # Apps
     'apps.users',
     'apps.films',

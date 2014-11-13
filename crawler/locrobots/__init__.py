@@ -8,8 +8,6 @@ from crawler.locrobots.ivi_ru.loader import IVI_Loader
 from crawler.locrobots.ivi_ru.parsers import ParseFilmPage
 from crawler.locrobots.now_ru.loader import NOW_Loader
 from crawler.locrobots.now_ru.parsers import ParseNowFilmPage
-from crawler.locrobots.megogo_net.loader import MEGOGO_Loader
-from crawler.locrobots.megogo_net.parsers import ParseMegogoFilm
 from crawler.locrobots.stream_ru.loader import STREAM_RU_Loader
 from crawler.locrobots.stream_ru.parsers import ParseStreamFilm
 from crawler.locrobots.play_google_com.loader import PLAY_GOOGLE_Loader
@@ -42,10 +40,11 @@ sites_crawler = {
         'loader': ZOOMBY_Loader,
         'parser': ParseFilm()
     },
-    'megogo_net': {
-        'loader': MEGOGO_Loader,
-        'parser': ParseMegogoFilm
-    },
+
+    # 'megogo_net': {
+    #     'loader': MEGOGO_Loader,
+    #     'parser': ParseMegogoFilm
+    # },
     'now_ru': {
         'loader': NOW_Loader,
         'parser': ParseNowFilmPage

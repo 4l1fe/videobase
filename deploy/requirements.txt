@@ -35,7 +35,7 @@ zerorpc
 lxml
 pycurl
 django-treebeard
-djorm-ext-pgfulltext
+git+git://github.com/djangonauts/djorm-ext-pgfulltext.git
 GitPython
 PySocks
 django-nose

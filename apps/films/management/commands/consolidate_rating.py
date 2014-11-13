@@ -5,7 +5,7 @@ import traceback
 from time import time
 
 from django.db import connection, transaction
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 
 from apps.films.models import Films
 
