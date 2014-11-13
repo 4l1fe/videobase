@@ -1,6 +1,6 @@
 # Ini
 *.ini
-
+videobase/local_settings
 *.py[cod]
 
 # Pycharm conf
