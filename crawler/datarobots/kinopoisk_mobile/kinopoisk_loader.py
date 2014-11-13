@@ -346,6 +346,7 @@ class ParseFilmActors():
         try:
             block = self.page.find('dl', { "class" : "block"})
             p_type = None
+            index = 0
             persons = {}
             for cont in block.contents:
                 if 'dt' == cont.name:
@@ -356,24 +357,31 @@ class ParseFilmActors():
                     simple_person = {
                         'name': cont.find('a').text,
                         'link': cont.find('a')['href'],
-                        'type': self.types[p_type]
+                        'type': self.types[p_type],
+                        'index': index
                     }
                     if p_type in persons:
                         persons[p_type] += [simple_person]
+                        index += 1
                     else:
                         persons[p_type] = [simple_person]
+                        index += 1
         except Exception, e:
             pass
         return persons
 
     @staticmethod
-    def save_persons_films(film, person, pers_type):
+    def save_persons_films(film, person, pers_type): #p_index
         person_films = PersonsFilms.objects.filter(film=film, person=person, p_type=pers_type)
         if person_films.count() == 0:
             msg = u"Adding link for film {film} and person {person}"
             print msg.format(film=film, person=person)
             person_film = PersonsFilms(person=person, film=film, p_type=pers_type)
             person_film.save()
+        # else:
+        #     person_films[0].p_index = p_index
+        #     person_films[0].save()
+
 
     @staticmethod
     def get_person(name, kinopoisk_id):

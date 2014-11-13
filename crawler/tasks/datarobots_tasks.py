@@ -59,6 +59,8 @@ def update_ratings_task():
 @app.task(name='kinopoisk_films')
 def kinopoisk_films(pages):
     try:
+        json_path = 'saved_pages/kinopoisk_mobile/'
+        files = os.listdir(json_path)
         for page in range(1, pages+1):
             print u"Page number: {0} of {1}".format(page, pages)
             html = simple_tor_get_page(KINOPOISK_LIST_FILMS_URL.format(page), tor_flag=True)
@@ -69,15 +71,14 @@ def kinopoisk_films(pages):
 
                 name = film.a.text
                 print u"Film name: {0}".format(name)
-                if u'(сериал)' in name:
-                    name = name.replace(u'(сериал)', u'')
 
                 film, flag = Films.objects.get_or_create(kinopoisk_id=kinopoisk_id,
                                                     defaults={'type': '', 'name':name})
                 print u"Film: {0} {1}".format(film.name, film.kinopoisk_id)
 
-                kinopoisk_parse_one_film.apply_async((film.kinopoisk_id, film.name))
+                #kinopoisk_parse_one_film.apply_async((film.kinopoisk_id, film.name))
                 persons_films_update_with_indexes.apply_async((film.kinopoisk_id,))
+                kinopoisk_mobile_parse.apply_async((film.kinopoisk_id, files))
     except Exception, e:
         traceback_own(e)
 
