@@ -23,7 +23,6 @@ class CastsChatsMsgsView(APIView):
             form = CastsChatGetForm(data=data)
             if form.is_valid():
                 query = CastsChatsMsgs.objects.filter(cast=cast_id)
-
                 for field in form.cleaned_data:
                     if form.cleaned_data[field]:
                         query = transform_map[field](query, form.cleaned_data[field])
