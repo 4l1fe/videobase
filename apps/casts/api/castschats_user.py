@@ -12,7 +12,7 @@ class CastsChatsUsersView(APIView):
 
     permission_classes = (IsAuthenticated,)
 
-    def get(self, request, castchat_id):
+    def get(self, request, castchat_id, *args, **kwargs):
         try:
             users = [ccu.user for ccu in CastsChatsUsers.objects.filter(cast_id=castchat_id, status='online')]
 

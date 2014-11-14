@@ -80,6 +80,15 @@ def casts_chats_view(main_token, session_token, id_):
     return resp.content
 
 
+def casts_chats_users(main_token, session_token, id_):
+    url = 'api/v1/castschats/{}/users.json'.format(id_)
+    req = Request(urljoin(address, url))
+    req.add_header('X-MI-TOKEN', main_token)
+    req.add_header('X-MI-SESSION', session_token)
+    resp = urlopen(req)
+    return resp.read()
+
+
 if __name__ == '__main__':
     host = 'localvsevi'
     address = 'http://{}'.format(host)
@@ -91,5 +100,7 @@ if __name__ == '__main__':
     import json
     # resp = casts_chats_msgs(st, 329, limit=1)
     # pp(json.loads(resp))
-    resp = casts_chats_view(mt, st, 329)
+    # resp = casts_chats_view(mt, st, 329)
+    # print(resp)
+    resp = casts_chats_users(mt, st, 329)
     print(resp)
