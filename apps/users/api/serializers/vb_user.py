@@ -104,7 +104,7 @@ class vbUser(serializers.ModelSerializer):
         return rel
 
     def genres_list(self, obj):
-        genres = Genres.objects.filter(genres__uf_films_rel__user=obj).filter(Q(genres__uf_films_rel__status=APP_USERFILM_STATUS_UNDEF)|Q(genres__uf_films_rel__status=APP_USERFILM_STATUS_PLAYLIST)).distinct()
+        genres = Genres.objects.filter(Q(genres__uf_films_rel__user=obj), Q(genres__uf_films_rel__status=APP_USERFILM_STATUS_UNDEF) | Q( genres__uf_films_rel__status=APP_USERFILM_STATUS_PLAYLIST)).distinct()
         return sorted(vbUserGenre(genres, user=obj, many=True).data, key=lambda g: g['percent'], reverse=True)
 
     def friends_list(self, obj):
