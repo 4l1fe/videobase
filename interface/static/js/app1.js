@@ -3,7 +3,8 @@
   'use strict';
   var App, CastThumb, CastsDeck, CommentThumb, CommentsDeck, Deck, FeedDeck, FeedThumb, FilmThumb, FilmsDeck, Item, Page, Page_Account, Page_Cast, Page_CastsList, Page_Feed, Page_Film, Page_Login, Page_Main, Page_Person, Page_Playlist, Page_Register, Page_Search, Page_Simple, Page_User, PersonThumb, PersonsDeck, Player, PlayerCast, check_app_is_init, error, scroll_to_obj, stars_tootltips, state_toggle,
     __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   window.mi_app = void 0;
 
@@ -751,6 +752,7 @@
       if (opts == null) {
         opts = {};
       }
+      this.action_subscribe = __bind(this.action_subscribe, this);
       this._name = "cast-thumb";
       if (opts.vals) {
         this._type = opts.vals.type;
@@ -783,6 +785,7 @@
                 label_prim_str = time_text(_this.vals.start_date);
               }
               _this.elements["btn"].self.show().addClass("btn-subscribe").text("Подписаться");
+              _this.elements["btn"].self.click(_this.action_subscribe);
             } else {
               label_fright_str = time_text(_this.vals.start_date);
               label_fright_cls = 'cast-archive-date';
@@ -810,6 +813,11 @@
         }) : void 0;
       }
       return CastThumb.__super__.transform_val.apply(this, arguments);
+    };
+
+    CastThumb.prototype.action_subscribe = function() {
+      this._app.cast_action(this.vals.id, "subscribe");
+      return false;
     };
 
     return CastThumb;
@@ -1233,6 +1241,7 @@
       this.rest.castschats.add("msgs");
       this.rest.castschats.add("send");
       this.rest.casts.add("list");
+      this.rest.casts.add("subscribe");
       this._e = {
         search: {
           frm: $("#frm_search")
@@ -1417,6 +1426,17 @@
             return opts.callback(new_state);
           }
         });
+      }
+    };
+
+    App.prototype.cast_action = function(id, action, opts) {
+      if (opts == null) {
+        opts = {};
+      }
+      if (this.user_is_auth()) {
+        if (action === "subscribe") {
+          return this.rest.casts.subscribe.create(id);
+        }
       }
     };
 
@@ -2680,6 +2700,7 @@
     function Page_Cast(conf) {
       var casts_deck, self;
       this.conf = conf;
+      this.action_cast_subscribe = __bind(this.action_cast_subscribe, this);
       Page_Cast.__super__.constructor.apply(this, arguments);
       this.chat = {
         active: true,
@@ -2691,6 +2712,7 @@
         attempts_pos: 0
       };
       this._e = {
+        cast_subscribe_btn: $('#cast_subscribe_btn'),
         player: {
           wrapper: $("#player_wrapper"),
           frame: $("#player_frame")
@@ -2709,6 +2731,7 @@
       this.conf.min_vs_start = Math.floor((new Date() - this.conf.start_date) / 60 / 1000);
       this.conf.is_online = this.conf.min_vs_start >= 0 && this.conf.min_vs_start < this.conf.duration;
       self = this;
+      this._e.cast_subscribe_btn.click(this.action_cast_subscribe);
       if (this.conf.is_online) {
         this.player = new PlayerCast(this._e.player.frame);
         if (this.conf.locations && this.conf.locations.length) {
@@ -2866,6 +2889,11 @@
         this._e.chat.wrapper.hide();
         this._e.player.wrapper.removeClass("col-md-8");
       }
+      return false;
+    };
+
+    Page_Cast.prototype.action_cast_subscribe = function() {
+      this._app.cast_action(this._app.page().conf.id, "subscribe");
       return false;
     };
 
