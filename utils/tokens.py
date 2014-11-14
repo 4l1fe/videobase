@@ -63,6 +63,32 @@ def upload_avatar(main_token, session_token,  address):
     return resp
 
 
+def casts_chats_msgs(session_token, id_, **kwargs):
+    url = 'api/v1/castschats/{}/msgs.json'.format(id_)
+    if kwargs:
+        url = url + '?' + urlencode(kwargs)
+    req = Request(urljoin(address, url))
+    req.add_header('X-MI-SESSION', session_token)
+    resp = urlopen(req)
+    return resp.read()
+
+
+def casts_chats_view(main_token, session_token, id_):
+    import requests
+    url = 'casts/{}/'.format(id_)
+    resp = requests.get(urljoin(address, url), cookies={'x-token': main_token, 'x-session':session_token})
+    return resp.content
+
+
+def casts_chats_users(main_token, session_token, id_):
+    url = 'api/v1/castschats/{}/users.json'.format(id_)
+    req = Request(urljoin(address, url))
+    req.add_header('X-MI-TOKEN', main_token)
+    req.add_header('X-MI-SESSION', session_token)
+    resp = urlopen(req)
+    return resp.read()
+
+
 if __name__ == '__main__':
     host = 'localvsevi'
     address = 'http://{}'.format(host)
@@ -70,10 +96,11 @@ if __name__ == '__main__':
     print(mt)
     st = get_session_token(mt, address)
     print(st)
-    # resp = add_friendship(st, 42, address)
+    from pprint import pprint as pp
+    import json
+    # resp = casts_chats_msgs(st, 329, limit=1)
+    # pp(json.loads(resp))
+    # resp = casts_chats_view(mt, st, 329)
     # print(resp)
-    # del_friendship(st, 42, host)
-    mt = list(mt); mt[1] = 'z'
-    st = list(st); st[1] = 'z'
-    resp = upload_avatar(''.join(mt), ''.join(st), address)
+    resp = casts_chats_users(mt, st, 329)
     print(resp)
