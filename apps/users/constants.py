@@ -121,3 +121,6 @@ TYPE_PASSWD_HASH = (
     (APP_USER_HASH_PASSWD, u'Смена пароля'),
     (APP_USER_HASH_REGISTR, u'При регистрации'),
 )
+
+#############################################################################################################
+APP_USER_REQUIRE_AUTH_PAGES = ('stream', 'playlist', 'profile') # страницы требующие авторизации
