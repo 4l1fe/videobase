@@ -26,7 +26,7 @@ class CastsChatsMsgsView(APIView):
                 for field in form.cleaned_data:
                     if form.cleaned_data[field]:
                         query = transform_map[field](query, form.cleaned_data[field])
-
+                query = query.order_by('created')
                 return Response(vbCastChatMsg(query, many=True).data, status=status.HTTP_200_OK)
 
             return Response(form.errors, status=status.HTTP_400_BAD_REQUEST)
