@@ -13,7 +13,6 @@ class CastsView(View):
 
     def get(self, *args, **kwargs):
         data = {}
-
         # Если пришли параметры то обратимся к API
         if len(self.request.REQUEST.keys()):
             api_resp = CastsListView().get(self.request)
@@ -21,7 +20,8 @@ class CastsView(View):
         else:
             today = timezone.datetime.now()
             casts = casts_models.Casts.objects.filter(start__gte=today - timezone.timedelta(hours=3)).order_by('start')[:12]
-            data['casts'] = vbCast(casts).data
+            data['casts'] = vbCast(casts, many=True).data
+
         data['casts_tags'] = []
         return HttpResponse(render_page('casts_list', data))
 
@@ -41,5 +41,5 @@ class CastInfoView(View):
         other_casts = casts_models.Casts.objects.filter(start__gte=today - timezone.timedelta(hours=3)).order_by('start').exclude(id=cast_id)[:12]
         data['cast'] = vbCast(cast).data
         data['cast']['chat_items'] = msgs_list
-        data['online_casts'] = vbCast(other_casts).data
+        data['online_casts'] = vbCast(other_casts, many=True).data
         return HttpResponse(render_page('cast', data))
