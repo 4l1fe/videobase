@@ -1,4 +1,4 @@
-- location_names = {"drugoekino": "Другое Кино", "youtubemoviesru": "Youtube Movies", "ivi": "IVI.ru", "nowru": "Now.ru", "megogo": "Megogo", "tvigle": "TVigle", "zoomby": "Zoomby.ru", playfamily: "PlayFamily.ru", "olltv": "Oll.tv", amediateka: "Amediateka", molodejj: "Molodejj.tv", streamru: "Stream.ru", tvzavr: "TVzavr.ru", viaplay: "Viaplay.ru", zabavaru: "Zabava.ru", playgoogle: "Play Google", itunes: "Apple Itunes", ayyo: "Ayyo.ru", mosfilm: "Cinema.mosfilm.ru", "default": "Неизвестно"}
+- location_names = {"drugoekino": "Другое Кино", "youtubemoviesru": "Youtube Movies", "ivi": "IVI.ru", "nowru": "Now.ru", "megogo": "Megogo", "tvigle": "TVigle", "zoomby": "Zoomby.ru", playfamily: "PlayFamily.ru", "olltv": "Oll.tv", amediateka: "Amediateka", molodejj: "Molodejj.tv", streamru: "Stream.ru", tvzavr: "TVzavr.ru", viaplay: "Viaplay.ru", zabavaru: "Zabava.ru", playgoogle: "Play Google", itunes: "Apple Itunes", ayyo: "Ayyo.ru", mosfilm: "Cinema.mosfilm.ru", tvzorru: "TVzor.ru", "default": "Неизвестно"}
 - quality_texts = {"norm": "Отличное", "hd": "Хорошее", "fhd": "Full<strong>HD</strong>", "default": "Хорошее"}
 - months = ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"]
 - date_now = new Date()
@@ -186,7 +186,7 @@ mixin loc_thumb(item)
             span=item.price_type == 0?"бесплатно":(price + " р.")
 
 mixin person_thumb(item)
-    li(data-mi-id="id",data-mi-val=item.id)
+    li(data-mi-id="id",data-mi-val="item.id",class="person-thumb")
         - person_url = '/persons/' + item.id + '/'
         .actor
             a(href=person_url, title='', data-mi-athref="id")
@@ -255,6 +255,7 @@ mixin feed_thumb(item, for_tpl)
     - created = time_text_str(item.created)
     - if( item.type == "film-c" ) {
     -   film_url = "/films/" + item.object.film.id + "/"
+    -   film_name = item.object.film.name
     - } else if (item.type.substr(0,4) == "film") {
     -   film_url = "/films/" + item.object.id + "/"
     - } else if (item.type.substr(0,4) == "pers") {
@@ -278,20 +279,12 @@ mixin feed_thumb(item, for_tpl)
                                     |&nbsp;оставил комментарий к фильму&nbsp;
                                 .col-md-2.col-sm-3.col-xs-3
                                     .time-tape(data-mi-id="created", data-mi-name="created", data-mi-val=item.created)=created
-                        //-
-                           .title-item-tape
                         .content-item-tape
                             .short-text-tape
                                 h4
-                                    a(href=film_url, title='', data-mi-athref="object.id", data-mi-name="object.name")=item.object.film.name
+                                    a(href=film_url, title='', data-mi-athref="object.film.id", data-mi-name="object.film.name")=film_name
                                 - text = (item.object.text || "").replace(/\n+/gm, "<br/>")
                                 p(data-mi-name="object.text")=item.object.text
-                            //-
-                               .short-text-tape
-                        //-
-                           .content-item-tape
-            //-
-               .tape-item
         if item.type == "film-r" || for_tpl
             .tape-item.cf.tape-thumb(class="tape-film-r")
                 .row
@@ -556,6 +549,8 @@ mixin cast_thumb(item)
         - } else if (min_vs_start < 0) {
         -   btn_cls = "btn-subscribe"
         -   btn_text = "Подписаться"
+        -   url_btn = url
+        -   btn_click_handler = "action_subscribe"
         - } else {
         -   btn_cls = "display-none"
         - }
@@ -595,7 +590,7 @@ mixin cast_thumb(item)
                         span.cast-item-title(data-mi-name="title")=title
                     span(data-mi-name="pg_rating",data-mi-id="pg_rating",data-mi-val=pg_rating).cast-item-pg-rating=(item.pg_rating?" (" + item.pg_rating + ")":"")
                 .btn-def.block(class=btn_cls,data-mi-id="btn")
-                    a(href=url_btn , title='',data-mi-id="btn_text",data-mi-athref="id")!=btn_text
+                    a(href=url_btn , title='',data-mi-id="btn_text",data-mi-athref="id", data-mi-onclick=btn_click_handler)!=btn_text
                 p(class=is_online && min_price && has_free?'':'display-none',data-mi-id="btn_price")
                     | или
                     a(href=url_loc, title='',data-mi-athref="id")

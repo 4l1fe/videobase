@@ -3,6 +3,7 @@
 from __future__ import absolute_import
 
 import datetime
+import os
 from bs4 import BeautifulSoup
 
 from django.core.files import File
@@ -22,6 +23,7 @@ from crawler.datarobots.youtube_com.youtube_trailers import find_youtube_trailer
 from crawler.tasks.kinopoisk_one_page import kinopoisk_parse_one_film
 from crawler.tor import simple_tor_get_page
 from crawler.tasks.utils import update_robot_state_film_id
+from crawler.tasks.kinopoisk_mobile import kinopoisk_mobile_parse
 from videobase.celery import app
 
 import data.film_facts.checker
@@ -36,9 +38,9 @@ def persons_films_update_with_indexes(kinopoisk_film_id):
     page_dump = PersoneParser.acquire_page(kinopoisk_film_id)
     PersoneParser.update_persons_films_with_indexes(page_dump, kinopoisk_film_id)
 
+
 @app.task(name='update_film_rating')
 def update_film_rating_task(kinopoisk_id):
-
     f = Films.objects.get(kinopoisk_id=kinopoisk_id)
     r = get_ratings(kinopoisk_id)
     f.rating_imdb = r['imdb']['rating']
@@ -47,14 +49,18 @@ def update_film_rating_task(kinopoisk_id):
     f.rating_kinopoisk_cnt = r['kp']['votes']
     f.save()
 
+
 @app.task(name="update_ratings")
 def update_ratings_task():
     for f in Films.objects.all():
         update_film_rating_task.apply_async((f.kinopoisk_id,))
 
+
 @app.task(name='kinopoisk_films')
 def kinopoisk_films(pages):
     try:
+        json_path = 'saved_pages/kinopoisk_mobile/'
+        files = os.listdir(json_path)
         for page in range(1, pages+1):
             print u"Page number: {0} of {1}".format(page, pages)
             html = simple_tor_get_page(KINOPOISK_LIST_FILMS_URL.format(page), tor_flag=True)
@@ -65,15 +71,14 @@ def kinopoisk_films(pages):
 
                 name = film.a.text
                 print u"Film name: {0}".format(name)
-                if u'(сериал)' in name:
-                    name = name.replace(u'(сериал)', u'')
 
                 film, flag = Films.objects.get_or_create(kinopoisk_id=kinopoisk_id,
                                                     defaults={'type': '', 'name':name})
                 print u"Film: {0} {1}".format(film.name, film.kinopoisk_id)
 
-                kinopoisk_parse_one_film.apply_async((film.kinopoisk_id, film.name))
-                persons_films_update_with_indexes.apply_async((film.kinopoisk_id,))
+                #kinopoisk_parse_one_film.apply_async((film.kinopoisk_id, film.name))
+                #persons_films_update_with_indexes.apply_async((film.kinopoisk_id,))
+                kinopoisk_mobile_parse.apply_async((film.kinopoisk_id, files))
     except Exception, e:
         traceback_own(e)
 
@@ -89,11 +94,6 @@ def kinopoisk_set_paster(*args, **kwargs):
 
     else:
         print u'Skipping robot {name}'.format(name=robot.name)
-
-
-@app.task(name='imdb_rating_update')
-def imdb_robot_start(*args, **kwargs):
-    process_all()
 
 
 def film_at_least_years_old(film, years):
@@ -115,18 +115,20 @@ def film_checked_on_kp_at_least_days_ago(film, days):
 
 @app.task(name='kinopoisk_refresher')
 def create_due_refresh_tasks():
+    json_path = 'saved_pages/kinopoisk_mobile/'
+    files = os.listdir(json_path)
     for film in Films.objects.all():
         if film_at_least_years_old(film, years=2):
             if film_checked_on_kp_at_least_days_ago(film, days=3):
-                kinopoisk_parse_one_film.apply_async((film.kinopoisk_id, film.name))
+                kinopoisk_mobile_parse.apply_async((film.kinopoisk_id, files))
 
         elif film_at_least_years_old(film, years=4):
             if film_checked_on_kp_at_least_days_ago(film, days=7):
-                kinopoisk_parse_one_film.apply_async((film.kinopoisk_id, film.name))
+                kinopoisk_mobile_parse.apply_async((film.kinopoisk_id, files))
 
         else:
             if film_checked_on_kp_at_least_days_ago(film, days=14):
-                kinopoisk_parse_one_film.apply_async((film.kinopoisk_id, film.name))
+                kinopoisk_mobile_parse.apply_async((film.kinopoisk_id, files))
 
 
 @app.task(name='kinopoisk_news')
@@ -135,8 +137,11 @@ def parse_kinopoisk_news():
     Periodic task for parsing new films from kinopoisk
     For each film found on premiere page, parser called asynchronously
     '''
+
+    json_path = 'saved_pages/kinopoisk_mobile/'
+    files = os.listdir(json_path)
     for name, kinopoisk_id in kinopoisk_news():
-        kinopoisk_parse_one_film.apply_async((kinopoisk_id, name))
+        kinopoisk_mobile_parse.apply_async((kinopoisk_id, files))
 
 
 @app.task(name="find_trailer_for_film")
@@ -149,23 +154,26 @@ def trailer_commands():
     for film in Films.objects.all():
         find_trailer.apply_async((film.id,))
 
+
 @app.task(name='check_one_film_by_id')
 def check_and_correct_one_film(film_id):
     film = Films.objects.get(id=film_id)
     data.film_facts.checker.film_checker.check_and_correct(film)
+
 
 @app.task(name='check_one_person_by_id')
 def check_and_correct_one_person(person_id):
     person = Persons.objects.get(id=person_id)
     data.person_facts.checker.person_checker.check_and_correct(person)
 
+
 @app.task(name='film_info_check_and_correct')
 def check_and_correct_tasks():
     for film in Films.objects.all():
         check_and_correct_one_film.apply_async(film.id)
 
+
 @app.task(name='persons_check_and_correct')
 def person_check_and_correct_tasks():
     for person in Persons.objects.all():
         check_and_correct_one_person.apply_async(person.id)
-

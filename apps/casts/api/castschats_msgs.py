@@ -1,15 +1,13 @@
 # coding: utf-8
-
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-
-from apps.casts.models import Casts, CastsChatsMsgs
+from apps.casts.models import CastsChatsMsgs
 from apps.casts.forms import CastsChatGetForm
-from apps.casts.api.serializers import vbCast, vbCastChatMsg
+from apps.casts.api.serializers import vbCastChatMsg
+from videobase.settings import DEFAULT_REST_API_RESPONSE
 
 
-#############################################################################################################
 transform_map = {
     'id_low': lambda query, arg: query.filter(id__gte=arg),
     'id_high': lambda query, arg: query.filter(id__lte=arg),
@@ -18,16 +16,13 @@ transform_map = {
 
 
 class CastsChatsMsgsView(APIView):
-    """
-    Cast info
-    """
 
-    def get(self, request, castchat_id, *args, **kwargs):
+    def get(self, request, cast_id, *args, **kwargs):
         try:
-            form = CastsChatGetForm(data = request.GET)
+            data = request.GET.copy()
+            form = CastsChatGetForm(data=data)
             if form.is_valid():
-                query = CastsChatsMsgs.objects.all()
-
+                query = CastsChatsMsgs.objects.filter(cast=cast_id)
                 for field in form.cleaned_data:
                     if form.cleaned_data[field]:
                         query = transform_map[field](query, form.cleaned_data[field])
@@ -35,5 +30,5 @@ class CastsChatsMsgsView(APIView):
                 return Response(vbCastChatMsg(query, many=True).data, status=status.HTTP_200_OK)
 
             return Response(form.errors, status=status.HTTP_400_BAD_REQUEST)
-        except CastsChatsMsgs.DoesNotExist:
-            return Response({}, status=status.HTTP_404_NOT_FOUND)
+        except Exception:
+            return Response(DEFAULT_REST_API_RESPONSE, status=status.HTTP_400_BAD_REQUEST)

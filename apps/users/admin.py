@@ -91,5 +91,5 @@ class FeedAdmin(admin.ModelAdmin):
 admin.site.register(UsersProfile, UsersProfileAdmin)
 admin.site.register(UsersRels, UsersRelsAdmin)
 admin.site.register(UsersPics, UsersPicsAdmin)
-admin.site.register(LogEntry, LogEntryAdmin)
+# admin.site.register(LogEntry, LogEntryAdmin)
 admin.site.register(Feed, FeedAdmin)

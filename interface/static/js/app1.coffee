@@ -439,7 +439,7 @@ class FeedThumb extends Item
   transform_attr: (attr, name, val) ->
     type = @_type
     if type.substr(0,4) == "film"
-      if name == "object.id" && attr="href"
+      if name == "object.id" || name == 'object.film.id' && attr="href"
         return "/films/" + val + "/"
       if name == "object.name"
         return val + " (" + @vals_orig.object.releasedate.substr(0,4) + ")"
@@ -488,6 +488,7 @@ class CastThumb extends Item
           else
             label_prim_str = time_text(@vals.start_date)
           @elements["btn"].self.show().addClass("btn-subscribe").text("Подписаться")
+          @elements["btn"].self.click @action_subscribe
         else
           label_fright_str = time_text(@vals.start_date)
           label_fright_cls = 'cast-archive-date'
@@ -505,6 +506,10 @@ class CastThumb extends Item
     if name == "pg_rating"
       return val?" (" + val + ")":""
     super
+
+  action_subscribe: =>
+    @_app.cast_action( @vals.id, "subscribe" )
+    return false
 
 class Deck
   constructor: (@_place, opts = {}) ->
@@ -758,6 +763,7 @@ class App
     @rest.castschats.add("msgs")
     @rest.castschats.add("send")
     @rest.casts.add("list")
+    @rest.casts.add("subscribe")
 
     @_e =
       search:
@@ -888,6 +894,11 @@ class App
           rel[action_str] = new_state if opts.rel
           opts.callback(new_state) if opts.callback
       )
+
+  cast_action: (id, action, opts = {}) ->
+    if( @user_is_auth() )
+      if( action == "subscribe" )
+        @rest.casts.subscribe.create(id)
 
   config: (name) ->
     if name == undefined
@@ -1254,11 +1265,12 @@ class Page_Film extends Page
     @_app.rest.films.comments.read(@conf.id, {page: (comments_deck.page || 1) + 1})
     .done(
       (data) ->
+        total_page_count = Math.ceil(data.total_cnt/data.ipp)
         if data && data.items
           comments_deck.add_items(data.items)
           comments_deck.time_update()
           comments_deck.page = data.page
-          if data.items.length >= 10
+          if data.page < total_page_count
             comments_deck.load_more_show()
           else
             comments_deck.load_more_hide(false)
@@ -1695,6 +1707,7 @@ class Page_Cast extends Page
       attempts_pos: 0
 
     @_e =
+      cast_subscribe_btn: $('#cast_subscribe_btn')
       player:
         wrapper: $("#player_wrapper")
         frame: $("#player_frame")
@@ -1710,6 +1723,7 @@ class Page_Cast extends Page
     @conf.min_vs_start = Math.floor((new Date() - @conf.start_date) / 60 / 1000)
     @conf.is_online = @conf.min_vs_start >=0 && @conf.min_vs_start < @conf.duration
     self = @
+    @_e.cast_subscribe_btn.click @action_cast_subscribe
     if @conf.is_online
       @player = new PlayerCast(@_e.player.frame)
       if @conf.locations && @conf.locations.length
@@ -1753,7 +1767,7 @@ class Page_Cast extends Page
     @chat.counter++
     local_counter = @chat.counter
     limit = limit || 20
-    @_app.rest.castschats.msgs.read @conf.id, {id_low: @chat.last_id, limit: limit}
+    @_app.rest.castschats.msgs.read @conf.id, {id_low: (@chat.last_id|| -1) + 1, limit: limit}
       .done(
         (data)=>
           if local_counter == @chat.counter
@@ -1816,6 +1830,10 @@ class Page_Cast extends Page
       @_e.chat.wrapper.hide()
       @_e.player.wrapper.removeClass("col-md-8")
     false
+
+  action_cast_subscribe: =>
+    @_app.cast_action( @_app.page().conf.id, "subscribe" )
+    return false
 
 window.InitApp =  (opts = {}, page_name) ->
   new App(opts, page_name)

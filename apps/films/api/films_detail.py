@@ -24,7 +24,7 @@ class DetailFilmView(APIView):
 
         prefetch = []
         if cleaned_data['extend']:
-            prefetch.extend(['genres', 'countries'])
+            prefetch.extend(['countries'])
 
         if cleaned_data['persons']:
             prefetch.append('persons')

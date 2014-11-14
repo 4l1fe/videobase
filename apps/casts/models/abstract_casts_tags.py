@@ -13,6 +13,10 @@ class AbstractCastsTags(models.Model):
     def __unicode__(self):
         return u'[{0}] {1}'.format(self.pk, self.name)
 
+    @classmethod
+    def get_abstract_cast_tags(cls):
+        return cls.objects.filter().all()
+
     class Meta:
         # Имя таблицы в БД
         db_table = 'abstract_casts_tags'

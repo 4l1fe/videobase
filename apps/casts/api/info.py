@@ -8,7 +8,7 @@ from apps.casts.models import Casts
 from apps.casts.api.serializers import vbCast
 
 
-#############################################################################################################
+################################################################################
 class CastsInfoView(APIView):
     """
     Cast info

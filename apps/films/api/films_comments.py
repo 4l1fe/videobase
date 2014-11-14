@@ -78,7 +78,7 @@ class CommentsFilmView(APIView):
         except Exception as e:
             return Response({
                 'total_cnt': len(o_comments),
-                'ipp': 0,
+                'ipp': len(o_comments),
                 'page': filter['page'],
                 'items': [],
             }, status=status.HTTP_200_OK)

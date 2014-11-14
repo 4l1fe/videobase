@@ -1,10 +1,13 @@
 # Ini
 *.ini
-
+videobase/local_settings.py
 *.py[cod]
 
 # Pycharm conf
 .idea
+
+# Local settings
+videobase/local_settings.py
 
 # C extensions
 *.so

@@ -1265,6 +1265,8 @@ section.cast-chat {padding-bottom: 40px;}
 .title-cast .cast-start-date { color: #a08c8c; padding-top: 8px; }
 .title-cast .cast-chat-title { color: #fff; text-transform: uppercase; font-weight: normal; }
 
+.cast-archive-date, .cast-watching-users-count { color: #7f7878; text-decoration: none; }
+
 .list-btns-cast { margin-top: 24px; }
 
 .cast-area { padding-bottom: 20px; }
@@ -1405,10 +1407,17 @@ section.cast-chat {padding-bottom: 40px;}
 .sad-text {font-size: 30px; color: #fff; text-align: center; padding: 40px 0 60px 0}
 
 .add-comment {margin-bottom: 50px}
-.add-comment textarea {margin-top: 20px; margin-bottom: 20px; border-width: 0}
+.add-comment textarea {margin-top: 20px; margin-bottom: 20px; border-width: 0; resize: none}
 
 .index-comments-block {margin: 0 auto; padding: 0}
 .index-comments-block .bg-noise {padding: 34px 0}
+
+.index-comments-block .crsl-nav {/*fix issue #505*/
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
 
 .password-reset { padding-top: 0;  }
 .password-reset .container {padding-top: 37px}
@@ -1418,3 +1427,5 @@ section.cast-chat {padding-bottom: 40px;}
 .cast-offline h4 span {color: #fff}
 .cast-offline .btn-def {margin: 35px auto 0 auto; cursor: pointer}
 .cast-item-def .btn-def {cursor: pointer}
+
+.cast-thumb a.poster-place { text-decoration: none; display: block; }

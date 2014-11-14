@@ -1,9 +1,11 @@
 from apps.contents.models import Contents, Locations
+from apps.films.constants import APP_FILM_SERIAL
 from apps.films.models import Seasons
-from apps.robots.constants import APP_ROBOT_VALUE
 from django.core.validators import URLValidator
 from apps.contents.constants import APP_CONTENTS_PRICE_TYPE_FREE
-from django.utils import timezone
+from apps.robots.constants import APP_ROBOT_VALUE
+
+
 from crawler.locations_saver import save_location_to_locs_dict
 
 
@@ -28,7 +30,9 @@ def sane_dict(film=None):
             'subtitles': '',
             'url_source': '',
             'value': '',
-            'type': ''
+            'type': '',
+            'episode': '',
+            'content_type': ''
             }
 
 
@@ -42,7 +46,7 @@ def get_content(film, kwargs):
     object will be created with these defaults
     '''
     # Getting all content with this film
-    contents = Contents.objects.filter(film=film)
+    contents = Contents.get_content_by_film(film)
 
     if 'number' in kwargs:
         season_num = kwargs['number']
@@ -74,41 +78,45 @@ def get_content(film, kwargs):
 
             return content
         else:
-            raise NameError(u"Variant with new series currently not in db is not implemented")
+            season = Seasons(film=film, number=season_num, release_date='1999-12-12', series_cnt=0, description='')
+            season.save()
+            content = Contents(film=film, name=film.name, name_orig=film.name_orig,
+                           description=description,
+                           release_date=film.release_date,
+                           viewer_cnt=0,
+                           viewer_lastweek_cnt=0,
+                           viewer_lastmonth_cnt=0,
+                           season=season,
+                           number=season_num)
+            content.save()
+            return content
 
     else:
         print season_num
         #According to contract we agreed if there are no seasons there should be return 0, buy some code may return None
         if (season_num is None) or (season_num == 0):
-            content = contents[0]
+            content = Contents.get_content_by_film(film)[0]
         else:
-            content = next((c for c in contents if c.season.number == season_num), None)
-
-            if content is None:
-
-                precontent = contents[0]
-                if release_date is None:
-                    print u"Assigned release date for new content based on release date for the film %d" %   film.pk
-                    release_date = film.release_date
-
-                if 'series_cnt' in kwargs:
-                    series_cnt = kwargs['series_cnt']
-                else:
-                    print u"Assigned new series count in season to number of series in previous season for season %d for film %d" % ( season_num, film.pk)
-                    series_cnt = precontent.season.series_cnt
-
-                season = Seasons(film=film, release_date=release_date,
-                                 series_cnt=series_cnt, description=description,
-                                 number=season_num)
-                content = Contents(film=film, name=precontent.name,
-                                   name_orig=precontent.name_orig,
-                                   description=description, number=season_num,
-                                   release_date=release_date,
-                                   viewer_cnt=kwargs['viewer_cnt'],
-                                   season=season,
-                                   viewer_lastweek_cnt=kwargs['viewer_cnt'],
-                                   viewer_lastmonth_cnt=kwargs['viewer_cnt'])
+            content = Contents.get_content_by_film_and_number(film, season_num)
+            if len(content) == 0:
+                new_season = Seasons(film=film, number=season_num, release_date='1999-12-12', series_cnt=0, description='')
+                new_season.save()
+                content = Contents(film=film, name=film.name, name_orig=film.name_orig,
+                    description=description,
+                    release_date=film.release_date,
+                    viewer_cnt=0,
+                    viewer_lastweek_cnt=0,
+                    viewer_lastmonth_cnt=0,
+                    season=new_season,
+                    number=season_num)
+                content = Contents.get_content_by_film(film)
+                content.season = new_season
+                content.number = season_num
                 content.save()
+                return content
+            else:
+                return content[0]
+
         return content
 
 
@@ -125,25 +133,31 @@ def save_location(film, **kwargs):
         'type': kwargs['type']
                 }
 
-    if kwargs['type'] in APP_ROBOT_VALUE and kwargs['value'] == '':
-        return
+    # if kwargs['type'] in APP_ROBOT_VALUE and kwargs['value'] == '':
+    #     return
 
     content = get_content(film, kwargs)
     val = URLValidator()
 
     # Validating that given url_view exists
+    prev_location = None
     val(kwargs['url_view'])
     try:
-        prev_location = Locations.objects.get(type=kwargs['type'], content = content)
+        if film.type == APP_FILM_SERIAL:
+            prev_location = Locations.objects.get(type=kwargs['type'], content = content, episode=kwargs['episode'])
+        else:
+            prev_location = Locations.objects.get(type=kwargs['type'], content = content)
         print "Found location with such type and film."
     except Locations.DoesNotExist:
         print "There is no location with such type and film."
         prev_location = None
     except Locations.MultipleObjectsReturned:
         print "There are multiple locations with such parameters. Deleting all"
-        locations = Locations.objects.filter(type=kwargs['type'], content = content)
+        if film.type == APP_FILM_SERIAL:
+            locations = Locations.objects.filter(type=kwargs['type'], content = content, episode=kwargs['episode'])
+        else:
+            locations = Locations.objects.filter(type=kwargs['type'], content = content)
         locations.delete()
-        prev_location = None
 
 
     location = Locations(content=content,
@@ -154,6 +168,9 @@ def save_location(film, **kwargs):
                          subtitles=kwargs['subtitles'],
                          price=kwargs['price'],
                          price_type=kwargs['price_type'],
+                         episode=kwargs['episode'],
+                         content_type=kwargs['content_type']
+
                          
     )
     print "Saving location"
@@ -169,3 +186,4 @@ def save_location(film, **kwargs):
         is_new = True
     save_location_to_locs_dict(locations_d, True, film, kwargs['type'], location.id, is_new)
     return  locations_d
+    

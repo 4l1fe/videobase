@@ -45,7 +45,10 @@ class LocationsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Locations
         
-        fields = ('id','type', 'lang', 'quality', 'subtitles', 'price', 'price_type', 'url_view','value')
+        fields = (
+            'id', 'type', 'lang', 'quality', 'subtitles',
+            'price', 'price_type', 'url_view', 'value'
+        )
 
 
 #############################################################################################################
@@ -69,13 +72,12 @@ class vbFilm(serializers.ModelSerializer):
 
     # Признак extend
     countries = CountriesSerializer()
-    genres = GenresSerializer()
+    genres = serializers.SerializerMethodField('genres_list')
     directors = serializers.SerializerMethodField('director_list')
     scriptwriters = serializers.SerializerMethodField('scriptwriter_list')
 
     # Признак person
     persons = serializers.SerializerMethodField('persons_list')
-
 
     def __init__(self, *args, **kwargs):
         new_fields = []
@@ -105,12 +107,13 @@ class vbFilm(serializers.ModelSerializer):
         self._rebuild_location()
         self._rebuild_poster_list()
         self._rebuild_relation_list(request, require_relation)
-        self._rebuild_tors_list()
 
+        if self.extend_sign:
+            self._rebuild_tors_list()
+            self._rebuild_genres()
 
     def calc_release(self, obj):
         return obj.release_date
-
 
     def persons_list(self, obj):
         o_persons = Persons.objects.filter(pf_persons_rel__film=obj).\
@@ -120,55 +123,58 @@ class vbFilm(serializers.ModelSerializer):
 
         return vbPerson(o_persons, many=True).data
 
-
     def calc_ratings(self, obj):
         return obj.get_rating_for_vb_film
 
-
     def calc_has_free(self, obj):
-        result = self.location_rebuild.get(obj.pk, [])
-        for loc in result:
+        for loc in self.location_rebuild.get(obj.pk, []):
             if loc.price_type == APP_CONTENTS_PRICE_TYPE_FREE:
                 return True
 
         return False
 
-
     def calc_instock(self, obj):
-        result = self.location_rebuild.get(obj.pk, [])
-        if len(result):
+        if len(self.location_rebuild.get(obj.pk, [])):
             return True
 
         return False
 
-
     def _get_obj_list(self):
         list_pk = []
         instance = self.object
-        if hasattr(instance, '__iter__') and not isinstance(instance, (Page, dict)):  #WARNING: Если в instance придёт dict,
-            for item in instance:                                              # такое возможно при десериализации,
-                list_pk.append(item.pk)                                        # то поломается добрая половина методов
+        if hasattr(instance, '__iter__') and not isinstance(instance, (Page, dict)):
+            list_pk = [item.id for item in instance]
         else:
-            list_pk.append(instance.pk)
+            list_pk.append(instance.id)
 
         self.list_obj_pk = list_pk
 
+    # ---------------------------------------------------------------------------------------
+    def _rebuild_genres(self):
+        result = defaultdict(list)
+        for item in Genres.get_full_genres_by_films(self.list_obj_pk):
+            result[item.films_id].append(
+                {
+                    'id': item.id,
+                    'name': item.name,
+                }
+            )
+
+        self.genres_rebuild = result
+
+    def genres_list(self, obj):
+        return self.genres_rebuild.get(obj.pk, [])
 
     # ---------------------------------------------------------------------------------------
     def _rebuild_location(self):
         locations = Locations.objects.filter(content__film__in=self.list_obj_pk)\
             .order_by('price', 'content__film', 'content__id').select_related('content')
 
-        result = {}
+        result = defaultdict(list)
         for item in locations:
-            v = item.content.film_id
-            if not v in result:
-                result[v] = []
-
-            result[v].append(item)
+            result[item.content.film_id].append(item)
 
         self.location_rebuild = result
-
 
     def locations_list(self, obj):
         result = self.location_rebuild.get(obj.pk, [])
@@ -177,13 +183,10 @@ class vbFilm(serializers.ModelSerializer):
 
         return result
 
-
     # ---------------------------------------------------------------------------------------
     def _rebuild_poster_list(self):
         extras = FilmExtras.get_additional_material_by_film(self.list_obj_pk)
-        extras = group_by(extras, 'film_id', True)
-        self.poster_rebuild = extras
-
+        self.poster_rebuild = group_by(extras, 'film_id', True)
 
     def poster_list(self, obj):
         result = self.poster_rebuild.get(obj.pk, '')
@@ -199,10 +202,9 @@ class vbFilm(serializers.ModelSerializer):
 
         return result
 
-
     # ---------------------------------------------------------------------------------------
     def _rebuild_relation_list(self, request, require_relation):
-        result = defaultdict()
+        result = defaultdict(list)
 
         if require_relation:
             def check_auth(request):
@@ -221,38 +223,35 @@ class vbFilm(serializers.ModelSerializer):
 
         self.relation_rebuild = result
 
-
     def relation_list(self, obj):
         return self.relation_rebuild.get(obj.pk, {})
-
 
     # ---------------------------------------------------------------------------------------
     def _rebuild_tors_list(self):
         result = {}
 
-        if self.extend_sign:
-            o_person = Persons.objects.\
-                filter(Q(pf_persons_rel__p_type=APP_PERSON_DIRECTOR) | Q(pf_persons_rel__p_type=APP_PERSON_SCRIPTWRITER),
-                                              pf_persons_rel__film__in=self.list_obj_pk).\
-                extra(select={'p_type': "persons_films.p_type", 'film': "persons_films.film_id"}).order_by('id')
+        o_person = Persons.objects.\
+            filter(Q(pf_persons_rel__p_type=APP_PERSON_DIRECTOR) | Q(pf_persons_rel__p_type=APP_PERSON_SCRIPTWRITER),
+                                          pf_persons_rel__film__in=self.list_obj_pk).\
+            extra(select={
+                'p_type': 'persons_films.p_type',
+                'film': 'persons_films.film_id'
+            }).order_by('id')
 
-            o_person = group_by(o_person, 'film', True)
+        for key, value in group_by(o_person, 'film', True).items():
+            if not key in result:
+                result[key] = {
+                    'directors': [],
+                    'scriptwriters': [],
+                }
 
-            for key, value in o_person.items():
-                if not key in result:
-                    result[key] = {
-                        'directors': [],
-                        'scriptwriters': [],
-                    }
-
-                for item in value:
-                    if item.p_type == APP_PERSON_DIRECTOR:
-                        result[key]['directors'].append(item)
-                    else:
-                        result[key]['scriptwriters'].append(item)
+            for item in value:
+                if item.p_type == APP_PERSON_DIRECTOR:
+                    result[key]['directors'].append(item)
+                else:
+                    result[key]['scriptwriters'].append(item)
 
         self.tors_list = result
-
 
     def director_list(self, obj):
         temp = self.tors_list.get(obj.pk, [])
@@ -264,7 +263,6 @@ class vbFilm(serializers.ModelSerializer):
 
         return temp
 
-
     def scriptwriter_list(self, obj):
         temp = self.tors_list.get(obj.pk, [])
         if len(temp):
@@ -275,12 +273,11 @@ class vbFilm(serializers.ModelSerializer):
 
         return temp
 
-
     class Meta:
         model = Films
         fields = [
-            'id', 'name', 'name_orig', 'releasedate', \
-            'ratings', 'duration', 'locations', 'hasFree', 'instock',\
-            'poster', 'relation', 'description', 'countries', \
+            'id', 'name', 'name_orig', 'releasedate',
+            'ratings', 'duration', 'locations', 'hasFree', 'instock',
+            'poster', 'relation', 'description', 'countries',
             'directors', 'scriptwriters', 'genres', 'persons'
         ]

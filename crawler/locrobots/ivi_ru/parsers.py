@@ -1,11 +1,12 @@
 # coding: utf-8
-from crawler.core.parse import BaseParse
-from crawler.core.exceptions import NoSuchFilm
 from apps.contents.constants import *
+from apps.films.constants import APP_FILM_SERIAL
+from crawler.core.parse import BaseParse
 
-from bs4 import BeautifulSoup
 import re
 import json
+import requests
+from bs4 import BeautifulSoup
 
 
 # Парсер для поисковика фильма
@@ -24,38 +25,75 @@ def parse_search(response, film):
 
 # Парсер для страницы фильма
 class ParseFilmPage(BaseParse):
-    def __init__(self, html):
-        super(ParseFilmPage, self).__init__(html)
+    def __init__(self, html, film):
+        super(ParseFilmPage, self).__init__(html, film)
         self.soup = BeautifulSoup(html, "html")
-        if self.soup.find_all('div', {'class': ['series-block']}):
-            self.is_film = False
-        else:
-            self.is_film = True
+        self.host = "http://www.ivi.ru"
 
     def get_link(self, **kwargs):
-        link = self.soup.find_all('div', {'class':  'watch-top-main'})[0]\
-            .find('div', {'class':  ['action-button-wrapper',
-                                     'main-button-wrapper']})\
-            .find('a')
-        url = ''
-        if link['href'] != '#':
-            if '#' in link['href']:
-                url = '%s%s' % (kwargs.get('url', ''), link['href'])
-            else:
-                url = link['href']
+        ret_value = None
+        if self.film_type == APP_FILM_SERIAL:
+            seasons = self._get_seasons(url=kwargs.get('url'))
+            ret_value = self._get_series(seasons)
         else:
-            #raise NoSuchFilm
-            print "Film not found"
-        return url
+            link = self.soup.find_all('div', {'class':  'watch-top-main'})[0]\
+                .find('div', {'class':  ['action-button-wrapper',
+                                         'main-button-wrapper']})\
+                .find('a')
+            ret_value = ''
+            if link['href'] != '#':
+                if '#' in link['href']:
+                    ret_value = '%s%s' % (kwargs.get('url', ''), link['href'])
+                else:
+                    ret_value = link['href']
+            else:
+                #raise NoSuchFilm
+                print "Film not found"
+
+        return ret_value
+
+    def _get_seasons(self, url):
+        seasons_list = []
+        seasons_div = self.soup.find('div', {'class': 'series-block'})
+        if seasons_div:
+            seasons_tag = seasons_div.select("div.seasons-list-block li a")
+            if seasons_tag:
+                for season in seasons_tag:
+                    seasons_list.append({
+                        'id': season['data-compilation'],
+                        'season_numer': season['data-season'],
+                        'season_url': "{0}{1}".format(self.host, season['href'])
+                    })
+            else:
+                recomend_tag = self.soup.find('div', {'id': 'video_block_recomendations'})
+                seasons_list.append({
+                    'id': recomend_tag['data-compilation-id'],
+                    'season_numer': 0,
+                    'season_url': url,
+                })
+        else:
+            print "This film is not a serial"
+        return seasons_list
+
+    def _get_series(self, seasons_list):
+        url = "{0}/{1}".format(self.host, "video/json/video/items")
+        params = {'limit': "", 'ids[]': "", 'action': 'series', 'tmpl': 0}
+        series = []
+        for season in seasons_list:
+            params['ids[]'] = season['id']
+            params['limit'] = season['season_numer']
+            data = requests.get(url, params=params)
+            series.append({'season': season['season_numer'],
+                           'season_url': season['season_url'],
+                           'episode_list': [
+                               {'season': episode['season'] if episode['season'] else 1,
+                                'url': "{0}{1}".format(self.host, episode['url']),
+                                'number': episode['episode']}
+                               for episode in data.json()]})
+        return series
 
     def get_seasons(self, **kwargs):
-        if not self.is_film:
-            seasons_div_tag = self.soup.find_all('div', {'class': 'series-block'})
-            seasons_number = seasons_div_tag.find('div', {'class': 'seasons-list-block'}).\
-                find('li')
-            return range(1, len(seasons_number)+1)
-        else:
-            return [0]
+        pass
 
     def get_price(self, **kwargs):
         price = 0
@@ -96,6 +134,3 @@ class ParseFilmPage(BaseParse):
 
     def get_type(self, **kwargs):
         return 'ivi'
-
-
-
