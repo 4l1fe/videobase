@@ -40,7 +40,7 @@ def get_title(item_div):
 
 def get_link(item_div):
     a_tag = item_div.find('a', {"class": "vs"})
-    link = MAIN_SITE_LINK + a_tag['href']
+    link = 'http://video.khl.ru/t/{}?partner=qqHbuYA'.format(a_tag['href'].split('/')[2])
     if link:
         return link
     else:
