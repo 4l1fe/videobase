@@ -710,7 +710,7 @@
       var type;
       type = this._type;
       if (type.substr(0, 4) === "film") {
-        if (name === "object.id" && (attr = "href")) {
+        if (name === "object.id" || name === 'object.film.id' && (attr = "href")) {
           return "/films/" + val + "/";
         }
         if (name === "object.name") {
