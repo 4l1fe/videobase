@@ -77,6 +77,7 @@ def parse_translation_championat_com():
                     'link': link,
                     'meta': {'championship': championship if championship else None},
                     'value': value,
+                    'tag': 'sport'
                 }
                 translation_list.append(translation_data)
             except Exception, e:

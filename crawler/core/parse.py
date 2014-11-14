@@ -16,10 +16,6 @@ class BaseParse(object):
     def get_price(self, **kwargs):
         raise NotImplementedError()
 
-    # Доступные серии для просмотра
-    def get_seasons(self, **kwargs):
-        raise NotImplementedError()
-
     # Ссылка на просмотр
     def get_link(self, **kwargs):
         raise NotImplementedError()
@@ -40,7 +36,6 @@ class BaseParse(object):
         type_robot = obj.get_type()
         films_list = obj.get_link(**kwargs)
         price, price_type = obj.get_price(**kwargs)
-        seasons = obj.get_seasons(**kwargs)
         value = obj.get_value(**kwargs)
         if film.type == APP_FILM_SERIAL:
             resp_dict = dict_gen(film)
