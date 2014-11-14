@@ -1407,7 +1407,7 @@ section.cast-chat {padding-bottom: 40px;}
 .sad-text {font-size: 30px; color: #fff; text-align: center; padding: 40px 0 60px 0}
 
 .add-comment {margin-bottom: 50px}
-.add-comment textarea {margin-top: 20px; margin-bottom: 20px; border-width: 0}
+.add-comment textarea {margin-top: 20px; margin-bottom: 20px; border-width: 0; resize: none}
 
 .index-comments-block {margin: 0 auto; padding: 0}
 .index-comments-block .bg-noise {padding: 34px 0}

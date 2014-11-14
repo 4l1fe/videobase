@@ -1,10 +1,11 @@
 # coding: utf-8
+import pytz
 
 from rest_framework import serializers
-import time
-import pytz
-from apps.casts.models import Casts, UsersCasts
+
+from apps.casts.models import Casts
 from videobase.settings import TIME_ZONE
+
 
 class vbCast(serializers.ModelSerializer):
 
@@ -43,11 +44,11 @@ class vbCast(serializers.ModelSerializer):
 
     class Meta:
         model = Casts
-        fields = [
+        fields = (
             'id', 'title', 'title_orig', 'description', 'status', 'pg_rating',
             'start', 'duration',
             'tags',
             'poster',
             'locations',
 #           'relation'
-        ]
+        )
