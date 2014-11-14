@@ -12,10 +12,26 @@ class CastsView(View):
 
     def get(self, *args, **kwargs):
         today = timezone.datetime.now()
+        casts_tags_list = []
+
+        tag_dict = {
+            'id': '',
+            'name': '',
+            'type': ''
+        }
+
         data = {}
         casts = casts_models.Casts.objects.filter(start__gte=today - timezone.timedelta(hours=3)).order_by('start')[:12]
         data['casts'] = vbCast(casts).data
-        data['casts_tags'] = []
+        tags = casts_models.AbstractCastsTags.get_abstract_cast_tags()
+
+        for tag in tags:
+            tag_dict['id'] = tag.id
+            tag_dict['name'] = tag.name
+            tag_dict['type'] = tag.type
+            casts_tags_list.append(tag_dict)
+
+        data['casts_tags'] = casts_tags_list
         return HttpResponse(render_page('casts_list', data))
 
 
