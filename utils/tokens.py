@@ -73,6 +73,13 @@ def casts_chats_msgs(session_token, id_, **kwargs):
     return resp.read()
 
 
+def casts_chats_view(main_token, session_token, id_):
+    import requests
+    url = 'casts/{}/'.format(id_)
+    resp = requests.get(urljoin(address, url), cookies={'x-token': main_token, 'x-session':session_token})
+    return resp.content
+
+
 if __name__ == '__main__':
     host = 'localvsevi'
     address = 'http://{}'.format(host)
@@ -82,5 +89,7 @@ if __name__ == '__main__':
     print(st)
     from pprint import pprint as pp
     import json
-    resp = casts_chats_msgs(st, 329, limit=1)
-    pp(json.loads(resp))
+    # resp = casts_chats_msgs(st, 329, limit=1)
+    # pp(json.loads(resp))
+    resp = casts_chats_view(mt, st, 329)
+    print(resp)

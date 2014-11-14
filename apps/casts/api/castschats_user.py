@@ -14,7 +14,7 @@ class CastsChatsUsersView(APIView):
 
     def get(self, request, castchat_id):
         try:
-            users = [ccu.user for ccu in CastsChatsUsers.objects.filter(cast_id=castchat_id)]
+            users = [ccu.user for ccu in CastsChatsUsers.objects.filter(cast_id=castchat_id, status='online')]
 
             return Response(vbUser(users, many=True).data, status=status.HTTP_200_OK)
 
