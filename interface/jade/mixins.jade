@@ -186,7 +186,7 @@ mixin loc_thumb(item)
             span=item.price_type == 0?"бесплатно":(price + " р.")
 
 mixin person_thumb(item)
-    li(data-mi-id="id",data-mi-val=item.id)
+    li(data-mi-id="id",data-mi-val="item.id",class="person-thumb")
         - person_url = '/persons/' + item.id + '/'
         .actor
             a(href=person_url, title='', data-mi-athref="id")
