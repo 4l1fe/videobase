@@ -1,12 +1,12 @@
 # coding: utf-8
 import copy
 from django.views.generic import View
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.utils import timezone
 from utils.noderender import render_page
-
 import apps.casts.models as casts_models
 from apps.casts.api.serializers import vbCast
+from apps.users.api.serializers import vbUser
 from apps.casts.api import CastsListView
 
 
@@ -31,9 +31,6 @@ class CastsView(View):
             casts = casts_models.Casts.objects.filter(start__gte=today - timezone.timedelta(hours=3)).order_by('start')[:12]
             data['casts'] = vbCast(casts, many=True).data
 
-        casts = casts_models.Casts.objects.filter(start__gte=today - timezone.timedelta(hours=3)).order_by('start')[:12]
-        data['casts'] = vbCast(casts).data
-        
         tags = casts_models.AbstractCastsTags.get_abstract_cast_tags()
 
         for tag in tags:
@@ -48,16 +45,24 @@ class CastsView(View):
 
 class CastInfoView(View):
 
-    def get(self, *args, **kwargs):
-        cast_id = int(kwargs.get('cast_id', None))
+    def get(self, request, cast_id, *args, **kwargs):
         today = timezone.datetime.now()
         data = {}
-        cast = casts_models.Casts.objects.get(id=cast_id)
-        chat_items = casts_models.CastsChatsMsgs.objects.filter(cast_id=cast_id)
+
+        try:
+            cast = casts_models.Casts.objects.get(id=cast_id)
+        except casts_models.Casts.DoesNotExist:
+            raise Http404
+
+        if request.user.is_authenticated():
+            ccu, created = casts_models.CastsChatsUsers.objects.get_or_create(cast_id=cast_id, user_id=request.user.id)
+            ccu.status = 'online'
+            ccu.save()
+
+        chat_items = casts_models.CastsChatsMsgs.objects.filter(cast_id=cast_id).iterator()
         msgs_list = []
         for item in chat_items:
-            user = {'id': item.user.id, 'name': u' '.join([item.user.first_name, item.user.last_name]), 'avatar': ""}
-            msgs_list.append({'user': user, 'text': item.text})
+            msgs_list.append({'user': vbUser(item.user).data, 'text': item.text})
         other_casts = casts_models.Casts.objects.filter(start__gte=today - timezone.timedelta(hours=3)).order_by('start').exclude(id=cast_id)[:12]
         data['cast'] = vbCast(cast).data
         data['cast']['chat_items'] = msgs_list

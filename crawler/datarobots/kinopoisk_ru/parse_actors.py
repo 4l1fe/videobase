@@ -87,10 +87,8 @@ class PersoneParser(object):
         if not person_film:
             msg = u"Adding link for film {film} and person {person}"
             print msg.format(film=film, person=person)
-
             person_film = PersonsFilms(person=person, film=film, p_type=pers_type)
             person_film.save()
-
         return person_film
 
     @staticmethod
@@ -99,9 +97,7 @@ class PersoneParser(object):
         if not person:
             person = Persons(name=name, photo='', kinopoisk_id=kinopoisk_id)
             person.save()
-
             print u'Added Person {name}'.format(name=name)
-
         return person
 
     @staticmethod
