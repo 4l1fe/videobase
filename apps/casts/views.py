@@ -30,9 +30,6 @@ class CastsView(View):
             casts = casts_models.Casts.objects.filter(start__gte=today - timezone.timedelta(hours=3)).order_by('start')[:12]
             data['casts'] = vbCast(casts, many=True).data
 
-        casts = casts_models.Casts.objects.filter(start__gte=today - timezone.timedelta(hours=3)).order_by('start')[:12]
-        data['casts'] = vbCast(casts).data
-        
         tags = casts_models.AbstractCastsTags.get_abstract_cast_tags()
 
         for tag in tags:
