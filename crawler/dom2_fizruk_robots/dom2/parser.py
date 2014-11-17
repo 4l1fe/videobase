@@ -24,12 +24,8 @@ class ParseDom2():
         pages = []
         pages = Dom2Loader.load_pages()
         all_actors = ParseDom2.get_all_actors()
-        i = 0
         for page in pages:
             all_episods_info = all_episods_info + ParseDom2.parse_one_page(page, all_actors)
-            i += 1
-            if i == 5:
-                break
         return all_episods_info
 
     @staticmethod
