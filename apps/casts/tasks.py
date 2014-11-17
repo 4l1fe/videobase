@@ -19,7 +19,7 @@ def cast_notification(cast, user):
     o_cast = Casts.objects.get(id=cast)
 
     vb_cast = vbCast(o_cast, many=False).data
-    vb_cast['tags'] = vb_cast[0].name
+    vb_cast['tag'] = vb_cast['tags'][0]['name'].capitalize()
 
     params = {
         'context': {
