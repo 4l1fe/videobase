@@ -1,4 +1,5 @@
 # coding: utf-8
+import glob
 import json
 import os
 import subprocess
@@ -144,6 +145,10 @@ class Dom2Loader():
                         video_url = Dom2Loader.generate_video_url(video_id)
                         file_link = Dom2Loader.get_video_file_link(video_url)
                         Dom2Loader.save_flv_to_disk(file_link, trimmed_fname)
+
+        for fl in glob.glob("*Frag*"):
+            os.remove(fl)
+
 
     @staticmethod
     def save_flv_to_disk(file_link, name):
