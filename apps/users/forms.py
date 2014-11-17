@@ -13,7 +13,7 @@ from utils.common import url_with_querystring
 
 
 class UsersProfileForm(forms.ModelForm):
-    email = forms.EmailField(required=False)
+    email = forms.EmailField(required=True)
     username = forms.CharField(required=True, max_length=30)
     avatar = forms.ImageField(required=False)
 
@@ -27,9 +27,10 @@ class UsersProfileForm(forms.ModelForm):
     def clean_email(self):
         email = self.cleaned_data.get('email')
         if email:
-            exists = User.objects.filter(email=email).exists()
+            exists = User.objects.filter(email=email).exclude(id=self.user.id).exists()
             if exists:
                 raise forms.ValidationError(u'Ведёный email уже занят')
+        return email
 
     @transaction.commit_manually
     def save(self, commit=True, send_email=False):
