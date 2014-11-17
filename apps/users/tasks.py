@@ -1,10 +1,11 @@
 # coding: utf-8
 
 import StringIO
+import textwrap
 import requests
 from PIL import Image
 
-from django.core.mail import EmailMultiAlternatives
+from django.core.mail import EmailMultiAlternatives, EmailMessage
 from django.template.loader import render_to_string
 from django.core.files.uploadedfile import InMemoryUploadedFile
 
@@ -27,7 +28,12 @@ def send_template_mail(subject, tpl_name, context, to, jade_render=False):
     else:
         tpl = render_to_string(tpl_name, context)
 
-    msg = EmailMultiAlternatives(subject=subject, to=to)
+    encoded_content = '\r\n'.join(textwrap.wrap(tpl.encode('utf-8').encode('base64'), 76))
+    msg = EmailMessage(subject, encoded_content, to=to, headers={
+        'Content-Type': 'text/html; charset=ISO-8859-1',
+        'Content-Transfer-Encoding': 'base64',
+        'MIME-Version': '1.0'
+    })
     msg.attach_alternative(tpl, 'text/html')
     msg.send()
 
