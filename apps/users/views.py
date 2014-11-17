@@ -1,6 +1,7 @@
 # coding: utf-8
 
 import datetime
+import re
 from pytils import numeral
 
 from django.db import transaction
@@ -88,6 +89,7 @@ class LoginUserView(View):
         return response
 
     def post(self, *args, **kwargs):
+        reg = re.compile(ur'vsevi\.\w{2,3}\/login')
         data = self.request.POST
         login_form = AuthenticationForm(data=data)
         if login_form.is_valid():
@@ -97,7 +99,7 @@ class LoginUserView(View):
                 '_': timezone.now().date().strftime("%H%M%S")
             }
 
-            if self.request.META['HTTP_HOST'] == HOST and not HOST+'/login' in self.request.META['HTTP_REFERER']:
+            if 'vsevi' in self.request.META['HTTP_HOST'] and not reg.search(self.request.META['HTTP_REFERER']):
                 kw.update(back_url=self.request.META['HTTP_REFERER'])
 
             url = url_with_querystring(reverse('tokenize'), **kw)
