@@ -14,7 +14,7 @@ from apps.users.tasks import send_template_mail
 
 
 @app.task(name="cast_notify", queue="send_cast_notify")
-def cast_notification(cast, user):
+def cast_notification(cast, user, **kwargs):
     o_user = User.objects.get(id=user)
     o_cast = Casts.objects.get(id=cast)
 
