@@ -13,21 +13,6 @@ from apps.casts.constants import APP_CASTS_MAIL_SUBJECT, APP_CASTS_MAIL_TEMPLATE
 from apps.users.tasks import send_template_mail
 
 
-def find_min_price(price_list):
-    loc_cnt = 0
-    has_free = min_obj = False
-
-    for item in price_list:
-        if item.price_type == 0:
-            has_free = True
-        else:
-            loc_cnt += 1
-            if min_obj is False or min_obj.price > item.price:
-                min_obj = item
-
-    return has_free, min_obj, loc_cnt
-
-
 @app.task(name="cast_notify", queue="send_cast_notify")
 def cast_notification(cast, user):
     o_user = User.objects.get(id=user)
