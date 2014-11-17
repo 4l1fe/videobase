@@ -33,20 +33,17 @@ def cast_notification(cast, user):
     o_user = User.objects.get(id=user)
     o_cast = Casts.objects.get(id=cast)
 
-    o_loc = CastsLocations.objects.filter(cast=o_cast)
-    has_free, min_obj, loc_cnt = find_min_price(o_loc)
-    min_price = math.floor(min_obj) if min_obj else False
+    vb_cast = vbCast(o_cast, many=False).data
+    vb_cast['tags'] = vb_cast[0].name
 
     params = {
         'context': {
-            'cast': vbCast(o_cast, many=False).data,
-            'free': has_free,
-            'min_price': min_price,
-            'loc_cnt': loc_cnt,
+            'cast': vb_cast,
         },
         'subject': APP_CASTS_MAIL_SUBJECT,
         'tpl_name': APP_CASTS_MAIL_TEMPLATE,
         'to': [o_user.email],
+        'jade_render': True,
     }
 
     send_template_mail.s(**params).apply_async()

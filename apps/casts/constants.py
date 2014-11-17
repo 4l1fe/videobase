@@ -19,5 +19,5 @@ APP_CAST_POSTER_DIR = os.path.join('upload', 'castextras')
 
 APP_CASTS_START_NOTIFY = 40
 APP_CASTS_MAIL_SUBJECT = u'Уведомление о старте трансляции'
-APP_CASTS_MAIL_TEMPLATE = 'mail/cast_notification.html'
+APP_CASTS_MAIL_TEMPLATE = u'cast_notification'
 
