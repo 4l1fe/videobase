@@ -8,6 +8,7 @@ import apps.casts.models as casts_models
 from apps.casts.api.serializers import vbCast
 from apps.users.api.serializers import vbUser
 from apps.casts.api import CastsListView
+from apps.casts.constants import CCU_ONLINE
 
 
 class CastsView(View):
@@ -56,7 +57,7 @@ class CastInfoView(View):
 
         if request.user.is_authenticated():
             ccu, created = casts_models.CastsChatsUsers.objects.get_or_create(cast_id=cast_id, user_id=request.user.id)
-            ccu.status = 'online'
+            ccu.status = CCU_ONLINE
             ccu.save()
 
         chat_items = casts_models.CastsChatsMsgs.objects.filter(cast_id=cast_id).iterator()
