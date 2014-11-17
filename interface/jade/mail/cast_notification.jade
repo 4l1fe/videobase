@@ -17,9 +17,9 @@
 
 - get_start_translation = function(item) {
 -    result = "";
--    if (item && item.lenght > 0) {
--        i = new Date(item);
--        result = i.getUTCHours() + ":" + i.getUTCMinutes();
+-    if (item && item.length > 0) {
+-        date = new Date(item);
+-        result = date.getUTCHours() + ":" + date.getUTCMinutes();
 -    }
 -    return result;
 -}
