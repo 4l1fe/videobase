@@ -43,10 +43,12 @@ def persons_films_update_with_indexes(kinopoisk_film_id):
 def update_film_rating_task(kinopoisk_id):
     f = Films.objects.get(kinopoisk_id=kinopoisk_id)
     r = get_ratings(kinopoisk_id)
-    f.rating_imdb = r['imdb']['rating']
-    f.rating_imdb_cnt = r['imdb']['votes']
-    f.rating_kinopoisk = r['kp']['rating']
-    f.rating_kinopoisk_cnt = r['kp']['votes']
+    if r['imdb']:
+        f.rating_imdb = r['imdb']['rating']
+        f.rating_imdb_cnt = r['imdb']['votes']
+    if r['kp']:
+        f.rating_kinopoisk = r['kp']['rating']
+        f.rating_kinopoisk_cnt = r['kp']['votes']
     f.save()
 
 
