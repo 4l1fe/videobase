@@ -1,7 +1,5 @@
 # coding: utf-8
 
-import math
-
 from django.contrib.auth.models import User
 
 from videobase.celery import app
