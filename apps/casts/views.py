@@ -1,4 +1,5 @@
 # coding: utf-8
+import copy
 from django.views.generic import View
 from django.http import HttpResponse, Http404
 from django.utils import timezone
@@ -36,7 +37,7 @@ class CastsView(View):
             tag_dict['id'] = tag.id
             tag_dict['name'] = tag.name
             tag_dict['type'] = tag.type
-            casts_tags_list.append(tag_dict)
+            casts_tags_list.append(copy.deepcopy(tag_dict))
 
         data['casts_tags'] = casts_tags_list
         return HttpResponse(render_page('casts_list', data))

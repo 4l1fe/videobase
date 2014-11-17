@@ -480,11 +480,11 @@ class CastThumb extends Item
           label_prim_cls = 'label-success'
           @elements["btn"].self.show().addClass("btn-free").html("Смотреть<br/>бесплатно")
         else if @vals.min_vs_start < 0
-          if @vals.min_vs_start < -1440
+          if @vals.min_vs_start > -1440
             label_prim_str = ''
             if @vals.min_vs_start > -60
               label_prim_str = "примерно "
-            label_prim_str+= 'через ' + duration_text( -@vals.min_vs_start )
+            label_prim_str += 'через ' + duration_text( -@vals.min_vs_start )
           else
             label_prim_str = time_text(@vals.start_date)
           @elements["btn"].self.show().addClass("btn-subscribe").text("Подписаться")
@@ -1731,7 +1731,7 @@ class Page_Cast extends Page
       @_e.chat.ico.click(-> self.toggle_chat())
       @_e.chat.input
         .keypress((e) -> self.sendmsg_chat() if e.which == 13)
-        .focus( -> return false if false && !self.user_is_auth())
+        .focus( -> return false if !self.user_is_auth())
       @update_chat()
     else if @conf.min_vs_start < 0 && @_e.time_counter.length
       @timer_tick()
@@ -1740,8 +1740,6 @@ class Page_Cast extends Page
 
   timer_tick: () ->
     min_left = Math.floor((new Date() - @conf.start_date) / 60 / 1000)
-    console.log @conf.min_vs_start, min_left
-    console.log min_left >=0 || (@conf.min_vs_start < -40 && min_left >= -40)
     if min_left >=0 || (@conf.min_vs_start < -40 && min_left >= -40)
       location.reload()
     else
@@ -1758,14 +1756,12 @@ class Page_Cast extends Page
       @_app.rest.castschats.send.create(@conf.id, {text: text})
         .done(
           =>
-            @update_chat()
-            @_e.chat.input.prop('disabled', false);
+            @update_chat(undefined, => @_e.chat.input.val("").prop('disabled', false))
         )
         .fail(
-
         )
 
-  update_chat: (limit) ->
+  update_chat: (limit, cb) ->
     if !@conf.is_online
       return
     @chat.counter++
@@ -1805,6 +1801,7 @@ class Page_Cast extends Page
               @chat.attempts_pos = 2
               @chat.attempts = [0,0,0]
             @update_chat_set(@chat.attempts_pos)
+        cb(true) if typeof cb == "function"
       )
       .fail(
         =>
@@ -1812,6 +1809,7 @@ class Page_Cast extends Page
             @chat.attempts = [0,0,0]
             @chat.attempts_pos = 0
             @update_chat_set(2)
+          cb(false) if typeof cb == "function"
       )
 
   update_chat_set: (timeout_id) ->
