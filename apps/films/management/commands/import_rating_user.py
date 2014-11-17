@@ -14,23 +14,23 @@ from django.core.management.base import BaseCommand
 from rest_framework.authtoken.models import Token
 
 from apps.films.models import Films
-from apps.users.models import SessionToken, UsersApiSessions, User
+from apps.users.models import SessionToken, User
 
 
 class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
         make_option('-f', '--filename',
-            action  = 'store',
-            dest    = 'filename',
-            default = False,
-            help    = 'Full path for file',
-        ),
+                    action='store',
+                    dest='filename',
+                    default=False,
+                    help='Full path for file',
+                    ),
         make_option('-u', '--user',
-            action  = 'store',
-            dest    = 'user',
-            default = False,
-            help    = 'ID for user',
-        ),
+                    action='store',
+                    dest='user',
+                    default=False,
+                    help='ID for user',
+                    ),
     )
 
     help = u"Импортирование оценок фильма из файла"
@@ -70,7 +70,6 @@ class Command(BaseCommand):
         # Create Session
         token = Token.objects.get(user=o_user.id)
         s_token = SessionToken.objects.create(user=o_user)
-        UsersApiSessions.objects.create(token=s_token)
 
         # Init Request
         request = Client(HTTP_X_MI_SESSION=s_token.key, HTTP_USER_AGENT='Mozilla/5.0')

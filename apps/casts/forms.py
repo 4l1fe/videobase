@@ -51,11 +51,12 @@ class CastsChatGetForm(Form):
     limit   = fields.IntegerField(min_value=0, required=False)
 
     def __init__(self, *args, **kwargs):
+        if not kwargs['data'].get('limit'):
+            kwargs['data']['limit'] = 10
+
         super(CastsChatGetForm, self).__init__(*args, **kwargs)
+
         for k, v in self.fields.items():
             if k in kwargs['data'] and kwargs['data'][k]:
                 if self.fields[k].required == False:
                     self.fields[k].required = True
-
-    class Meta:
-        fields = ('id_low', 'id_high', 'limit')

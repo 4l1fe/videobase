@@ -26,7 +26,7 @@ class AyyoRobot(object):
     def get_data(self):
         locations = {
         'info': [],
-        'type': 'www.ayyo.ru'
+        'type': 'ayyo'
                 }
         try:
             films = json.loads(self.response)['live_search']['search_movies_result']
