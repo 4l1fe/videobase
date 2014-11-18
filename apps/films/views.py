@@ -380,10 +380,10 @@ def calc_actors(o_film):
     try:
         enumerated_actors = film_model.PersonsFilms.objects.\
             filter(film=o_film, p_type=APP_PERSON_ACTOR).\
-            exclude(p_index=0).order_by('p_index')
+            exclude(p_index=0).order_by('p_index', 'person__name')
 
         unenumerated_actors = film_model.PersonsFilms.objects.\
-            filter(film=o_film, p_type=APP_PERSON_ACTOR, p_index=0)
+            filter(film=o_film, p_type=APP_PERSON_ACTOR, p_index=0).order_by('person__name')
         
         result = (serialize_actors(enumerated_actors) + serialize_actors(unenumerated_actors))[slice(filter['offset'], filter['limit'])]
     except Exception, e:

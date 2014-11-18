@@ -775,7 +775,7 @@
               label_prim_cls = 'label-success';
               _this.elements["btn"].self.show().addClass("btn-free").html("Смотреть<br/>бесплатно");
             } else if (_this.vals.min_vs_start < 0) {
-              if (_this.vals.min_vs_start < -1440) {
+              if (_this.vals.min_vs_start > -1440) {
                 label_prim_str = '';
                 if (_this.vals.min_vs_start > -60) {
                   label_prim_str = "примерно ";
@@ -2745,7 +2745,7 @@
             return self.sendmsg_chat();
           }
         }).focus(function() {
-          if (false && !self.user_is_auth()) {
+          if (!self.user_is_auth()) {
             return false;
           }
         });
@@ -2759,8 +2759,6 @@
     Page_Cast.prototype.timer_tick = function() {
       var func, min_left;
       min_left = Math.floor((new Date() - this.conf.start_date) / 60 / 1000);
-      console.log(this.conf.min_vs_start, min_left);
-      console.log(min_left >= 0 || (this.conf.min_vs_start < -40 && min_left >= -40));
       if (min_left >= 0 || (this.conf.min_vs_start < -40 && min_left >= -40)) {
         return location.reload();
       } else {
@@ -2786,14 +2784,15 @@
           text: text
         }).done((function(_this) {
           return function() {
-            _this.update_chat();
-            return _this._e.chat.input.prop('disabled', false);
+            return _this.update_chat(void 0, function() {
+              return _this._e.chat.input.val("").prop('disabled', false);
+            });
           };
         })(this)).fail();
       }
     };
 
-    Page_Cast.prototype.update_chat = function(limit) {
+    Page_Cast.prototype.update_chat = function(limit, cb) {
       var local_counter;
       if (!this.conf.is_online) {
         return;
@@ -2851,12 +2850,15 @@
             return _this.update_chat_set(_this.chat.attempts_pos);
           }
         };
-      })(this)).fail((function(_this) {
+      })(this), typeof cb === "function" ? cb(true) : void 0).fail((function(_this) {
         return function() {
           if (local_counter === _this.chat.counter) {
             _this.chat.attempts = [0, 0, 0];
             _this.chat.attempts_pos = 0;
-            return _this.update_chat_set(2);
+            _this.update_chat_set(2);
+          }
+          if (typeof cb === "function") {
+            return cb(false);
           }
         };
       })(this));
