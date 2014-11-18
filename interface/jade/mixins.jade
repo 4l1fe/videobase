@@ -525,17 +525,16 @@ mixin cast_thumb(item)
         - title_orig = item.title_orig
         - poster_url = item.poster || noposter_url
         - url = "/casts/" + item.id + "/"
-        - watching_users_count = item.watching_users_count
         - min_vs_start = start_date ? Math.floor((new Date() - new Date(start_date)) / 60 / 1000) : ''
-        - duration = duration || 180
-        - is_online = min_vs_start >= 0 && min_vs_start < duration
-        - start_date_class = is_online ? "label-success" : "label-primary"
+        - item.duration = item.duration || 180
+        - item.is_online = min_vs_start >= 0 && min_vs_start < item.duration
+        - start_date_class = item.is_online ? "label-success" : "label-primary"
         - has_free = false
         - min_price = false
         - price_loc = ""
         - btn_cls = ""
         - price_loc_cnt = 0
-        - if ( is_online ) {
+        - if ( item.is_online ) {
         -   if( item.locations && item.locations.length ) {
         -       for (i = 0; i < item.locations.length; i++) {
         -          obj = item.locations[i];
@@ -589,7 +588,7 @@ mixin cast_thumb(item)
                     -   } else {
                     -       label_prim_str = time_text(start_date)
                     -   }
-                    - } else if( min_vs_start < duration ) {
+                    - } else if( min_vs_start < item.duration ) {
                     -   if( watching_users_count !== null && watching_users_count !== undefined ) {
                     -       label_fright_str = "смотрят: " + watching_users_count
                     -       label_fright_cls = 'cast-watching-users-count'
@@ -609,7 +608,7 @@ mixin cast_thumb(item)
                     span(data-mi-name="pg_rating",data-mi-id="pg_rating",data-mi-val=pg_rating).cast-item-pg-rating=(item.pg_rating?" (" + item.pg_rating + ")":"")
                 .btn-def.block(class=btn_cls,data-mi-id="btn")
                     a(href=url_btn , title='',data-mi-id="btn_text",data-mi-athref="id", data-mi-onclick=btn_click_handler)!=btn_text
-                p(class=is_online && min_price && has_free?'':'display-none',data-mi-id="btn_price")
+                p(class=item.is_online && min_price && has_free?'':'display-none',data-mi-id="btn_price")
                     | или
                     a(href=url_loc, title='',data-mi-athref="id")
                         - text = " " + (price_loc_cnt > 1?"от ":"") + min_price + " р. без рекламы"

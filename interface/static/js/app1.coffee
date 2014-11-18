@@ -522,8 +522,9 @@ class Deck
 
     self = @
     $("." + @element_name, @_place).each(
-      ->
-        self.add_item_DOM($(this))
+      (i) ->
+        item_vals = opts.items_vals[i] if opts.items_vals && i < opts.items_vals.length
+        self.add_item_DOM($(this), item_vals)
     )
     @load_func = opts.load_func if opts.load_func
     if opts.more_place
@@ -531,8 +532,8 @@ class Deck
 
   onchange: ->
 
-  add_item_DOM: (obj) ->
-    @items.push(new @item_class({place: obj, do_not_set: true}))
+  add_item_DOM: (obj, vals = {}) ->
+    @items.push(new @item_class({place: obj, do_not_set: true, vals: vals}))
     @onchange()
 
   add_item: (item, onchange_call = true, up = false) ->
@@ -679,7 +680,7 @@ class CastsDeck extends Deck
   constructor: (place, opts = {}) ->
     @element_name = "cast-thumb"
     @item_class = CastThumb
-    super
+    super(place, opts)
     $(window).resize(=> @onchange())
 
   onchange: (global = false) ->
@@ -1576,7 +1577,6 @@ class Page_User extends Page
     )
 
 class Page_CastsList extends Page
-  casts_deck = undefined
   self = undefined
   _filter_params = {}
   _filter_counter = 0
@@ -1584,10 +1584,15 @@ class Page_CastsList extends Page
   constructor: () ->
     self = @
     super
-    casts_deck = new CastsDeck($("#casts"), {load_func: (deck) =>@load_more_casts(deck) })
-    casts_deck.page = 1
-    casts_deck.load_more_hide(false)
-    casts_deck.load_more_bind($("#casts_more"))
+    opts = {
+      load_func: (deck) =>
+        @load_more_casts(deck)
+      items_vals: @_app.config().page_conf.casts
+    }
+    @casts_deck = new CastsDeck($("#casts"), opts)
+    @casts_deck.page = 1
+    @casts_deck.load_more_hide(false)
+    @casts_deck.load_more_bind($("#casts_more"))
 
     @_e.filter =
       status: $("#filter_cast_status")
@@ -1636,7 +1641,7 @@ class Page_CastsList extends Page
             clear_output: true
             page_loading: false
             params: _filter_params
-          @load_more_casts(casts_deck, opts)
+          @load_more_casts(@casts_deck, opts)
       @_app.config("filter_delay")
     )
 
@@ -1684,7 +1689,7 @@ class Page_CastsList extends Page
       else
         _filter_params[key] = null
 
-    page = casts_deck.page || 1
+    page = @casts_deck.page || 1
     _filter_params.page = page
     more_btn_href = "/?" + query_string + "page=" + (page+1)
 
@@ -1736,7 +1741,7 @@ class Page_Cast extends Page
     else if @conf.min_vs_start < 0 && @_e.time_counter.length
       @timer_tick()
 
-    casts_deck = new CastsDeck($("#casts"))
+    @casts_deck = new CastsDeck($("#casts"))
 
   timer_tick: () ->
     min_left = Math.floor((new Date() - @conf.start_date) / 60 / 1000)
