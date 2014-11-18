@@ -21,14 +21,20 @@ from apps.users.constants import APP_NOTIFICATION_TEMPLATE,\
 
 
 @app.task(name="send_template_mail", queue="send_mail")
-def send_template_mail(subject, tpl_name, context, to, jade_render=False):
-    if jade_render:
-        tpl = render_page(tpl_name, context, False)
+def send_template_mail(subject, context, to, tpl_name=None, use_render=True, jade_render=False):
+    if use_render:
+        if jade_render:
+            text_email = render_page(tpl_name, context, False)
+        else:
+            text_email = render_to_string(tpl_name, context)
     else:
-        tpl = render_to_string(tpl_name, context)
+        text_email = context
+
+    if isinstance(to, basestring):
+        to = [to]
 
     msg = EmailMultiAlternatives(subject=subject, to=to)
-    msg.attach_alternative(tpl, 'text/html')
+    msg.attach_alternative(text_email, 'text/html')
     msg.send()
 
 
@@ -71,12 +77,12 @@ def notification(id_, type_):
         pass
 
 
-@app.task(name="send_robots_statistic_to_email", queue="send_mail")
-def send_statistic_to_mail(subject, text, to):
-    print "Sending email to {}".format(to)
-    msg = EmailMultiAlternatives(subject=subject, to=to)
-    msg.attach_alternative(text, 'text/html')
-    msg.send()
+# @app.task(name="send_robots_statistic_to_email", queue="send_mail")
+# def send_statistic_to_mail(subject, text, to):
+#     print "Sending email to {}".format(to)
+#     msg = EmailMultiAlternatives(subject=subject, to=to)
+#     msg.attach_alternative(text, 'text/html')
+#     msg.send()
 
 
 @app.task(name="get_avatar", queue="load")
