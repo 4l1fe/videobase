@@ -4,7 +4,7 @@
 .inner {position: absolute; top: 50%; height: 6em;margin-top: -3em; text-align: center; width: 100%; color: white; font-size: 24px}
 .pay_film {font-size: 22px; color: #827272; position: absolute; top: 20px; left: 20px; background: #000; width: 70%; max-width: 580px}</style></head><body><div id="player"></div><script>var
     query_arr = (window.location + "").split("?"),
-    params, vals = {}, html = false, location_names;
+    params, vals = {}, html = false, location_names, param_arr, embeddables;
 if (query_arr.length > 1) {
     params = query_arr[1].split("&");
     for (var i = 0; i < params.length; i++) {
@@ -12,23 +12,29 @@ if (query_arr.length > 1) {
         vals[param_arr[0]] = decodeURIComponent(param_arr[1])
     }
 }
-location_names = {"sportbox_ru": "Sportbox.ru", "championat_com": "Championat.com", "default": "сервисе трансляций"}
+location_names = {"sportbox_ru": "Sportbox.ru", "championat_com": "Championat.com", "khl_ru": "KHL.ru", "default": "сервисе трансляций"}
 vals.type = (vals.type || "").toLowerCase()
+if (vals.type === "liverussia_ru" && vals.value) {
+    vals.value = 'http://player.rutv.ru/iframe/live/id/' + vals.value + '/showZoomBtn/false/isPlay/true/';
+}
+
 if (vals.price && vals.price != "0" && vals.view) {
     price = Math.floor(vals.price);
     link_title = 'Ссылка на трансляции на ' + (location_names[vals.type] || location_names["default"]) + ' за ' + price + ' руб.';
     html = '<div class="black_body"><div class="pay_film">Нам пока не удалось договориться с админстрацией ' + (location_names[vals.type] || location_names["default"]) + ' об отображении плеера с платными трансляциями на нашем сайте, поэтому она доступна к просмотру только в новом окне. Нажмите на кнопку, чтобы открыть новое окно для просмотра трансляции за ' + price + ' руб.</div><div class="inner"><a href="' + vals.view + '" target=_new rel="nofollow"><img src="/static/img/player_play.png" alt="' + link_title + '" title="' + link_title + '"/></a></div></div>';
 } else if (vals.type && (vals.value || vals.view)) {
     html = false;
-    value = vals.value || false
+    value = false;
     autoplay = vals["autoplay"] && (vals["autoplay"] == 1 || vals["autoplay"] == true || vals["autoplay"] == "true")?1:0;
-    if (vals.type == "sportbox_ru") {
-        if (value.substr(1,6) == "iframe") {
-            v = /src="([^"]+)"/.exec(value)
-            console.log (v)
-            value = v[1]
-        }
-        html = '<iframe src="' + value + '" width="100%" height="100%" frameborder="0" allowfullscreen="" id="player_frame"></iframe>';
+    
+    embeddables = ["sportbox_ru", "liverussia_ru", "championat_com", "khl_ru"];
+    
+    if (embeddables.indexOf(vals.type) !== -1) {
+        value = vals.value;
+    }
+    
+    if (value) {
+       html = '<iframe src="' + value + '" width="100%" height="100%" frameborder="0" allowfullscreen="" id="player_frame"></iframe>';
     }
 }
 if (!html) {
