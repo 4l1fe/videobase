@@ -461,6 +461,7 @@ class FeedThumb extends Item
 class CastThumb extends Item
   constructor: (opts = {}, callback) ->
     @_name = "cast-thumb"
+    self = @
     if opts.vals
       @_type = opts.vals.type
       @vals_orig = opts.vals
@@ -495,6 +496,11 @@ class CastThumb extends Item
           label_prim_str = 'Архив'
         @elements["label_prim"].self.removeClass("label-primary").addClass(label_prim_cls).text(label_prim_str)
         @elements["label_fright"].self.addClass(label_fright_cls).text(label_fright_str)
+
+    if @vals.is_online
+      @_app.rest.castschats.users.read(@vals.id).done (data)->
+        len = data.length
+        self.elements["label_fright"].self.text("смотрят: " + len).addClass("cast-spectators-count") if len
 
   transform_attr: (attr, name, val) ->
     if attr == "href" && name == "id"
@@ -763,6 +769,7 @@ class App
     @rest.add("castschats")
     @rest.castschats.add("msgs")
     @rest.castschats.add("send")
+    @rest.castschats.add("users")
     @rest.casts.add("list")
     @rest.casts.add("subscribe")
 

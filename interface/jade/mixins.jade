@@ -589,9 +589,9 @@ mixin cast_thumb(item)
                     -       label_prim_str = time_text(start_date)
                     -   }
                     - } else if( min_vs_start < item.duration ) {
-                    -   if( watching_users_count !== null && watching_users_count !== undefined ) {
-                    -       label_fright_str = "смотрят: " + watching_users_count
-                    -       label_fright_cls = 'cast-watching-users-count'
+                    -   if( cast_spectators_count ) {
+                    -       label_fright_str = "смотрят: " + cast_spectators_count
+                    -       label_fright_cls = 'cast-spectators-count'
                     -   }
                     -   label_prim_str = "Онлайн"
                     -   label_prim_cls = 'label-success'

@@ -1265,7 +1265,7 @@ section.cast-chat {padding-bottom: 40px;}
 .title-cast .cast-start-date { color: #a08c8c; padding-top: 8px; }
 .title-cast .cast-chat-title { color: #fff; text-transform: uppercase; font-weight: normal; }
 
-.cast-archive-date, .cast-watching-users-count { color: #7f7878; text-decoration: none; }
+.cast-archive-date, .cast-spectators-count { color: #7f7878; text-decoration: none; }
 
 .list-btns-cast { margin-top: 24px; }
 

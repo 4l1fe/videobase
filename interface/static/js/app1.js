@@ -749,11 +749,13 @@
     __extends(CastThumb, _super);
 
     function CastThumb(opts, callback) {
+      var self;
       if (opts == null) {
         opts = {};
       }
       this.action_subscribe = __bind(this.action_subscribe, this);
       this._name = "cast-thumb";
+      self = this;
       if (opts.vals) {
         this._type = opts.vals.type;
         this.vals_orig = opts.vals;
@@ -796,6 +798,15 @@
           }
         };
       })(this));
+      if (this.vals.is_online) {
+        this._app.rest.castschats.users.read(this.vals.id).done(function(data) {
+          var len;
+          len = data.length;
+          if (len) {
+            return self.elements["label_fright"].self.text("смотрят: " + len).addClass("cast-spectators-count");
+          }
+        });
+      }
     }
 
     CastThumb.prototype.transform_attr = function(attr, name, val) {
@@ -1248,6 +1259,7 @@
       this.rest.add("castschats");
       this.rest.castschats.add("msgs");
       this.rest.castschats.add("send");
+      this.rest.castschats.add("users");
       this.rest.casts.add("list");
       this.rest.casts.add("subscribe");
       this._e = {
