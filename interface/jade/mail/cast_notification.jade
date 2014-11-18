@@ -5,23 +5,23 @@
 - noposter_url = img_url + "noposter.png"
 
 - socials = []
-- socials.push( { href: "http://vk.com/vsevi", title: "Страница ВсеВидео в Вконтакте", img_url: "http://vsevi.ru/static/img/i-vk.png" } )
-- socials.push( { href: "http://www.odnoklassniki.ru/group/53196730400877", title: "Страница ВсеВидео в Одноклассниках", img_url: "http://vsevi.ru/static/img/i-ok.png" } )
-- socials.push( { href: "https://twitter.com/vseviru", title: "Страница ВсеВидео в Твиттере", img_url: "http://vsevi.ru/static/img/i-tw.png" } )
-- socials.push( { href: "https://www.facebook.com/vseviru", title: "Страница ВсеВидео на Фейсбуке", img_url: "http://vsevi.ru/static/img/i-fb.png" } )
-- socials.push( { href: "http://vsevi.ru/rss/feed", title: "RSS новинок на ВсеВидео", img_url: "http://vsevi.ru/static/img/i-rss.png" } )
+- socials.push( { href: "http://vk.com/vsevi", title: "Страница ВсеВидео в Вконтакте", img_url: static_url + "img/i-vk.png" } )
+- socials.push( { href: "http://www.odnoklassniki.ru/group/53196730400877", title: "Страница ВсеВидео в Одноклассниках", img_url: static_url + "img/i-ok.png" } )
+- socials.push( { href: "https://twitter.com/vseviru", title: "Страница ВсеВидео в Твиттере", img_url: static_url + "img/i-tw.png" } )
+- socials.push( { href: "https://www.facebook.com/vseviru", title: "Страница ВсеВидео на Фейсбуке", img_url: static_url + "img/i-fb.png" } )
+- socials.push( { href: "http://vsevi.ru/rss/feed", title: "RSS новинок на ВсеВидео", img_url: static_url + "img/i-rss.png" } )
 
 - get_poster_url = function(cast) {
 -   return cast.poster && cast.poster.length > 0 ? ( vsevi_url + cast.poster ) : noposter_url;
 - }
 
 - get_start_translation = function(item) {
--    result = "";
+-   result = "";
 -    if (item && item.length > 0) {
--        date = new Date(item);
--        result = date.getUTCHours() + ":" + date.getUTCMinutes();
--    }
--    return result;
+-      date = new Date(item);
+-      result = date.getUTCHours() + ":" + date.getUTCMinutes();
+-   }
+-   return result;
 -}
 
 mixin cast_price(item)
@@ -57,7 +57,7 @@ mixin cast_price(item)
                     =item.tag
             span(style="color:#ffcc00; font:bold 16pt arial;")
                 font(size="4")
-                    | #{": "}
+                    |#{": "}
             a(href=url, rel="nofollow" style="color:#ffcc00; text-decoration:none; font:bold 16pt arial;")
                 font(size="4", style="border-bottom:2px solid #ffcc00;")
                     =item.title
@@ -67,7 +67,7 @@ mixin cast_price(item)
                     -cast_start_time = "в " + get_start_translation(item.start)
                     =cast_start_time
                 div(align="center", style="text-shadow:0px 2px 1px #777; white-space:nowrap; font-family:Arial, sans-serif; font-style:normal; font-weight:normal; font-size:9.5pt; line-height:110%")
-                    | менее чем через 40 минут
+                    |менее чем через 40 минут
         td(width="109")
     tr
         td(width="109")
@@ -81,7 +81,6 @@ mixin cast_price(item)
                 a(href=url, class="button3", style="white-space:nowrap;")
                     -text = "" + (price_loc_cnt > 1?"от ":"") + min_price + " р."
                     =text
-
         - } else if( has_free ) {
              td(width="282", height="50")
                 a(href=url, class="button2", style="white-space:nowrap;")
@@ -90,7 +89,7 @@ mixin cast_price(item)
         - } else if( has_price ) {
             td(width="282", height="50")
                 a(href=url, class="button3", style="white-space:nowrap;")
-                    text = "" + (price_loc_cnt > 1?"от ":"") + min_price + " р."
+                    -text = "" + (price_loc_cnt > 1?"от ":"") + min_price + " р."
                     =text
         - }
         td(width="109")
@@ -99,18 +98,17 @@ doctype html
 html
     head
         meta(charset='utf-8')
-        link(href="http://vsevi.ru/static/css/email.css", rel="stylesheet")
+        link(href=static_url + "css/email.css", rel="stylesheet")
     body
         table(width="800px", height="75", cellspacing="0", cellpadding="10")
             tr(class="logo-block")
                 td(style="padding: 10px 10px 10px 20px")
-                    a(href="http://vsevi.ru", title="Все видео")
-                        img(src="http://vsevi.ru/static/img/logo-header.png", style="border: none;")
+                    a(href=vsevi_url, title="Все видео")
+                        img(src=static_url + "img/logo-header.png", style="border: none;")
                 td(align="right", colspan="3", style="padding: 10px 20px 10px 10px")
                     each social in socials
                         a(href=social.href, title=social.title, rel="nofollow", target="_new", style="padding-left:2px;")
                             img(src=social.img_url, style="border:none;", height="30", width="30")
-
         table(width="800px", height="105", style="background:#0469a1;", cellspacing="0", cellpadding="5")
             tr
                 td(width="109")
@@ -124,7 +122,6 @@ html
                     - poster_url = get_poster_url(cast)
                     img(src=poster_url, width="582", height="329")
                 td(width="109")
-
             mixin cast_price(cast)
             tr
                 td(width="109")
@@ -132,7 +129,6 @@ html
                     p(style="margin-top:10px; font-family:Arial, sans-serif; font-style:normal; font-weight:lighter; font-size:12.5pt; line-height:125%")
                         =cast.description
                 td(width="109")
-
         table(width="800px", height="110", cellspacing="0", cellpadding="5")
             tr
                 td(colspan="2", width="450", style="color:#7a7a7a")
@@ -147,8 +143,8 @@ html
                         =" "
                         |пользователя.
                 td(style="padding-right:0px;")
-                    a(href="http://vsevi.ru")
-                        img(src="http://vsevi.ru/static/img/logo-footer.png", width="90px", style="padding-bottom:25px; border:none;")
+                    a(href=vsevi_url)
+                        img(src=static_url + "img/logo-footer.png", width="90px", style="padding-bottom:25px; border:none;")
                 td(style="padding-right: 0px;")
                     a(href="http://solarispromo.com", title="", rel="nofollow")
-                        img(src="http://vsevi.ru/static/img/solaris-logo.png", style="padding-bottom:30px; border:none;")
+                        img(src=static_url + "img/solaris-logo.png", style="padding-bottom:30px; border:none;")
