@@ -36,6 +36,7 @@ def send_template_mail(subject, context, to, tpl_name=None, use_render=True, jad
 
     text_email = '\r\n'.join(textwrap.wrap(text_email.encode('utf-8').encode('base64'), 76))
     msg = EmailMessage(subject, text_email, to=to, headers=EMAIL_HEADERS)
+    msg.content_subtype = 'html'
     msg.send()
 
 
