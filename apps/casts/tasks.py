@@ -28,7 +28,7 @@ def find_min_price(price_list):
     return has_free, min_obj, loc_cnt
 
 
-@app.task(name="cast_notify", queue="send_cast_notify")
+@app.task(queue="cast_notify")
 def cast_notification(cast, user):
     o_user = User.objects.get(id=user)
     o_cast = Casts.objects.get(id=cast)

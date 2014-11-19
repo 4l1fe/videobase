@@ -25,8 +25,8 @@ from apps.casts.models import Casts
 from apps.casts.api.serializers import vbCast
 
 
-@app.task(name="week_newsletter", queue="week_newsletter")
-def best_of_the_best_this_week():
+@app.task(name="films.week_newsletter", queue="main")
+def week_newsletter(*args, **kwargs):
     curr_dt = datetime.now()
 
     # Выборка фильмов
@@ -82,7 +82,7 @@ def best_of_the_best_this_week():
         send_template_mail.s(**params_email).apply_async()
 
 
-@app.task(name="personal_newsletter", queue="personal_newsletter")
+@app.task(name="films.personal_newsletter", queue="main")
 def personal_newsletter(*args, **kwargs):
     curr_dt = datetime.now()
     start_dt = curr_dt - timedelta(days=1)
@@ -145,7 +145,7 @@ def personal_newsletter(*args, **kwargs):
             send_template_mail.s(**params_email).apply_async()
 
 
-@app.task(name="calc_amount_subscribed_to_movie")
+@app.task(name="films.subscribed_to_movie", queue="main")
 @transaction.commit_on_success
 def calc_amount_subscribed_to_movie(*args, **kwargs):
     sql = """
@@ -156,14 +156,11 @@ def calc_amount_subscribed_to_movie(*args, **kwargs):
     ORDER BY "users_films"."film_id" ASC
     """
 
-    cursor = connection.cursor()
-    cursor.execute(sql, params=[APP_USERFILM_SUBS_TRUE])
+    with connection.cursor() as cursor:
+        cursor.execute(sql, params=[APP_USERFILM_SUBS_TRUE])
 
-    for item in dict_fetch_all(cursor):
-        o_film = Films.objects.get(id=item['film_id'])
+        for item in dict_fetch_all(cursor):
+            o_film = Films.objects.get(id=item['film_id'])
 
-        o_film.subscribed_cnt = item['film_cnt']
-        o_film.save()
-
-    # Закрытие курсора
-    cursor.close()
+            o_film.subscribed_cnt = item['film_cnt']
+            o_film.save()

@@ -20,8 +20,32 @@ AMQP_HOST = 'localhost'
 BROKER_HOST = 'localhost'
 BROKER_PORT = 5672
 
+CELERY_ENABLE_UTC = False
+# CELERY_ALWAYS_EAGER = False
+
 CELERY_TIMEZONE = 'UTC'
-CELERY_ACCEPT_CONTENT = ['pickle', 'json', 'msgpack', 'yaml']
+CELERY_ACCEPT_CONTENT = ['pickle', 'json', 'msgpack']
+
+DEAD_LETTER_OPTIONS = {
+    # 'x-expires': (60 * 3 + 1) * 1000,
+    'x-dead-letter-exchange': 'test',
+    # 'x-dead-letter-routing-key': 'notify',
+    # 'x-message-ttl': 60 * 3 * 1000, # 3 mins
+}
+
+from kombu import Exchange, Queue
+MAIN_EXCHANGE = Exchange(name='main', type='topic')
+
+
+CELERY_QUEUES = (
+    Queue('main', MAIN_EXCHANGE, routing_key='main_key'),
+    Queue('send_mail', MAIN_EXCHANGE, routing_key='mail_key'),
+    Queue('notify', MAIN_EXCHANGE, routing_key='notify_key'),
+    Queue('cast_notify', MAIN_EXCHANGE, routing_key='cast_notify_key'),
+    # Queue('test', Exchange(name='test', type='direct'), routing_key='test_key'),
+    # # Queue('test2', Exchange(name='test', type='fanout'), routing_key='test2_key'),
+    # Queue('wait', Exchange(name='wait', type='fanout', arguments=DEAD_LETTER_OPTIONS), routing_key='wait_key'),
+)
 
 ###########################################################
 # Base path for project
@@ -470,7 +494,10 @@ TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 USE_THOR = True
 
-from .local_settings import *
+try:
+    from .local_settings import *
+except:
+    pass
 
 if not DEBUG:
     INSTALLED_APPS += (

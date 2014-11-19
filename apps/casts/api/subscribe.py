@@ -43,14 +43,19 @@ class CastsSubscribeView(APIView):
 
                 # Отправка email о трансляции
                 delta_notify = cast.start - timedelta(minutes=APP_CASTS_START_NOTIFY)
-                if user_cast.subscribed <= delta_notify:
+                if True:#user_cast.subscribed <= delta_notify:
                     cast_notification.apply_async(
                         kwargs={
                             'cast': cast.id,
                             'user': request.user.id
                         },
-                        eta=delta_notify,
-                        expires=cast.start
+                        # retry=2,
+                        # eta=delta_notify,
+                        countdown=60 *4+10,
+                        expires=(60 * 4 +15),
+                        # exchange='wait',
+                        # routing_key='wait_key',
+                        # expires=cast.start
                     )
 
             return Response({'subscribed': bool(user_cast.subscribed)}, status=status.HTTP_200_OK)
