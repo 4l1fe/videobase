@@ -1,10 +1,11 @@
 # coding: utf-8
 
 import StringIO
+import textwrap
 import requests
 from PIL import Image
 
-from django.core.mail import EmailMultiAlternatives
+from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 from django.core.files.uploadedfile import InMemoryUploadedFile
 
@@ -17,11 +18,14 @@ from apps.films.constants import APP_PERSONFILM_SUBS_TRUE, APP_USERFILM_SUBS_TRU
 
 from apps.users.models import User, UsersPics
 from apps.users.constants import APP_NOTIFICATION_TEMPLATE,\
-    APP_NOTIFICATION_EMAIL_SUBJECT, FILM_O, PERSON_O
+    APP_NOTIFICATION_EMAIL_SUBJECT, FILM_O, PERSON_O, EMAIL_HEADERS
 
 
 @app.task(name="send_template_mail", queue="send_mail")
 def send_template_mail(subject, context, to, tpl_name=None, use_render=True, jade_render=False):
+    if isinstance(to, basestring):
+        to = [to]
+    
     if use_render:
         if jade_render:
             text_email = render_page(tpl_name, context, False)
@@ -30,11 +34,8 @@ def send_template_mail(subject, context, to, tpl_name=None, use_render=True, jad
     else:
         text_email = context
 
-    if isinstance(to, basestring):
-        to = [to]
-
-    msg = EmailMultiAlternatives(subject=subject, to=to)
-    msg.attach_alternative(text_email, 'text/html')
+    text_email = '\r\n'.join(textwrap.wrap(text_email.encode('utf-8').encode('base64'), 76))
+    msg = EmailMessage(subject, text_email, to=to, headers=EMAIL_HEADERS)
     msg.send()
 
 
@@ -75,14 +76,6 @@ def notification(id_, type_):
         send_template_mail.apply_async(kwargs=kw)
     except Exception, e:
         pass
-
-
-# @app.task(name="send_robots_statistic_to_email", queue="send_mail")
-# def send_statistic_to_mail(subject, text, to):
-#     print "Sending email to {}".format(to)
-#     msg = EmailMultiAlternatives(subject=subject, to=to)
-#     msg.attach_alternative(text, 'text/html')
-#     msg.send()
 
 
 @app.task(name="get_avatar", queue="load")
