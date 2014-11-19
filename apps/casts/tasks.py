@@ -35,7 +35,7 @@ def cast_notification(cast, user):
 
     o_loc = CastsLocations.objects.filter(cast=o_cast)
     has_free, min_obj, loc_cnt = find_min_price(o_loc)
-    min_price = math.floor(min_obj) if min_obj else False
+    min_price = math.floor(min_obj.price) if min_obj else False
 
     params = {
         'context': {
