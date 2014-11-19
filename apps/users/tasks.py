@@ -58,13 +58,17 @@ def notification(id_, type_, **kwargs):
         'tpl_name': APP_NOTIFICATION_TEMPLATE[type_],
     }
 
+    define_id = lambda i: id_ if type_ == FILM_O else kwargs['child_obj_id']
+    o_film = Films.objects.get(id=define_id)
+    kw.update({'context': {
+        'film': {
+            'id': o_film.id,
+            'name': o_film.name
+        }
+    }})
+
     if type_ == FILM_O:
         model_user = UsersFilms
-        o_film = Films.objects.get(id=id_)
-        kw.update({'context': {
-            'film': o_film.name
-        }})
-
         query = {
             'film': id_,
             'subscribed': APP_USERFILM_SUBS_TRUE,
@@ -73,12 +77,10 @@ def notification(id_, type_, **kwargs):
     else:
         model_user = UsersPersons
         o_person = Persons.objects.get(id=id_)
-        o_film = Films.objects.get(id=kwargs['child_obj_id'])
-
-        kw.update({'context': {
-            'film': o_film.name,
-            'person': o_person.name
-        }})
+        kw['context']['person'] = {
+            'id': o_person.id,
+            'name': o_person.name
+        }
 
         query = {
             'person': id_,
