@@ -17,5 +17,5 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         film_id = options['film']
         robot = options['robot']
-        process_film_on_site('tvzavr_ru', 2)
+        process_film_on_site(robot, film_id)
 
