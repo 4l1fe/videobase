@@ -326,7 +326,6 @@ class FilmThumb extends Item
     else
       btn_cls = "btn-subscribe"
       btn_text = "Подписаться"
-      @elements["btn"].self.click => @toggle_subscribe()
     if vals.relation && vals.relation.rating
       @elements["relation.rating"].self.rateit().rateit("value", vals.relation.rating)
     @elements["btn"].self.removeClass("btn-subscribe").removeClass("btn-price").removeClass("btn-free").addClass(btn_cls)
@@ -371,6 +370,9 @@ class FilmThumb extends Item
     }
 
   toggle_subscribe: (status) ->
+    if !@vals.relation?
+      @vals.relation = {}
+
     @_app.film_action @vals.id, "subscribe", {
       rel: @vals.relation
       state: status
