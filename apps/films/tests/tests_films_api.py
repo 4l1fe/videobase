@@ -1,9 +1,12 @@
 #coding: utf-8
 import os
+import pytz
+
 from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APISimpleTestCase
 from rest_framework.authtoken.models import Token
+
 import videobase.settings as settings
 from apps.films.tests.factories import (UserFactory, GenreFactory, CountriesFactory, PersonFactory,
                                         FilmFactory, ContentFactory,LocationFactory, CommentsFactory,
@@ -11,7 +14,8 @@ from apps.films.tests.factories import (UserFactory, GenreFactory, CountriesFact
 from apps.films.constants import (APP_FILM_SERIAL, APP_PERSON_DIRECTOR, APP_PERSON_ACTOR, APP_PERSON_SCRIPTWRITER,
                                   APP_USERFILM_STATUS_UNDEF, APP_USERFILM_STATUS_NOT_WATCH, APP_USERFILM_STATUS_PLAYLIST,
                                   APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER, APP_FILM_TYPE_ADDITIONAL_MATERIAL_TRAILER,
-                                  APP_USERFILM_SUBS_TRUE, APP_USERFILM_SUBS_FALSE, APP_USERFILM_STATUS)
+                                  APP_USERFILM_SUBS_TRUE, APP_USERFILM_SUBS_FALSE, APP_USERFILM_STATUS,
+                                  APP_COMMENTS_API_DEFAULT_PER_PAGE, APP_COMMENTS_API_DEFAULT_PAGE)
 from apps.users.models.session_token import SessionToken
 from apps.users.constants import FILM_SUBSCRIBE, FILM_COMMENT, FILM_NOTWATCH, FILM_RATE
 from apps.films.models import UsersFilms, Genres, FilmExtras
@@ -129,7 +133,7 @@ class FilmsTestCase(APISimpleTestCase):
         self.assertEqual(response_data['ipp'], data['per_page'])
         self.assertEqual(response_data['total_cnt'], len(comments))
         for i in range(len(response_data['items'])):
-            self.assertEqual(response_data['items'][i]['created'], comments[start_count+i].created)
+            self.assertEqual(response_data['items'][i]['created'], pytz.timezone(settings.TIME_ZONE).localize(comments[start_count+i].created, is_dst=True))
             self.assertEqual(response_data['items'][i]['id'], comments[start_count+i].id)
             self.assertEqual(response_data['items'][i]['text'], comments[start_count+i].text)
             self.assertDictEqual(response_data['items'][i]['film'], {'id': film.id, 'name': film.name})
@@ -465,8 +469,8 @@ class FilmsTestCase(APISimpleTestCase):
         film = self.films[0]
         UsersFilmsFactory.create(user=self.user, film=film, status=APP_USERFILM_STATUS_PLAYLIST, subscribed=APP_USERFILM_SUBS_TRUE)
         response = self.client.delete(reverse('films_api:act_film_playlist_view', kwargs={'film_id': film.id, 'format': 'json'}), HTTP_X_MI_SESSION=self.headers)
-        self.assertFalse(UsersFilms.objects.filter(user=self.user, film=film).exists())
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(UsersFilms.objects.get(user=self.user, film=film).status, APP_USERFILM_STATUS_UNDEF)
 
     def test_api_action_playlist_add_serial(self):
         film = self.films[1]
@@ -724,7 +728,8 @@ class FilmsTestCase(APISimpleTestCase):
             if film.id == comment.content.film.id:
                 comments.append(comment)
         comments = sorted(comments, key=lambda x: x.created, reverse=True)
-        data = {'page': 1, 'per_page': 10}
+        data = {'page': APP_COMMENTS_API_DEFAULT_PAGE,
+                'per_page': APP_COMMENTS_API_DEFAULT_PER_PAGE}
         response = self.client.get(reverse('films_api:film_comments_view', kwargs={'film_id': film.id, 'format': 'json'}))
         self.assertEqual(len(comments), len(response.data['items']))
 

@@ -11,7 +11,7 @@ from apps.films.models import Films
 
 from apps.robots.models.robots_logs import RobotsInfoLogging, LocationsCorrectorLogging
 from apps.robots.models.robots_mail_list import RobotsMailList
-from apps.users.tasks import  send_statistic_to_mail
+from apps.users.tasks import send_template_mail
 from crawler.locrobots import sites_crawler
 from videobase.settings import ROBOTS_LIST
 
@@ -177,12 +177,21 @@ def send_statistic_to_email_for_each_robot():
 
 def send_message_for_all_recipients(message, subject):
     print "Send messages"
+
+    message = {
+        'subject': subject,
+        'context': message,
+    }
+
     to = []
     for item in RobotsMailList.objects.all():
         to.append(item.email)
-    if len(to) == 0:
+
+    if not len(to):
         return
 
     print "Generating task to send message to {}".format(to)
+
     for t in to:
-        send_statistic_to_mail.apply_async((subject, message, [t]))
+        message.update({'to': t})
+        send_template_mail.apply_async(kwargs=message)

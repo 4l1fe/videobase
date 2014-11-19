@@ -46,9 +46,6 @@ class vbCast(serializers.ModelSerializer):
         model = Casts
         fields = (
             'id', 'title', 'title_orig', 'description', 'status', 'pg_rating',
-            'start', 'duration',
-            'tags',
-            'poster',
-            'locations',
+            'start', 'duration', 'tags', 'poster', 'locations',
 #           'relation'
         )

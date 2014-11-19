@@ -24,7 +24,7 @@ CELERY_ENABLE_UTC = False
 # CELERY_ALWAYS_EAGER = False
 
 CELERY_TIMEZONE = 'UTC'
-CELERY_ACCEPT_CONTENT = ['pickle', 'json', 'msgpack']
+CELERY_ACCEPT_CONTENT = ['pickle', 'json']
 
 DEAD_LETTER_OPTIONS = {
     # 'x-expires': (60 * 3 + 1) * 1000,
@@ -228,7 +228,7 @@ MEDIA_ROOT = '/var/www/static/'
 MEDIA_URL = '/static/'
 
 STATIC_URL = '/production/static/'
-STATIC_ROOT = os.path.join('/var/www/')
+STATIC_ROOT = '/var/www/'
 
 SITE_ID = 1
 
@@ -490,13 +490,13 @@ CELERYBEAT_SCHEDULE = {
 }
 
 POSTER_URL_PREFIX = '_260x360'
-TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+# TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 USE_THOR = True
 
 try:
     from .local_settings import *
-except:
+except ImportError:
     pass
 
 if not DEBUG:
