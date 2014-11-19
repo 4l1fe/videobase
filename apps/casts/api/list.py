@@ -3,6 +3,7 @@
 import datetime
 
 from django.core.paginator import Paginator
+from django.utils import timezone
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -137,7 +138,7 @@ class CastsListView(APIView):
             if filter[field]:
                 o_search = transform_map[field](o_search, filter[field])
             elif field == 'status':
-                o_search = o_search.filter(start__gte=datetime.datetime.now()).order_by('start')
+                o_search = o_search.filter(start__gte=datetime.datetime.now() - timezone.timedelta(hours=3)).order_by('start')
 
         return o_search
 
