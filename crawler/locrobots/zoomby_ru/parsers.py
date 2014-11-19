@@ -123,7 +123,7 @@ class ParseFilm(object):
                     resp_list.append(resp_dict)
         else:
             resp_dict = dict_gen(film)
-            resp_dict['type'] = 'tvigle'
+            resp_dict['type'] = 'zoomby'
             resp_dict['number'] = 0
             resp_dict['value'] = value
             resp_dict['url_view'] = serial_list
