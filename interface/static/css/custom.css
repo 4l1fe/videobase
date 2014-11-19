@@ -255,6 +255,7 @@ section {padding:37px 0 6px 0;}
 
 .search-block input {color: #fff; background-color: #615858}
 
+.add-content { cursor: pointer; }
 .add-filter {padding-bottom: 16px;}
 .add-filter .img-responsive {width: 100%}
 .add-filter-loading .add-content a {visibility: hidden}

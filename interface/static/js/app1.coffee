@@ -554,9 +554,8 @@ class Deck
     @items
 
   load_more_bind: (place) ->
-    @more.place = place
+    @more.place = place.click(=> @load_more(); return false)
     @more.btn = $("a", place)
-    @more.btn.click(=> @load_more(); return false)
 
   load_more: (opts) ->
     if @load_func != undefined
