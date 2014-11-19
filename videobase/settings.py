@@ -35,6 +35,7 @@ CELERY_ACCEPT_CONTENT = ['pickle', 'json']
 #     # 'x-message-ttl': 60 * 3 * 1000, # 3 mins
 # }
 
+CELERY_DEFAULT_QUEUE = 'default'
 MAIN_EXCHANGE = Exchange(name='main', type='topic', delivery_mode='persistent', durable=True)
 
 CELERY_QUEUES = (
