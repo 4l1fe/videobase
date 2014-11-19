@@ -95,8 +95,8 @@ html
                                 h3 Лента активности
                                 .tape-list#feed
                                     if user.feed
-                                        each item in user.feed
-                                            mixin feed_thumb(item)
+                                        each item, i in user.feed
+                                            mixin feed_thumb(item, i)
                                 if user.feed.length >= 10
                                     .add-filter#feed_more
                                         .add-content.style-panel-action.rel.zmin
