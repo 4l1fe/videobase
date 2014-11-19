@@ -1424,6 +1424,13 @@ section.cast-chat {padding-bottom: 40px;}
     user-select: none;
 }
 
+.playlist .crsl-nav {
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
 .password-reset { padding-top: 0;  }
 .password-reset .container {padding-top: 37px}
 
