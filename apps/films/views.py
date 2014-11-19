@@ -568,7 +568,7 @@ def kinopoisk_view(request, film_id, *args, **kwargs):
 
 def get_recommend_film(request):
     try:
-        o_recommend = SearchFilmsView()(request, use_thread=True, recommend=True).data
+        o_recommend = SearchFilmsView().get(request, use_thread=True, recommend=True).data
         o_recommend = o_recommend['items']
     except Exception, e:
         o_recommend = []
