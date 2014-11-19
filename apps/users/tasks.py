@@ -53,19 +53,19 @@ def notification(id_, type_, **kwargs):
     if type_ not in (FILM_O, PERSON_O):
         raise ValueError("Not valid argument")
 
+    define_id = lambda i: id_ if type_ == FILM_O else kwargs['child_obj_id']
+    o_film = Films.objects.get(id=define_id)
+
     kw = {
         'subject': APP_NOTIFICATION_EMAIL_SUBJECT[type_],
         'tpl_name': APP_NOTIFICATION_TEMPLATE[type_],
-    }
-
-    define_id = lambda i: id_ if type_ == FILM_O else kwargs['child_obj_id']
-    o_film = Films.objects.get(id=define_id)
-    kw.update({'context': {
-        'film': {
-            'id': o_film.id,
-            'name': o_film.name
+        'context': {
+            'film': {
+                'id': o_film.id,
+                'name': o_film.name
+            }
         }
-    }})
+    }
 
     if type_ == FILM_O:
         model_user = UsersFilms
