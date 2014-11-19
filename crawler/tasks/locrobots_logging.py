@@ -7,13 +7,16 @@ from celery import Task
 from djcelery.models import TaskMeta
 from djcelery.picklefield import decode
 from djcelery.views import task_status
+
+from videobase.settings import ROBOTS_LIST
+
 from apps.films.models import Films
 
 from apps.robots.models.robots_logs import RobotsInfoLogging, LocationsCorrectorLogging
 from apps.robots.models.robots_mail_list import RobotsMailList
 from apps.users.tasks import send_template_mail
 from crawler.locrobots import sites_crawler
-from videobase.settings import ROBOTS_LIST
+
 
 __author__ = 'vladimir'
 

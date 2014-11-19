@@ -28,14 +28,10 @@ def add_profile_to_user(instance, **kwargs):
 def add_feed(instance, created, **kwargs):
     if created:
         if instance.type in (PERSON_O, FILM_O,):
-            try:
-                data = json.loads(instance.object)
-                if instance.type == PERSON_O:
-                    id_ = data['film']['id']
-                else:
-                    id_ = data['id']
+            kw = {
+                'id_': instance.obj_id,
+                'type_': instance.type,
+                'child_obj': instance.child_obj_id
+            }
 
-                kw = {'id_': id_, 'type_': instance.type}
-                notification.apply_async(kwargs=kw)
-            except Exception, e:
-                pass
+            notification.apply_async(kwargs=kw)

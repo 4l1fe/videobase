@@ -38,9 +38,8 @@ MAIN_EXCHANGE = Exchange(name='main', type='topic')
 
 
 CELERY_QUEUES = (
-    Queue('main', MAIN_EXCHANGE, routing_key='main_key'),
+    Queue('default', MAIN_EXCHANGE, routing_key='default_key'),
     Queue('send_mail', MAIN_EXCHANGE, routing_key='mail_key'),
-    Queue('notify', MAIN_EXCHANGE, routing_key='notify_key'),
     Queue('cast_notify', MAIN_EXCHANGE, routing_key='cast_notify_key'),
     # Queue('test', Exchange(name='test', type='direct'), routing_key='test_key'),
     # # Queue('test2', Exchange(name='test', type='fanout'), routing_key='test2_key'),
