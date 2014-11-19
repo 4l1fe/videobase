@@ -1,7 +1,8 @@
 {% load value_for_key %}
 <h3>Уважаемый юзер</h3>
 <p>
-    В онлайн-кинотеатрах появился новый фильм <strong>"{{ film }}"</strong> вашего любимого актера, <strong>{{ person }}</strong>.
+    В онлайн-кинотеатрах появился новый фильм <strong>"{{ film|dict_get:"name" }}"</strong>
+    вашего любимого актера, <strong>{{ person|dict_get:"name" }}</strong>.
     Подробнее можете узнать на <a href="http://vsevi.com">vsevi.com</a>
 </p>
 

@@ -53,7 +53,7 @@ def notification(id_, type_, **kwargs):
     if type_ not in (FILM_O, PERSON_O):
         raise ValueError("Not valid argument")
 
-    define_id = lambda i: id_ if type_ == FILM_O else kwargs['child_obj_id']
+    define_id = id_ if type_ == FILM_O else kwargs['child_obj']
     o_film = Films.objects.get(id=define_id)
 
     kw = {
