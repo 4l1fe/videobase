@@ -1424,7 +1424,7 @@ section.cast-chat {padding-bottom: 40px;}
     user-select: none;
 }
 
-.playlist-wrap .crsl-nav {
+.playlist .crsl-nav {
     -moz-user-select: none;
     -webkit-user-select: none;
     -ms-user-select: none;
