@@ -39,9 +39,9 @@ CELERY_DEFAULT_QUEUE = 'default'
 MAIN_EXCHANGE = Exchange(name='main', type='topic', delivery_mode='persistent', durable=True)
 
 CELERY_QUEUES = (
-    Queue('default', MAIN_EXCHANGE, routing_key='default_key'),
-    Queue('send_mail', MAIN_EXCHANGE, routing_key='mail_key'),
-    Queue('cast_notify', MAIN_EXCHANGE, routing_key='cast_notify_key'),
+    Queue('default', MAIN_EXCHANGE, routing_key='default'),
+    Queue('mail', MAIN_EXCHANGE, routing_key='default.mail'),
+    Queue('cast_notify', MAIN_EXCHANGE, routing_key='default.cast_notify'),
     # Queue('test', Exchange(name='test', type='direct'), routing_key='test_key'),
     # # Queue('test2', Exchange(name='test', type='fanout'), routing_key='test2_key'),
     # Queue('wait', Exchange(name='wait', type='fanout', arguments=DEAD_LETTER_OPTIONS), routing_key='wait_key'),

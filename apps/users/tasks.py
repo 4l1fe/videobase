@@ -21,7 +21,7 @@ from apps.users.constants import APP_NOTIFICATION_TEMPLATE,\
     APP_NOTIFICATION_EMAIL_SUBJECT, FILM_O, PERSON_O, EMAIL_HEADERS
 
 
-@app.task(name="send_template_mail", queue="send_mail")
+@app.task(name="send_template_mail", queue="mail")
 def send_template_mail(subject, context, to, tpl_name=None, use_render=True, jade_render=False, **kwargs):
     """
     Очередь отправки сообщений
