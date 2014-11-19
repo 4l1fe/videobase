@@ -7,6 +7,8 @@ import logging
 from datetime import timedelta
 from ConfigParser import RawConfigParser
 
+from kombu import Exchange, Queue
+
 import djcelery
 from celery.schedules import crontab
 
@@ -21,21 +23,19 @@ BROKER_HOST = 'localhost'
 BROKER_PORT = 5672
 
 CELERY_ENABLE_UTC = False
-# CELERY_ALWAYS_EAGER = False
+CELERY_ALWAYS_EAGER = False
 
 CELERY_TIMEZONE = 'UTC'
 CELERY_ACCEPT_CONTENT = ['pickle', 'json']
 
-DEAD_LETTER_OPTIONS = {
-    # 'x-expires': (60 * 3 + 1) * 1000,
-    'x-dead-letter-exchange': 'test',
-    # 'x-dead-letter-routing-key': 'notify',
-    # 'x-message-ttl': 60 * 3 * 1000, # 3 mins
-}
+# DEAD_LETTER_OPTIONS = {
+#     # 'x-expires': (60 * 3 + 1) * 1000,
+#     'x-dead-letter-exchange': 'test',
+#     # 'x-dead-letter-routing-key': 'notify',
+#     # 'x-message-ttl': 60 * 3 * 1000, # 3 mins
+# }
 
-from kombu import Exchange, Queue
-MAIN_EXCHANGE = Exchange(name='main', type='topic')
-
+MAIN_EXCHANGE = Exchange(name='main', type='topic', delivery_mode='persistent', durable=True)
 
 CELERY_QUEUES = (
     Queue('default', MAIN_EXCHANGE, routing_key='default_key'),
