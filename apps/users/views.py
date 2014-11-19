@@ -8,8 +8,8 @@ from django.db import transaction
 from django.forms.models import model_to_dict
 from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse
-from django.http import (HttpResponseRedirect, HttpResponse, HttpResponseForbidden,
-                         HttpResponseBadRequest, HttpResponseServerError, Http404)
+from django.http import (HttpResponseRedirect, HttpResponse, Http404,
+                         HttpResponseBadRequest, HttpResponseServerError)
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
