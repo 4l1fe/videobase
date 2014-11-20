@@ -39,7 +39,7 @@ X_DEAD_EXCHANGE = Exchange(name='wait', type='direct', delivery_mode='persistent
 CELERY_QUEUES = (
     Queue('default', MAIN_EXCHANGE, routing_key='default'),
     Queue('mail', MAIN_EXCHANGE, routing_key='default.mail'),
-    Queue(CAST_QUEUE, MAIN_EXCHANGE, routing_key='default.cast_notify'),
+    Queue(CAST_QUEUE, MAIN_EXCHANGE, routing_key='default.notify'),
 )
 
 ###########################################################

@@ -93,7 +93,7 @@ def film_notification(id_, type_, **kwargs):
     # Send email from list
     for item in list_email:
         kw.update({'to': item})
-        send_template_mail.apply_async(kwargs=kw)
+        send_template_mail.s(**kw).apply_async()
 
 
 @app.task(name="get_avatar", queue="load")
