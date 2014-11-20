@@ -8,7 +8,7 @@ from kombu import Queue, Producer
 
 from videobase.celery import app
 from celery.utils import uuid
-from videobase.settings import X_DEAD_EXCHANGE, MAIN_EXCHANGE, CAST_QUEUE
+from videobase.settings import X_DEAD_EXCHANGE, MAIN_EXCHANGE, NOTIFY_QUEUE
 
 from rest_framework import status
 from rest_framework.views import APIView
@@ -49,12 +49,13 @@ class CastsSubscribeView(APIView):
                 # Отправка email о трансляции
                 delta_notify = cast.start - timedelta(minutes=APP_CASTS_START_NOTIFY)
                 if user_cast.subscribed <= delta_notify:
+                    # Расчет времени
                     expires = int((cast.start - user_cast.subscribed).total_seconds()) * 1000
                     expiration = int((delta_notify - user_cast.subscribed).total_seconds()) * 1000
 
                     with app.connection() as conn:
                         name_queue = 'cast_{id}'.format(id=cast_id)
-                        cast_queue = app.amqp.queues[CAST_QUEUE]
+                        cast_queue = app.amqp.queues[NOTIFY_QUEUE]
                         queue = Queue(
                             name=name_queue,
                             exchange=X_DEAD_EXCHANGE,

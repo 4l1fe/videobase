@@ -31,7 +31,7 @@ CELERY_TIMEZONE = 'UTC'
 CELERY_ACCEPT_CONTENT = ['pickle', 'json']
 
 CELERY_DEFAULT_QUEUE = 'default'
-CAST_QUEUE = 'notify'
+NOTIFY_QUEUE = 'notify'
 
 MAIN_EXCHANGE = Exchange(name='main', type='topic', delivery_mode='persistent', durable=True)
 X_DEAD_EXCHANGE = Exchange(name='wait', type='direct', delivery_mode='persistent', durable=True)
@@ -39,7 +39,7 @@ X_DEAD_EXCHANGE = Exchange(name='wait', type='direct', delivery_mode='persistent
 CELERY_QUEUES = (
     Queue('default', MAIN_EXCHANGE, routing_key='default'),
     Queue('mail', MAIN_EXCHANGE, routing_key='default.mail'),
-    Queue(CAST_QUEUE, MAIN_EXCHANGE, routing_key='default.notify'),
+    Queue(NOTIFY_QUEUE, MAIN_EXCHANGE, routing_key='default.notify'),
 )
 
 ###########################################################
