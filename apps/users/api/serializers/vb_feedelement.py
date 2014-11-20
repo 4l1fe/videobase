@@ -16,11 +16,14 @@ from apps.users.constants import (FILM_RATE, FILM_SUBSCRIBE, FILM_NOTWATCH,
                                   PERSON_O, USER_ASK, USER_FRIENDSHIP, SYS_ALL)
 
 from utils.common import isiterable
+from utils.fields.datetime_with_time_zone import DateTimeWithTimeZone
 
 
 class vbFeedElement(serializers.ModelSerializer):
     user = serializers.SerializerMethodField('get_user_field')
     object = serializers.SerializerMethodField('get_object_field')
+    created = DateTimeWithTimeZone(source='created')
+
 
     def __init__(self, *args,  **kwargs):
         super(vbFeedElement, self).__init__(*args, **kwargs)
