@@ -4,12 +4,16 @@ from datetime import timedelta
 
 from django.utils import timezone
 
+from kombu import Queue, Producer
+
+from videobase.celery import app
+from videobase.settings import X_DEAD_EXCHANGE, MAIN_EXCHANGE, CAST_QUEUE
+
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
-from apps.casts.tasks import cast_notification
 from apps.casts.models import Casts, UsersCasts
 from apps.casts.constants import APP_CASTS_START_NOTIFY
 
@@ -43,20 +47,36 @@ class CastsSubscribeView(APIView):
 
                 # Отправка email о трансляции
                 delta_notify = cast.start - timedelta(minutes=APP_CASTS_START_NOTIFY)
-                if True:#user_cast.subscribed <= delta_notify:
-                    cast_notification.apply_async(
-                        kwargs={
-                            'cast': cast.id,
-                            'user': request.user.id
-                        },
-                        # retry=2,
-                        # eta=delta_notify,
-                        countdown=60 *4+10,
-                        expires=(60 * 4 +15),
-                        # exchange='wait',
-                        # routing_key='wait_key',
-                        # expires=cast.start
-                    )
+                if user_cast.subscribed <= delta_notify:
+                    expires = int((cast.start - user_cast.subscribed).total_seconds()) * 1000
+                    expiration = int((delta_notify - user_cast.subscribed).total_seconds()) * 1000
+
+                    with app.connection() as conn:
+                        name_queue = 'cast_{id}'.format(id=cast_id)
+                        cast_queue = app.amqp.queues[CAST_QUEUE]
+                        queue = Queue(
+                            name=name_queue,
+                            exchange=X_DEAD_EXCHANGE,
+                            routing_key='wait.{name}'.format(name=name_queue),
+                            queue_arguments={
+                                'x-dead-letter-exchange'   : MAIN_EXCHANGE.name,
+                                'x-dead-letter-routing-key': cast_queue.routing_key,
+                                'x-expires'                : expires
+                            }
+                        )
+
+                        channel = conn.channel()
+                        producer = Producer(channel, exchange=X_DEAD_EXCHANGE)
+                        producer.publish(
+                            exchange=X_DEAD_EXCHANGE.name,
+                            routing_key='wait.{name}'.format(name=name_queue),
+                            declare=[cast_queue, queue],
+                            body={'cast': cast.id, 'user': request.user.id},
+                            **{
+                                'expiration': str(expiration),
+                                'delivery_mode': 2
+                            }
+                        )
 
             return Response({'subscribed': bool(user_cast.subscribed)}, status=status.HTTP_200_OK)
 

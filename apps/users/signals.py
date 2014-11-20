@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from apps.users.tasks import notification
+from apps.users.tasks import film_notification
 from apps.users.models import User, UsersProfile, Feed
 from apps.users.constants import FILM_O, PERSON_O
 
@@ -34,4 +34,4 @@ def add_feed(instance, created, **kwargs):
                 'child_obj': instance.child_obj_id
             }
 
-            notification.apply_async(kwargs=kw)
+            film_notification.apply_async(kwargs=kw)

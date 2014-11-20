@@ -24,27 +24,22 @@ BROKER_PORT = 5672
 
 CELERY_ENABLE_UTC = False
 CELERY_ALWAYS_EAGER = False
+CELERY_CREATE_MISSING_QUEUES = True
+CELERYD_PREFETCH_MULTIPLIER = 1
 
 CELERY_TIMEZONE = 'UTC'
 CELERY_ACCEPT_CONTENT = ['pickle', 'json']
 
-# DEAD_LETTER_OPTIONS = {
-#     # 'x-expires': (60 * 3 + 1) * 1000,
-#     'x-dead-letter-exchange': 'test',
-#     # 'x-dead-letter-routing-key': 'notify',
-#     # 'x-message-ttl': 60 * 3 * 1000, # 3 mins
-# }
-
 CELERY_DEFAULT_QUEUE = 'default'
+CAST_QUEUE = 'notify'
+
 MAIN_EXCHANGE = Exchange(name='main', type='topic', delivery_mode='persistent', durable=True)
+X_DEAD_EXCHANGE = Exchange(name='wait', type='direct', delivery_mode='persistent', durable=True)
 
 CELERY_QUEUES = (
     Queue('default', MAIN_EXCHANGE, routing_key='default'),
     Queue('mail', MAIN_EXCHANGE, routing_key='default.mail'),
-    Queue('cast_notify', MAIN_EXCHANGE, routing_key='default.cast_notify'),
-    # Queue('test', Exchange(name='test', type='direct'), routing_key='test_key'),
-    # # Queue('test2', Exchange(name='test', type='fanout'), routing_key='test2_key'),
-    # Queue('wait', Exchange(name='wait', type='fanout', arguments=DEAD_LETTER_OPTIONS), routing_key='wait_key'),
+    Queue(CAST_QUEUE, MAIN_EXCHANGE, routing_key='default.cast_notify'),
 )
 
 ###########################################################

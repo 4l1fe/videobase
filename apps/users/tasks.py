@@ -44,8 +44,8 @@ def send_template_mail(subject, context, to, tpl_name=None, use_render=True, jad
     msg.send()
 
 
-@app.task(name="notification", queue="default")
-def notification(id_, type_, **kwargs):
+@app.task(name="notification", queue="notify")
+def film_notification(id_, type_, **kwargs):
     """
     Очередь обработка момента, когда появилось событие подписки на фильм или на персону
     """
