@@ -7,6 +7,7 @@ from django.utils import timezone
 from kombu import Queue, Producer
 
 from videobase.celery import app
+from celery.utils import uuid
 from videobase.settings import X_DEAD_EXCHANGE, MAIN_EXCHANGE, CAST_QUEUE
 
 from rest_framework import status
@@ -71,7 +72,10 @@ class CastsSubscribeView(APIView):
                             exchange=X_DEAD_EXCHANGE.name,
                             routing_key='wait.{name}'.format(name=name_queue),
                             declare=[cast_queue, queue],
-                            body={'cast': cast.id, 'user': request.user.id},
+                            body={
+                                'kwargs': {'cast': cast.id, 'user': request.user.id},
+                                'task': 'cast_notification', 'id': uuid()
+                            },
                             **{
                                 'expiration': str(expiration),
                                 'delivery_mode': 2

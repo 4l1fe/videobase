@@ -13,7 +13,7 @@ from apps.casts.constants import APP_CASTS_MAIL_SUBJECT, APP_CASTS_MAIL_TEMPLATE
 from apps.users.tasks import send_template_mail
 
 
-@app.task(name="cast_notify", queue="notify")
+@app.task(name="cast_notification", queue="notify")
 def cast_notification(cast, user, **kwargs):
     o_cast = Casts.objects.get(id=cast)
 
