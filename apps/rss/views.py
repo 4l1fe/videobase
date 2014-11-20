@@ -9,7 +9,7 @@ from django.utils.timezone import datetime
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.cache import cache
 
-from apps.contents.models import Contents, Locations
+from apps.contents.models import Contents, Locations, Comments
 
 from apps.films.models import Films, PersonsFilms, FilmExtras
 from apps.films.api.serializers import vbFilm
@@ -85,6 +85,14 @@ def get_feed_fb(request):
     }
 
     return render(request, 'rss/fb_feed.html', result, content_type=CONTENT_TYPE)
+
+
+def get_feed_comment(request):
+    result = {
+        'comments': get_comment(),
+        'date': get_format_time()
+    }
+    return render(request, 'rss/comment_feed.html', result, content_type=CONTENT_TYPE)
 
 
 def get_film_description(**kwargs):
@@ -207,3 +215,18 @@ def get_person(film):
             list_scriptwriter_by_film.append(person.person.name)
 
     return u', '.join(list_actor_by_film), u', '.join(list_director_by_film), u', '.join(list_scriptwriter_by_film)
+
+
+def get_comment():
+    comments = Comments.get_comments_sorting_by_created()
+    list_title = []
+    list_date = []
+    list_link = []
+    list_description = []
+    for comment in comments:
+        list_title.append(comment.user.username)
+        list_date.append(comment.created.strftime('%Y-%m-%d %H:%M'))
+        list_link.append('http://vsevi.ru/films/' + str(comment.content.film_id))
+        list_description.append(comment.text)
+
+    return zip(list_title, list_date, list_link, list_description)

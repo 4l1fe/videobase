@@ -1,0 +1,15 @@
+{% extends "rss/base_comment_feed.html" %}
+
+{% block feeditems %}
+{% for title, date, link, description in comments %}
+<item>
+  <title>{{ title}}{{ date }} </title>
+  <link> {{link}}/</link>
+  <description>
+    {{ description }}<br>
+  </description>
+  <pubDate></pubDate>
+  <guid></guid>
+</item>
+{% endfor %}
+{% endblock %}
