@@ -33,14 +33,17 @@ CELERY_ACCEPT_CONTENT = ['pickle', 'json']
 
 CELERY_DEFAULT_QUEUE = 'default'
 NOTIFY_QUEUE = 'notify'
+CAST_QUEUE = 'casts'
 
 MAIN_EXCHANGE = Exchange(name='main', type='topic', delivery_mode='persistent', durable=True)
 X_DEAD_EXCHANGE = Exchange(name='wait', type='direct', delivery_mode='persistent', durable=True)
+CAST_EXCHANGE = Exchange(name='casts', type='direct', delivery_mode='persistent', durable=True)
 
 CELERY_QUEUES = (
     Queue('default', MAIN_EXCHANGE, routing_key='default'),
     Queue('mail', MAIN_EXCHANGE, routing_key='default.mail'),
     Queue(NOTIFY_QUEUE, MAIN_EXCHANGE, routing_key='default.notify'),
+    Queue(CAST_QUEUE, MAIN_EXCHANGE, routing_key='casts'),
 )
 
 ###########################################################
@@ -306,9 +309,6 @@ SESSION_EXPIRATION_TIME = timedelta(minutes=API_SESSION_EXPIRATION_TIME)
 HAPROXY_ADDRESS = '127.0.0.1:11800'
 
 ###########################################################
-CELERY_QUEUES = (
-    Queue('main_casts_qu', Exchange(name='main_casts_ex', type='direct'), routing_key='main_casts_rk'),
-)
 CELERYBEAT_SCHEDULE = {
 
     # Launching robots that are described in Robots table.

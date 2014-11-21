@@ -25,7 +25,7 @@ from apps.casts.models import Casts
 from apps.casts.api.serializers import vbCast
 
 
-@app.task(name="week_newsletter", queue="default")
+@app.task(name="week_newsletter")
 def week_newsletter(*args, **kwargs):
     curr_dt = datetime.now()
 
@@ -82,7 +82,7 @@ def week_newsletter(*args, **kwargs):
         send_template_mail.s(**params_email).apply_async()
 
 
-@app.task(name="personal_newsletter", queue="default")
+@app.task(name="personal_newsletter")
 def personal_newsletter(*args, **kwargs):
     curr_dt = datetime.now()
     start_dt = curr_dt - timedelta(days=1)
@@ -145,7 +145,7 @@ def personal_newsletter(*args, **kwargs):
             send_template_mail.s(**params_email).apply_async()
 
 
-@app.task(name="calc_amount_subscribed_to_movie", queue="default")
+@app.task(name="calc_amount_subscribed_to_movie")
 @transaction.commit_on_success
 def calc_amount_subscribed_to_movie(*args, **kwargs):
     sql = """
