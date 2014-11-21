@@ -115,7 +115,6 @@ class CustomRegisterForm(forms.ModelForm):
         self.fields['username'].required = False
         self.fields['email'].required = True
 
-
     def clean(self):
         if 'email' in self.cleaned_data:
             self.cleaned_data['username'] = self.cleaned_data.get('email')

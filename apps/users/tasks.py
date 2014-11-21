@@ -21,8 +21,12 @@ from apps.users.constants import APP_NOTIFICATION_TEMPLATE,\
     APP_NOTIFICATION_EMAIL_SUBJECT, FILM_O, PERSON_O, EMAIL_HEADERS
 
 
-@app.task(name="send_template_mail", queue="send_mail")
-def send_template_mail(subject, context, to, tpl_name=None, use_render=True, jade_render=False):
+@app.task(name="send_template_mail", queue="mail")
+def send_template_mail(subject, context, to, tpl_name=None, use_render=True, jade_render=False, **kwargs):
+    """
+    Очередь отправки сообщений
+    """
+
     if isinstance(to, basestring):
         to = [to]
     
@@ -40,15 +44,30 @@ def send_template_mail(subject, context, to, tpl_name=None, use_render=True, jad
     msg.send()
 
 
-@app.task(name="notification", queue="notification")
-def notification(id_, type_):
+@app.task(name="notification", queue="notify")
+def film_notification(id_, type_, **kwargs):
+    """
+    Очередь обработка момента, когда появилось событие подписки на фильм или на персону
+    """
+
     if type_ not in (FILM_O, PERSON_O):
         raise ValueError("Not valid argument")
 
-    tpl_name = APP_NOTIFICATION_TEMPLATE[type_]
-    subject = APP_NOTIFICATION_EMAIL_SUBJECT[type_]
+    define_id = id_ if type_ == FILM_O else kwargs['child_obj']
+    o_film = Films.objects.get(id=define_id)
+
+    kw = {
+        'subject': APP_NOTIFICATION_EMAIL_SUBJECT[type_],
+        'tpl_name': APP_NOTIFICATION_TEMPLATE[type_],
+        'context': {
+            'film': {
+                'id': o_film.id,
+                'name': o_film.name
+            }
+        }
+    }
+
     if type_ == FILM_O:
-        model_obj = Films
         model_user = UsersFilms
         query = {
             'film': id_,
@@ -56,31 +75,29 @@ def notification(id_, type_):
         }
 
     else:
-        model_obj = Persons
         model_user = UsersPersons
+        o_person = Persons.objects.get(id=id_)
+        kw['context']['person'] = {
+            'id': o_person.id,
+            'name': o_person.name
+        }
+
         query = {
             'person': id_,
             'subscribed': APP_PERSONFILM_SUBS_TRUE,
         }
 
-    try:
-        obj = model_obj.objects.get(id=id_)
-        to = model_user.objects.filter(**query).exclude(user__email='').values_list("user__email", flat=True)
-        kw = {
-            'subject': subject,
-            'tpl_name': tpl_name,
-            'to': to,
-            'context': {'object': obj},
-        }
+    # Выборка почтовых адресов
+    list_email = model_user.objects.filter(**query).exclude(user__email='').values_list("user__email", flat=True)
 
-        # Send email
-        send_template_mail.apply_async(kwargs=kw)
-    except Exception, e:
-        pass
+    # Send email from list
+    for item in list_email:
+        kw.update({'to': item})
+        send_template_mail.s(**kw).apply_async()
 
 
 @app.task(name="get_avatar", queue="load")
-def avatar_load(image_url, type_, user_id=None):
+def avatar_load(image_url, type_, user_id=None, **kwargs):
     response = requests.get(image_url)
     if response.status_code == 200:
         buff = StringIO.StringIO(response.content)

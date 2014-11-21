@@ -7,6 +7,8 @@ import logging
 from datetime import timedelta
 from ConfigParser import RawConfigParser
 
+from kombu import Exchange, Queue
+
 import djcelery
 from celery.schedules import crontab
 
@@ -20,8 +22,25 @@ AMQP_HOST = 'localhost'
 BROKER_HOST = 'localhost'
 BROKER_PORT = 5672
 
+CELERY_ENABLE_UTC = False
+CELERY_ALWAYS_EAGER = False
+CELERY_CREATE_MISSING_QUEUES = True
+CELERYD_PREFETCH_MULTIPLIER = 1
+
 CELERY_TIMEZONE = 'UTC'
-CELERY_ACCEPT_CONTENT = ['pickle', 'json', 'msgpack', 'yaml']
+CELERY_ACCEPT_CONTENT = ['pickle', 'json']
+
+CELERY_DEFAULT_QUEUE = 'default'
+NOTIFY_QUEUE = 'notify'
+
+MAIN_EXCHANGE = Exchange(name='main', type='topic', delivery_mode='persistent', durable=True)
+X_DEAD_EXCHANGE = Exchange(name='wait', type='direct', delivery_mode='persistent', durable=True)
+
+CELERY_QUEUES = (
+    Queue('default', MAIN_EXCHANGE, routing_key='default'),
+    Queue('mail', MAIN_EXCHANGE, routing_key='default.mail'),
+    Queue(NOTIFY_QUEUE, MAIN_EXCHANGE, routing_key='default.notify'),
+)
 
 ###########################################################
 # Base path for project

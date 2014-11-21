@@ -26,7 +26,7 @@ from apps.casts.api.serializers import vbCast
 
 
 @app.task(name="week_newsletter", queue="default")
-def best_of_the_best_this_week():
+def week_newsletter(*args, **kwargs):
     curr_dt = datetime.now()
 
     # Выборка фильмов
@@ -156,14 +156,11 @@ def calc_amount_subscribed_to_movie(*args, **kwargs):
     ORDER BY "users_films"."film_id" ASC
     """
 
-    cursor = connection.cursor()
-    cursor.execute(sql, params=[APP_USERFILM_SUBS_TRUE])
+    with connection.cursor() as cursor:
+        cursor.execute(sql, params=[APP_USERFILM_SUBS_TRUE])
 
-    for item in dict_fetch_all(cursor):
-        o_film = Films.objects.get(id=item['film_id'])
+        for item in dict_fetch_all(cursor):
+            o_film = Films.objects.get(id=item['film_id'])
 
-        o_film.subscribed_cnt = item['film_cnt']
-        o_film.save()
-
-    # Закрытие курсора
-    cursor.close()
+            o_film.subscribed_cnt = item['film_cnt']
+            o_film.save()
