@@ -3,12 +3,12 @@
 {% block feeditems %}
 {% for title, date, link, description in comments %}
 <item>
-  <title>{{ title}}{{ date }} </title>
+  <title>{{ title}}, {{ date }} </title>
   <link> {{link}}/</link>
   <description>
-    {{ description }}<br>
+    {{ description }}
   </description>
-  <pubDate></pubDate>
+  <pubDate>{{ date }}</pubDate>
   <guid></guid>
 </item>
 {% endfor %}
