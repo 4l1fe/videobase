@@ -53,10 +53,10 @@ sites_crawler = {
         'loader': TVIGLE_Loader,
         'parser': ParseTvigleFilm()
     },
-    #'tvzavr_ru': {
-    #     'loader': Tvzavr_Loader,
-    #     'parser': ParseTvzavrFilmPage()
-    # },
+    'tvzavr_ru': {
+        'loader': Tvzavr_Loader,
+        'parser': ParseTvzavrFilmPage()
+    },
     'stream_ru': {
         'loader': STREAM_RU_Loader,
         'parser': ParseStreamFilm
