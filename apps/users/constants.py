@@ -10,10 +10,11 @@ APP_USER_PIC_DIR = os.path.join('upload', 'users', 'user_pic')
 APP_USER_REL_TYPE_FRIENDS              = 'f'
 APP_USER_REL_TYPE_SEND_NOT_RECEIVED    = 's'
 APP_USER_REL_TYPE_ACCEPTED_NOT_ADOPTED = 'r'
-APP_USER_REL_TYPE_NONE                 = None
+APP_USER_REL_TYPE_NONE                 = ''
 
 APP_USER_REL_TYPES = (
     (APP_USER_REL_TYPE_FRIENDS, 'Друзья'),
+    (APP_USER_REL_TYPE_NONE, 'Нету отношений'),
     (APP_USER_REL_TYPE_SEND_NOT_RECEIVED, 'Заявка отправлена, но не принята'),
     (APP_USER_REL_TYPE_ACCEPTED_NOT_ADOPTED, 'Заявка получена, но не принята'),
 )
@@ -124,3 +125,11 @@ TYPE_PASSWD_HASH = (
 
 #############################################################################################################
 APP_USER_REQUIRE_AUTH_PAGES = ('stream', 'playlist', 'profile') # страницы требующие авторизации
+
+
+#############################################################################################################
+EMAIL_HEADERS = {
+    'Content-Type': 'text/html; charset=ISO-8859-1',
+    'Content-Transfer-Encoding': 'base64',
+    'MIME-Version': '1.0'
+}

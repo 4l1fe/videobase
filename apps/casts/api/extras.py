@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from apps.casts.models import Casts, CastsExtras
-from apps.films.api.serializers import vbExtra
+from apps.casts.api.serializers import vbExtra
 
 
 ################################################################################
