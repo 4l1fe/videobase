@@ -4,7 +4,6 @@ import re
 import datetime
 import requests
 
-__author__ = 'vladimir'
 
 MAIN_SITE_LINK = 'http://video.khl.ru'
 
@@ -92,7 +91,7 @@ def get_info_for_one_item(one_item_div):
     return streams
 
 
-def get_tv_khl_translations():
+def parse_khl():
     items_list = get_items_list_div()
     all_streams = []
     for item_div in items_list:
@@ -101,8 +100,3 @@ def get_tv_khl_translations():
             all_streams = all_streams + streams
 
     return all_streams
-
-
-def parse_khl():
-    return get_tv_khl_translations()
-

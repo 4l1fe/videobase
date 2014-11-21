@@ -1,6 +1,7 @@
 # coding: utf-8
 
 from __future__ import absolute_import
+from kombu import Queue, Exchange
 
 import os
 import logging
@@ -32,14 +33,17 @@ CELERY_ACCEPT_CONTENT = ['pickle', 'json']
 
 CELERY_DEFAULT_QUEUE = 'default'
 NOTIFY_QUEUE = 'notify'
+CAST_QUEUE = 'casts'
 
 MAIN_EXCHANGE = Exchange(name='main', type='topic', delivery_mode='persistent', durable=True)
 X_DEAD_EXCHANGE = Exchange(name='wait', type='direct', delivery_mode='persistent', durable=True)
+CAST_EXCHANGE = Exchange(name='casts', type='direct', delivery_mode='persistent', durable=True)
 
 CELERY_QUEUES = (
     Queue('default', MAIN_EXCHANGE, routing_key='default'),
     Queue('mail', MAIN_EXCHANGE, routing_key='default.mail'),
     Queue(NOTIFY_QUEUE, MAIN_EXCHANGE, routing_key='default.notify'),
+    Queue(CAST_QUEUE, MAIN_EXCHANGE, routing_key='casts'),
 )
 
 ###########################################################
@@ -439,26 +443,6 @@ CELERYBEAT_SCHEDULE = {
         'task': 'parse_news_from_tvzor_ru',
         'schedule': timedelta(hours=12)
     },
-    'cast_sportbox_ru_schedule': {
-        'task': 'cast_sportbox_robot',
-        'schedule': timedelta(hours=24)
-    },
-    'cast_championat_com_schedule': {
-        'task': 'cast_championat_robot',
-        'schedule': timedelta(hours=24)
-    },
-    'cast_liverussia_ru_schedule': {
-        'task': 'cast_liverussia_robot',
-        'schedule': timedelta(hours=24)
-    },
-    'cast_khl_ru_schedule': {
-        'task': 'cast_khl_robot',
-        'schedule': timedelta(hours=24)
-    },
-    'cast_ntv_plus_schedule': {
-        'task': 'cast_ntv_plus_robot',
-        'schedule': timedelta(hours=24)
-    },
     'itunes_update': {
         'task': 'itunes_robot_start',
         'schedule': timedelta(hours=24)
@@ -481,6 +465,36 @@ CELERYBEAT_SCHEDULE = {
     'personal_newsletter_schedule': {
         'task': 'personal_newsletter',
         'schedule': crontab(minute=0, hour=18)
+    },
+    'sportbox_update': {
+        'task': 'sportbox_update',
+        'schedule': timedelta(hours=24),
+        'options': {'exchange': 'main_casts_ex',
+                    'routing_key': 'main_casts_rk'}
+    },
+    'liverussia_update': {
+        'task': 'liverussia_update',
+        'schedule': timedelta(hours=24),
+        'options': {'exchange': 'main_casts_ex',
+                    'routing_key': 'main_casts_rk'}
+    },
+    'championat_update': {
+        'task': 'championat_update',
+        'schedule': timedelta(hours=24),
+        'options': {'exchange': 'main_casts_ex',
+                    'routing_key': 'main_casts_rk'}
+    },
+    'khl_update': {
+        'task': 'khl_update',
+        'schedule': timedelta(hours=24),
+        'options': {'exchange': 'main_casts_ex',
+                    'routing_key': 'main_casts_rk'}
+    },
+    'ntv_plus_update': {
+        'task': 'ntv_plus_update',
+        'schedule': timedelta(hours=24),
+        'options': {'exchange': 'main_casts_ex',
+                    'routing_key': 'main_casts_rk'}
     }
 }
 
