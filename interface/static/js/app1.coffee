@@ -446,6 +446,8 @@ class FeedThumb extends Item
     if type.substr(0,4) == "pers" && attr="href"
       if name == "object.id"
         return "/persons/" + val + "/"
+      else if name == "object.film.id"
+        return "/films/" + val + "/"
     if type.substr(0,4) == "user" && attr="href"
       if name == "object.id"
         return "/users/" + val + "/"
