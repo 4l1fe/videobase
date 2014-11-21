@@ -1,6 +1,7 @@
 # coding: utf-8
 
 from __future__ import absolute_import
+from kombu import Queue, Exchange
 
 import os
 import logging
@@ -286,6 +287,9 @@ SESSION_EXPIRATION_TIME = timedelta(minutes=API_SESSION_EXPIRATION_TIME)
 HAPROXY_ADDRESS = '127.0.0.1:11800'
 
 ###########################################################
+CELERY_QUEUES = (
+    Queue('main_casts_qu', Exchange(name='main_casts_ex', type='direct'), routing_key='main_casts_rk'),
+)
 CELERYBEAT_SCHEDULE = {
 
     # Launching robots that are described in Robots table.
@@ -420,26 +424,6 @@ CELERYBEAT_SCHEDULE = {
         'task': 'parse_news_from_tvzor_ru',
         'schedule': timedelta(hours=12)
     },
-    'cast_sportbox_ru_schedule': {
-        'task': 'cast_sportbox_robot',
-        'schedule': timedelta(hours=24)
-    },
-    'cast_championat_com_schedule': {
-        'task': 'cast_championat_robot',
-        'schedule': timedelta(hours=24)
-    },
-    'cast_liverussia_ru_schedule': {
-        'task': 'cast_liverussia_robot',
-        'schedule': timedelta(hours=24)
-    },
-    'cast_khl_ru_schedule': {
-        'task': 'cast_khl_robot',
-        'schedule': timedelta(hours=24)
-    },
-    'cast_ntv_plus_schedule': {
-        'task': 'cast_ntv_plus_robot',
-        'schedule': timedelta(hours=24)
-    },
     'itunes_update': {
         'task': 'itunes_robot_start',
         'schedule': timedelta(hours=24)
@@ -462,6 +446,36 @@ CELERYBEAT_SCHEDULE = {
     'personal_newsletter_schedule': {
         'task': 'personal_newsletter',
         'schedule': crontab(minute=0, hour=18)
+    },
+    'sportbox_update': {
+        'task': 'sportbox_update',
+        'schedule': timedelta(hours=24),
+        'options': {'exchange': 'main_casts_ex',
+                    'routing_key': 'main_casts_rk'}
+    },
+    'liverussia_update': {
+        'task': 'liverussia_update',
+        'schedule': timedelta(hours=24),
+        'options': {'exchange': 'main_casts_ex',
+                    'routing_key': 'main_casts_rk'}
+    },
+    'championat_update': {
+        'task': 'championat_update',
+        'schedule': timedelta(hours=24),
+        'options': {'exchange': 'main_casts_ex',
+                    'routing_key': 'main_casts_rk'}
+    },
+    'khl_update': {
+        'task': 'khl_update',
+        'schedule': timedelta(hours=24),
+        'options': {'exchange': 'main_casts_ex',
+                    'routing_key': 'main_casts_rk'}
+    },
+    'ntv_plus_update': {
+        'task': 'ntv_plus_update',
+        'schedule': timedelta(hours=24),
+        'options': {'exchange': 'main_casts_ex',
+                    'routing_key': 'main_casts_rk'}
     }
 }
 

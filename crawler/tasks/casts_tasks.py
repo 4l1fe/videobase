@@ -1,5 +1,4 @@
 # coding: utf-8
-
 from __future__ import absolute_import
 from crawler.casts_robot import parse_sportbox_ru, parse_translation_live_russia_tv, parse_khl, parse_translation_championat_com, parse_ntv_plus_translation
 from crawler.casts_robot.cast_utils import save_cast_dict
@@ -22,26 +21,26 @@ def generic_task(parse_function, service_name):
             traceback_own(e)
 
 
-@app.task(name='cast_sportbox_robot')
+@app.task(name='sportbox_update')
 def sportbox_update():
     generic_task(parse_sportbox_ru, 'sportbox_ru')
 
 
-@app.task(name='cast_liverussia_robot')
+@app.task(name='liverussia_update')
 def liverussia_update():
     generic_task(parse_translation_live_russia_tv, 'liverussia_ru')
 
 
-@app.task(name='cast_championat_robot')
+@app.task(name='championat_update')
 def championat_update():
     generic_task(parse_translation_championat_com, 'championat_com')
 
 
-@app.task(name='cast_khl_robot')
+@app.task(name='khl_update')
 def khl_update():
     generic_task(parse_khl, 'khl_ru')
 
 
-@app.task(name='cast_ntv_plus_robot')
+@app.task(name='ntv_plus_update')
 def ntv_plus_update():
     generic_task(parse_ntv_plus_translation, 'ntv_plus')
