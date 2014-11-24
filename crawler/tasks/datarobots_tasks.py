@@ -39,7 +39,7 @@ def persons_films_update_with_indexes(kinopoisk_film_id):
     PersoneParser.update_persons_films_with_indexes(page_dump, kinopoisk_film_id)
 
 
-@app.task(name='update_film_rating')
+@app.task(name='update_film_rating_task')
 def update_film_rating_task(kinopoisk_id):
     f = Films.objects.get(kinopoisk_id=kinopoisk_id)
     r = get_ratings(kinopoisk_id)
@@ -52,7 +52,7 @@ def update_film_rating_task(kinopoisk_id):
     f.save()
 
 
-@app.task(name="update_ratings")
+@app.task(name="update_ratings_task")
 def update_ratings_task():
     for f in Films.objects.all():
         update_film_rating_task.apply_async((f.kinopoisk_id,))
@@ -115,7 +115,7 @@ def film_checked_on_kp_at_least_days_ago(film, days):
         return True
 
 
-@app.task(name='kinopoisk_refresher')
+@app.task(name='create_due_refresh_tasks')
 def create_due_refresh_tasks():
     json_path = 'saved_pages/kinopoisk_mobile/'
     files = os.listdir(json_path)
@@ -133,7 +133,7 @@ def create_due_refresh_tasks():
                 kinopoisk_mobile_parse.apply_async((film.kinopoisk_id, files))
 
 
-@app.task(name='kinopoisk_news')
+@app.task(name='parse_kinopoisk_news')
 def parse_kinopoisk_news():
     '''
     Periodic task for parsing new films from kinopoisk
@@ -146,36 +146,36 @@ def parse_kinopoisk_news():
         kinopoisk_mobile_parse.apply_async((kinopoisk_id, files))
 
 
-@app.task(name="find_trailer_for_film")
+@app.task(name="find_trailer")
 def find_trailer(film_id):
     film = Films.objects.get(id=film_id)
     find_youtube_trailer(film)
 
-@app.task(name='youtube_trailers_all')
+@app.task(name='trailer_commands')
 def trailer_commands():
     for film in Films.objects.all():
         find_trailer.apply_async((film.id,))
 
 
-@app.task(name='check_one_film_by_id')
+@app.task(name='check_and_correct_one_film')
 def check_and_correct_one_film(film_id):
     film = Films.objects.get(id=film_id)
     data.film_facts.checker.film_checker.check_and_correct(film)
 
 
-@app.task(name='check_one_person_by_id')
+@app.task(name='check_and_correct_one_person')
 def check_and_correct_one_person(person_id):
     person = Persons.objects.get(id=person_id)
     data.person_facts.checker.person_checker.check_and_correct(person)
 
 
-@app.task(name='film_info_check_and_correct')
+@app.task(name='check_and_correct_tasks')
 def check_and_correct_tasks():
     for film in Films.objects.all():
         check_and_correct_one_film.apply_async(film.id)
 
 
-@app.task(name='persons_check_and_correct')
+@app.task(name='person_check_and_correct_tasks')
 def person_check_and_correct_tasks():
     for person in Persons.objects.all():
         check_and_correct_one_person.apply_async(person.id)

@@ -1,11 +1,9 @@
 #coding: utf-8
 from crawler.datarobots.kinopoisk_mobile.kinopoisk_loader import KinopoiskMobile
-
-__author__ = 'vladimir'
 from videobase.celery import app
 
 
-@app.task(name='kinopoisk_mobile_parse_film')
+@app.task(name='kinopoisk_mobile_parse')
 def kinopoisk_mobile_parse(f_kinopoisk_id, files):
     try:
         max_date_film_fname = KinopoiskMobile.get_max_date_file_name(KinopoiskMobile.load_film_page_to_file, f_kinopoisk_id, files, 3, 5)
