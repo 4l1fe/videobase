@@ -37,7 +37,6 @@ CAST_QUEUE = 'casts'
 
 MAIN_EXCHANGE = Exchange(name='main', type='topic', delivery_mode='persistent', durable=True)
 X_DEAD_EXCHANGE = Exchange(name='wait', type='direct', delivery_mode='persistent', durable=True)
-CAST_EXCHANGE = Exchange(name='casts', type='direct', delivery_mode='persistent', durable=True)
 
 CELERY_QUEUES = (
     Queue('default', MAIN_EXCHANGE, routing_key='default'),
