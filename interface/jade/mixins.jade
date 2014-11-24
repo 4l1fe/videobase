@@ -162,7 +162,7 @@ mixin film_thumb(item)
             - if (item.name_orig && item.name_orig != item.name) title_alt+= " (" +item.name_orig + ")"
             - title_alt+= " " + year
             img(src=item.poster || noposter_url,data-mi-atsrc="poster",data-mi-default=noposter_url,data-mi-id="poster",title=title_alt, alt=title_alt,data-mi-attitle="title_alt", data-mi-atalt="title_alt").img-poster
-        img(src=img_url + 'shd-small.png', alt='')
+        img(src=img_url + 'shd-small.png', alt='').img-shadow
         .rel.zmin.num
             i(data-mi-name="ratings.cons.0")=(item.ratings && item.ratings.cons)?item.ratings.cons[0]:""
         .caption-def

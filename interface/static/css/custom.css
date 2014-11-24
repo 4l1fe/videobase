@@ -1338,6 +1338,7 @@ section.cast-chat {padding-bottom: 40px;}
 
 .film-thumb .poster-place {display: block; overflow:hidden; line-height: 0}
 .film-thumb .btn-add {width: 50px;height: 50px;top: 0px;right: 0px;}
+.film-thumb .img-shadow { width: 100%; }
 .btn-def a {display: block;}
 .btn-def {
     font-size: 14px;font-weight: bold;text-transform: uppercase;text-align: center;position: relative;z-index: 1;
