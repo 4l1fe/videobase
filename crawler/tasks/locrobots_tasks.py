@@ -16,6 +16,7 @@ from collections import defaultdict
 from crawler.locrobots.individual_tasks import process_individual_film_on_site
 from crawler.locrobots.now_or_stream_news import parse_news
 from crawler.locrobots.tvzor_news import parse_tvzor_news
+from videobase.settings import MAIN_EXCHANGE
 
 
 @app.task(name='amediateka_robot_start')
@@ -56,7 +57,8 @@ def age_weighted_robot_launcher(years):
         for robot in Robots.objects.all():
             if film_at_least_years_old(film, years):
                 if robot.name in sites_crawler:
-                    process_individual_film_on_site.apply_async((robot.name, film.id), countdown=15*delays[robot.name], queue=robot.name)
+                    process_individual_film_on_site.apply_async((robot.name, film.id), countdown=15*delays[robot.name],
+                                                                exchange=MAIN_EXCHANGE, routing_key='location.plural')
                     delays[robot.name] += 1
 
 
