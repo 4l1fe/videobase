@@ -173,10 +173,10 @@ def check_and_correct_one_person(person_id):
 @app.task(name='check_and_correct_tasks')
 def check_and_correct_tasks():
     for film in Films.objects.all():
-        check_and_correct_one_film.apply_async(film.id)
+        check_and_correct_one_film.apply_async((film.id,))
 
 
 @app.task(name='person_check_and_correct_tasks')
 def person_check_and_correct_tasks():
     for person in Persons.objects.all():
-        check_and_correct_one_person.apply_async(person.id)
+        check_and_correct_one_person.apply_async((person.id,))
