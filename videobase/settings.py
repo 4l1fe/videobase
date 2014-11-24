@@ -323,12 +323,12 @@ CELERYBEAT_SCHEDULE = {
     },
     # Amediateka weekly run
     'amediateka_ru_update': {
-        'task': 'amediateka_ru_robot_start',
+        'task': 'amediateka_robot_start',
         'schedule': timedelta(days=7),
     },
     # Viaplay robot weekly run
     'viaplay_ru_robot_start': {
-        'task': 'viaplay_ru_robot_start',
+        'task': 'viaplay_robot_start',
         'schedule': timedelta(days=7),
     },
     'kinopoisk-set_poster': {
@@ -373,7 +373,7 @@ CELERYBEAT_SCHEDULE = {
     },
     # Playfamily XML parser.
     'playfamily_xml': {
-        'task': 'playfamily_xml',
+        'task': 'pltask',
         'schedule': timedelta(days=7),
     },
     # Films check and correct
@@ -388,24 +388,24 @@ CELERYBEAT_SCHEDULE = {
     },
     # Checking locations for new films weekly
     'age_weighted_robot_launch_task_weekly': {
-        'task': 'age_weighted_robot_launch',
+        'task': 'age_weighted_robot_launcher',
         'schedule': timedelta(days=3),
         'args': (1,)
     },
     # Checking locations for aged films monthly
     'age_weighted_robot_launch_task_monthly': {
-        'task': 'age_weighted_robot_launch',
+        'task': 'age_weighted_robot_launcher',
         'schedule': timedelta(days=7),
         'args': (3,)
     },
     # Checking locations for aged films yearly
     'age_weighted_robot_launch_task_six_month': {
-        'task': 'age_weighted_robot_launch',
+        'task': 'age_weighted_robot_launcher',
         'schedule': timedelta(days=14),
         'args': (120,)
     },
     'drugoe_kino_update_schedule': {
-        'task': 'drugoe_kino_update',
+        'task': 'dg_update',
         'schedule': timedelta(days=7)
     },
     # Refreshing sitemap

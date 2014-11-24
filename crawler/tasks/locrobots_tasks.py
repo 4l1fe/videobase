@@ -18,10 +18,7 @@ from crawler.locrobots.now_or_stream_news import parse_news
 from crawler.locrobots.tvzor_news import parse_tvzor_news
 
 
-
-
-
-@app.task(name='amediateka_ru_robot_start', queue='amediateka_ru')
+@app.task(name='amediateka_robot_start')
 def amediateka_robot_start(*args, **kwargs):
     '''
     Amediateka_robot
@@ -29,26 +26,27 @@ def amediateka_robot_start(*args, **kwargs):
     Amediateka_robot().get_film_data()
 
 
-@app.task(name='itunes_robot_start', queue='itunes')
+@app.task(name='itunes_robot_start')
 def itunes_robot_start():
     ItunesRobot().get_film_data()
 
-@app.task(name='mail_robot_start', queue='mail')
+
+@app.task(name='mail_robot_start')
 def mail_robot_start():
     MailRobot.get_film_data()
 
 
-@app.task(name='playfamily_xml')
+@app.task(name='pltask')
 def pltask():
     process()
 
 
-@app.task(name='viaplay_ru_robot_start', queue='viaplay_ru')
+@app.task(name='viaplay_robot_start')
 def viaplay_robot_start():
     ViaplayRobot().get_data()
 
 
-@app.task(name='age_weighted_robot_launch')
+@app.task(name='age_weighted_robot_launcher')
 def age_weighted_robot_launcher(years):
     msg = "Starting locations checks for every film at least {year} days old"
     print msg.format(year=years)
@@ -62,12 +60,12 @@ def age_weighted_robot_launcher(years):
                     delays[robot.name] += 1
 
 
-@app.task(name="drugoe_kino_update")
+@app.task(name="dg_update")
 def dg_update():
     update_drugoe_kino_listing()
 
 
-@app.task(name="parse_you_tube_movies_ru", base=DebugTask, queue='you_tube_movies_ru')
+@app.task(name="parse_you_tube_movies_ru", base=DebugTask)
 def parse_you_tube_movies_ru():
     return YoutubeChannelParser.process_channels_list()
 
@@ -86,6 +84,7 @@ def parse_news_from_stream_ru():
     stream_news = parse_news('robot')
     for film in stream_news:
         process_individual_film_on_site.apply_async(args=(robot, film['film_id'], film['url']))
+
 
 @app.task(name="parse_news_from_tvzor_ru")
 def parse_news_from_tvzor_ru():

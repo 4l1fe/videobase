@@ -151,6 +151,7 @@ def find_trailer(film_id):
     film = Films.objects.get(id=film_id)
     find_youtube_trailer(film)
 
+
 @app.task(name='trailer_commands')
 def trailer_commands():
     for film in Films.objects.all():
