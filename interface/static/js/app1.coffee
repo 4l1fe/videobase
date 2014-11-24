@@ -1073,7 +1073,7 @@ class Page_Main extends Page
       @load_more_films(films_deck, {page: 2})
     else
       films_deck.load_more_hide(false)
-    $('.crsl-items').carousel({itemMinWidth: 200, itemEqualHeight: true, visible: 3});
+    $('.crsl-items').carousel({itemMinWidth: 180, itemEqualHeight: true, visible: 3});
 
   filter_changed: (text) ->
     _filter_counter++

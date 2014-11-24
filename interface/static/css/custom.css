@@ -164,6 +164,8 @@ section {padding:37px 0 6px 0;}
     box-shadow: none;
 }
 
+.list-film { text-align: center; }
+
 .films-new {padding-top: 0}
 .films-new .container {padding-top: 37px}
 .blue-block .list-film {
@@ -829,7 +831,7 @@ a.btn-more-friends, .btn-more-friends {
     background: url(../img/bg-broun-light.jpg) center top;
 }
 .playlist-slider-wrap  {
-    padding: 0 30px 27px 30px;
+    padding: 0 40px 27px 40px;
 }
 a.toggle-playlist {
     text-align: center;color: #fff;font-size: 16px;text-decoration: none;line-height: 38px;
@@ -850,8 +852,8 @@ a.toggle-playlist.active {
 .control-slider {
     cursor: pointer;top:90px;
 }
-.prev-slide-playlist {left: -10px;}
-.next-slide-playlist {right: -10px;}
+.prev-slide-playlist {left: 0px; margin-left: 10px; }
+.next-slide-playlist {right: 0px; margin-right: 10px; }
 #slider-playlist li {padding: 23px 0;float:left;text-align: center;}
 #slider-playlist li img {max-width: 100%}
 #slider-playlist p {
