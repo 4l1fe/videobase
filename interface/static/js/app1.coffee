@@ -392,6 +392,9 @@ class CommentThumb extends Item
     super opts, =>
       if !opts.place
         $(".time-tape", @_place).data("miVal", @vals_orig.created)
+        item_anchor = "comment_" + opts.vals.item_index
+        $(".time-tape-bookmark", @_place).attr("name", item_anchor)
+        $(".time-tape", @_place).attr("href", "#" + item_anchor)
 
   transform_attr: (attr, name, val) ->
     if attr == "href" && name == "user.id"
@@ -430,6 +433,10 @@ class FeedThumb extends Item
         @_place.removeClass("display-none")
         if @_type == "film-r"
           @elements["object.rating"].self.rateit().rateit("value", opts.vals.object.rating)
+
+        item_anchor = "comment_" + opts.vals.item_index
+        $(".time-tape-bookmark", @_place).attr("name", item_anchor)
+        $(".time-tape", @_place).attr("href", "#" + item_anchor)
 
   transform_val: (name, val) ->
     if name == "user.name"
@@ -1298,6 +1305,10 @@ class Page_Film extends Page
       (data) ->
         total_page_count = Math.ceil(data.total_cnt/data.ipp)
         if data && data.items
+          item_idx = comments_deck.items.length || 0
+          for item in data.items
+            item.item_index = item_idx
+            item_idx++
           comments_deck.add_items(data.items)
           comments_deck.time_update()
           comments_deck.page = data.page
@@ -1496,6 +1507,10 @@ class Page_Feed extends Page
       (data) =>
         return if current_counter != deck.load_counter
         if data.items
+          item_idx = feed_deck.items.length || 0
+          for item in data.items
+            item.item_index = item_idx
+            item_idx++
           deck.add_items(data.items)
           if data.items.length >= 10
             deck.load_more_show()

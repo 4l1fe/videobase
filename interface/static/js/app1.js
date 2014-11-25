@@ -618,8 +618,12 @@
       }
       CommentThumb.__super__.constructor.call(this, opts, (function(_this) {
         return function() {
+          var item_anchor;
           if (!opts.place) {
-            return $(".time-tape", _this._place).data("miVal", _this.vals_orig.created);
+            $(".time-tape", _this._place).data("miVal", _this.vals_orig.created);
+            item_anchor = "comment_" + opts.vals.item_index;
+            $(".time-tape-bookmark", _this._place).attr("name", item_anchor);
+            return $(".time-tape", _this._place).attr("href", "#" + item_anchor);
           }
         };
       })(this));
@@ -683,14 +687,18 @@
       }
       FeedThumb.__super__.constructor.call(this, opts, (function(_this) {
         return function() {
+          var item_anchor;
           if (!opts.place) {
             $(".tape-" + _this._type, _this._place).removeClass("tape-thumb");
             $(".tape-thumb", _this._place).remove();
             $(".time-tape", _this._place).data("miVal", _this.vals_orig.created);
             _this._place.removeClass("display-none");
             if (_this._type === "film-r") {
-              return _this.elements["object.rating"].self.rateit().rateit("value", opts.vals.object.rating);
+              _this.elements["object.rating"].self.rateit().rateit("value", opts.vals.object.rating);
             }
+            item_anchor = "comment_" + opts.vals.item_index;
+            $(".time-tape-bookmark", _this._place).attr("name", item_anchor);
+            return $(".time-tape", _this._place).attr("href", "#" + item_anchor);
           }
         };
       })(this));
@@ -2082,9 +2090,16 @@
       return this._app.rest.films.comments.read(this.conf.id, {
         page: (comments_deck.page || 1) + 1
       }).done(function(data) {
-        var total_page_count;
+        var item, item_idx, total_page_count, _i, _len, _ref;
         total_page_count = Math.ceil(data.total_cnt / data.ipp);
         if (data && data.items) {
+          item_idx = comments_deck.items.length || 0;
+          _ref = data.items;
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            item = _ref[_i];
+            item.item_index = item_idx;
+            item_idx++;
+          }
           comments_deck.add_items(data.items);
           comments_deck.time_update();
           comments_deck.page = data.page;
@@ -2383,10 +2398,18 @@
         page: deck.page + 1
       }).done((function(_this) {
         return function(data) {
+          var item, item_idx, _i, _len, _ref;
           if (current_counter !== deck.load_counter) {
             return;
           }
           if (data.items) {
+            item_idx = feed_deck.items.length || 0;
+            _ref = data.items;
+            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+              item = _ref[_i];
+              item.item_index = item_idx;
+              item_idx++;
+            }
             deck.add_items(data.items);
             if (data.items.length >= 10) {
               deck.load_more_show();
