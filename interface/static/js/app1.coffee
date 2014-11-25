@@ -326,7 +326,6 @@ class FilmThumb extends Item
     else
       btn_cls = "btn-subscribe"
       btn_text = "Подписаться"
-      @elements["btn"].self.click => @toggle_subscribe()
     if vals.relation && vals.relation.rating
       @elements["relation.rating"].self.rateit().rateit("value", vals.relation.rating)
     @elements["btn"].self.removeClass("btn-subscribe").removeClass("btn-price").removeClass("btn-free").addClass(btn_cls)
@@ -371,6 +370,9 @@ class FilmThumb extends Item
     }
 
   toggle_subscribe: (status) ->
+    if !@vals.relation?
+      @vals.relation = {}
+
     @_app.film_action @vals.id, "subscribe", {
       rel: @vals.relation
       state: status
@@ -446,6 +448,8 @@ class FeedThumb extends Item
     if type.substr(0,4) == "pers" && attr="href"
       if name == "object.id"
         return "/persons/" + val + "/"
+      else if name == "object.film.id"
+        return "/films/" + val + "/"
     if type.substr(0,4) == "user" && attr="href"
       if name == "object.id"
         return "/users/" + val + "/"
@@ -469,6 +473,7 @@ class CastThumb extends Item
       opts.vals.min_vs_start = opts.vals.min_vs_start = Math.floor((new Date() - opts.vals.start_date) / 60 / 1000)
       opts.vals.duration = opts.vals.duration || 180
       opts.vals.is_online = opts.vals.min_vs_start >=0 && opts.vals.min_vs_start < opts.vals.duration
+      opts.relation = opts.relation || {}
 
     super opts, =>
       if (!opts.place)
@@ -489,7 +494,7 @@ class CastThumb extends Item
           else
             label_prim_str = time_text(@vals.start_date)
           @elements["btn"].self.show().addClass("btn-subscribe").text("Подписаться")
-          @elements["btn"].self.click @action_subscribe
+          @elements["btn"].self.click @toggle_subscribe
         else
           label_fright_str = time_text(@vals.start_date)
           label_fright_cls = 'cast-archive-date'
@@ -502,6 +507,8 @@ class CastThumb extends Item
         len = data.length
         self.elements["label_fright"].self.text("смотрят: " + len).addClass("cast-spectators-count") if len
 
+    @vals.relation = @vals.relation || {}
+
   transform_attr: (attr, name, val) ->
     if attr == "href" && name == "id"
       return "/casts/" + val + "/"
@@ -513,9 +520,17 @@ class CastThumb extends Item
       return val?" (" + val + ")":""
     super
 
-  action_subscribe: =>
-    @_app.cast_action( @vals.id, "subscribe" )
-    return false
+  toggle_subscribe: (status)=>
+    if !@vals.relation
+      @vals.relation = {}
+
+    @_app.cast_action @vals.id, "subscribe", {
+      rel: @vals.relation
+      state: status
+      callback: (new_state) =>
+        #alert("done")
+    }
+    false
 
 class Deck
   constructor: (@_place, opts = {}) ->
@@ -904,9 +919,17 @@ class App
       )
 
   cast_action: (id, action, opts = {}) ->
-    if( @user_is_auth() )
+    if @user_is_auth()
+      rel = opts.rel || {}
       if( action == "subscribe" )
-        @rest.casts.subscribe.create(id)
+        new_state = state_toggle(opts.status, rel.subscribed)
+        if new_state
+          doit = "create"
+        else
+          doit = "destroy"
+        @rest.casts.subscribe[doit](id).done (data)->
+          rel.subscribed = data.subscribed
+          opts.callback(new_state) if opts.callback
 
   config: (name) ->
     if name == undefined
@@ -1317,6 +1340,11 @@ class Page_Film extends Page
                   if res.items && res.items.length
                     $("#has_comments").show()
                     comments_deck.add_item(res.items[0], true, true)
+                    items_len = comments_deck.items.length
+                    if items_len
+                      $('body').animate({
+                        scrollTop: comments_deck.items[items_len-1]._place.offset().top
+                      }, "slow")
               )
               .fail(
                 (res) =>
@@ -1749,6 +1777,7 @@ class Page_Cast extends Page
       @timer_tick()
 
     @casts_deck = new CastsDeck($("#casts"))
+    @conf.relation = @conf.relation || {}
 
   timer_tick: () ->
     min_left = Math.floor((new Date() - @conf.start_date) / 60 / 1000)
@@ -1844,7 +1873,8 @@ class Page_Cast extends Page
     false
 
   action_cast_subscribe: =>
-    @_app.cast_action( @_app.page().conf.id, "subscribe" )
+    opts = {rel: @conf.relation}
+    @_app.cast_action( @conf.id, "subscribe", opts )
     return false
 
 window.InitApp =  (opts = {}, page_name) ->

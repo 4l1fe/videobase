@@ -9,12 +9,13 @@ from django.utils.timezone import datetime
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.cache import cache
 
-from apps.contents.models import Contents, Locations
+from apps.contents.models import Contents, Locations, Comments
 
 from apps.films.models import Films, PersonsFilms, FilmExtras
 from apps.films.api.serializers import vbFilm
 from apps.films.constants import APP_PERSON_ACTOR, APP_PERSON_DIRECTOR, APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER, \
-    APP_FILMS_EXTRAS_POSTER_HOST, APP_FILM_TYPE_ADDITIONAL_MATERIAL_TRAILER, APP_PERSON_SCRIPTWRITER
+    APP_FILM_TYPE_ADDITIONAL_MATERIAL_TRAILER, APP_PERSON_SCRIPTWRITER
+from apps.users.models import UsersProfile
 
 
 TWITTER_MESSAGE_TEMPLATE = u"Новый #{ftype} {f_name} {genres_string} {f_rating}/10, {f_year} http://vsevi.ru/films/{film_id}/"
@@ -85,6 +86,14 @@ def get_feed_fb(request):
     }
 
     return render(request, 'rss/fb_feed.html', result, content_type=CONTENT_TYPE)
+
+
+def get_feed_comment(request):
+    result = {
+        'comments': get_comment(),
+        'date': get_format_time()
+    }
+    return render(request, 'rss/comment_feed.html', result, content_type=CONTENT_TYPE)
 
 
 def get_film_description(**kwargs):
@@ -207,3 +216,19 @@ def get_person(film):
             list_scriptwriter_by_film.append(person.person.name)
 
     return u', '.join(list_actor_by_film), u', '.join(list_director_by_film), u', '.join(list_scriptwriter_by_film)
+
+
+def get_comment():
+    comments = Comments.get_comments_sorting_by_created()
+    list_title = []
+    list_date = []
+    list_link = []
+    list_description = []
+    for comment in comments:
+        user_profile = UsersProfile.objects.get(user=comment.user)
+        list_title.append(user_profile.get_name())
+        list_date.append(comment.created.strftime('%Y-%m-%d %H:%M'))
+        list_link.append('http://vsevi.ru/films/' + str(comment.content.film_id))
+        list_description.append(comment.text)
+
+    return zip(list_title, list_date, list_link, list_description)

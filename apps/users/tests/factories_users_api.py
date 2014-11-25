@@ -3,8 +3,7 @@ import datetime
 import factory
 from factory.django import ImageField
 
-from apps.users import Feed
-from apps.users.models import User, UsersPics, UsersRels
+from apps.users.models import User, UsersPics, UsersRels, Feed
 from apps.contents.models import Comments, Contents, Locations
 from apps.contents.constants import APP_CONTENTS_PRICE_TYPE_FREE
 from apps.films.models import Films, Genres, UsersFilms, UsersPersons, Persons, Countries, Cities, PersonsFilms
@@ -21,6 +20,7 @@ class UserFactory(factory.DjangoModelFactory):
 class FeedFactory(factory.DjangoModelFactory):
     FACTORY_FOR = Feed
     user = factory.SubFactory(UserFactory)
+
 
 class UserRelsFactory(factory.DjangoModelFactory):
     FACTORY_FOR = UsersRels
