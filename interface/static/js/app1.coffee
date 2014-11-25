@@ -326,7 +326,6 @@ class FilmThumb extends Item
     else
       btn_cls = "btn-subscribe"
       btn_text = "Подписаться"
-      @elements["btn"].self.click => @toggle_subscribe()
     if vals.relation && vals.relation.rating
       @elements["relation.rating"].self.rateit().rateit("value", vals.relation.rating)
     @elements["btn"].self.removeClass("btn-subscribe").removeClass("btn-price").removeClass("btn-free").addClass(btn_cls)
@@ -371,6 +370,9 @@ class FilmThumb extends Item
     }
 
   toggle_subscribe: (status) ->
+    if !@vals.relation?
+      @vals.relation = {}
+
     @_app.film_action @vals.id, "subscribe", {
       rel: @vals.relation
       state: status
@@ -390,6 +392,9 @@ class CommentThumb extends Item
     super opts, =>
       if !opts.place
         $(".time-tape", @_place).data("miVal", @vals_orig.created)
+        item_anchor = "comment_" + opts.vals.item_index
+        $(".time-tape-bookmark", @_place).attr("name", item_anchor)
+        $(".time-tape", @_place).attr("href", "#" + item_anchor)
 
   transform_attr: (attr, name, val) ->
     if attr == "href" && name == "user.id"
@@ -429,6 +434,10 @@ class FeedThumb extends Item
         if @_type == "film-r"
           @elements["object.rating"].self.rateit().rateit("value", opts.vals.object.rating)
 
+        item_anchor = "comment_" + opts.vals.item_index
+        $(".time-tape-bookmark", @_place).attr("name", item_anchor)
+        $(".time-tape", @_place).attr("href", "#" + item_anchor)
+
   transform_val: (name, val) ->
     if name == "user.name"
       return val || "Пользователь"
@@ -463,6 +472,7 @@ class FeedThumb extends Item
 class CastThumb extends Item
   constructor: (opts = {}, callback) ->
     @_name = "cast-thumb"
+    self = @
     if opts.vals
       @_type = opts.vals.type
       @vals_orig = opts.vals
@@ -498,6 +508,11 @@ class CastThumb extends Item
           label_prim_str = 'Архив'
         @elements["label_prim"].self.removeClass("label-primary").addClass(label_prim_cls).text(label_prim_str)
         @elements["label_fright"].self.addClass(label_fright_cls).text(label_fright_str)
+
+    if @vals.is_online
+      @_app.rest.castschats.users.read(@vals.id).done (data)->
+        len = data.length
+        self.elements["label_fright"].self.text("смотрят: " + len).addClass("cast-spectators-count") if len
 
     @vals.relation = @vals.relation || {}
 
@@ -535,8 +550,9 @@ class Deck
 
     self = @
     $("." + @element_name, @_place).each(
-      ->
-        self.add_item_DOM($(this))
+      (i) ->
+        item_vals = opts.items_vals[i] if opts.items_vals && i < opts.items_vals.length
+        self.add_item_DOM($(this), item_vals)
     )
     @load_func = opts.load_func if opts.load_func
     if opts.more_place
@@ -544,8 +560,8 @@ class Deck
 
   onchange: ->
 
-  add_item_DOM: (obj) ->
-    @items.push(new @item_class({place: obj, do_not_set: true}))
+  add_item_DOM: (obj, vals = {}) ->
+    @items.push(new @item_class({place: obj, do_not_set: true, vals: vals}))
     @onchange()
 
   add_item: (item, onchange_call = true, up = false) ->
@@ -692,7 +708,7 @@ class CastsDeck extends Deck
   constructor: (place, opts = {}) ->
     @element_name = "cast-thumb"
     @item_class = CastThumb
-    super
+    super(place, opts)
     $(window).resize(=> @onchange())
 
   onchange: (global = false) ->
@@ -775,6 +791,7 @@ class App
     @rest.add("castschats")
     @rest.castschats.add("msgs")
     @rest.castschats.add("send")
+    @rest.castschats.add("users")
     @rest.casts.add("list")
     @rest.casts.add("subscribe")
 
@@ -1288,6 +1305,10 @@ class Page_Film extends Page
       (data) ->
         total_page_count = Math.ceil(data.total_cnt/data.ipp)
         if data && data.items
+          item_idx = comments_deck.items.length || 0
+          for item in data.items
+            item.item_index = item_idx
+            item_idx++
           comments_deck.add_items(data.items)
           comments_deck.time_update()
           comments_deck.page = data.page
@@ -1330,6 +1351,11 @@ class Page_Film extends Page
                   if res.items && res.items.length
                     $("#has_comments").show()
                     comments_deck.add_item(res.items[0], true, true)
+                    items_len = comments_deck.items.length
+                    if items_len
+                      $('body').animate({
+                        scrollTop: comments_deck.items[items_len-1]._place.offset().top
+                      }, "slow")
               )
               .fail(
                 (res) =>
@@ -1481,6 +1507,10 @@ class Page_Feed extends Page
       (data) =>
         return if current_counter != deck.load_counter
         if data.items
+          item_idx = feed_deck.items.length || 0
+          for item in data.items
+            item.item_index = item_idx
+            item_idx++
           deck.add_items(data.items)
           if data.items.length >= 10
             deck.load_more_show()
@@ -1597,7 +1627,6 @@ class Page_User extends Page
     )
 
 class Page_CastsList extends Page
-  casts_deck = undefined
   self = undefined
   _filter_params = {}
   _filter_counter = 0
@@ -1605,10 +1634,15 @@ class Page_CastsList extends Page
   constructor: () ->
     self = @
     super
-    casts_deck = new CastsDeck($("#casts"), {load_func: (deck) =>@load_more_casts(deck) })
-    casts_deck.page = 1
-    casts_deck.load_more_hide(false)
-    casts_deck.load_more_bind($("#casts_more"))
+    opts = {
+      load_func: (deck) =>
+        @load_more_casts(deck)
+      items_vals: @_app.config().page_conf.casts
+    }
+    @casts_deck = new CastsDeck($("#casts"), opts)
+    @casts_deck.page = 1
+    @casts_deck.load_more_hide(false)
+    @casts_deck.load_more_bind($("#casts_more"))
 
     @_e.filter =
       status: $("#filter_cast_status")
@@ -1657,7 +1691,7 @@ class Page_CastsList extends Page
             clear_output: true
             page_loading: false
             params: _filter_params
-          @load_more_casts(casts_deck, opts)
+          @load_more_casts(@casts_deck, opts)
       @_app.config("filter_delay")
     )
 
@@ -1705,7 +1739,7 @@ class Page_CastsList extends Page
       else
         _filter_params[key] = null
 
-    page = casts_deck.page || 1
+    page = @casts_deck.page || 1
     _filter_params.page = page
     more_btn_href = "/?" + query_string + "page=" + (page+1)
 
@@ -1757,7 +1791,7 @@ class Page_Cast extends Page
     else if @conf.min_vs_start < 0 && @_e.time_counter.length
       @timer_tick()
 
-    casts_deck = new CastsDeck($("#casts"))
+    @casts_deck = new CastsDeck($("#casts"))
     @conf.relation = @conf.relation || {}
 
   timer_tick: () ->
