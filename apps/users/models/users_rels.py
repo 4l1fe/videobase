@@ -29,7 +29,7 @@ class UsersRels(models.Model):
         if self.user != self.user_rel:
             super(UsersRels, self).save(*args, **kwargs)
         else:
-            raise ValueError('Relation to themself')
+            raise ValueError('Связь к самому себе')
 
     class Meta:
         # Имя таблицы в БД

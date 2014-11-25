@@ -63,7 +63,7 @@ class UsersFriendshipView(APIView):
 
         except IntegrityError:
             UsersRels.objects.filter(user=request.user, user_rel=user_friend).update(rel_type=APP_USER_REL_TYPE_SEND_NOT_RECEIVED)
-        except ValueError, e:
+        except ValueError as e:
             return Response({'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
 
         if UsersRels.objects.filter(user_id=user_friend.id, user_rel_id=request.user.id,
