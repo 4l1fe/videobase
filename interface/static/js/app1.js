@@ -749,11 +749,13 @@
     __extends(CastThumb, _super);
 
     function CastThumb(opts, callback) {
+      var self;
       if (opts == null) {
         opts = {};
       }
       this.toggle_subscribe = __bind(this.toggle_subscribe, this);
       this._name = "cast-thumb";
+      self = this;
       if (opts.vals) {
         this._type = opts.vals.type;
         this.vals_orig = opts.vals;
@@ -797,6 +799,15 @@
           }
         };
       })(this));
+      if (this.vals.is_online) {
+        this._app.rest.castschats.users.read(this.vals.id).done(function(data) {
+          var len;
+          len = data.length;
+          if (len) {
+            return self.elements["label_fright"].self.text("смотрят: " + len).addClass("cast-spectators-count");
+          }
+        });
+      }
       this.vals.relation = this.vals.relation || {};
     }
 
@@ -849,8 +860,12 @@
       this.more = {};
       this.save_footer = false;
       self = this;
-      $("." + this.element_name, this._place).each(function() {
-        return self.add_item_DOM($(this));
+      $("." + this.element_name, this._place).each(function(i) {
+        var item_vals;
+        if (opts.items_vals && i < opts.items_vals.length) {
+          item_vals = opts.items_vals[i];
+        }
+        return self.add_item_DOM($(this), item_vals);
       });
       if (opts.load_func) {
         this.load_func = opts.load_func;
@@ -862,10 +877,14 @@
 
     Deck.prototype.onchange = function() {};
 
-    Deck.prototype.add_item_DOM = function(obj) {
+    Deck.prototype.add_item_DOM = function(obj, vals) {
+      if (vals == null) {
+        vals = {};
+      }
       this.items.push(new this.item_class({
         place: obj,
-        do_not_set: true
+        do_not_set: true,
+        vals: vals
       }));
       return this.onchange();
     };
@@ -905,13 +924,14 @@
     };
 
     Deck.prototype.load_more_bind = function(place) {
-      this.more.place = place.click((function(_this) {
+      this.more.place = place;
+      this.more.btn = $("a", place);
+      return this.more.btn.click((function(_this) {
         return function() {
           _this.load_more();
           return false;
         };
       })(this));
-      return this.more.btn = $("a", place);
     };
 
     Deck.prototype.load_more = function(opts) {
@@ -1123,7 +1143,7 @@
       }
       this.element_name = "cast-thumb";
       this.item_class = CastThumb;
-      CastsDeck.__super__.constructor.apply(this, arguments);
+      CastsDeck.__super__.constructor.call(this, place, opts);
       $(window).resize((function(_this) {
         return function() {
           return _this.onchange();
@@ -1250,6 +1270,7 @@
       this.rest.add("castschats");
       this.rest.castschats.add("msgs");
       this.rest.castschats.add("send");
+      this.rest.castschats.add("users");
       this.rest.casts.add("list");
       this.rest.casts.add("subscribe");
       this._e = {
@@ -2554,11 +2575,9 @@
   })(Page);
 
   Page_CastsList = (function(_super) {
-    var casts_deck, self, _filter_counter, _filter_params;
+    var self, _filter_counter, _filter_params;
 
     __extends(Page_CastsList, _super);
-
-    casts_deck = void 0;
 
     self = void 0;
 
@@ -2567,19 +2586,21 @@
     _filter_counter = 0;
 
     function Page_CastsList() {
-      var params;
+      var opts, params;
       self = this;
       Page_CastsList.__super__.constructor.apply(this, arguments);
-      casts_deck = new CastsDeck($("#casts"), {
+      opts = {
         load_func: (function(_this) {
           return function(deck) {
             return _this.load_more_casts(deck);
           };
-        })(this)
-      });
-      casts_deck.page = 1;
-      casts_deck.load_more_hide(false);
-      casts_deck.load_more_bind($("#casts_more"));
+        })(this),
+        items_vals: this._app.config().page_conf.casts
+      };
+      this.casts_deck = new CastsDeck($("#casts"), opts);
+      this.casts_deck.page = 1;
+      this.casts_deck.load_more_hide(false);
+      this.casts_deck.load_more_bind($("#casts_more"));
       this._e.filter = {
         status: $("#filter_cast_status"),
         tag: $("#filter_cast_tag"),
@@ -2635,7 +2656,7 @@
               page_loading: false,
               params: _filter_params
             };
-            return _this.load_more_casts(casts_deck, opts);
+            return _this.load_more_casts(_this.casts_deck, opts);
           }
         };
       })(this), this._app.config("filter_delay"));
@@ -2706,7 +2727,7 @@
           _filter_params[key] = null;
         }
       }
-      page = casts_deck.page || 1;
+      page = this.casts_deck.page || 1;
       _filter_params.page = page;
       more_btn_href = "/?" + query_string + "page=" + (page + 1);
       if (query_string) {
@@ -2728,7 +2749,7 @@
     __extends(Page_Cast, _super);
 
     function Page_Cast(conf) {
-      var casts_deck, self;
+      var self;
       this.conf = conf;
       this.action_cast_subscribe = __bind(this.action_cast_subscribe, this);
       Page_Cast.__super__.constructor.apply(this, arguments);
@@ -2783,7 +2804,7 @@
       } else if (this.conf.min_vs_start < 0 && this._e.time_counter.length) {
         this.timer_tick();
       }
-      casts_deck = new CastsDeck($("#casts"));
+      this.casts_deck = new CastsDeck($("#casts"));
       this.conf.relation = this.conf.relation || {};
     }
 

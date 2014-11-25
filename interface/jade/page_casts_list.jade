@@ -73,5 +73,7 @@ html
                                         img.img-responsive(src=img_url + 'shd-big.png', alt='')
             include footer
         script(src=js_url + 'responsiveCarousel.min.js')
-        script.
-            $(document).ready(function () {window.InitApp({}, "CastsList")})
+        - context = {}
+        - context.casts = casts
+        script
+            $(document).ready(function () {window.InitApp({page_conf: !{JSON.stringify(context)}}, "CastsList")})
