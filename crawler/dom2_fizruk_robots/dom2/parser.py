@@ -24,12 +24,8 @@ class ParseDom2():
         pages = []
         pages = Dom2Loader.load_pages()
         all_actors = ParseDom2.get_all_actors()
-        i = 0
         for page in pages:
             all_episods_info = all_episods_info + ParseDom2.parse_one_page(page, all_actors)
-            i += 1
-            if i == 5:
-                break
         return all_episods_info
 
     @staticmethod
@@ -41,8 +37,11 @@ class ParseDom2():
         ParseDom2.get_episods_for_page(beatiful_soup)
         episods = ParseDom2.get_episods_for_page(beatiful_soup)
         for episode in episods:
-            episod_quick_info = ParseDom2.get_episode_quick_info(episode)
-            episods_informations = episods_informations + [ParseDom2.parse_one_episode(episod_quick_info, all_actors)]
+            try:
+                episod_quick_info = ParseDom2.get_episode_quick_info(episode)
+                episods_informations = episods_informations + [ParseDom2.parse_one_episode(episod_quick_info, all_actors)]
+            except:
+                continue
         return episods_informations
 
     @staticmethod
@@ -79,8 +78,10 @@ class ParseDom2():
 
         quick_info['label'] = unicode(episode.find('div', {"class": "photo-list-title"}).find('a').contents[0])
         quick_info['video_info_page_url'] = 'http://dom2.ru'+a_tag['href']
-        poster_link = a_tag.find('img')['src']
-        quick_info['poster'] = ParseDom2.save_poster_to_file(poster_link, quick_info['label'])
+        img = a_tag.find('img')
+        if img:
+            poster_link = img['src']
+            quick_info['poster'] = ParseDom2.save_poster_to_file(poster_link, quick_info['label'])
         return quick_info
 
     @staticmethod

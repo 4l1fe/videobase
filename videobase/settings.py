@@ -1,11 +1,14 @@
 # coding: utf-8
 
 from __future__ import absolute_import
+from kombu import Queue, Exchange
 
 import os
 import logging
 from datetime import timedelta
 from ConfigParser import RawConfigParser
+
+from kombu import Exchange, Queue
 
 import djcelery
 from celery.schedules import crontab
@@ -20,8 +23,27 @@ AMQP_HOST = 'localhost'
 BROKER_HOST = 'localhost'
 BROKER_PORT = 5672
 
+CELERY_ENABLE_UTC = False
+CELERY_ALWAYS_EAGER = False
+CELERY_CREATE_MISSING_QUEUES = True
+CELERYD_PREFETCH_MULTIPLIER = 1
+
 CELERY_TIMEZONE = 'UTC'
-CELERY_ACCEPT_CONTENT = ['pickle', 'json', 'msgpack', 'yaml']
+CELERY_ACCEPT_CONTENT = ['pickle', 'json']
+
+CELERY_DEFAULT_QUEUE = 'default'
+NOTIFY_QUEUE = 'notify'
+CAST_QUEUE = 'casts'
+
+MAIN_EXCHANGE = Exchange(name='main', type='topic', delivery_mode='persistent', durable=True)
+X_DEAD_EXCHANGE = Exchange(name='wait', type='direct', delivery_mode='persistent', durable=True)
+
+CELERY_QUEUES = (
+    Queue('default', MAIN_EXCHANGE, routing_key='default'),
+    Queue('mail', MAIN_EXCHANGE, routing_key='default.mail'),
+    Queue(NOTIFY_QUEUE, MAIN_EXCHANGE, routing_key='default.notify'),
+    Queue(CAST_QUEUE, MAIN_EXCHANGE, routing_key='casts'),
+)
 
 ###########################################################
 # Base path for project
@@ -204,7 +226,7 @@ MEDIA_ROOT = '/var/www/static/'
 MEDIA_URL = '/static/'
 
 STATIC_URL = '/production/static/'
-STATIC_ROOT = os.path.join('/var/www/')
+STATIC_ROOT = '/var/www/'
 
 SITE_ID = 1
 
@@ -420,26 +442,6 @@ CELERYBEAT_SCHEDULE = {
         'task': 'parse_news_from_tvzor_ru',
         'schedule': timedelta(hours=12)
     },
-    'cast_sportbox_ru_schedule': {
-        'task': 'cast_sportbox_robot',
-        'schedule': timedelta(hours=24)
-    },
-    'cast_championat_com_schedule': {
-        'task': 'cast_championat_robot',
-        'schedule': timedelta(hours=24)
-    },
-    'cast_liverussia_ru_schedule': {
-        'task': 'cast_liverussia_robot',
-        'schedule': timedelta(hours=24)
-    },
-    'cast_khl_ru_schedule': {
-        'task': 'cast_khl_robot',
-        'schedule': timedelta(hours=24)
-    },
-    'cast_ntv_plus_schedule': {
-        'task': 'cast_ntv_plus_robot',
-        'schedule': timedelta(hours=24)
-    },
     'itunes_update': {
         'task': 'itunes_robot_start',
         'schedule': timedelta(hours=24)
@@ -462,15 +464,48 @@ CELERYBEAT_SCHEDULE = {
     'personal_newsletter_schedule': {
         'task': 'personal_newsletter',
         'schedule': crontab(minute=0, hour=18)
+    },
+    'sportbox_update': {
+        'task': 'sportbox_update',
+        'schedule': timedelta(hours=24),
+        'options': {'exchange': 'main_casts_ex',
+                    'routing_key': 'main_casts_rk'}
+    },
+    'liverussia_update': {
+        'task': 'liverussia_update',
+        'schedule': timedelta(hours=24),
+        'options': {'exchange': 'main_casts_ex',
+                    'routing_key': 'main_casts_rk'}
+    },
+    'championat_update': {
+        'task': 'championat_update',
+        'schedule': timedelta(hours=24),
+        'options': {'exchange': 'main_casts_ex',
+                    'routing_key': 'main_casts_rk'}
+    },
+    'khl_update': {
+        'task': 'khl_update',
+        'schedule': timedelta(hours=24),
+        'options': {'exchange': 'main_casts_ex',
+                    'routing_key': 'main_casts_rk'}
+    },
+    'ntv_plus_update': {
+        'task': 'ntv_plus_update',
+        'schedule': timedelta(hours=24),
+        'options': {'exchange': 'main_casts_ex',
+                    'routing_key': 'main_casts_rk'}
     }
 }
 
 POSTER_URL_PREFIX = '_260x360'
-TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+# TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 USE_THOR = True
 
-from .local_settings import *
+try:
+    from .local_settings import *
+except ImportError:
+    pass
 
 if not DEBUG:
     INSTALLED_APPS += (

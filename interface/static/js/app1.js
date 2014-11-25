@@ -721,6 +721,8 @@
       if (type.substr(0, 4) === "pers" && (attr = "href")) {
         if (name === "object.id") {
           return "/persons/" + val + "/";
+        } else if (name === "object.film.id") {
+          return "/films/" + val + "/";
         }
       }
       if (type.substr(0, 4) === "user" && (attr = "href")) {
@@ -752,7 +754,7 @@
       if (opts == null) {
         opts = {};
       }
-      this.action_subscribe = __bind(this.action_subscribe, this);
+      this.toggle_subscribe = __bind(this.toggle_subscribe, this);
       this._name = "cast-thumb";
       if (opts.vals) {
         this._type = opts.vals.type;
@@ -761,6 +763,7 @@
         opts.vals.min_vs_start = opts.vals.min_vs_start = Math.floor((new Date() - opts.vals.start_date) / 60 / 1000);
         opts.vals.duration = opts.vals.duration || 180;
         opts.vals.is_online = opts.vals.min_vs_start >= 0 && opts.vals.min_vs_start < opts.vals.duration;
+        opts.relation = opts.relation || {};
       }
       CastThumb.__super__.constructor.call(this, opts, (function(_this) {
         return function() {
@@ -785,7 +788,7 @@
                 label_prim_str = time_text(_this.vals.start_date);
               }
               _this.elements["btn"].self.show().addClass("btn-subscribe").text("Подписаться");
-              _this.elements["btn"].self.click(_this.action_subscribe);
+              _this.elements["btn"].self.click(_this.toggle_subscribe);
             } else {
               label_fright_str = time_text(_this.vals.start_date);
               label_fright_cls = 'cast-archive-date';
@@ -796,6 +799,7 @@
           }
         };
       })(this));
+      this.vals.relation = this.vals.relation || {};
     }
 
     CastThumb.prototype.transform_attr = function(attr, name, val) {
@@ -815,8 +819,17 @@
       return CastThumb.__super__.transform_val.apply(this, arguments);
     };
 
-    CastThumb.prototype.action_subscribe = function() {
-      this._app.cast_action(this.vals.id, "subscribe");
+    CastThumb.prototype.toggle_subscribe = function(status) {
+      if (!this.vals.relation) {
+        this.vals.relation = {};
+      }
+      this._app.cast_action(this.vals.id, "subscribe", {
+        rel: this.vals.relation,
+        state: status,
+        callback: (function(_this) {
+          return function(new_state) {};
+        })(this)
+      });
       return false;
     };
 
@@ -1430,12 +1443,25 @@
     };
 
     App.prototype.cast_action = function(id, action, opts) {
+      var doit, new_state, rel;
       if (opts == null) {
         opts = {};
       }
       if (this.user_is_auth()) {
+        rel = opts.rel || {};
         if (action === "subscribe") {
-          return this.rest.casts.subscribe.create(id);
+          new_state = state_toggle(opts.status, rel.subscribed);
+          if (new_state) {
+            doit = "create";
+          } else {
+            doit = "destroy";
+          }
+          return this.rest.casts.subscribe[doit](id).done(function(data) {
+            rel.subscribed = data.subscribed;
+            if (opts.callback) {
+              return opts.callback(new_state);
+            }
+          });
         }
       }
     };
@@ -2754,6 +2780,7 @@
         this.timer_tick();
       }
       casts_deck = new CastsDeck($("#casts"));
+      this.conf.relation = this.conf.relation || {};
     }
 
     Page_Cast.prototype.timer_tick = function() {
@@ -2895,7 +2922,11 @@
     };
 
     Page_Cast.prototype.action_cast_subscribe = function() {
-      this._app.cast_action(this._app.page().conf.id, "subscribe");
+      var opts;
+      opts = {
+        rel: this.conf.relation
+      };
+      this._app.cast_action(this.conf.id, "subscribe", opts);
       return false;
     };
 

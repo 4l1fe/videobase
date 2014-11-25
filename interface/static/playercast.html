@@ -1,4 +1,4 @@
-<!DOCTYPE html5><html><head><title>Плеер ВсеВидео</title><meta charset="utf-8"/><style>html, body {margin: 0; overflow: hidden}
+<!DOCTYPE html5><html><head><title>Плеер ВсеВидео</title><meta charset="utf-8"/><style>html, body, img {margin: 0; overflow: hidden; border: 0;}
 .black_body {background: #000; width: 100%; height: 100%}
 #player {width: 100%; height: 100%}
 .inner {position: absolute; top: 50%; height: 6em;margin-top: -3em; text-align: center; width: 100%; color: white; font-size: 24px}
@@ -26,13 +26,13 @@ if (vals.price && vals.price != "0" && vals.view) {
     html = false;
     value = false;
     autoplay = vals["autoplay"] && (vals["autoplay"] == 1 || vals["autoplay"] == true || vals["autoplay"] == "true")?1:0;
-    
+
     embeddables = ["sportbox_ru", "liverussia_ru", "championat_com", "khl_ru"];
-    
+
     if (embeddables.indexOf(vals.type) !== -1) {
         value = vals.value;
     }
-    
+
     if (value) {
        html = '<iframe src="' + value + '" width="100%" height="100%" frameborder="0" allowfullscreen="" id="player_frame"></iframe>';
     }

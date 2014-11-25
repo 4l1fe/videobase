@@ -1,4 +1,5 @@
 # coding: utf-8
+import glob
 import json
 import os
 import subprocess
@@ -106,6 +107,8 @@ class Dom2Loader():
     @staticmethod
     def download_dom2_videos():
         uploads_path = 'static/upload/Dom2/'
+        if not os.path.exists(uploads_path):
+            os.makedirs(uploads_path)
         json_path = 'saved_pages/dom2/'
         files = os.listdir(json_path)
         for file_name in files:
@@ -113,7 +116,7 @@ class Dom2Loader():
             if os.path.exists(uploads_path + trimmed_fname + ".flv"):
                 print "Skipped ", trimmed_fname
             if not os.path.exists(uploads_path + trimmed_fname + ".flv") and ('video_info_page' in file_name):
-                print 'File', trimmed_fname, 'will be downloaded'
+                print "I'm trying to download file ", trimmed_fname
                 with open(json_path + file_name) as current_file:
                     json_page = json.load(current_file)
                     beatiful_soup = BeautifulSoup(json_page['html'])
@@ -143,11 +146,22 @@ class Dom2Loader():
                         file_link = Dom2Loader.get_video_file_link(video_url)
                         Dom2Loader.save_flv_to_disk(file_link, trimmed_fname)
 
+        for fl in glob.glob("*Frag*"):
+            os.remove(fl)
+
+
     @staticmethod
     def save_flv_to_disk(file_link, name):
         uploads_path = 'static/upload/Dom2/'
         file = urllib.URLopener()
-        file.retrieve(file_link, uploads_path + name + ".flv")
+        try:
+            file.retrieve(file_link, uploads_path + name + ".flv")
+            print "Downloading from Dom2 server finished"
+        except:
+            file.close()
+            if os.path.exists(uploads_path + name + ".flv"):
+                os.remove(uploads_path + name + ".flv")
+            print "#Downloading not finished! Content Too Short Error or 404. File deleted"
 
     @staticmethod
     def get_video_id_by_page_url(page_url):
@@ -170,27 +184,31 @@ class Dom2Loader():
     @staticmethod
     def download_video_by_id(id, file_name):
         BASE_PATH = os.path.join('static/upload/', 'Dom2/')
-        if not os.path.exists(BASE_PATH):
-            os.makedirs(BASE_PATH)
         manifest_root_link = 'http://rutube.ru/api/play/options/{}/?format=xml'.format(id)
-        manifest_txt = requests.get(manifest_root_link)
-        f4link =  Dom2Loader.get_manifest_f4_link(manifest_txt.content)
-        bashCommand = "php crawler/dom2_fizruk_robots/AdobeHDS.php --manifest \"{}\" --outfile \"{}.mp4\"".format(f4link, BASE_PATH + file_name)
-        process = subprocess.Popen(bashCommand, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        out, err = process.communicate()
-        print out
+        try:
+            manifest_txt = requests.get(manifest_root_link)
+            f4link =  Dom2Loader.get_manifest_f4_link(manifest_txt.content)
+            bashCommand = "php crawler/dom2_fizruk_robots/AdobeHDS.php --manifest \"{}\" --outfile \"{}.mp4\"".format(f4link, BASE_PATH + file_name)
+            process = subprocess.Popen(bashCommand, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            out, err = process.communicate()
+            #print out
+            print "Downloading from rutube finished"
+        except:
+            if os.path.exists(BASE_PATH + file_name + ".flv"):
+                os.remove(BASE_PATH + file_name + ".flv")
+            print "#Downloading not finished! File deleted"
 
     @staticmethod
     def get_manifest_f4_link(xml_root_file):
         dom = parseString(xml_root_file)
         video_manifest_default_link = dom.getElementsByTagName('default')
         element_lnk = video_manifest_default_link.item(0).firstChild.nodeValue
-        print element_lnk
+        #print element_lnk
         return element_lnk
 
     @staticmethod
     def get_id_by_link(link):
-        print link
+        #print link
         return link
 
     @staticmethod
@@ -198,10 +216,10 @@ class Dom2Loader():
         r = requests.get(embedded_link)
         soup = BeautifulSoup(r.content)
         rutube_link = soup.findAll('link')[0]
-        print "Rutube link:",rutube_link
+        #print "Rutube link:",rutube_link
         if 'private' in rutube_link:
             link = str(rutube_link).split('/')[5]
         else:
             link = str(rutube_link).split('/')[4]
-        print "ID:", link
+        #print "ID:", link
         return link

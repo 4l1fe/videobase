@@ -1,14 +1,15 @@
 # coding: utf-8
 
 import datetime
+import re
 from pytils import numeral
 
 from django.db import transaction
 from django.forms.models import model_to_dict
 from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse
-from django.http import (HttpResponseRedirect, HttpResponse, HttpResponseForbidden,
-                         HttpResponseBadRequest, HttpResponseServerError, Http404)
+from django.http import (HttpResponseRedirect, HttpResponse, Http404,
+                         HttpResponseBadRequest, HttpResponseServerError)
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
@@ -88,6 +89,7 @@ class LoginUserView(View):
         return response
 
     def post(self, *args, **kwargs):
+        reg = re.compile(ur'vsevi\.\w{2,3}\/login')
         data = self.request.POST
         login_form = AuthenticationForm(data=data)
         if login_form.is_valid():
@@ -97,7 +99,7 @@ class LoginUserView(View):
                 '_': timezone.now().date().strftime("%H%M%S")
             }
 
-            if self.request.META['HTTP_HOST'] == HOST and not HOST+'/login' in self.request.META['HTTP_REFERER']:
+            if 'vsevi' in self.request.META['HTTP_HOST'] and not reg.search(self.request.META['HTTP_REFERER']):
                 kw.update(back_url=self.request.META['HTTP_REFERER'])
 
             url = url_with_querystring(reverse('tokenize'), **kw)
@@ -237,7 +239,7 @@ class UserAvatar(View):
 class ConfirmEmailView(View):
 
     def get(self, request, *args, **kwargs):
-        key = request.GET.get(APP_USER_ACTIVE_KEY, None)
+        key = request.GET.get(APP_USER_ACTIVE_KEY)
         if key is None:
             raise Http404
 
@@ -248,6 +250,9 @@ class ConfirmEmailView(View):
         profile = user_hash.user.profile
         profile.confirm_email = True
         profile.save()
+
+        user_hash.activated = True
+        user_hash.save()
 
         return HttpResponse(render_page('confirm_email', {}))
 

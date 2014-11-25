@@ -38,7 +38,7 @@ class APIUsersFriendShipActionTestCase(APISimpleTestCase):
         user_friend = UserFactory.create()
         kw = self.kwargs.copy()
         kw['user_id'] = user_friend.pk
-        response = self.client.get(reverse(self.url_name, kwargs=kw),
+        response = self.client.post(reverse(self.url_name, kwargs=kw),
                                    HTTP_X_MI_SESSION=self.headers)
         flag = UsersRels.objects.filter(user=self.user, user_rel=user_friend).exists()
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -56,10 +56,13 @@ class APIUsersFriendShipActionTestCase(APISimpleTestCase):
         FeedFactory.create(user=user_friend, obj_id=self.user.id, type=USER_ASK)
         response = self.client.get(reverse(self.url_name, kwargs=kw),
                                    HTTP_X_MI_SESSION=self.headers)
-        feed = Feed.objects.order_by('-created')[1]
-        self.assertEqual(feed.user, self.user)
-        self.assertEqual(feed.type, USER_FRIENDSHIP)
-        self.assertEqual(feed.obj_id, user_friend.id)
+        d_friendship = {
+            'id': user_friend.pk,
+            'name': '',
+            'relation': APP_USER_REL_TYPE_SEND_NOT_RECEIVED,
+        }
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertDictEqual(response.data, d_friendship)
 
     def test_api_user_friendship_200_with_rel_delete(self):
         user_friend = UserFactory.create()
@@ -141,7 +144,7 @@ class APIUsersTestCase(APITestCase):
         for i in range(10):
             new_user = UserFactory.create()
             UserRelsFactory.create(user=self.user, user_rel=new_user,
-                                   rel_type=random.choice((APP_USER_REL_TYPE_FRIENDS, APP_USER_REL_TYPE_NONE, )))
+                                   rel_type=APP_USER_REL_TYPE_FRIENDS)
 
         for i in range(10):
             CommentsFactory.create(user=self.user)
@@ -348,8 +351,7 @@ class APIUsersFriendsTestCase(APITestCase):
             new_user.profile.userpic_id = UserPicsFactory.create(user=new_user).id
             self.friends.append(new_user)
             UserRelsFactory.create(user=self.user, user_rel=new_user,
-                                   rel_type=random.choice((APP_USER_REL_TYPE_FRIENDS,
-                                                           APP_USER_REL_TYPE_NONE, )))
+                                   rel_type=APP_USER_REL_TYPE_FRIENDS)
 
     def test_api_users_friends_400_bad_user_post(self):
         pk = User.objects.latest('id').pk
