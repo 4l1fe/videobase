@@ -1331,6 +1331,11 @@ class Page_Film extends Page
                   if res.items && res.items.length
                     $("#has_comments").show()
                     comments_deck.add_item(res.items[0], true, true)
+                    items_len = comments_deck.items.length
+                    if items_len
+                      $('body').animate({
+                        scrollTop: comments_deck.items[items_len-1]._place.offset().top
+                      }, "slow")
               )
               .fail(
                 (res) =>

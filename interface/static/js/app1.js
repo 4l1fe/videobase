@@ -2107,9 +2107,16 @@
                   per_page: 1,
                   page: 1
                 }).done(function(res) {
+                  var items_len;
                   if (res.items && res.items.length) {
                     $("#has_comments").show();
-                    return comments_deck.add_item(res.items[0], true, true);
+                    comments_deck.add_item(res.items[0], true, true);
+                    items_len = comments_deck.items.length;
+                    if (items_len) {
+                      return $('body').animate({
+                        scrollTop: comments_deck.items[items_len - 1]._place.offset().top
+                      }, "slow");
+                    }
                   }
                 }).fail(function(res) {
                   error = "Не удалось сохранить комментарий.";
