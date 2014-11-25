@@ -470,6 +470,7 @@ class CastThumb extends Item
       opts.vals.min_vs_start = opts.vals.min_vs_start = Math.floor((new Date() - opts.vals.start_date) / 60 / 1000)
       opts.vals.duration = opts.vals.duration || 180
       opts.vals.is_online = opts.vals.min_vs_start >=0 && opts.vals.min_vs_start < opts.vals.duration
+      opts.relation = opts.relation || {}
 
     super opts, =>
       if (!opts.place)
@@ -490,13 +491,15 @@ class CastThumb extends Item
           else
             label_prim_str = time_text(@vals.start_date)
           @elements["btn"].self.show().addClass("btn-subscribe").text("Подписаться")
-          @elements["btn"].self.click @action_subscribe
+          @elements["btn"].self.click @toggle_subscribe
         else
           label_fright_str = time_text(@vals.start_date)
           label_fright_cls = 'cast-archive-date'
           label_prim_str = 'Архив'
         @elements["label_prim"].self.removeClass("label-primary").addClass(label_prim_cls).text(label_prim_str)
         @elements["label_fright"].self.addClass(label_fright_cls).text(label_fright_str)
+
+    @vals.relation = @vals.relation || {}
 
   transform_attr: (attr, name, val) ->
     if attr == "href" && name == "id"
@@ -509,9 +512,17 @@ class CastThumb extends Item
       return val?" (" + val + ")":""
     super
 
-  action_subscribe: =>
-    @_app.cast_action( @vals.id, "subscribe" )
-    return false
+  toggle_subscribe: (status)=>
+    if !@vals.relation
+      @vals.relation = {}
+
+    @_app.cast_action @vals.id, "subscribe", {
+      rel: @vals.relation
+      state: status
+      callback: (new_state) =>
+        #alert("done")
+    }
+    false
 
 class Deck
   constructor: (@_place, opts = {}) ->
@@ -898,9 +909,17 @@ class App
       )
 
   cast_action: (id, action, opts = {}) ->
-    if( @user_is_auth() )
+    if @user_is_auth()
+      rel = opts.rel || {}
       if( action == "subscribe" )
-        @rest.casts.subscribe.create(id)
+        new_state = state_toggle(opts.status, rel.subscribed)
+        if new_state
+          doit = "create"
+        else
+          doit = "destroy"
+        @rest.casts.subscribe[doit](id).done (data)->
+          rel.subscribed = data.subscribed
+          opts.callback(new_state) if opts.callback
 
   config: (name) ->
     if name == undefined
@@ -1739,6 +1758,7 @@ class Page_Cast extends Page
       @timer_tick()
 
     casts_deck = new CastsDeck($("#casts"))
+    @conf.relation = @conf.relation || {}
 
   timer_tick: () ->
     min_left = Math.floor((new Date() - @conf.start_date) / 60 / 1000)
@@ -1834,7 +1854,8 @@ class Page_Cast extends Page
     false
 
   action_cast_subscribe: =>
-    @_app.cast_action( @_app.page().conf.id, "subscribe" )
+    opts = {rel: @conf.relation}
+    @_app.cast_action( @conf.id, "subscribe", opts )
     return false
 
 window.InitApp =  (opts = {}, page_name) ->
