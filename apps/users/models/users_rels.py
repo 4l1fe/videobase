@@ -25,6 +25,12 @@ class UsersRels(models.Model):
 
         return result
 
+    def save(self, *args, **kwargs):
+        if self.user != self.user_rel:
+            super(UsersRels, self).save(*args, **kwargs)
+        else:
+            raise ValueError('Relation to themself')
+
     class Meta:
         # Имя таблицы в БД
         db_table = 'users_rels'

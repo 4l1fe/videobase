@@ -39,9 +39,10 @@ def get_session_token(main_token, address):
     return json_resp['session_token']
 
 
-def add_friendship(session_token, id_, address):
-    req = Request(urljoin(address, 'api/v1/users/{}/friendship.json'.format(id_)))
+def add_friendship(main_token, session_token, id_, address):
+    req = Request(urljoin(address, 'api/v1/users/{}/friendship.json'.format(id_)), data="{'id': 3455}")
     req.add_header('X-MI-SESSION', session_token)
+    req.add_header('X-MI-TOKEN', main_token)
     resp = urlopen(req)
     return resp.read()
 
@@ -90,9 +91,9 @@ def casts_chats_users(main_token, session_token, id_):
 
 
 if __name__ == '__main__':
-    host = 'localvsevi'
+    host = 'vsevi.com'
     address = 'http://{}'.format(host)
-    mt = get_main_token('nana@nana.na', 'na', address)
+    mt = get_main_token('test@test.test', 'test', address)
     print(mt)
     st = get_session_token(mt, address)
     print(st)
@@ -102,5 +103,6 @@ if __name__ == '__main__':
     # pp(json.loads(resp))
     # resp = casts_chats_view(mt, st, 329)
     # print(resp)
-    resp = casts_chats_users(mt, st, 329)
+    # resp = casts_chats_users(mt, st, 329)
+    resp = add_friendship(mt, st, 8, address)
     print(resp)
