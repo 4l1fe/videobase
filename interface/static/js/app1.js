@@ -530,11 +530,6 @@
       } else {
         btn_cls = "btn-subscribe";
         btn_text = "Подписаться";
-        this.elements["btn"].self.click((function(_this) {
-          return function() {
-            return _this.toggle_subscribe();
-          };
-        })(this));
       }
       if (vals.relation && vals.relation.rating) {
         this.elements["relation.rating"].self.rateit().rateit("value", vals.relation.rating);
@@ -589,6 +584,9 @@
     };
 
     FilmThumb.prototype.toggle_subscribe = function(status) {
+      if (this.vals.relation == null) {
+        this.vals.relation = {};
+      }
       this._app.film_action(this.vals.id, "subscribe", {
         rel: this.vals.relation,
         state: status,
