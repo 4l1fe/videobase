@@ -39,14 +39,16 @@ DATA_RK = 'data'
 CAST_RK = 'casts'
 LOCATION_RK_S = 'location.singular'
 LOCATION_RK_P = 'location.plural'
+MAIL_RK = 'default.mail'
+NOTIFY_RK = 'default.notify'
 
 MAIN_EXCHANGE = Exchange(name='main', type='topic', delivery_mode='persistent', durable=True)
 X_DEAD_EXCHANGE = Exchange(name='wait', type='direct', delivery_mode='persistent', durable=True)
 
 CELERY_QUEUES = (
     Queue(CELERY_DEFAULT_QUEUE, MAIN_EXCHANGE, routing_key='default'),
-    Queue(MAIL_QUEUE, MAIN_EXCHANGE, routing_key='default.mail'),
-    Queue(NOTIFY_QUEUE, MAIN_EXCHANGE, routing_key='default.notify'),
+    Queue(MAIL_QUEUE, MAIN_EXCHANGE, routing_key=MAIL_RK),
+    Queue(NOTIFY_QUEUE, MAIN_EXCHANGE, routing_key=NOTIFY_RK),
     Queue(CAST_QUEUE, MAIN_EXCHANGE, routing_key=CAST_RK),
     Queue(DATA_QUEUE, MAIN_EXCHANGE, routing_key=DATA_RK),
     Queue(LOCATION_QUEUE_S, MAIN_EXCHANGE, routing_key=LOCATION_RK_S),
@@ -527,13 +529,13 @@ CELERYBEAT_SCHEDULE = {
         'task': 'week_newsletter',
         'schedule': crontab(minute=0, hour=16, day_of_week=6),
         'options': {'exchange': MAIN_EXCHANGE.name,
-                    'routing_key': 'default.mail'}
+                    'routing_key': MAIL_RK}
     },
     'personal_newsletter_schedule': {
         'task': 'personal_newsletter',
         'schedule': crontab(minute=0, hour=18),
         'options': {'exchange': MAIN_EXCHANGE.name,
-                    'routing_key': 'default.mail'}
+                    'routing_key': MAIL_RK}
     }
 }
 CELERYBEAT_SCHEDULE.update(DATAROBOTS_SCHEDULE)
