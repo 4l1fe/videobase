@@ -12,8 +12,8 @@ html
                     .container
                         h3 Лента активности
                         .tape-list#feed
-                            each item in feed
-                                mixin feed_thumb(item)
+                            each item, i in feed
+                                mixin feed_thumb(item, i)
                         if feed.length >= 10
                             .add-filter#feed_more
                                 .add-content.style-panel-action.rel.zmin
