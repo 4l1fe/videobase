@@ -1,87 +1,72 @@
-<!DOCTYPE html5>
-<html>
-  <head>
-    <title>Плеер ВсеВидео</title>
-    <meta charset="utf-8"/>
-    <style>
-      html, body {margin: 0; overflow: hidden}
-      .black_body {background: #000; width: 100%; height: 100%}
-      #player {width: 100%; height: 100%}
-      .inner {position: absolute; top: 50%; height: 6em;margin-top: -3em; text-align: center; width: 100%; color: white; font-size: 24px}
-      .pay_film {font-size: 22px; color: #827272; position: absolute; top: 20px; left: 20px; background: #000; width: 70%; max-width: 580px}
-    </style>
-  </head>
-  <body>
-    <div id="player"></div>
-    <script>
-      var
-          query_arr = (window.location + "").split("?"),
-          params, vals = {}, html = false, location_names;
-      if (query_arr.length > 1) {
-          params = query_arr[1].split("&");
-          for (var i = 0; i < params.length; i++) {
-              param_arr = params[i].split("=")
-              vals[param_arr[0]] = decodeURIComponent(param_arr[1])
-          }
-      }
-      location_names = {"drugeokino": "Другое Кино", "youtubemoviesru": "Youtube Movies", "ivi": "IVI.ru", "nowru": "Now.ru", "megogo": "Megogo", "tvigle": "TVigle", "zoomby": "Zoomby.ru", playfamily: "PlayFamily.ru", "olltv": "Oll.tv", amediateka: "Amediateka", molodejj: "Molodejj.tv", streamru: "Stream.ru", tvzavr: "TVzavr.ru", viaplay: "Viaplay.ru", zabavaru: "Zabava.ru", tvzorru: "TVzor", playgoogle: "Play Google", itunes: "Apple Itunes", ayyo: "Ayyo.ru", mosfilm: "Cinema.mosfilm.ru", "default": "Онлайн-кинотеатре"}
-      vals.type = (vals.type || "").toLowerCase()
-      if (vals.price && vals.view) {
-          price = Math.floor(vals.price);
-          link_title = 'Ссылка на страницу фильма на ' + (location_names[vals.type] || location_names["default"]) + ' за ' + price + ' руб.';
-          html = '<div class="black_body"><div class="pay_film">Нам пока не удалось договориться с админстрацией ' + (location_names[vals.type] || location_names["default"]) + ' об отображении плеера с платными фильмами на нашем сайте, поэтому фильм доступен к просмотру только в новом окне. Нажмите на кнопку, чтобы открыть новое окно для просмотра фильма за ' + price + ' руб.</div><div class="inner"><a href="' + vals.view + '" target=_new rel="nofollow"><img src="/static/img/player_play.png" alt="' + link_title + '" title="' + link_title + '"/></a></div></div>';
-      } else if (vals.type && (vals.value || vals.view)) {
-          html = false;
-          value = vals.value || false
-          autoplay = vals["autoplay"] && (vals["autoplay"] == 1 || vals["autoplay"] == true || vals["autoplay"] == "true")?1:0;
-          if (vals.type == "ivi") {
-              if (value == false) {
-                  value = vals.view.substr(24)
-                  value = value.substr(0, value.indexOf("#"))
-              }
-              html = '<iframe src="http://www.ivi.ru/player/?videoid=' + value + '&amp;subsite=138&amp;enableseries=0&amp;autostart=' + autoplay + '" width="100%" height="100%" frameborder="0" allowfullscreen=""></iframe>'
-          } else if (vals.type == "nowru") {
-              if (value == false) {
-                  arr = vals.view.split("/")
-                  value = arr[arr.length - 1]
-              }
-              html = '<iframe name="now1023318" src="http://www.now.ru/embed/frame/' + value + '" scrolling="no" frameborder="no" height="100%" width="100%" allowfullscreen></iframe>'
-          } else if (vals.type == "tvigle") {
-                  if (value == false) {
-                      arr = vals.view.split("=")
-                      value = arr[arr.length - 1]
-                  }
-          html = '<object codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=9,0,0,0" width="100%" height="100%"><param name="FlashVars" value="vote=0&amp;srv=pub.tvigle.ru&amp;prt=e0d0f9ff7176e333398f17de0dbdabb2&amp;id=' + value + '&amp;w=640&amp;h=400&amp;type=&amp;dopparam=&amp;modes=1&amp;autoplay=1"><param name="allowFullScreen" value="true"><param name="movie" value="http://pub.tvigle.ru/swf/tvigle_single_v2.swf"><param name="quality" value="high"><param name="bgcolor" value="#000000"><param name="allowscriptaccess" value="always"><embed src="http://pub.tvigle.ru/swf/tvigle_single_v2.swf" allowscriptaccess="always" quality="high" width="100%" height="100%" bgcolor="#000000" allowfullscreen="true" flashvars="vote=0&amp;srv=pub.tvigle.ru&amp;prt=e0d0f9ff7176e333398f17de0dbdabb2&amp;id=' + value + '&amp;w=640&amp;h=400&amp;type=&amp;dopparam=&amp;modes=1&amp;autoplay=1" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer"></object>'
-          } else if (vals.type == "drugoekino") {
-              html = '<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" width="100%" height="100%" id="player" align="middle"><param name="movie" value="http://drugoekino.ru/player.swf"><param name="flashvars" value="filmID=' + value + '"><param name="bgcolor" value="#000000"><param name="play" value="false"><param name="loop" value="false"><param name="wmode" value="window"><param name="scale" value="showall"><param name="menu" value="false"><param name="devicefont" value="false"><param name="salign" value=""><param name="allowScriptAccess" value="true"><param name="allowFullScreen" value="true"><embed src="http://drugoekino.ru/player.swf" allowscriptaccess="always" quality="high" width="100%" height="100%" bgcolor="#000000" allowfullscreen="true" flashvars="filmID=' + value + '&amp;play=false" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer"></object>'
-          } else if (vals.type == "youtubemoviesru") {
-              value = /v=([a-z0-9_\-]+)/i.exec(vals.view)[1]
-              html = '<iframe width="100%" height="100%" src="//www.youtube-nocookie.com/embed/' + value + '?rel=0&autoplay=' + autoplay + '" frameborder="0" allowfullscreen></iframe>'
-          } else if (vals.type == "zoomby") {
-              html = '<iframe src="' + value + '" width="100%" height="100%" frameborder="0"></iframe>'
-          } else if (vals.type == "meogogo") {
-              html = '<iframe width="100%" height="100%" src="http://megogo.net/e/' + value + '" frameborder="0" allowfullscreen></iframe>'
-          } else if (vals.type == "molodejj") {
-              html = '<iframe width="100%" height="100%" src="http://player.molodejj.tv/player_mjj.swf?pl=544&amp;vid=' + value + '&amp;site=vkontakte_embed&amp;type=video&amp;channel=3" frameborder="0"></iframe>'
-          } else if (vals.type == "tvzavr") {
-              html = '<iframe width="100%" height="100%" src="http://www.tvzavr.ru/js/v5/tvzavrplayer2.swf?playlist=' + value + '&autoplay=1" frameborder="0"></iframe>';
-          } else if (vals.type == "mosfilm") {
-              html = '<iframe width="100%" height="100%" src="//www.youtube.com/embed/' + value + '" frameborder="0" allowfullscreen></iframe>'
-          } else if (vals.type == "playfamily") {
-              html = '<iframe width="100%" height="100%" id="playlite-frame" class="playlite-object" frameborder="0" scrolling="no" src="http://playlite.ru/widgets/widget/' + value + '/PARTNER661">'
-          } else if (vals.type == "tvzorru") {
-              if (value == false) {
-                  arr = vals.view.split("/")
-                  value = arr[arr.length - 1]
-              }
-              html = '<object type="application/x-shockwave-flash" id="WebPlayer" name="WebPlayer" align="middle" data="http://tvzor.ru/flash/WebPlayer.swf" width="100%" height="100%"><param name="wmode" value="transparent"><param name="quality" value="high"><param name="bgcolor" value="#000000"><param name="allowscriptaccess" value="sameDomain"><param name="allowfullscreen" value="true"><param name="flashvars" value="assetId=' + value + '&amp;title=&amp;subTitle=&amp;preview=http://v-cache.tvzor.ru/IMAGE/' + value + '/IMAGE_16_9_XL.jpg&amp;hd=true&amp;time=0&amp;logged=false&amp;liked=false&amp;checked=false&amp;trailer=false&amp;currentLang=ru_RU&amp;vodStr=&amp;isMovie=true&amp;parentalRating=16&amp;brand=tvzor&amp;autoPlay=true&amp;lastLocationUpdateInterval=300000&amp;isAdult=false"></object>'
-          }
-      }
-      if (!html) {
-          link_title = 'Ссылка на страницу фильма на ' + (location_names[vals.type] || location_names["default"]) + '.';
-          html = '<div class="black_body"><div class="pay_film">Нам пока не удалось договориться с админстрацией ' + (location_names[vals.type] || location_names["default"]) + ' об отображении плеера с бесплатными фильмами на нашем сайте, поэтому фильм доступен к просмотру только в новом окне. Нажмите на кнопку, чтобы открыть новое окно для просмотра фильма.</div><div class="inner"><a href="' + vals.view + '" target=_new rel="nofollow"><img src="/static/img/player_play.png" alt="' + link_title + '" title="' + link_title + '"/></a></div></div>';
-      }
-      document.getElementById("player").innerHTML = html
-    </script>
-  </body>
-</html>
+<!DOCTYPE html5><html><head><title>Плеер ВсеВидео</title><meta charset="utf-8"/><style>html, body, img {margin: 0; overflow: hidden; border: 0;}
+.black_body {background: #000; width: 100%; height: 100%}
+#player {width: 100%; height: 100%}
+.inner {position: absolute; top: 50%; height: 6em;margin-top: -3em; text-align: center; width: 100%; color: white; font-size: 24px}
+.pay_film {font-size: 22px; color: #827272; position: absolute; top: 20px; left: 20px; background: #000; width: 70%; max-width: 580px}</style></head><body><div id="player"></div><script>var
+    query_arr = (window.location + "").split("?"),
+    params, vals = {}, html = false, location_names;
+if (query_arr.length > 1) {
+    params = query_arr[1].split("&");
+    for (var i = 0; i < params.length; i++) {
+        param_arr = params[i].split("=")
+        vals[param_arr[0]] = decodeURIComponent(param_arr[1])
+    }
+}
+location_names = {"drugeokino": "Другое Кино", "youtubemoviesru": "Youtube Movies", "ivi": "IVI.ru", "nowru": "Now.ru", "megogo": "Megogo", "tvigle": "TVigle", "zoomby": "Zoomby.ru", playfamily: "PlayFamily.ru", "olltv": "Oll.tv", amediateka: "Amediateka", molodejj: "Molodejj.tv", streamru: "Stream.ru", tvzavr: "TVzavr.ru", viaplay: "Viaplay.ru", zabavaru: "Zabava.ru", tvzorru: "TVzor", playgoogle: "Play Google", itunes: "Apple Itunes", ayyo: "Ayyo.ru", mosfilm: "Cinema.mosfilm.ru", "default": "Онлайн-кинотеатре"}
+vals.type = (vals.type || "").toLowerCase()
+if (vals.price && vals.view) {
+    price = Math.floor(vals.price);
+    link_title = 'Ссылка на страницу фильма на ' + (location_names[vals.type] || location_names["default"]) + ' за ' + price + ' руб.';
+    html = '<div class="black_body"><div class="pay_film">Нам пока не удалось договориться с админстрацией ' + (location_names[vals.type] || location_names["default"]) + ' об отображении плеера с платными фильмами на нашем сайте, поэтому фильм доступен к просмотру только в новом окне. Нажмите на кнопку, чтобы открыть новое окно для просмотра фильма за ' + price + ' руб.</div><div class="inner"><a href="' + vals.view + '" target=_new rel="nofollow"><img src="/static/img/player_play.png" alt="' + link_title + '" title="' + link_title + '"/></a></div></div>';
+} else if (vals.type && (vals.value || vals.view)) {
+    html = false;
+    value = vals.value || false
+    autoplay = vals["autoplay"] && (vals["autoplay"] == 1 || vals["autoplay"] == true || vals["autoplay"] == "true")?1:0;
+    if (vals.type == "ivi") {
+        if (value == false) {
+            value = vals.view.substr(24)
+            value = value.substr(0, value.indexOf("#"))
+        }
+        html = '<iframe src="http://www.ivi.ru/player/?videoid=' + value + '&amp;subsite=138&amp;enableseries=0&amp;autostart=' + autoplay + '" width="100%" height="100%" frameborder="0" allowfullscreen=""></iframe>'
+    } else if (vals.type == "nowru") {
+        if (value == false) {
+            arr = vals.view.split("/")
+            value = arr[arr.length - 1]
+        }
+        html = '<iframe name="now1023318" src="http://www.now.ru/embed/frame/' + value + '" scrolling="no" frameborder="no" height="100%" width="100%" allowfullscreen></iframe>'
+    } else if (vals.type == "tvigle") {
+            if (value == false) {
+                arr = vals.view.split("=")
+                value = arr[arr.length - 1]
+            }
+        html = '<object codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=9,0,0,0" width="100%" height="100%"><param name="FlashVars" value="vote=0&amp;srv=pub.tvigle.ru&amp;prt=e0d0f9ff7176e333398f17de0dbdabb2&amp;id=' + value + '&amp;w=640&amp;h=400&amp;type=&amp;dopparam=&amp;modes=1&amp;autoplay=1"><param name="allowFullScreen" value="true"><param name="movie" value="http://pub.tvigle.ru/swf/tvigle_single_v2.swf"><param name="quality" value="high"><param name="bgcolor" value="#000000"><param name="allowscriptaccess" value="always"><embed src="http://pub.tvigle.ru/swf/tvigle_single_v2.swf" allowscriptaccess="always" quality="high" width="100%" height="100%" bgcolor="#000000" allowfullscreen="true" flashvars="vote=0&amp;srv=pub.tvigle.ru&amp;prt=e0d0f9ff7176e333398f17de0dbdabb2&amp;id=' + value + '&amp;w=640&amp;h=400&amp;type=&amp;dopparam=&amp;modes=1&amp;autoplay=1" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer"></object>'
+    } else if (vals.type == "drugoekino") {
+        html = '<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" width="100%" height="100%" id="player" align="middle"><param name="movie" value="http://drugoekino.ru/player.swf"><param name="flashvars" value="filmID=' + value + '"><param name="bgcolor" value="#000000"><param name="play" value="false"><param name="loop" value="false"><param name="wmode" value="window"><param name="scale" value="showall"><param name="menu" value="false"><param name="devicefont" value="false"><param name="salign" value=""><param name="allowScriptAccess" value="true"><param name="allowFullScreen" value="true"><embed src="http://drugoekino.ru/player.swf" allowscriptaccess="always" quality="high" width="100%" height="100%" bgcolor="#000000" allowfullscreen="true" flashvars="filmID=' + value + '&amp;play=false" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer"></object>'
+    } else if (vals.type == "youtubemoviesru") {
+        value = /v=([a-z0-9_\-]+)/i.exec(vals.view)[1]
+        html = '<iframe width="100%" height="100%" src="//www.youtube-nocookie.com/embed/' + value + '?rel=0&autoplay=' + autoplay + '" frameborder="0" allowfullscreen></iframe>'
+    } else if (vals.type == "zoomby") {
+        html = '<iframe src="' + value + '" width="100%" height="100%" frameborder="0"></iframe>'
+    } else if (vals.type == "meogogo") {
+        html = '<iframe width="100%" height="100%" src="http://megogo.net/e/' + value + '" frameborder="0" allowfullscreen></iframe>'
+    } else if (vals.type == "molodejj") {
+        html = '<iframe width="100%" height="100%" src="http://player.molodejj.tv/player_mjj.swf?pl=544&amp;vid=' + value + '&amp;site=vkontakte_embed&amp;type=video&amp;channel=3" frameborder="0"></iframe>'
+    } else if (vals.type == "tvzavr") {
+        html = '<iframe width="100%" height="100%" src="http://www.tvzavr.ru/js/v5/tvzavrplayer2.swf?playlist=' + value + '&autoplay=1" frameborder="0"></iframe>';
+    } else if (vals.type == "mosfilm") {
+        html = '<iframe width="100%" height="100%" src="//www.youtube.com/embed/' + value + '" frameborder="0" allowfullscreen></iframe>'
+    } else if (vals.type == "playfamily") {
+        html = '<iframe width="100%" height="100%" id="playlite-frame" class="playlite-object" frameborder="0" scrolling="no" src="http://playlite.ru/widgets/widget/' + value + '/PARTNER661">'
+    } else if (vals.type == "tvzorru") {
+        if (value == false) {
+            arr = vals.view.split("/")
+            value = arr[arr.length - 1]
+        }
+        html = '<object type="application/x-shockwave-flash" id="WebPlayer" name="WebPlayer" align="middle" data="http://tvzor.ru/flash/WebPlayer.swf" width="100%" height="100%"><param name="wmode" value="transparent"><param name="quality" value="high"><param name="bgcolor" value="#000000"><param name="allowscriptaccess" value="sameDomain"><param name="allowfullscreen" value="true"><param name="flashvars" value="assetId=' + value + '&amp;title=&amp;subTitle=&amp;preview=http://v-cache.tvzor.ru/IMAGE/' + value + '/IMAGE_16_9_XL.jpg&amp;hd=true&amp;time=0&amp;logged=false&amp;liked=false&amp;checked=false&amp;trailer=false&amp;currentLang=ru_RU&amp;vodStr=&amp;isMovie=true&amp;parentalRating=16&amp;brand=tvzor&amp;autoPlay=true&amp;lastLocationUpdateInterval=300000&amp;isAdult=false"></object>'
+    }
+}
+if (!html) {
+    link_title = 'Ссылка на страницу фильма на ' + (location_names[vals.type] || location_names["default"]) + '.';
+    html = '<div class="black_body"><div class="pay_film">Нам пока не удалось договориться с админстрацией ' + (location_names[vals.type] || location_names["default"]) + ' об отображении плеера с бесплатными фильмами на нашем сайте, поэтому фильм доступен к просмотру только в новом окне. Нажмите на кнопку, чтобы открыть новое окно для просмотра фильма.</div><div class="inner"><a href="' + vals.view + '" target=_new rel="nofollow"><img src="/static/img/player_play.png" alt="' + link_title + '" title="' + link_title + '"/></a></div></div>';
+}
+document.getElementById("player").innerHTML = html</script></body></html>

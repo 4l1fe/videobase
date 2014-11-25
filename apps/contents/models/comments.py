@@ -56,6 +56,10 @@ class Comments(models.Model):
 
         return obj
 
+    @classmethod
+    def get_comments_sorting_by_created(cls):
+        return cls.objects.order_by("-created")[0:20]
+
 
     class Meta:
         # Имя таблицы в БД

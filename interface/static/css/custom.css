@@ -255,6 +255,7 @@ section {padding:37px 0 6px 0;}
 
 .search-block input {color: #fff; background-color: #615858}
 
+.add-content { cursor: pointer; }
 .add-filter {padding-bottom: 16px;}
 .add-filter .img-responsive {width: 100%}
 .add-filter-loading .add-content a {visibility: hidden}
@@ -1421,6 +1422,13 @@ section.cast-chat {padding-bottom: 40px;}
 .index-comments-block .bg-noise {padding: 34px 0}
 
 .index-comments-block .crsl-nav {/*fix issue #505*/
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.playlist .crsl-nav {
     -moz-user-select: none;
     -webkit-user-select: none;
     -ms-user-select: none;

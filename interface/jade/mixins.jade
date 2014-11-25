@@ -251,7 +251,6 @@ mixin comment_thumb(item, item_index)
                             .col-md-9.col-sm-9.col-xs-9
                                 a(href=href, title='', data-mi-athref="user.id", data-mi-name="user.name")=name
                             .col-md-3.col-sm-3.col-xs-3
-
                                 .time-tape-wrapper
                                     a.time-tape(data-mi-id="created",data-mi-val=item.created,data-mi-name="created", href=item_anchor_name)=time_text_str(item.created)
                     .content-item-tape
@@ -324,8 +323,7 @@ mixin feed_thumb(item, item_index, for_tpl)
                                     a(href=user_url, title='', data-mi-name="user.name", data-mi-athref="user.id")=user_name
                                     |&nbsp;оценил фильм
                                 .col-md-2.col-sm-3.col-xs-3
-                                    .time-tape-wrapper
-                                        a.time-tape(data-mi-id="created", data-mi-name="created", data-mi-val=item.created, href=item_anchor_name)=created
+                                    .time-tape(data-mi-id="created", data-mi-name="created", data-mi-val=item.created)=created
                         //-
                            .title-item-tape
                         .content-item-tape
@@ -429,27 +427,22 @@ mixin feed_thumb(item, item_index, for_tpl)
                                     a(href=user_url, title='', data-mi-name="user.name", data-mi-athref="user.id")=user_name
                                     |&nbsp;теперь дружит с
                                 .col-md-2.col-sm-3.col-xs-3
-                                    .time-tape-wrapper
-                                        a.time-tape(data-mi-id="created", data-mi-name="created", data-mi-val=item.created, href=item_anchor_name)=created
-                        //-
-                           .title-item-tape
+                                    .time-tape(data-mi-id="created", data-mi-name="created", data-mi-val=item.created)=created
                         .content-item-tape
                             .actor
                                 a(href=user_url, title='')
                                     img.img-circle(src=item.object.avatar || noavatar_url, alt='',data-mi-atsrc="object.avatar",data-mi-default=noavatar_url)
                                     span(data-mi-name="object.name")=item.object.name
-                            //-
-                               .actor
-                        //-
-                           .content-item-tape
-            //-
-               .tape-item
         if item.type == "pers-o" || for_tpl
             .tape-msg.tape-thumb(class="tape-pers-o")
                 i.type-msg1.block.sprite.sprite-i-user.fleft
                 p
-                    |&nbsp;В кинотеатре появился новый фильм с участием актёра&nbsp;
-                    a(href=person_url, title='',data-mi-athref="object.id", data-mi-name="object.name")=item.object.name
+                    |&nbsp;В кинотеатре появился новый фильм&nbsp
+                    a(href='', title='', data-mi-athref="object.film.id", data-mi-name="object.film.name")
+                        item.object.film.name
+                    |&nbspс участием актёра&nbsp;
+                    a(href=person_url, title='',data-mi-athref="object.id", data-mi-name="object.name")
+                        item.object.name
             //-
                .tape-msg
         if item.type == "film-nw" || for_tpl
@@ -581,7 +574,7 @@ mixin cast_thumb(item)
         -   btn_cls = "btn-subscribe"
         -   btn_text = "Подписаться"
         -   url_btn = url
-        -   btn_click_handler = "action_subscribe"
+        -   btn_click_handler = "toggle_subscribe"
         - } else {
         -   btn_cls = "display-none"
         - }

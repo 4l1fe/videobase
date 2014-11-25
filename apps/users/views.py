@@ -239,7 +239,7 @@ class UserAvatar(View):
 class ConfirmEmailView(View):
 
     def get(self, request, *args, **kwargs):
-        key = request.GET.get(APP_USER_ACTIVE_KEY, None)
+        key = request.GET.get(APP_USER_ACTIVE_KEY)
         if key is None:
             raise Http404
 
@@ -250,6 +250,9 @@ class ConfirmEmailView(View):
         profile = user_hash.user.profile
         profile.confirm_email = True
         profile.save()
+
+        user_hash.activated = True
+        user_hash.save()
 
         return HttpResponse(render_page('confirm_email', {}))
 
