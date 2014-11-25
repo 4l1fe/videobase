@@ -7,6 +7,6 @@ from crawler.tasks.locrobots_logging import DebugTask
 from videobase.celery import app
 
 
-@app.task(name='process_film_on_site')
+@app.task(name='process_individual_film_on_site')
 def process_individual_film_on_site(site, film_id, url=None):
     process_film_on_site(site, film_id, url)

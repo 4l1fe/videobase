@@ -18,9 +18,6 @@ from apps.users.tasks import send_template_mail
 from crawler.locrobots import sites_crawler
 
 
-__author__ = 'vladimir'
-
-
 def write_logs_to_console():
     for task in TaskMeta.objects.all():
         result = task_status(None, task.task_id)
