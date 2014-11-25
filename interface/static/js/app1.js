@@ -905,14 +905,13 @@
     };
 
     Deck.prototype.load_more_bind = function(place) {
-      this.more.place = place;
-      this.more.btn = $("a", place);
-      return this.more.btn.click((function(_this) {
+      this.more.place = place.click((function(_this) {
         return function() {
           _this.load_more();
           return false;
         };
       })(this));
+      return this.more.btn = $("a", place);
     };
 
     Deck.prototype.load_more = function(opts) {
