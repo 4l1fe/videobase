@@ -332,6 +332,9 @@
     };
 
     Item.prototype.set_val = function(name, val, do_not_set) {
+      if (do_not_set == null) {
+        do_not_set = false;
+      }
       val = this.transform_val(name, val);
       this.vals[name] = val;
       if (!do_not_set) {
@@ -381,6 +384,9 @@
 
     Item.prototype.set_vals = function(vals, do_not_set) {
       var key, val;
+      if (do_not_set == null) {
+        do_not_set = false;
+      }
       this.reset();
       for (key in vals) {
         val = vals[key];
@@ -487,62 +493,64 @@
           vals.title_alt += " " + vals.releasedate.substr(0, 4);
         }
       }
-      this.elements["btn_price"].self.hide();
-      if (vals.locations && vals.locations.length) {
-        vals.hasFree = false;
-        vals.price = 0;
-        price_loc_cnt = 0;
-        _ref = vals.locations;
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          loc = _ref[_i];
-          loc.price = parseFloat(loc.price || 0);
-          if (loc.price_type === 0) {
-            vals.hasFree = true;
-          } else {
-            if (loc.price && (vals.price === 0 || loc.price < vals.price)) {
-              vals.price = loc.price;
-              vals.price_loc = loc.id;
+      if (!do_not_set) {
+        this.elements["btn_price"].self.hide();
+        if (vals.locations && vals.locations.length) {
+          vals.hasFree = false;
+          vals.price = 0;
+          price_loc_cnt = 0;
+          _ref = vals.locations;
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            loc = _ref[_i];
+            loc.price = parseFloat(loc.price || 0);
+            if (loc.price_type === 0) {
+              vals.hasFree = true;
+            } else {
+              if (loc.price && (vals.price === 0 || loc.price < vals.price)) {
+                vals.price = loc.price;
+                vals.price_loc = loc.id;
+              }
+              price_loc_cnt++;
             }
-            price_loc_cnt++;
           }
+          btn_cls = false;
+          btn_text = "";
+          if (!vals.hasFree && vals.price) {
+            btn_cls = "btn-price";
+            btn_text = "Смотреть<br><i>";
+            if (price_loc_cnt > 1) {
+              btn_text += "от ";
+            }
+            btn_text += vals.price + " р. без рекламы</i>";
+          } else if (vals.price) {
+            this.elements["btn_price"].self.css("display", "block");
+            text = vals.price + " р. без рекламы";
+            if (price_loc_cnt > 1) {
+              text = "от " + text;
+            }
+            this.elements["price"].self.text(text);
+          }
+          if (!vals.price || vals.hasFree) {
+            btn_cls = "btn-free";
+            btn_text = "Смотреть<br/>бесплатно";
+          }
+        } else {
+          btn_cls = "btn-subscribe";
+          btn_text = "Подписаться";
         }
-        btn_cls = false;
-        btn_text = "";
+        if (vals.relation && vals.relation.rating) {
+          this.elements["relation.rating"].self.rateit().rateit("value", vals.relation.rating);
+        }
+        this.elements["btn"].self.removeClass("btn-subscribe").removeClass("btn-price").removeClass("btn-free").addClass(btn_cls);
+        this.elements["btn_text"].self.html(btn_text).css("display", "block");
+        FilmThumb.__super__.set_vals.apply(this, arguments);
         if (!vals.hasFree && vals.price) {
-          btn_cls = "btn-price";
-          btn_text = "Смотреть<br><i>";
-          if (price_loc_cnt > 1) {
-            btn_text += "от ";
+          return this.elements["btn_text"].self.attr("href", this.elements["btn_text"].self.attr("href") + "#" + vals.price_loc);
+        } else {
+          this.elements["btn_text"].self.attr("href", this.elements["btn_text"].self.attr("href") + "#player");
+          if (vals.price) {
+            return this.elements["price"].self.parent().attr("href", this.elements["price"].self.parent().attr("href") + "#" + vals.price_loc);
           }
-          btn_text += vals.price + " р. без рекламы</i>";
-        } else if (vals.price) {
-          this.elements["btn_price"].self.css("display", "block");
-          text = vals.price + " р. без рекламы";
-          if (price_loc_cnt > 1) {
-            text = "от " + text;
-          }
-          this.elements["price"].self.text(text);
-        }
-        if (!vals.price || vals.hasFree) {
-          btn_cls = "btn-free";
-          btn_text = "Смотреть<br/>бесплатно";
-        }
-      } else {
-        btn_cls = "btn-subscribe";
-        btn_text = "Подписаться";
-      }
-      if (vals.relation && vals.relation.rating) {
-        this.elements["relation.rating"].self.rateit().rateit("value", vals.relation.rating);
-      }
-      this.elements["btn"].self.removeClass("btn-subscribe").removeClass("btn-price").removeClass("btn-free").addClass(btn_cls);
-      this.elements["btn_text"].self.html(btn_text).css("display", "block");
-      FilmThumb.__super__.set_vals.apply(this, arguments);
-      if (!vals.hasFree && vals.price) {
-        return this.elements["btn_text"].self.attr("href", this.elements["btn_text"].self.attr("href") + "#" + vals.price_loc);
-      } else {
-        this.elements["btn_text"].self.attr("href", this.elements["btn_text"].self.attr("href") + "#player");
-        if (vals.price) {
-          return this.elements["price"].self.parent().attr("href", this.elements["price"].self.parent().attr("href") + "#" + vals.price_loc);
         }
       }
     };
@@ -932,14 +940,13 @@
     };
 
     Deck.prototype.load_more_bind = function(place) {
-      this.more.place = place;
-      this.more.btn = $("a", place);
-      return this.more.btn.click((function(_this) {
+      this.more.place = place.click((function(_this) {
         return function() {
           _this.load_more();
           return false;
         };
       })(this));
+      return this.more.btn = $("a", place);
     };
 
     Deck.prototype.load_more = function(opts) {
