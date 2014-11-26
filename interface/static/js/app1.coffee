@@ -200,7 +200,7 @@ class Item
     else
       @vals
 
-  set_val: (name, val, do_not_set) ->
+  set_val: (name, val, do_not_set = false) ->
     val = @transform_val(name, val)
     @vals[name] = val
     if !do_not_set
@@ -223,7 +223,7 @@ class Item
             else
               e.self.attr(attr, val || e.default)
 
-  set_vals: (vals, do_not_set) ->
+  set_vals: (vals, do_not_set = false) ->
     @reset()
     for key, val of vals
       @set_val(key, val, do_not_set)
@@ -294,49 +294,50 @@ class FilmThumb extends Item
       if vals.releasedate && typeof(val) == "string"
         vals.title_alt+= " " + vals.releasedate.substr(0,4)
 
-    @elements["btn_price"].self.hide()
-    if vals.locations && vals.locations.length
-      vals.hasFree = false
-      vals.price = 0
-      price_loc_cnt = 0
-      for loc in vals.locations
-        loc.price = parseFloat(loc.price || 0)
-        if loc.price_type == 0
-          vals.hasFree = true
-        else
-          if loc.price && (vals.price == 0 || loc.price < vals.price)
-            vals.price = loc.price
-            vals.price_loc = loc.id
-          price_loc_cnt++
-      btn_cls = false
-      btn_text = ""
+    if !do_not_set
+      @elements["btn_price"].self.hide()
+      if vals.locations && vals.locations.length
+        vals.hasFree = false
+        vals.price = 0
+        price_loc_cnt = 0
+        for loc in vals.locations
+          loc.price = parseFloat(loc.price || 0)
+          if loc.price_type == 0
+            vals.hasFree = true
+          else
+            if loc.price && (vals.price == 0 || loc.price < vals.price)
+              vals.price = loc.price
+              vals.price_loc = loc.id
+            price_loc_cnt++
+        btn_cls = false
+        btn_text = ""
+        if !vals.hasFree && vals.price
+          btn_cls = "btn-price"
+          btn_text = "Смотреть<br><i>"
+          btn_text+= "от " if price_loc_cnt > 1
+          btn_text+= vals.price + " р. без рекламы</i>"
+        else if vals.price
+          @elements["btn_price"].self.css("display", "block")
+          text = vals.price + " р. без рекламы"
+          text = "от " + text if price_loc_cnt > 1
+          @elements["price"].self.text(text)
+        if !vals.price || vals.hasFree
+          btn_cls = "btn-free"
+          btn_text = "Смотреть<br/>бесплатно"
+      else
+        btn_cls = "btn-subscribe"
+        btn_text = "Подписаться"
+      if vals.relation && vals.relation.rating
+        @elements["relation.rating"].self.rateit().rateit("value", vals.relation.rating)
+      @elements["btn"].self.removeClass("btn-subscribe").removeClass("btn-price").removeClass("btn-free").addClass(btn_cls)
+      @elements["btn_text"].self.html(btn_text).css("display", "block")
+      super
       if !vals.hasFree && vals.price
-        btn_cls = "btn-price"
-        btn_text = "Смотреть<br><i>"
-        btn_text+= "от " if price_loc_cnt > 1
-        btn_text+= vals.price + " р. без рекламы</i>"
-      else if vals.price
-        @elements["btn_price"].self.css("display", "block")
-        text = vals.price + " р. без рекламы"
-        text = "от " + text if price_loc_cnt > 1
-        @elements["price"].self.text(text)
-      if !vals.price || vals.hasFree
-        btn_cls = "btn-free"
-        btn_text = "Смотреть<br/>бесплатно"
-    else
-      btn_cls = "btn-subscribe"
-      btn_text = "Подписаться"
-    if vals.relation && vals.relation.rating
-      @elements["relation.rating"].self.rateit().rateit("value", vals.relation.rating)
-    @elements["btn"].self.removeClass("btn-subscribe").removeClass("btn-price").removeClass("btn-free").addClass(btn_cls)
-    @elements["btn_text"].self.html(btn_text).css("display", "block")
-    super
-    if !vals.hasFree && vals.price
-      @elements["btn_text"].self.attr("href", @elements["btn_text"].self.attr("href") + "#" + vals.price_loc)
-    else
-      @elements["btn_text"].self.attr("href", @elements["btn_text"].self.attr("href") + "#player")
-      if vals.price
-        @elements["price"].self.parent().attr("href", @elements["price"].self.parent().attr("href") + "#" + vals.price_loc)
+        @elements["btn_text"].self.attr("href", @elements["btn_text"].self.attr("href") + "#" + vals.price_loc)
+      else
+        @elements["btn_text"].self.attr("href", @elements["btn_text"].self.attr("href") + "#player")
+        if vals.price
+          @elements["price"].self.parent().attr("href", @elements["price"].self.parent().attr("href") + "#" + vals.price_loc)
 
   action_rate: (val) ->
     @_app.film_action @vals.id, "rate", {
@@ -581,9 +582,8 @@ class Deck
     @items
 
   load_more_bind: (place) ->
-    @more.place = place
+    @more.place = place.click(=> @load_more(); return false)
     @more.btn = $("a", place)
-    @more.btn.click(=> @load_more(); return false)
 
   load_more: (opts) ->
     if @load_func != undefined

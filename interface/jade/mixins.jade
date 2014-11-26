@@ -138,8 +138,7 @@ mixin film_thumb(item)
         -           }
         -       }
         -   }
-        -   if (min_price)
-        -       min_price = Math.floor(min_price)
+        -   if (min_price) min_price = Math.floor(min_price)
         -   url_loc = price_loc?(url+"#" + price_loc):""
         -   url_btn = url
         -   if (min_price && !has_free) {
@@ -323,7 +322,8 @@ mixin feed_thumb(item, item_index, for_tpl)
                                     a(href=user_url, title='', data-mi-name="user.name", data-mi-athref="user.id")=user_name
                                     |&nbsp;оценил фильм
                                 .col-md-2.col-sm-3.col-xs-3
-                                    .time-tape(data-mi-id="created", data-mi-name="created", data-mi-val=item.created)=created
+                                    .time-tape-wrapper
+                                        .time-tape(data-mi-id="created", data-mi-name="created", data-mi-val=item.created)=created
                         //-
                            .title-item-tape
                         .content-item-tape
@@ -427,7 +427,8 @@ mixin feed_thumb(item, item_index, for_tpl)
                                     a(href=user_url, title='', data-mi-name="user.name", data-mi-athref="user.id")=user_name
                                     |&nbsp;теперь дружит с
                                 .col-md-2.col-sm-3.col-xs-3
-                                    .time-tape(data-mi-id="created", data-mi-name="created", data-mi-val=item.created)=created
+                                    .time-tape-wrapper
+                                        a.time-tape(data-mi-id="created", data-mi-name="created", data-mi-val=item.created)=created
                         .content-item-tape
                             .actor
                                 a(href=user_url, title='')
@@ -439,10 +440,10 @@ mixin feed_thumb(item, item_index, for_tpl)
                 p
                     |&nbsp;В кинотеатре появился новый фильм&nbsp
                     a(href='', title='', data-mi-athref="object.film.id", data-mi-name="object.film.name")
-                        item.object.film.name
+                        =item.object.film.name
                     |&nbspс участием актёра&nbsp;
                     a(href=person_url, title='',data-mi-athref="object.id", data-mi-name="object.name")
-                        item.object.name
+                        =item.object.name
             //-
                .tape-msg
         if item.type == "film-nw" || for_tpl
