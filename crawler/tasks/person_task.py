@@ -10,7 +10,7 @@ from crawler.tasks.utils import robot_task
 from crawler.tor import simple_tor_get_page
 from crawler.datarobots.kinopoisk_ru.parse_actors import update_kinopoisk_persone
 
-@robot_task('kinopoisk_persons')
+@robot_task('parse_kinopoisk_persons')
 def parse_kinopoisk_persons(pid):
     update_kinopoisk_persone(pid)
 

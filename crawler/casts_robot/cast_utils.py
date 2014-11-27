@@ -46,7 +46,7 @@ def save_cast_dict(cast_service_name, cast_dict):
     if not location:
         cast_location = CastsLocations(cast=cast,
                                        cast_service=cast_service,
-                                       price_type=APP_CONTENTS_PRICE_TYPE_PAY if cast_dict['price']==0 else APP_CONTENTS_PRICE_TYPE_FREE,
+                                       price_type=APP_CONTENTS_PRICE_TYPE_FREE if cast_dict['price']==0 else APP_CONTENTS_PRICE_TYPE_PAY,
                                        price=cast_dict['price'],
                                        url_view=cast_dict['link'],
                                        value=cast_dict['value'],

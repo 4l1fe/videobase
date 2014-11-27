@@ -222,8 +222,8 @@ html
                                 h2.blackh1 Комментарии
                                 .tape-list#comments
                                     if film.comments && film.comments.length
-                                        each el in film.comments
-                                            mixin comment_thumb(el)
+                                        each el, i in film.comments
+                                            mixin comment_thumb(el, i)
                                 if film.comments && film.comments.length >= 5
                                     .add-filter#comments_more
                                         .add-content.style-panel-action.rel.zmin

@@ -1,16 +1,12 @@
 # coding: utf-8
 
 from __future__ import absolute_import
-from kombu import Queue, Exchange
-
 import os
 import logging
+import djcelery
 from datetime import timedelta
 from ConfigParser import RawConfigParser
-
 from kombu import Exchange, Queue
-
-import djcelery
 from celery.schedules import crontab
 
 
@@ -32,18 +28,31 @@ CELERY_TIMEZONE = 'UTC'
 CELERY_ACCEPT_CONTENT = ['pickle', 'json']
 
 CELERY_DEFAULT_QUEUE = 'default'
+MAIL_QUEUE = 'mail'
 NOTIFY_QUEUE = 'notify'
 CAST_QUEUE = 'casts'
+DATA_QUEUE = 'data'
+LOCATION_QUEUE_S = 'location_singular'
+LOCATION_QUEUE_P = 'location_plural'
+
+DATA_RK = 'data'
+CAST_RK = 'casts'
+LOCATION_RK_S = 'location.singular'
+LOCATION_RK_P = 'location.plural'
+MAIL_RK = 'default.mail'
+NOTIFY_RK = 'default.notify'
 
 MAIN_EXCHANGE = Exchange(name='main', type='topic', delivery_mode='persistent', durable=True)
 X_DEAD_EXCHANGE = Exchange(name='wait', type='direct', delivery_mode='persistent', durable=True)
-CAST_EXCHANGE = Exchange(name='casts', type='direct', delivery_mode='persistent', durable=True)
 
 CELERY_QUEUES = (
-    Queue('default', MAIN_EXCHANGE, routing_key='default'),
-    Queue('mail', MAIN_EXCHANGE, routing_key='default.mail'),
-    Queue(NOTIFY_QUEUE, MAIN_EXCHANGE, routing_key='default.notify'),
-    Queue(CAST_QUEUE, MAIN_EXCHANGE, routing_key='casts'),
+    Queue(CELERY_DEFAULT_QUEUE, MAIN_EXCHANGE, routing_key='default'),
+    Queue(MAIL_QUEUE, MAIN_EXCHANGE, routing_key=MAIL_RK),
+    Queue(NOTIFY_QUEUE, MAIN_EXCHANGE, routing_key=NOTIFY_RK),
+    Queue(CAST_QUEUE, MAIN_EXCHANGE, routing_key=CAST_RK),
+    Queue(DATA_QUEUE, MAIN_EXCHANGE, routing_key=DATA_RK),
+    Queue(LOCATION_QUEUE_S, MAIN_EXCHANGE, routing_key=LOCATION_RK_S),
+    Queue(LOCATION_QUEUE_P, MAIN_EXCHANGE, routing_key=LOCATION_RK_P),
 )
 
 ###########################################################
@@ -309,194 +318,230 @@ SESSION_EXPIRATION_TIME = timedelta(minutes=API_SESSION_EXPIRATION_TIME)
 HAPROXY_ADDRESS = '127.0.0.1:11800'
 
 ###########################################################
-CELERYBEAT_SCHEDULE = {
-
-    # Launching robots that are described in Robots table.
-    #'robot-launch': {
-    #    'task': 'robot_launch',
+DATAROBOTS_SCHEDULE = {
+    # Updating information about persons using kinopoisk
+    #'kinopoisk_persons': {
+    #    'task': 'parse_kinopoisk_persons',
     #    'schedule': timedelta(seconds=10),
     #},
-
     'update_rating_command': {
-        'task': 'update_ratings',
+        'task': 'update_ratings_task',
         'schedule': timedelta(days=3),
-    },
-    # Amediateka weekly run
-    'amediateka_ru_update': {
-        'task': 'amediateka_ru_robot_start',
-        'schedule': timedelta(days=7),
-    },
-    # Viaplay robot weekly run
-    'viaplay_ru_robot_start': {
-        'task': 'viaplay_ru_robot_start',
-        'schedule': timedelta(days=7),
+        'options': {'exchange': MAIN_EXCHANGE.name,
+                    'routing_key': DATA_RK}
     },
     'kinopoisk-set_poster': {
         'task': 'kinopoisk_set_poster',
         'schedule': timedelta(seconds=10),
+        'options': {'exchange': MAIN_EXCHANGE.name,
+                    'routing_key': DATA_RK}
     },
-    # Updating information about persons using kinopoisk
-    #'kinopoisk_persons': {
-    #    'task': 'kinopoisk_persons',
-    #    'schedule': timedelta(seconds=10),
-    #},
-    # Checking kinopoisk premiere page
     'kinopoisk_news': {
-        'task': 'kinopoisk_news',
+        'task': 'parse_kinopoisk_news',
         'schedule': timedelta(days=3),
+        'options': {'exchange': MAIN_EXCHANGE.name,
+                    'routing_key': DATA_RK}
     },
-    # Youtube trailers
     'youtube_trailers': {
-        'task': 'youtube_trailers_all',
+        'task': 'trailer_commands',
         'schedule': timedelta(days=1),
+        'options': {'exchange': MAIN_EXCHANGE.name,
+                    'routing_key': DATA_RK}
     },
-    # Three tasks that parse information from kinopoisk navigator page
     'kinopoisk_films_daily': {
         'task': 'kinopoisk_films',
         'schedule': timedelta(days=1),
         'args': (3,),
+        'options': {'exchange': MAIN_EXCHANGE.name,
+                    'routing_key': DATA_RK}
     },
     'kinopoisk_films_weekly': {
         'task': 'kinopoisk_films',
         'schedule': timedelta(days=7),
         'args': (10,),
+        'options': {'exchange': MAIN_EXCHANGE.name,
+                    'routing_key': DATA_RK}
     },
     'kinopoisk_films_monthly': {
         'task': 'kinopoisk_films',
         'schedule': timedelta(days=31),
         'args': (1100,),
+        'options': {'exchange': MAIN_EXCHANGE.name,
+                    'routing_key': DATA_RK}
     },
-    # Task that periodically requests information from kinopoisk depending on film age
     'kinopoisk_refresh': {
-        'task': 'kinopoisk_refresher',
+        'task': 'create_due_refresh_tasks',
         'schedule': timedelta(days=1),
+        'options': {'exchange': MAIN_EXCHANGE.name,
+                    'routing_key': DATA_RK}
     },
-    # Playfamily XML parser.
-    'playfamily_xml': {
-        'task': 'playfamily_xml',
-        'schedule': timedelta(days=7),
-    },
-    # Films check and correct
     'film_info_check_and_correct': {
-        'task': 'film_info_check_and_correct',
+        'task': 'check_and_correct_tasks',
         'schedule': timedelta(days=7),
+        'options': {'exchange': MAIN_EXCHANGE.name,
+                    'routing_key': DATA_RK}
     },
-    # Persons check and correct
     'persons_check_and_correct': {
-        'task': 'persons_check_and_correct',
+        'task': 'person_check_and_correct_tasks',
         'schedule': timedelta(days=7),
+        'options': {'exchange': MAIN_EXCHANGE.name,
+                    'routing_key': DATA_RK}
     },
-    # Checking locations for new films weekly
-    'age_weighted_robot_launch_task_weekly': {
-        'task': 'age_weighted_robot_launch',
-        'schedule': timedelta(days=3),
-        'args': (1,)
-    },
-    # Checking locations for aged films monthly
-    'age_weighted_robot_launch_task_monthly': {
-        'task': 'age_weighted_robot_launch',
+
+}
+
+LOCATIONROBOTS_SCHEDULE = {
+    'amediateka_ru_update': {
+        'task': 'amediateka_robot_start',
         'schedule': timedelta(days=7),
-        'args': (3,)
+        'options': {'exchange': MAIN_EXCHANGE.name,
+                    'routing_key': LOCATION_RK_S}
     },
-    # Checking locations for aged films yearly
-    'age_weighted_robot_launch_task_six_month': {
-        'task': 'age_weighted_robot_launch',
-        'schedule': timedelta(days=14),
-        'args': (120,)
+    'viaplay_ru_robot_start': {
+        'task': 'viaplay_robot_start',
+        'schedule': timedelta(days=7),
+        'options': {'exchange': MAIN_EXCHANGE.name,
+                    'routing_key': LOCATION_RK_S}
+    },
+    'playfamily_xml': {
+        'task': 'pltask',
+        'schedule': timedelta(days=7),
+        'options': {'exchange': MAIN_EXCHANGE.name,
+                    'routing_key': LOCATION_RK_S}
     },
     'drugoe_kino_update_schedule': {
-        'task': 'drugoe_kino_update',
-        'schedule': timedelta(days=7)
+        'task': 'dg_update',
+        'schedule': timedelta(days=7),
+        'options': {'exchange': MAIN_EXCHANGE.name,
+                    'routing_key': LOCATION_RK_S}
     },
-    # Refreshing sitemap
-    'sitemap_refresh_schedule': {
-        'task': 'refresh_sitemap',
-        'schedule': timedelta(days=14)
-    },
-    # Parsing videos from YouTubeMoviesRU
     'parse_you_tube_movies_ru': {
         'task': 'parse_you_tube_movies_ru',
-        'schedule': timedelta(days=1)
+        'schedule': timedelta(days=1),
+        'options': {'exchange': MAIN_EXCHANGE.name,
+                    'routing_key': LOCATION_RK_S}
     },
-    # Refreshing consolidate rating
-    'consolidate_rating_schedule': {
-        'task': 'consolidate_rating',
-        'schedule': timedelta(days=1)
+    'age_weighted_robot_launch_task_weekly': {
+        'task': 'age_weighted_robot_launcher',
+        'schedule': timedelta(days=3),
+        'args': (1,),
+        'options': {'exchange': MAIN_EXCHANGE.name,
+                    'routing_key': LOCATION_RK_P}
     },
-    # Send robots statistic to email
-    'send_robots_statistic_to_email_schedule': {
-        'task': 'send_robots_logs_to_email',
-        'schedule': timedelta(days=1)
+    'age_weighted_robot_launch_task_monthly': {
+        'task': 'age_weighted_robot_launcher',
+        'schedule': timedelta(days=7),
+        'args': (3,),
+        'options': {'exchange': MAIN_EXCHANGE.name,
+                    'routing_key': LOCATION_RK_P}
     },
-    # News from now.ru
+    'age_weighted_robot_launch_task_six_month': {
+        'task': 'age_weighted_robot_launcher',
+        'schedule': timedelta(days=14),
+        'args': (120,),
+        'options': {'exchange': MAIN_EXCHANGE.name,
+                    'routing_key': LOCATION_RK_P}
+    },
     'parse_news_from_now_ru': {
         'task': 'parse_news_from_now_ru',
-        'schedule': timedelta(hours=12)
+        'schedule': timedelta(hours=12),
+        'options': {'exchange': MAIN_EXCHANGE.name,
+                    'routing_key': LOCATION_RK_P}
     },
-    # News from stream.ru
     'parse_news_from_stream_ru': {
         'task': 'parse_news_from_stream_ru',
-        'schedule': timedelta(hours=12)
+        'schedule': timedelta(hours=12),
+        'options': {'exchange': MAIN_EXCHANGE.name,
+                    'routing_key': LOCATION_RK_P}
     },
-    # News from tvzor.ru
     'parse_news_from_tvzor_ru': {
         'task': 'parse_news_from_tvzor_ru',
-        'schedule': timedelta(hours=12)
+        'schedule': timedelta(hours=12),
+        'options': {'exchange': MAIN_EXCHANGE.name,
+                    'routing_key': LOCATION_RK_P}
     },
     'itunes_update': {
         'task': 'itunes_robot_start',
-        'schedule': timedelta(hours=24)
+        'schedule': timedelta(hours=24),
+        'options': {'exchange': MAIN_EXCHANGE.name,
+                    'routing_key': LOCATION_RK_P}
     },
     'mail_movies_update': {
         'task': 'mail_robot_start',
-        'schedule': timedelta(hours=24)
+        'schedule': timedelta(hours=24),
+        'options': {'exchange': MAIN_EXCHANGE.name,
+                    'routing_key': LOCATION_RK_P}
     },
-    # Calculate amount subscribed to the films
-    'calc_amount_subscribed_to_movie': {
-        'task': 'calc_amount_subscribed_to_movie',
-        'schedule': timedelta(hours=1)
-    },
-    # Do weekly newsletter
-    'week_newsletter_schedule': {
-        'task': 'week_newsletter',
-        'schedule': crontab(minute=0, hour=16, day_of_week=6)
-    },
-    # Do every day personal newsletter
-    'personal_newsletter_schedule': {
-        'task': 'personal_newsletter',
-        'schedule': crontab(minute=0, hour=18)
-    },
+}
+
+CASTROBOT_SCHEDULE = {
     'sportbox_update': {
         'task': 'sportbox_update',
         'schedule': timedelta(hours=24),
-        'options': {'exchange': 'main_casts_ex',
-                    'routing_key': 'main_casts_rk'}
+        'options': {'exchange': MAIN_EXCHANGE.name,
+                    'routing_key': CAST_RK}
     },
     'liverussia_update': {
         'task': 'liverussia_update',
         'schedule': timedelta(hours=24),
-        'options': {'exchange': 'main_casts_ex',
-                    'routing_key': 'main_casts_rk'}
+        'options': {'exchange': MAIN_EXCHANGE.name,
+                    'routing_key': CAST_RK}
     },
     'championat_update': {
         'task': 'championat_update',
         'schedule': timedelta(hours=24),
-        'options': {'exchange': 'main_casts_ex',
-                    'routing_key': 'main_casts_rk'}
+        'options': {'exchange': MAIN_EXCHANGE.name,
+                    'routing_key': CAST_RK}
     },
     'khl_update': {
         'task': 'khl_update',
-        'schedule': timedelta(hours=24),
-        'options': {'exchange': 'main_casts_ex',
-                    'routing_key': 'main_casts_rk'}
+        'schedule': timedelta(seconds=10),
+        'options': {'exchange': MAIN_EXCHANGE.name,
+                    'routing_key': CAST_RK}
     },
     'ntv_plus_update': {
         'task': 'ntv_plus_update',
         'schedule': timedelta(hours=24),
-        'options': {'exchange': 'main_casts_ex',
-                    'routing_key': 'main_casts_rk'}
+        'options': {'exchange': MAIN_EXCHANGE.name,
+                    'routing_key': CAST_RK}
     }
 }
+
+
+CELERYBEAT_SCHEDULE = {
+    'sitemap_refresh_schedule': {
+        'task': 'refresh_sitemap',
+        'schedule': timedelta(days=14)
+    },
+    'consolidate_rating_schedule': {
+        'task': 'consolidate_rating',
+        'schedule': timedelta(days=1)
+    },
+    'send_robots_statistic_to_email_schedule': {
+        'task': 'send_robots_statistic_to_email',
+        'schedule': timedelta(days=1),
+    },
+    'calc_amount_subscribed_to_movie': {
+        'task': 'calc_amount_subscribed_to_movie',
+        'schedule': timedelta(hours=1)
+    },
+    'week_newsletter_schedule': {
+        'task': 'week_newsletter',
+        'schedule': crontab(minute=0, hour=16, day_of_week=6),
+        'options': {'exchange': MAIN_EXCHANGE.name,
+                    'routing_key': MAIL_RK}
+    },
+    'personal_newsletter_schedule': {
+        'task': 'personal_newsletter',
+        'schedule': crontab(minute=0, hour=18),
+        'options': {'exchange': MAIN_EXCHANGE.name,
+                    'routing_key': MAIL_RK}
+    }
+}
+CELERYBEAT_SCHEDULE.update(DATAROBOTS_SCHEDULE)
+CELERYBEAT_SCHEDULE.update(LOCATIONROBOTS_SCHEDULE)
+CELERYBEAT_SCHEDULE.update(CASTROBOT_SCHEDULE)
+
 
 POSTER_URL_PREFIX = '_260x360'
 # TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'

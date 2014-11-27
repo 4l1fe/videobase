@@ -332,6 +332,9 @@
     };
 
     Item.prototype.set_val = function(name, val, do_not_set) {
+      if (do_not_set == null) {
+        do_not_set = false;
+      }
       val = this.transform_val(name, val);
       this.vals[name] = val;
       if (!do_not_set) {
@@ -381,6 +384,9 @@
 
     Item.prototype.set_vals = function(vals, do_not_set) {
       var key, val;
+      if (do_not_set == null) {
+        do_not_set = false;
+      }
       this.reset();
       for (key in vals) {
         val = vals[key];
@@ -487,67 +493,64 @@
           vals.title_alt += " " + vals.releasedate.substr(0, 4);
         }
       }
-      this.elements["btn_price"].self.hide();
-      if (vals.locations && vals.locations.length) {
-        vals.hasFree = false;
-        vals.price = 0;
-        price_loc_cnt = 0;
-        _ref = vals.locations;
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          loc = _ref[_i];
-          loc.price = parseFloat(loc.price || 0);
-          if (loc.price_type === 0) {
-            vals.hasFree = true;
-          } else {
-            if (loc.price && (vals.price === 0 || loc.price < vals.price)) {
-              vals.price = loc.price;
-              vals.price_loc = loc.id;
+      if (!do_not_set) {
+        this.elements["btn_price"].self.hide();
+        if (vals.locations && vals.locations.length) {
+          vals.hasFree = false;
+          vals.price = 0;
+          price_loc_cnt = 0;
+          _ref = vals.locations;
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            loc = _ref[_i];
+            loc.price = parseFloat(loc.price || 0);
+            if (loc.price_type === 0) {
+              vals.hasFree = true;
+            } else {
+              if (loc.price && (vals.price === 0 || loc.price < vals.price)) {
+                vals.price = loc.price;
+                vals.price_loc = loc.id;
+              }
+              price_loc_cnt++;
             }
-            price_loc_cnt++;
           }
+          btn_cls = false;
+          btn_text = "";
+          if (!vals.hasFree && vals.price) {
+            btn_cls = "btn-price";
+            btn_text = "Смотреть<br><i>";
+            if (price_loc_cnt > 1) {
+              btn_text += "от ";
+            }
+            btn_text += vals.price + " р. без рекламы</i>";
+          } else if (vals.price) {
+            this.elements["btn_price"].self.css("display", "block");
+            text = vals.price + " р. без рекламы";
+            if (price_loc_cnt > 1) {
+              text = "от " + text;
+            }
+            this.elements["price"].self.text(text);
+          }
+          if (!vals.price || vals.hasFree) {
+            btn_cls = "btn-free";
+            btn_text = "Смотреть<br/>бесплатно";
+          }
+        } else {
+          btn_cls = "btn-subscribe";
+          btn_text = "Подписаться";
         }
-        btn_cls = false;
-        btn_text = "";
+        if (vals.relation && vals.relation.rating) {
+          this.elements["relation.rating"].self.rateit().rateit("value", vals.relation.rating);
+        }
+        this.elements["btn"].self.removeClass("btn-subscribe").removeClass("btn-price").removeClass("btn-free").addClass(btn_cls);
+        this.elements["btn_text"].self.html(btn_text).css("display", "block");
+        FilmThumb.__super__.set_vals.apply(this, arguments);
         if (!vals.hasFree && vals.price) {
-          btn_cls = "btn-price";
-          btn_text = "Смотреть<br><i>";
-          if (price_loc_cnt > 1) {
-            btn_text += "от ";
+          return this.elements["btn_text"].self.attr("href", this.elements["btn_text"].self.attr("href") + "#" + vals.price_loc);
+        } else {
+          this.elements["btn_text"].self.attr("href", this.elements["btn_text"].self.attr("href") + "#player");
+          if (vals.price) {
+            return this.elements["price"].self.parent().attr("href", this.elements["price"].self.parent().attr("href") + "#" + vals.price_loc);
           }
-          btn_text += vals.price + " р. без рекламы</i>";
-        } else if (vals.price) {
-          this.elements["btn_price"].self.css("display", "block");
-          text = vals.price + " р. без рекламы";
-          if (price_loc_cnt > 1) {
-            text = "от " + text;
-          }
-          this.elements["price"].self.text(text);
-        }
-        if (!vals.price || vals.hasFree) {
-          btn_cls = "btn-free";
-          btn_text = "Смотреть<br/>бесплатно";
-        }
-      } else {
-        btn_cls = "btn-subscribe";
-        btn_text = "Подписаться";
-        this.elements["btn"].self.click((function(_this) {
-          return function() {
-            return _this.toggle_subscribe();
-          };
-        })(this));
-      }
-      if (vals.relation && vals.relation.rating) {
-        this.elements["relation.rating"].self.rateit().rateit("value", vals.relation.rating);
-      }
-      this.elements["btn"].self.removeClass("btn-subscribe").removeClass("btn-price").removeClass("btn-free").addClass(btn_cls);
-      this.elements["btn_text"].self.html(btn_text).css("display", "block");
-      FilmThumb.__super__.set_vals.apply(this, arguments);
-      if (!vals.hasFree && vals.price) {
-        return this.elements["btn_text"].self.attr("href", this.elements["btn_text"].self.attr("href") + "#" + vals.price_loc);
-      } else {
-        this.elements["btn_text"].self.attr("href", this.elements["btn_text"].self.attr("href") + "#player");
-        if (vals.price) {
-          return this.elements["price"].self.parent().attr("href", this.elements["price"].self.parent().attr("href") + "#" + vals.price_loc);
         }
       }
     };
@@ -589,6 +592,9 @@
     };
 
     FilmThumb.prototype.toggle_subscribe = function(status) {
+      if (this.vals.relation == null) {
+        this.vals.relation = {};
+      }
       this._app.film_action(this.vals.id, "subscribe", {
         rel: this.vals.relation,
         state: status,
@@ -620,8 +626,12 @@
       }
       CommentThumb.__super__.constructor.call(this, opts, (function(_this) {
         return function() {
+          var item_anchor;
           if (!opts.place) {
-            return $(".time-tape", _this._place).data("miVal", _this.vals_orig.created);
+            $(".time-tape", _this._place).data("miVal", _this.vals_orig.created);
+            item_anchor = "comment_" + opts.vals.item_index;
+            $(".time-tape-bookmark", _this._place).attr("name", item_anchor);
+            return $(".time-tape", _this._place).attr("href", "#" + item_anchor);
           }
         };
       })(this));
@@ -685,14 +695,18 @@
       }
       FeedThumb.__super__.constructor.call(this, opts, (function(_this) {
         return function() {
+          var item_anchor;
           if (!opts.place) {
             $(".tape-" + _this._type, _this._place).removeClass("tape-thumb");
             $(".tape-thumb", _this._place).remove();
             $(".time-tape", _this._place).data("miVal", _this.vals_orig.created);
             _this._place.removeClass("display-none");
             if (_this._type === "film-r") {
-              return _this.elements["object.rating"].self.rateit().rateit("value", opts.vals.object.rating);
+              _this.elements["object.rating"].self.rateit().rateit("value", opts.vals.object.rating);
             }
+            item_anchor = "comment_" + opts.vals.item_index;
+            $(".time-tape-bookmark", _this._place).attr("name", item_anchor);
+            return $(".time-tape", _this._place).attr("href", "#" + item_anchor);
           }
         };
       })(this));
@@ -751,11 +765,13 @@
     __extends(CastThumb, _super);
 
     function CastThumb(opts, callback) {
+      var self;
       if (opts == null) {
         opts = {};
       }
-      this.action_subscribe = __bind(this.action_subscribe, this);
+      this.toggle_subscribe = __bind(this.toggle_subscribe, this);
       this._name = "cast-thumb";
+      self = this;
       if (opts.vals) {
         this._type = opts.vals.type;
         this.vals_orig = opts.vals;
@@ -763,6 +779,7 @@
         opts.vals.min_vs_start = opts.vals.min_vs_start = Math.floor((new Date() - opts.vals.start_date) / 60 / 1000);
         opts.vals.duration = opts.vals.duration || 180;
         opts.vals.is_online = opts.vals.min_vs_start >= 0 && opts.vals.min_vs_start < opts.vals.duration;
+        opts.relation = opts.relation || {};
       }
       CastThumb.__super__.constructor.call(this, opts, (function(_this) {
         return function() {
@@ -787,7 +804,7 @@
                 label_prim_str = time_text(_this.vals.start_date);
               }
               _this.elements["btn"].self.show().addClass("btn-subscribe").text("Подписаться");
-              _this.elements["btn"].self.click(_this.action_subscribe);
+              _this.elements["btn"].self.click(_this.toggle_subscribe);
             } else {
               label_fright_str = time_text(_this.vals.start_date);
               label_fright_cls = 'cast-archive-date';
@@ -798,6 +815,16 @@
           }
         };
       })(this));
+      if (this.vals.is_online) {
+        this._app.rest.castschats.users.read(this.vals.id).done(function(data) {
+          var len;
+          len = data.length;
+          if (len) {
+            return self.elements["label_fright"].self.text("смотрят: " + len).addClass("cast-spectators-count");
+          }
+        });
+      }
+      this.vals.relation = this.vals.relation || {};
     }
 
     CastThumb.prototype.transform_attr = function(attr, name, val) {
@@ -817,8 +844,17 @@
       return CastThumb.__super__.transform_val.apply(this, arguments);
     };
 
-    CastThumb.prototype.action_subscribe = function() {
-      this._app.cast_action(this.vals.id, "subscribe");
+    CastThumb.prototype.toggle_subscribe = function(status) {
+      if (!this.vals.relation) {
+        this.vals.relation = {};
+      }
+      this._app.cast_action(this.vals.id, "subscribe", {
+        rel: this.vals.relation,
+        state: status,
+        callback: (function(_this) {
+          return function(new_state) {};
+        })(this)
+      });
       return false;
     };
 
@@ -840,8 +876,12 @@
       this.more = {};
       this.save_footer = false;
       self = this;
-      $("." + this.element_name, this._place).each(function() {
-        return self.add_item_DOM($(this));
+      $("." + this.element_name, this._place).each(function(i) {
+        var item_vals;
+        if (opts.items_vals && i < opts.items_vals.length) {
+          item_vals = opts.items_vals[i];
+        }
+        return self.add_item_DOM($(this), item_vals);
       });
       if (opts.load_func) {
         this.load_func = opts.load_func;
@@ -853,10 +893,14 @@
 
     Deck.prototype.onchange = function() {};
 
-    Deck.prototype.add_item_DOM = function(obj) {
+    Deck.prototype.add_item_DOM = function(obj, vals) {
+      if (vals == null) {
+        vals = {};
+      }
       this.items.push(new this.item_class({
         place: obj,
-        do_not_set: true
+        do_not_set: true,
+        vals: vals
       }));
       return this.onchange();
     };
@@ -896,14 +940,13 @@
     };
 
     Deck.prototype.load_more_bind = function(place) {
-      this.more.place = place;
-      this.more.btn = $("a", place);
-      return this.more.btn.click((function(_this) {
+      this.more.place = place.click((function(_this) {
         return function() {
           _this.load_more();
           return false;
         };
       })(this));
+      return this.more.btn = $("a", place);
     };
 
     Deck.prototype.load_more = function(opts) {
@@ -1115,7 +1158,7 @@
       }
       this.element_name = "cast-thumb";
       this.item_class = CastThumb;
-      CastsDeck.__super__.constructor.apply(this, arguments);
+      CastsDeck.__super__.constructor.call(this, place, opts);
       $(window).resize((function(_this) {
         return function() {
           return _this.onchange();
@@ -1242,6 +1285,7 @@
       this.rest.add("castschats");
       this.rest.castschats.add("msgs");
       this.rest.castschats.add("send");
+      this.rest.castschats.add("users");
       this.rest.casts.add("list");
       this.rest.casts.add("subscribe");
       this._e = {
@@ -1432,12 +1476,25 @@
     };
 
     App.prototype.cast_action = function(id, action, opts) {
+      var doit, new_state, rel;
       if (opts == null) {
         opts = {};
       }
       if (this.user_is_auth()) {
+        rel = opts.rel || {};
         if (action === "subscribe") {
-          return this.rest.casts.subscribe.create(id);
+          new_state = state_toggle(opts.status, rel.subscribed);
+          if (new_state) {
+            doit = "create";
+          } else {
+            doit = "destroy";
+          }
+          return this.rest.casts.subscribe[doit](id).done(function(data) {
+            rel.subscribed = data.subscribed;
+            if (opts.callback) {
+              return opts.callback(new_state);
+            }
+          });
         }
       }
     };
@@ -2040,9 +2097,16 @@
       return this._app.rest.films.comments.read(this.conf.id, {
         page: (comments_deck.page || 1) + 1
       }).done(function(data) {
-        var total_page_count;
+        var item, item_idx, total_page_count, _i, _len, _ref;
         total_page_count = Math.ceil(data.total_cnt / data.ipp);
         if (data && data.items) {
+          item_idx = comments_deck.items.length || 0;
+          _ref = data.items;
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            item = _ref[_i];
+            item.item_index = item_idx;
+            item_idx++;
+          }
           comments_deck.add_items(data.items);
           comments_deck.time_update();
           comments_deck.page = data.page;
@@ -2086,9 +2150,16 @@
                   per_page: 1,
                   page: 1
                 }).done(function(res) {
+                  var items_len;
                   if (res.items && res.items.length) {
                     $("#has_comments").show();
-                    return comments_deck.add_item(res.items[0], true, true);
+                    comments_deck.add_item(res.items[0], true, true);
+                    items_len = comments_deck.items.length;
+                    if (items_len) {
+                      return $('body').animate({
+                        scrollTop: comments_deck.items[items_len - 1]._place.offset().top
+                      }, "slow");
+                    }
                   }
                 }).fail(function(res) {
                   error = "Не удалось сохранить комментарий.";
@@ -2334,10 +2405,18 @@
         page: deck.page + 1
       }).done((function(_this) {
         return function(data) {
+          var item, item_idx, _i, _len, _ref;
           if (current_counter !== deck.load_counter) {
             return;
           }
           if (data.items) {
+            item_idx = feed_deck.items.length || 0;
+            _ref = data.items;
+            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+              item = _ref[_i];
+              item.item_index = item_idx;
+              item_idx++;
+            }
             deck.add_items(data.items);
             if (data.items.length >= 10) {
               deck.load_more_show();
@@ -2526,11 +2605,9 @@
   })(Page);
 
   Page_CastsList = (function(_super) {
-    var casts_deck, self, _filter_counter, _filter_params;
+    var self, _filter_counter, _filter_params;
 
     __extends(Page_CastsList, _super);
-
-    casts_deck = void 0;
 
     self = void 0;
 
@@ -2539,19 +2616,21 @@
     _filter_counter = 0;
 
     function Page_CastsList() {
-      var params;
+      var opts, params;
       self = this;
       Page_CastsList.__super__.constructor.apply(this, arguments);
-      casts_deck = new CastsDeck($("#casts"), {
+      opts = {
         load_func: (function(_this) {
           return function(deck) {
             return _this.load_more_casts(deck);
           };
-        })(this)
-      });
-      casts_deck.page = 1;
-      casts_deck.load_more_hide(false);
-      casts_deck.load_more_bind($("#casts_more"));
+        })(this),
+        items_vals: this._app.config().page_conf.casts
+      };
+      this.casts_deck = new CastsDeck($("#casts"), opts);
+      this.casts_deck.page = 1;
+      this.casts_deck.load_more_hide(false);
+      this.casts_deck.load_more_bind($("#casts_more"));
       this._e.filter = {
         status: $("#filter_cast_status"),
         tag: $("#filter_cast_tag"),
@@ -2607,7 +2686,7 @@
               page_loading: false,
               params: _filter_params
             };
-            return _this.load_more_casts(casts_deck, opts);
+            return _this.load_more_casts(_this.casts_deck, opts);
           }
         };
       })(this), this._app.config("filter_delay"));
@@ -2678,7 +2757,7 @@
           _filter_params[key] = null;
         }
       }
-      page = casts_deck.page || 1;
+      page = this.casts_deck.page || 1;
       _filter_params.page = page;
       more_btn_href = "/?" + query_string + "page=" + (page + 1);
       if (query_string) {
@@ -2700,7 +2779,7 @@
     __extends(Page_Cast, _super);
 
     function Page_Cast(conf) {
-      var casts_deck, self;
+      var self;
       this.conf = conf;
       this.action_cast_subscribe = __bind(this.action_cast_subscribe, this);
       Page_Cast.__super__.constructor.apply(this, arguments);
@@ -2755,7 +2834,8 @@
       } else if (this.conf.min_vs_start < 0 && this._e.time_counter.length) {
         this.timer_tick();
       }
-      casts_deck = new CastsDeck($("#casts"));
+      this.casts_deck = new CastsDeck($("#casts"));
+      this.conf.relation = this.conf.relation || {};
     }
 
     Page_Cast.prototype.timer_tick = function() {
@@ -2897,7 +2977,11 @@
     };
 
     Page_Cast.prototype.action_cast_subscribe = function() {
-      this._app.cast_action(this._app.page().conf.id, "subscribe");
+      var opts;
+      opts = {
+        rel: this.conf.relation
+      };
+      this._app.cast_action(this.conf.id, "subscribe", opts);
       return false;
     };
 

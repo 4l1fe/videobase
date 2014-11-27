@@ -79,8 +79,8 @@ def process_person_dict(film, person_dict):
     try:
         print u"Found person {person}".format(person=person_dict['name'])
         o_person = get_person(person_dict['name'], person_dict['kinopoisk_id'])
-
-        if not PersonsFilms.objects.filter(film=film, person=o_person).count():
+        p_film = PersonsFilms.objects.filter(film=film, person=o_person, p_type=person_dict['p_type']).first()
+        if not p_film:
             msg = u"Adding link for film {film} and person {person}"
             print msg.format(film=film, person=o_person)
 
@@ -89,9 +89,15 @@ def process_person_dict(film, person_dict):
                 'film': film,
                 'p_type': person_dict['p_type']
             }
-
+            if 'p_index' in person_dict:
+                params['p_index'] = person_dict['p_index']
             person_film = PersonsFilms(**params)
             person_film.save()
+        elif 'p_index' in person_dict:
+            if p_film.p_index != person_dict['p_index']:
+                p_film.p_index = person_dict['p_index']
+                p_film.save()
+
 
     except Exception, e:
         msg = u"Exception caught in process_person_dict"
