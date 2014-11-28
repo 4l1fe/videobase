@@ -182,7 +182,7 @@ class vbFeedElement(serializers.ModelSerializer):
 
         elif feed.type == USER_ASK:
             try:
-                friend = User.objects.get(pk=feed.obj_id)
+                friend = User.objects.get(pk=feed.user_id)
                 object_ = {
                     'id': friend.id,
                     'name': friend.username
