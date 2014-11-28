@@ -1828,15 +1828,19 @@ class Page_Cast extends Page
         (data)=>
           if local_counter == @chat.counter
             if data && data.length
-              i = data.length - 1
-              while i >= 0
+              data.sort(
+                (a,b) ->
+                  new Date(a.created) - new Date(b.created)
+              )
+              i = 0
+              while i < data.length
                 name = "пользователь"
                 if data[i].user
                   name = data[i].user.name
                 text = data[i].text || "&nbsp;"
                 e = $('<div class="cast-chat-item"><div class="cast-chat-item-body"><span class="cast-chat-item-username">' + name + '</span>: <span class="cast-chat-item-msg">' + text + '</span></div></div>').appendTo(@_e.chat.list)
-                i--
-              @_e.chat.list.animate({ scrollTop: e.position().top}, "slow");
+                i++
+              @_e.chat.list.animate({ scrollTop: @_e.chat.list[0].scrollHeight}, "slow");
               if data.length >= limit
                 @chat.attempts = [0,0,0]
                 @chat.attempts_pos = 0

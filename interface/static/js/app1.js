@@ -2890,18 +2890,21 @@
           var e, i, name, text;
           if (local_counter === _this.chat.counter) {
             if (data && data.length) {
-              i = data.length - 1;
-              while (i >= 0) {
+              data.sort(function(a, b) {
+                return new Date(a.created) - new Date(b.created);
+              });
+              i = 0;
+              while (i < data.length) {
                 name = "пользователь";
                 if (data[i].user) {
                   name = data[i].user.name;
                 }
                 text = data[i].text || "&nbsp;";
                 e = $('<div class="cast-chat-item"><div class="cast-chat-item-body"><span class="cast-chat-item-username">' + name + '</span>: <span class="cast-chat-item-msg">' + text + '</span></div></div>').appendTo(_this._e.chat.list);
-                i--;
+                i++;
               }
               _this._e.chat.list.animate({
-                scrollTop: e.position().top
+                scrollTop: _this._e.chat.list[0].scrollHeight
               }, "slow");
               if (data.length >= limit) {
                 _this.chat.attempts = [0, 0, 0];
