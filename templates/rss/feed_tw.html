@@ -1,0 +1,14 @@
+{% extends "rss/feed_base.html" %}
+
+{% block feeditems %}
+    {% for film, genres in description %}
+        <item>
+            <title>{{ film.name }}</title>
+            <link>http://vsevi.ru/films/{{ film.id }}/?utm_source=tw</link>
+            <description><![CDATA[Новый #{{ film.film_type }} {{ film.name }} #{{ genres|join:" #" }} {{ film.rating_cons }}/10 {{ film.release_date.year }} http://vsevi.ru/films/{{ film.id }}/]]>
+            </description>
+            <pubDate>{{ date }}</pubDate>
+            <guid>{{ film.id }}</guid>
+        </item>
+    {% endfor %}
+{% endblock %}

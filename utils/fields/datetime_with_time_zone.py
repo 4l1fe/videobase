@@ -6,8 +6,6 @@ from videobase.settings import TIME_ZONE
 
 
 class DateTimeWithTimeZone(serializers.DateTimeField):
-    def __init__(self, *args, **kwargs):
-        super(DateTimeWithTimeZone, self).__init__(*args, **kwargs)
 
     def to_native(self, value):
         if isinstance(value, datetime.datetime):
