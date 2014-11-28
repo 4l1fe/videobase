@@ -28,3 +28,5 @@ tor
 libzmq-dev
 libxml2-dev
 supervisor
+munin-node
+postfix

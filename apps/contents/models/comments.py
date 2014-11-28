@@ -2,8 +2,9 @@
 
 from django.db import models
 from django.contrib.auth.models import User
+from apps.users.constants import FILM_COMMENT
 
-from apps.users.models import UsersPics
+from apps.users.models import UsersPics, Feed
 from apps.contents.constants import APP_CONTENTS_COMMENT_STATUS
 
 
@@ -56,6 +57,15 @@ class Comments(models.Model):
 
         return obj
 
+    @classmethod
+    def get_comments_sorting_by_created(cls):
+        return cls.objects.order_by("-created")[0:20]
+
+    def delete(self, *args, **kwargs):
+        feeds_to_this_comment = Feed.objects.filter(type=FILM_COMMENT, user_id=self.user_id, obj_id=self.id).first()
+        if feeds_to_this_comment:
+            feeds_to_this_comment.delete()
+        super(Comments, self).delete(*args, **kwargs)
 
     class Meta:
         # Имя таблицы в БД

@@ -6,7 +6,7 @@ from django.db import models
 
 # Модель Список рассылки для роботов
 class RobotsMailList(models.Model):
-    email      = models.CharField(max_length=255, verbose_name=u'Email')
+    email = models.CharField(max_length=255, verbose_name=u'Email')
 
     def __unicode__(self):
         return u'[{0}] {1}'.format(self.pk, self.email,)

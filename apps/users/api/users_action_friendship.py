@@ -7,21 +7,19 @@ from django.db import IntegrityError
 from django.db.models import Q
 from videobase.settings import DEFAULT_REST_API_RESPONSE
 from apps.users.models import User, UsersRels, Feed
-from apps.users.constants import (APP_USER_REL_TYPE_NONE,
-                                  USER_ASK, USER_FRIENDSHIP,
+from apps.users.constants import (USER_ASK, USER_FRIENDSHIP,
                                   APP_USER_REL_TYPE_SEND_NOT_RECEIVED,
                                   APP_USER_REL_TYPE_FRIENDS,
                                   APP_USER_REL_TYPE_ACCEPTED_NOT_ADOPTED,
-                                  APP_USER_REL_TYPE_NONE
-                                  
-)
+                                  APP_USER_REL_TYPE_NONE)
 
 RELATIONS_MAP = {
-            (True,True) :  APP_USER_REL_TYPE_FRIENDS,
-            (True,False):  APP_USER_REL_TYPE_SEND_NOT_RECEIVED,
-            (False,True):  APP_USER_REL_TYPE_ACCEPTED_NOT_ADOPTED,
-            (False,False): APP_USER_REL_TYPE_NONE,
-        }
+    (True, True):  APP_USER_REL_TYPE_FRIENDS,
+    (True, False):  APP_USER_REL_TYPE_SEND_NOT_RECEIVED,
+    (False, True):  APP_USER_REL_TYPE_ACCEPTED_NOT_ADOPTED,
+    (False, False): APP_USER_REL_TYPE_NONE,
+    }
+
 
 class UsersFriendshipView(APIView):
 
@@ -32,27 +30,27 @@ class UsersFriendshipView(APIView):
         try:
             user_friend = User.objects.get(pk=user_id)
 
-            response_template = {'id':user_friend.id,
-                             'name':user_friend.get_full_name() }
+            response_template = {'id': user_friend.id,
+                                 'name': user_friend.get_full_name() }
 
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         to_rel = UsersRels.objects.filter(user_id=user_friend.id, user_rel_id=request.user.id,
-                                                rel_type=APP_USER_REL_TYPE_SEND_NOT_RECEIVED).exists() 
+                                          rel_type=APP_USER_REL_TYPE_SEND_NOT_RECEIVED).exists()
         from_rel = UsersRels.objects.filter(user_rel_id=user_friend.id, user_id=request.user.id,
-                                                rel_type=APP_USER_REL_TYPE_SEND_NOT_RECEIVED).exists()
+                                            rel_type=APP_USER_REL_TYPE_SEND_NOT_RECEIVED).exists()
 
-        return Response(dict(relation=RELATIONS_MAP[(to_rel,from_rel)],
-                                 **response_template),
-                          status=status.HTTP_200_OK)
+        return Response(dict(relation=RELATIONS_MAP[(to_rel, from_rel)],
+                             **response_template),
+                        status=status.HTTP_200_OK)
             
     def post(self, request, user_id, format=None):
         try:
             user_friend = User.objects.get(pk=user_id)
 
-            response_template = {'id':user_friend.id,
-                                 'name':user_friend.get_full_name()
+            response_template = {'id': user_friend.id,
+                                 'name': user_friend.get_full_name()
             }
 
         except Exception as e:
@@ -65,9 +63,11 @@ class UsersFriendshipView(APIView):
 
         except IntegrityError:
             UsersRels.objects.filter(user=request.user, user_rel=user_friend).update(rel_type=APP_USER_REL_TYPE_SEND_NOT_RECEIVED)
+        except ValueError as e:
+            return Response({'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
 
         if UsersRels.objects.filter(user_id=user_friend.id, user_rel_id=request.user.id,
-                                                rel_type=APP_USER_REL_TYPE_SEND_NOT_RECEIVED).exists():  # если есть встречная заявка
+                                    rel_type=APP_USER_REL_TYPE_SEND_NOT_RECEIVED).exists():  # если есть встречная заявка
             Feed.objects.filter(Q(user=request.user, type=USER_ASK, obj_id=user_friend.id)
                                 | Q(user=user_friend, type=USER_ASK, obj_id=request.user.id)).delete()
             feed, created = Feed.objects.get_or_create(user=request.user, type=USER_FRIENDSHIP, obj_id=user_friend.id)
@@ -76,16 +76,14 @@ class UsersFriendshipView(APIView):
             if not created: feed.save()
 
             return Response(dict(
-                relation=APP_USER_REL_TYPE_FRIENDS, **response_template),
-                          status=status.HTTP_200_OK)
+                relation=APP_USER_REL_TYPE_FRIENDS, **response_template), status=status.HTTP_200_OK)
         else:
             feed, created = Feed.objects.get_or_create(user=request.user, type=USER_ASK, obj_id=user_friend.id)
             if not created: feed.save()
 
             return Response(dict(relation=APP_USER_REL_TYPE_SEND_NOT_RECEIVED,
                                  **response_template),
-                          status=status.HTTP_200_OK)
-
+                            status=status.HTTP_200_OK)
 
     def delete(self, request, user_id, format=None, *args, **kwargs):
         try:

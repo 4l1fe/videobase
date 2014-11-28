@@ -17,7 +17,7 @@ def save_loaded_data_to_file(loaded_json_data, file_name, sub_dir_name):
         if not os.path.exists(site_dir):
             os.makedirs(site_dir)
         with open(site_dir + '/' + saved_file_name, 'w') as f:
-            json.dump(loaded_json_data, f, ensure_ascii=False)
+            json.dump(loaded_json_data, f)
 
     except Exception, e:
         import traceback

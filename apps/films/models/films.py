@@ -162,7 +162,7 @@ class Films(models.Model):
         Высчитывается как сумма значений rating_local_cnt, rating_imdb_cnt, rating_kinopoisk_imdb
         """
 
-        return self.get_rating_local_cnt + self.get_rating_imdb_cnt + self.get_rating_kinopoisk_cnt
+        return self.get_rating_local_cnt + self.get_rating_imdb_cnt/6 + self.get_rating_kinopoisk_cnt
 
 
     @property

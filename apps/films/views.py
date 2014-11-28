@@ -348,10 +348,11 @@ class SearchView(View):
             'films': [],
         }
 
-        if self.request.REQUEST.get('text'):
+        search_text = self.request.REQUEST.get('text')
+        if search_text:
+            resp_dict['search_text'] = search_text
             try:
-                resp_dict['films'] = SearchFilmsView.as_view()(self.request, use_thread=True).data
-                resp_dict['search_text'] = self.request.REQUEST.get('text')
+                resp_dict['films'] = SearchFilmsView().get(self.request, use_thread=True).data
             except Exception, e:
                 pass
 
@@ -380,10 +381,10 @@ def calc_actors(o_film):
     try:
         enumerated_actors = film_model.PersonsFilms.objects.\
             filter(film=o_film, p_type=APP_PERSON_ACTOR).\
-            exclude(p_index=0).order_by('p_index')
+            exclude(p_index=0).order_by('p_index', 'person__name')
 
         unenumerated_actors = film_model.PersonsFilms.objects.\
-            filter(film=o_film, p_type=APP_PERSON_ACTOR, p_index=0)
+            filter(film=o_film, p_type=APP_PERSON_ACTOR, p_index=0).order_by('person__name')
         
         result = (serialize_actors(enumerated_actors) + serialize_actors(unenumerated_actors))[slice(filter['offset'], filter['limit'])]
     except Exception, e:
@@ -567,7 +568,7 @@ def kinopoisk_view(request, film_id, *args, **kwargs):
 
 def get_recommend_film(request):
     try:
-        o_recommend = SearchFilmsView.as_view()(request, use_thread=True, recommend=True).data
+        o_recommend = SearchFilmsView().get(request, use_thread=True, recommend=True).data
         o_recommend = o_recommend['items']
     except Exception, e:
         o_recommend = []

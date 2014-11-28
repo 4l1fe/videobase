@@ -7,15 +7,15 @@ from celery import Task
 from djcelery.models import TaskMeta
 from djcelery.picklefield import decode
 from djcelery.views import task_status
+
+from videobase.settings import ROBOTS_LIST
+
 from apps.films.models import Films
 
 from apps.robots.models.robots_logs import RobotsInfoLogging, LocationsCorrectorLogging
 from apps.robots.models.robots_mail_list import RobotsMailList
-from apps.users.tasks import  send_statistic_to_mail
+from apps.users.tasks import send_template_mail
 from crawler.locrobots import sites_crawler
-from videobase.settings import ROBOTS_LIST
-
-__author__ = 'vladimir'
 
 
 def write_logs_to_console():
@@ -136,7 +136,11 @@ def set_zero_for_not_present_in_table_robots(robo_dict):
 
 
 def create_one_email_report_str_for_statistic(robo_name, robot_informs_list):
-    result = "<p> <span>Robot </span> <span>{0}</span> <span> returned {1}</span> <span> locations:".format(robo_name, len(robot_informs_list))
+    result = """<p>
+<span>Robot </span>
+<span>{0}</span>
+<span> returned {1}</span>
+<span> locations:""".format(robo_name, len(robot_informs_list))
 
     for robo_info in robot_informs_list:
         if robo_info['is_new']:
@@ -144,17 +148,24 @@ def create_one_email_report_str_for_statistic(robo_name, robot_informs_list):
         else:
             result += "{0} ({1})".format(robo_info['loc_id'], robo_info['film_id'])
         result += ", "
-    result += "</span> </p>"
+
+    result += "</span></p>"
     return result
 
 
 def create_report_for_locations_corrector(robo_name, loc_corrector_film_ids):
-    result = "<p> <span>From </span> <span>{0}</span> <span> was deleted {1}</span> <span> films:".format(robo_name, len(loc_corrector_film_ids))
+    result = """<p>
+<span>From </span>
+<span>{0}</span>
+<span> was deleted {1}</span>
+<span> films:""".format(robo_name, len(loc_corrector_film_ids))
+
     for film_id in loc_corrector_film_ids:
         f = Films.objects.get(id = film_id)
         result += "({0}, {1}, {2})".format(film_id, f.name.encode("utf8"), str(f.release_date))
         result += ", "
-    result += "</span> </p>"
+
+    result += "</span></p>"
     return result
 
 
@@ -162,27 +173,31 @@ def send_statistic_to_email_for_each_robot():
     str_for_send = ""
     robo_dict = collect_logs()
     loc_corrector_log = collect_logs_for_deleted_flocations()
-    #clear_log_table()
-    #clear_corrector_log_table()
+
     for key, value in robo_dict.iteritems():
-        one_report_str = create_one_email_report_str_for_statistic(key, value)
-        str_for_send += one_report_str
+        str_for_send += create_one_email_report_str_for_statistic(key, value)
 
     for key, value in loc_corrector_log.iteritems():
-        one_report_str = create_report_for_locations_corrector(key, value)
-        str_for_send += one_report_str
+        str_for_send += create_report_for_locations_corrector(key, value)
 
     send_message_for_all_recipients(str_for_send, "robots logs")
 
 
 def send_message_for_all_recipients(message, subject):
     print "Send messages"
-    to = []
-    for item in RobotsMailList.objects.all():
-        to.append(item.email)
-    if len(to) == 0:
+
+    message = {
+        'subject': subject,
+        'context': message,
+    }
+
+    to = RobotsMailList.objects.all().value_list('email', flat=True)
+
+    if not len(to):
         return
 
     print "Generating task to send message to {}".format(to)
+
     for t in to:
-        send_statistic_to_mail.apply_async((subject, message, [t]))
+        message.update({'to': t})
+        send_template_mail.apply_async(kwargs=message)

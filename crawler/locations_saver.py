@@ -1,5 +1,12 @@
 # coding: utf-8
-from crawler.robot_result import create_location_result
+def create_location_result(location_type, location_id, film_id, status, is_new):
+    loc_dict = {'location_type': location_type,
+                'location_id': location_id,
+                'film_id': film_id,
+                'status': status,
+                'is_new': is_new
+                }
+    return loc_dict
 
 
 def save_location_to_locs_dict(locations_dict, status, film, loc_type, location_id, is_new):
