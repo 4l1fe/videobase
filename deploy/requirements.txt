@@ -41,4 +41,5 @@ PySocks
 django-nose
 ipdb
 multi_key_dict
+gunicorn
 python-Levenshtein==0.11.2

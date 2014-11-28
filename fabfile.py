@@ -1,15 +1,24 @@
 # coding: utf-8
 
 import os
+import sys
+import re
+import json
 import fabtools
 
 from time import time
 from fabric.api import env, roles, run, settings, sudo, cd, local, require, get, put
+from fabric.contrib.files import exists
+
+from subprocess import Popen, PIPE
+
+LOCAL_DOCKER_HOST_TEMPLATE = "localhost:{}"
+LOCAL_DOCKER_PASS_TEMPLATE = "root@{}".format(LOCAL_DOCKER_HOST_TEMPLATE)
 
 
 common_packages = [
     'python', 'build-essential', 'python-dev',
-    'python-setuptools', 'python-pip', 'git', 'python-virtualenv'
+    'python-setuptools', 'python-pip', 'git', 'python-virtualenv', 'postgresql'
 ]
 
 env.git_clone = 'git@git.aaysm.com:developers/videobase.git'
@@ -33,24 +42,6 @@ def localhost_env():
     env.python = '%(env)s/bin/python' % env
     env.shell = '/bin/bash -c'
 
-def docker_env():
-    "Use the docker"
-    env.hosts = ['localhost:49153']
-    env.passwords = {'root@host1:49153': 'screencast'}
-    env.user = 'root'
-    env.project_name = 'videobase2'
-    env.path = '/var/www/%(project_name)s' % env
-    env.env = '/root/venv' % env
-    env.current_path = '%(path)s/current' % env
-    env.releases_path = '%(path)s/releases' % env
-    env.req_dir = 'deploy'
-    env.services = ['supervisor', 'nginx']
-    env.configs = '/root/configs' % env
-    env.pip = '%(env)s/bin/pip' % env
-    env.python = '%(env)s/bin/python' % env
-    env.shell = '/bin/bash -c'
-
-
 def production_env():
     "Use the actual webserver"
     env.hosts = ['www.example.com']
@@ -72,7 +63,7 @@ def install_common_packages():
     """
     Установка основных общих системных пакетов
     """
-
+    fabtools.deb.update_index()
     fabtools.deb.install(globals()['common_packages'])
 
 
@@ -135,14 +126,9 @@ def checkout(branch=None):
 
         run("git clone --depth=1 -b %(git_branch)s %(git_clone)s %(current_release)s" % env)
 
-        with cd(env.current_release):
-            run("mv configs configs_from_repo")
-            run("ln -s %(configs)s" % {
-                'configs': env.configs
-            })
 
 
-def update_env(install_node_pkg=False):
+def update_env(install_node_pkg=False, config_path = None):
     """
     Обновление python окружения
     """
@@ -165,6 +151,13 @@ def update_env(install_node_pkg=False):
 
     with cd(env.current_release):
         # Установка python пакетов
+
+        with cd(env.current_release):
+                run("mv configs configs_from_repo")
+                run("ln -s %(configs)s configs" % {
+                    'configs': env.configs
+                })
+
         with fabtools.python.virtualenv(env.env):
             run('%(pip)s install -r %(path)s' % {
                 'pip': env.pip,
@@ -193,7 +186,9 @@ def restart_services():
     Перезапуск всех сервисов проекта
     """
 
-    for service in env.get('services', []):
+    require('hosts', provided_by=[])
+    for service in env.get('services', [docker_env,localhost_env, production_env]):
+
         fabtools.service.restart(service)
 
 
@@ -201,7 +196,7 @@ def setup():
     """
     """
 
-    require('hosts', provided_by=[localhost_env, production_env])
+    require('hosts', provided_by=[docker_env,localhost_env, production_env])
 
     if not fabtools.files.is_dir(env.path):
         run('/bin/mkdir {dir}'.format(dir=env.path))
@@ -210,18 +205,18 @@ def setup():
 
     install_common_packages()
 
-    # # Init Postgres User
-    # if not fabtools.postgres.user_exists():
-    #     fabtools.postgres.create_user(
-    #         name='pgadmin', password='qwerty',
-    #         createdb=True, createrole=True,
-    #     )
-    #
-    # # Init Postgres DB
-    # if not fabtools.postgres.database_exists('videobase'):
-    #     fabtools.postgres.create_database(
-    #         name='videobase', owner='pgadmin'
-    #     )
+    # Init Postgres User
+    if not fabtools.postgres.user_exists('pgadmin'):
+         fabtools.postgres.create_user(
+             name='pgadmin', password='qwerty',
+             createdb=True, createrole=True, superuser=True
+         )
+ 
+    # Init Postgres DB
+    if not fabtools.postgres.database_exists('videobase'):
+         fabtools.postgres.create_database(
+             name='videobase', owner='pgadmin'
+         )
 
 
 def migrate(app_name=''):
@@ -257,8 +252,10 @@ def create_supervisor_config():
 
 
 def deploy(branch=None, install_node_pkg=False, use_migrate=True):
-    require('hosts', provided_by=[localhost_env, production_env])
+    require('hosts', provided_by=[docker_env,localhost_env, production_env])
     require('path')
+
+    restart_services()
 
     setup()
     checkout(branch)
@@ -341,3 +338,141 @@ def delete_old_releases():
         del directories[4:]
 
         releases()
+
+def get_docker_container_hashes():
+    p = Popen('docker ps -q -a', stdout = PIPE, shell = True)
+    return  p.communicate()[0].strip().split()
+
+def get_container_data(hashes):
+    p2 = Popen("docker inspect {}".format(' '.join(hashes)), stdout = PIPE, shell=True)
+    data = json.loads(p2.communicate()[0])
+    return data
+
+def get_docker_ports():
+
+    ports = dict ((d['internal'],d["external"]) for d in  [m.groupdict() for m in re.finditer('(?P<external>\d+)->(?P<internal>\d+)',  Popen("docker ps | grep test_sshd", shell= True, stdout = PIPE).communicate()[0])])
+
+    return ports
+
+
+def docker_env():
+    "Use the docker"
+    env.user = 'root'
+    env.hosts = env.hosts if env.hosts else []
+    env.passwords=env.passwords if env.passwords else {}
+    env.project_name = 'videobase'
+    env.path = '/var/www/%(project_name)s' % env
+    env.env = '/root/venv' % env
+    env.current_path = '%(path)s/current' % env
+    env.releases_path = '%(path)s/releases' % env
+    env.req_dir = 'deploy'
+    env.services = ['supervisor', 'nginx', 'nginx', 'postgresql']
+    env.pip = '%(env)s/bin/pip' % env
+    env.python = '%(env)s/bin/python' % env
+    env.shell = '/bin/bash -c'
+    env.configs = '/root/configs/' % env
+
+
+def init_docker():
+
+    print "Checking if image alredy built"
+    p = Popen(['docker.io images -q eg_sshd',], shell = True, stdout = PIPE)
+
+    hashes = None
+    if not p.communicate()[0]:
+        print "Couldn't find eg_sshd image. Building one now. Please wait"
+        p = Popen(['docker.io build -t eg_sshd ./deploy/',], shell = True, stdout = PIPE)
+        while p.poll() is None:
+            output = p.stdout.readline()
+            print output,
+
+    else:
+        print "Found image, Checking if container..."
+
+        hashes = get_docker_container_hashes()
+
+
+    if hashes:
+
+        data = get_container_data(hashes)
+
+        if u'/test_sshd' in [d['Name'] for d in data]:
+
+            test_sshd = next( d for d in data if d['Name'] == '/test_sshd')
+
+            if test_sshd['State']['Running']:
+                print "Container already running"
+            else:
+                print "Starting container"
+                p = Popen(['docker.io start test_sshd',], shell=True)
+                p.wait()
+
+        else:
+            print "Creating new container"
+            p = Popen(['docker run -d -P --name test_sshd eg_sshd',], shell = True)
+            p.wait()
+
+    else:
+        print "Creating new container"
+        p = Popen(['docker run -d -P --name test_sshd eg_sshd',], shell = True)
+        p.wait()
+
+def modify_local_nginx(ports):
+
+    abspath = os.path.expanduser('~/nginx-docker.conf')
+    if os.path.exists(abspath):
+        print "Found local nginx config at {}".format(abspath)
+    else:
+        raise NameError("Expected local nginx config at {}. Found none".format(abspath))
+
+    with open(abspath) as df:
+        data = df.read()
+
+    modified = re.sub('localhost[:](?P<port>[0-9]+)','localhost:{}'.format(ports['80']),data, flags=re.DOTALL)
+
+    with open(abspath,'w') as df:
+        df.write(modified)
+
+
+def modify_supervisor():
+    with cd(env.current_release):
+        run('{} deploy/update_supervisor.py'.format(env.python))
+    run("supervisorctl update")
+    run("supervisorctl restart all")
+
+def npm_packets():
+    with cd(env.current_release):
+        run("npm install jade zerorpc")
+
+
+def set_nginx_config():
+
+    if exists('/etc/nginx/sites-enabled/vsevi.conf'):
+        run('rm /etc/nginx/sites-enabled/vsevi.conf')
+
+    with cd(env.current_path):
+        run('/root/venv/bin/python deploy/update_nginx_conf.py')
+    with cd('/etc/nginx/sites-enabled/'):
+        run('ln -s %(config)/vsevi.conf' % {'config': env.current_path})
+
+
+
+def local_docker_deploy(*args, **kwargs):
+
+    init_docker()
+    ports = get_docker_ports()
+
+    #Workaround for some reason you need to define both of parameters for Fabriq to work
+    env.host_string = LOCAL_DOCKER_HOST_TEMPLATE.format(ports['22'])
+    env.hosts.append([LOCAL_DOCKER_HOST_TEMPLATE.format(ports['22'])])
+
+    env.passwords.update({LOCAL_DOCKER_PASS_TEMPLATE.format(ports['22']):'test'})
+
+    deploy(*args,**kwargs)
+
+    npm_packets()
+    
+    modify_supervisor()
+    modify_local_nginx(ports)
+    local('sudo service nginx restart')
+
