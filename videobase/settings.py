@@ -421,6 +421,12 @@ LOCATIONROBOTS_SCHEDULE = {
         'options': {'exchange': MAIN_EXCHANGE.name,
                     'routing_key': LOCATION_RK_S}
     },
+    'vk_robot': {
+        'task': 'vk_robot_start',
+        'schedule': timedelta(days=7),
+        'options': {'exchange': MAIN_EXCHANGE.name,
+                    'routing_key': LOCATION_RK_P}
+    },
     'age_weighted_robot_launch_task_weekly': {
         'task': 'age_weighted_robot_launcher',
         'schedule': timedelta(days=3),
@@ -472,6 +478,7 @@ LOCATIONROBOTS_SCHEDULE = {
         'options': {'exchange': MAIN_EXCHANGE.name,
                     'routing_key': LOCATION_RK_P}
     },
+
 }
 
 CASTROBOT_SCHEDULE = {

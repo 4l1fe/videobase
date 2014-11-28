@@ -8,6 +8,7 @@ from crawler.locrobots.mail_ru.mail_robot import MailRobot
 from crawler.locrobots.viaplay_ru.robot import ViaplayRobot
 from crawler.locrobots.playfamily_dot_ru.playfamily_xml import process
 from crawler.locrobots.drugoe_kino.robot import update_drugoe_kino_listing
+from crawler.locrobots.vk.vk_parser import VKParser
 from crawler.locrobots.youtube_com.parser import YoutubeChannelParser
 from crawler.tasks.locrobots_logging import DebugTask
 from crawler.utils.films_statistics import film_at_least_years_old
@@ -94,3 +95,9 @@ def parse_news_from_tvzor_ru():
     tvzor_news = parse_tvzor_news()
     for film in tvzor_news:
         process_individual_film_on_site.apply_async(args=(robot, film['film_id'], film['url']))
+
+
+@app.task(name='vk_robot_start')
+def vk_robot_start():
+    vk = VKParser()
+    vk.start_vk_parsing()
