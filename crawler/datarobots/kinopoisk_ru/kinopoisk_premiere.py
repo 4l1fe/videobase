@@ -8,7 +8,7 @@ KINOPOISK_PREMIERES_URL = "http://www.kinopoisk.ru/premiere"
 
 
 def kinopoisk_news():
-    data = BeautifulSoup(simple_tor_get_page(KINOPOISK_PREMIERES_URL).content.decode('cp1251'))
+    data = BeautifulSoup(simple_tor_get_page(KINOPOISK_PREMIERES_URL).decode('cp1251'))
 
     big_names = data.select('span.name_big')
     names = data.select('span.name')

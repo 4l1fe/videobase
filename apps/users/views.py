@@ -1,12 +1,15 @@
 # coding: utf-8
+
 import datetime
+import re
 from pytils import numeral
+
 from django.db import transaction
 from django.forms.models import model_to_dict
 from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse
-from django.http import (HttpResponseRedirect, HttpResponse, HttpResponseForbidden,
-                         HttpResponseBadRequest, HttpResponseServerError, Http404)
+from django.http import (HttpResponseRedirect, HttpResponse, Http404,
+                         HttpResponseBadRequest, HttpResponseServerError)
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
@@ -20,20 +23,22 @@ from django.contrib.auth.models import User, AnonymousUser
 from social.apps.django_app.default.models import UserSocialAuth
 from rest_framework.authtoken.models import Token
 from videobase.settings import HOST
-from apps.users.models import Feed, SessionToken, UsersHash
+
+from apps.users.models import Feed, SessionToken, UsersHash, UsersPics
 from apps.users.tasks import send_template_mail
 from apps.users.api.serializers import vbUser, vbFeedElement, vbUserProfile
 from apps.users.forms import CustomRegisterForm, UsersProfileForm
 from apps.users.api.utils import create_new_session
 from apps.users.constants import (APP_USERS_API_DEFAULT_PAGE, APP_USERS_API_DEFAULT_PER_PAGE,
                                   APP_SUBJECT_TO_RESTORE_PASSWORD, APP_USER_ACTIVE_KEY, APP_USER_HASH_EMAIL,
-                                  APP_USER_HASH_REGISTR, APP_USER_HASH_PASSWD, APP_USER_PIC_TYPE_LOCAL)
+                                  APP_USER_HASH_REGISTR, APP_USER_HASH_PASSWD, APP_USER_PIC_TYPE_LOCAL,
+                                  APP_USER_REQUIRE_AUTH_PAGES)
+
 from apps.films.models import Films, Persons, UsersFilms, UsersPersons
 from apps.films.constants import APP_PERSON_DIRECTOR, APP_PERSON_ACTOR, APP_USERFILM_SUBS_TRUE
 from apps.films.api.serializers import vbFilm, vbPerson
 from utils.common import url_with_querystring
 from utils.noderender import render_page
-from apps.users import UsersPics
 
 
 class RegisterUserView(View):
@@ -84,6 +89,7 @@ class LoginUserView(View):
         return response
 
     def post(self, *args, **kwargs):
+        reg = re.compile(ur'vsevi\.\w{2,3}\/login')
         data = self.request.POST
         login_form = AuthenticationForm(data=data)
         if login_form.is_valid():
@@ -93,7 +99,7 @@ class LoginUserView(View):
                 '_': timezone.now().date().strftime("%H%M%S")
             }
 
-            if self.request.META['HTTP_HOST'] == HOST and not HOST+'/login' in self.request.META['HTTP_REFERER']:
+            if 'vsevi' in self.request.META['HTTP_HOST'] and not reg.search(self.request.META['HTTP_REFERER']):
                 kw.update(back_url=self.request.META['HTTP_REFERER'])
 
             url = url_with_querystring(reverse('tokenize'), **kw)
@@ -107,14 +113,26 @@ class UserLogoutView(View):
 
     def get(self, request, **kwargs):
         x_session = request.COOKIES.get('x-session')
+        require_auth_pages = APP_USER_REQUIRE_AUTH_PAGES
         try:
             session = SessionToken.objects.get(key=x_session)
             session.is_active = False
             session.save()
         except Exception, e:
             pass
-        
-        response = HttpResponseRedirect(reverse('index_view'))
+
+        back_url = reverse('index_view')
+
+        if 'HTTP_REFERER' in self.request.META:
+            index_view_flag = False
+            for page in require_auth_pages:
+                if page in self.request.META['HTTP_REFERER'] and 'vsevi' in self.request.META['HTTP_REFERER']:
+                    index_view_flag = True
+                    break
+            if not index_view_flag and 'vsevi' in self.request.META['HTTP_REFERER']:
+                back_url = self.request.META['HTTP_REFERER']
+
+        response = HttpResponseRedirect(back_url)
         response.delete_cookie("x-session")
         response.delete_cookie("x-token")
         response.delete_cookie("sessionid")
@@ -221,7 +239,7 @@ class UserAvatar(View):
 class ConfirmEmailView(View):
 
     def get(self, request, *args, **kwargs):
-        key = request.GET.get(APP_USER_ACTIVE_KEY, None)
+        key = request.GET.get(APP_USER_ACTIVE_KEY)
         if key is None:
             raise Http404
 
@@ -232,6 +250,9 @@ class ConfirmEmailView(View):
         profile = user_hash.user.profile
         profile.confirm_email = True
         profile.save()
+
+        user_hash.activated = True
+        user_hash.save()
 
         return HttpResponse(render_page('confirm_email', {}))
 
@@ -309,6 +330,9 @@ class UserProfileView(View):
             profile.save()
 
             return HttpResponse(render_page('profile', {'user': vbUserProfile(profile).data}))
+        else:
+            error = form.errors.as_text().split("*")[-1]
+            return redirect(url_with_querystring('/profile/', e=error))
 
         return redirect('profile_view')
 
@@ -419,3 +443,12 @@ def password_reset_done(request):
 
 def password_reset_confirm(request):
     return HttpResponse(render_page('confirm_passwd', {'confirm': True}))
+
+def feed_view(request):
+    feeds = vbFeedElement(calc_feed(request.user.id), many=True).data
+
+    data = {
+        'feeds': feeds,
+    }
+    return HttpResponse(render_page('notice_feed_letter', data))
+

@@ -91,7 +91,8 @@ def parse_ntv_plus_translation():
                 'meta': meta,
                 'embed_code': ' ',
                 'value': '',
-                'player': None
+                'player': None,
+                'tag': 'sport'
         }
 
         translations_list.append(translation_data)

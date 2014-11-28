@@ -14,8 +14,8 @@ class EmptyQuerySet(Exception):
 
 
 class PosterFilmManager(models.Manager):
-    def get_query_set(self):
-        return super(PosterFilmManager, self).get_query_set().filter(type=APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER)
+    def get_queryset(self):
+        return super(PosterFilmManager, self).get_queryset().filter(type=APP_FILM_TYPE_ADDITIONAL_MATERIAL_POSTER)
 
 
 # Модель Расширения фильмов/сериалов

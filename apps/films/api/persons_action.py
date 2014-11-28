@@ -4,9 +4,12 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from apps.users import Feed
+
+from apps.users.models import Feed
 from apps.users.constants import PERSON_SUBSCRIBE
+
 from apps.films.models import UsersPersons, Persons
+
 from videobase.settings import DEFAULT_REST_API_RESPONSE
 
 

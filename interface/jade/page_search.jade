@@ -16,7 +16,6 @@ html
                                     .list-film
                                         .row#films
                                             each item in films.items
-                                                - console.log(item)
                                                 mixin film_thumb(item)
                                     //-
                                        .list-film
@@ -24,8 +23,7 @@ html
                                         .add-filter#films_more
                                             .add-content.style-panel-action.rel.zmin
                                                 a(href='#') мало, хочу еще фильмов
-                                            //-
-                                               .filter-content
+
                                             img.img-responsive(src=img_url + 'shd-big.png', alt='')
                             else
                                 .sad-text К сожалению, мы ничего не нашли по вашему запросу.

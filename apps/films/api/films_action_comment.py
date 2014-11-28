@@ -13,7 +13,8 @@ from rest_framework.permissions import IsAuthenticated
 from apps.contents.models import Comments, Contents
 from apps.films.forms import CommentForm
 from apps.films.models import Films
-from apps.users import Feed
+
+from apps.users.models import Feed
 from apps.users.constants import FILM_COMMENT
 
 from videobase.settings import DEFAULT_REST_API_RESPONSE

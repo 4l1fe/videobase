@@ -200,7 +200,7 @@ class Item
     else
       @vals
 
-  set_val: (name, val, do_not_set) ->
+  set_val: (name, val, do_not_set = false) ->
     val = @transform_val(name, val)
     @vals[name] = val
     if !do_not_set
@@ -223,7 +223,7 @@ class Item
             else
               e.self.attr(attr, val || e.default)
 
-  set_vals: (vals, do_not_set) ->
+  set_vals: (vals, do_not_set = false) ->
     @reset()
     for key, val of vals
       @set_val(key, val, do_not_set)
@@ -294,50 +294,50 @@ class FilmThumb extends Item
       if vals.releasedate && typeof(val) == "string"
         vals.title_alt+= " " + vals.releasedate.substr(0,4)
 
-    @elements["btn_price"].self.hide()
-    if vals.locations && vals.locations.length
-      vals.hasFree = false
-      vals.price = 0
-      price_loc_cnt = 0
-      for loc in vals.locations
-        loc.price = parseFloat(loc.price || 0)
-        if loc.price_type == 0
-          vals.hasFree = true
-        else
-          if loc.price && (vals.price == 0 || loc.price < vals.price)
-            vals.price = loc.price
-            vals.price_loc = loc.id
-          price_loc_cnt++
-      btn_cls = false
-      btn_text = ""
+    if !do_not_set
+      @elements["btn_price"].self.hide()
+      if vals.locations && vals.locations.length
+        vals.hasFree = false
+        vals.price = 0
+        price_loc_cnt = 0
+        for loc in vals.locations
+          loc.price = parseFloat(loc.price || 0)
+          if loc.price_type == 0
+            vals.hasFree = true
+          else
+            if loc.price && (vals.price == 0 || loc.price < vals.price)
+              vals.price = loc.price
+              vals.price_loc = loc.id
+            price_loc_cnt++
+        btn_cls = false
+        btn_text = ""
+        if !vals.hasFree && vals.price
+          btn_cls = "btn-price"
+          btn_text = "Смотреть<br><i>"
+          btn_text+= "от " if price_loc_cnt > 1
+          btn_text+= vals.price + " р. без рекламы</i>"
+        else if vals.price
+          @elements["btn_price"].self.css("display", "block")
+          text = vals.price + " р. без рекламы"
+          text = "от " + text if price_loc_cnt > 1
+          @elements["price"].self.text(text)
+        if !vals.price || vals.hasFree
+          btn_cls = "btn-free"
+          btn_text = "Смотреть<br/>бесплатно"
+      else
+        btn_cls = "btn-subscribe"
+        btn_text = "Подписаться"
+      if vals.relation && vals.relation.rating
+        @elements["relation.rating"].self.rateit().rateit("value", vals.relation.rating)
+      @elements["btn"].self.removeClass("btn-subscribe").removeClass("btn-price").removeClass("btn-free").addClass(btn_cls)
+      @elements["btn_text"].self.html(btn_text).css("display", "block")
+      super
       if !vals.hasFree && vals.price
-        btn_cls = "btn-price"
-        btn_text = "Смотреть<br><i>"
-        btn_text+= "от " if price_loc_cnt > 1
-        btn_text+= vals.price + " р. без рекламы</i>"
-      else if vals.price
-        @elements["btn_price"].self.css("display", "block")
-        text = vals.price + " р. без рекламы"
-        text = "от " + text if price_loc_cnt > 1
-        @elements["price"].self.text(text)
-      if !vals.price || vals.hasFree
-        btn_cls = "btn-free"
-        btn_text = "Смотреть<br/>бесплатно"
-    else
-      btn_cls = "btn-subscribe"
-      btn_text = "Подписаться"
-      @elements["btn"].self.click => @toggle_subscribe()
-    if vals.relation && vals.relation.rating
-      @elements["relation.rating"].self.rateit().rateit("value", vals.relation.rating)
-    @elements["btn"].self.removeClass("btn-subscribe").removeClass("btn-price").removeClass("btn-free").addClass(btn_cls)
-    @elements["btn_text"].self.html(btn_text).css("display", "block")
-    super
-    if !vals.hasFree && vals.price
-      @elements["btn_text"].self.attr("href", @elements["btn_text"].self.attr("href") + "#" + vals.price_loc)
-    else
-      @elements["btn_text"].self.attr("href", @elements["btn_text"].self.attr("href") + "#player")
-      if vals.price
-        @elements["price"].self.parent().attr("href", @elements["price"].self.parent().attr("href") + "#" + vals.price_loc)
+        @elements["btn_text"].self.attr("href", @elements["btn_text"].self.attr("href") + "#" + vals.price_loc)
+      else
+        @elements["btn_text"].self.attr("href", @elements["btn_text"].self.attr("href") + "#player")
+        if vals.price
+          @elements["price"].self.parent().attr("href", @elements["price"].self.parent().attr("href") + "#" + vals.price_loc)
 
   action_rate: (val) ->
     @_app.film_action @vals.id, "rate", {
@@ -371,6 +371,9 @@ class FilmThumb extends Item
     }
 
   toggle_subscribe: (status) ->
+    if !@vals.relation?
+      @vals.relation = {}
+
     @_app.film_action @vals.id, "subscribe", {
       rel: @vals.relation
       state: status
@@ -390,6 +393,9 @@ class CommentThumb extends Item
     super opts, =>
       if !opts.place
         $(".time-tape", @_place).data("miVal", @vals_orig.created)
+        item_anchor = "comment_" + opts.vals.item_index
+        $(".time-tape-bookmark", @_place).attr("name", item_anchor)
+        $(".time-tape", @_place).attr("href", "#" + item_anchor)
 
   transform_attr: (attr, name, val) ->
     if attr == "href" && name == "user.id"
@@ -429,6 +435,10 @@ class FeedThumb extends Item
         if @_type == "film-r"
           @elements["object.rating"].self.rateit().rateit("value", opts.vals.object.rating)
 
+        item_anchor = "comment_" + opts.vals.item_index
+        $(".time-tape-bookmark", @_place).attr("name", item_anchor)
+        $(".time-tape", @_place).attr("href", "#" + item_anchor)
+
   transform_val: (name, val) ->
     if name == "user.name"
       return val || "Пользователь"
@@ -439,13 +449,15 @@ class FeedThumb extends Item
   transform_attr: (attr, name, val) ->
     type = @_type
     if type.substr(0,4) == "film"
-      if name == "object.id" && attr="href"
+      if name == "object.id" || name == 'object.film.id' && attr="href"
         return "/films/" + val + "/"
       if name == "object.name"
         return val + " (" + @vals_orig.object.releasedate.substr(0,4) + ")"
     if type.substr(0,4) == "pers" && attr="href"
       if name == "object.id"
         return "/persons/" + val + "/"
+      else if name == "object.film.id"
+        return "/films/" + val + "/"
     if type.substr(0,4) == "user" && attr="href"
       if name == "object.id"
         return "/users/" + val + "/"
@@ -461,6 +473,7 @@ class FeedThumb extends Item
 class CastThumb extends Item
   constructor: (opts = {}, callback) ->
     @_name = "cast-thumb"
+    self = @
     if opts.vals
       @_type = opts.vals.type
       @vals_orig = opts.vals
@@ -468,6 +481,7 @@ class CastThumb extends Item
       opts.vals.min_vs_start = opts.vals.min_vs_start = Math.floor((new Date() - opts.vals.start_date) / 60 / 1000)
       opts.vals.duration = opts.vals.duration || 180
       opts.vals.is_online = opts.vals.min_vs_start >=0 && opts.vals.min_vs_start < opts.vals.duration
+      opts.relation = opts.relation || {}
 
     super opts, =>
       if (!opts.place)
@@ -480,20 +494,28 @@ class CastThumb extends Item
           label_prim_cls = 'label-success'
           @elements["btn"].self.show().addClass("btn-free").html("Смотреть<br/>бесплатно")
         else if @vals.min_vs_start < 0
-          if @vals.min_vs_start < -1440
+          if @vals.min_vs_start > -1440
             label_prim_str = ''
             if @vals.min_vs_start > -60
               label_prim_str = "примерно "
-            label_prim_str+= 'через ' + duration_text( -@vals.min_vs_start )
+            label_prim_str += 'через ' + duration_text( -@vals.min_vs_start )
           else
             label_prim_str = time_text(@vals.start_date)
           @elements["btn"].self.show().addClass("btn-subscribe").text("Подписаться")
+          @elements["btn"].self.click @toggle_subscribe
         else
           label_fright_str = time_text(@vals.start_date)
           label_fright_cls = 'cast-archive-date'
           label_prim_str = 'Архив'
         @elements["label_prim"].self.removeClass("label-primary").addClass(label_prim_cls).text(label_prim_str)
         @elements["label_fright"].self.addClass(label_fright_cls).text(label_fright_str)
+
+    if @vals.is_online
+      @_app.rest.castschats.users.read(@vals.id).done (data)->
+        len = data.length
+        self.elements["label_fright"].self.text("смотрят: " + len).addClass("cast-spectators-count") if len
+
+    @vals.relation = @vals.relation || {}
 
   transform_attr: (attr, name, val) ->
     if attr == "href" && name == "id"
@@ -506,6 +528,18 @@ class CastThumb extends Item
       return val?" (" + val + ")":""
     super
 
+  toggle_subscribe: (status)=>
+    if !@vals.relation
+      @vals.relation = {}
+
+    @_app.cast_action @vals.id, "subscribe", {
+      rel: @vals.relation
+      state: status
+      callback: (new_state) =>
+        #alert("done")
+    }
+    false
+
 class Deck
   constructor: (@_place, opts = {}) ->
     @load_counter = 0
@@ -517,8 +551,9 @@ class Deck
 
     self = @
     $("." + @element_name, @_place).each(
-      ->
-        self.add_item_DOM($(this))
+      (i) ->
+        item_vals = opts.items_vals[i] if opts.items_vals && i < opts.items_vals.length
+        self.add_item_DOM($(this), item_vals)
     )
     @load_func = opts.load_func if opts.load_func
     if opts.more_place
@@ -526,8 +561,8 @@ class Deck
 
   onchange: ->
 
-  add_item_DOM: (obj) ->
-    @items.push(new @item_class({place: obj, do_not_set: true}))
+  add_item_DOM: (obj, vals = {}) ->
+    @items.push(new @item_class({place: obj, do_not_set: true, vals: vals}))
     @onchange()
 
   add_item: (item, onchange_call = true, up = false) ->
@@ -547,9 +582,8 @@ class Deck
     @items
 
   load_more_bind: (place) ->
-    @more.place = place
+    @more.place = place.click(=> @load_more(); return false)
     @more.btn = $("a", place)
-    @more.btn.click(=> @load_more(); return false)
 
   load_more: (opts) ->
     if @load_func != undefined
@@ -674,7 +708,7 @@ class CastsDeck extends Deck
   constructor: (place, opts = {}) ->
     @element_name = "cast-thumb"
     @item_class = CastThumb
-    super
+    super(place, opts)
     $(window).resize(=> @onchange())
 
   onchange: (global = false) ->
@@ -757,7 +791,9 @@ class App
     @rest.add("castschats")
     @rest.castschats.add("msgs")
     @rest.castschats.add("send")
+    @rest.castschats.add("users")
     @rest.casts.add("list")
+    @rest.casts.add("subscribe")
 
     @_e =
       search:
@@ -888,6 +924,19 @@ class App
           rel[action_str] = new_state if opts.rel
           opts.callback(new_state) if opts.callback
       )
+
+  cast_action: (id, action, opts = {}) ->
+    if @user_is_auth()
+      rel = opts.rel || {}
+      if( action == "subscribe" )
+        new_state = state_toggle(opts.status, rel.subscribed)
+        if new_state
+          doit = "create"
+        else
+          doit = "destroy"
+        @rest.casts.subscribe[doit](id).done (data)->
+          rel.subscribed = data.subscribed
+          opts.callback(new_state) if opts.callback
 
   config: (name) ->
     if name == undefined
@@ -1254,11 +1303,16 @@ class Page_Film extends Page
     @_app.rest.films.comments.read(@conf.id, {page: (comments_deck.page || 1) + 1})
     .done(
       (data) ->
+        total_page_count = Math.ceil(data.total_cnt/data.ipp)
         if data && data.items
+          item_idx = comments_deck.items.length || 0
+          for item in data.items
+            item.item_index = item_idx
+            item_idx++
           comments_deck.add_items(data.items)
           comments_deck.time_update()
           comments_deck.page = data.page
-          if data.items.length >= 10
+          if data.page < total_page_count
             comments_deck.load_more_show()
           else
             comments_deck.load_more_hide(false)
@@ -1297,6 +1351,11 @@ class Page_Film extends Page
                   if res.items && res.items.length
                     $("#has_comments").show()
                     comments_deck.add_item(res.items[0], true, true)
+                    items_len = comments_deck.items.length
+                    if items_len
+                      $('body').animate({
+                        scrollTop: comments_deck.items[items_len-1]._place.offset().top
+                      }, "slow")
               )
               .fail(
                 (res) =>
@@ -1448,6 +1507,10 @@ class Page_Feed extends Page
       (data) =>
         return if current_counter != deck.load_counter
         if data.items
+          item_idx = feed_deck.items.length || 0
+          for item in data.items
+            item.item_index = item_idx
+            item_idx++
           deck.add_items(data.items)
           if data.items.length >= 10
             deck.load_more_show()
@@ -1564,7 +1627,6 @@ class Page_User extends Page
     )
 
 class Page_CastsList extends Page
-  casts_deck = undefined
   self = undefined
   _filter_params = {}
   _filter_counter = 0
@@ -1572,10 +1634,15 @@ class Page_CastsList extends Page
   constructor: () ->
     self = @
     super
-    casts_deck = new CastsDeck($("#casts"), {load_func: (deck) =>@load_more_casts(deck) })
-    casts_deck.page = 1
-    casts_deck.load_more_hide(false)
-    casts_deck.load_more_bind($("#casts_more"))
+    opts = {
+      load_func: (deck) =>
+        @load_more_casts(deck)
+      items_vals: @_app.config().page_conf.casts
+    }
+    @casts_deck = new CastsDeck($("#casts"), opts)
+    @casts_deck.page = 1
+    @casts_deck.load_more_hide(false)
+    @casts_deck.load_more_bind($("#casts_more"))
 
     @_e.filter =
       status: $("#filter_cast_status")
@@ -1624,7 +1691,7 @@ class Page_CastsList extends Page
             clear_output: true
             page_loading: false
             params: _filter_params
-          @load_more_casts(casts_deck, opts)
+          @load_more_casts(@casts_deck, opts)
       @_app.config("filter_delay")
     )
 
@@ -1672,7 +1739,7 @@ class Page_CastsList extends Page
       else
         _filter_params[key] = null
 
-    page = casts_deck.page || 1
+    page = @casts_deck.page || 1
     _filter_params.page = page
     more_btn_href = "/?" + query_string + "page=" + (page+1)
 
@@ -1695,6 +1762,7 @@ class Page_Cast extends Page
       attempts_pos: 0
 
     @_e =
+      cast_subscribe_btn: $('#cast_subscribe_btn')
       player:
         wrapper: $("#player_wrapper")
         frame: $("#player_frame")
@@ -1710,6 +1778,7 @@ class Page_Cast extends Page
     @conf.min_vs_start = Math.floor((new Date() - @conf.start_date) / 60 / 1000)
     @conf.is_online = @conf.min_vs_start >=0 && @conf.min_vs_start < @conf.duration
     self = @
+    @_e.cast_subscribe_btn.click @action_cast_subscribe
     if @conf.is_online
       @player = new PlayerCast(@_e.player.frame)
       if @conf.locations && @conf.locations.length
@@ -1717,17 +1786,16 @@ class Page_Cast extends Page
       @_e.chat.ico.click(-> self.toggle_chat())
       @_e.chat.input
         .keypress((e) -> self.sendmsg_chat() if e.which == 13)
-        .focus( -> return false if false && !self.user_is_auth())
+        .focus( -> return false if !self.user_is_auth())
       @update_chat()
     else if @conf.min_vs_start < 0 && @_e.time_counter.length
       @timer_tick()
 
-    casts_deck = new CastsDeck($("#casts"))
+    @casts_deck = new CastsDeck($("#casts"))
+    @conf.relation = @conf.relation || {}
 
   timer_tick: () ->
     min_left = Math.floor((new Date() - @conf.start_date) / 60 / 1000)
-    console.log @conf.min_vs_start, min_left
-    console.log min_left >=0 || (@conf.min_vs_start < -40 && min_left >= -40)
     if min_left >=0 || (@conf.min_vs_start < -40 && min_left >= -40)
       location.reload()
     else
@@ -1744,20 +1812,18 @@ class Page_Cast extends Page
       @_app.rest.castschats.send.create(@conf.id, {text: text})
         .done(
           =>
-            @update_chat()
-            @_e.chat.input.prop('disabled', false);
+            @update_chat(undefined, => @_e.chat.input.val("").prop('disabled', false))
         )
         .fail(
-
         )
 
-  update_chat: (limit) ->
+  update_chat: (limit, cb) ->
     if !@conf.is_online
       return
     @chat.counter++
     local_counter = @chat.counter
     limit = limit || 20
-    @_app.rest.castschats.msgs.read @conf.id, {id_low: @chat.last_id, limit: limit}
+    @_app.rest.castschats.msgs.read @conf.id, {id_low: (@chat.last_id|| -1) + 1, limit: limit}
       .done(
         (data)=>
           if local_counter == @chat.counter
@@ -1791,6 +1857,7 @@ class Page_Cast extends Page
               @chat.attempts_pos = 2
               @chat.attempts = [0,0,0]
             @update_chat_set(@chat.attempts_pos)
+        cb(true) if typeof cb == "function"
       )
       .fail(
         =>
@@ -1798,6 +1865,7 @@ class Page_Cast extends Page
             @chat.attempts = [0,0,0]
             @chat.attempts_pos = 0
             @update_chat_set(2)
+          cb(false) if typeof cb == "function"
       )
 
   update_chat_set: (timeout_id) ->
@@ -1818,6 +1886,11 @@ class Page_Cast extends Page
       @_e.chat.wrapper.hide()
       @_e.player.wrapper.removeClass("col-md-8")
     false
+
+  action_cast_subscribe: =>
+    opts = {rel: @conf.relation}
+    @_app.cast_action( @conf.id, "subscribe", opts )
+    return false
 
 window.InitApp =  (opts = {}, page_name) ->
   new App(opts, page_name)

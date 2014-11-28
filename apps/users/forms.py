@@ -13,10 +13,9 @@ from utils.common import url_with_querystring
 
 
 class UsersProfileForm(forms.ModelForm):
-    email = forms.EmailField(required=False)
+    email = forms.EmailField(required=True)
     username = forms.CharField(required=True, max_length=30)
     avatar = forms.ImageField(required=False)
-
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('instance')
@@ -25,11 +24,19 @@ class UsersProfileForm(forms.ModelForm):
         super(UsersProfileForm, self).__init__(*args, **kwargs)
         self.fields['email'].initial = self.user.email
 
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if email:
+            exists = User.objects.filter(email=email).exclude(id=self.user.id).exists()
+            if exists:
+                raise forms.ValidationError(u'Ведёный email уже занят')
+        return email
+
     @transaction.commit_manually
     def save(self, commit=True, send_email=False):
         try:
             email = self.cleaned_data['email']
-            email_flag = True if self.user.username != email or self.user.email != email else False
+            email_flag = self.user.username != email or self.user.email != email
 
             if email_flag:
                 # Save confirm email
@@ -107,7 +114,6 @@ class CustomRegisterForm(forms.ModelForm):
         super(CustomRegisterForm, self).__init__(**kwargs)
         self.fields['username'].required = False
         self.fields['email'].required = True
-
 
     def clean(self):
         if 'email' in self.cleaned_data:

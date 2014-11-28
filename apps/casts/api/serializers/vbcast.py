@@ -1,10 +1,9 @@
 # coding: utf-8
-
 from rest_framework import serializers
-import time
-import pytz
-from apps.casts.models import Casts, UsersCasts
-from videobase.settings import TIME_ZONE
+
+from apps.casts.models import Casts
+from utils.fields.datetime_with_time_zone import DateTimeWithTimeZone
+
 
 class vbCast(serializers.ModelSerializer):
 
@@ -12,7 +11,7 @@ class vbCast(serializers.ModelSerializer):
     locations = serializers.SerializerMethodField('locations_list')
     relation = serializers.SerializerMethodField('calc_relation')
     poster = serializers.SerializerMethodField('get_poster')
-    start = serializers.SerializerMethodField('get_start')
+    start = DateTimeWithTimeZone(source='start')
 
     def tags_list(self, obj):
         return [{
@@ -24,8 +23,6 @@ class vbCast(serializers.ModelSerializer):
     def get_poster(self, obj):
         return obj.ce_cast_rel.first().get_photo_url() if obj.ce_cast_rel.first() else None
 
-    def get_start(self, obj):
-        return pytz.timezone(TIME_ZONE).localize(obj.start, is_dst=None)
 
     def locations_list(self, obj):
         return [{
@@ -43,11 +40,8 @@ class vbCast(serializers.ModelSerializer):
 
     class Meta:
         model = Casts
-        fields = [
+        fields = (
             'id', 'title', 'title_orig', 'description', 'status', 'pg_rating',
-            'start', 'duration',
-            'tags',
-            'poster',
-            'locations',
+            'start', 'duration', 'tags', 'poster', 'locations',
 #           'relation'
-        ]
+        )

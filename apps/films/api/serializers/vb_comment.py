@@ -3,12 +3,14 @@
 from rest_framework import serializers
 from apps.contents.models import Comments
 from apps.users.models import UsersPics
+from utils.fields.datetime_with_time_zone import DateTimeWithTimeZone
 
 
-#############################################################################################################
+################################################################################
 class vbComment(serializers.ModelSerializer):
     film = serializers.SerializerMethodField('calc_film')
     user = serializers.SerializerMethodField('calc_user')
+    created = DateTimeWithTimeZone(source='created')
 
     def calc_film(self, obj):
         film = obj.content.film
@@ -16,7 +18,6 @@ class vbComment(serializers.ModelSerializer):
             'id': film.id,
             'name': film.name,
         }
-
 
     def calc_user(self, obj):
         path = ''

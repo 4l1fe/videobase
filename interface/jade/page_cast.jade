@@ -22,73 +22,55 @@ html
     - min_vs_start = (new Date() - new Date(cast.start)) / 60 / 1000
     - duration = duration || 180
     - is_online = min_vs_start >= 0 && min_vs_start < duration
+    - has_locations = cast.locations && cast.locations.length
     include head
     body
         .wrap-page.bg-noise
             include header
             .content(role='main')
-                - if (cast.locations && cast.locations.length) {
-                    section.broun-block-playlist
-                        .bg-noise
-                            .title-cast
-                                .container
-                                    .row
-                                        .col-md-8.col-sm-7
-                                            .name-playlist
-                                                h2=cast.title
-                                    .row
-                                        .col-md-8.col-sm-7
-                                            div.cast-start-date=date_text(new Date(cast.start))
-                                        if is_online
-                                            .col-md-4.col-sm-5
-                                                .cast-chat-header.fright#chat_ico
-                                                    - tmp_url = img_url + "cast-chat-icon.png"
-                                                    img(src=tmp_url, alt="", title="")
-                                                    .fright
-                                                        h3.cast-chat-title Чат
-                            //-
-                               .title-cast
-                            .cast-area
-                                .container
-                                    .row
-                                        if is_online
-                                            .col-md-8.rpadding0#player_wrapper
-                                                each el in cast.locations
-                                                    a(id=el.id)
-                                                a(id="player")
-                                                .frame-player-wrapper
-                                                    .frame-player-aspect
-                                                        .frame-player#player_frame
-                                            .col-md-4.lpadding0#chat_wrapper
-                                                .cast-chat-block
-                                                    .cast-chat-list-wrapper-out
-                                                        .cast-chat-list-wrapper-in
-                                                            .cast-chat-list#chat_list
-                                                    input(type="text", placeholder="Введите сообщение и нажмите Enter").cast-chat-text-area#chat_input
-                                        else if min_vs_start < -40
-                                            - function duration_text(min) {
-                                            -   da, ho, mi;
-                                            -   ho = Math.floor(min / 60); mi = min - ho*60;
-                                            -   da = Math.floor(ho / 24); ho = ho - da * 24;
-                                            -   res = da?da + cardinal(da, " день", " дня", " дней"):"";
-                                            -   res+= (res?" ":"") + (ho?ho + cardinal(ho, " час", " часа", " часов"):"");
-                                            -   if (mi) res+= (res?" ":"") + mi + cardinal(mi, " минута", " минуты", " минут")
-                                            -   return res || "0 минут";
-                                            - }
-                                            .col-md-12.rpadding0.cast-offline
-                                                h4 До начала видео осталось <span id="time_counter">#{duration_text(Math.floor(-min_vs_start))}</span>
-                                                .btn-def.block.btn-subscribe Подписаться
-                                        else if min_vs_start < 0
-                                            .col-md-12.rpadding0.cast-offline
-                                                h4 До начала видео осталось <span id="time_counter">#{duration_text(Math.floor(-min_vs_start))}</span>
-                                        else
-                                            .col-md-12.rpadding0.cast-offline
-                                                h4 Данное видео временно недоступно
-        //-
-                               .cast-area
-                    //-
-                        .broun-block
-                - }
+                section.broun-block-playlist
+                    .bg-noise
+                        .title-cast
+                            .container
+                                .row
+                                    .col-md-8.col-sm-7
+                                        .name-playlist
+                                            h2=cast.title
+                                .row
+                                    .col-md-8.col-sm-7
+                                        div.cast-start-date=date_text(new Date(cast.start))
+                                    if is_online
+                                        .col-md-4.col-sm-5
+                                            .cast-chat-header.fright#chat_ico
+                                                - tmp_url = img_url + "cast-chat-icon.png"
+                                                img(src=tmp_url, alt="", title="")
+                                                .fright
+                                                    h3.cast-chat-title Чат
+                        .cast-area
+                            .container
+                                .row
+                                    if is_online && has_locations
+                                        .col-md-8.rpadding0#player_wrapper
+                                            each el in cast.locations
+                                                a(id=el.id)
+                                            a(id="player")
+                                            .frame-player-wrapper
+                                                .frame-player-aspect
+                                                    .frame-player#player_frame
+                                        .col-md-4.lpadding0#chat_wrapper
+                                            .cast-chat-block
+                                                .cast-chat-list-wrapper-out
+                                                    .cast-chat-list-wrapper-in
+                                                        .cast-chat-list#chat_list
+                                                input(type="text", placeholder="Введите сообщение и нажмите Enter").cast-chat-text-area#chat_input
+                                    else if min_vs_start < 0 && has_locations
+                                        .col-md-12.rpadding0.cast-offline
+                                            h4 До начала видео осталось <span id="time_counter">#{duration_text(Math.floor(-min_vs_start))}</span>
+                                            if min_vs_start < -40
+                                                .btn-def.block.btn-subscribe#cast_subscribe_btn Подписаться
+                                    else
+                                        .col-md-12.rpadding0.cast-offline
+                                            h4 Данное видео временно недоступно
             section.brd-top.cast-details
                 .container
                     .row

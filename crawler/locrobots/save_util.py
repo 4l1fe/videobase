@@ -16,11 +16,12 @@ def save_loaded_data_to_file(loaded_json_data, file_name, sub_dir_name):
         site_dir = saved_pages_directory + '/' + sub_dir_name
         if not os.path.exists(site_dir):
             os.makedirs(site_dir)
-        f = open(site_dir + '/' + saved_file_name, 'w')
-        f.write(json.dumps(loaded_json_data))
-        f.close()
+        with open(site_dir + '/' + saved_file_name, 'w') as f:
+            json.dump(loaded_json_data, f)
+
     except Exception, e:
-        print "Saving failed with error:", e.message
+        import traceback
+        print "Saving failed with error:", traceback.print_exc()
         return None
     return site_dir + '/' + saved_file_name
 

@@ -6,6 +6,7 @@ from apps.films.models.photoclass import PhotoClass
 from utils.common import get_image_path
 import videobase.settings as settings
 
+
 # Модель Расширения фильмов/сериалов
 class CastExtrasStorage(PhotoClass):
     cast      = models.ForeignKey('Casts', verbose_name=u'Cast', related_name="ce_cast_rel")

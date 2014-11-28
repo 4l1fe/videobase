@@ -255,6 +255,7 @@ section {padding:37px 0 6px 0;}
 
 .search-block input {color: #fff; background-color: #615858}
 
+.add-content { cursor: pointer; }
 .add-filter {padding-bottom: 16px;}
 .add-filter .img-responsive {width: 100%}
 .add-filter-loading .add-content a {visibility: hidden}
@@ -558,9 +559,12 @@ footer[role=contentinfo] {padding: 18px 0 0 0;}
     padding: 14px 0 8px 0;
     border-bottom: 1px solid #c5c5c5;
 }
-.time-tape {
-    text-align: right;color: #9e9e9e;padding-top: 3px;
+.title-item-tape .time-tape {
+    color: #9e9e9e; padding-top: 3px; font-size: 14px;
 }
+
+.time-tape-wrapper { text-align: right; }
+
 .content-item-tape {padding: 16px 0 0 0;}
 .short-text-tape p {
     color: #464b4c;font-size: 14px;line-height: 20px;
@@ -1068,6 +1072,10 @@ a.toggle-playlist.active {
     .list-btns-film li {padding-left:10px;padding-right: 10px;}*/
 }
 
+@media only screen and (max-width: 992px) {
+    .cast-chat-block { margin-left: 15px; }
+}
+
 .cast-thumb {
     background: transparent;
     margin-bottom: 10px;
@@ -1265,6 +1273,8 @@ section.cast-chat {padding-bottom: 40px;}
 .title-cast .cast-start-date { color: #a08c8c; padding-top: 8px; }
 .title-cast .cast-chat-title { color: #fff; text-transform: uppercase; font-weight: normal; }
 
+.cast-archive-date, .cast-spectators-count { color: #7f7878; text-decoration: none; }
+
 .list-btns-cast { margin-top: 24px; }
 
 .cast-area { padding-bottom: 20px; }
@@ -1380,6 +1390,7 @@ section.cast-chat {padding-bottom: 40px;}
 .frame-player-wrapper .frame-player-aspect {width: 100%; padding-top: 59%; position: relative}
 .frame-player-wrapper .frame-player {position: absolute; top: 0; bottom: 0; left: 0; right: 0}
 .frame-player iframe {width: 100%; height: 100%}
+.frame-player { background: #fff; }
 
 .trailer-area-wrapper {text-align: center; width: 100%}
 .trailer-area-wrapper .trailer-area-aspect {width: 100%; padding-top: 59%; position: relative}
@@ -1405,10 +1416,24 @@ section.cast-chat {padding-bottom: 40px;}
 .sad-text {font-size: 30px; color: #fff; text-align: center; padding: 40px 0 60px 0}
 
 .add-comment {margin-bottom: 50px}
-.add-comment textarea {margin-top: 20px; margin-bottom: 20px; border-width: 0}
+.add-comment textarea {margin-top: 20px; margin-bottom: 20px; border-width: 0; resize: none}
 
 .index-comments-block {margin: 0 auto; padding: 0}
 .index-comments-block .bg-noise {padding: 34px 0}
+
+.index-comments-block .crsl-nav {/*fix issue #505*/
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.playlist .crsl-nav {
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
 
 .password-reset { padding-top: 0;  }
 .password-reset .container {padding-top: 37px}
@@ -1418,3 +1443,5 @@ section.cast-chat {padding-bottom: 40px;}
 .cast-offline h4 span {color: #fff}
 .cast-offline .btn-def {margin: 35px auto 0 auto; cursor: pointer}
 .cast-item-def .btn-def {cursor: pointer}
+
+.cast-thumb a.poster-place { text-decoration: none; display: block; }

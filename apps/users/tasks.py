@@ -1,10 +1,11 @@
 # coding: utf-8
 
 import StringIO
+import textwrap
 import requests
 from PIL import Image
 
-from django.core.mail import EmailMultiAlternatives
+from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 from django.core.files.uploadedfile import InMemoryUploadedFile
 
@@ -17,30 +18,56 @@ from apps.films.constants import APP_PERSONFILM_SUBS_TRUE, APP_USERFILM_SUBS_TRU
 
 from apps.users.models import User, UsersPics
 from apps.users.constants import APP_NOTIFICATION_TEMPLATE,\
-    APP_NOTIFICATION_EMAIL_SUBJECT, FILM_O, PERSON_O
+    APP_NOTIFICATION_EMAIL_SUBJECT, FILM_O, PERSON_O, EMAIL_HEADERS
 
 
-@app.task(name="confirm_register", queue="send_mail")
-def send_template_mail(subject, tpl_name, context, to, jade_render=False):
-    if jade_render:
-        tpl = render_page(tpl_name, context, False)
+@app.task(name="send_template_mail", queue="mail")
+def send_template_mail(subject, context, to, tpl_name=None, use_render=True, jade_render=False, **kwargs):
+    """
+    Очередь отправки сообщений
+    """
+
+    if isinstance(to, basestring):
+        to = [to]
+    
+    if use_render:
+        if jade_render:
+            text_email = render_page(tpl_name, context, False)
+        else:
+            text_email = render_to_string(tpl_name, context)
     else:
-        tpl = render_to_string(tpl_name, context)
+        text_email = context
 
-    msg = EmailMultiAlternatives(subject=subject, to=to)
-    msg.attach_alternative(tpl, 'text/html')
+    text_email = '\r\n'.join(textwrap.wrap(text_email.encode('utf-8').encode('base64'), 76))
+    msg = EmailMessage(subject, text_email, to=to, headers=EMAIL_HEADERS)
+    msg.content_subtype = 'html'
     msg.send()
 
 
-@app.task(name="notification", queue="notification")
-def notification(id_, type_):
+@app.task(name="notification", queue="notify")
+def film_notification(id_, type_, **kwargs):
+    """
+    Очередь обработка момента, когда появилось событие подписки на фильм или на персону
+    """
+
     if type_ not in (FILM_O, PERSON_O):
         raise ValueError("Not valid argument")
 
-    tpl_name = APP_NOTIFICATION_TEMPLATE[type_]
-    subject = APP_NOTIFICATION_EMAIL_SUBJECT[type_]
+    define_id = id_ if type_ == FILM_O else kwargs['child_obj']
+    o_film = Films.objects.get(id=define_id)
+
+    kw = {
+        'subject': APP_NOTIFICATION_EMAIL_SUBJECT[type_],
+        'tpl_name': APP_NOTIFICATION_TEMPLATE[type_],
+        'context': {
+            'film': {
+                'id': o_film.id,
+                'name': o_film.name
+            }
+        }
+    }
+
     if type_ == FILM_O:
-        model_obj = Films
         model_user = UsersFilms
         query = {
             'film': id_,
@@ -48,39 +75,29 @@ def notification(id_, type_):
         }
 
     else:
-        model_obj = Persons
         model_user = UsersPersons
+        o_person = Persons.objects.get(id=id_)
+        kw['context']['person'] = {
+            'id': o_person.id,
+            'name': o_person.name
+        }
+
         query = {
             'person': id_,
             'subscribed': APP_PERSONFILM_SUBS_TRUE,
         }
 
-    try:
-        obj = model_obj.objects.get(id=id_)
-        to = model_user.objects.filter(**query).exclude(user__email='').values_list("user__email", flat=True)
-        kw = {
-            'subject': subject,
-            'tpl_name': tpl_name,
-            'to': to,
-            'context': {'object': obj},
-        }
+    # Выборка почтовых адресов
+    list_email = model_user.objects.filter(**query).exclude(user__email='').values_list("user__email", flat=True)
 
-        # Send email
-        send_template_mail.apply_async(kwargs=kw)
-    except Exception, e:
-        pass
-
-
-@app.task(name="send_robots_statistic_to_email", queue="send_mail")
-def send_statistic_to_mail(subject, text, to):
-    print "Sending email to {}".format(to)
-    msg = EmailMultiAlternatives(subject=subject, to=to)
-    msg.attach_alternative(text, 'text/html')
-    msg.send()
+    # Send email from list
+    for item in list_email:
+        kw.update({'to': item})
+        send_template_mail.s(**kw).apply_async()
 
 
 @app.task(name="get_avatar", queue="load")
-def avatar_load(image_url, type_, user_id=None):
+def avatar_load(image_url, type_, user_id=None, **kwargs):
     response = requests.get(image_url)
     if response.status_code == 200:
         buff = StringIO.StringIO(response.content)
