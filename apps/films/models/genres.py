@@ -56,7 +56,7 @@ class Genres(NS_Node):
 
         list_ids = ','.join([str(i) for i in pk])
 
-        sql = """SELECT "t".* FROM ((SELECT "t".films_id, "b".* FROM (
+        sql = """SELECT DISTINCT ON("t"."id") "t".* FROM ((SELECT "t".films_id, "b".* FROM (
 SELECT "films_genres"."films_id", "genres"."id", "genres"."lft", "genres"."rgt", "genres"."tree_id" FROM "genres"
 INNER JOIN "films_genres" ON ("genres"."id" = "films_genres"."genres_id")
 WHERE "films_genres"."films_id" = ANY('{%s}'::integer[])

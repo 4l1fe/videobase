@@ -5,7 +5,7 @@ from django.db.models import Q
 from rest_framework import serializers
 
 from apps.films.api.serializers import vbUserGenre
-from apps.films.models import Genres, UsersFilms
+from apps.films.models import Genres, UsersFilms, Films
 from apps.films.constants import APP_USERFILM_STATUS_NOT_WATCH, APP_USERFILM_STATUS_UNDEF, APP_USERFILM_STATUS_PLAYLIST
 
 from apps.users.models import User, UsersPics, UsersRels
@@ -104,7 +104,8 @@ class vbUser(serializers.ModelSerializer):
         return rel
 
     def genres_list(self, obj):
-        genres = Genres.objects.filter(Q(genres__uf_films_rel__user=obj), Q(genres__uf_films_rel__status=APP_USERFILM_STATUS_UNDEF) | Q( genres__uf_films_rel__status=APP_USERFILM_STATUS_PLAYLIST)).distinct()
+        user_films = list(Films.objects.filter(Q(uf_films_rel__user=obj), ~Q(uf_films_rel__status=APP_USERFILM_STATUS_NOT_WATCH)).values_list('pk', flat=True))
+        genres = Genres.get_full_genres_by_films(user_films)
         return sorted(vbUserGenre(genres, user=obj, many=True).data, key=lambda g: g['percent'], reverse=True)
 
     def friends_list(self, obj):
