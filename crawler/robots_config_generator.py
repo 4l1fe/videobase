@@ -54,18 +54,6 @@ stdout_logfile=/var/log/%(program_name)s.log'''
         file.write(generate_program('beat', beat_command, d, u))
         file.write("\n")
 
-        # file.write(generate_group('locrobots', ','.join(lt_list)))
-        # file.write("\n")
-        #
-        # file.write(generate_group('datarobots', ','.join(dt_list)))
-        # file.write("\n")
-        #
-        # file.write(generate_group('castrobots', ','.join(ct_list)))
-        # file.write("\n")
-        #
-        # file.write(generate_group('additionalrobots', ','.join(adnt_list)))
-        # file.write("\n")
-
         cast_queue = [CAST_QUEUE]
         mail_notify_queue = [MAIL_QUEUE, NOTIFY_QUEUE]
         data_queue = [DATA_QUEUE]
