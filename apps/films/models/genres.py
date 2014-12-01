@@ -61,7 +61,7 @@ SELECT "films_genres"."films_id", "genres"."id", "genres"."lft", "genres"."rgt",
 INNER JOIN "films_genres" ON ("genres"."id" = "films_genres"."genres_id")
 WHERE "films_genres"."films_id" = ANY('{%s}'::integer[])
 AND "genres"."hidden" = false AND "genres"."lft" != 1
-) AS "t" LEFT JOIN "genres" AS "b" ON "b"."tree_id" = "t"."tree_id" AND "b"."lft" = 1
+) AS "t" INNER JOIN "genres" AS "b" ON "b"."tree_id" = "t"."tree_id" AND "b"."lft" = 1 AND "b"."hidden" = false
 ) UNION (
 SELECT "films_genres"."films_id", "genres".*
 FROM "genres" INNER JOIN "films_genres" ON ("genres"."id" = "films_genres"."genres_id")
