@@ -27,6 +27,8 @@ class Command(BaseCommand):
         self.calculate_local_rating()
 
         # Вычисляем консолидированный рейтинг
+        # В случае медленного исполнения можно обсчитать в пуле тредов.
+        # Батчи для этого уже сделаны.
         count_films = Films.objects.count()
         for index, offset in enumerate(xrange(0, count_films, self.step_limit), start=1):
             start = time()
@@ -39,7 +41,6 @@ class Command(BaseCommand):
             print u"Elapsed time: {0}, Chunk: {1}".format(time() - start, index * self.step_limit)
 
         print u"Total Elapsed time: {0}".format(time() - main_time)
-
 
     @transaction.commit_on_success
     def calc_our_ratings_for_chunk(self, offset):
@@ -68,7 +69,6 @@ class Command(BaseCommand):
 
             item.save()
 
-
     def calculate_local_rating(self):
         """
         Вычисление локального рейтинга
@@ -83,19 +83,18 @@ class Command(BaseCommand):
             """
 
             cursor.execute(query)
-            desc = cursor.description
             o_count = dict_fetch_all(cursor)
+
+            # Обновляем локальные рейтинги
+            self.update_local_params(o_count)
+
         except Exception, e:
             self.print_error(e)
             sys.exit(1)
         finally:
             cursor.close()
 
-        # Обновляем локальные рейтинги
-        self.update_local_params(o_count)
-
         print u"End calculate local ratings"
-
 
     @transaction.commit_on_success
     def update_local_params(self, items):
@@ -111,7 +110,6 @@ class Command(BaseCommand):
             # Обновляем локальный рейтинг
             Films.objects.filter(id=item['film_id']).\
                 update(rating_local_cnt=item['count_films'], rating_local=sum_value)
-
 
     def print_error(self, e):
         exc_type, exc_value, exc_traceback = sys.exc_info()
