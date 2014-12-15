@@ -260,10 +260,12 @@
                   _this.token = void 0;
                   _this.session_token = void 0;
                   $.cookie("x-session", "", {
-                    expires: -1
+                    expires: -1,
+                    path: "/"
                   });
                   $.cookie("x-token", "", {
-                    expires: -1
+                    expires: -1,
+                    path: "/"
                   });
                   if (_this.opts.auth_error) {
                     _this.opts.auth_error(xhr);

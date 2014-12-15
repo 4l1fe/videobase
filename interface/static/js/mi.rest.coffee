@@ -167,8 +167,10 @@ class Resource
             else
               @token = undefined
               @session_token = undefined
-              $.cookie("x-session", "", {expires: -1} )
-              $.cookie("x-token", "", {expires: -1} )
+
+              $.cookie("x-session", "", {expires: -1, path: "/"})
+              $.cookie("x-token", "", {expires: -1, path: "/"})
+
               @opts.auth_error(xhr) if @opts.auth_error
               success = false
             for cb in @_session_callback_queue
