@@ -9,6 +9,8 @@ from django.core.management.base import BaseCommand
 
 from apps.films.models import Films
 
+from utils.common import dict_fetch_all
+
 
 class Command(BaseCommand):
 
@@ -21,10 +23,12 @@ class Command(BaseCommand):
         main_time = time()
         print u"Start calculate rating...."
 
-        # Вычисляем локальный рейтинг
+        print u"Start calculate local ratings"
         self.calculate_local_rating()
 
         # Вычисляем консолидированный рейтинг
+        # В случае медленного исполнения можно обсчитать в пуле тредов.
+        # Батчи для этого уже сделаны.
         count_films = Films.objects.count()
         for index, offset in enumerate(xrange(0, count_films, self.step_limit), start=1):
             start = time()
@@ -38,9 +42,19 @@ class Command(BaseCommand):
 
         print u"Total Elapsed time: {0}".format(time() - main_time)
 
-
     @transaction.commit_on_success
     def calc_our_ratings_for_chunk(self, offset):
+        def calc_rating_sort(instance):
+            """
+            Вычисление условного рейтинга для сортировки
+            """
+
+            rating_sort = instance.get_sort_cnt(instance.rating_cons_cnt) * \
+                          instance.get_time_factor * instance.rating_cons
+
+            return rating_sort
+
+        # Выборка фильмов
         o_film = Films.objects.order_by('id')[offset:offset + self.step_limit]
 
         for item in o_film:
@@ -51,10 +65,9 @@ class Command(BaseCommand):
             item.rating_cons = item.get_calc_rating_cons
 
             # Calculate rating sort
-            item.rating_sort = self.calc_rating_sort(item)
+            item.rating_sort = calc_rating_sort(item)
 
             item.save()
-
 
     def calculate_local_rating(self):
         """
@@ -70,45 +83,33 @@ class Command(BaseCommand):
             """
 
             cursor.execute(query)
-            desc = cursor.description
-            o_count = [dict(zip([col[0] for col in desc], row)) for row in cursor.fetchall()]
+            o_count = dict_fetch_all(cursor)
+
+            # Обновляем локальные рейтинги
+            self.update_local_params(o_count)
+
         except Exception, e:
             self.print_error(e)
             sys.exit(1)
         finally:
             cursor.close()
 
-        print u"Reset local rating"
-        Films.objects.update(rating_local_cnt=0, rating_local=0)
-
-        print u"Update local params for films"
-        self.update_local_params(o_count)
-
+        print u"End calculate local ratings"
 
     @transaction.commit_on_success
     def update_local_params(self, items):
-        for item in items:
-            sum = 0
+        # Сброс рейтингов
+        Films.objects.update(rating_local_cnt=0, rating_local=0)
 
-            # Check if not null
+        for item in items:
+            sum_value = 0
+
             if item['count_films']:
-                sum = round(item['sum_films'] / item['count_films'], 1)
+                sum_value = round(item['sum_films'] / item['count_films'], 1)
 
             # Обновляем локальный рейтинг
             Films.objects.filter(id=item['film_id']).\
-                update(rating_local_cnt=item['count_films'], rating_local=sum)
-
-
-    def calc_rating_sort(self, instance):
-        """
-        Вычисление условного рейтинга для сортировки
-        """
-
-        rating_sort = instance.get_sort_cnt(instance.rating_cons_cnt) * \
-                      instance.get_time_factor * instance.rating_cons
-
-        return rating_sort
-
+                update(rating_local_cnt=item['count_films'], rating_local=sum_value)
 
     def print_error(self, e):
         exc_type, exc_value, exc_traceback = sys.exc_info()
