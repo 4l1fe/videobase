@@ -159,10 +159,14 @@ section {padding:37px 0 6px 0;}
 .list-film .col-md-3 {padding: 29px 10px 10px 10px;}
 .films-new .list-film > .row {overflow: hidden;}
 .film-thumb {
-    background: transparent;margin-bottom: 18px;
+    background: transparent;
+    margin-bottom: 18px;
     border: none;
     box-shadow: none;
+    overflow: hidden;
 }
+
+.list-film { text-align: center; }
 
 .films-new {padding-top: 0}
 .films-new .container {padding-top: 37px}
@@ -833,7 +837,7 @@ a.btn-more-friends, .btn-more-friends {
     background: url(../img/bg-broun-light.jpg) center top;
 }
 .playlist-slider-wrap  {
-    padding: 0 30px 27px 30px;
+    padding: 0 40px 27px 40px;
 }
 a.toggle-playlist {
     text-align: center;color: #fff;font-size: 16px;text-decoration: none;line-height: 38px;
@@ -854,8 +858,8 @@ a.toggle-playlist.active {
 .control-slider {
     cursor: pointer;top:90px;
 }
-.prev-slide-playlist {left: -10px;}
-.next-slide-playlist {right: -10px;}
+.prev-slide-playlist {left: 0px; margin-left: 10px; }
+.next-slide-playlist {right: 0px; margin-right: 10px; }
 #slider-playlist li {padding: 23px 0;float:left;text-align: center;}
 #slider-playlist li img {max-width: 100%}
 #slider-playlist p {
@@ -1001,9 +1005,9 @@ a.toggle-playlist.active {
 .sprite-i-watch{ background-position: 0 -1925px; width: 16px; height: 15px; }
 
 .actors-full .actor-list li {width: 23.3%;float: left;}
-@media only screen and (min-width: 991px) {
-    .list-film img {width: 100%;min-width: 100%;}
-}
+/*@media only screen and (min-width: 991px) {*/
+    /*.list-film img {width: 100%;min-width: 100%;}*/
+/*}*/
 
 @media only screen and (max-width: 991px) {
     .profile-column {padding-left: 0px;}
@@ -1338,8 +1342,21 @@ section.cast-chat {padding-bottom: 40px;}
 .blue-block .film-thumb .caption-def a span {color: #fff;}
 .blue-block .film-thumb .caption-def p {color: #85b6c7;}
 
-.film-thumb .poster-place {display: block; overflow:hidden; line-height: 0}
+.film-thumb .poster-place {
+    display: inline-block;
+    overflow:hidden;
+    line-height: 0;
+    position: relative;
+    padding-bottom: 19px;
+}
+
 .film-thumb .btn-add {width: 50px;height: 50px;top: 0px;right: 0px;}
+.film-thumb .img-shadow {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    display: block;
+}
 .btn-def a {display: block;}
 .btn-def {
     font-size: 14px;font-weight: bold;text-transform: uppercase;text-align: center;position: relative;z-index: 1;

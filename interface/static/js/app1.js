@@ -1763,7 +1763,7 @@
         films_deck.load_more_hide(false);
       }
       $('.crsl-items').carousel({
-        itemMinWidth: 200,
+        itemMinWidth: 180,
         itemEqualHeight: true,
         visible: 3
       });
