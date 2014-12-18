@@ -3,6 +3,7 @@ from apps.casts.models import Casts, CastsLocations, CastsServices, CastExtrasSt
 from apps.casts.constants import APP_CONTENTS_PRICE_TYPE_FREE, APP_CONTENTS_PRICE_TYPE_PAY
 from crawler.casts_robot.save_image_for_translation import get_one_google_image_by_query
 from django.core.files import File
+from utils.common import traceback_own
 
 DEFAULT_PG_RATING = u'16+'
 
@@ -30,15 +31,17 @@ def save_cast_dict(cast_service_name, cast_dict):
         cast.save()
         cast.tags.add(tag)
         cast.save()
-
-        image_path = get_one_google_image_by_query(cast_dict['title'])
-        cast_extras_storage = CastExtrasStorage(cast=cast,
-                                                name=cast_dict['title'],
-                                                name_orig=cast_dict['title']
-        )
-        cast_extras_storage.save()
-        cast_extras_storage.photo.save('wallpapper.jpg', File(image_path))
-        print cast_extras_storage.id
+        try:
+            image_path = get_one_google_image_by_query(cast_dict['title'])
+            cast_extras_storage = CastExtrasStorage(cast=cast,
+                                                    name=cast_dict['title'],
+                                                    name_orig=cast_dict['title']
+            )
+            cast_extras_storage.save()
+            cast_extras_storage.photo.save('wallpapper.jpg', File(image_path))
+            print cast_extras_storage.id
+        except Exception as e:
+            traceback_own(e)
 
     cast_service = CastsServices.objects.get(name=cast_service_name)
     location = CastsLocations.objects.filter(cast=cast, cast_service_id=cast_service.id).first()
