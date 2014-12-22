@@ -135,7 +135,7 @@ class CastsListView(APIView):
         }
 
         for field in filter:
-            if filter[field]:
+            if filter[field] or (field == 'price_high' and filter[field] == 0):
                 o_search = transform_map[field](o_search, filter[field])
             elif field == 'status':
                 o_search = o_search.filter(start__gte=datetime.datetime.now() - timezone.timedelta(hours=3)).order_by('start')

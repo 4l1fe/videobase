@@ -1732,7 +1732,7 @@ class Page_CastsList extends Page
     query_string=""
     for key, el of @_e.filter
       val = el._selected._val
-      if val && val != "0"
+      if (val && val != "0") || (key == "price_high")
         _filter_params[key] = val
         query_string+= "&" if query_string
         query_string+= key + "=" + val
