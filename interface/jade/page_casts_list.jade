@@ -3,7 +3,7 @@ html
     - is_main = true
     - filter_cast_status = {0: "все трансляции", "online": "онлайн", "future": "не начавшиеся", "passed": "архив"}
     - filter_cast_quality = [["", "любое качество"], ["sd", "обычное качество"], ["hd", "HD качество"]]
-    - filter_cast_price = {0: "бесплатно", 50: "до 50 рублей", 100: "до 100 рублей", 200: "до 200 рублей"}
+    - filter_cast_price = [["", "любая стоимость"], [0, "бесплатно"], [50, "до 50 рублей"], [100, "до 100 рублей"], [200, "до 200 рублей"]]
     include config
     include mixins
     include head
@@ -48,12 +48,12 @@ html
                                                             e
                                             li#filter_cast_price
                                                 a.sprite.sprite-i-toggle-bottom(href='#', data-toggle='dropdown', title='')
-                                                    span=filter_cast_price[0]
+                                                    span=filter_cast_price[0][1]
                                                 ul.dropdown-menu
-                                                    each item, i in filter_cast_price
+                                                    each item in filter_cast_price
                                                         li
-                                                            - url_tmp = "?price_high=" + i
-                                                            a(href=url_tmp, title='',data-mi-id=i)=item
+                                                            - url_tmp = "?price_high=" + item[0]
+                                                            a(href=url_tmp, title='',data-mi-id=item[0])=item[1]
                             img.img-responsive(src=img_url + 'shd-big.png', alt='')
                             //-
                                .filter-content
