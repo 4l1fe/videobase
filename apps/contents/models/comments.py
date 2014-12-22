@@ -1,5 +1,6 @@
 # coding: utf-8
-
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
 from django.db import models
 from django.contrib.auth.models import User
 from apps.users.constants import FILM_COMMENT
@@ -61,11 +62,7 @@ class Comments(models.Model):
     def get_comments_sorting_by_created(cls):
         return cls.objects.order_by("-created")[0:20]
 
-    def delete(self, *args, **kwargs):
-        feeds_to_this_comment = Feed.objects.filter(type=FILM_COMMENT, user_id=self.user_id, obj_id=self.id).first()
-        if feeds_to_this_comment:
-            feeds_to_this_comment.delete()
-        super(Comments, self).delete(*args, **kwargs)
+
 
     class Meta:
         # Имя таблицы в БД
@@ -73,3 +70,11 @@ class Comments(models.Model):
         app_label = 'contents'
         verbose_name = u'Комментарий'
         verbose_name_plural = u'Комментарии'
+
+
+@receiver(post_delete, sender=Comments)
+def post_delete_signal(sender, **kwargs):
+    com = kwargs.get('instance')
+    feeds_to_this_comment = Feed.objects.filter(type=FILM_COMMENT, user_id=com.user_id, obj_id=com.id).first()
+    if feeds_to_this_comment:
+        feeds_to_this_comment.delete()
