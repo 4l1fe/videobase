@@ -107,7 +107,7 @@ html
                                                                 span Привязать
                                                     li
                                                         if user.social.twitter
-                                                            -var url = 'https://twitter.com/account/redirect_by_id/' + user.social.twitter
+                                                            -var url = 'https://twitter.com/intent/user?user_id=' + user.social.twitter
                                                             a(href=url, title='',target='_blank')
                                                                 img(src=img_url + 'i-tw.png', alt='')
                                                                 =url
