@@ -4,6 +4,7 @@ from django.db.models.query import QuerySet
 from django.contrib.auth.models import User
 
 from rest_framework import serializers
+from apps.casts.models import Casts
 
 from apps.contents.models import Comments, Locations
 from apps.films.models import FilmExtras, PersonsFilms, Films, UsersFilms
@@ -13,7 +14,7 @@ from apps.users.models.users_feed import Feed
 from apps.users.api.serializers import vbUser
 from apps.users.constants import (FILM_RATE, FILM_SUBSCRIBE, FILM_NOTWATCH,
                                   FILM_COMMENT, FILM_O, PERSON_SUBSCRIBE,
-                                  PERSON_O, USER_ASK, USER_FRIENDSHIP, SYS_ALL)
+                                  PERSON_O, USER_ASK, USER_FRIENDSHIP, SYS_ALL, CAST_SUBSCRIBE)
 
 from utils.common import isiterable
 from utils.fields.datetime_with_time_zone import DateTimeWithTimeZone
@@ -134,6 +135,17 @@ class vbFeedElement(serializers.ModelSerializer):
                         'id': feed.child_obj_id,
                         'name': self.films[feed.child_obj_id]['name']
                     }
+                }
+            except Exception, e:
+                object_ = {}
+
+        elif feed.type == CAST_SUBSCRIBE:
+            try:
+                cast = Casts.objects.get(pk=feed.obj_id)
+                object_ = {
+                    'id': cast.id,
+                    'name': cast.title,
+                    'poster': cast.ce_cast_rel.first().get_photo_url() if cast.ce_cast_rel.first() else ''
                 }
             except Exception, e:
                 object_ = {}
