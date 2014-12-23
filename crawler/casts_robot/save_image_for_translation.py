@@ -11,7 +11,7 @@ from requests.exceptions import ConnectionError
 
 DEFAULT_TAG_IMAGE_SEARCH = " спорт "
 
-def get_one_google_image_by_query(query, default_tag = DEFAULT_TAG_IMAGE_SEARCH path=''):
+def get_one_google_image_by_query(query, default_tag = DEFAULT_TAG_IMAGE_SEARCH, path=''):
     BASE_URL = ''.join(['https://ajax.googleapis.com/ajax/services/search/images?',
     'v=1.0&q=',query,default_tag,'&start=%d'])
 
