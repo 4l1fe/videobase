@@ -63,6 +63,7 @@ PERSON_O = 'pers-o'
 USER_ASK = 'user-a'
 USER_FRIENDSHIP = 'user-f'
 SYS_ALL = 'sys-a'
+CAST_SUBSCRIBE = 'cast-s'
 
 FILM_NEWSLETTER = [FILM_RATE, FILM_SUBSCRIBE, FILM_COMMENT, FILM_O]
 
@@ -77,6 +78,7 @@ APP_FEED_TYPE = (
     (USER_ASK, u"Предложение дружить"),
     (USER_FRIENDSHIP, u"Юзеры друзья"),
     (SYS_ALL, u"Системное сообщение"),
+    (CAST_SUBSCRIBE, u"Подписка на трансляцию"),
 )
 
 APP_NOTIFICATION_TEMPLATE = {

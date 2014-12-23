@@ -5,6 +5,8 @@ from datetime import timedelta
 from django.utils import timezone
 
 from kombu import Queue, Producer
+from apps.users.constants import CAST_SUBSCRIBE
+from apps.users.models import Feed
 
 from videobase.celery import app
 from celery.utils import uuid
@@ -45,6 +47,9 @@ class CastsSubscribeView(APIView):
             if user_cast.subscribed is None:
                 user_cast.subscribed = timezone.now()
                 user_cast.save()
+
+                # Создание фида
+                Feed.objects.create(user=request.user, type=CAST_SUBSCRIBE, obj_id=cast.id)
 
                 # Отправка email о трансляции
                 delta_notify = cast.start - timedelta(minutes=APP_CASTS_START_NOTIFY)
@@ -93,7 +98,8 @@ class CastsSubscribeView(APIView):
             cast = Casts.objects.get(pk=cast_id)
             user_cast = UsersCasts.objects.get(user__id=request.user.id, cast=cast)
             user_cast.subscribed = None
-            
+            user_cast.save()
+            Feed.objects.filter(user=request.user, type=CAST_SUBSCRIBE, obj_id=cast.id).delete()
             return Response({}, status=status.HTTP_200_OK)
 
         except Casts.DoesNotExist:
