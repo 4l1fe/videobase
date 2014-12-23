@@ -84,7 +84,7 @@ def get_info_for_one_item(one_item_div):
         'embed_code': None,
         'value': link,
         'player': None,
-        'tag': 'hokey'
+        'tag': 'hockey'
     }
 
     streams.append(one_stream)
