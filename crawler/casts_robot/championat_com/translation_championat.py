@@ -69,6 +69,15 @@ def parse_translation_championat_com():
                 value = value_div.iframe.get('src')
 
                 #Create dict with information about translation
+
+                #Get tag
+                if championship == u'КХЛ':
+                    tag = 'hockey'
+                elif championship == u'Прочие':
+                    tag = 'sport'
+                else:
+                    tag = 'football'
+
                 translation_data = {
                     'title': title,
                     'date': timezone.datetime(year=current_year, month=int(date[1]), day=int(date[0]), hour=int(time[0]),
@@ -77,7 +86,7 @@ def parse_translation_championat_com():
                     'link': link,
                     'meta': {'championship': championship if championship else None},
                     'value': value,
-                    'tag': 'sport'
+                    'tag': tag
                 }
                 translation_list.append(translation_data)
             except Exception, e:

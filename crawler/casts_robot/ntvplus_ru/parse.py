@@ -83,6 +83,14 @@ def parse_ntv_plus_translation():
             'quality': quality,
         }
 
+        if u'хоккей' in type.lower():
+            tag = 'hockey'
+        elif u'чемпионат' in type.lower():
+            tag = 'footbal'
+        else:
+            tag = 'sport'
+
+
         translation_data = {
                 'title': name_translation,
                 'date': date,
@@ -92,7 +100,7 @@ def parse_ntv_plus_translation():
                 'embed_code': ' ',
                 'value': '',
                 'player': None,
-                'tag': 'sport'
+                'tag': tag
         }
 
         translations_list.append(translation_data)
