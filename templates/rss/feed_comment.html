@@ -1,0 +1,15 @@
+{% extends "rss/feed_base.html" %}
+
+{% block title %}комментарии{% endblock %}
+
+
+{% block feeditems %}
+    {% for comment in description %}
+        <item>
+            <title>{{ comment.user.profile.get_name }}, {{ comment.created|date:"Y-m-d H:i" }} </title>
+            <link>http://vsevi.ru/films/{{ comment.content.film_id }}/</link>
+            <description>{{ comment.text }}</description>
+            <pubDate>{{ date }}</pubDate>
+        </item>
+    {% endfor %}
+{% endblock %}

@@ -1,0 +1,9 @@
+{% if locations %}
+    {% if locations|length == 1 %}
+        <a href="http://vsevi.ru/films/{{ film.id }}/#{{ locations.0.id }}">{% if locations.0.price == 0 %}бесплатно{% else %}от {{ locations.0.price|stringformat:".0f" }} рублей без рекламы{% endif %}</a>
+    {% else %}
+        <a href="http://vsevi.ru/films/{{ film.id }}/#{{ locations.0.id }}">бесплатно</a>
+        или
+        <a href="http://vsevi.ru/films/{{ film.id }}/#{{ locations.1.id }}">от {{ locations.1.price|stringformat:".0f" }} рублей без рекламы</a>
+    {% endif %}
+{% endif %}

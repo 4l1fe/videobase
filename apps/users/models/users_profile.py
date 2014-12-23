@@ -36,7 +36,7 @@ class UsersProfile(models.Model):
         return u'[{0}] {1}'.format(self.id, self.user.username)
 
     def get_name(self):
-        return self.user.first_name
+        return self.user.first_name or self.user.username
 
     def generate_key(self):
         salt = '{0}_{1}'.format(sha.new(str(random.random())).hexdigest(), self.user.id)
