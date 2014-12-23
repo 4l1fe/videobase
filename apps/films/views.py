@@ -404,7 +404,7 @@ def calc_similar(film_id, actors, directors, genres, **kwargs):
     request = get_current_request()
     if request.user.is_authenticated():
         sql = """
-        "films"."id" NOT IN (SELECT "users_films"."film_id" FROM "users_films"
+        "films"."id" IN (SELECT "users_films"."film_id" FROM "users_films"
         WHERE "users_films"."user_id" = %s AND ("users_films"."status" = %s OR
         "users_films"."rating" IS NOT NULL))
         """
