@@ -9,10 +9,11 @@ import time
 import requests
 from requests.exceptions import ConnectionError
 
+DEFAULT_TAG_IMAGE_SEARCH = " спорт "
 
-def get_one_google_image_by_query(query, path=''):
-    BASE_URL = 'https://ajax.googleapis.com/ajax/services/search/images?'\
-    'v=1.0&q=' + query + '&start=%d'
+def get_one_google_image_by_query(query, default_tag = DEFAULT_TAG_IMAGE_SEARCH path=''):
+    BASE_URL = ''.join(['https://ajax.googleapis.com/ajax/services/search/images?',
+    'v=1.0&q=',query,default_tag,'&start=%d'])
 
     BASE_PATH = os.path.join(path, 'static/upload/castextras')
     if not os.path.exists(BASE_PATH):
