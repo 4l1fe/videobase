@@ -11,7 +11,6 @@ from apps.users.constants import (APP_SUBJECT_TO_RESTORE_EMAIL, APP_USER_ACTIVE_
                                   APP_SUBJECT_TO_CONFIRM_REGISTER, APP_USER_HASH_EMAIL, APP_USER_HASH_REGISTR)
 from utils.common import url_with_querystring
 
-
 class UsersProfileForm(forms.ModelForm):
     email = forms.EmailField(required=True)
     username = forms.CharField(required=True, max_length=30)
@@ -155,7 +154,9 @@ class CustomRegisterForm(forms.ModelForm):
                 'subject': APP_SUBJECT_TO_CONFIRM_REGISTER,
                 'tpl_name': 'mail/confirmation_register.html',
             }
-
+            del param_email['context']['user']['last_login']
+            del param_email['context']['user']['date_joined']
+            
             send_template_mail.apply_async(kwargs=param_email)
 
         return instance
